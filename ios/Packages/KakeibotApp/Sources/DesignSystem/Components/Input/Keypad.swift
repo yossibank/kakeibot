@@ -8,17 +8,20 @@ public struct Keypad: View {
 
     let calculator: AmountCalculator
     let accessories: [Accessory]
+    let maxKeyHeight: CGFloat
     let onDone: (() -> Void)?
     let onKey: (AmountCalculator.Key) -> Void
 
     public init(
         calculator: AmountCalculator,
         accessories: [Accessory] = [],
+        maxKeyHeight: CGFloat = 50,
         onDone: (() -> Void)? = nil,
         onKey: @escaping (AmountCalculator.Key) -> Void
     ) {
         self.calculator = calculator
         self.accessories = accessories
+        self.maxKeyHeight = maxKeyHeight
         self.onDone = onDone
         self.onKey = onKey
     }
@@ -86,7 +89,7 @@ private extension Keypad {
                 .foregroundStyle(accessory.isActive ? Palette.accentStrong : Palette.text)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity, minHeight: 40, idealHeight: 50, maxHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: 40, idealHeight: 50, maxHeight: maxKeyHeight)
                 .background(fill, in: shape)
                 .overlay {
                     shape
@@ -104,7 +107,7 @@ private extension Keypad {
             press(key)
         } label: {
             label(for: key, isActive: isActive)
-                .frame(maxWidth: .infinity, minHeight: 40, idealHeight: 50, maxHeight: 50)
+                .frame(maxWidth: .infinity, minHeight: 40, idealHeight: 50, maxHeight: maxKeyHeight)
                 .background(
                     background(for: key, isActive: isActive),
                     in: .rect(cornerRadius: corner.radius(16))

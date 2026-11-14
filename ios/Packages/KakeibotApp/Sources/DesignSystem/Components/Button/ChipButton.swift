@@ -155,14 +155,16 @@ private extension ChipButton {
     }
 }
 
-private extension ChipButton.Size {
+public extension ChipButton.Size {
     var height: CGFloat {
         switch self {
         case .regular: 34
         case .large: 40
         }
     }
+}
 
+private extension ChipButton.Size {
     var padding: CGFloat {
         switch self {
         case .regular: 12

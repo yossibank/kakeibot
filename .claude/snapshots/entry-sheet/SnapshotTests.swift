@@ -61,6 +61,24 @@ struct SnapshotTests {
 
         try Self.write(mini, to: "entry-mini-large.png")
 
+        let tallCases: [(String, CGSize, EntryDeck)] = [
+            ("entry-tall-expense", Self.tall, .amount),
+            ("entry-tall-date", Self.tall, .date),
+            ("entry-mini-date", Self.mini, .date),
+            ("entry-max-expense", Self.max, .amount)
+        ]
+
+        for (name, size, deck) in tallCases {
+            let tallModel = try await Self.model(.expense, digits: Self.smallDigits)
+
+            let tallView = EntrySheet(model: tallModel, deck: deck)
+                .frame(width: size.width, height: size.height)
+                .background(Color(uiColor: .systemBackground))
+                .environment(\.colorScheme, .light)
+
+            try Self.write(tallView, to: "\(name).png")
+        }
+
         let closedModel = try await Self.model(
             .expense,
             digits: Self.smallDigits
@@ -230,6 +248,7 @@ private extension SnapshotTests {
             isMemoActive: false,
             listening: listeningFlow,
             preview: VoiceReading(amount: 980, categoryId: category.id),
+            growth: 0,
             onSelect: { _ in },
             onMemo: {},
             onOpenItems: {},
@@ -261,6 +280,7 @@ private extension SnapshotTests {
             isMemoActive: false,
             listening: nil,
             preview: nil,
+            growth: 0,
             onSelect: { _ in },
             onMemo: {},
             onOpenItems: {},
@@ -470,6 +490,8 @@ private extension SnapshotTests {
     static let directory = "__OUT__"
     static let phone = CGSize(width: 393, height: 852)
     static let mini = CGSize(width: 375, height: 812)
+    static let tall = CGSize(width: 402, height: 874)
+    static let max = CGSize(width: 440, height: 956)
     static let narrow = CGSize(width: 320, height: 693)
 
     static let smallDigits: [AmountCalculator.Key] = [.digit(1), .digit(2), .doubleZero]

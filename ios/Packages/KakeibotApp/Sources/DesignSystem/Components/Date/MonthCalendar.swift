@@ -30,7 +30,7 @@ public struct MonthCalendar: View {
         let rows = Array(weeks.enumerated())
         let edge: Edge = movesForward ? .trailing : .leading
 
-        VStack(spacing: 8) {
+        VStack(spacing: Self.sectionSpacing) {
             HStack {
                 monthButton(systemImage: "chevron.left", months: -1)
 
@@ -50,7 +50,7 @@ public struct MonthCalendar: View {
                     Text(weekday.shortName)
                         .textFont(.caption2)
                         .foregroundStyle(Self.headerColor(for: weekday))
-                        .frame(maxWidth: .infinity, minHeight: 24)
+                        .frame(maxWidth: .infinity, minHeight: Self.weekdayHeight)
                 }
             }
 
@@ -74,6 +74,15 @@ public struct MonthCalendar: View {
     }
 }
 
+public extension MonthCalendar {
+    static func height(isCompact: Bool) -> CGFloat {
+        let rows = CGFloat(rowCount)
+        let cells = rows * cellHeight(isCompact: isCompact)
+        let gaps = (rows - 1) * rowSpacing(isCompact: isCompact)
+        return headerHeight + weekdayHeight + sectionSpacing * 2 + cells + gaps
+    }
+}
+
 private extension MonthCalendar {
     func monthButton(
         systemImage: String,
@@ -85,7 +94,7 @@ private extension MonthCalendar {
             Image(systemName: systemImage)
                 .sansFont(.small, weight: .semibold)
                 .foregroundStyle(Palette.subtext)
-                .frame(width: 44, height: 36)
+                .frame(width: 44, height: Self.headerHeight)
                 .contentShape(.rect)
         }
         .buttonStyle(.plain)
@@ -139,9 +148,12 @@ private extension MonthCalendar {
 private extension MonthCalendar {
     static let rowCount = 6
     static let swipeDistance: CGFloat = 50
+    static let headerHeight: CGFloat = 36
+    static let weekdayHeight: CGFloat = 24
+    static let sectionSpacing: CGFloat = 8
 
     var cellHeight: CGFloat {
-        isCompact ? 36 : 46
+        Self.cellHeight(isCompact: isCompact)
     }
 
     var dayWidth: CGFloat {
@@ -149,7 +161,7 @@ private extension MonthCalendar {
     }
 
     var rowSpacing: CGFloat {
-        isCompact ? 2 : 8
+        Self.rowSpacing(isCompact: isCompact)
     }
 
     var swipe: SwipeGesture {
@@ -177,6 +189,14 @@ private extension MonthCalendar {
 
     static func headerColor(for weekday: Weekday) -> Color {
         weekday.tint ?? Palette.subtext
+    }
+
+    static func cellHeight(isCompact: Bool) -> CGFloat {
+        isCompact ? 36 : 46
+    }
+
+    static func rowSpacing(isCompact: Bool) -> CGFloat {
+        isCompact ? 2 : 8
     }
 
     func move(months: Int) {
