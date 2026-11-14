@@ -8,12 +8,13 @@ struct EntryRecentTransfers: View {
     let onUse: (Entry) -> Void
 
     var body: some View {
-        EntryRecentRow(title: "最近の振替") {
+        EntryRecentRow(title: "最近の振替", rows: 1) {
             ForEach(transfers) { transfer in
                 EntryRecentCard(
                     title: model.wallet(transfer.walletId)?.name ?? "",
                     amount: transfer.amount,
                     detail: destination(transfer),
+                    isPinned: false,
                     onUse: {
                         onUse(transfer)
                     },

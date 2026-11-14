@@ -24,6 +24,37 @@ extension EntryModelTests {
     }
 
     @Test
+    func skipsRecentEntriesThatMatchTemplates() async throws {
+        let setup = try await TemplateSetup()
+        let template = try await setup.saveTemplate(name: "ランチ", amount: 980)
+
+        let same = EntryDraft(
+            type: .expense,
+            amount: 980,
+            date: setup.date,
+            categoryId: template.categoryId,
+            walletId: template.walletId,
+            memo: "社食"
+        )
+
+        let other = EntryDraft(
+            type: .expense,
+            amount: 220,
+            date: setup.date,
+            categoryId: template.categoryId,
+            walletId: template.walletId
+        )
+
+        _ = try await setup.database.saveEntry(same, at: Date())
+        _ = try await setup.database.saveEntry(other, at: Date())
+        let model = EntryModel(database: setup.database, date: setup.date)
+        await model.load()
+        await model.reloadCategories()
+
+        #expect(model.recentEntries.map(\.amount) == [220])
+    }
+
+    @Test
     func listsNoRecentEntriesForTransfers() async throws {
         let setup = try await Setup()
         _ = try await setup.saveEntry(amount: 980)

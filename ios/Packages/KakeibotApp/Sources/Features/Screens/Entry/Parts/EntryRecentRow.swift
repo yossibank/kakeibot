@@ -4,6 +4,7 @@ import SwiftUI
 
 struct EntryRecentRow<Content: View>: View {
     let title: String
+    let rows: Int
 
     @ViewBuilder let content: Content
 
@@ -15,14 +16,27 @@ struct EntryRecentRow<Content: View>: View {
                 .padding(.horizontal, 4)
 
             ScrollView(.horizontal) {
-                HStack(spacing: 8) {
+                LazyHGrid(rows: gridRows, spacing: 8) {
                     content
                 }
                 .padding(.vertical, 1)
             }
             .scrollIndicators(.hidden)
             .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            .fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+private extension EntryRecentRow {
+    var gridRows: [GridItem] {
+        let row = GridItem(
+            .fixed(EntryRecentCard<EmptyView>.height),
+            spacing: 8,
+            alignment: .leading
+        )
+
+        return Array(repeating: row, count: rows)
     }
 }
 
@@ -32,6 +46,7 @@ struct EntryRecentCard<Mark: View>: View {
     let title: String
     let amount: Int?
     let detail: String
+    let isPinned: Bool
     let onUse: () -> Void
 
     @ViewBuilder let mark: Mark
@@ -45,11 +60,19 @@ struct EntryRecentCard<Mark: View>: View {
                     mark
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(title)
-                            .textFont(.caption, weight: .bold)
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                        HStack(spacing: 4) {
+                            if isPinned {
+                                Image(systemName: "pin.fill")
+                                    .sansFont(.micro, weight: .bold)
+                                    .foregroundStyle(Palette.accent)
+                            }
+
+                            Text(title)
+                                .textFont(.caption, weight: .bold)
+                                .foregroundStyle(Palette.text)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
 
                         HStack(alignment: .firstTextBaseline, spacing: 8) {
                             Text(detail)
@@ -79,13 +102,15 @@ struct EntryRecentCard<Mark: View>: View {
     }
 }
 
+extension EntryRecentCard {
+    static var height: CGFloat {
+        48
+    }
+}
+
 private extension EntryRecentCard {
     static var maxWidth: CGFloat {
         240
-    }
-
-    static var height: CGFloat {
-        48
     }
 
     @ViewBuilder

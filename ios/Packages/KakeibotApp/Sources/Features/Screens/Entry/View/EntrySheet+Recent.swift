@@ -16,23 +16,16 @@ extension EntrySheet {
         } else {
             let templates = model.templates
             let entries = model.recentEntries
+            let count = templates.count + entries.count
 
-            if !templates.isEmpty || !entries.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    if !templates.isEmpty {
-                        EntryRecentRow(title: "テンプレート") {
-                            ForEach(templates) { template in
-                                templateCard(template)
-                            }
-                        }
+            if count > 0 {
+                EntryRecentRow(title: "よく使う", rows: min(count, 2)) {
+                    ForEach(templates) { template in
+                        templateCard(template)
                     }
 
-                    if !entries.isEmpty {
-                        EntryRecentRow(title: "最近の記録") {
-                            ForEach(entries) { entry in
-                                recentCard(entry)
-                            }
-                        }
+                    ForEach(entries) { entry in
+                        recentCard(entry)
                     }
                 }
             }
@@ -48,6 +41,7 @@ private extension EntrySheet {
             title: template.name,
             amount: template.amount,
             detail: detail(category: category?.name, walletId: template.walletId),
+            isPinned: true,
             onUse: {
                 useTemplate(template)
             },
@@ -66,6 +60,7 @@ private extension EntrySheet {
             title: memo ?? category?.name ?? "",
             amount: entry.amount,
             detail: detail(category: named, walletId: entry.walletId),
+            isPinned: false,
             onUse: {
                 useRecent(entry)
             },
