@@ -5,6 +5,8 @@ import SwiftUI
 struct EntryTypeSwitch: View {
     @Binding var selection: Entry.Kind
 
+    @State private var tapCount = 0
+
     @Environment(\.themeStyle.corner) private var corner
 
     @Namespace private var face
@@ -15,7 +17,7 @@ struct EntryTypeSwitch: View {
                 key(kind)
             }
         }
-        .animation(.spring(duration: 0.35, bounce: 0.25), value: selection)
+        .animation(.spring(duration: 0.35, bounce: 0.25), value: tapCount)
     }
 }
 
@@ -66,11 +68,12 @@ private extension EntryTypeSwitch {
 
         return Button {
             selection = kind
+            tapCount += 1
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: symbol(of: kind))
                     .textFont(.caption2, weight: weight)
-                    .keyframeAnimator(initialValue: 1.0, trigger: selection) { content, scale in
+                    .keyframeAnimator(initialValue: 1.0, trigger: tapCount) { content, scale in
                         content
                             .scaleEffect(isSelected ? scale : 1)
                     } keyframes: { _ in
