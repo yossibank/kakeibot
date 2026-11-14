@@ -1,3 +1,4 @@
+import CloudKit
 import Core
 import DesignSystem
 import Features
@@ -261,6 +262,7 @@ extension AppModel {
         for metadata in shares {
             do {
                 try await SyncEngine.acceptShare(metadata)
+                notice.inform(Self.joinedMessage(for: metadata))
             } catch is CancellationError {
                 continue
             } catch {
@@ -316,9 +318,21 @@ extension AppModel {
 
 private extension AppModel {
     static let shareFailedMessage = "共有の口座に参加できませんでした"
+    static let shareJoinedMessage = "共有の口座に参加しました"
     static let widgetReloadDelay: Duration = .seconds(1)
     static let recurringFailedMessage = "固定費を自動で記録できませんでした"
     static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Sharing")
+
+    static func joinedMessage(for metadata: CKShare.Metadata) -> String {
+        guard
+            let title = metadata.share[CKShare.SystemFieldKey.title] as? String,
+            !title.isEmpty
+        else {
+            return shareJoinedMessage
+        }
+
+        return "「\(title)」に参加しました"
+    }
 
     func observeLook(in database: AppDatabase) async {
         await watch(database.themeLookUpdates()) { look in
