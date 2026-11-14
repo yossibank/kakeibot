@@ -9,6 +9,7 @@ struct EntryWalletDeck: View {
     @Environment(\.themeStyle.corner) private var corner
 
     @State private var isEditing = false
+    @State private var isBillOpen = false
 
     let role: Role
     let onChoose: (Wallet) -> Void
@@ -58,6 +59,9 @@ struct EntryWalletDeck: View {
         }
         .animation(.snappy, value: showsBills)
         .haptic(.selection, trigger: model.billMonth)
+        .onChange(of: model.walletId, initial: true) {
+            isBillOpen = model.billMonth != nil
+        }
     }
 }
 
@@ -70,23 +74,84 @@ extension EntryWalletDeck {
 
 private extension EntryWalletDeck {
     var billSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SectionTitle("請求")
+        let shape = RoundedRectangle(cornerRadius: corner.radius(16))
+        let ring = isBillOpen ? Palette.accent : Palette.line
 
-            HStack(spacing: 8) {
-                ForEach(model.billChoices) { choice in
-                    billButton(choice)
+        return VStack(alignment: .leading, spacing: 0) {
+            billHeader
+
+            if isBillOpen {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        ForEach(model.billChoices) { choice in
+                            billButton(choice)
+                        }
+                    }
+
+                    if let billNote {
+                        Text(billNote)
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 4)
+                    }
                 }
-            }
-
-            if let billNote {
-                Text(billNote)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 4)
+                .padding([.horizontal, .bottom], 8)
+                .transition(.opacity)
             }
         }
+        .background(Palette.panel.opacity(.strong), in: shape)
+        .overlay {
+            shape
+                .stroke(ring, lineWidth: 1)
+        }
+    }
+
+    var billHeader: some View {
+        Button {
+            withAnimation(.snappy) {
+                isBillOpen.toggle()
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "calendar")
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.accent)
+
+                if let date = model.selectedBillDate {
+                    Text("\(date.monthDayText) に引き落とし")
+                        .textFont(.subheadline, weight: .medium)
+                        .foregroundStyle(Palette.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+
+                if let shiftTitle {
+                    Text(shiftTitle)
+                        .textFont(.caption2, weight: .semibold)
+                        .foregroundStyle(Palette.accentStrong)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Palette.accent.opacity(.subtle), in: .capsule)
+                }
+
+                Spacer(minLength: 0)
+
+                if !isBillOpen {
+                    Text("変える")
+                        .textFont(.caption, weight: .semibold)
+                        .foregroundStyle(Palette.accent)
+                }
+
+                Image(systemName: isBillOpen ? "chevron.up" : "chevron.right")
+                    .textFont(.caption2, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+            }
+            .padding(.horizontal, 12)
+            .frame(minHeight: 44)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
     }
 
     var editBadge: some View {
@@ -212,6 +277,19 @@ private extension EntryWalletDeck {
 
     var editImage: String {
         isEditing ? "checkmark" : "pencil"
+    }
+
+    var shiftTitle: String? {
+        let choices = model.billChoices
+
+        guard
+            let chosen = choices.first(where: { $0.date == model.selectedBillDate }),
+            chosen.date != choices.first?.date
+        else {
+            return nil
+        }
+
+        return chosen.title
     }
 
     var billNote: String? {
