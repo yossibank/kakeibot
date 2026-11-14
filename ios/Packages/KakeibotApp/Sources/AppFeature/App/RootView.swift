@@ -129,7 +129,7 @@ private extension RootView {
             .task(id: model.observationID(model.syncActivity)) {
                 await model.syncChanges(in: database)
             }
-            .task(id: model.observationID(model.pendingShareCount)) {
+            .task(id: model.observationID(model.receivedShareCount)) {
                 await model.acceptShares(in: database)
             }
             .task {
