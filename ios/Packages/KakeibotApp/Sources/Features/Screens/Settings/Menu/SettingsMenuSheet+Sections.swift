@@ -131,13 +131,7 @@ extension SettingsMenuSheet {
             }
 
             if usesFun == false {
-                Hairline()
-
-                NavigationLink {
-                    RewardRuleListView(database: database)
-                } label: {
-                    row("ごほうび貯金を始める", systemImage: "gift")
-                }
+                SettingsMenuRewardStartRow(database: database)
             }
         }
     }
