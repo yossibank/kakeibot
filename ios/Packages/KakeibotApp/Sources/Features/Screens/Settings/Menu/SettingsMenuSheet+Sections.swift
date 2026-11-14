@@ -129,6 +129,10 @@ extension SettingsMenuSheet {
             } label: {
                 row("記録忘れの通知", systemImage: "bell", value: reminderText)
             }
+
+            if usesFun == false {
+                SettingsMenuRewardStartRow(database: database)
+            }
         }
     }
 
