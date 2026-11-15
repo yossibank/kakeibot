@@ -19,26 +19,10 @@ extension WidgetGuidePlace {
         }
     }
 
-    var abilities: [Ability] {
+    func abilities(for widget: WidgetGuideWidget) -> [Ability] {
         switch self {
         case .home:
-            [
-                Ability(
-                    systemImage: "gauge.with.needle",
-                    title: "あといくら",
-                    detail: "小は今月あといくら使えるかと今日の支出を出します。中は今週・今月の支出と次の固定費も出します"
-                ),
-                Ability(
-                    systemImage: "bolt",
-                    title: "すぐ記録",
-                    detail: "テンプレートを押すと、アプリを開かずに記録し、5 秒のあいだ取り消せます。大は今日の記録も出します"
-                ),
-                Ability(
-                    systemImage: "pencil",
-                    title: "金額を入れるもの",
-                    detail: "鉛筆の印のテンプレートは、入力シートを開いて金額を入れます"
-                )
-            ]
+            widget.abilities
 
         case .lockScreen:
             [
@@ -75,13 +59,14 @@ extension WidgetGuidePlace {
         }
     }
 
-    var steps: [String] {
+    func steps(for widget: WidgetGuideWidget, size: WidgetGuideSize) -> [String] {
         switch self {
         case .home:
             [
                 "ホーム画面の空いた所を長押しします",
                 "左上の「編集」から「ウィジェットを追加」を選びます",
-                "「かけいぼっと」を選び、置きたいものを選びます"
+                "「かけいぼっと」を選び、左右になぞって「\(widget.title)」の「\(size.title)」を出します",
+                "「ウィジェットを追加」を押します"
             ]
 
         case .lockScreen:

@@ -38,25 +38,18 @@ public struct WidgetGuideView: View {
                         CapsulePicker(selection: $place, options: Self.options, size: .wide)
 
                         if place == .home {
-                            samplePickers
+                            carousel
+                        } else {
+                            WidgetGuideStage(
+                                place: place,
+                                widget: widget,
+                                size: size
+                            )
+                            .id(place)
+                            .transition(.opacity)
                         }
-
-                        WidgetGuideStage(
-                            place: place,
-                            widget: widget,
-                            size: size
-                        )
-                        .id(place)
-                        .transition(.opacity)
                     }
                     .animation(.snappy, value: place)
-                    .animation(.snappy, value: widget)
-                    .animation(.snappy, value: size)
-                    .onChange(of: widget) {
-                        if !widget.sizes.contains(size) {
-                            size = .medium
-                        }
-                    }
 
                     abilities
 
@@ -82,27 +75,67 @@ private extension WidgetGuideView {
     static let options = WidgetGuidePlace.allCases.map { place in
         CapsulePicker<WidgetGuidePlace>.Option(place.title, value: place)
     }
-
-    static let widgetOptions = WidgetGuideWidget.allCases.map { widget in
-        CapsulePicker<WidgetGuideWidget>.Option(widget.title, value: widget)
-    }
 }
 
 private extension WidgetGuideView {
-    var sizeOptions: [CapsulePicker<WidgetGuideSize>.Option] {
-        widget.sizes.map { size in
-            CapsulePicker<WidgetGuideSize>.Option(size.title, value: size)
-        }
+    static let carouselMargin: CGFloat = 16
+
+    var sample: Binding<WidgetGuideSample?> {
+        Binding(
+            get: { WidgetGuideSample(widget: widget, size: size) },
+            set: { sample in
+                if let sample {
+                    widget = sample.widget
+                    size = sample.size
+                }
+            }
+        )
     }
-}
 
-private extension WidgetGuideView {
-    var samplePickers: some View {
-        HStack(spacing: 12) {
-            CapsulePicker(selection: $widget, options: Self.widgetOptions)
+    var carousel: some View {
+        VStack(spacing: 12) {
+            WidgetGuideStage(
+                place: .home,
+                widget: widget,
+                size: size
+            )
+            .padding(.horizontal, Self.carouselMargin)
+            .hidden()
+            .overlay {
+                GeometryReader { proxy in
+                    ScrollView(.horizontal) {
+                        HStack(alignment: .top, spacing: 8) {
+                            ForEach(WidgetGuideSample.all, id: \.self) { item in
+                                WidgetGuideStage(
+                                    place: .home,
+                                    widget: item.widget,
+                                    size: item.size
+                                )
+                                .frame(width: proxy.size.width - Self.carouselMargin * 2)
+                                .opacity(isCurrent(item) ? 1 : 0.35)
+                                .id(item)
+                            }
+                        }
+                        .scrollTargetLayout()
+                    }
+                    .scrollPosition(id: sample)
+                    .scrollTargetBehavior(.viewAligned)
+                    .contentMargins(.horizontal, Self.carouselMargin)
+                    .scrollIndicators(.hidden)
+                }
+            }
 
-            CapsulePicker(selection: $size, options: sizeOptions, size: .small)
-                .id(widget)
+            Text("\(widget.title)・\(size.title)")
+                .textFont(.subheadline, weight: .semibold)
+                .foregroundStyle(Palette.text)
+
+            HStack(spacing: 8) {
+                ForEach(WidgetGuideSample.all, id: \.self) { item in
+                    Circle()
+                        .fill(isCurrent(item) ? Palette.accent : Palette.line)
+                        .frame(width: 6, height: 6)
+                }
+            }
         }
     }
 
@@ -111,7 +144,7 @@ private extension WidgetGuideView {
             SettingsSectionTitle("できること")
 
             VStack(alignment: .leading, spacing: 12) {
-                ForEach(place.abilities, id: \.self) { ability in
+                ForEach(place.abilities(for: widget), id: \.self) { ability in
                     HStack(alignment: .top, spacing: 12) {
                         Image(systemName: ability.systemImage)
                             .sansFont(.small, weight: .medium)
@@ -140,11 +173,13 @@ private extension WidgetGuideView {
     }
 
     var steps: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let texts = place.steps(for: widget, size: size)
+
+        return VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle("置き方")
 
             VStack(alignment: .leading, spacing: 0) {
-                ForEach(Array(place.steps.enumerated()), id: \.offset) { index, text in
+                ForEach(Array(texts.enumerated()), id: \.offset) { index, text in
                     HStack(alignment: .top, spacing: 12) {
                         VStack(spacing: 0) {
                             Text("\(index + 1)")
@@ -154,7 +189,7 @@ private extension WidgetGuideView {
                                 .frame(width: 24, height: 24)
                                 .background(Palette.accent, in: Circle())
 
-                            if index < place.steps.count - 1 {
+                            if index < texts.count - 1 {
                                 Rectangle()
                                     .fill(Palette.outline)
                                     .frame(width: 1.5)
@@ -178,6 +213,10 @@ private extension WidgetGuideView {
             .padding(.bottom, 2)
             .card()
         }
+    }
+
+    func isCurrent(_ item: WidgetGuideSample) -> Bool {
+        item.widget == widget && item.size == size
     }
 }
 
