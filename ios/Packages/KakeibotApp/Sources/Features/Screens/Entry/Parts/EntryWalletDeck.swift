@@ -10,6 +10,8 @@ struct EntryWalletDeck: View {
 
     @State private var isEditing = false
     @State private var isBillOpen = false
+    @State private var isBillShown = false
+    @State private var scrollPosition = ScrollPosition()
 
     let role: Role
     let onChoose: (Wallet) -> Void
@@ -46,7 +48,7 @@ struct EntryWalletDeck: View {
                         }
                     }
 
-                    if showsBills {
+                    if isBillShown {
                         billSection
                             .transition(.opacity)
                     }
@@ -56,11 +58,23 @@ struct EntryWalletDeck: View {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .scrollPosition($scrollPosition)
         }
-        .animation(.snappy, value: showsBills)
         .haptic(.selection, trigger: model.billMonth)
-        .onChange(of: model.walletId, initial: true) {
+        .onChange(of: showsBills) {
+            withAnimation(.snappy) {
+                isBillShown = showsBills
+            }
+        }
+        .onChange(of: model.walletId, initial: true) { old, new in
             isBillOpen = model.billMonth != nil
+
+            guard old != new else {
+                isBillShown = showsBills
+                return
+            }
+
+            chooseBills()
         }
     }
 }
@@ -339,6 +353,20 @@ private extension EntryWalletDeck {
         switch role {
         case .source: return model.toWalletId
         case .destination: return model.walletId
+        }
+    }
+
+    func chooseBills() {
+        withAnimation(.snappy) {
+            isBillShown = showsBills
+        } completion: {
+            guard isBillShown else {
+                return
+            }
+
+            withAnimation(.snappy) {
+                scrollPosition.scrollTo(edge: .bottom)
+            }
         }
     }
 }
