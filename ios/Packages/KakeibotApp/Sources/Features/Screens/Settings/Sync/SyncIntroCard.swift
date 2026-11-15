@@ -2,6 +2,12 @@ import DesignSystem
 import SwiftUI
 
 struct SyncIntroCard: View {
+    private let flag: SettingsScreenFlag?
+
+    init(flag: SettingsScreenFlag? = nil) {
+        self.flag = flag
+    }
+
     var body: some View {
         SettingsIntroCard(
             systemImage: "icloud",
@@ -11,7 +17,8 @@ struct SyncIntroCard: View {
                 .init("person.2", "口座ごとに、ほかの人と共有できます"),
                 .init("iphone.and.arrow.forward", "機種変更しても、記録が残ります"),
                 .init("lock", "記録は暗号化して iCloud に置きます")
-            ]
+            ],
+            flag: flag
         )
     }
 }

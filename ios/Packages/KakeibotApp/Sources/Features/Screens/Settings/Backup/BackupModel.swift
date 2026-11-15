@@ -86,6 +86,10 @@ public extension BackupModel {
         return months < 12 ? "\(months) か月前" : "\(months / 12) 年前"
     }
 
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.backup, in: database)
+    }
+
     func loadSync() async {
         do {
             for try await activity in database.syncActivityUpdates() {

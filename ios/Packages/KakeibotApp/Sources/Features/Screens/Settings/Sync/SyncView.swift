@@ -10,20 +10,25 @@ public struct SyncView: View {
 
     @Environment(\.isPro) var isPro
 
+    @State private var hintFlag: SettingsScreenFlag
+
     @Environment(\.scenePhase) private var scenePhase
 
     public init(model: SyncModel) {
+        let hintFlag = model.hintFlag()
+
         _model = State(initialValue: model)
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: 16) {
-            SettingsBackHeader("同期と共有")
+            SettingsBackHeader("同期と共有", hint: hintFlag)
+
+            SyncIntroCard(flag: hintFlag)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
-                    SyncIntroCard()
-
                     VStack(alignment: .leading, spacing: 8) {
                         VStack(spacing: 0) {
                             HStack(spacing: 12) {

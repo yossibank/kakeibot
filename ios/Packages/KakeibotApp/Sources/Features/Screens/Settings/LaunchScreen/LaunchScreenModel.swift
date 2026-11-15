@@ -18,6 +18,10 @@ public final class LaunchScreenModel {
 }
 
 public extension LaunchScreenModel {
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.launchScreen, in: database)
+    }
+
     func load() async {
         do {
             screen = try await database.setting(.launchScreen)

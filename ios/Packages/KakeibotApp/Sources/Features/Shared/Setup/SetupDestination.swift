@@ -74,7 +74,7 @@ public struct SetupDestination: View {
             ThemeListView(database: database, appIcon: appIcon)
 
         case .appIcon:
-            AppIconListView(model: appIcon)
+            AppIconListView(model: appIcon, database: database)
 
         case .themeStyle:
             ThemeStyleTextView(model: ThemeStyleModel(database: database))
