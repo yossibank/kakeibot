@@ -61,11 +61,20 @@ struct EntryWalletDeck: View {
             .scrollPosition($scrollPosition)
         }
         .haptic(.selection, trigger: model.billMonth)
-        .onChange(of: showsBills, initial: true) { old, new in
-            changeBills(from: old, to: new)
+        .onChange(of: showsBills) {
+            withAnimation(.snappy) {
+                isBillShown = showsBills
+            }
         }
-        .onChange(of: model.walletId, initial: true) {
+        .onChange(of: model.walletId, initial: true) { old, new in
             isBillOpen = model.billMonth != nil
+
+            guard old != new else {
+                isBillShown = showsBills
+                return
+            }
+
+            chooseBills()
         }
     }
 }
@@ -347,17 +356,9 @@ private extension EntryWalletDeck {
         }
     }
 
-    func changeBills(
-        from old: Bool,
-        to new: Bool
-    ) {
-        guard old != new else {
-            isBillShown = new
-            return
-        }
-
+    func chooseBills() {
         withAnimation(.snappy) {
-            isBillShown = new
+            isBillShown = showsBills
         } completion: {
             guard isBillShown else {
                 return
