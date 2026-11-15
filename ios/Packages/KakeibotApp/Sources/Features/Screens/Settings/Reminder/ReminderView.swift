@@ -8,30 +8,35 @@ public struct ReminderView: View {
 
     @Environment(\.themeStyle.corner) var corner
 
+    @State private var hintFlag: SettingsScreenFlag
     @State private var isPickingTime = false
 
     @Environment(\.scenePhase) private var scenePhase
 
     public init(model: ReminderModel) {
+        let hintFlag = model.hintFlag()
+
         _model = State(initialValue: model)
+        _hintFlag = State(initialValue: hintFlag)
         _isPickingTime = State(initialValue: model.isCustom)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("記録忘れの通知")
+            SettingsBackHeader("記録忘れの通知", hint: hintFlag)
+
+            SettingsIntroCard(
+                systemImage: "bell",
+                headline: ("記録のない日だけ", "そっとお知らせします"),
+                notes: [
+                    .init("checkmark.circle", "記録か「支出なし」の日は届きません"),
+                    .init("repeat", recurringText)
+                ],
+                flag: hintFlag
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    SettingsIntroCard(
-                        systemImage: "bell",
-                        headline: ("記録のない日だけ", "そっとお知らせします"),
-                        notes: [
-                            .init("checkmark.circle", "記録か「支出なし」の日は届きません"),
-                            .init("repeat", recurringText)
-                        ]
-                    )
-
                     VStack(spacing: 12) {
                         hero
 

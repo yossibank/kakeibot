@@ -94,6 +94,10 @@ public extension ReminderModel {
         return authorization == .denied ? "許可が必要" : time.description
     }
 
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.reminder, in: database)
+    }
+
     func showPreview(on day: Weekday) {
         previewDay = day
     }

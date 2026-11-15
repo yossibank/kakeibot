@@ -9,19 +9,23 @@ public struct BackupView: View {
     @State private var isImporting = false
     @State private var isConfirmingRestore = false
     @State private var pressed: String?
+    @State private var hintFlag: SettingsScreenFlag
 
     public init(model: BackupModel) {
+        let hintFlag = model.hintFlag()
+
         _model = State(initialValue: model)
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("バックアップ")
+            SettingsBackHeader("バックアップ", hint: hintFlag)
+
+            BackupIntroCard(flag: hintFlag)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    BackupIntroCard()
-
                     VStack(alignment: .leading, spacing: 8) {
                         SettingsSectionTitle("残す")
 

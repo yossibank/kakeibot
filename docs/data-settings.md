@@ -83,3 +83,10 @@ closed_hints に入る画面の名前は、次のとおり。
 - `homeSections`
 - `themeText`
 - `themeLook`
+- `reminder`
+- `monthStartDay`
+- `launchScreen`
+- `sync`
+- `backup`
+- `appIcons`
+- `widgetGuide`

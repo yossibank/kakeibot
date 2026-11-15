@@ -49,6 +49,10 @@ public extension MonthStartDayModel {
         return "\(PeriodText.weekdayDate(unshifted))を \(PeriodText.weekdayDate(start))にずらしています"
     }
 
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.monthStartDay, in: database)
+    }
+
     func load() async {
         do {
             startDay = try await database.setting(.monthStartDay)

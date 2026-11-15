@@ -2,6 +2,12 @@ import DesignSystem
 import SwiftUI
 
 struct BackupIntroCard: View {
+    private let flag: SettingsScreenFlag?
+
+    init(flag: SettingsScreenFlag? = nil) {
+        self.flag = flag
+    }
+
     var body: some View {
         SettingsIntroCard(
             systemImage: "doc.on.doc",
@@ -11,7 +17,8 @@ struct BackupIntroCard: View {
                 .init("icloud.and.arrow.up", "端末の iCloud バックアップにも含まれます"),
                 .init("tablecells", "記録は、表計算用にも書き出せます"),
                 .init("arrow.uturn.backward", "読み込む前のデータは退避します")
-            ]
+            ],
+            flag: flag
         )
     }
 }

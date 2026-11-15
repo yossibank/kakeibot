@@ -96,6 +96,10 @@ public extension SyncModel {
         }
     }
 
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.sync, in: database)
+    }
+
     func load() async {
         do {
             isOn = try await database.isSyncEnabled()

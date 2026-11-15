@@ -1,30 +1,38 @@
 import DesignSystem
+import Store
 import SwiftUI
 
 public struct AppIconListView: View {
     @Bindable private var model: AppIconListModel
+    @State private var hintFlag: SettingsScreenFlag
 
-    public init(model: AppIconListModel) {
+    public init(
+        model: AppIconListModel,
+        database: AppDatabase
+    ) {
+        let hintFlag = SettingsScreenFlag.closedHint(.appIcons, in: database)
+
         self.model = model
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("アプリアイコン")
+            SettingsBackHeader("アプリアイコン", hint: hintFlag)
+
+            SettingsIntroCard(
+                systemImage: "app.badge",
+                headline: ("ホーム画面のアイコンを", "好きな色にできます"),
+                notes: [
+                    .init("arrow.triangle.2.circlepath", "押すと、すぐに切り替わります"),
+                    .init("circle.lefthalf.filled", "ライト用とダーク用から選べます")
+                ],
+                flag: hintFlag
+            )
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    SettingsIntroCard(
-                        systemImage: "app.badge",
-                        headline: ("ホーム画面のアイコンを", "好きな色にできます"),
-                        notes: [
-                            .init("arrow.triangle.2.circlepath", "押すと、すぐに切り替わります"),
-                            .init("circle.lefthalf.filled", "ライト用とダーク用から選べます")
-                        ]
-                    )
-
                     section("ライト", isLight: true)
-
                     section("ダーク", isLight: false)
                 }
                 .padding(.vertical, 8)

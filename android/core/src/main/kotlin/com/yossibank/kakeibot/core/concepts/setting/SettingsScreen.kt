@@ -14,6 +14,13 @@ enum class SettingsScreen(
     homeSections("homeSections"),
     themeText("themeText"),
     themeLook("themeLook"),
+    reminder("reminder"),
+    monthStartDay("monthStartDay"),
+    launchScreen("launchScreen"),
+    sync("sync"),
+    backup("backup"),
+    appIcons("appIcons"),
+    widgetGuide("widgetGuide"),
     ;
 
     companion object {

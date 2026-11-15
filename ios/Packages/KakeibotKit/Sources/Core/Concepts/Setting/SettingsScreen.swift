@@ -10,4 +10,11 @@ public enum SettingsScreen: String, CaseIterable, Codable, Sendable {
     case homeSections
     case themeText
     case themeLook
+    case reminder
+    case monthStartDay
+    case launchScreen
+    case sync
+    case backup
+    case appIcons
+    case widgetGuide
 }

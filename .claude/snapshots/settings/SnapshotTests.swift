@@ -244,24 +244,44 @@ struct SnapshotTests {
             try Self.write(reminderView, variant: variant, to: "settings-reminder")
             try Self.write(monthStartView, variant: variant, to: "settings-month-start")
             try Self.write(budgetView, variant: variant, to: "settings-budgets")
-            try Self.write(WidgetGuideView(), variant: variant, to: "settings-widget-guide")
             try Self.write(
-                WidgetGuideView(place: .home, widget: .budget, size: .small),
+                WidgetGuideView(database: database),
+                variant: variant,
+                to: "settings-widget-guide"
+            )
+            try Self.write(
+                WidgetGuideView(
+                    database: database,
+                    place: .home,
+                    widget: .budget,
+                    size: .small
+                ),
                 variant: variant,
                 to: "settings-widget-guide-small"
             )
             try Self.write(
-                WidgetGuideView(place: .home, widget: .quickRecord, size: .large),
+                WidgetGuideView(
+                    database: database,
+                    place: .home,
+                    widget: .quickRecord,
+                    size: .large
+                ),
                 variant: variant,
                 to: "settings-widget-guide-large"
             )
             try Self.write(
-                WidgetGuideView(place: .lockScreen),
+                WidgetGuideView(
+                    database: database,
+                    place: .lockScreen
+                ),
                 variant: variant,
                 to: "settings-widget-guide-lock"
             )
             try Self.write(
-                WidgetGuideView(place: .control),
+                WidgetGuideView(
+                    database: database,
+                    place: .control
+                ),
                 variant: variant,
                 to: "settings-widget-guide-control"
             )

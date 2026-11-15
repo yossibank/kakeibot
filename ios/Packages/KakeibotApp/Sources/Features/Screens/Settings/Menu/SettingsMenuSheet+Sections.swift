@@ -151,7 +151,7 @@ extension SettingsMenuSheet {
             Hairline()
 
             NavigationLink {
-                AppIconListView(model: appIcon)
+                AppIconListView(model: appIcon, database: database)
             } label: {
                 row(
                     "アプリアイコン",
@@ -239,7 +239,7 @@ extension SettingsMenuSheet {
     var aboutSection: some View {
         section("このアプリについて") {
             NavigationLink {
-                WidgetGuideView()
+                WidgetGuideView(database: database)
             } label: {
                 row("ウィジェットの置き方", systemImage: "square.grid.2x2")
             }

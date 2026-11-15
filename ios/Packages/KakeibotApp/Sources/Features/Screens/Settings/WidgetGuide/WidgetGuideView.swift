@@ -1,33 +1,39 @@
 import DesignSystem
+import Store
 import SwiftUI
 
 public struct WidgetGuideView: View {
     @State private var place: WidgetGuidePlace
     @State private var widget: WidgetGuideWidget
     @State private var size: WidgetGuideSize
+    @State private var hintFlag: SettingsScreenFlag
 
-    public init() {
-        self.init(place: .home)
+    public init(database: AppDatabase) {
+        self.init(database: database, place: .home)
     }
 
     init(
+        database: AppDatabase,
         place: WidgetGuidePlace,
         widget: WidgetGuideWidget = .budget,
         size: WidgetGuideSize = .medium
     ) {
+        let hintFlag = SettingsScreenFlag.closedHint(.widgetGuide, in: database)
+
         _place = State(initialValue: place)
         _widget = State(initialValue: widget)
         _size = State(initialValue: size)
+        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("ウィジェットの置き方")
+            SettingsBackHeader("ウィジェットの置き方", hint: hintFlag)
+
+            WidgetGuideIntroCard(flag: hintFlag)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    WidgetGuideIntroCard()
-
                     VStack(spacing: 16) {
                         CapsulePicker(selection: $place, options: Self.options, size: .wide)
 
@@ -176,7 +182,9 @@ private extension WidgetGuideView {
 }
 
 #Preview {
-    NavigationStack {
-        WidgetGuideView()
+    if let database = try? AppDatabase.inMemory() {
+        NavigationStack {
+            WidgetGuideView(database: database)
+        }
     }
 }
