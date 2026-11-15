@@ -334,7 +334,7 @@ private extension RecordsModel {
 
     func makeDays() -> [EntryDay] {
         let days = list?.days.within(period) ?? []
-        let filtered = filter.apply(to: days)
+        let filtered = shownFilter.apply(to: days)
         let adjusted = adjustedDays(besides: filtered)
 
         guard !adjusted.isEmpty else {
@@ -358,7 +358,7 @@ private extension RecordsModel {
 
         let index = searchIndex ?? EntrySearchIndex(list)
         let matched = index.days(matching: search)
-        let shown = filter.apply(to: matched)
+        let shown = shownFilter.apply(to: matched)
         let isHidden = !filter.isEmpty && shown.isEmpty
 
         searchIndex = index

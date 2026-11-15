@@ -4,7 +4,7 @@ import Store
 extension EntryList {
     var filterCategories: [EntryCategory] {
         categories.values
-            .filter { $0.archivedAt == nil }
+            .filter { $0.archivedAt == nil && $0.walletId == nil }
             .sorted { lhs, rhs in
                 if lhs.kind != rhs.kind {
                     return lhs.kind == .expense
@@ -59,5 +59,51 @@ extension EntryList {
             .filter { !$0.isEmpty }
             .map { $0.joined(separator: "・") }
             .joined(separator: "｜")
+    }
+
+    func widened(_ filter: EntryFilter) -> EntryFilter {
+        var widened = filter
+        widened.categoryIds = sameCategoryIds(as: filter.categoryIds)
+        widened.tagIds = sameTagIds(as: filter.tagIds)
+        return widened
+    }
+}
+
+private extension EntryList {
+    struct SameKey: Hashable {
+        let kind: EntryCategory.Kind
+        let category: String
+        let tag: String?
+    }
+
+    func sameCategoryIds(as ids: Set<EntryCategory.ID>) -> Set<EntryCategory.ID> {
+        let keys = Set(ids.compactMap { categories[$0] }.map { key(of: $0) })
+
+        let same = categories.values
+            .filter { keys.contains(key(of: $0)) }
+            .map(\.id)
+
+        return ids.union(same)
+    }
+
+    func sameTagIds(as ids: Set<EntryTag.ID>) -> Set<EntryTag.ID> {
+        let keys = Set(ids.compactMap { tags[$0] }.compactMap { key(of: $0) })
+
+        let same = tags.values
+            .filter { key(of: $0).map(keys.contains) ?? false }
+            .map(\.id)
+
+        return ids.union(same)
+    }
+
+    func key(
+        of category: EntryCategory,
+        tag: String? = nil
+    ) -> SameKey {
+        SameKey(kind: category.kind, category: category.name, tag: tag)
+    }
+
+    func key(of tag: EntryTag) -> SameKey? {
+        categories[tag.categoryId].map { key(of: $0, tag: tag.name) }
     }
 }
