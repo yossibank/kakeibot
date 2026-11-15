@@ -7,6 +7,7 @@ struct WalletRowCard<Leading: View>: View {
     let kind: Wallet.Kind
     let amount: Int
     let caption: String?
+    let isShared: Bool
     let icon: Leading
 
     init(
@@ -14,12 +15,14 @@ struct WalletRowCard<Leading: View>: View {
         kind: Wallet.Kind,
         amount: Int,
         caption: String? = nil,
+        isShared: Bool = false,
         @ViewBuilder icon: () -> Leading
     ) {
         self.name = name
         self.kind = kind
         self.amount = amount
         self.caption = caption
+        self.isShared = isShared
         self.icon = icon()
     }
 
@@ -28,10 +31,16 @@ struct WalletRowCard<Leading: View>: View {
             icon
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(name)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .sharedTextScale()
+                HStack(spacing: 4) {
+                    Text(name)
+                        .textFont(.subheadline)
+                        .foregroundStyle(Palette.text)
+                        .sharedTextScale()
+
+                    if isShared {
+                        SharedMark()
+                    }
+                }
 
                 Text(kind.title)
                     .textFont(.caption2)

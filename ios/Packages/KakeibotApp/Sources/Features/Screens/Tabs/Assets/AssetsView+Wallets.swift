@@ -143,10 +143,16 @@ private extension AssetsView {
     }
 
     func walletName(_ row: AssetsModel.WalletRow) -> some View {
-        Text(row.wallet.name)
-            .textFont(.subheadline)
-            .foregroundStyle(Palette.text)
-            .sharedTextScale()
+        HStack(spacing: 4) {
+            Text(row.wallet.name)
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.text)
+                .sharedTextScale()
+
+            if model.list?.isShared(row.wallet) == true {
+                SharedMark()
+            }
+        }
     }
 
     func walletLabel(_ label: String) -> some View {

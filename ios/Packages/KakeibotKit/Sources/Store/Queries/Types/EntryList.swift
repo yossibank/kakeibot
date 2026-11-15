@@ -10,6 +10,7 @@ public struct EntryList: Sendable {
     public let icons: [Icon.ID: Icon]
     public let cardBills: [Recurring]
     public let items: [Entry.ID: [EntryItem]]
+    public let sharedWalletIds: Set<Wallet.ID>
     public let entries: [Entry]
     public let entriesByWallet: [Wallet.ID: [Entry]]
 
@@ -22,7 +23,8 @@ public struct EntryList: Sendable {
         adjustments: [Adjustment] = [],
         icons: [Icon.ID: Icon],
         cardBills: [Recurring] = [],
-        items: [Entry.ID: [EntryItem]] = [:]
+        items: [Entry.ID: [EntryItem]] = [:],
+        sharedWalletIds: Set<Wallet.ID> = []
     ) {
         self.days = days
         self.categories = categories
@@ -33,6 +35,7 @@ public struct EntryList: Sendable {
         self.icons = icons
         self.cardBills = cardBills
         self.items = items
+        self.sharedWalletIds = sharedWalletIds
         self.entries = days.flatMap(\.entries)
         self.entriesByWallet = Wallet.entriesByWallet(entries)
     }
@@ -52,10 +55,15 @@ extension EntryList: Equatable {
             && lhs.icons == rhs.icons
             && lhs.cardBills == rhs.cardBills
             && lhs.items == rhs.items
+            && lhs.sharedWalletIds == rhs.sharedWalletIds
     }
 }
 
 public extension EntryList {
+    func isShared(_ wallet: Wallet) -> Bool {
+        sharedWalletIds.contains(wallet.id)
+    }
+
     func balance(
         of wallet: Wallet,
         through date: LocalDate? = nil
@@ -90,6 +98,7 @@ public struct EntryOptions: Equatable, Sendable {
     public let icons: [Icon.ID: Icon]
     public let sharedCategories: [EntryCategory]
     public let sharedTags: [EntryTag]
+    public let sharedWalletIds: Set<Wallet.ID>
 
     public init(
         expenseCategories: [EntryCategory],
@@ -98,7 +107,8 @@ public struct EntryOptions: Equatable, Sendable {
         wallets: [Wallet],
         icons: [Icon.ID: Icon],
         sharedCategories: [EntryCategory] = [],
-        sharedTags: [EntryTag] = []
+        sharedTags: [EntryTag] = [],
+        sharedWalletIds: Set<Wallet.ID> = []
     ) {
         self.expenseCategories = expenseCategories
         self.incomeCategories = incomeCategories
@@ -107,5 +117,6 @@ public struct EntryOptions: Equatable, Sendable {
         self.icons = icons
         self.sharedCategories = sharedCategories
         self.sharedTags = sharedTags
+        self.sharedWalletIds = sharedWalletIds
     }
 }

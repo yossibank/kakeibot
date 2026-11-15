@@ -185,11 +185,17 @@ private extension EntryWalletDeck {
                     .foregroundStyle(isSelected ? Palette.accent : Palette.subtext)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(wallet.name)
-                        .textFont(.subheadline, weight: .medium)
-                        .foregroundStyle(isSelected ? Palette.accentStrong : Palette.text)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    HStack(spacing: 4) {
+                        Text(wallet.name)
+                            .textFont(.subheadline, weight: .medium)
+                            .foregroundStyle(isSelected ? Palette.accentStrong : Palette.text)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+
+                        if model.isShared(wallet) {
+                            SharedMark()
+                        }
+                    }
 
                     if let balance = model.balanceText(of: wallet) {
                         Text(balance)

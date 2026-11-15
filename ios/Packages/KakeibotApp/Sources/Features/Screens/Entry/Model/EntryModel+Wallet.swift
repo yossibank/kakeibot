@@ -109,6 +109,10 @@ public extension EntryModel {
         options?.icons[wallet.iconId]
     }
 
+    func isShared(_ wallet: Wallet) -> Bool {
+        options?.sharedWalletIds.contains(wallet.id) ?? false
+    }
+
     func wallet(_ id: Wallet.ID?) -> Wallet? {
         wallets.first { $0.id == id }
     }

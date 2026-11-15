@@ -74,6 +74,7 @@ private extension RecordsFilterSheet {
         let name: String
         let icon: Icon?
         let isOn: Bool
+        let isShared: Bool
         let toggle: () -> Void
     }
 
@@ -154,10 +155,16 @@ private extension RecordsFilterSheet {
             VStack(spacing: 8) {
                 IconBadge(item.icon, size: 34)
 
-                Text(item.name)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.text)
-                    .sharedTextScale()
+                HStack(spacing: 2) {
+                    Text(item.name)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.text)
+                        .sharedTextScale()
+
+                    if item.isShared {
+                        SharedMark()
+                    }
+                }
             }
             .frame(maxWidth: .infinity, minHeight: 72)
             .background(fill, in: shape)
@@ -272,7 +279,8 @@ private extension RecordsFilterSheet {
                 id: wallet.id,
                 name: wallet.name,
                 icon: list?.icons[wallet.iconId],
-                isOn: filter.walletIds.contains(wallet.id)
+                isOn: filter.walletIds.contains(wallet.id),
+                isShared: list?.isShared(wallet) == true
             ) {
                 toggle(wallet.id, in: \.walletIds)
             }
@@ -313,7 +321,8 @@ private extension RecordsFilterSheet {
                     id: category.id,
                     name: category.name,
                     icon: list?.icons[category.iconId],
-                    isOn: filter.categoryIds.contains(category.id)
+                    isOn: filter.categoryIds.contains(category.id),
+                    isShared: false
                 ) {
                     toggle(category.id, in: \.categoryIds)
                     keepShownTags()

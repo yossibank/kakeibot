@@ -62,6 +62,7 @@ extension AppDatabase {
         let icons = try byID(Icon.self, in: db)
         let cardBills = try cardBills(in: db)
         let items = includesItems ? try listItems(of: request, in: db) : [:]
+        let sharedWalletIds = try sharedWalletIds(in: db)
 
         return EntryList(
             days: days,
@@ -72,8 +73,14 @@ extension AppDatabase {
             adjustments: adjustments,
             icons: icons,
             cardBills: cardBills,
-            items: items
+            items: items,
+            sharedWalletIds: sharedWalletIds
         )
+    }
+
+    static func sharedWalletIds(in db: Database) throws -> Set<Wallet.ID> {
+        let ids = try Wallet.ID.fetchAll(db, sql: "SELECT wallet_id FROM sync_share")
+        return Set(ids)
     }
 }
 
@@ -111,6 +118,7 @@ private extension AppDatabase {
         let expenseCategories = categories.filter { $0.kind == .expense }
         let incomeCategories = categories.filter { $0.kind == .income }
         let icons = try byID(Icon.self, in: db)
+        let sharedWalletIds = try sharedWalletIds(in: db)
 
         return EntryOptions(
             expenseCategories: expenseCategories,
@@ -119,7 +127,8 @@ private extension AppDatabase {
             wallets: wallets,
             icons: icons,
             sharedCategories: sharedCategories,
-            sharedTags: sharedTags
+            sharedTags: sharedTags,
+            sharedWalletIds: sharedWalletIds
         )
     }
 
