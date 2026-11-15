@@ -1,4 +1,7 @@
 ・Fixed an issue where opening an invitation link to a shared wallet could fail to join it.
+・When you join a shared wallet, a notice now shows the name of the wallet you joined.
+・Fixed template icons and categories not showing in the entry sheet while a shared wallet is chosen.
+・Templates on Home now use wide cards that take up less space.
 ・Templates and recent records in the entry sheet are now combined into "Frequent", leaving more room for categories.
 ・The card bill month now fits in one row and opens only when you tap it.
 ・On tall iPhones, the entry sheet now fills the screen height and its keys are easier to tap.
