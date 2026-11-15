@@ -13,7 +13,7 @@ public struct TemplateListView: View {
 
     @State var grid = SettingsBoardGrid(
         columns: 1,
-        itemHeight: TemplateRowCard.height,
+        itemHeight: TemplateRowCard.Fit.fill.height,
         spacing: 12
     )
 
