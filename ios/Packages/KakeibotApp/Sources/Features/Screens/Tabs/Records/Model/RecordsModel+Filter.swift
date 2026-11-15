@@ -29,6 +29,10 @@ public extension RecordsModel {
 }
 
 extension RecordsModel {
+    var shownFilter: EntryFilter {
+        list?.widened(filter) ?? filter
+    }
+
     static func entryCount(in days: [EntryDay]) -> Int {
         days.reduce(0) { $0 + $1.entries.count }
     }
