@@ -85,18 +85,18 @@ private extension HomeView {
     }
 
     var templateShelf: some View {
-        let row = GridItem(.fixed(Self.tileHeight), spacing: 12, alignment: .leading)
-        let rows = Array(repeating: row, count: shelfRowCount)
-
-        return ScrollView(.horizontal) {
-            LazyHGrid(rows: rows, spacing: 12) {
-                ForEach(model.templates) { template in
-                    CappedWidthLayout(maxWidth: shelfCardWidth) {
-                        templateButton(template)
+        ScrollView(.horizontal) {
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(shelfRows.indices, id: \.self) { index in
+                    HStack(spacing: 12) {
+                        ForEach(shelfRows[index]) { template in
+                            CappedWidthLayout(maxWidth: shelfCardWidth) {
+                                templateButton(template)
+                            }
+                        }
                     }
                 }
             }
-            .scrollTargetLayout()
         }
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
@@ -104,7 +104,6 @@ private extension HomeView {
             shelfWidth = width - Self.shelfMargin * 2
         }
         .scrollIndicators(.hidden)
-        .scrollTargetBehavior(.viewAligned)
         .contentMargins(.horizontal, Self.shelfMargin, for: .scrollContent)
         .contentMargins(.vertical, 8, for: .scrollContent)
         .scrollClipDisabled()
@@ -133,7 +132,6 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let tileHeight = TemplateRowCard.Fit.hug.height
     static let shadowRoom: CGFloat = 32
     static let shelfMargin: CGFloat = 16
     static let toolStroke = Palette.accent.opacity(.muted)
@@ -143,8 +141,17 @@ private extension HomeView {
         .init("収入", value: .income)
     ]
 
-    var shelfRowCount: Int {
-        model.templates.count > 2 ? 2 : 1
+    var shelfRows: [[EntryTemplate]] {
+        let templates = model.templates
+
+        guard templates.count > 2 else {
+            return [templates]
+        }
+
+        let indexed = templates.enumerated()
+        let top = indexed.filter { $0.offset.isMultiple(of: 2) }.map(\.element)
+        let bottom = indexed.filter { !$0.offset.isMultiple(of: 2) }.map(\.element)
+        return [top, bottom]
     }
 
     var shelfCardWidth: CGFloat {
