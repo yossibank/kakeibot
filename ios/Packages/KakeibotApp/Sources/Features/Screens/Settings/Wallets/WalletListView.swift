@@ -251,7 +251,8 @@ private extension WalletListView {
             name: wallet.name,
             kind: wallet.kind,
             amount: model.balance(of: wallet),
-            caption: wallet.kind.role.balanceLabel(model.balance(of: wallet))
+            caption: wallet.kind.role.balanceLabel(model.balance(of: wallet)),
+            isShared: model.list?.isShared(wallet) == true
         ) {
             WalletRowIcon(icon: model.icon(for: wallet))
         }
