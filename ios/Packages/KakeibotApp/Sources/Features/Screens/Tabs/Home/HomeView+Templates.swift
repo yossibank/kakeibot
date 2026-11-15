@@ -101,18 +101,18 @@ private extension HomeView {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { width in
-            shelfWidth = width
+            shelfWidth = width - Self.shelfMargin * 2
         }
         .scrollIndicators(.hidden)
         .scrollTargetBehavior(.viewAligned)
-        .contentMargins(.horizontal, 16, for: .scrollContent)
+        .contentMargins(.horizontal, Self.shelfMargin, for: .scrollContent)
         .contentMargins(.vertical, 8, for: .scrollContent)
         .scrollClipDisabled()
         .mask {
             Rectangle()
                 .padding(.vertical, -Self.shadowRoom)
         }
-        .padding(.horizontal, -16)
+        .padding(.horizontal, -Self.shelfMargin)
         .padding(.vertical, -8)
     }
 
@@ -135,6 +135,7 @@ private extension HomeView {
 private extension HomeView {
     static let tileHeight = TemplateRowCard.Fit.hug.height
     static let shadowRoom: CGFloat = 32
+    static let shelfMargin: CGFloat = 16
     static let toolStroke = Palette.accent.opacity(.muted)
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
