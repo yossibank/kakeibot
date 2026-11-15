@@ -7,6 +7,7 @@ public struct HomeView: View {
     @Bindable var model: HomeModel
 
     @State var orderButtonFrame: CGRect = .zero
+    @State var shelfWidth: CGFloat = 0
 
     @State private var openId: Entry.ID?
     @State private var openStamp: StampCalendar.Tally?

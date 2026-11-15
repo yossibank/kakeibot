@@ -85,17 +85,23 @@ private extension HomeView {
     }
 
     var templateShelf: some View {
-        let row = GridItem(.fixed(Self.tileHeight), spacing: 12)
+        let row = GridItem(.fixed(Self.tileHeight), spacing: 12, alignment: .leading)
         let rows = Array(repeating: row, count: shelfRowCount)
 
         return ScrollView(.horizontal) {
             LazyHGrid(rows: rows, spacing: 12) {
                 ForEach(model.templates) { template in
-                    templateButton(template)
-                        .homeShelfWidth()
+                    CappedWidthLayout(maxWidth: shelfCardWidth) {
+                        templateButton(template)
+                    }
                 }
             }
             .scrollTargetLayout()
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            shelfWidth = width
         }
         .scrollIndicators(.hidden)
         .scrollTargetBehavior(.viewAligned)
@@ -118,7 +124,8 @@ private extension HomeView {
                 icon: model.icon(for: template),
                 name: template.name,
                 detail: model.detail(for: template),
-                amount: template.amount
+                amount: template.amount,
+                fit: .hug
             )
         }
         .buttonStyle(.plain)
@@ -126,7 +133,7 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let tileHeight = TemplateRowCard.height
+    static let tileHeight = TemplateRowCard.Fit.hug.height
     static let shadowRoom: CGFloat = 32
     static let toolStroke = Palette.accent.opacity(.muted)
 
@@ -138,12 +145,8 @@ private extension HomeView {
     var shelfRowCount: Int {
         model.templates.count > 2 ? 2 : 1
     }
-}
 
-private extension View {
-    func homeShelfWidth() -> some View {
-        containerRelativeFrame(.horizontal) { width, _ in
-            width * 0.85
-        }
+    var shelfCardWidth: CGFloat {
+        shelfWidth > 0 ? shelfWidth * 0.85 : .infinity
     }
 }
