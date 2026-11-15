@@ -7,6 +7,7 @@ public struct WidgetGuideView: View {
     @State private var widget: WidgetGuideWidget
     @State private var size: WidgetGuideSize
     @State private var hintFlag: SettingsScreenFlag
+    @State private var shownSample: WidgetGuideSample?
 
     public init(database: AppDatabase) {
         self.init(database: database, place: .home)
@@ -80,18 +81,6 @@ private extension WidgetGuideView {
 private extension WidgetGuideView {
     static let carouselMargin: CGFloat = 16
 
-    var sample: Binding<WidgetGuideSample?> {
-        Binding(
-            get: { WidgetGuideSample(widget: widget, size: size) },
-            set: { sample in
-                if let sample {
-                    widget = sample.widget
-                    size = sample.size
-                }
-            }
-        )
-    }
-
     var carousel: some View {
         VStack(spacing: 12) {
             WidgetGuideStage(
@@ -118,7 +107,16 @@ private extension WidgetGuideView {
                         }
                         .scrollTargetLayout()
                     }
-                    .scrollPosition(id: sample)
+                    .scrollPosition(id: $shownSample)
+                    .onAppear {
+                        shownSample = WidgetGuideSample(widget: widget, size: size)
+                    }
+                    .onChange(of: shownSample) {
+                        if let shownSample {
+                            widget = shownSample.widget
+                            size = shownSample.size
+                        }
+                    }
                     .scrollTargetBehavior(.viewAligned)
                     .contentMargins(.horizontal, Self.carouselMargin)
                     .scrollIndicators(.hidden)
