@@ -67,6 +67,9 @@ extension WhatsNewScene {
         case entrySlip
         case entryDeck
         case entryShortcuts
+        case padHome
+        case padReview
+        case padKeyboard
     }
 }
 
@@ -164,6 +167,9 @@ private extension WhatsNewScene {
 
         case .entrySlip, .entryDeck, .entryShortcuts:
             WhatsNewEntryScene(kind: kind)
+
+        case .padHome, .padReview, .padKeyboard:
+            WhatsNewPadScene(kind: kind)
         }
     }
 
