@@ -34,7 +34,10 @@ extension EntrySheet {
             proxy.size.height
         } action: { height in
             panelHeight = height
-            slipGrowth = slipGrowth(forPanel: height)
+
+            if !isEditingMemo {
+                slipGrowth = slipGrowth(forPanel: height)
+            }
         }
     }
 }
