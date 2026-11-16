@@ -48,9 +48,9 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        GeometryReader { _ in
+        GeometryReader { proxy in
             ZStack(alignment: .top) {
-                content
+                fittedContent(in: proxy.size.height)
                     .ignoresSafeArea(.keyboard)
                     .floatingInput(isPresented: isEditingMemo) {
                         editMemo(false)
@@ -278,6 +278,19 @@ private extension EntrySheet {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    @ViewBuilder
+    func fittedContent(in height: CGFloat) -> some View {
+        if height > 0, height < fitHeight {
+            ScrollView {
+                content
+                    .frame(height: fitHeight)
+            }
+            .scrollIndicators(.hidden)
+        } else {
+            content
+        }
+    }
+
     func sideButton(
         _ title: String,
         systemImage: String,
@@ -315,9 +328,14 @@ private extension EntrySheet {
 
 private extension EntrySheet {
     static let continueWidth: CGFloat = 64
+    static let fitBase: CGFloat = 692
 
     var bottomGap: CGFloat {
         bottomInset > 0 ? 20 : 8
+    }
+
+    var fitHeight: CGFloat {
+        Self.fitBase + bottomGap - bottomInset
     }
 
     var bannerBottom: CGFloat {
