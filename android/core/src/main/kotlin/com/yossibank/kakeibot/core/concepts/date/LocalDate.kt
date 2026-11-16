@@ -46,7 +46,6 @@ data class LocalDate private constructor(
 
     fun periodMonth(startingOn: MonthStartDay): YearMonth {
         val startMonth = startingOn.startMonth(ofPeriodContaining = this)
-
         return startingOn.periodMonth(startingIn = startMonth)
     }
 
@@ -54,19 +53,16 @@ data class LocalDate private constructor(
         val difference = weekday.daysSinceMonday - startingOn.daysSinceMonday
         val offset = (difference + 7) % 7
         val start = adding(days = -offset)
-
         return start..start.adding(days = 6)
     }
 
     internal fun period(startingOn: MonthStartDay): ClosedRange<LocalDate> {
         val startMonth = startingOn.startMonth(ofPeriodContaining = this)
-
         return startingOn.period(startingIn = startMonth)
     }
 
     override fun compareTo(other: LocalDate): Int {
         val monthOrder = yearMonth.compareTo(other.yearMonth)
-
         return if (monthOrder != 0) monthOrder else day.compareTo(other.day)
     }
 
@@ -138,7 +134,6 @@ data class LocalDate private constructor(
             val offset = timeZone.rules.getOffset(instant).totalSeconds
             val localSeconds = instant.epochSecond + offset
             val days = Math.floorDiv(localSeconds, SECONDS_PER_DAY).toInt()
-
             return ofDayNumber(unixEpochDayNumber + days)
         }
 
@@ -185,7 +180,6 @@ object LocalDateSerializer : KSerializer<LocalDate> {
 
     override fun deserialize(decoder: Decoder): LocalDate {
         val text = decoder.decodeString()
-
         return LocalDate.parse(text) ?: throw SerializationException("Invalid date: $text")
     }
 }

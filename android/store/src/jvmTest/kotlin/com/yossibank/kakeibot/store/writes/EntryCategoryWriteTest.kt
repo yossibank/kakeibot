@@ -207,13 +207,11 @@ class EntryCategoryWriteTest {
     ) {
         suspend fun category(named: String): EntryCategory {
             val list = database.categoryList()
-
             return assertNotNull(list.categories.firstOrNull { it.name == named })
         }
 
         suspend fun expenseCategories(): List<EntryCategory> {
             val list = database.categoryList()
-
             return list.categories.filter { it.kind == EntryCategory.Kind.expense }
         }
 

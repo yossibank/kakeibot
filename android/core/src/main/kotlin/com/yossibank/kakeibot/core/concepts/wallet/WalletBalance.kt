@@ -9,7 +9,6 @@ fun Wallet.Companion.repaid(
     balance: Long,
 ): Long {
     val remaining = maxOf(-balance, 0L)
-
     return minOf(maxOf(borrowed - remaining, 0L), borrowed)
 }
 
@@ -82,6 +81,5 @@ internal fun Wallet.change(entry: Entry): Long = when (entry.type) {
 private fun Wallet.transferChange(entry: Entry): Long {
     val outgoing = if (entry.walletId == id) -entry.amount.toLong() else 0L
     val incoming = if (entry.toWalletId == id) entry.amount.toLong() else 0L
-
     return outgoing + incoming
 }

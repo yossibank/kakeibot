@@ -181,7 +181,6 @@ class ShelfIconWriteTest {
     ) {
         suspend fun firstShelfIcon(): ShelfIcon {
             val shelf = database.iconShelf()
-
             return assertNotNull(shelf.shelfIcons.firstOrNull())
         }
 

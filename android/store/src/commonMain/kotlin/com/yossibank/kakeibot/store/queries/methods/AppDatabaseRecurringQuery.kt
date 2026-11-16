@@ -24,6 +24,5 @@ internal suspend fun AppDatabase.fetchRecurrings(
 ): List<Recurring> {
     val dao = recurringDao()
     val records = if (includingHidden) dao.inOrder() else dao.unarchivedInOrder()
-
     return records.map { it.decoded(RecurringRecord::recurring) }
 }

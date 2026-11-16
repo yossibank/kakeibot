@@ -11,7 +11,6 @@ import java.util.Locale
 
 fun EntryList.icon(of: EntryTemplate): Icon? {
     val category = categories[of.categoryId]
-
     return category?.let { icons[it.iconId] }
 }
 

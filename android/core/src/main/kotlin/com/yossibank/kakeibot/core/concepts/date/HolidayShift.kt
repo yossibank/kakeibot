@@ -58,7 +58,6 @@ object HolidayShiftSerializer : KSerializer<HolidayShift> {
 
     override fun deserialize(decoder: Decoder): HolidayShift {
         val text = decoder.decodeString()
-
         return HolidayShift.of(text) ?: throw SerializationException("Invalid holiday shift: $text")
     }
 }

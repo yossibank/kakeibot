@@ -11,7 +11,6 @@ repos:
         entry: ktlint --format --relative
         language: system
         types: [kotlin]
-        exclude: ^android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/Icon\.kt$
       - id: json-format
         name: JSON format
         entry: scripts/json-format.sh write

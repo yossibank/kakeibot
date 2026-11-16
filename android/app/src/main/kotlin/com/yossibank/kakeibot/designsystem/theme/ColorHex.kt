@@ -36,6 +36,5 @@ internal fun colorOf(
     lightOpacity: Float,
 ): Color {
     val alpha = if (isLight) lightOpacity else 1f
-
     return colorOf(rgb = rgb).copy(alpha = alpha)
 }

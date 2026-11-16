@@ -11,7 +11,6 @@ data class WidgetRecord(
     val text: String
         get() {
             val date = clearedNoSpendDate ?: return entryId.toString()
-
             return "$entryId,$date"
         }
 

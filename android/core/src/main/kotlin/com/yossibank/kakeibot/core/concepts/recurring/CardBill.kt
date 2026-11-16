@@ -33,7 +33,6 @@ data class CardBill(
         val length = period.start.days(until = period.endInclusive) + 1
         val passed = period.start.days(until = on) + 1
         val progress = passed.toDouble() / length.toDouble()
-
         return progress.coerceIn(0.0, 1.0)
     }
 

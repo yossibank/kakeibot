@@ -15,7 +15,6 @@ internal object ThemeHex {
 
     fun text(rgb: Int): String {
         val digits = rgb.toString(16).uppercase()
-
         return "#" + digits.padStart(6, '0')
     }
 }

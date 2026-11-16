@@ -129,7 +129,6 @@ data class EntryDraft(
     private val destinationProblems: List<Problem>
         get() {
             val toWalletId = toWalletId ?: return listOf(Problem.missingDestination)
-
             return if (toWalletId == walletId) listOf(Problem.sameWallet) else emptyList()
         }
 

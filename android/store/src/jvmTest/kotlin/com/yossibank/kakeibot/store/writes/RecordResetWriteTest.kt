@@ -110,7 +110,6 @@ class RecordResetWriteTest {
 
         suspend fun count(source: String): Int {
             val row = database.rows("SELECT COUNT(*) AS count FROM $source").first()
-
             return (row["count"] as Long).toInt()
         }
 

@@ -9,6 +9,5 @@ fun ClosedRange<LocalDate>.weeks(startingOn: Weekday): List<List<LocalDate?>> {
     val filled = List<LocalDate?>(leading) { null } + days
     val trailing = (7 - filled.size % 7) % 7
     val cells = filled + List<LocalDate?>(trailing) { null }
-
     return cells.chunked(7)
 }

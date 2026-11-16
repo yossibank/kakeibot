@@ -158,7 +158,7 @@ data class Icon(
         discount("discount"),
         budget("budget"),
         store("store"),
-        contract("contract"),
+        `contract`("contract"),
         goal("goal"),
         target("target"),
         hourglass("hourglass"),
@@ -313,5 +313,6 @@ object GlyphSerializer : KSerializer<Icon.Glyph> {
         encoder.encodeString(value.rawValue)
     }
 
-    override fun deserialize(decoder: Decoder): Icon.Glyph = Icon.Glyph.known(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): Icon.Glyph =
+        Icon.Glyph.known(decoder.decodeString())
 }

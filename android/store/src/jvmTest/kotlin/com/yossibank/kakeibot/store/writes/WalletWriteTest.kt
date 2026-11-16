@@ -467,7 +467,6 @@ class WalletWriteTest {
     ) {
         suspend fun wallet(named: String): Wallet {
             val options = database.entryOptions()
-
             return assertNotNull(options.wallets.firstOrNull { it.name == named })
         }
 

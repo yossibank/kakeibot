@@ -258,7 +258,6 @@ class EntryTagWriteTest {
     ) {
         suspend fun category(named: String): EntryCategory {
             val list = database.categoryList()
-
             return assertNotNull(list.categories.firstOrNull { it.name == named })
         }
 
@@ -288,7 +287,6 @@ class EntryTagWriteTest {
         suspend fun foodTags(): List<EntryTag> {
             val food = category(named = "食費")
             val list = database.categoryList()
-
             return list.tags.filter { it.categoryId == food.id }
         }
 

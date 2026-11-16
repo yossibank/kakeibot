@@ -78,7 +78,6 @@ private val MonthOverview.widgetStart: LocalDate
         val start = minOf(monthStart, templateStart)
         val carryoverFrom = carryoverFrom ?: return start
         val carryoverStart = carryoverFrom.period(startingOn = monthStartDay).start
-
         return minOf(start, carryoverStart)
     }
 
