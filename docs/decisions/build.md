@@ -34,6 +34,18 @@
 | 理由 | Core を Kotlin に移すとき、iOS のどこに当たるかを追いやすい。`:core` は Android に頼らず、速くテストできる |
 | 却下 | 1 つのモジュールにまとめる |
 
+### Store のモジュール
+
+**決定：`:store` は Kotlin Multiplatform にし、JVM と Android を対象にする。**
+
+| 項目 | 内容 |
+| --- | --- |
+| 理由 | Room は、JVM 版と Android 版で DB を開く入口が違う。JVM のターゲットを残すと、テストは端末なしで速く走る |
+| 却下 | JVM だけのモジュール、Android のライブラリにして Robolectric でテストする |
+
+> [!IMPORTANT]
+> JVM だけのモジュールは、アプリの実行時に Room の Android 版が選ばれ、DB を開く所で落ちる。エミュレーターで確かめた。
+
 ## リポジトリ
 
 **決定：1 つにまとめる。**

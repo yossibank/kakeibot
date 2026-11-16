@@ -1,11 +1,36 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
 }
 
 kotlin {
     jvmToolchain(17)
+
+    jvm()
+
+    androidLibrary {
+        namespace = "com.yossibank.kakeibot.store"
+        compileSdk = 36
+        minSdk = 26
+    }
+
+    sourceSets {
+        commonMain.dependencies {
+            api(libs.room.runtime)
+
+            implementation(project(":core"))
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.sqlite.bundled)
+        }
+
+        jvmTest.dependencies {
+            implementation(libs.junit)
+            implementation(libs.kotlin.test.junit)
+            implementation(libs.kotlinx.coroutines.test)
+        }
+    }
 }
 
 room {
@@ -13,19 +38,11 @@ room {
 }
 
 dependencies {
-    implementation(project(":core"))
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.room.runtime)
-    implementation(libs.sqlite.bundled)
-
-    ksp(libs.room.compiler)
-
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
+    add("kspJvm", libs.room.compiler)
+    add("kspAndroid", libs.room.compiler)
 }
 
-tasks.test {
+tasks.named<Test>("jvmTest") {
     val fixtures = rootDir.resolve("../spec/fixtures")
 
     inputs.dir(fixtures).withPathSensitivity(PathSensitivity.RELATIVE)
