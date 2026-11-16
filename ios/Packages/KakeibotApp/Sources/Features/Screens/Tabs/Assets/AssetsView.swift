@@ -49,6 +49,8 @@ public struct AssetsView: View {
                 TwoColumnStack(spacing: 12) {
                     totalCard
 
+                    trendCard
+
                     if !model.upcomingBills.isEmpty {
                         billCard
                     }
@@ -132,6 +134,17 @@ private extension AssetsView {
         .card()
     }
 
+    var trendCard: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            CardHeader(model.showsNetWorth ? "純資産と推移" : "推移")
+
+            trendContent
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 16)
+        .card()
+    }
+
     var ownedCard: some View {
         walletGroup(
             "資産",
@@ -179,7 +192,11 @@ private extension AssetsView {
             if model.outlook.isShown {
                 outlookButton
             }
+        }
+    }
 
+    var trendContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
             if model.showsNetWorth {
                 netWorthRow
             }
