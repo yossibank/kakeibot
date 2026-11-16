@@ -61,20 +61,11 @@ struct EntryWalletDeck: View {
             .scrollPosition($scrollPosition)
         }
         .haptic(.selection, trigger: model.billMonth)
-        .onChange(of: showsBills) {
-            withAnimation(.snappy) {
-                isBillShown = showsBills
-            }
-        }
-        .onChange(of: model.walletId, initial: true) { old, new in
+        .onChange(of: model.walletId, initial: true) {
             isBillOpen = model.billMonth != nil
-
-            guard old != new else {
-                isBillShown = showsBills
-                return
-            }
-
-            chooseBills()
+        }
+        .onChange(of: billTrigger, initial: true) { old, new in
+            showBills(from: old, to: new)
         }
     }
 }
@@ -276,6 +267,11 @@ private extension EntryWalletDeck {
 }
 
 private extension EntryWalletDeck {
+    struct BillTrigger: Equatable {
+        let walletId: Wallet.ID?
+        let showsBills: Bool
+    }
+
     static let badgeSize: CGFloat = 20
 
     static let columns = [
@@ -289,6 +285,10 @@ private extension EntryWalletDeck {
 
     var showsBills: Bool {
         role == .source && !model.billChoices.isEmpty && !isEditing
+    }
+
+    var billTrigger: BillTrigger {
+        BillTrigger(walletId: model.walletId, showsBills: showsBills)
     }
 
     var editTitle: String {
@@ -356,17 +356,39 @@ private extension EntryWalletDeck {
         }
     }
 
-    func chooseBills() {
+    func showBills(
+        from old: BillTrigger,
+        to new: BillTrigger
+    ) {
+        guard old != new else {
+            isBillShown = new.showsBills
+            return
+        }
+
+        let isChosen = old.walletId != new.walletId
+
+        guard old.showsBills != new.showsBills else {
+            if isChosen, isBillShown {
+                scrollToBills()
+            }
+
+            return
+        }
+
         withAnimation(.snappy) {
-            isBillShown = showsBills
+            isBillShown = new.showsBills
         } completion: {
-            guard isBillShown else {
+            guard isChosen, isBillShown else {
                 return
             }
 
-            withAnimation(.snappy) {
-                scrollPosition.scrollTo(edge: .bottom)
-            }
+            scrollToBills()
+        }
+    }
+
+    func scrollToBills() {
+        withAnimation(.snappy) {
+            scrollPosition.scrollTo(edge: .bottom)
         }
     }
 }
