@@ -441,7 +441,12 @@ private extension StorePage {
     var artwork: some View {
         switch art {
         case let .phone(shot):
-            phone(shot, width: 360)
+            if canvas == .pad {
+                phone(shot, width: 410)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                phone(shot, width: 360)
+            }
 
         case let .fan(left, center, right, labels):
             fan(
