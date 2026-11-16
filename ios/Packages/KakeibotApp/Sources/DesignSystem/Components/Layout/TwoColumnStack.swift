@@ -5,15 +5,18 @@ public struct TwoColumnStack<Content: View>: View {
 
     let spacing: CGFloat
     let minWidth: CGFloat
+    let isLazy: Bool
     let content: Content
 
     public init(
         spacing: CGFloat,
         minWidth: CGFloat = 560,
+        isLazy: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.spacing = spacing
         self.minWidth = minWidth
+        self.isLazy = isLazy
         self.content = content()
     }
 
@@ -23,8 +26,12 @@ public struct TwoColumnStack<Content: View>: View {
                 TwoColumnLayout(spacing: spacing, minWidth: minWidth) {
                     content
                 }
-            } else {
+            } else if isLazy {
                 LazyVStack(alignment: .leading, spacing: spacing) {
+                    content
+                }
+            } else {
+                VStack(alignment: .leading, spacing: spacing) {
                     content
                 }
             }

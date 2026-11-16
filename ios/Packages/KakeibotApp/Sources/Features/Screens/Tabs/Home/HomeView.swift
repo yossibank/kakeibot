@@ -80,7 +80,11 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
-                TwoColumnStack(spacing: 12, minWidth: Self.twoColumnWidth) {
+                TwoColumnStack(
+                    spacing: 12,
+                    minWidth: Self.twoColumnWidth,
+                    isLazy: false
+                ) {
                     if setup.showsCard {
                         setupCard
                     }
