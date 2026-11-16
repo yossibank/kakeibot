@@ -206,7 +206,10 @@ class NotificationPlanTest {
                 shortages = listOf(shortage),
             )
 
-            val body = notifications.single { it.route is PlannedNotification.Route.Recurring && it.date == date("2026-11-05") }.body
+            val body = notifications.single {
+                it.route is PlannedNotification.Route.Recurring &&
+                    it.date == date("2026-11-05")
+            }.body
 
             assertEquals("今日は引き落としの日です。銀行が ¥3,000,000,000 足りません", body)
         }
@@ -234,7 +237,10 @@ class NotificationPlanTest {
             assertEquals(entry, PlannedNotification.Route.of(link = entry.link))
             assertEquals(recurring, PlannedNotification.Route.of(link = recurring.link))
             assertEquals(template, PlannedNotification.Route.of(link = template.link))
-            assertEquals(PlannedNotification.Route.NewTemplate, PlannedNotification.Route.of(link = "new-template"))
+            assertEquals(
+                PlannedNotification.Route.NewTemplate,
+                PlannedNotification.Route.of(link = "new-template"),
+            )
             assertNull(PlannedNotification.Route.of(link = "template/x"))
             assertNull(PlannedNotification.Route.of(link = "entry/2026-13-01"))
             assertNull(PlannedNotification.Route.of(link = "budget/1"))
@@ -256,7 +262,10 @@ class NotificationPlanTest {
             assertEquals(home, PlannedNotification.Route.of(url = homeURL))
             assertEquals(entry, PlannedNotification.Route.of(url = entryURL))
             assertEquals("kakeibot://new-template", newTemplateURL.toString())
-            assertEquals(PlannedNotification.Route.NewTemplate, PlannedNotification.Route.of(url = newTemplateURL))
+            assertEquals(
+                PlannedNotification.Route.NewTemplate,
+                PlannedNotification.Route.of(url = newTemplateURL),
+            )
             assertNull(PlannedNotification.Route.of(url = other))
         }
     }

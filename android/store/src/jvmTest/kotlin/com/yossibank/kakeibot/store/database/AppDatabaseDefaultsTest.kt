@@ -133,7 +133,9 @@ class AppDatabaseDefaultsTest {
         )
 
         database.insertShelfIfEmpty(now)
-        val shelfIcons = database.shelfIconDao().all().map { it.decoded(ShelfIconRecord::shelfIcon) }
+        val shelfIcons = database.shelfIconDao().all().map {
+            it.decoded(ShelfIconRecord::shelfIcon)
+        }
 
         assertEquals(8, shelfIcons.size)
         assertTrue(shelfIcons.all { it.archivedAt != null })

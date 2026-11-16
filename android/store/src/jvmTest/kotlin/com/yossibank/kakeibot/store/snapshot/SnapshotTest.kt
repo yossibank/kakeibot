@@ -48,7 +48,10 @@ class SnapshotTest {
         val database = AppDatabase.inMemory()
         val export = export()
         val entries = export.data.entries
-        val invalid = export.data.copy(entries = listOf(entries[0].copy(amount = 0)) + entries.drop(1))
+        val invalid = export.data.copy(
+            entries =
+                listOf(entries[0].copy(amount = 0)) + entries.drop(1),
+        )
 
         database.replace(export.data)
 

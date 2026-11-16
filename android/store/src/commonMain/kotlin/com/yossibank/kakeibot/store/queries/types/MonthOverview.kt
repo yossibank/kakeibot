@@ -96,14 +96,16 @@ data class MonthOverview(
 
     val nextRecurringExpense: PeriodRecurring?
         get() = periodRecurrings.firstOrNull { item ->
-            item.recurring.type == Entry.Kind.expense && item.status == PeriodRecurring.Status.upcoming
+            item.recurring.type == Entry.Kind.expense &&
+                item.status == PeriodRecurring.Status.upcoming
         }
 
     fun expense(range: ClosedRange<LocalDate>): Long = list?.days?.within(range)?.expenseTotal ?: 0L
 
     fun moved(to: LocalDate): MonthOverview = copy(today = to)
 
-    private fun expense(on: LocalDate): Long = list?.days?.firstOrNull { it.date == on }?.expenseTotal ?: 0L
+    private fun expense(on: LocalDate): Long =
+        list?.days?.firstOrNull { it.date == on }?.expenseTotal ?: 0L
 
     private fun recurringTotal(
         type: Entry.Kind,

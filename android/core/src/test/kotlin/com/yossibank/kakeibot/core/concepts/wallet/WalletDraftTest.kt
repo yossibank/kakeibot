@@ -53,7 +53,8 @@ class WalletDraftTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<DraftCase> = CoreFixture.cases("wallet/wallet-draft.json", DraftCase.serializer())
+            fun cases(): List<DraftCase> =
+                CoreFixture.cases("wallet/wallet-draft.json", DraftCase.serializer())
         }
     }
 

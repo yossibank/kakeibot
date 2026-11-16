@@ -233,7 +233,9 @@ class LatestSchemaTest {
             .filter { it["origin"] != "pk" }
             .map { row ->
                 val indexName = row["name"] as String
-                val indexColumns = rows("PRAGMA index_info(`$indexName`)").map { it["name"] as String }
+                val indexColumns = rows("PRAGMA index_info(`$indexName`)").map {
+                    it["name"] as String
+                }
 
                 Index(
                     columns = indexColumns,
@@ -250,7 +252,8 @@ class LatestSchemaTest {
     }
 
     private fun iosSchema(): List<Table> {
-        val text = javaClass.getResource("/ios-schema.json")?.readText() ?: error("ios-schema.json が無い")
+        val text =
+            javaClass.getResource("/ios-schema.json")?.readText() ?: error("ios-schema.json が無い")
         val tables = Json.parseToJsonElement(text).jsonObject.getValue("tables").jsonArray
 
         return tables.map { element ->
@@ -281,7 +284,9 @@ class LatestSchemaTest {
                 .filter { !it.flag("partial") }
                 .map { index ->
                     Index(
-                        columns = index.getValue("columns").jsonArray.map { it.jsonPrimitive.content },
+                        columns = index.getValue("columns").jsonArray.map {
+                            it.jsonPrimitive.content
+                        },
                         unique = index.flag("unique"),
                     )
                 }
@@ -295,7 +300,8 @@ class LatestSchemaTest {
         }
     }
 
-    private fun JsonObject.array(key: String): List<JsonObject> = getValue(key).jsonArray.map(JsonElement::jsonObject)
+    private fun JsonObject.array(key: String): List<JsonObject> =
+        getValue(key).jsonArray.map(JsonElement::jsonObject)
 
     private fun JsonObject.string(key: String): String = getValue(key).jsonPrimitive.content
 

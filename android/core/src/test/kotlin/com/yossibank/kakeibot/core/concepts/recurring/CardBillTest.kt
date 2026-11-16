@@ -378,7 +378,13 @@ class CardBillTest {
         val card = wallet(kind = Wallet.Kind.card, balance = 0, at = now)
 
         val bill = CardBill(
-            recurring = recurring(from = bank.id, to = card.id, amount = 0, day = 26, closingDay = 15),
+            recurring = recurring(
+                from = bank.id,
+                to = card.id,
+                amount = 0,
+                day = 26,
+                closingDay = 15,
+            ),
             date = date("2026-11-26"),
             amount = 0,
             balanceBefore = 0,

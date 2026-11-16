@@ -92,6 +92,7 @@ object MonthStartDaySerializer : KSerializer<MonthStartDay> {
     override fun deserialize(decoder: Decoder): MonthStartDay {
         val day = decoder.decodeInt()
 
-        return MonthStartDay.of(day) ?: throw SerializationException("Invalid month start day: $day")
+        return MonthStartDay.of(day)
+            ?: throw SerializationException("Invalid month start day: $day")
     }
 }

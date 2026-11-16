@@ -77,10 +77,18 @@ data class EntryDraft(
         get() = when (type) {
             Entry.Kind.expense,
             Entry.Kind.income,
-            -> if (categoryId == null) listOf(Problem.missingCategory) else emptyList()
+            -> {
+                if (categoryId == null) listOf(Problem.missingCategory) else emptyList()
+            }
 
             Entry.Kind.transfer -> {
-                val categoryProblems = if (categoryId == null) emptyList() else listOf(Problem.categoryOnTransfer)
+                val categoryProblems = if (categoryId ==
+                    null
+                ) {
+                    emptyList()
+                } else {
+                    listOf(Problem.categoryOnTransfer)
+                }
 
                 categoryProblems + destinationProblems
             }

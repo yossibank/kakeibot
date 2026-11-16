@@ -81,9 +81,13 @@ data class ReviewPeriod private constructor(
             weekStart: Weekday,
         ): ReviewPeriod {
             val range = when (scale) {
-                Scale.week -> containing.week(startingOn = weekStart)
+                Scale.week -> {
+                    containing.week(startingOn = weekStart)
+                }
 
-                Scale.month -> containing.period(startingOn = monthStartDay)
+                Scale.month -> {
+                    containing.period(startingOn = monthStartDay)
+                }
 
                 Scale.year -> {
                     val month = containing.periodMonth(startingOn = monthStartDay)

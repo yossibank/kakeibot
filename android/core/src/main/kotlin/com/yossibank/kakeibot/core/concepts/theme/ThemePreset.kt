@@ -57,7 +57,7 @@ enum class ThemePreset(
     val palette: ThemePalette
         get() =
             when (this) {
-                white ->
+                white -> {
                     ThemePalette(
                         backgroundTop = 0xFFFFFF,
                         backgroundBottom = 0xF8F8FA,
@@ -72,7 +72,9 @@ enum class ThemePreset(
                         subtext = 0x63636B,
                         hint = 0x707078,
                     )
-                ivory ->
+                }
+
+                ivory -> {
                     ThemePalette(
                         backgroundTop = 0xF8F4EB,
                         backgroundBottom = 0xF2ECE0,
@@ -87,7 +89,9 @@ enum class ThemePreset(
                         subtext = 0x6B6152,
                         hint = 0x736959,
                     )
-                sky ->
+                }
+
+                sky -> {
                     ThemePalette(
                         backgroundTop = 0xEEF4FA,
                         backgroundBottom = 0xE7EEF6,
@@ -102,7 +106,9 @@ enum class ThemePreset(
                         subtext = 0x54627A,
                         hint = 0x5E6B84,
                     )
-                sage ->
+                }
+
+                sage -> {
                     ThemePalette(
                         backgroundTop = 0xEEF3EA,
                         backgroundBottom = 0xE7EEE2,
@@ -117,7 +123,9 @@ enum class ThemePreset(
                         subtext = 0x56685E,
                         hint = 0x5C6E63,
                     )
-                rose ->
+                }
+
+                rose -> {
                     ThemePalette(
                         backgroundTop = 0xF8EEEC,
                         backgroundBottom = 0xF4E7E4,
@@ -132,7 +140,9 @@ enum class ThemePreset(
                         subtext = 0x6E5559,
                         hint = 0x7C6266,
                     )
-                gold ->
+                }
+
+                gold -> {
                     ThemePalette(
                         backgroundTop = 0xF4E8C8,
                         backgroundBottom = 0xEDDDB3,
@@ -147,7 +157,9 @@ enum class ThemePreset(
                         subtext = 0x5E5240,
                         hint = 0x6A5D47,
                     )
-                black ->
+                }
+
+                black -> {
                     ThemePalette(
                         backgroundTop = 0x1D1D20,
                         backgroundBottom = 0x050506,
@@ -162,8 +174,13 @@ enum class ThemePreset(
                         subtext = 0x9A9CA3,
                         hint = 0x878A92,
                     )
-                navy -> ThemePalette.night
-                forest ->
+                }
+
+                navy -> {
+                    ThemePalette.night
+                }
+
+                forest -> {
                     ThemePalette(
                         backgroundTop = 0x143C32,
                         backgroundBottom = 0x04130E,
@@ -178,7 +195,9 @@ enum class ThemePreset(
                         subtext = 0x8FB0A3,
                         hint = 0x8AA498,
                     )
-                teal ->
+                }
+
+                teal -> {
                     ThemePalette(
                         backgroundTop = 0x0F3B44,
                         backgroundBottom = 0x04161A,
@@ -193,7 +212,9 @@ enum class ThemePreset(
                         subtext = 0x8FAEB3,
                         hint = 0x85A3A7,
                     )
-                wine ->
+                }
+
+                wine -> {
                     ThemePalette(
                         backgroundTop = 0x3A1220,
                         backgroundBottom = 0x12050A,
@@ -208,7 +229,9 @@ enum class ThemePreset(
                         subtext = 0xB39AA2,
                         hint = 0xA0858E,
                     )
-                plum ->
+                }
+
+                plum -> {
                     ThemePalette(
                         backgroundTop = 0x2C1A36,
                         backgroundBottom = 0x0D0712,
@@ -223,6 +246,7 @@ enum class ThemePreset(
                         subtext = 0xA99AB5,
                         hint = 0x958AA3,
                     )
+                }
             }
 
     companion object {

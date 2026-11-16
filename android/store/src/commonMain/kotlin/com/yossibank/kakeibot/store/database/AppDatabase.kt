@@ -137,18 +137,23 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
-internal fun RoomDatabase.Builder<AppDatabase>.configured(): AppDatabase = setDriver(BundledSQLiteDriver())
-    .setQueryCoroutineContext(Dispatchers.IO)
-    .addCallback(AppDatabaseChecks)
-    .build()
+internal fun RoomDatabase.Builder<AppDatabase>.configured(): AppDatabase =
+    setDriver(BundledSQLiteDriver())
+        .setQueryCoroutineContext(Dispatchers.IO)
+        .addCallback(AppDatabaseChecks)
+        .build()
 
-internal suspend fun <Result> AppDatabase.write(block: suspend PooledConnection.() -> Result): Result = useWriterConnection { connection ->
+internal suspend fun <Result> AppDatabase.write(
+    block: suspend PooledConnection.() -> Result,
+): Result = useWriterConnection { connection ->
     connection.immediateTransaction {
         block()
     }
 }
 
-internal suspend fun <Result> AppDatabase.read(block: suspend PooledConnection.() -> Result): Result = useReaderConnection { connection ->
+internal suspend fun <Result> AppDatabase.read(
+    block: suspend PooledConnection.() -> Result,
+): Result = useReaderConnection { connection ->
     connection.deferredTransaction {
         block()
     }

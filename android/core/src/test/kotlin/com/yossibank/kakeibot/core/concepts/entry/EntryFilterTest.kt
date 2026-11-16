@@ -73,8 +73,10 @@ class EntryFilterTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<FilterCase> = CoreFixture.cases("entry/entry-filter.json", FilterCase.serializer())
+        fun cases(): List<FilterCase> =
+            CoreFixture.cases("entry/entry-filter.json", FilterCase.serializer())
     }
 }
 
-private fun <Owner> identifier(text: String): Identifier<Owner> = Identifier.parse(text) ?: error("ID が読めない: $text")
+private fun <Owner> identifier(text: String): Identifier<Owner> =
+    Identifier.parse(text) ?: error("ID が読めない: $text")

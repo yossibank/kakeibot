@@ -95,7 +95,8 @@ private suspend fun AppDatabase.restore(
     entries: List<Entry>,
     at: Instant,
 ) {
-    val ordered = entries.filter { it.transferId == null } + entries.filter { it.transferId != null }
+    val ordered =
+        entries.filter { it.transferId == null } + entries.filter { it.transferId != null }
 
     for (original in ordered) {
         removeRecordedDuplicates(original)
@@ -112,7 +113,9 @@ private suspend fun AppDatabase.restore(
 
         entryDao().save(entry.record())
 
-        if (existing != null && (existing.walletId != entry.walletId || existing.toWalletId != entry.toWalletId)) {
+        if (existing != null &&
+            (existing.walletId != entry.walletId || existing.toWalletId != entry.toWalletId)
+        ) {
             touchItems(
                 of = listOf(entry.id),
                 at = at,

@@ -39,7 +39,8 @@ class ThemePaletteContrastTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<ContrastCase> = CoreFixture.cases("theme/theme-palette-contrast.json", ContrastCase.serializer())
+            fun cases(): List<ContrastCase> =
+                CoreFixture.cases("theme/theme-palette-contrast.json", ContrastCase.serializer())
         }
     }
 
@@ -66,7 +67,8 @@ class ThemePaletteContrastTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<ReadableCase> = CoreFixture.cases("theme/theme-palette-readable.json", ReadableCase.serializer())
+            fun cases(): List<ReadableCase> =
+                CoreFixture.cases("theme/theme-palette-readable.json", ReadableCase.serializer())
         }
     }
 

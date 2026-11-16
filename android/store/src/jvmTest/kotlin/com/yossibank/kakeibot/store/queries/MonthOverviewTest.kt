@@ -62,7 +62,6 @@ class MonthOverviewTest {
 
         database.setBudget(
             amount = 50000,
-
             categoryId = null,
             from = month,
         )
@@ -104,7 +103,6 @@ class MonthOverviewTest {
 
         database.setBudget(
             amount = 50000,
-
             categoryId = null,
             from = month,
         )
@@ -133,7 +131,6 @@ class MonthOverviewTest {
 
         database.setBudget(
             amount = 50000,
-
             categoryId = null,
             from = month,
         )
@@ -169,7 +166,6 @@ class MonthOverviewTest {
 
         database.setBudget(
             amount = 50000,
-
             categoryId = null,
             from = month,
         )
@@ -183,7 +179,6 @@ class MonthOverviewTest {
 
         database.setBudget(
             amount = 60000,
-
             categoryId = null,
             from = month,
         )
@@ -215,10 +210,25 @@ class MonthOverviewTest {
             today = today,
         )
 
-        assertEquals(listOf(PeriodRecurring.Status.upcoming), ungenerated.periodRecurrings.map { it.status })
+        assertEquals(
+            listOf(PeriodRecurring.Status.upcoming),
+            ungenerated.periodRecurrings.map {
+                it.status
+            },
+        )
         assertEquals(today, ungenerated.nextRecurringExpense?.date)
-        assertEquals(listOf(PeriodRecurring.Status.upcoming), neverGenerated.periodRecurrings.map { it.status })
-        assertEquals(listOf(PeriodRecurring.Status.missing), deleted.periodRecurrings.map { it.status })
+        assertEquals(
+            listOf(PeriodRecurring.Status.upcoming),
+            neverGenerated.periodRecurrings.map {
+                it.status
+            },
+        )
+        assertEquals(
+            listOf(PeriodRecurring.Status.missing),
+            deleted.periodRecurrings.map {
+                it.status
+            },
+        )
         assertNull(deleted.nextRecurringExpense)
     }
 
@@ -250,8 +260,18 @@ class MonthOverviewTest {
 
         assertEquals(listOf(billDate), overview.periodRecurrings.map { it.date })
         assertEquals(listOf(5000L), overview.periodRecurrings.map { it.amount })
-        assertEquals(listOf(PeriodRecurring.Status.upcoming), overview.periodRecurrings.map { it.status })
-        assertEquals(listOf(PeriodRecurring.Status.missing), moved.periodRecurrings.map { it.status })
+        assertEquals(
+            listOf(PeriodRecurring.Status.upcoming),
+            overview.periodRecurrings.map {
+                it.status
+            },
+        )
+        assertEquals(
+            listOf(PeriodRecurring.Status.missing),
+            moved.periodRecurrings.map {
+                it.status
+            },
+        )
 
         database.close()
     }

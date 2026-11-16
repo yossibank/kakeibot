@@ -46,6 +46,7 @@ class DateRangeWeeksTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<WeeksCase> = CoreFixture.cases("date/date-range-weeks.json", WeeksCase.serializer())
+        fun cases(): List<WeeksCase> =
+            CoreFixture.cases("date/date-range-weeks.json", WeeksCase.serializer())
     }
 }

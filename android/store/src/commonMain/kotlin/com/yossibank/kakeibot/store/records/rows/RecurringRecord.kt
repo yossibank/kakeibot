@@ -127,7 +127,9 @@ interface RecurringRecordDao {
     )
     suspend fun cardBill(walletId: String): RecurringRecord?
 
-    @Query("UPDATE recurring SET generated_until = :date WHERE id = :id AND generated_until IS NOT :date")
+    @Query(
+        "UPDATE recurring SET generated_until = :date WHERE id = :id AND generated_until IS NOT :date",
+    )
     suspend fun setGeneratedUntil(
         id: String,
         date: String,
@@ -163,7 +165,10 @@ fun Recurring.record(): RecurringRecord = RecurringRecord(
 fun RecurringRecord.recurring(): Recurring? {
     val id = Identifier.fromDatabaseValue<Recurring>(id) ?: return null
     val type = Entry.Kind.of(type) ?: return null
-    val categoryId = categoryId?.let { Identifier.fromDatabaseValue<EntryCategory>(it) ?: return null }
+    val categoryId = categoryId?.let {
+        Identifier.fromDatabaseValue<EntryCategory>(it)
+            ?: return null
+    }
     val walletId = Identifier.fromDatabaseValue<Wallet>(walletId) ?: return null
     val toWalletId = toWalletId?.let { Identifier.fromDatabaseValue<Wallet>(it) ?: return null }
     val frequency = Recurring.Frequency.of(frequency) ?: return null

@@ -98,7 +98,8 @@ suspend fun AppDatabase.setCategoryHidden(
     at: Instant,
 ) {
     write {
-        val category = findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
+        val category =
+            findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
 
         val updated = category.copy(
             archivedAt = if (isHidden) at else null,
@@ -113,7 +114,8 @@ suspend fun AppDatabase.deleteCategory(
     id: Identifier<EntryCategory>,
     at: Instant,
 ): Deletion = write {
-    val category = findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
+    val category =
+        findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
     val key = id.databaseValue
 
     if (entryDao().countOfCategory(key) > 0) {
@@ -122,7 +124,9 @@ suspend fun AppDatabase.deleteCategory(
 
     val tags = tagDao().ofCategory(key).map { it.decoded(EntryTagRecord::entryTag) }
     val recurrings = recurringDao().ofCategory(key).map { it.decoded(RecurringRecord::recurring) }
-    val templates = templateDao().ofCategory(key).map { it.decoded(EntryTemplateRecord::entryTemplate) }
+    val templates = templateDao().ofCategory(key).map {
+        it.decoded(EntryTemplateRecord::entryTemplate)
+    }
     val budgets = budgetDao().ofCategory(key).map { it.decoded(BudgetRecord::budget) }
 
     val deletion = Deletion(
@@ -173,7 +177,8 @@ private suspend fun AppDatabase.updateCategory(
     with: EntryCategoryDraft,
     at: Instant,
 ): EntryCategory {
-    val existing = findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
+    val existing =
+        findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
 
     val icon = iconDao().find(existing.iconId.databaseValue)?.decoded(IconRecord::icon)
         ?: throw CategoryWriteException(CategoryWriteError.iconNotFound)
@@ -199,7 +204,9 @@ private suspend fun AppDatabase.storeTags(
     categoryId: Identifier<EntryCategory>,
     at: Instant,
 ): List<EntryTag> {
-    val existing = tagDao().ofCategory(categoryId.databaseValue).map { it.decoded(EntryTagRecord::entryTag) }
+    val existing = tagDao().ofCategory(categoryId.databaseValue).map {
+        it.decoded(EntryTagRecord::entryTag)
+    }
     val names = drafts.map { it.name.trim() }
 
     if (names.toSet().size != names.size) {
@@ -260,7 +267,9 @@ private suspend fun AppDatabase.storeTags(
             return@mapIndexed tag
         }
 
-        val tag = existing.firstOrNull { it.id == id } ?: throw CategoryWriteException(CategoryWriteError.tagNotFound)
+        val tag =
+            existing.firstOrNull { it.id == id }
+                ?: throw CategoryWriteException(CategoryWriteError.tagNotFound)
 
         val saved = draft.applied(
             to = tag,

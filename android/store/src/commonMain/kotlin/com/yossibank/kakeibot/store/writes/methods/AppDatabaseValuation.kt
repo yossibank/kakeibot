@@ -39,7 +39,9 @@ suspend fun AppDatabase.saveValuation(
 }
 
 suspend fun AppDatabase.deleteValuation(id: Identifier<Valuation>): Deletion? = write {
-    val valuation = valuationDao().find(id.databaseValue)?.decoded(ValuationRecord::valuation) ?: return@write null
+    val valuation =
+        valuationDao().find(id.databaseValue)?.decoded(ValuationRecord::valuation)
+            ?: return@write null
 
     valuationDao().delete(id.databaseValue)
 

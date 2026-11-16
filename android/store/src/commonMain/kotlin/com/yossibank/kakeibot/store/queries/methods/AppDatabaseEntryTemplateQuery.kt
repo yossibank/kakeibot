@@ -9,16 +9,18 @@ import com.yossibank.kakeibot.store.records.rows.EntryTemplateRecord
 import com.yossibank.kakeibot.store.records.rows.entryTemplate
 import kotlinx.coroutines.flow.Flow
 
-fun AppDatabase.templateUpdates(includingHidden: Boolean = false): Flow<List<EntryTemplate>> = observation("template") {
-    fetchTemplates(includingHidden)
-}
+fun AppDatabase.templateUpdates(includingHidden: Boolean = false): Flow<List<EntryTemplate>> =
+    observation("template") {
+        fetchTemplates(includingHidden)
+    }
 
 suspend fun AppDatabase.templates(includingHidden: Boolean = false): List<EntryTemplate> = read {
     fetchTemplates(includingHidden)
 }
 
 private suspend fun AppDatabase.fetchTemplates(includingHidden: Boolean): List<EntryTemplate> {
-    val records = if (includingHidden) templateDao().inOrder() else templateDao().unarchivedInOrder()
+    val dao = templateDao()
+    val records = if (includingHidden) dao.inOrder() else dao.unarchivedInOrder()
 
     return records.map { it.decoded(EntryTemplateRecord::entryTemplate) }
 }

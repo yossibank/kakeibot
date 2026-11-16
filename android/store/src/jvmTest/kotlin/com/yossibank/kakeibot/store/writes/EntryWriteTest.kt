@@ -154,7 +154,13 @@ class EntryWriteTest {
         for (type in listOf(Entry.Kind.expense, Entry.Kind.income)) {
             val setup = Setup.make()
             val options = setup.database.entryOptions()
-            val categories = if (type == Entry.Kind.expense) options.expenseCategories else options.incomeCategories
+            val categories = if (type ==
+                Entry.Kind.expense
+            ) {
+                options.expenseCategories
+            } else {
+                options.incomeCategories
+            }
 
             val draft = setup.draft.copy(
                 type = type,

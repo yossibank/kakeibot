@@ -46,7 +46,8 @@ class EntryCategoryDraftTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<DraftCase> = CoreFixture.cases("category/entry-category-draft.json", DraftCase.serializer())
+            fun cases(): List<DraftCase> =
+                CoreFixture.cases("category/entry-category-draft.json", DraftCase.serializer())
         }
     }
 

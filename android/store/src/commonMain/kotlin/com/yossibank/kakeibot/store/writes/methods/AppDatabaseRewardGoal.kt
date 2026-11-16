@@ -34,7 +34,8 @@ suspend fun AppDatabase.saveRewardGoal(
         return@write goal
     }
 
-    val goal = findRewardGoal(editing) ?: throw RewardGoalWriteException(RewardGoalWriteError.goalNotFound)
+    val goal =
+        findRewardGoal(editing) ?: throw RewardGoalWriteException(RewardGoalWriteError.goalNotFound)
 
     val updated = draft.applied(
         to = goal,
@@ -52,7 +53,8 @@ suspend fun AppDatabase.setRewardGoalPurchased(
     at: Instant,
 ) {
     write {
-        val goal = findRewardGoal(id) ?: throw RewardGoalWriteException(RewardGoalWriteError.goalNotFound)
+        val goal =
+            findRewardGoal(id) ?: throw RewardGoalWriteException(RewardGoalWriteError.goalNotFound)
 
         if (isPurchased && goal.purchasedAt == null && currentRewardBalance() < goal.targetAmount) {
             throw RewardGoalWriteException(RewardGoalWriteError.shortOfBalance)

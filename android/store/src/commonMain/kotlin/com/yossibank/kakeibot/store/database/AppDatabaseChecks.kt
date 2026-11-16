@@ -139,7 +139,7 @@ internal object AppDatabaseChecks : RoomDatabase.Callback() {
         BEGIN
             SELECT RAISE(ABORT, '$message');
         END
-    """.trimIndent()
+        """.trimIndent()
 
     private fun List<String>.sqlList(): String = joinToString(
         separator = ", ",

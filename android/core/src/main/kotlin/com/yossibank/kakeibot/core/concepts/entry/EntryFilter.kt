@@ -13,10 +13,9 @@ data class EntryFilter(
     val isEmpty: Boolean
         get() = categoryIds.isEmpty() && walletIds.isEmpty() && tagIds.isEmpty()
 
-    fun includes(entry: Entry): Boolean =
-        includesCategory(entry) &&
-            includesWallet(entry) &&
-            includesTag(entry)
+    fun includes(entry: Entry): Boolean = includesCategory(entry) &&
+        includesWallet(entry) &&
+        includesTag(entry)
 
     fun apply(to: List<EntryDay>): List<EntryDay> {
         if (isEmpty) {

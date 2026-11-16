@@ -56,7 +56,9 @@ interface RewardGoalRecordDao {
     @Query("DELETE FROM reward_goal WHERE id = :id")
     suspend fun delete(id: String): Int
 
-    @Query("UPDATE reward_goal SET entry_id = NULL, updated_at = :updatedAt WHERE entry_id IN (:entryIds)")
+    @Query(
+        "UPDATE reward_goal SET entry_id = NULL, updated_at = :updatedAt WHERE entry_id IN (:entryIds)",
+    )
     suspend fun detach(
         entryIds: List<String>,
         updatedAt: String,

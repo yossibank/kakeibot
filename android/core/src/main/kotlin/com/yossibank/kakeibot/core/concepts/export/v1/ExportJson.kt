@@ -59,29 +59,35 @@ internal object ExportJson {
                 }
             }
 
-            is JsonArray -> appendContainer(
-                out = out,
-                open = '[',
-                close = ']',
-                items = element,
-                depth = depth,
-            ) { item ->
-                append(
+            is JsonArray -> {
+                appendContainer(
                     out = out,
-                    element = item,
-                    depth = depth + 1,
-                )
+                    open = '[',
+                    close = ']',
+                    items = element,
+                    depth = depth,
+                ) { item ->
+                    append(
+                        out = out,
+                        element = item,
+                        depth = depth + 1,
+                    )
+                }
             }
 
-            is JsonNull -> out.append("null")
+            is JsonNull -> {
+                out.append("null")
+            }
 
-            is JsonPrimitive -> if (element.isString) {
-                appendString(
-                    out = out,
-                    text = element.content,
-                )
-            } else {
-                out.append(element.content)
+            is JsonPrimitive -> {
+                if (element.isString) {
+                    appendString(
+                        out = out,
+                        text = element.content,
+                    )
+                } else {
+                    out.append(element.content)
+                }
             }
         }
     }
@@ -138,7 +144,8 @@ internal object ExportJson {
 internal class ExportRow(
     element: JsonElement,
 ) {
-    private val fields = element as? JsonObject ?: throw SerializationException("Expected an object")
+    private val fields =
+        element as? JsonObject ?: throw SerializationException("Expected an object")
 
     fun row(key: String): ExportRow = required(key) { ExportRow(it) }
 
@@ -160,22 +167,36 @@ internal class ExportRow(
 
     fun booleanOrNull(key: String): Boolean? = optional(key) { flag(it) }
 
-    fun instant(key: String): Instant = required(key) { parsed(it) { text -> InstantSerializer.parse(text) } }
+    fun instant(key: String): Instant = required(key) {
+        parsed(it) { text -> InstantSerializer.parse(text) }
+    }
 
-    fun instantOrNull(key: String): Instant? = optional(key) { parsed(it) { text -> InstantSerializer.parse(text) } }
+    fun instantOrNull(key: String): Instant? = optional(key) {
+        parsed(it) { text -> InstantSerializer.parse(text) }
+    }
 
-    fun <Owner> id(key: String): Identifier<Owner> = required(key) { parsed(it) { text -> Identifier.parse(text) } }
+    fun <Owner> id(key: String): Identifier<Owner> = required(key) {
+        parsed(it) { text -> Identifier.parse(text) }
+    }
 
     fun <Owner> idOrNull(key: String): Identifier<Owner>? =
         optional(key) { parsed(it) { text -> Identifier.parse(text) } }
 
-    fun date(key: String): LocalDate = required(key) { parsed(it) { text -> LocalDate.parse(text) } }
+    fun date(key: String): LocalDate = required(key) {
+        parsed(it) { text -> LocalDate.parse(text) }
+    }
 
-    fun dateOrNull(key: String): LocalDate? = optional(key) { parsed(it) { text -> LocalDate.parse(text) } }
+    fun dateOrNull(key: String): LocalDate? = optional(key) {
+        parsed(it) { text -> LocalDate.parse(text) }
+    }
 
-    fun month(key: String): YearMonth = required(key) { parsed(it) { text -> YearMonth.parse(text) } }
+    fun month(key: String): YearMonth = required(key) {
+        parsed(it) { text -> YearMonth.parse(text) }
+    }
 
-    fun monthOrNull(key: String): YearMonth? = optional(key) { parsed(it) { text -> YearMonth.parse(text) } }
+    fun monthOrNull(key: String): YearMonth? = optional(key) {
+        parsed(it) { text -> YearMonth.parse(text) }
+    }
 
     fun <T> raw(
         key: String,

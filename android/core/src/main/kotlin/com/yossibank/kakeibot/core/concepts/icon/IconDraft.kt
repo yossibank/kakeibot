@@ -50,9 +50,13 @@ data class IconDraft(
 
     private val markProblems: List<DraftProblem>
         get() = when (mark) {
-            is Mark.Glyph -> emptyList()
+            is Mark.Glyph -> {
+                emptyList()
+            }
 
-            is Mark.Emoji -> if (trimmed(mark.value).isEmpty()) listOf(DraftProblem.emptyMark) else emptyList()
+            is Mark.Emoji -> {
+                if (trimmed(mark.value).isEmpty()) listOf(DraftProblem.emptyMark) else emptyList()
+            }
 
             is Mark.Text -> {
                 val trimmed = trimmed(mark.value)
@@ -122,13 +126,12 @@ data class IconDraft(
 
         private fun trimmed(value: String): String = value.trim()
 
-        private fun isHexDigit(char: Char): Boolean =
-            char in '0'..'9' ||
-                char in 'a'..'f' ||
-                char in 'A'..'F' ||
-                char in '０'..'９' ||
-                char in 'Ａ'..'Ｆ' ||
-                char in 'ａ'..'ｆ'
+        private fun isHexDigit(char: Char): Boolean = char in '0'..'9' ||
+            char in 'a'..'f' ||
+            char in 'A'..'F' ||
+            char in '０'..'９' ||
+            char in 'Ａ'..'Ｆ' ||
+            char in 'ａ'..'ｆ'
 
         private fun characterCount(text: String): Int {
             val iterator = BreakIterator.getCharacterInstance()

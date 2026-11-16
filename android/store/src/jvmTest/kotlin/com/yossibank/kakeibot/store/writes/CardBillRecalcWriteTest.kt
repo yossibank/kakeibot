@@ -58,7 +58,12 @@ class CardBillRecalcWriteTest {
     @Test
     fun removesBillWhenUsageBecomesZero() = runTest {
         val setup = Setup.make(usage = listOf(10000))
-        val entry = assertNotNull(setup.database.snapshot().entries.firstOrNull { it.recurringId == null })
+        val entry = assertNotNull(
+            setup.database.snapshot().entries.firstOrNull {
+                it.recurringId ==
+                    null
+            },
+        )
 
         setup.database.deleteEntry(entry.id)
 
@@ -226,7 +231,12 @@ class CardBillRecalcWriteTest {
     @Test
     fun restoresBillRemovedWithAllUsage() = runTest {
         val setup = Setup.make(usage = listOf(10000))
-        val usage = assertNotNull(setup.database.snapshot().entries.firstOrNull { it.recurringId == null })
+        val usage = assertNotNull(
+            setup.database.snapshot().entries.firstOrNull {
+                it.recurringId ==
+                    null
+            },
+        )
 
         val deleted = setup.database.deleteEntries(listOf(usage.id))
         assertTrue(setup.bills().isEmpty())
@@ -268,7 +278,12 @@ class CardBillRecalcWriteTest {
             at = setup.now,
         )
 
-        val usage = assertNotNull(setup.database.snapshot().entries.firstOrNull { it.recurringId == null })
+        val usage = assertNotNull(
+            setup.database.snapshot().entries.firstOrNull {
+                it.recurringId ==
+                    null
+            },
+        )
 
         val previous = setup.database.changeEntries(
             listOf(usage.id),

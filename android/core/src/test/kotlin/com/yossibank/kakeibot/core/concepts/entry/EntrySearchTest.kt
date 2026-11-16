@@ -41,7 +41,8 @@ class EntrySearchTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<SearchCase> = CoreFixture.cases("entry/entry-search.json", SearchCase.serializer())
+            fun cases(): List<SearchCase> =
+                CoreFixture.cases("entry/entry-search.json", SearchCase.serializer())
         }
     }
 
@@ -72,7 +73,8 @@ class EntrySearchTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<RecentCase> = CoreFixture.cases("entry/entry-search-recent.json", RecentCase.serializer())
+            fun cases(): List<RecentCase> =
+                CoreFixture.cases("entry/entry-search-recent.json", RecentCase.serializer())
         }
     }
 

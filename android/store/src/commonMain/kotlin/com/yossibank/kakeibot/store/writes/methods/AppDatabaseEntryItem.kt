@@ -87,13 +87,15 @@ suspend fun AppDatabase.forgetItemName(
     }
 }
 
-internal suspend fun AppDatabase.fetchEntryItems(of: List<Identifier<Entry>>): List<EntryItem> = entryItemDao()
-    .ofEntries(of.map { it.databaseValue })
-    .map { it.decoded(EntryItemRecord::entryItem) }
+internal suspend fun AppDatabase.fetchEntryItems(of: List<Identifier<Entry>>): List<EntryItem> =
+    entryItemDao()
+        .ofEntries(of.map { it.databaseValue })
+        .map { it.decoded(EntryItemRecord::entryItem) }
 
-internal suspend fun AppDatabase.fetchEntryItems(of: Identifier<Entry>): List<EntryItem> = entryItemDao()
-    .ofEntry(of.databaseValue)
-    .map { it.decoded(EntryItemRecord::entryItem) }
+internal suspend fun AppDatabase.fetchEntryItems(of: Identifier<Entry>): List<EntryItem> =
+    entryItemDao()
+        .ofEntry(of.databaseValue)
+        .map { it.decoded(EntryItemRecord::entryItem) }
 
 internal suspend fun AppDatabase.saveItems(
     drafts: List<EntryItem.Draft>?,

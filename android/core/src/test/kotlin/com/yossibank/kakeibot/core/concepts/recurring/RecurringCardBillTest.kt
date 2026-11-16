@@ -52,7 +52,8 @@ class RecurringCardBillTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<PeriodCase> = CoreFixture.cases("recurring/card-bill-period.json", PeriodCase.serializer())
+            fun cases(): List<PeriodCase> =
+                CoreFixture.cases("recurring/card-bill-period.json", PeriodCase.serializer())
         }
     }
 
@@ -226,7 +227,12 @@ class RecurringCardBillTest {
         fun skipsPaymentIntoCard() {
             val bill = bill(closingDay = 15)
             val card = assertNotNull(bill.toWalletId)
-            val payment = entry(Entry.Kind.transfer, 45000, "2026-10-10", bill.walletId).copy(toWalletId = card)
+            val payment = entry(
+                Entry.Kind.transfer,
+                45000,
+                "2026-10-10",
+                bill.walletId,
+            ).copy(toWalletId = card)
 
             val entries = listOf(
                 payment,
@@ -247,8 +253,18 @@ class RecurringCardBillTest {
             val card = assertNotNull(bill.toWalletId)
             val october = date("2026-10-10")
             val november = date("2026-11-10")
-            val late = entry(Entry.Kind.expense, 3000, "2026-08-31", card).copy(billMonth = november.yearMonth)
-            val moved = entry(Entry.Kind.expense, 500, "2026-09-20", card).copy(billMonth = november.yearMonth)
+            val late = entry(
+                Entry.Kind.expense,
+                3000,
+                "2026-08-31",
+                card,
+            ).copy(billMonth = november.yearMonth)
+            val moved = entry(
+                Entry.Kind.expense,
+                500,
+                "2026-09-20",
+                card,
+            ).copy(billMonth = november.yearMonth)
 
             val entries = listOf(
                 late,
@@ -282,7 +298,12 @@ class RecurringCardBillTest {
             val card = assertNotNull(bill.toWalletId)
             val february = date("2027-03-01")
             val march = date("2027-03-29")
-            val moved = entry(Entry.Kind.expense, 500, "2027-01-20", card).copy(billMonth = YearMonth.parse("2027-02"))
+            val moved = entry(
+                Entry.Kind.expense,
+                500,
+                "2027-01-20",
+                card,
+            ).copy(billMonth = YearMonth.parse("2027-02"))
 
             val entries = listOf(
                 moved,
@@ -313,7 +334,12 @@ class RecurringCardBillTest {
                 count = 3,
             )
 
-            assertEquals(listOf("2026-09-10", "2026-10-10", "2026-11-10"), dates.map { it.toString() })
+            assertEquals(
+                listOf("2026-09-10", "2026-10-10", "2026-11-10"),
+                dates.map {
+                    it.toString()
+                },
+            )
         }
 
         @Test
@@ -364,7 +390,12 @@ class RecurringCardBillTest {
                 count = 3,
             )
 
-            assertEquals(listOf("2026-09-10", "2026-10-10", "2026-11-10"), dates.map { it.toString() })
+            assertEquals(
+                listOf("2026-09-10", "2026-10-10", "2026-11-10"),
+                dates.map {
+                    it.toString()
+                },
+            )
         }
 
         @Test

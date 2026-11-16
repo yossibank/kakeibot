@@ -47,7 +47,8 @@ class RepaymentPlanTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<PlanCase> = CoreFixture.cases("recurring/repayment-plan.json", PlanCase.serializer())
+            fun cases(): List<PlanCase> =
+                CoreFixture.cases("recurring/repayment-plan.json", PlanCase.serializer())
         }
     }
 

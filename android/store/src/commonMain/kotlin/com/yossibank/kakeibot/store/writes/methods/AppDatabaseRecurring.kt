@@ -43,7 +43,9 @@ suspend fun AppDatabase.saveRecurring(
     val change = CardBillChange()
 
     val recurring = if (editing != null) {
-        val current = findRecurring(editing) ?: throw RecurringWriteException(RecurringWriteError.recurringNotFound)
+        val current =
+            findRecurring(editing)
+                ?: throw RecurringWriteException(RecurringWriteError.recurringNotFound)
 
         val updated = draft.applied(
             to = current,
@@ -92,7 +94,9 @@ suspend fun AppDatabase.setRecurringHidden(
     at: Instant,
 ) {
     write {
-        val current = findRecurring(id) ?: throw RecurringWriteException(RecurringWriteError.recurringNotFound)
+        val current =
+            findRecurring(id)
+                ?: throw RecurringWriteException(RecurringWriteError.recurringNotFound)
 
         val generatedUntil = if (isHidden) {
             current.generatedUntil
@@ -314,7 +318,13 @@ private suspend fun AppDatabase.generateEntries(
     change: CardBillChange,
     at: Instant,
 ) {
-    val occurrences = if (of.archivedAt == null) of.pendingOccurrences(through = through) else emptyList()
+    val occurrences = if (of.archivedAt ==
+        null
+    ) {
+        of.pendingOccurrences(through = through)
+    } else {
+        emptyList()
+    }
 
     for (occurrence in occurrences) {
         generateEntry(

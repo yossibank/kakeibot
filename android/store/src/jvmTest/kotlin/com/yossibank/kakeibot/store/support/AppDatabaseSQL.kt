@@ -49,14 +49,15 @@ private fun SQLiteStatement.bind(arguments: List<Any?>) {
     }
 }
 
-private fun SQLiteStatement.row(): Map<String, Any?> = (0 until getColumnCount()).associate { index ->
-    val value = when {
-        isNull(index) -> null
-        getColumnType(index) == SQLITE_INTEGER -> getLong(index)
-        else -> getText(index)
-    }
+private fun SQLiteStatement.row(): Map<String, Any?> =
+    (0 until getColumnCount()).associate { index ->
+        val value = when {
+            isNull(index) -> null
+            getColumnType(index) == SQLITE_INTEGER -> getLong(index)
+            else -> getText(index)
+        }
 
-    getColumnName(index) to value
-}
+        getColumnName(index) to value
+    }
 
 private const val SQLITE_INTEGER = 1

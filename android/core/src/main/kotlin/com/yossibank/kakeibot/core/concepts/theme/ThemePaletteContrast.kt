@@ -4,7 +4,9 @@ import kotlin.math.pow
 
 val ThemePalette.unreadableRoles: List<ThemePalette.Role>
     get() = readableRoles.mapNotNull { (role, minimum) ->
-        val lowest = ThemePalette.surfaces.map { ThemePalette.contrast(this[role], this[it]) }.minOrNull() ?: 0.0
+        val lowest =
+            ThemePalette.surfaces.map { ThemePalette.contrast(this[role], this[it]) }.minOrNull()
+                ?: 0.0
 
         if (lowest < minimum) role else null
     }
@@ -58,5 +60,10 @@ private fun luminance(rgb: Int): Double {
         if (ratio <= 0.04045) ratio / 12.92 else linear.pow(2.4)
     }
 
-    return channels.zip(luminanceWeights) { channel, weight -> channel * weight }.fold(0.0) { sum, part -> sum + part }
+    return channels.zip(luminanceWeights) { channel, weight ->
+        channel * weight
+    }.fold(0.0) { sum, part ->
+        sum +
+            part
+    }
 }

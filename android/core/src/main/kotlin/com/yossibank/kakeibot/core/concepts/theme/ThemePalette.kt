@@ -71,21 +71,20 @@ data class ThemePalette(
         }
     }
 
-    operator fun get(role: Role): Int =
-        when (role) {
-            Role.backgroundTop -> backgroundTop
-            Role.backgroundBottom -> backgroundBottom
-            Role.panel -> panel
-            Role.cardTop -> cardTop
-            Role.cardBottom -> cardBottom
-            Role.line -> line
-            Role.accent -> accent
-            Role.accentDeep -> accentDeep
-            Role.accentStrong -> accentStrong
-            Role.text -> text
-            Role.subtext -> subtext
-            Role.hint -> hint
-        }
+    operator fun get(role: Role): Int = when (role) {
+        Role.backgroundTop -> backgroundTop
+        Role.backgroundBottom -> backgroundBottom
+        Role.panel -> panel
+        Role.cardTop -> cardTop
+        Role.cardBottom -> cardBottom
+        Role.line -> line
+        Role.accent -> accent
+        Role.accentDeep -> accentDeep
+        Role.accentStrong -> accentStrong
+        Role.text -> text
+        Role.subtext -> subtext
+        Role.hint -> hint
+    }
 
     companion object {
         val night = ThemePalette(

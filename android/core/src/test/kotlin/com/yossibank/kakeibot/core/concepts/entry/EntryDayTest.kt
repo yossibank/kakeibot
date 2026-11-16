@@ -110,4 +110,5 @@ class EntryDayTest(
     }
 }
 
-private fun <Owner> identifier(text: String): Identifier<Owner> = Identifier.parse(text) ?: error("ID が読めない: $text")
+private fun <Owner> identifier(text: String): Identifier<Owner> =
+    Identifier.parse(text) ?: error("ID が読めない: $text")

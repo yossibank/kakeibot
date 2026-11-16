@@ -345,7 +345,8 @@ private suspend fun AppDatabase.insertTemplates(now: Instant) {
         .filter { it.archivedAt == null }
         .sortedBy { it.sortOrder }
 
-    val wallet = wallets.firstOrNull { it.kind == Wallet.Kind.cash } ?: wallets.firstOrNull() ?: return
+    val wallet =
+        wallets.firstOrNull { it.kind == Wallet.Kind.cash } ?: wallets.firstOrNull() ?: return
 
     val categories = categoryDao().withoutWallet()
         .map { it.decoded(EntryCategoryRecord::entryCategory) }

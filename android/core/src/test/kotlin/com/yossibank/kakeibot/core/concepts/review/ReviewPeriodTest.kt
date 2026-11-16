@@ -71,6 +71,7 @@ class ReviewPeriodTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<PeriodCase> = CoreFixture.cases("review/review-period.json", PeriodCase.serializer())
+        fun cases(): List<PeriodCase> =
+            CoreFixture.cases("review/review-period.json", PeriodCase.serializer())
     }
 }

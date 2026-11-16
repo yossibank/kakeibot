@@ -15,8 +15,20 @@ data class RewardGoalDraft(
 
     val problems: List<DraftProblem>
         get() {
-            val nameProblems = if (trimmedName.isEmpty()) listOf(DraftProblem.emptyName) else emptyList()
-            val amountProblems = if (targetAmount > 0) emptyList() else listOf(DraftProblem.emptyAmount)
+            val nameProblems = if (trimmedName.isEmpty()) {
+                listOf(
+                    DraftProblem.emptyName,
+                )
+            } else {
+                emptyList()
+            }
+            val amountProblems = if (targetAmount >
+                0
+            ) {
+                emptyList()
+            } else {
+                listOf(DraftProblem.emptyAmount)
+            }
 
             return nameProblems + amountProblems
         }

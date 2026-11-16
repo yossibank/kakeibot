@@ -3,6 +3,7 @@ package com.yossibank.kakeibot.core.concepts.notification
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.core.concepts.recurring.Recurring as RecurringItem
 
 data class PlannedNotification(
     val key: String,
@@ -37,7 +38,7 @@ data class PlannedNotification(
         }
 
         data class Recurring(
-            val id: Identifier<com.yossibank.kakeibot.core.concepts.recurring.Recurring>,
+            val id: Identifier<RecurringItem>,
         ) : Route {
             override val link: String
                 get() = "recurring/$id"
@@ -70,8 +71,7 @@ data class PlannedNotification(
 
                 return when (parts[0]) {
                     "entry" -> LocalDate.parse(parts[1])?.let { Entry(it) }
-                    "recurring" -> Identifier.parse<com.yossibank.kakeibot.core.concepts.recurring.Recurring>(parts[1])
-                        ?.let { Recurring(it) }
+                    "recurring" -> Identifier.parse<RecurringItem>(parts[1])?.let { Recurring(it) }
                     "template" -> Identifier.parse<EntryTemplate>(parts[1])?.let { Template(it) }
                     else -> null
                 }

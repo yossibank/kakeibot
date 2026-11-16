@@ -42,7 +42,9 @@ class EntryItemTotalTest(
             EntryItem.Draft(
                 name = "品目",
                 amount = item.amount,
-                taxRate = item.taxRate?.let { AmountCalculator.TaxRate.of(it) ?: error("知らない率: $it") },
+                taxRate = item.taxRate?.let {
+                    AmountCalculator.TaxRate.of(it) ?: error("知らない率: $it")
+                },
             )
         }
 
@@ -90,6 +92,7 @@ class EntryItemTotalTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<TotalCase> = CoreFixture.cases("entry/entry-item-total.json", TotalCase.serializer())
+        fun cases(): List<TotalCase> =
+            CoreFixture.cases("entry/entry-item-total.json", TotalCase.serializer())
     }
 }

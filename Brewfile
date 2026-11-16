@@ -1,4 +1,5 @@
 brew "jq"
+brew "ktlint"
 brew "mint"
 brew "pre-commit"
 brew "xcbeautify"

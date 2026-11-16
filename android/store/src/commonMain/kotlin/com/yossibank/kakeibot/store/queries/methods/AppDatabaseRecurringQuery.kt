@@ -10,16 +10,20 @@ import com.yossibank.kakeibot.store.records.rows.recurring
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-fun AppDatabase.recurringUpdates(includingHidden: Boolean = false): Flow<List<Recurring>> = observation("recurring") {
-    fetchRecurrings(includingHidden)
-}.distinctUntilChanged()
+fun AppDatabase.recurringUpdates(includingHidden: Boolean = false): Flow<List<Recurring>> =
+    observation("recurring") {
+        fetchRecurrings(includingHidden)
+    }.distinctUntilChanged()
 
 suspend fun AppDatabase.recurrings(includingHidden: Boolean = false): List<Recurring> = read {
     fetchRecurrings(includingHidden)
 }
 
-internal suspend fun AppDatabase.fetchRecurrings(includingHidden: Boolean = false): List<Recurring> {
-    val records = if (includingHidden) recurringDao().inOrder() else recurringDao().unarchivedInOrder()
+internal suspend fun AppDatabase.fetchRecurrings(
+    includingHidden: Boolean = false,
+): List<Recurring> {
+    val dao = recurringDao()
+    val records = if (includingHidden) dao.inOrder() else dao.unarchivedInOrder()
 
     return records.map { it.decoded(RecurringRecord::recurring) }
 }

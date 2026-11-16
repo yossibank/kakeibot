@@ -73,6 +73,7 @@ class LoanPayoffTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<PayoffCase> = CoreFixture.cases("recurring/loan-payoff.json", PayoffCase.serializer())
+        fun cases(): List<PayoffCase> =
+            CoreFixture.cases("recurring/loan-payoff.json", PayoffCase.serializer())
     }
 }

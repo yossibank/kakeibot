@@ -51,5 +51,6 @@ internal object TabBarStyle {
 
     @Composable
     @ReadOnlyComposable
-    fun ring(hasDecorations: Boolean): Brush = if (hasDecorations) goldRing else SolidColor(Palette.outline)
+    fun ring(hasDecorations: Boolean): Brush =
+        if (hasDecorations) goldRing else SolidColor(Palette.outline)
 }

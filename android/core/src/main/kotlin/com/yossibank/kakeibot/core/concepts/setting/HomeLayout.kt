@@ -86,7 +86,8 @@ class HomeLayout private constructor(
         )
     }
 
-    override fun equals(other: Any?): Boolean = other is HomeLayout && order == other.order && hidden == other.hidden
+    override fun equals(other: Any?): Boolean =
+        other is HomeLayout && order == other.order && hidden == other.hidden
 
     override fun hashCode(): Int = 31 * order.hashCode() + hidden.hashCode()
 
@@ -106,7 +107,13 @@ class HomeLayout private constructor(
 
             return HomeLayout(
                 order = fullOrder,
-                hidden = if (allHidden.size < fullOrder.size) allHidden else allHidden - leading.toSet(),
+                hidden = if (allHidden.size <
+                    fullOrder.size
+                ) {
+                    allHidden
+                } else {
+                    allHidden - leading.toSet()
+                },
             )
         }
     }

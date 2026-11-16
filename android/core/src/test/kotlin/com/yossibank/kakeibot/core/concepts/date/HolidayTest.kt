@@ -41,7 +41,8 @@ class HolidayTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<YearCase> = CoreFixture.cases("date/holiday-dates.json", YearCase.serializer())
+            fun cases(): List<YearCase> =
+                CoreFixture.cases("date/holiday-dates.json", YearCase.serializer())
         }
     }
 

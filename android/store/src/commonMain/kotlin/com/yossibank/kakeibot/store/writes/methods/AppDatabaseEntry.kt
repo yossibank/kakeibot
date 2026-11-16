@@ -256,7 +256,9 @@ internal suspend fun AppDatabase.saveEntry(
 }
 
 internal suspend fun AppDatabase.clearNoSpendDay(on: LocalDate): List<NoSpendDay> {
-    val day = noSpendDayDao().find(on.databaseValue)?.decoded(NoSpendDayRecord::noSpendDay) ?: return emptyList()
+    val day =
+        noSpendDayDao().find(on.databaseValue)?.decoded(NoSpendDayRecord::noSpendDay)
+            ?: return emptyList()
 
     noSpendDayDao().delete(on.databaseValue)
 
@@ -305,7 +307,9 @@ internal suspend fun AppDatabase.findEntry(id: Identifier<Entry>): Entry? =
 
 internal suspend fun AppDatabase.fitCategory(entry: Entry): Entry {
     val categoryId = entry.categoryId ?: return entry
-    val category = categoryDao().find(categoryId.databaseValue)?.decoded(EntryCategoryRecord::entryCategory) ?: return entry
+    val category =
+        categoryDao().find(categoryId.databaseValue)?.decoded(EntryCategoryRecord::entryCategory)
+            ?: return entry
 
     if (category.walletId == null) {
         return entry
@@ -334,12 +338,17 @@ private suspend fun AppDatabase.canChange(
     to: EntryBatchChange,
 ): Boolean = when (to) {
     is EntryBatchChange.Category -> {
-        val category = categoryDao().find(to.id.databaseValue)?.decoded(EntryCategoryRecord::entryCategory)
+        val category = categoryDao().find(
+            to.id.databaseValue,
+        )?.decoded(EntryCategoryRecord::entryCategory)
 
         category?.kind?.rawValue == entry.type.rawValue
     }
 
-    is EntryBatchChange.Wallet -> entry.transferId == null && walletDao().exists(to.id.databaseValue)
+    is EntryBatchChange.Wallet -> {
+        entry.transferId == null &&
+            walletDao().exists(to.id.databaseValue)
+    }
 }
 
 private suspend fun AppDatabase.entry(

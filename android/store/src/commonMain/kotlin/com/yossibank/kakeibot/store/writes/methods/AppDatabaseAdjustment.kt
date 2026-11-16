@@ -40,7 +40,9 @@ suspend fun AppDatabase.saveAdjustment(
 }
 
 suspend fun AppDatabase.deleteAdjustment(id: Identifier<Adjustment>): Deletion? = write {
-    val adjustment = adjustmentDao().find(id.databaseValue)?.decoded(AdjustmentRecord::adjustment) ?: return@write null
+    val adjustment =
+        adjustmentDao().find(id.databaseValue)?.decoded(AdjustmentRecord::adjustment)
+            ?: return@write null
 
     adjustmentDao().delete(id.databaseValue)
 

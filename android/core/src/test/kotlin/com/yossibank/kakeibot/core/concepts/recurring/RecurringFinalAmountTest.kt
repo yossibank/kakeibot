@@ -84,7 +84,10 @@ class RecurringFinalAmountTest(
 
         assertEquals(fixture.endDate, recurring.finalDate)
         assertEquals(final ?: fixture.amount, recurring.scheduledAmount(paidOn = fixture.endDate))
-        assertEquals(fixture.amount, recurring.scheduledAmount(paidOn = fixture.startDate.adding(days = -1)))
+        assertEquals(
+            fixture.amount,
+            recurring.scheduledAmount(paidOn = fixture.startDate.adding(days = -1)),
+        )
     }
 
     private fun recurring(endDate: LocalDate?): Recurring {
@@ -109,7 +112,8 @@ class RecurringFinalAmountTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<FinalCase> = CoreFixture.cases("recurring/final-amount.json", FinalCase.serializer())
+        fun cases(): List<FinalCase> =
+            CoreFixture.cases("recurring/final-amount.json", FinalCase.serializer())
     }
 }
 
