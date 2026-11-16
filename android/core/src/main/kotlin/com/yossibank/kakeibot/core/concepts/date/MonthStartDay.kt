@@ -36,7 +36,6 @@ data class MonthStartDay private constructor(
         val start = date(startingIn)
         val nextMonth = startingIn.adding(months = 1)
         val end = date(nextMonth).adding(days = -1)
-
         return start..end
     }
 

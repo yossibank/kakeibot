@@ -31,7 +31,6 @@ internal object DateText {
     ): String {
         val text = value.toLong().absoluteValue.toString()
         val sign = if (value < 0) "-" else ""
-
         return sign + text.padStart(digits, '0')
     }
 

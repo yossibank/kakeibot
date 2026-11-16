@@ -109,7 +109,6 @@ fun Recurring.endDate(
 
 fun Recurring.scheduledAmount(paidOn: LocalDate): Int {
     val finalAmount = finalAmount ?: return amount
-
     return if (paidOn == finalDate) finalAmount else amount
 }
 

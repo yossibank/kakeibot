@@ -24,7 +24,6 @@ class HomeLayout private constructor(
         get() {
             val shown = visible.map { Slot.Section(it) }
             val hiddenSlots = order.filter(::isHidden).map { Slot.Section(it) }
-
             return shown + Slot.Boundary + hiddenSlots
         }
 

@@ -148,6 +148,5 @@ private fun Recurring.isBilled(
     period: ClosedRange<LocalDate>,
 ): Boolean {
     val month = entry.billMonth ?: return entry.date in period
-
     return month == occurrenceMonth(of = paidOn)
 }

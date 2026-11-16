@@ -21,6 +21,5 @@ suspend fun AppDatabase.templates(includingHidden: Boolean = false): List<EntryT
 private suspend fun AppDatabase.fetchTemplates(includingHidden: Boolean): List<EntryTemplate> {
     val dao = templateDao()
     val records = if (includingHidden) dao.inOrder() else dao.unarchivedInOrder()
-
     return records.map { it.decoded(EntryTemplateRecord::entryTemplate) }
 }

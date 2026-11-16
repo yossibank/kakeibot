@@ -10,7 +10,6 @@ import com.yossibank.kakeibot.core.concepts.recurring.title
 
 fun EntryList.title(of: Recurring): String? {
     val category = of.categoryId?.let { categories[it] }
-
     return of.title(categoryName = category?.name)
 }
 

@@ -40,7 +40,6 @@ data class RewardBank(
     fun rules(on: LocalDate): List<RewardRule> {
         val achieved = logs(on = on).map { it.ruleId }.toSet()
         val hidden = rules.filter { !it.isActive && it.id in achieved }
-
         return activeRules + hidden
     }
 
@@ -48,7 +47,6 @@ data class RewardBank(
 
     fun remaining(to: RewardGoal): Long {
         val shortfall = to.targetAmount - balance
-
         return maxOf(shortfall, 0L)
     }
 

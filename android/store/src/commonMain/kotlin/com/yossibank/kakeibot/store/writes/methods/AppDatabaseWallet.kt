@@ -212,6 +212,5 @@ private suspend fun AppDatabase.hasRecords(id: Identifier<Wallet>): Boolean {
     val hasEntries = entryDao().countOfWallet(key) > 0
     val hasRecurrings = recurringDao().countOfWallet(key) > 0
     val hasAdjustments = adjustmentDao().countOfWallet(key) > 0
-
     return hasEntries || hasRecurrings || hasAdjustments || hasValuations(id)
 }

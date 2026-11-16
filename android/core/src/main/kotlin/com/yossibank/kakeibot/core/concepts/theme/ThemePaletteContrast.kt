@@ -15,7 +15,6 @@ val ThemePalette.isLight: Boolean
     get() {
         val onBlack = ThemePalette.contrast(backgroundTop, 0x000000)
         val onWhite = ThemePalette.contrast(backgroundTop, 0xFFFFFF)
-
         return onBlack > onWhite
     }
 
@@ -27,7 +26,6 @@ fun ThemePalette.Companion.contrast(
     val secondLuminance = luminance(second)
     val lighter = maxOf(firstLuminance, secondLuminance)
     val darker = minOf(firstLuminance, secondLuminance)
-
     return (lighter + 0.05) / (darker + 0.05)
 }
 

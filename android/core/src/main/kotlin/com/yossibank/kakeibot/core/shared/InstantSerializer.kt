@@ -37,7 +37,6 @@ object InstantSerializer : KSerializer<Instant> {
 
     override fun deserialize(decoder: Decoder): Instant {
         val text = decoder.decodeString()
-
         return parse(text) ?: throw SerializationException("Invalid date: $text")
     }
 

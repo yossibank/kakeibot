@@ -45,7 +45,6 @@ class AppVersion private constructor(
         ): Boolean {
             val latestVersion = parse(latest) ?: return false
             val seenVersion = seen?.let(::parse) ?: return true
-
             return latestVersion > seenVersion
         }
     }

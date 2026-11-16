@@ -43,7 +43,6 @@ class IdentifierSerializer<Owner> : KSerializer<Identifier<Owner>> {
 
     override fun deserialize(decoder: Decoder): Identifier<Owner> {
         val text = decoder.decodeString()
-
         return Identifier.parse(text) ?: throw SerializationException("Invalid identifier: $text")
     }
 }

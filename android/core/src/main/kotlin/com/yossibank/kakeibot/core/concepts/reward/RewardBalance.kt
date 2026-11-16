@@ -8,7 +8,6 @@ object RewardBalance {
         val saved = logs.sumOf { it.amount.toLong() }
         val bought = goals.filter { it.purchasedAt != null }
         val spent = bought.sumOf { it.targetAmount.toLong() }
-
         return saved - spent
     }
 }

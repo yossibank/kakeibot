@@ -26,7 +26,6 @@ object Holiday {
     fun isDayOff(date: LocalDate): Boolean {
         val isWeekend = date.weekday == Weekday.saturday || date.weekday == Weekday.sunday
         val isYearEnd = (date.month == 12 && date.day == 31) || (date.month == 1 && date.day <= 3)
-
         return isWeekend || isYearEnd || contains(date)
     }
 
@@ -78,7 +77,6 @@ object Holiday {
     private fun isBetweenHolidays(date: LocalDate): Boolean {
         val previous = date.adding(days = -1)
         val next = date.adding(days = 1)
-
         return isNamed(previous) && isNamed(next)
     }
 
@@ -103,7 +101,6 @@ object Holiday {
     ): Int {
         val years = year - 1980
         val day = floor(base + 0.242194 * years)
-
         return day.toInt() - years / 4
     }
 }

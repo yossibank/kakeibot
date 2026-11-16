@@ -33,7 +33,6 @@ enum class Weekday(
 
         internal fun of(daysSinceMonday: Int): Weekday {
             val index = (daysSinceMonday % 7 + 7) % 7
-
             return entries[index]
         }
     }
@@ -54,7 +53,6 @@ object WeekdaySerializer : KSerializer<Weekday> {
 
     override fun deserialize(decoder: Decoder): Weekday {
         val text = decoder.decodeString()
-
         return Weekday.of(text) ?: throw SerializationException("Invalid weekday: $text")
     }
 }

@@ -33,7 +33,6 @@ data class YearMonth private constructor(
             val leapDayThisYear = if (month > 2 && isLeapYear) 1 else 0
             val commonDays = daysBeforeMonthInCommonYear[month - 1]
             val daysBeforeMonth = commonDays + leapDayThisYear
-
             return daysBeforeYear + daysBeforeMonth
         }
 
@@ -41,7 +40,6 @@ data class YearMonth private constructor(
         get() {
             val isFourth = year % 4 == 0
             val isCentury = year % 100 == 0
-
             return isFourth && (!isCentury || year % 400 == 0)
         }
 
@@ -60,7 +58,6 @@ data class YearMonth private constructor(
 
     fun period(startingOn: MonthStartDay): ClosedRange<LocalDate> {
         val startMonth = startingOn.startMonth(ofPeriodIn = this)
-
         return startingOn.period(startingIn = startMonth)
     }
 
@@ -155,7 +152,6 @@ object YearMonthSerializer : KSerializer<YearMonth> {
 
     override fun deserialize(decoder: Decoder): YearMonth {
         val text = decoder.decodeString()
-
         return YearMonth.parse(text) ?: throw SerializationException("Invalid year-month: $text")
     }
 }

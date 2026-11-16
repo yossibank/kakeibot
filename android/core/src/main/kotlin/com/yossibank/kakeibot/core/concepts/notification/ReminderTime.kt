@@ -25,7 +25,6 @@ data class ReminderTime private constructor(
     override fun toString(): String {
         val hour = if (hour < 10) "0$hour" else "$hour"
         val minute = if (minute < 10) "0$minute" else "$minute"
-
         return "$hour:$minute"
     }
 
@@ -100,7 +99,6 @@ object ReminderTimeSerializer : KSerializer<ReminderTime> {
 
     override fun deserialize(decoder: Decoder): ReminderTime {
         val text = decoder.decodeString()
-
         return ReminderTime.parse(text) ?: throw SerializationException("Invalid time: $text")
     }
 }

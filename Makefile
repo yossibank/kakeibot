@@ -9,7 +9,7 @@ ON_SIMULATOR = -destination 'id=$(SIMULATOR)'
 CLAUDE_CONFIG ?= $(HOME)/Applications/AI/claude-config
 SNAPSHOT ?=
 KTLINT_VERSION = 1.8.0
-KTLINT = cd android && ktlint --relative '**/*.kt' '**/*.kts' '!**/build/**' '!core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/Icon.kt'
+KTLINT = cd android && ktlint --relative '**/*.kt' '**/*.kts' '!**/build/**'
 ANDROID_JAVA_HOME ?= /Applications/Android Studio.app/Contents/jbr/Contents/Home
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
 GRADLE = env JAVA_HOME="$(ANDROID_JAVA_HOME)" ANDROID_HOME="$(ANDROID_HOME)" android/gradlew -p android --console=plain
@@ -60,6 +60,8 @@ verify: verify-docs
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	@ktlint --version | grep -qx 'ktlint version $(KTLINT_VERSION)' || { echo "NG ktlint は $(KTLINT_VERSION) を使う"; exit 1; }
 	scripts/verify.sh ktlint sh -c "$(KTLINT)"
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-style-check.py || { echo "NG claude-config に kotlin-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh kotlin-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-style-check.py $$(git ls-files '*.kt')
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build

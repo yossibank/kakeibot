@@ -237,7 +237,6 @@ internal class ExportRow(
     private companion object {
         fun list(element: JsonElement): List<ExportRow> {
             val array = element as? JsonArray ?: throw SerializationException("Expected an array")
-
             return array.map { ExportRow(it) }
         }
 
@@ -305,7 +304,6 @@ internal class ExportRow(
             of: (String) -> T?,
         ): T {
             val content = text(element)
-
             return of(content) ?: throw SerializationException("Invalid value: $content")
         }
     }

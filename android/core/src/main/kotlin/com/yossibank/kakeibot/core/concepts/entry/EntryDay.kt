@@ -46,7 +46,6 @@ data class EntryDay(
         ): Pair<Int, Int> {
             val category = entry.categoryId?.let { categories[it] } ?: return 2 to 0
             val kind = if (category.kind == EntryCategory.Kind.expense) 0 else 1
-
             return kind to category.sortOrder
         }
     }

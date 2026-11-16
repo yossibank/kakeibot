@@ -38,7 +38,6 @@ private fun channels(rgb: Int): List<Double> = listOf(16, 8, 0).map { shift ->
 
 private fun luminance(rgb: Int): Double {
     val values = channels(rgb)
-
     return (0.299 * values[0] + 0.587 * values[1] + 0.114 * values[2]) / 255
 }
 

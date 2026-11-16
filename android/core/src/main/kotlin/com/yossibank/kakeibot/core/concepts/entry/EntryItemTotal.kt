@@ -50,7 +50,6 @@ data class EntryItemTotal private constructor(
             ): Long {
                 val numerator = base.absoluteValue * rate * 2 + 100 + rate
                 val rounded = numerator / ((100 + rate) * 2)
-
                 return if (base < 0) -rounded else rounded
             }
         }

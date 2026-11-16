@@ -44,7 +44,6 @@ data class IconDraft(
     val problems: List<DraftProblem>
         get() {
             val colorProblems = if (isValidColor) emptyList() else listOf(DraftProblem.invalidColor)
-
             return markProblems + colorProblems
         }
 
