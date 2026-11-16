@@ -284,6 +284,7 @@ struct MainView: View {
         }
         .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
             sheetContent(for: sheet)
+                .presentationSizing(.page)
         }
         .task(id: observationRound) {
             await home.run()

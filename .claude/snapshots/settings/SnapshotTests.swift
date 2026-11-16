@@ -363,7 +363,8 @@ private extension SnapshotTests {
 
     static let variants = [
         Variant(name: "regular", width: 393, scheme: .light, textSize: .standard),
-        Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large)
+        Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large),
+        Variant(name: "pad", width: 704, scheme: .light, textSize: .standard)
     ]
 
     static func wait(until isReady: () -> Bool) async throws {

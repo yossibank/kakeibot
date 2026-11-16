@@ -65,7 +65,12 @@ struct SnapshotTests {
             ("entry-tall-expense", Self.tall, .amount),
             ("entry-tall-date", Self.tall, .date),
             ("entry-mini-date", Self.mini, .date),
-            ("entry-max-expense", Self.max, .amount)
+            ("entry-max-expense", Self.max, .amount),
+            ("entry-pad-form-expense", Self.padForm, .amount),
+            ("entry-pad-form-date", Self.padForm, .date),
+            ("entry-pad-page-expense", Self.padPage, .amount),
+            ("entry-pad-page-date", Self.padPage, .date),
+            ("entry-pad-tall-expense", Self.padTall, .amount)
         ]
 
         for (name, size, deck) in tallCases {
@@ -489,6 +494,9 @@ private extension SnapshotTests {
 private extension SnapshotTests {
     static let directory = "__OUT__"
     static let phone = CGSize(width: 393, height: 852)
+    static let padForm = CGSize(width: 540, height: 620)
+    static let padPage = CGSize(width: 704, height: 790)
+    static let padTall = CGSize(width: 704, height: 1130)
     static let mini = CGSize(width: 375, height: 812)
     static let tall = CGSize(width: 402, height: 874)
     static let max = CGSize(width: 440, height: 956)
