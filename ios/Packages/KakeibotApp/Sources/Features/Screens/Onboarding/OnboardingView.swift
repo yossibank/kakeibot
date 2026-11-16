@@ -54,6 +54,8 @@ public struct OnboardingView: View {
 }
 
 private extension OnboardingView {
+    static let contentWidth: CGFloat = 580
+
     var content: some View {
         VStack(spacing: 20) {
             topBar
@@ -79,7 +81,8 @@ private extension OnboardingView {
         .padding(.horizontal, 20)
         .padding(.top, 12)
         .padding(.bottom, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .frame(maxWidth: Self.contentWidth, maxHeight: .infinity, alignment: .top)
+        .frame(maxWidth: .infinity)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
