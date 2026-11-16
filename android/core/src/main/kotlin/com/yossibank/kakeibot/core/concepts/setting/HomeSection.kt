@@ -16,8 +16,8 @@ enum class HomeSection(
 
     companion object {
         val standard: List<HomeSection> = listOf(
-            customize,
             budget,
+            customize,
             templates,
             recent,
         )

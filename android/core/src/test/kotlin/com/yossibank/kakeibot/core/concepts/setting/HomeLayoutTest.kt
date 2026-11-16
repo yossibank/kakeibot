@@ -111,8 +111,8 @@ class HomeLayoutTest {
 
         assertEquals(
             listOf(
-                HomeLayout.Slot.Section(HomeSection.customize),
                 HomeLayout.Slot.Section(HomeSection.budget),
+                HomeLayout.Slot.Section(HomeSection.customize),
                 HomeLayout.Slot.Section(HomeSection.templates),
                 HomeLayout.Slot.Section(HomeSection.recent),
                 HomeLayout.Slot.Boundary,
