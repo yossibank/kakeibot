@@ -31,6 +31,7 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":store"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

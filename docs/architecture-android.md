@@ -23,7 +23,7 @@ Android は、次の技術を使う。
 | モジュール | 中身 |
 | --- | --- |
 | `:core` | Kotlin だけで書く Core。テストは `spec/fixtures` を読み、iOS と同じ結果を確かめる |
-| `:store` | Room の DB。Android に頼らない JVM のモジュールで、テストは JVM の SQLite で走る |
+| `:store` | Room の DB。Kotlin Multiplatform のモジュールで、テストは JVM の SQLite で走る |
 | `:app` | Jetpack Compose のアプリ |
 
 `:core` は、iOS の Core のファイルと 1 対 1 に対応させる。レシートの読み取りは Android に無い。`Concepts/Receipt/` は、書き出しが使う `ItemName` だけを移す。
@@ -33,7 +33,7 @@ Android は、次の技術を使う。
 | `Core/Concepts/<概念>/X.swift` | `core/concepts/<概念>/X.kt`。概念の名前は小文字にする |
 | `Core/Shared/X.swift` | `core/shared/X.kt` |
 | `Type+Topic.swift` | `TypeTopic.kt`。拡張関数で書く |
-| `Tests/CoreTests/.../XTests.swift` | `src/test/.../XTest.kt`。テストの補助は `support/` に置く |
+| `Tests/CoreTests/.../XTests.swift` | `src/test/.../XTest.kt`。テストの補助は `support/` に置く。`:store` は `src/jvmTest/` に置く |
 
 型・プロパティ・関数の名前は iOS と同じにする。Kotlin で使えない名前だけ、次のように変える。
 
@@ -46,6 +46,17 @@ Android は、次の技術を使う。
 | 金額の和と、和を返す戻り値 | `Long` |
 | 1 件の金額 | `Int`。調整の額（`Adjustment.amount`）だけは `Long` |
 
+`:store` は JVM と Android のターゲットを持ち、ソースをターゲットごとのフォルダに分ける。
+
+| フォルダ | 中身 |
+| --- | --- |
+| `src/commonMain/` | 表・読み出し・書き込み。2 つのターゲットで同じものを使う |
+| `src/jvmMain/` | パスかメモリで DB を開く `AppDatabaseOpen.kt`。テストが使う |
+| `src/androidMain/` | `Context` で DB を開く `AppDatabaseOpen.kt`。アプリが使う |
+| `src/jvmTest/` | テスト |
+
+DB を開く入口だけは、Room がターゲットごとに違うので分けている。どちらも、共通の `AppDatabase.open` に Room の Builder を渡す。
+
 `:store` も、iOS の Store のファイルと 1 対 1 に対応させる。同期は Android に無いので、`Store/Sync/` は移さない。マイグレーションは iOS の最新の形から始めるので、`Store/Migrations/` も移さない。
 
 | iOS | Android |
@@ -57,7 +68,7 @@ Android は、次の技術を使う。
 | `removeDuplicates()` | `distinctUntilChanged()` |
 | 失敗を表す enum（`XError`）を投げる | 同じ名前の enum と、それを持つ `XException` |
 
-表の形は、`store/src/test/resources/ios-schema.json` と比べて確かめる。このファイルは iOS の DB から書き出したものである。Room で同じに書けないものは、次のように守る。
+表の形は、`store/src/jvmTest/resources/ios-schema.json` と比べて確かめる。このファイルは iOS の DB から書き出したものである。Room で同じに書けないものは、次のように守る。
 
 | iOS | Android |
 | --- | --- |
