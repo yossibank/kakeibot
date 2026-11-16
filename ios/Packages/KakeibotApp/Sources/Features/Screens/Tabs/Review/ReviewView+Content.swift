@@ -64,7 +64,6 @@ extension ReviewView {
                             openShare = share
                         }
                     )
-                    .layoutColumn(.trailing)
                 }
             }
 
