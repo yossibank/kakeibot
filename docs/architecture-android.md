@@ -24,7 +24,7 @@ Android は、次の技術を使う。
 | --- | --- |
 | `:core` | Kotlin だけで書く Core。テストは `spec/fixtures` を読み、iOS と同じ結果を確かめる |
 | `:store` | Room の DB。Kotlin Multiplatform のモジュールで、テストは JVM の SQLite で走る |
-| `:app` | Jetpack Compose のアプリ |
+| `:app` | Jetpack Compose のアプリ。iOS の KakeibotApp のターゲットを、パッケージで分ける |
 
 `:core` は、iOS の Core のファイルと 1 対 1 に対応させる。レシートの読み取りは Android に無い。`Concepts/Receipt/` は、書き出しが使う `ItemName` だけを移す。
 
@@ -75,6 +75,29 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 | CHECK 制約 | 表を作るときに足すトリガー |
 | WHERE 付きの一意インデックス | 表を作るときに足すトリガー |
 | BOOLEAN の列 | INTEGER の列。入る値は 0 と 1 で同じ |
+
+`:app` は、iOS のターゲットをパッケージにし、その下のフォルダも iOS に合わせる。
+
+| iOS | Android |
+| --- | --- |
+| `AppFeature/<フォルダ>/X.swift` | `appfeature/<フォルダ>/X.kt` |
+| `DesignSystem/<フォルダ>/X.swift` | `designsystem/<フォルダ>/X.kt` |
+| `Features/<フォルダ>/X.swift` | `features/<フォルダ>/X.kt` |
+| `View+Topic.swift` | `ViewTopic.kt` |
+| SF Symbols の絵 | `res/drawable/` の `ic_<名前>.xml` |
+
+画面の部品は、iOS と同じ名前の Composable で書く。Compose で同じに書けないものは、次のようにする。
+
+| iOS | Android |
+| --- | --- |
+| `@Observable` のモデル | Compose の状態を持つクラス。`AppModel` だけは ViewModel にする |
+| `@Environment` の値 | `Local<名前>` の CompositionLocal |
+| `Palette.accent` などの色 | `Palette` の Composable のプロパティ。`LocalPalette` のテーマから読む |
+| フォントを付けるモディファイア | `TextStyle` を返す `displayFont`・`textFont`・`sansFont` |
+| 大きさを固定したフォント | dp から直した sp。端末の文字の大きさに合わせない |
+| 見た目の明暗の上書き | `PaletteScene` がテーマを配り、バーのアイコンの色を合わせる |
+| ガラスの効果 | 背景の色を濃く敷く |
+| 同梱のフォント | 入れない。明朝は端末の serif、ほかは端末の既定で出す |
 
 ## 🔧 設定
 

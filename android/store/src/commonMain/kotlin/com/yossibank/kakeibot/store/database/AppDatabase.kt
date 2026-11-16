@@ -124,8 +124,13 @@ abstract class AppDatabase : RoomDatabase() {
         ): AppDatabase {
             val database = builder.configured()
 
-            database.insertDefaultsIfEmpty(now)
-            database.insertShelfIfEmpty(now)
+            try {
+                database.insertDefaultsIfEmpty(now)
+                database.insertShelfIfEmpty(now)
+            } catch (error: Throwable) {
+                database.close()
+                throw error
+            }
 
             return database
         }
