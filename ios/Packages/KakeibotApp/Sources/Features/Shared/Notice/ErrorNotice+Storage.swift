@@ -2,7 +2,7 @@ import DesignSystem
 import Store
 
 public extension ErrorNotice {
-    static let storageFullMessage = "iPhone の空き容量が足りません"
+    static let storageFullMessage = "\(DeviceName.current) の空き容量が足りません"
 
     mutating func show(
         _ message: String,

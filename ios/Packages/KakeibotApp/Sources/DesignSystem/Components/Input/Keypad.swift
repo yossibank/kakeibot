@@ -45,7 +45,56 @@ public struct Keypad: View {
             }
         }
         .haptic(.impact(weight: .medium), trigger: clearCount)
+        .background {
+            KeyCatcher { characters in
+                guard let key = Self.key(typed: characters) else {
+                    return false
+                }
+
+                press(key)
+
+                return true
+            }
+        }
     }
+}
+
+extension Keypad {
+    nonisolated static func key(typed characters: String) -> AmountCalculator.Key? {
+        if let operation = typedOperations[characters] {
+            return .operation(operation)
+        }
+
+        if typedEquals.contains(characters) {
+            return .equals
+        }
+
+        if typedDeletes.contains(characters) {
+            return .delete
+        }
+
+        guard
+            characters.count == 1,
+            let digit = Int(characters),
+            digit >= 0
+        else {
+            return nil
+        }
+
+        return .digit(digit)
+    }
+}
+
+private extension Keypad {
+    nonisolated static let typedEquals: Set = ["=", "\r"]
+    nonisolated static let typedDeletes: Set = ["\u{8}", "\u{7F}"]
+
+    nonisolated static let typedOperations: [String: AmountCalculator.Operation] = [
+        "+": .add,
+        "-": .subtract,
+        "*": .multiply,
+        "/": .divide
+    ]
 }
 
 public extension Keypad {

@@ -51,7 +51,7 @@ public extension SettingsMenuResetModel {
         var text = "記録・評価額・スタンプなど\(amount)件を削除します。口座・カテゴリ・設定は残ります。元に戻せません。"
 
         if isSyncing {
-            text += "ほかの iPhone からも消えます。"
+            text += "ほかの端末からも消えます。"
         }
 
         if hasSharedWallets {

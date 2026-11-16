@@ -97,7 +97,7 @@ public struct SyncView: View {
             isPresented: isLeavingBinding,
             systemImage: "person.crop.circle.badge.minus",
             title: "共有から抜けますか",
-            message: "この iPhone から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
+            message: "この \(DeviceName.current) から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
             keepTitle: "やめる",
             confirmTitle: "抜ける"
         ) { [leaving] in
@@ -107,7 +107,7 @@ public struct SyncView: View {
             isPresented: isStoppingBinding,
             systemImage: "person.2.slash",
             title: "共有を終えますか",
-            message: "相手の iPhone から、この口座と記録が消えます。この iPhone には残ります",
+            message: "相手の端末から、この口座と記録が消えます。この \(DeviceName.current) には残ります",
             keepTitle: "やめる",
             confirmTitle: "共有を終える"
         ) { [stopping] in

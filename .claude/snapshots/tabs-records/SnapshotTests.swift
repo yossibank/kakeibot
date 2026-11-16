@@ -201,7 +201,9 @@ private extension SnapshotTests {
 
     static let variants = [
         Variant(name: "regular", width: 393, scheme: .light, textSize: .standard),
-        Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large)
+        Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large),
+        Variant(name: "pad", width: 954, scheme: .light, textSize: .standard),
+        Variant(name: "pad-wide", width: 1126, scheme: .light, textSize: .standard)
     ]
 
     static func includedItems(

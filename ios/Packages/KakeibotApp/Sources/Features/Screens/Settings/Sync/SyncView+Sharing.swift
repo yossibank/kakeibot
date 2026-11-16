@@ -47,7 +47,7 @@ extension SyncView {
             .card()
             .disabled(isSharingLocked)
 
-            SettingsCaption("抜けると、この iPhone からその口座と記録が消えます。", kind: .caution)
+            SettingsCaption("抜けると、この \(DeviceName.current) からその口座と記録が消えます。", kind: .caution)
         }
     }
 }

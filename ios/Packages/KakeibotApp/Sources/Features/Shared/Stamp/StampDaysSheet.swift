@@ -73,6 +73,7 @@ struct StampDaysSheet: View {
             Backdrop()
                 .ignoresSafeArea()
         }
+        .presentationSizing(.tallForm)
     }
 }
 

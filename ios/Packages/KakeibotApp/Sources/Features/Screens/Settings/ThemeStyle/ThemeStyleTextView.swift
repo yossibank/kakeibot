@@ -155,7 +155,7 @@ private extension ThemeStyleTextView {
 
     var largeSuggestion: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("iPhone の文字を大きくしています。このアプリでは「大きめ」にすると読みやすくなります。")
+            Text("\(DeviceName.current) の文字を大きくしています。このアプリでは「大きめ」にすると読みやすくなります。")
                 .textFont(.subheadline)
                 .foregroundStyle(Palette.text)
                 .fixedSize(horizontal: false, vertical: true)

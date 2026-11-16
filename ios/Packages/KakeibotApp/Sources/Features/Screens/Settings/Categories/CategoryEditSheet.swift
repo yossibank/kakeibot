@@ -115,6 +115,7 @@ public struct CategoryEditSheet: View {
                 addTag()
             }
         }
+        .presentationSizing(.tallForm)
     }
 }
 

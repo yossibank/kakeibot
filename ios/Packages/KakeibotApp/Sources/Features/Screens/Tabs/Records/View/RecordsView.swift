@@ -88,6 +88,7 @@ public struct RecordsView: View {
                     Group {
                         monthContent
                     }
+                    .frame(maxWidth: model.layout == .list ? Self.listWidth : nil)
                     .pageSlide(slide, page: model.month)
                 }
             }
@@ -262,6 +263,7 @@ private extension RecordsView {
 
 private extension RecordsView {
     static let wideCalendarWidth: CGFloat = 560
+    static let listWidth: CGFloat = 720
 
     static let layoutOptions: [CapsulePicker<RecordsLayout>.Option] = [
         .init("カレンダー", value: .calendar),

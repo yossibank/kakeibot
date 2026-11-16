@@ -1,7 +1,7 @@
 import Core
 
 extension ThemeChoice {
-    static let systemTitle = "iPhone に合わせる"
+    static let systemTitle = "\(DeviceName.current) に合わせる"
 
     func title(in themes: [Theme]) -> String {
         switch self {

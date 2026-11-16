@@ -127,6 +127,7 @@ public struct RewardRuleEditSheet: View {
         .task {
             await model.load()
         }
+        .presentationSizing(.tallForm)
     }
 }
 

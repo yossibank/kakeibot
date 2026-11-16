@@ -66,7 +66,7 @@ struct SyncModelTests {
     @Test(
         arguments: [
             (SyncAccount.noAccount, "設定アプリで iCloud にサインインすると使えます。"),
-            (.restricted, "この iPhone では、制限で iCloud を使えません。"),
+            (.restricted, "この \(DeviceName.current) では、制限で iCloud を使えません。"),
             (.temporarilyUnavailable, "設定アプリで iCloud にサインインし直すと使えます。"),
             (.couldNotDetermine, "iCloud の状態を確かめられませんでした。\n時間をおいて開き直してください。")
         ]

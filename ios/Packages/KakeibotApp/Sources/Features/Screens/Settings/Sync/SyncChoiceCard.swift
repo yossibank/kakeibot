@@ -41,7 +41,7 @@ struct SyncChoiceCard: View {
                     tile(.cloud)
                 }
 
-                Text("「この iPhone」を選ぶと、\nほかの端末の同期は切れます")
+                Text("「この \(DeviceName.current)」を選ぶと、\nほかの端末の同期は切れます")
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .multilineTextAlignment(.center)
@@ -123,7 +123,7 @@ private extension SyncChoiceCard {
 
     func name(of side: SyncChoice.Side) -> String {
         switch side {
-        case .local: "この iPhone"
+        case .local: "この \(DeviceName.current)"
         case .cloud: "iCloud"
         }
     }

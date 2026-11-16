@@ -84,13 +84,13 @@ public extension SyncModel {
 
     var footnote: String {
         guard !isOn else {
-            return "切っても、この iPhone のデータは残ります。"
+            return "切っても、この \(DeviceName.current) のデータは残ります。"
         }
 
         return switch account {
         case .available: "オンにすると、ほかの端末と記録がそろいます。"
         case .noAccount: "設定アプリで iCloud にサインインすると使えます。"
-        case .restricted: "この iPhone では、制限で iCloud を使えません。"
+        case .restricted: "この \(DeviceName.current) では、制限で iCloud を使えません。"
         case .temporarilyUnavailable: "設定アプリで iCloud にサインインし直すと使えます。"
         case .couldNotDetermine: "iCloud の状態を確かめられませんでした。\n時間をおいて開き直してください。"
         }
