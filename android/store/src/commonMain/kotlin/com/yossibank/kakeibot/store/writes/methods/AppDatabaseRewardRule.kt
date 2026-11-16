@@ -68,7 +68,8 @@ suspend fun AppDatabase.setRewardRuleHidden(
     at: Instant,
 ) {
     write {
-        val rule = findRewardRule(id) ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
+        val rule =
+            findRewardRule(id) ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
 
         val updated = rule.copy(
             isActive = !isHidden,
@@ -80,7 +81,8 @@ suspend fun AppDatabase.setRewardRuleHidden(
 }
 
 suspend fun AppDatabase.deleteRewardRule(id: Identifier<RewardRule>): Deletion = write {
-    val rule = findRewardRule(id) ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
+    val rule =
+        findRewardRule(id) ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
 
     if (rewardLogDao().countOfRule(id.databaseValue) != 0) {
         throw RewardRuleWriteException(RewardRuleWriteError.hasLogs)
@@ -120,7 +122,8 @@ private suspend fun AppDatabase.updateRewardRule(
     with: RewardRuleDraft,
     at: Instant,
 ): RewardRule {
-    val rule = findRewardRule(id) ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
+    val rule =
+        findRewardRule(id) ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
 
     val icon = iconDao().find(rule.iconId.databaseValue)?.decoded(IconRecord::icon)
         ?: throw RewardRuleWriteException(RewardRuleWriteError.iconNotFound)

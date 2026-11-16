@@ -75,7 +75,10 @@ class YearMonthTest {
     ) {
         @Test
         fun findsPeriod() {
-            val startDay = fixture.monthStartDay.shifted(by = fixture.monthStartShift ?: HolidayShift.none)
+            val startDay = fixture.monthStartDay.shifted(
+                by =
+                    fixture.monthStartShift ?: HolidayShift.none,
+            )
             val period = fixture.month.period(startingOn = startDay)
 
             assertEquals(fixture.start..fixture.end, period)
@@ -84,7 +87,8 @@ class YearMonthTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<PeriodCase> = CoreFixture.cases("date/year-month-period.json", PeriodCase.serializer())
+            fun cases(): List<PeriodCase> =
+                CoreFixture.cases("date/year-month-period.json", PeriodCase.serializer())
         }
     }
 
@@ -110,7 +114,8 @@ class YearMonthTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<WeeksCase> = CoreFixture.cases("date/year-month-weeks.json", WeeksCase.serializer())
+            fun cases(): List<WeeksCase> =
+                CoreFixture.cases("date/year-month-weeks.json", WeeksCase.serializer())
         }
     }
 

@@ -31,6 +31,7 @@ class AppVersionTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<VersionCase> = CoreFixture.cases("app/app-version.json", VersionCase.serializer())
+        fun cases(): List<VersionCase> =
+            CoreFixture.cases("app/app-version.json", VersionCase.serializer())
     }
 }

@@ -56,10 +56,11 @@ suspend fun AppDatabase.recentMemos(limit: Int): List<String> = read {
     entryDao().recentMemos(limit)
 }
 
-internal suspend fun AppDatabase.fetchEntryList(includesItems: Boolean = true): EntryList = fetchEntryList(
-    entries = entryDao().all().map { it.decoded(EntryRecord::entry) },
-    includesItems = includesItems,
-)
+internal suspend fun AppDatabase.fetchEntryList(includesItems: Boolean = true): EntryList =
+    fetchEntryList(
+        entries = entryDao().all().map { it.decoded(EntryRecord::entry) },
+        includesItems = includesItems,
+    )
 
 internal suspend fun AppDatabase.fetchEntryList(
     entries: List<Entry>,
@@ -118,7 +119,9 @@ internal suspend fun AppDatabase.fetchIcons(): Map<Identifier<Icon>, Icon> = ico
     .map { it.decoded(IconRecord::icon) }
     .associateBy { it.id }
 
-internal suspend fun AppDatabase.fetchIcons(ids: List<Identifier<Icon>>): Map<Identifier<Icon>, Icon> {
+internal suspend fun AppDatabase.fetchIcons(
+    ids: List<Identifier<Icon>>,
+): Map<Identifier<Icon>, Icon> {
     val keys = ids.map { it.databaseValue }.distinct()
 
     return iconDao()

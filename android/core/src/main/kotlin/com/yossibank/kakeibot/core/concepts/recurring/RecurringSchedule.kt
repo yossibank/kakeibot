@@ -180,7 +180,9 @@ private fun Recurring.months(
     val months = (from.monthIndex..through.monthIndex).map { YearMonth.ofMonthIndex(it) }
 
     return when (frequency) {
-        Recurring.Frequency.monthly -> months
+        Recurring.Frequency.monthly -> {
+            months
+        }
 
         Recurring.Frequency.yearly -> {
             val month = month ?: 1

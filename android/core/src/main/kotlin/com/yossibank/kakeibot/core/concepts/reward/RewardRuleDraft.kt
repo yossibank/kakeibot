@@ -23,7 +23,13 @@ data class RewardRuleDraft(
 
     val problems: List<DraftProblem>
         get() {
-            val nameProblems = if (trimmedName.isEmpty()) listOf(DraftProblem.emptyName) else emptyList()
+            val nameProblems = if (trimmedName.isEmpty()) {
+                listOf(
+                    DraftProblem.emptyName,
+                )
+            } else {
+                emptyList()
+            }
             val amountProblems = if (amount > 0) emptyList() else listOf(DraftProblem.emptyAmount)
 
             return nameProblems + amountProblems + icon.problems

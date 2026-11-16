@@ -32,12 +32,10 @@ fun EntryList.place(of: Recurring): String? {
 fun EntryList.amount(
     of: Recurring,
     on: LocalDate,
-): Long {
-    return of.amount(
-        paidOn = on,
-        entries = entries,
-    )
-}
+): Long = of.amount(
+    paidOn = on,
+    entries = entries,
+)
 
 fun EntryList.upcomingCardBills(
     recurrings: List<Recurring>,

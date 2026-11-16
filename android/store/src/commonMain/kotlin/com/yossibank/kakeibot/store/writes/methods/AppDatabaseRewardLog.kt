@@ -23,7 +23,9 @@ suspend fun AppDatabase.setReward(
     at: Instant,
 ) {
     write {
-        val rule = findRewardRule(ruleId) ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
+        val rule =
+            findRewardRule(ruleId)
+                ?: throw RewardRuleWriteException(RewardRuleWriteError.ruleNotFound)
         val key = ruleId.databaseValue
         val date = on.databaseValue
 

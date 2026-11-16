@@ -50,7 +50,8 @@ class RecordResetWriteTest {
     @Test
     fun keepsSettingsAndPlans() = runTest {
         val setup = Setup.make()
-        val tables = listOf("wallet", "category", "tag", "budget", "template", "recurring", "setting")
+        val tables =
+            listOf("wallet", "category", "tag", "budget", "template", "recurring", "setting")
         setup.addOwnRecords()
         val before = setup.counts(tables)
 
@@ -169,7 +170,8 @@ class RecordResetWriteTest {
             return entry
         }
 
-        private suspend fun value(sql: String): String? = database.rows(sql).firstOrNull()?.values?.firstOrNull() as String?
+        private suspend fun value(sql: String): String? =
+            database.rows(sql).firstOrNull()?.values?.firstOrNull() as String?
 
         companion object {
             suspend fun make(): Setup {
@@ -177,8 +179,12 @@ class RecordResetWriteTest {
 
                 database.insertDefaultsIfEmpty(Instant.ofEpochSecond(1_791_000_000))
 
-                val other = database.rows("SELECT id FROM wallet ORDER BY sort_order LIMIT 1 OFFSET 1").first()["id"] as String
-                val food = database.rows("SELECT id FROM category WHERE name = '食費'").first()["id"] as String
+                val other = database.rows(
+                    "SELECT id FROM wallet ORDER BY sort_order LIMIT 1 OFFSET 1",
+                ).first()["id"] as String
+                val food = database.rows(
+                    "SELECT id FROM category WHERE name = '食費'",
+                ).first()["id"] as String
 
                 return Setup(
                     database = database,

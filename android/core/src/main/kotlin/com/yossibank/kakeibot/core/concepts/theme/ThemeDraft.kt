@@ -36,7 +36,13 @@ data class ThemeDraft(
 
     val palette: ThemePalette?
         get() {
-            val colors = listOf(background, surface, text, subtext, accent).mapNotNull(ThemeHex::rgb)
+            val colors = listOf(
+                background,
+                surface,
+                text,
+                subtext,
+                accent,
+            ).mapNotNull(ThemeHex::rgb)
 
             if (colors.size != 5) {
                 return null
@@ -57,7 +63,8 @@ data class ThemeDraft(
 
             val isReadable = palette.unreadableRoles.isEmpty()
 
-            return nameProblems + (if (isReadable) emptyList() else listOf(DraftProblem.unreadableColors))
+            return nameProblems +
+                (if (isReadable) emptyList() else listOf(DraftProblem.unreadableColors))
         }
 
     fun newTheme(at: Instant): Theme {

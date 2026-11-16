@@ -64,7 +64,8 @@ private fun EntryList.templateUses(through: LocalDate): Map<Identifier<EntryTemp
     return uses
 }
 
-private fun EntryList.categoryOrder(of: EntryTemplate): Int = categories[of.categoryId]?.sortOrder ?: Int.MAX_VALUE
+private fun EntryList.categoryOrder(of: EntryTemplate): Int =
+    categories[of.categoryId]?.sortOrder ?: Int.MAX_VALUE
 
 private fun EntryList.compare(
     lhs: EntryTemplate,

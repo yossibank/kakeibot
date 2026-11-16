@@ -117,7 +117,9 @@ internal suspend fun AppDatabase.fetchEntryDraft(
     on: LocalDate,
 ): EntryDraft? {
     val draft = template.entryDraft(on = on) ?: return null
-    val tag = draft.tagId?.let { tagDao().find(it.databaseValue)?.decoded(EntryTagRecord::entryTag) }
+    val tag = draft.tagId?.let {
+        tagDao().find(it.databaseValue)?.decoded(EntryTagRecord::entryTag)
+    }
     val tagId = if (tag?.archivedAt != null) null else draft.tagId
 
     val billMonth = billMonth(

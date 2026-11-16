@@ -65,7 +65,9 @@ suspend fun AppDatabase.setShelfIconHidden(
     at: Instant,
 ) {
     write {
-        val shelfIcon = findShelfIcon(id) ?: throw ShelfIconWriteException(ShelfIconWriteError.shelfIconNotFound)
+        val shelfIcon =
+            findShelfIcon(id)
+                ?: throw ShelfIconWriteException(ShelfIconWriteError.shelfIconNotFound)
 
         val updated = shelfIcon.copy(
             archivedAt = if (isHidden) at else null,
@@ -77,7 +79,8 @@ suspend fun AppDatabase.setShelfIconHidden(
 }
 
 suspend fun AppDatabase.deleteShelfIcon(id: Identifier<ShelfIcon>): Deletion = write {
-    val shelfIcon = findShelfIcon(id) ?: throw ShelfIconWriteException(ShelfIconWriteError.shelfIconNotFound)
+    val shelfIcon =
+        findShelfIcon(id) ?: throw ShelfIconWriteException(ShelfIconWriteError.shelfIconNotFound)
 
     shelfIconDao().delete(id.databaseValue)
 
@@ -112,7 +115,8 @@ private suspend fun AppDatabase.updateShelfIcon(
     with: IconDraft,
     at: Instant,
 ): ShelfIcon {
-    val shelfIcon = findShelfIcon(id) ?: throw ShelfIconWriteException(ShelfIconWriteError.shelfIconNotFound)
+    val shelfIcon =
+        findShelfIcon(id) ?: throw ShelfIconWriteException(ShelfIconWriteError.shelfIconNotFound)
 
     val icon = iconDao().find(shelfIcon.iconId.databaseValue)?.decoded(IconRecord::icon)
         ?: throw ShelfIconWriteException(ShelfIconWriteError.iconNotFound)

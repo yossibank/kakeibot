@@ -49,7 +49,8 @@ class ThemePaletteSemanticTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<SemanticCase> = CoreFixture.cases("theme/theme-palette-semantic.json", SemanticCase.serializer())
+            fun cases(): List<SemanticCase> =
+                CoreFixture.cases("theme/theme-palette-semantic.json", SemanticCase.serializer())
         }
     }
 
@@ -62,18 +63,21 @@ class ThemePaletteSemanticTest {
                 for (semantic in ThemePalette.Semantic.entries) {
                     val base = if (palette.isLight) semantic.light else semantic.dark
 
-                    assertEquals(base, palette.color(semantic), "${preset.rawValue} ${semantic.rawValue}")
+                    assertEquals(
+                        base,
+                        palette.color(semantic),
+                        "${preset.rawValue} ${semantic.rawValue}",
+                    )
                 }
             }
         }
     }
 }
 
-private fun palette(background: Int): ThemePalette =
-    ThemePalette.night.copy(
-        backgroundTop = background,
-        backgroundBottom = background,
-        panel = background,
-        cardTop = background,
-        cardBottom = background,
-    )
+private fun palette(background: Int): ThemePalette = ThemePalette.night.copy(
+    backgroundTop = background,
+    backgroundBottom = background,
+    panel = background,
+    cardTop = background,
+    cardBottom = background,
+)

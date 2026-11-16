@@ -29,14 +29,63 @@ data class DeletionSubject(
 
 val Deletion.subject: DeletionSubject?
     get() = when {
-        wallets.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.wallet, wallets.map { it.name })
-        categories.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.category, categories.map { it.name })
-        recurrings.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.recurring, recurrings.map { it.memo })
-        templates.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.template, templates.map { it.name })
-        rewardRules.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.rewardRule, rewardRules.map { it.name })
+        wallets.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.wallet,
+            wallets.map {
+                it.name
+            },
+        )
+
+        categories.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.category,
+            categories.map {
+                it.name
+            },
+        )
+
+        recurrings.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.recurring,
+            recurrings.map {
+                it.memo
+            },
+        )
+
+        templates.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.template,
+            templates.map {
+                it.name
+            },
+        )
+
+        rewardRules.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.rewardRule,
+            rewardRules.map {
+                it.name
+            },
+        )
+
         themes.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.theme, themes.map { it.name })
-        shelfIcons.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.shelfIcon, shelfIcons.map { null })
-        valuations.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.valuation, valuations.map { null })
-        adjustments.isNotEmpty() -> DeletionSubject(DeletionSubject.Kind.adjustment, adjustments.map { null })
+
+        shelfIcons.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.shelfIcon,
+            shelfIcons.map {
+                null
+            },
+        )
+
+        valuations.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.valuation,
+            valuations.map {
+                null
+            },
+        )
+
+        adjustments.isNotEmpty() -> DeletionSubject(
+            DeletionSubject.Kind.adjustment,
+            adjustments.map {
+                null
+            },
+        )
+
         else -> null
     }

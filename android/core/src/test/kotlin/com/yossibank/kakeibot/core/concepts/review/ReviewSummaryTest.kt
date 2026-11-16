@@ -112,6 +112,7 @@ class ReviewSummaryTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<SummaryCase> = CoreFixture.cases("review/review-summary.json", SummaryCase.serializer())
+        fun cases(): List<SummaryCase> =
+            CoreFixture.cases("review/review-summary.json", SummaryCase.serializer())
     }
 }

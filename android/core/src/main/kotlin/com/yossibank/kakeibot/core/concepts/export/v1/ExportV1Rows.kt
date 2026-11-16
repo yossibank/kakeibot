@@ -303,8 +303,8 @@ private fun ExportRow.entryItem(): EntryItem = EntryItem(
     updatedAt = instant("updatedAt"),
 )
 
-private fun taxRate(rawValue: Int): AmountCalculator.TaxRate =
-    AmountCalculator.TaxRate.of(rawValue) ?: throw SerializationException("Invalid tax rate: $rawValue")
+private fun taxRate(rawValue: Int): AmountCalculator.TaxRate = AmountCalculator.TaxRate.of(rawValue)
+    ?: throw SerializationException("Invalid tax rate: $rawValue")
 
 private fun ItemName.row(): JsonObject = buildJsonObject {
     put("id", id.toString())

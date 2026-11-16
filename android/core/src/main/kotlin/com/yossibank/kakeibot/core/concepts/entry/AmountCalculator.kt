@@ -200,7 +200,13 @@ data class AmountCalculator private constructor(
     }
 
     private fun settle(): AmountCalculator {
-        val trimmed = if (tokens.lastOrNull() is Token.Operation) copy(tokens = tokens.dropLast(1)) else this
+        val trimmed = if (tokens.lastOrNull() is Token.Operation) {
+            copy(
+                tokens = tokens.dropLast(1),
+            )
+        } else {
+            this
+        }
         val amount = trimmed.amount
 
         return trimmed.copy(

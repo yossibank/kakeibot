@@ -15,7 +15,8 @@ data class Identifier<Owner>(
     override fun toString(): String = uuid.toString().lowercase()
 
     companion object {
-        private val pattern = Regex("[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}")
+        private val pattern =
+            Regex("[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}")
 
         fun <Owner> parse(text: String): Identifier<Owner>? {
             if (!pattern.matches(text)) {

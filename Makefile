@@ -8,6 +8,7 @@ ANY_SIMULATOR = -destination 'generic/platform=iOS Simulator'
 ON_SIMULATOR = -destination 'id=$(SIMULATOR)'
 CLAUDE_CONFIG ?= $(HOME)/Applications/AI/claude-config
 SNAPSHOT ?=
+KTLINT = cd android && ktlint --relative '**/*.kt' '**/*.kts' '!**/build/**' '!core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/Icon.kt'
 ANDROID_JAVA_HOME ?= /Applications/Android Studio.app/Contents/jbr/Contents/Home
 ANDROID_HOME ?= $(HOME)/Library/Android/sdk
 GRADLE = env JAVA_HOME="$(ANDROID_JAVA_HOME)" ANDROID_HOME="$(ANDROID_HOME)" android/gradlew -p android --console=plain
@@ -24,6 +25,7 @@ open:
 
 format:
 	mint run swiftformat .
+	$(KTLINT) --format
 	scripts/json-format.sh write
 
 licenses:
@@ -55,6 +57,7 @@ android-test:
 verify: verify-docs
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh ktlint sh -c "$(KTLINT)"
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build

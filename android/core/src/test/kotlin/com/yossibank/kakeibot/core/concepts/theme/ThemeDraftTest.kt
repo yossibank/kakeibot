@@ -47,7 +47,8 @@ class ThemeDraftTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<BaseCase> = CoreFixture.cases("theme/theme-palette-base.json", BaseCase.serializer())
+            fun cases(): List<BaseCase> =
+                CoreFixture.cases("theme/theme-palette-base.json", BaseCase.serializer())
         }
     }
 
@@ -86,7 +87,8 @@ class ThemeDraftTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<DraftCase> = CoreFixture.cases("theme/theme-draft.json", DraftCase.serializer())
+            fun cases(): List<DraftCase> =
+                CoreFixture.cases("theme/theme-draft.json", DraftCase.serializer())
         }
     }
 
@@ -99,7 +101,11 @@ class ThemeDraftTest {
                     palette = preset.palette,
                 )
 
-                assertEquals(preset.palette.backgroundTop, draft.palette?.backgroundTop, preset.rawValue)
+                assertEquals(
+                    preset.palette.backgroundTop,
+                    draft.palette?.backgroundTop,
+                    preset.rawValue,
+                )
                 assertEquals(preset.palette.accent, draft.palette?.accent, preset.rawValue)
             }
         }

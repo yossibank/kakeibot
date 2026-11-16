@@ -305,7 +305,9 @@ class RecurringWriteTest {
 
         private suspend fun update(change: (Recurring) -> Recurring) {
             database.write {
-                val recurrings = database.recurringDao().all().map { it.decoded(RecurringRecord::recurring) }
+                val recurrings = database.recurringDao().all().map {
+                    it.decoded(RecurringRecord::recurring)
+                }
 
                 for (recurring in recurrings) {
                     database.recurringDao().update(change(recurring).record())

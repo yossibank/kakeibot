@@ -40,7 +40,8 @@ class AmountCalculatorTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<KeysCase> = CoreFixture.cases("entry/amount-calculator.json", KeysCase.serializer())
+            fun cases(): List<KeysCase> =
+                CoreFixture.cases("entry/amount-calculator.json", KeysCase.serializer())
         }
     }
 
@@ -49,7 +50,8 @@ class AmountCalculatorTest {
         fun remembersTaxBaseUntilNextKey() {
             var calculator = AmountCalculator(amount = 1180)
 
-            calculator = calculator.press(AmountCalculator.Key.Tax(AmountCalculator.TaxRate.standard))
+            calculator =
+                calculator.press(AmountCalculator.Key.Tax(AmountCalculator.TaxRate.standard))
             val note = calculator.taxNote
             calculator = calculator.press(AmountCalculator.Key.Digit(1))
 
@@ -62,7 +64,8 @@ class AmountCalculatorTest {
         fun startsFromExistingAmount() {
             var calculator = AmountCalculator(amount = 980)
 
-            calculator = calculator.press(AmountCalculator.Key.Operation(AmountCalculator.Operation.add))
+            calculator =
+                calculator.press(AmountCalculator.Key.Operation(AmountCalculator.Operation.add))
             calculator = calculator.press(AmountCalculator.Key.Digit(2))
 
             assertEquals(982, calculator.amount)
@@ -91,15 +94,16 @@ private fun key(text: String): AmountCalculator.Key {
     }
 }
 
-private fun expression(tokens: List<AmountCalculator.Token>): String = tokens.joinToString(" ") { token ->
-    when (token) {
-        is AmountCalculator.Token.Number -> token.number.toString()
+private fun expression(tokens: List<AmountCalculator.Token>): String =
+    tokens.joinToString(" ") { token ->
+        when (token) {
+            is AmountCalculator.Token.Number -> token.number.toString()
 
-        is AmountCalculator.Token.Operation -> when (token.operation) {
-            AmountCalculator.Operation.add -> "+"
-            AmountCalculator.Operation.subtract -> "-"
-            AmountCalculator.Operation.multiply -> "*"
-            AmountCalculator.Operation.divide -> "/"
+            is AmountCalculator.Token.Operation -> when (token.operation) {
+                AmountCalculator.Operation.add -> "+"
+                AmountCalculator.Operation.subtract -> "-"
+                AmountCalculator.Operation.multiply -> "*"
+                AmountCalculator.Operation.divide -> "/"
+            }
         }
     }
-}

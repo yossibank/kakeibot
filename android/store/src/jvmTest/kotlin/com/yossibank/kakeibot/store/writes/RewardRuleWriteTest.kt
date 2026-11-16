@@ -250,6 +250,8 @@ class RewardRuleWriteTest {
             return database.saveRewardRule(draft, at = now)
         }
 
-        suspend fun logs(): List<RewardLog> = database.rewardLogDao().all().map { it.decoded(RewardLogRecord::rewardLog) }
+        suspend fun logs(): List<RewardLog> = database.rewardLogDao().all().map {
+            it.decoded(RewardLogRecord::rewardLog)
+        }
     }
 }

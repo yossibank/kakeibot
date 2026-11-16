@@ -31,7 +31,10 @@ suspend fun AppDatabase.saveTemplate(
     editing: Identifier<EntryTemplate>? = null,
     at: Instant,
 ): EntryTemplate = write {
-    val existing = editing?.let { findTemplate(it) ?: throw TemplateWriteException(TemplateWriteError.templateNotFound) }
+    val existing = editing?.let {
+        findTemplate(it)
+            ?: throw TemplateWriteException(TemplateWriteError.templateNotFound)
+    }
 
     val template = if (existing != null) {
         draft.applied(
@@ -69,7 +72,8 @@ suspend fun AppDatabase.setTemplateHidden(
     at: Instant,
 ) {
     write {
-        val template = findTemplate(id) ?: throw TemplateWriteException(TemplateWriteError.templateNotFound)
+        val template =
+            findTemplate(id) ?: throw TemplateWriteException(TemplateWriteError.templateNotFound)
 
         val updated = template.copy(
             archivedAt = if (isHidden) at else null,

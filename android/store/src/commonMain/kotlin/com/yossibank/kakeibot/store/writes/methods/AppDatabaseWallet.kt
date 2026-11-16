@@ -109,13 +109,17 @@ suspend fun AppDatabase.deleteWallet(
         throw WalletWriteException(WalletWriteError.lastShownWallet)
     }
 
-    val categories = categoryDao().ofWallet(key).map { it.decoded(EntryCategoryRecord::entryCategory) }
+    val categories = categoryDao().ofWallet(key).map {
+        it.decoded(EntryCategoryRecord::entryCategory)
+    }
     val categoryIds = categories.map { it.id.databaseValue }
     val iconIds = categories.map { it.iconId.databaseValue } + wallet.iconId.databaseValue
     val icons = iconDao().withIds(iconIds).map { it.decoded(IconRecord::icon) }
     val tags = tagDao().ofCategories(categoryIds).map { it.decoded(EntryTagRecord::entryTag) }
     val recurrings = recurringDao().ofWallet(key).map { it.decoded(RecurringRecord::recurring) }
-    val templates = templateDao().ofWallet(key).map { it.decoded(EntryTemplateRecord::entryTemplate) }
+    val templates = templateDao().ofWallet(key).map {
+        it.decoded(EntryTemplateRecord::entryTemplate)
+    }
     val valuations = valuationDao().ofWallet(key).map { it.decoded(ValuationRecord::valuation) }
     val adjustments = adjustmentDao().ofWallet(key).map { it.decoded(AdjustmentRecord::adjustment) }
 

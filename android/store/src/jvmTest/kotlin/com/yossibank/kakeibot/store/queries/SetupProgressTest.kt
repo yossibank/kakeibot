@@ -32,7 +32,6 @@ class SetupProgressTest {
 
         database.setBudget(
             amount = 80000,
-
             categoryId = null,
             from = month,
         )

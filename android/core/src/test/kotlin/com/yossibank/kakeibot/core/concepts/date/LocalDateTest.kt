@@ -90,7 +90,8 @@ class LocalDateTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<InstantCase> = CoreFixture.cases("date/local-date-instant.json", InstantCase.serializer())
+            fun cases(): List<InstantCase> =
+                CoreFixture.cases("date/local-date-instant.json", InstantCase.serializer())
         }
     }
 
@@ -108,7 +109,8 @@ class LocalDateTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<WeekCase> = CoreFixture.cases("date/local-date-week.json", WeekCase.serializer())
+            fun cases(): List<WeekCase> =
+                CoreFixture.cases("date/local-date-week.json", WeekCase.serializer())
         }
     }
 
@@ -118,20 +120,30 @@ class LocalDateTest {
     ) {
         @Test
         fun findsPeriodMonth() {
-            val startDay = fixture.monthStartDay.shifted(by = fixture.monthStartShift ?: HolidayShift.none)
+            val startDay = fixture.monthStartDay.shifted(
+                by =
+                    fixture.monthStartShift ?: HolidayShift.none,
+            )
             val dayBefore = fixture.start.adding(days = -1)
             val dayAfter = fixture.end.adding(days = 1)
 
             assertEquals(fixture.month, fixture.start.periodMonth(startingOn = startDay))
             assertEquals(fixture.month, fixture.end.periodMonth(startingOn = startDay))
-            assertEquals(fixture.month.adding(months = -1), dayBefore.periodMonth(startingOn = startDay))
-            assertEquals(fixture.month.adding(months = 1), dayAfter.periodMonth(startingOn = startDay))
+            assertEquals(
+                fixture.month.adding(months = -1),
+                dayBefore.periodMonth(startingOn = startDay),
+            )
+            assertEquals(
+                fixture.month.adding(months = 1),
+                dayAfter.periodMonth(startingOn = startDay),
+            )
         }
 
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<PeriodCase> = CoreFixture.cases("date/year-month-period.json", PeriodCase.serializer())
+            fun cases(): List<PeriodCase> =
+                CoreFixture.cases("date/year-month-period.json", PeriodCase.serializer())
         }
     }
 

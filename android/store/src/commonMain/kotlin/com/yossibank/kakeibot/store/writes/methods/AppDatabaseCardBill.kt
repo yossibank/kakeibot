@@ -189,7 +189,9 @@ private suspend fun AppDatabase.recalculateBill(
             at = at,
         ) ?: return CardBillChange()
 
-        val fees = entryDao().fees(listOf(inserted.id.databaseValue)).map { it.decoded(EntryRecord::entry) }
+        val fees = entryDao().fees(listOf(inserted.id.databaseValue)).map {
+            it.decoded(EntryRecord::entry)
+        }
 
         return CardBillChange(after = listOf(inserted) + fees)
     }
@@ -199,7 +201,9 @@ private suspend fun AppDatabase.recalculateBill(
     }
 
     if (amount <= 0) {
-        val removed = entryDao().fees(listOf(bill.id.databaseValue)).map { it.decoded(EntryRecord::entry) }
+        val removed = entryDao().fees(listOf(bill.id.databaseValue)).map {
+            it.decoded(EntryRecord::entry)
+        }
 
         entryDao().deleteFees(listOf(bill.id.databaseValue))
         entryDao().delete(bill.id.databaseValue)

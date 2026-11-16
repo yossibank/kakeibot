@@ -324,7 +324,8 @@ internal object ExportFixture {
 
     fun data(path: String): ByteArray = CoreFixture.data(path)
 
-    fun jsonObject(data: ByteArray): JsonObject = Json.parseToJsonElement(data.toString(Charsets.UTF_8)).jsonObject
+    fun jsonObject(data: ByteArray): JsonObject =
+        Json.parseToJsonElement(data.toString(Charsets.UTF_8)).jsonObject
 
     fun edited(edit: (MutableMap<String, JsonElement>) -> Unit): ByteArray {
         val root = jsonObject(data("export/export-v1.json")).toMutableMap()

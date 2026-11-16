@@ -58,6 +58,7 @@ class BudgetAmountTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun cases(): List<AmountCase> = CoreFixture.cases("budget/budget-amount.json", AmountCase.serializer())
+        fun cases(): List<AmountCase> =
+            CoreFixture.cases("budget/budget-amount.json", AmountCase.serializer())
     }
 }

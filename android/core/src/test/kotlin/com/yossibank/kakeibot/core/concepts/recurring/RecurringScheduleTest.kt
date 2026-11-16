@@ -58,7 +58,8 @@ class RecurringScheduleTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<DatesCase> = CoreFixture.cases("recurring/recurring-dates.json", DatesCase.serializer())
+            fun cases(): List<DatesCase> =
+                CoreFixture.cases("recurring/recurring-dates.json", DatesCase.serializer())
         }
     }
 
@@ -124,8 +125,10 @@ class RecurringScheduleTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<OccurrenceCase> =
-                CoreFixture.cases("recurring/recurring-occurrence.json", OccurrenceCase.serializer())
+            fun cases(): List<OccurrenceCase> = CoreFixture.cases(
+                "recurring/recurring-occurrence.json",
+                OccurrenceCase.serializer(),
+            )
         }
     }
 

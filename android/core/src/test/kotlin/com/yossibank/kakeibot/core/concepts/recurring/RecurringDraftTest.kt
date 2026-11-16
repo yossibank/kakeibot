@@ -72,7 +72,8 @@ class RecurringDraftTest {
         companion object {
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<DraftCase> = CoreFixture.cases("recurring/recurring-draft.json", DraftCase.serializer())
+            fun cases(): List<DraftCase> =
+                CoreFixture.cases("recurring/recurring-draft.json", DraftCase.serializer())
         }
     }
 

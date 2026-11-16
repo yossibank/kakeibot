@@ -121,7 +121,8 @@ class WalletBalanceTest {
 
             @JvmStatic
             @Parameterized.Parameters(name = "{0}")
-            fun cases(): List<BalanceCase> = CoreFixture.cases("wallet/wallet-balance.json", BalanceCase.serializer())
+            fun cases(): List<BalanceCase> =
+                CoreFixture.cases("wallet/wallet-balance.json", BalanceCase.serializer())
         }
     }
 

@@ -17,7 +17,9 @@ import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import java.time.Instant
 import kotlin.test.assertNotNull
 
-suspend fun CardBillRecalcWriteTest.Setup.Companion.make(usage: List<Int>): CardBillRecalcWriteTest.Setup {
+suspend fun CardBillRecalcWriteTest.Setup.Companion.make(
+    usage: List<Int>,
+): CardBillRecalcWriteTest.Setup {
     val database = AppDatabase.inMemory()
     val now = Instant.ofEpochSecond(1_791_000_000)
     val startDate = assertNotNull(LocalDate.parse("2026-11-01"))

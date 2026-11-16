@@ -175,7 +175,8 @@ private fun <Value> Tabs(
                             change.consume()
                         }
 
-                        val width = if (currentItems.isEmpty()) 0f else size.width.toFloat() / currentItems.size
+                        val count = currentItems.size
+                        val width = if (count == 0) 0f else size.width.toFloat() / count
 
                         val selected = index(
                             x = x,

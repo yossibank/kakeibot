@@ -68,8 +68,9 @@ class DatabaseValueTest {
         }
     }
 
-    private fun SQLiteConnection.fetch(): String = prepare("SELECT value FROM sample").use { statement ->
-        statement.step()
-        statement.getText(0)
-    }
+    private fun SQLiteConnection.fetch(): String =
+        prepare("SELECT value FROM sample").use { statement ->
+            statement.step()
+            statement.getText(0)
+        }
 }

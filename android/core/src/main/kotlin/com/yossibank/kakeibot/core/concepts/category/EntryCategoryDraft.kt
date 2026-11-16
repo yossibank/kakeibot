@@ -31,7 +31,13 @@ data class EntryCategoryDraft(
 
     val problems: List<DraftProblem>
         get() {
-            val nameProblems = if (trimmedName.isEmpty()) listOf(DraftProblem.emptyName) else emptyList()
+            val nameProblems = if (trimmedName.isEmpty()) {
+                listOf(
+                    DraftProblem.emptyName,
+                )
+            } else {
+                emptyList()
+            }
 
             return nameProblems + icon.problems
         }

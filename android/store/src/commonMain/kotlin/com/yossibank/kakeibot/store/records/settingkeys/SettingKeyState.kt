@@ -73,7 +73,9 @@ val SettingKey.Companion.haptics: SettingKey<Boolean>
 val SettingKey.Companion.decorations: SettingKey<Boolean>
     get() = switch(Setting.Key.decorations)
 
-private fun SettingKey.Companion.categoryId(key: Setting.Key): SettingKey<Identifier<EntryCategory>?> = of(
+private fun SettingKey.Companion.categoryId(
+    key: Setting.Key,
+): SettingKey<Identifier<EntryCategory>?> = of(
     key = key,
     default = null,
     decode = { Identifier.parse(it) },

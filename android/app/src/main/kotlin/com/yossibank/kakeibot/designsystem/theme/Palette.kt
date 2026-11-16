@@ -168,7 +168,8 @@ object Palette {
 
     @Composable
     @ReadOnlyComposable
-    private fun semantic(semantic: ThemePalette.Semantic): Color = colorOf(rgb = LocalPalette.current.color(semantic))
+    private fun semantic(semantic: ThemePalette.Semantic): Color =
+        colorOf(rgb = LocalPalette.current.color(semantic))
 
     @Composable
     @ReadOnlyComposable

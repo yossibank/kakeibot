@@ -31,7 +31,13 @@ data class EntryTagDraft(
                 return listOf(Problem.emptyName)
             }
 
-            return if (characterCount(trimmedName) > maxNameLength) listOf(Problem.nameTooLong) else emptyList()
+            return if (characterCount(trimmedName) >
+                maxNameLength
+            ) {
+                listOf(Problem.nameTooLong)
+            } else {
+                emptyList()
+            }
         }
 
     private val trimmedName: String

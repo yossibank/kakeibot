@@ -83,7 +83,6 @@ class MonthOverviewWidgetTest {
 
         database.setBudget(
             amount = 50000,
-
             categoryId = null,
             from = month,
         )

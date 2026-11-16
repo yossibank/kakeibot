@@ -58,7 +58,9 @@ val Iterable<EntryDay>.expenseTotal: Long
 val Iterable<EntryDay>.incomeTotal: Long
     get() = sumOf { it.incomeTotal }
 
-fun List<EntryDay>.within(range: ClosedRange<LocalDate>): List<EntryDay> = filter { it.date in range }
+fun List<EntryDay>.within(range: ClosedRange<LocalDate>): List<EntryDay> = filter {
+    it.date in range
+}
 
 fun List<EntryDay>.filtered(isIncluded: (Entry) -> Boolean): List<EntryDay> = mapNotNull { day ->
     val entries = day.entries.filter(isIncluded)

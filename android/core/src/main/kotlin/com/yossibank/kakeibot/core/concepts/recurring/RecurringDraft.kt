@@ -125,7 +125,13 @@ data class RecurringDraft(
             Entry.Kind.income,
             -> if (categoryId == null) listOf(Problem.missingCategory) else emptyList()
 
-            Entry.Kind.transfer -> if (categoryId == null) emptyList() else listOf(Problem.categoryOnTransfer)
+            Entry.Kind.transfer -> if (categoryId ==
+                null
+            ) {
+                emptyList()
+            } else {
+                listOf(Problem.categoryOnTransfer)
+            }
         }
 
     private val destinationProblems: List<Problem>
@@ -149,7 +155,10 @@ data class RecurringDraft(
         get() = if (type == Entry.Kind.transfer && fee > 0) fee else null
 
     private val savedFinalAmount: Int?
-        get() = if (endDate != null && cardClosingDay == null && finalAmount > 0) finalAmount else null
+        get() {
+            val isSaved = endDate != null && cardClosingDay == null && finalAmount > 0
+            return if (isSaved) finalAmount else null
+        }
 
     private val savedBillShift: Int
         get() = if (type == Entry.Kind.transfer) 0 else Recurring.clampedBillShift(billShift)

@@ -49,7 +49,8 @@ data class EntrySearch private constructor(
             return (listOf(trimmed) + others).take(recentLimit)
         }
 
-        private fun fold(text: String): String = Normalizer.normalize(text, Normalizer.Form.NFKC).lowercase(japanese)
+        private fun fold(text: String): String =
+            Normalizer.normalize(text, Normalizer.Form.NFKC).lowercase(japanese)
 
         private fun amount(word: String): Long? {
             val digits = word.filter { it !in amountMarks }

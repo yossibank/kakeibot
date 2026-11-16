@@ -68,7 +68,9 @@ internal suspend fun AppDatabase.fetchTables(): ExportV1.Tables {
         rewardRules = rewardRuleDao().all().map { it.decoded(RewardRuleRecord::rewardRule) },
         rewardLogs = rewardLogDao().all().map { it.decoded(RewardLogRecord::rewardLog) },
         rewardGoals = rewardGoalDao().all().map { it.decoded(RewardGoalRecord::rewardGoal) },
-        calendarStamps = calendarStampDao().all().map { it.decoded(CalendarStampRecord::calendarStamp) },
+        calendarStamps = calendarStampDao().all().map {
+            it.decoded(CalendarStampRecord::calendarStamp)
+        },
         noSpendDays = noSpendDayDao().all().map { it.decoded(NoSpendDayRecord::noSpendDay) },
         themes = themeDao().all().map { it.decoded(ThemeRecord::theme) },
         settings = settingDao().all(knownKeys).map { it.decoded(SettingRecord::setting) },
@@ -135,7 +137,7 @@ internal suspend fun ExportV1.Tables.insert(into: AppDatabase) {
         into.templateDao().insert(template.record())
     }
 
-    for (entry in entries.filter { it.transferId == null } + entries.filter { it.transferId != null }) {
+    for (entry in entries.sortedBy { it.transferId != null }) {
         into.entryDao().insert(entry.record())
     }
 

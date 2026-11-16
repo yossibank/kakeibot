@@ -57,17 +57,22 @@ private suspend fun AppDatabase.fetchCustomThemes(): List<Theme> = themeDao()
     .custom()
     .map { it.decoded(ThemeRecord::theme) }
 
-private suspend fun AppDatabase.fetchThemeLook(): ThemeLook = when (val choice = fetchSetting(SettingKey.theme)) {
-    ThemeChoice.System -> ThemeLook.followsDevice
+private suspend fun AppDatabase.fetchThemeLook(): ThemeLook =
+    when (val choice = fetchSetting(SettingKey.theme)) {
+        ThemeChoice.System -> {
+            ThemeLook.followsDevice
+        }
 
-    is ThemeChoice.Preset -> ThemeLook.Fixed(choice.preset.palette)
+        is ThemeChoice.Preset -> {
+            ThemeLook.Fixed(choice.preset.palette)
+        }
 
-    is ThemeChoice.Custom -> {
-        val theme = themeDao().find(choice.id.databaseValue)?.decoded(ThemeRecord::theme)
+        is ThemeChoice.Custom -> {
+            val theme = themeDao().find(choice.id.databaseValue)?.decoded(ThemeRecord::theme)
 
-        theme?.let { ThemeLook.Fixed(it.palette) } ?: ThemeLook.followsDevice
+            theme?.let { ThemeLook.Fixed(it.palette) } ?: ThemeLook.followsDevice
+        }
     }
-}
 
 private suspend fun AppDatabase.fetchStyle(): ThemeStyle = ThemeStyle(
     corner = fetchSetting(SettingKey.cornerStyle),
