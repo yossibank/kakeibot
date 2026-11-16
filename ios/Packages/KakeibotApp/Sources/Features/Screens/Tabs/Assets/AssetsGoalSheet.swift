@@ -83,6 +83,7 @@ struct AssetsGoalSheet: View {
                 hidePanel()
             }
         }
+        .presentationSizing(.tallForm)
     }
 }
 

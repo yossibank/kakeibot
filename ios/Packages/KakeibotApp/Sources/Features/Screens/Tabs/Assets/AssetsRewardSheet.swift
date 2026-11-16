@@ -61,6 +61,7 @@ struct AssetsRewardSheet: View {
                 await model.setPurchased(id, isPurchased: false)
             }
         }
+        .presentationSizing(.tallForm)
     }
 }
 

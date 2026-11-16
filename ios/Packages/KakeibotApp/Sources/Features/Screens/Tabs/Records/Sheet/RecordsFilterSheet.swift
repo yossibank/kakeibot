@@ -58,6 +58,7 @@ struct RecordsFilterSheet: View {
         }
         .haptic(.selection, trigger: filter)
         .presentationDetents([.medium, .large])
+        .presentationSizing(.tallForm)
     }
 }
 

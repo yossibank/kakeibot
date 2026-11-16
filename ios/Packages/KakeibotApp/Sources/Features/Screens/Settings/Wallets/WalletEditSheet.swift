@@ -155,6 +155,7 @@ public struct WalletEditSheet: View {
         .task {
             await model.load()
         }
+        .presentationSizing(.tallForm)
     }
 }
 

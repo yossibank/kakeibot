@@ -109,6 +109,7 @@ public struct StampEditSheet: View {
         .task {
             await model.load()
         }
+        .presentationSizing(.tallForm)
     }
 }
 

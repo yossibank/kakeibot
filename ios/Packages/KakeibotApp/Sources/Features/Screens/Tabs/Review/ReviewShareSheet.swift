@@ -84,6 +84,7 @@ struct ReviewShareSheet: View {
             Backdrop()
                 .ignoresSafeArea()
         }
+        .presentationSizing(.tallForm)
     }
 }
 

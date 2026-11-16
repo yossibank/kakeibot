@@ -36,6 +36,7 @@ public struct FittedSheet<Content: View>: View {
         }
         .presentationDragIndicator(.visible)
         .presentationBackground(Palette.panel)
+        .presentationSizing(.form.fitted(horizontal: false, vertical: true))
     }
 }
 
