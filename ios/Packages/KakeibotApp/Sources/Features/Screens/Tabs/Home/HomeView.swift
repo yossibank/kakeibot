@@ -250,7 +250,7 @@ private extension HomeView {
 }
 
 private extension HomeView {
-    static let twoColumnWidth: CGFloat = 800
+    static let twoColumnWidth: CGFloat = 760
 
     static var cardTransition: AnyTransition {
         .offset(y: 16).combined(with: .opacity)
