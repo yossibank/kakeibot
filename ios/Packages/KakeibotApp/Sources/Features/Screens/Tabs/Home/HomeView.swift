@@ -80,12 +80,15 @@ public struct HomeView: View {
             VStack(spacing: 12) {
                 header
 
-                if setup.showsCard {
-                    setupCard
-                }
+                TwoColumnStack(spacing: 12, minWidth: Self.twoColumnWidth) {
+                    if setup.showsCard {
+                        setupCard
+                    }
 
-                ForEach(model.homeLayout.visible) { section in
-                    sectionView(section)
+                    ForEach(model.homeLayout.visible) { section in
+                        sectionView(section)
+                            .layoutColumn(Self.column(of: section))
+                    }
                 }
             }
             .padding(.horizontal, 16)
@@ -247,12 +250,21 @@ private extension HomeView {
 }
 
 private extension HomeView {
+    static let twoColumnWidth: CGFloat = 800
+
     static var cardTransition: AnyTransition {
         .offset(y: 16).combined(with: .opacity)
     }
 
     var periodTitle: String {
         "\(String(model.month.year))年 \(model.month.month)月"
+    }
+
+    static func column(of section: HomeSection) -> TwoColumnLayout.Column {
+        switch section {
+        case .customize, .budget, .templates: .leading
+        case .recent, .bills, .stamps: .trailing
+        }
     }
 
     func openPendingDay() {
