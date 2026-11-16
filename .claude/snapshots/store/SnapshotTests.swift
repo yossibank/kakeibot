@@ -39,6 +39,7 @@ extension SnapshotTests {
         case phone
         case duoOuter
         case duoInner
+        case pad
         case header
         case search
 
@@ -47,6 +48,7 @@ extension SnapshotTests {
             case .phone: CGSize(width: 440, height: 956)
             case .duoOuter: CGSize(width: 466, height: 678)
             case .duoInner: CGSize(width: 951, height: 669)
+            case .pad: CGSize(width: 1032, height: 1376)
             case .header: CGSize(width: 1920, height: 823)
             case .search: CGSize(width: 1920, height: 1280)
             }
@@ -55,7 +57,7 @@ extension SnapshotTests {
         var scale: CGFloat {
             switch self {
             case .phone, .duoOuter, .duoInner: 3
-            case .header, .search: 2
+            case .pad, .header, .search: 2
             }
         }
 
@@ -64,6 +66,7 @@ extension SnapshotTests {
             case .phone: "6.9"
             case .duoOuter: "duo-outer"
             case .duoInner: "duo-inner"
+            case .pad: "13"
             case .header: "header"
             case .search: "search"
             }
@@ -72,6 +75,7 @@ extension SnapshotTests {
         var headerHeight: CGFloat {
             switch self {
             case .duoOuter, .duoInner: 216
+            case .pad: 400
             default: 300
             }
         }
@@ -80,7 +84,15 @@ extension SnapshotTests {
             switch self {
             case .duoOuter: 0.78
             case .duoInner: 1.6
+            case .pad: 2.4
             default: 1
+            }
+        }
+
+        var headlineScale: CGFloat {
+            switch self {
+            case .pad: 2.2
+            default: 1.15
             }
         }
     }
@@ -415,9 +427,9 @@ private extension StorePage {
     }
 
     var header: some View {
-        StoreHeadline(lines: page.lines, lead: page.lead, scale: 1.15)
-            .padding(.leading, 28)
-            .padding(.top, 30)
+        StoreHeadline(lines: page.lines, lead: page.lead, scale: canvas.headlineScale)
+            .padding(.leading, canvas == .pad ? 56 : 28)
+            .padding(.top, canvas == .pad ? 60 : 30)
             .frame(
                 width: canvas.size.width,
                 height: canvas.headerHeight,
@@ -522,7 +534,7 @@ private extension StorePage {
         _ shot: UIImage,
         width: CGFloat
     ) -> some View {
-        PhoneFrame(shot: shot, width: width)
+        PhoneFrame(shot: shot, width: width, corner: canvas == .pad ? 18 : 44)
             .shadow(color: .black.opacity(0.5), radius: 24, y: 16)
     }
 
@@ -678,6 +690,7 @@ private extension StoreBanner {
 private struct PhoneFrame: View {
     let shot: UIImage
     let width: CGFloat
+    var corner: CGFloat = 44
 
     var body: some View {
         let height = width * shot.size.height / shot.size.width
@@ -686,9 +699,9 @@ private struct PhoneFrame: View {
         Image(uiImage: shot)
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .clipShape(.rect(cornerRadius: 44 * scale))
+            .clipShape(.rect(cornerRadius: corner * scale))
             .padding(10 * scale)
-            .background(Color.black, in: .rect(cornerRadius: 54 * scale))
+            .background(Color.black, in: .rect(cornerRadius: (corner + 10) * scale))
             .frame(width: width)
     }
 }
@@ -959,10 +972,20 @@ private extension SnapshotTests {
         )
     ]
 
+    static let padPages = innerPages.map { page in
+        Page(
+            file: page.file,
+            lines: page.lines,
+            lead: page.lead,
+            art: .phone("pad-\(page.file)")
+        )
+    }
+
     static var pageSets: [(Canvas, [Page])] {
         [
             (.duoOuter, outerPages),
-            (.duoInner, innerPages)
+            (.duoInner, innerPages),
+            (.pad, padPages)
         ]
     }
 
