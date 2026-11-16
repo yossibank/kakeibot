@@ -138,7 +138,7 @@ private extension WhatsNewPadScene {
 
             content()
         }
-        .padding(6)
+        .padding(8)
         .frame(width: 128, height: 92)
         .background(Palette.card, in: .rect(cornerRadius: 8))
         .overlay {
