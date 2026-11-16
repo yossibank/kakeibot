@@ -1,10 +1,10 @@
-・Fixed an issue where opening an invitation link to a shared wallet could fail to join it.
-・When you join a shared wallet, a notice now shows the name of the wallet you joined.
-・Fixed template icons and categories not showing in the entry sheet while a shared wallet is chosen.
-・Templates on Home now use wide cards that take up less space.
-・Templates and recent records in the entry sheet are now combined into "Frequent", leaving more room for categories.
-・The card bill month now fits in one row and opens only when you tap it.
-・On tall iPhones, the entry sheet now fills the screen height and its keys are easier to tap.
-・Fixed the type switch briefly moving when you open an income or transfer record.
-・Fixed wallets overlapping the header when scrolling the payment source in the entry sheet.
-・The "Fun" section in Settings now appears once you start using stamps or the reward bank.
+・Kakeibot now works on iPad. Home, Review and Assets are laid out in two columns so you can see your budget at a glance on the large screen.
+・With a keyboard connected to iPad, you can type amounts with the number keys.
+・"Net worth and trend" in Assets is now its own card, separate from your cash on hand.
+・Shared wallets now show a mark next to their names.
+・Choosing a card now scrolls to its billing date.
+・In the widget placement guide, you can now swipe through the samples.
+・The intro on each Settings screen can now be reopened after you close it.
+・Template cards on Home now fit their content and line up from the left.
+・Fixed record rows getting shorter while you type a memo.
+・Fixed categories of shared wallets appearing twice in the records filter.
