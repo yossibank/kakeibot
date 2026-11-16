@@ -14,6 +14,6 @@ extension EntryModelTests {
         let saved = await model.save()
 
         #expect(saved == nil)
-        #expect(model.errorNotice.message == "iPhone の空き容量が足りません")
+        #expect(model.errorNotice.message == "\(DeviceName.current) の空き容量が足りません")
     }
 }

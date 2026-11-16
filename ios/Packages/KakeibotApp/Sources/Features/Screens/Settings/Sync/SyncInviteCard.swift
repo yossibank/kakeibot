@@ -56,7 +56,7 @@ struct SyncInviteCard: View {
                     point(
                         "hand.raised",
                         title: "やめるとき",
-                        text: "この画面で、いつでもやめられます。\n相手の iPhone からは消えます。"
+                        text: "この画面で、いつでもやめられます。\n相手の端末からは消えます。"
                     )
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

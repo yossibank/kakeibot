@@ -183,7 +183,7 @@ private extension EntryVoiceCard {
                 .displayFont(.headline, weight: .medium)
                 .foregroundStyle(Palette.accentStrong)
 
-            Text("声で記録するには、iPhone の設定で\nかけいぼっとの「マイク」と「音声認識」を入にしてください")
+            Text("声で記録するには、\(DeviceName.current) の設定で\nかけいぼっとの「マイク」と「音声認識」を入にしてください")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
