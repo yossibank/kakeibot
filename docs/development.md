@@ -11,7 +11,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | 道具 | 使い道 |
 | --- | --- |
 | [jq](https://jqlang.org/) | テストに使うシミュレーターを選ぶ（`scripts/find-simulator.sh`）。JSON を整形する（`scripts/json-format.sh`） |
-| [ktlint](https://pinterest.github.io/ktlint/) | Kotlin を整形し、書き方を確かめる（`android/.editorconfig`） |
+| [ktlint](https://pinterest.github.io/ktlint/) | Kotlin を整形し、書き方を確かめる（`android/.editorconfig`）。版は Makefile の `KTLINT_VERSION` にそろえる |
 | [Mint](https://github.com/yonaskolb/Mint) | SwiftFormat と LicensePlist の版をそろえる（`Mintfile`） |
 | [pre-commit](https://pre-commit.com/) | commit の前の確認を動かす |
 | [xcbeautify](https://github.com/cpisciotta/xcbeautify) | ビルドとテストの出力を読みやすくする |
