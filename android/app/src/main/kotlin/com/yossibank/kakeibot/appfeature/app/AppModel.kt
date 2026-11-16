@@ -53,21 +53,28 @@ class AppModel(
         }
 
         opening = viewModelScope.launch {
+            var database: AppDatabase? = null
+
             try {
-                val database = openDatabase()
+                val opened = openDatabase()
+                database = opened
 
-                generateRecurring(database)
+                generateRecurring(opened)
 
-                look = database.themeLook()
-                style = database.style()
-                launch = Launch.Ready(database)
+                look = opened.themeLook()
+                style = opened.style()
+                launch = Launch.Ready(opened)
 
-                observeTheme(database)
+                observeTheme(opened)
             } catch (error: CancellationException) {
                 throw error
             } catch (_: Exception) {
                 launch = Launch.Failed
             } finally {
+                if (launch !is Launch.Ready) {
+                    database?.close()
+                }
+
                 opening = null
             }
         }
