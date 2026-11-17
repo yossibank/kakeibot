@@ -115,22 +115,24 @@ extension QuickRecordWidgetSummary {
     }
 
     static func sample() -> QuickRecordWidgetSummary {
-        let tiles = [
-            ("駅前のカフェでモーニング", "カフェ・財布", 650),
-            ("ランチ", "食費・財布", 980),
-            ("電車", "交通・カード", 220),
-            ("外食", "食費・カード", nil),
-            ("本", "趣味・カード", 1500),
-            ("ジム", "健康・銀行", 800),
-            ("おやつ", "食費・財布", 300),
-            ("日用品", "日用品・カード", 1200)
-        ].map { name, detail, amount in
+        let seeds: [(String, String, Int?, Icon.Glyph, String)] = [
+            ("駅前のカフェでモーニング", "カフェ・財布", 650, .food, "#E07A5F"),
+            ("ランチ", "食費・財布", 980, .food, "#E07A5F"),
+            ("電車", "交通・カード", 220, .transit, "#3D5A80"),
+            ("外食", "食費・カード", nil, .food, "#E07A5F"),
+            ("本", "趣味・カード", 1500, .hobby, "#9C6ADE"),
+            ("ジム", "健康・銀行", 800, .medical, "#6CBF84"),
+            ("おやつ", "食費・財布", 300, .food, "#E07A5F"),
+            ("日用品", "日用品・カード", 1200, .daily, "#81B29A")
+        ]
+
+        let tiles = seeds.map { name, detail, amount, glyph, color in
             Tile(
                 id: EntryTemplate.ID(),
                 name: name,
                 detail: detail,
                 amount: amount,
-                icon: nil
+                icon: sampleIcon(glyph, color: color)
             )
         }
 
@@ -141,7 +143,7 @@ extension QuickRecordWidgetSummary {
                 detail: "ランチ・財布",
                 amount: 980,
                 type: .expense,
-                icon: nil
+                icon: sampleIcon(.food, color: "#E07A5F")
             ),
             Record(
                 id: Entry.ID(),
@@ -149,7 +151,7 @@ extension QuickRecordWidgetSummary {
                 detail: "コーヒー・カード",
                 amount: 140,
                 type: .expense,
-                icon: nil
+                icon: sampleIcon(.food, color: "#E07A5F")
             )
         ]
 
@@ -159,6 +161,20 @@ extension QuickRecordWidgetSummary {
             todayRecords: records,
             todayCount: 3,
             recorded: nil
+        )
+    }
+
+    static func sampleIcon(
+        _ glyph: Icon.Glyph,
+        color: String
+    ) -> Icon {
+        Icon(
+            emoji: nil,
+            text: nil,
+            glyph: glyph,
+            color: color,
+            createdAt: .distantPast,
+            updatedAt: .distantPast
         )
     }
 

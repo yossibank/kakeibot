@@ -29,11 +29,90 @@ extension RecordsView {
             }
 
             adjustmentList(on: day.date)
+
+            if selection == nil {
+                let upcoming = model.listRecurrings(on: day.date)
+
+                if !upcoming.isEmpty {
+                    upcomingList(upcoming, on: day.date)
+                        .padding(.top, 8)
+                        .overlay(alignment: .top) {
+                            Hairline(thickness: 1)
+                        }
+                }
+            }
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
         .card()
         .sharesTextScale(id: rows)
+    }
+
+    func upcomingList(
+        _ recurrings: [Recurring],
+        on date: LocalDate
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("予定の固定費")
+                .textFont(.caption2)
+                .tracking(2)
+                .foregroundStyle(Palette.hint)
+                .padding(.bottom, 4)
+
+            ForEach(recurrings, id: \.id) { recurring in
+                Button {
+                    onOpenRecurring(recurring.id)
+                } label: {
+                    upcomingRow(recurring, on: date)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.bottom, 8)
+    }
+
+    func upcomingRow(
+        _ recurring: Recurring,
+        on date: LocalDate
+    ) -> some View {
+        let amount = model.amount(of: recurring, on: date)
+
+        return HStack(spacing: 12) {
+            Image(systemName: "repeat")
+                .sansFont(.small, weight: .light)
+                .foregroundStyle(Palette.hint)
+
+            Text(model.title(of: recurring))
+                .textFont(.subheadline)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(2)
+
+            Spacer()
+
+            AmountText(amount, type: recurring.type, font: .style(.subheadline))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .layoutPriority(1)
+                .opacity(0.6)
+
+            Image(systemName: "chevron.right")
+                .sansFont(.small)
+                .foregroundStyle(Palette.hint)
+        }
+        .padding(.vertical, 8)
+        .contentShape(.rect)
+    }
+
+    func upcomingCard(on date: LocalDate) -> some View {
+        VStack(spacing: 0) {
+            dayHeader(date, day: nil)
+
+            upcomingList(model.listRecurrings(on: date), on: date)
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 4)
+        .card()
     }
 
     @ViewBuilder

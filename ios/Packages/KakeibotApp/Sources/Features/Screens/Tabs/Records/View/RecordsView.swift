@@ -241,8 +241,12 @@ private extension RecordsView {
                 )
             }
 
-            ForEach(model.days, id: \.date) { day in
-                dayCard(day)
+            ForEach(model.listDays) { item in
+                if let day = item.day {
+                    dayCard(day)
+                } else if selection == nil {
+                    upcomingCard(on: item.date)
+                }
             }
 
         case .calendar:

@@ -55,7 +55,8 @@ private extension QuickRecordWidgetView {
                     emptyTemplateGuide
                 } else {
                     grid(of: summary, metrics: metrics)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxHeight: isLarge ? Self.largeGridHeight : nil)
+                        .fixedSize(horizontal: false, vertical: !isLarge)
                 }
 
                 if isLarge {
@@ -109,6 +110,8 @@ private extension QuickRecordWidgetView {
                     .textFont(size: .caption)
                     .tracking(1)
                     .foregroundStyle(Palette.accent)
+
+                receiptLink
 
                 Spacer(minLength: 4)
 
@@ -213,7 +216,7 @@ private extension QuickRecordWidgetView {
 
     func recordRow(_ record: QuickRecordWidgetSummary.Record) -> some View {
         HStack(spacing: 8) {
-            TemplateBadge(icon: record.icon, size: .small)
+            IconTile(record.icon, size: Self.recordIconSize)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(record.title)
@@ -252,6 +255,7 @@ private extension QuickRecordWidgetView {
     }
 
     static let columns = 2
+    static let largeGridHeight: CGFloat = 240
 
     static let regular = Metrics(
         top: 12,

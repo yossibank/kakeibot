@@ -8,6 +8,7 @@ import SwiftUI
 struct MainView: View {
     @State var selection = MainTabSelection()
     @State var sheet: Sheet?
+    @State var startsReceipt = false
     @State var home: HomeModel
     @State var records: RecordsModel
     @State var review: ReviewModel
