@@ -16,10 +16,12 @@ import com.yossibank.kakeibot.designsystem.components.input.symbol
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
+import com.yossibank.kakeibot.store.queries.methods.entry
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.types.EntryOptions
 import com.yossibank.kakeibot.store.writes.methods.WriteError
 import com.yossibank.kakeibot.store.writes.methods.WriteException
+import com.yossibank.kakeibot.store.writes.methods.deleteEntry
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import kotlinx.coroutines.CancellationException
 import java.time.Instant
@@ -27,6 +29,7 @@ import java.time.Instant
 class EntryModel(
     private val database: AppDatabase,
     val today: LocalDate,
+    private val editing: Identifier<Entry>? = null,
 ) {
     enum class Field {
         Category,
@@ -62,6 +65,9 @@ class EntryModel(
         private set
 
     private var options: EntryOptions? by mutableStateOf(null)
+
+    val isEditing: Boolean
+        get() = editing != null
 
     val amount: Int
         get() = calculator.amount
@@ -124,9 +130,21 @@ class EntryModel(
 
             val loaded = database.entryOptions()
 
+            val entry = editing?.let { database.entry(it) }
+
             options = loaded
-            categoryId = categories.firstOrNull()?.id
-            walletId = loaded.wallets.firstOrNull()?.id
+
+            if (entry != null) {
+                type = entry.type
+                calculator = AmountCalculator(amount = entry.amount)
+                date = entry.date
+                categoryId = entry.categoryId
+                walletId = entry.walletId
+                memo = entry.memo ?: ""
+            } else {
+                categoryId = categories.firstOrNull()?.id
+                walletId = loaded.wallets.firstOrNull()?.id
+            }
         } catch (error: CancellationException) {
             throw error
         } catch (_: Exception) {
@@ -198,6 +216,7 @@ class EntryModel(
         try {
             database.saveEntry(
                 draft = draft,
+                editing = editing,
                 at = Instant.now(),
             )
 
@@ -214,6 +233,29 @@ class EntryModel(
             return false
         } catch (_: Exception) {
             message = "保存できませんでした"
+            return false
+        } finally {
+            isSaving = false
+        }
+    }
+
+    suspend fun delete(): Boolean {
+        val editing = editing
+
+        if (editing == null || isSaving) {
+            return false
+        }
+
+        isSaving = true
+
+        try {
+            database.deleteEntry(id = editing)
+
+            return true
+        } catch (error: CancellationException) {
+            throw error
+        } catch (_: Exception) {
+            message = "削除できませんでした"
             return false
         } finally {
             isSaving = false

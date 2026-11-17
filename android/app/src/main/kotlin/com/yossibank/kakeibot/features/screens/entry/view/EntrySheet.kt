@@ -20,12 +20,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +41,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
+import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -54,14 +61,18 @@ import kotlinx.coroutines.launch
 fun EntrySheet(
     database: AppDatabase,
     today: LocalDate,
+    editing: Identifier<Entry>?,
     onClose: () -> Unit,
 ) {
-    val model = remember(database) {
+    val model = remember(database, editing) {
         EntryModel(
             database = database,
             today = today,
+            editing = editing,
         )
     }
+
+    var isConfirmingDelete by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -116,6 +127,7 @@ fun EntrySheet(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SaveButton(
+                    title = if (model.isEditing) "保存する" else "記録する",
                     modifier = Modifier.weight(1f),
                     onSave = {
                         scope.launch {
@@ -126,17 +138,52 @@ fun EntrySheet(
                     },
                 )
 
-                NextButton(
-                    onSave = {
-                        scope.launch {
-                            if (model.save()) {
-                                model.startNext()
+                if (model.isEditing) {
+                    RoundButton(onSelect = { isConfirmingDelete = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_trash),
+                            contentDescription = null,
+                            modifier = Modifier.size(22.dp),
+                            tint = Palette.rose,
+                        )
+                    }
+                } else {
+                    RoundButton(
+                        onSelect = {
+                            scope.launch {
+                                if (model.save()) {
+                                    model.startNext()
+                                }
                             }
-                        }
-                    },
-                )
+                        },
+                    ) {
+                        Text(
+                            text = "続けて",
+                            color = Palette.accent,
+                            style = textFont(
+                                size = FontSize.Caption,
+                                weight = FontWeight.SemiBold,
+                            ),
+                        )
+                    }
+                }
             }
         }
+    }
+
+    if (isConfirmingDelete) {
+        DeleteDialog(
+            onConfirm = {
+                isConfirmingDelete = false
+
+                scope.launch {
+                    if (model.delete()) {
+                        onClose()
+                    }
+                }
+            },
+            onDismiss = { isConfirmingDelete = false },
+        )
     }
 }
 
@@ -187,6 +234,7 @@ private fun CloseButton(onClose: () -> Unit) {
 
 @Composable
 private fun SaveButton(
+    title: String,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -199,7 +247,7 @@ private fun SaveButton(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "記録する",
+            text = title,
             color = Palette.backgroundTop,
             style = textFont(
                 size = FontSize.Body,
@@ -210,7 +258,10 @@ private fun SaveButton(
 }
 
 @Composable
-private fun NextButton(onSave: () -> Unit) {
+private fun RoundButton(
+    onSelect: () -> Unit,
+    content: @Composable () -> Unit,
+) {
     Box(
         modifier = Modifier
             .size(52.dp)
@@ -219,16 +270,46 @@ private fun NextButton(onSave: () -> Unit) {
                 width = 1.dp,
                 color = Palette.accent.opacity(Emphasis.Medium),
                 shape = CircleShape,
-            ).clickable(onClick = onSave),
+            ).clickable(onClick = onSelect),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
-            text = "続けて",
-            color = Palette.accent,
-            style = textFont(
-                size = FontSize.Caption,
-                weight = FontWeight.SemiBold,
-            ),
-        )
+        content()
     }
+}
+
+@Composable
+private fun DeleteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = "削除する",
+                    color = Palette.rose,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = "やめる",
+                    color = Palette.subtext,
+                )
+            }
+        },
+        title = {
+            Text(
+                text = "この記録を削除しますか",
+                color = Palette.text,
+                style = textFont(
+                    size = FontSize.Body,
+                    weight = FontWeight.SemiBold,
+                ),
+            )
+        },
+        containerColor = Palette.backgroundTop,
+    )
 }
