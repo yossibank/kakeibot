@@ -96,6 +96,10 @@ private var isModelUsable: Bool {
         return false
     }
 
+    guard ProcessInfo.processInfo.environment["KAKEIBOT_MODEL_TESTS"] == "1" else {
+        return false
+    }
+
     let model = SystemLanguageModel.default
     return model.isAvailable && model.supportsLocale(Locale(identifier: "ja_JP"))
 }
