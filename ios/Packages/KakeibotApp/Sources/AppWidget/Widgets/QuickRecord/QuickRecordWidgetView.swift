@@ -55,7 +55,8 @@ private extension QuickRecordWidgetView {
                     emptyTemplateGuide
                 } else {
                     grid(of: summary, metrics: metrics)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxHeight: isLarge ? Self.largeGridHeight : nil)
+                        .fixedSize(horizontal: false, vertical: !isLarge)
                 }
 
                 if isLarge {
@@ -254,6 +255,7 @@ private extension QuickRecordWidgetView {
     }
 
     static let columns = 2
+    static let largeGridHeight: CGFloat = 240
 
     static let regular = Metrics(
         top: 12,
