@@ -22,6 +22,10 @@ public extension ReviewModel {
         rewriting: Bool = false,
         now: Date = Date()
     ) async {
+        commentRequest += 1
+
+        let request = commentRequest
+
         guard Self.canWriteComment else {
             comment = .hidden
             return
@@ -32,6 +36,10 @@ public extension ReviewModel {
         }
 
         let isFolded = await (try? database.setting(.reviewCommentFolded)) ?? false
+
+        guard request == commentRequest else {
+            return
+        }
 
         guard !isFolded else {
             comment = .folded
@@ -52,10 +60,21 @@ public extension ReviewModel {
         let suggestion = insights.first?.suggestion(in: period) ?? ""
         let saved = try? await database.reviewComment(for: key)
 
+        guard request == commentRequest else {
+            return
+        }
+
         if let saved,
            !rewriting,
            !saved.needsRewrite(basis: basis, isCurrent: isCurrent, today: now, calendar: .current) {
             comment = .ready(saved)
+            return
+        }
+
+        if !rewriting,
+           let failedAt = commentFailedAt[key],
+           Calendar.current.isDate(failedAt, inSameDayAs: now) {
+            comment = saved.map(CommentState.ready) ?? .failed
             return
         }
 
@@ -68,14 +87,17 @@ public extension ReviewModel {
             isCurrent: isCurrent
         )
 
-        guard period.commentKey == key else {
+        guard request == commentRequest else {
             return
         }
 
         guard let body else {
+            commentFailedAt[key] = now
             comment = saved.map(CommentState.ready) ?? .failed
             return
         }
+
+        commentFailedAt[key] = nil
 
         let new = ReviewComment(
             period: key,

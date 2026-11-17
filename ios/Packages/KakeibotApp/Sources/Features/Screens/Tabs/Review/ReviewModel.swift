@@ -53,6 +53,8 @@ public final class ReviewModel: ScreenModel {
 
     @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
     @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
+    @ObservationIgnored var commentRequest = 0
+    @ObservationIgnored var commentFailedAt: [String: Date] = [:]
 
     let database: AppDatabase
 
