@@ -46,7 +46,14 @@ public extension RecordsModel {
     }
 
     func listRecurrings(on date: LocalDate) -> [Recurring] {
-        filterTitle == nil ? upcomingRecurrings(on: date) : []
+        guard
+            filterTitle == nil,
+            !isSearching
+        else {
+            return []
+        }
+
+        return upcomingRecurrings(on: date)
     }
 
     func upcomingRecurrings(on date: LocalDate) -> [Recurring] {
