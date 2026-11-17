@@ -37,7 +37,7 @@
 | --- | --- |
 | 理由 | 端末の中の Foundation Models で動き、使う人が増えても費用がかからない。無料にして、ストアで打ち出してアプリの流入を増やす |
 | 却下 | AI の振り返りをすべて Pro に含める、すべて無料にする |
-| 関連 | 段階は [overview](../overview.md) にある |
+| 関連 | 段階は [overview](../overview.md)、作る時は [ai-review](ai-review.md) にある |
 
 > [!IMPORTANT]
 > - 無料では、月の振り返りに、ひとことと見直しの提案を出す。
