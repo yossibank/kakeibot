@@ -40,6 +40,7 @@ public final class ReviewModel: ScreenModel {
     }
 
     public internal(set) var errorNotice = ErrorNotice()
+    public internal(set) var comment: CommentState = .hidden
 
     private(set) var entries: [Entry] = []
 
@@ -53,11 +54,11 @@ public final class ReviewModel: ScreenModel {
     @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
     @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
 
+    let database: AppDatabase
+
     @ObservationIgnored private var summaries: [
         ClosedRange<LocalDate>: ReviewSummary
     ] = [:]
-
-    private let database: AppDatabase
 
     public init(
         database: AppDatabase,

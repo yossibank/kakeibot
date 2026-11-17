@@ -35,7 +35,7 @@ erDiagram
     entry ||--o{ entry_item : "entry_id"
 ```
 
-`no_spend_day`・`item_name`・`theme`・`setting` はほかの表を参照しない。`setting` の `theme_id` は、値として持つ。
+`no_spend_day` と `item_name` は、ほかの表を参照しない。`theme` と `setting` も参照せず、`setting` の `theme_id` は値として持つ。
 
 ## 📏 共通の決まり
 
@@ -90,7 +90,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 表ごとに、列と型と補足を書く。型は SQLite の型で書く。
 
-`theme` と `setting` は [data-settings](data-settings.md)、同期のための表は [data-sync](data-sync.md) にある。
+`theme`・`setting`・`review_comment` は [data-settings](data-settings.md) にある。同期のための表は [data-sync](data-sync.md) にある。
 
 ### icon
 

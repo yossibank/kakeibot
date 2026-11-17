@@ -1,7 +1,7 @@
-# 設定とテーマの表
+# 設定とテーマとひとことの表
 
 > [!NOTE]
-> テーマの表と、設定の表の形が分かる。
+> テーマの表・設定の表・振り返りのひとことの表の形が分かる。
 > ほかの表と共通の決まりは [data](data.md) にある。
 
 ## 🗄️ 表
@@ -57,6 +57,7 @@ expense・income の列は、描画に使わない。
 | records_layout | `calendar` `list` | 空ならカレンダー |
 | review_scale | `week` `month` `year` | 空なら月 |
 | review_kind | `expense` `income` `balance` | 空なら支出 |
+| review_comment_folded | `true` なら、振り返りのひとことを 1 行に畳む | 畳んでいる間は、ひとことを作らない。Android は持たない |
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの | 空ならすべて出す。画面の名前は、表の下の一覧にある |
 | closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ | 空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで | |
@@ -90,3 +91,15 @@ closed_hints に入る画面の名前は、次のとおり。
 - `backup`
 - `appIcons`
 - `widgetGuide`
+
+### review_comment
+
+振り返りの AI のひとことを、期間ごとに 1 行持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/ai-review.md](decisions/ai-review.md#ひとことの保存) にある。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| period | TEXT | 主キー。`month:2026-11-01` のように、週・月・年と期間の初日をつなぐ |
+| body | TEXT | 気づきの文 |
+| suggestion | TEXT | 提案の文 |
+| basis | TEXT | 作った時にモデルへ渡した事実の文。変わったら作り直す |
+| created_at | TEXT | |

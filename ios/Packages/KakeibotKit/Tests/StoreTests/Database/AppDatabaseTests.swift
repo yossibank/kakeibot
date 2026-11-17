@@ -44,6 +44,7 @@ private extension AppDatabaseTests {
         "item_name",
         "no_spend_day",
         "recurring",
+        "review_comment",
         "reward_goal",
         "reward_log",
         "reward_rule",

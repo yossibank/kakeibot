@@ -1,4 +1,4 @@
-.PHONY: setup open format licenses build test-build test snapshot android-build android-test verify verify-docs
+.PHONY: setup open format licenses build test-build test test-model snapshot android-build android-test verify verify-docs
 
 SIMULATOR ?= $(shell scripts/find-simulator.sh)
 XCBEAUTIFY = $(shell command -v xcbeautify)
@@ -44,6 +44,15 @@ test:
 	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
 	@mkdir -p .build
 	set -o pipefail; $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never test 2>&1 $(BEAUTIFY) | tee .build/test.log
+
+test-model:
+	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
+	@rm -rf .build/model-test.xcresult .build/model-test
+	@mkdir -p .build/model-test
+	-set -o pipefail; TEST_RUNNER_KAKEIBOT_MODEL_TESTS=1 $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never -resultBundlePath .build/model-test.xcresult -only-testing:FeaturesTests/ReviewCommentModelAccuracyTests test >| .build/model-test.log 2>&1
+	@xcrun xcresulttool export attachments --path .build/model-test.xcresult --output-path .build/model-test >/dev/null
+	@cat .build/model-test/*.txt; echo
+	@grep -E '(passed|failed) after' .build/model-test.log | tail -1
 
 snapshot:
 	@test -n "$(SNAPSHOT)" || { echo "NG SNAPSHOT に .claude/snapshots/ の下のセットの名前を渡す"; exit 1; }
