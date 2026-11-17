@@ -110,6 +110,8 @@ private extension QuickRecordWidgetView {
                     .tracking(1)
                     .foregroundStyle(Palette.accent)
 
+                receiptLink
+
                 Spacer(minLength: 4)
 
                 Text("今日の支出 \(AmountText.text(summary.todayExpense))")
@@ -213,7 +215,7 @@ private extension QuickRecordWidgetView {
 
     func recordRow(_ record: QuickRecordWidgetSummary.Record) -> some View {
         HStack(spacing: 8) {
-            TemplateBadge(icon: record.icon, size: .small)
+            IconTile(record.icon, size: Self.recordIconSize)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(record.title)

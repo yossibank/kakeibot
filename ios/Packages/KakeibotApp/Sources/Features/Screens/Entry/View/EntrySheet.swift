@@ -35,9 +35,11 @@ public struct EntrySheet: View {
     @Environment(\.dismiss) private var dismiss
 
     private let onChange: (EntryChange) -> Void
+    private let startsReceipt: Bool
 
     public init(
         model: EntryModel,
+        startsReceipt: Bool = false,
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
@@ -45,6 +47,7 @@ public struct EntrySheet: View {
         _notice = State(initialValue: EntryNoticeModel(database: model.database))
 
         self.onChange = onChange
+        self.startsReceipt = startsReceipt
     }
 
     public var body: some View {
@@ -147,6 +150,12 @@ public struct EntrySheet: View {
             }
             .task {
                 await load()
+
+                if startsReceipt, showsReceiptButton {
+                    withAnimation(.snappy) {
+                        receipt.start(for: model, isPro: isPro)
+                    }
+                }
             }
             .task {
                 await model.observeHistory()

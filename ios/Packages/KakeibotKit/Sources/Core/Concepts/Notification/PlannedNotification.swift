@@ -30,6 +30,7 @@ public extension PlannedNotification {
         case recurring(Recurring.ID)
         case template(EntryTemplate.ID)
         case newTemplate
+        case receipt
 
         public var link: String {
             switch self {
@@ -38,6 +39,7 @@ public extension PlannedNotification {
             case let .recurring(id): "recurring/\(id)"
             case let .template(id): "template/\(id)"
             case .newTemplate: "new-template"
+            case .receipt: "receipt"
             }
         }
 
@@ -49,6 +51,10 @@ public extension PlannedNotification {
 
             case "new-template":
                 self = .newTemplate
+                return
+
+            case "receipt":
+                self = .receipt
                 return
 
             default:

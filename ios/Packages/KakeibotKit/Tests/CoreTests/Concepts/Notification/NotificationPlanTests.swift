@@ -117,6 +117,8 @@ struct NotificationPlanTests {
         #expect(PlannedNotification.Route(link: recurring.link) == recurring)
         #expect(PlannedNotification.Route(link: template.link) == template)
         #expect(PlannedNotification.Route(link: "new-template") == .newTemplate)
+        #expect(PlannedNotification.Route(link: "receipt") == .receipt)
+        #expect(PlannedNotification.Route.receipt.link == "receipt")
         #expect(PlannedNotification.Route(link: "template/x") == nil)
         #expect(PlannedNotification.Route(link: "entry/2026-13-01") == nil)
         #expect(PlannedNotification.Route(link: "budget/1") == nil)

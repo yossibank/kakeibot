@@ -262,6 +262,8 @@ class NotificationPlanTest {
             assertEquals(home, PlannedNotification.Route.of(url = homeURL))
             assertEquals(entry, PlannedNotification.Route.of(url = entryURL))
             assertEquals("kakeibot://new-template", newTemplateURL.toString())
+            assertEquals(PlannedNotification.Route.Receipt, PlannedNotification.Route.of("receipt"))
+            assertEquals("receipt", PlannedNotification.Route.Receipt.link)
             assertEquals(
                 PlannedNotification.Route.NewTemplate,
                 PlannedNotification.Route.of(url = newTemplateURL),

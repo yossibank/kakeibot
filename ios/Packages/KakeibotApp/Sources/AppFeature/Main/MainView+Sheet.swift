@@ -28,7 +28,7 @@ extension MainView {
     func sheetContent(for sheet: Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(model: draft, onChange: show)
+            EntrySheet(model: draft, startsReceipt: startsReceipt, onChange: show)
 
         case let .edit(id):
             EntrySheet(

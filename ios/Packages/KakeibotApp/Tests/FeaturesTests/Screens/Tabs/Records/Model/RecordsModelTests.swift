@@ -105,6 +105,35 @@ struct RecordsModelTests {
     }
 
     @Test
+    func listsUpcomingDaysAmongRecordedDays() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let start = try #require(LocalDate("2026-09-01"))
+
+        let draft = RecurringDraft(
+            type: .expense,
+            amount: 78000,
+            categoryId: options.expenseCategories.first?.id,
+            walletId: options.wallets.first?.id,
+            memo: "家賃",
+            frequency: .monthly,
+            month: 1,
+            day: 27,
+            startDate: start
+        )
+
+        _ = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
+        try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
+        let model = RecordsModel(database: setup.database, today: setup.today)
+
+        await model.load()
+
+        #expect(model.upcomingDates.map(\.description) == ["2026-10-27"])
+        #expect(model.listDays.map(\.date.description) == ["2026-10-27", "2026-10-12"])
+        #expect(model.listDays.first?.day == nil)
+    }
+
+    @Test
     func describesRowsWithMemoAndWallet() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")

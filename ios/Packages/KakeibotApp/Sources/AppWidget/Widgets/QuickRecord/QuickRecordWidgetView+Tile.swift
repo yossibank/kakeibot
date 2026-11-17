@@ -29,29 +29,25 @@ private extension QuickRecordWidgetView {
         _ tile: QuickRecordWidgetSummary.Tile,
         padding: CGFloat
     ) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 4) {
-                TemplateBadge(icon: tile.icon, size: .small)
+        HStack(spacing: 8) {
+            IconTile(tile.icon, size: iconSize)
+                .foregroundStyle(Palette.accentStrong)
 
+            VStack(alignment: .leading, spacing: 1) {
                 Text(tile.name)
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-            }
+                    .minimumScaleFactor(0.8)
 
-            if isLarge {
-                Text(tile.detail)
-                    .textFont(size: .micro)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.leading, Self.badgeSize + 4)
-            }
+                if isLarge {
+                    Text(tile.detail)
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
 
-            Spacer(minLength: 0)
-
-            HStack(spacing: 4) {
                 if let amount = tile.amount {
                     AmountText(
                         amount,
@@ -66,18 +62,18 @@ private extension QuickRecordWidgetView {
                         .textFont(size: .micro)
                         .foregroundStyle(Palette.hint)
                 }
+            }
 
-                Spacer(minLength: 0)
+            Spacer(minLength: 0)
 
-                if tile.amount == nil {
-                    EditBadge(size: Self.markSize)
-                } else {
-                    Image(systemName: "plus")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Palette.backgroundTop)
-                        .frame(width: Self.markSize, height: Self.markSize)
-                        .background(Palette.accent, in: Circle())
-                }
+            if tile.amount == nil {
+                EditBadge(size: Self.markSize)
+            } else {
+                Image(systemName: "plus")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(Palette.backgroundTop)
+                    .frame(width: Self.markSize, height: Self.markSize)
+                    .background(Palette.accent, in: Circle())
             }
         }
         .padding(.horizontal, 8)
@@ -89,5 +85,10 @@ private extension QuickRecordWidgetView {
 
 extension QuickRecordWidgetView {
     static let tileRadius: CGFloat = 12
+    static let recordIconSize: CGFloat = 24
     static let markSize: CGFloat = 20
+
+    var iconSize: CGFloat {
+        isLarge ? 30 : 26
+    }
 }

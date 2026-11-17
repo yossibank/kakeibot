@@ -99,6 +99,12 @@ extension MainView {
             case .newTemplate:
                 tab = .home
                 sheet = .newTemplate
+
+            case .receipt:
+                tab = .home
+                draft.date = today
+                startsReceipt = true
+                sheet = .new
             }
         }
     }
@@ -162,6 +168,8 @@ extension MainView {
 
     func prepareDraft() {
         let model = EntryModel(database: database, date: today)
+
+        startsReceipt = false
 
         draft = model
 

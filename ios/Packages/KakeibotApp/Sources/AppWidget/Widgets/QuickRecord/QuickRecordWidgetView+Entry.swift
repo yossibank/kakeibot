@@ -33,6 +33,27 @@ extension QuickRecordWidgetView {
     }
 }
 
+extension QuickRecordWidgetView {
+    @ViewBuilder
+    var receiptLink: some View {
+        if let url = PlannedNotification.Route.receipt.url {
+            Link(destination: url) {
+                Label("レシート", systemImage: "doc.text.viewfinder")
+                    .textFont(size: .micro, weight: .medium)
+                    .foregroundStyle(Palette.accent)
+                    .lineLimit(1)
+                    .fixedSize()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .overlay {
+                        Capsule()
+                            .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
+                    }
+            }
+        }
+    }
+}
+
 private extension QuickRecordWidgetView {
     var entryURL: URL? {
         let today = LocalDate(entry.date, in: .current)
@@ -51,36 +72,34 @@ private extension QuickRecordWidgetView {
     }
 
     func entryTileFace(padding: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 4) {
-                Image(systemName: "plus")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(Palette.backgroundTop)
-                    .frame(width: Self.badgeSize, height: Self.badgeSize)
-                    .background(Palette.accent, in: Circle())
+        HStack(spacing: 8) {
+            Image(systemName: "plus")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(Palette.backgroundTop)
+                .frame(width: iconSize, height: iconSize)
+                .background(Palette.accent, in: Circle())
 
+            VStack(alignment: .leading, spacing: 1) {
                 Text("記録する")
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accent)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
-            }
 
-            if isLarge {
-                Text("入力の画面を開きます")
+                if isLarge {
+                    Text("入力の画面を開きます")
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+
+                Text("金額を入れる")
                     .textFont(size: .micro)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.leading, Self.badgeSize + 4)
+                    .foregroundStyle(Palette.hint)
             }
 
             Spacer(minLength: 0)
-
-            Text("金額を入れる")
-                .textFont(size: .micro)
-                .foregroundStyle(Palette.hint)
-                .frame(minHeight: Self.markSize)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, padding)
