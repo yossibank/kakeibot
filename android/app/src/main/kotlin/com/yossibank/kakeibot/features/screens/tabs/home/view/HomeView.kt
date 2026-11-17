@@ -40,6 +40,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.home.model.HomeModel
+import com.yossibank.kakeibot.features.shared.settingsparts.RoundIconButton
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.abs
 
@@ -49,6 +50,7 @@ fun HomeView(
     today: LocalDate,
     onEditBudget: (YearMonth, Int?) -> Unit,
     onOpenEntry: (Identifier<Entry>) -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     val model = remember(database) { HomeModel(database = database) }
 
@@ -80,9 +82,16 @@ fun HomeView(
 
                 Text(
                     text = model.periodText,
-                    modifier = Modifier.alignByBaseline(),
+                    modifier = Modifier
+                        .alignByBaseline()
+                        .weight(1f),
                     color = Palette.subtext,
                     style = textFont(style = FontTextStyle.Caption),
+                )
+
+                RoundIconButton(
+                    icon = R.drawable.ic_settings,
+                    onSelect = onOpenSettings,
                 )
             }
         }

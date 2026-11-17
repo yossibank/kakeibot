@@ -23,6 +23,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetEditSheet
+import com.yossibank.kakeibot.features.screens.settings.menu.SettingsMenuSheet
 import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
 import com.yossibank.kakeibot.features.screens.tabs.home.view.HomeView
 import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
@@ -38,6 +39,7 @@ fun MainView(
     var isEntryShown by rememberSaveable { mutableStateOf(false) }
     var editing by remember { mutableStateOf<Identifier<Entry>?>(null) }
     var budgetTarget by remember { mutableStateOf<BudgetTarget?>(null) }
+    var isSettingsShown by rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -65,6 +67,7 @@ fun MainView(
                                     editing = id
                                     isEntryShown = true
                                 },
+                                onOpenSettings = { isSettingsShown = true },
                             )
                         }
 
@@ -116,6 +119,19 @@ fun MainView(
                 today = today,
                 editing = editing,
                 onClose = { isEntryShown = false },
+            )
+        }
+
+        AnimatedVisibility(
+            visible = isSettingsShown,
+            modifier = Modifier.zIndex(3f),
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it },
+        ) {
+            SettingsMenuSheet(
+                database = database,
+                today = today,
+                onClose = { isSettingsShown = false },
             )
         }
 

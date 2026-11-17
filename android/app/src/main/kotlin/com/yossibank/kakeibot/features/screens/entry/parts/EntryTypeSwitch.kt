@@ -40,14 +40,16 @@ fun EntryTypeSwitch(
     selection: Entry.Kind,
     onSelect: (Entry.Kind) -> Unit,
     modifier: Modifier = Modifier,
+    hasTransfer: Boolean = true,
 ) {
     val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(12.dp))
+    val shown = types.filter { hasTransfer || it.first != Entry.Kind.transfer }
 
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        types.forEach { (type, title, icon) ->
+        shown.forEach { (type, title, icon) ->
             val isSelected = type == selection
             val color = if (isSelected) Palette.backgroundTop else Palette.subtext
 
