@@ -20,6 +20,42 @@ extension WhatsNewRelease {
                 ],
                 action: nil,
                 actionTitle: ""
+            ),
+            Feature(
+                systemImage: "calendar.badge.clock",
+                title: "予定の固定費",
+                shortTitle: "予定",
+                lead: "月末までの固定費を先に見られます",
+                points: [
+                    "明日から月末までの固定費を、日付ごとに並べます",
+                    "「これから」と「これまで」で、今日の前後を分けます",
+                    "押すと、その固定費を開けます"
+                ],
+                steps: [
+                    Step(scene: .upcomingCaptions, caption: "これからの日が上に並ぶ"),
+                    Step(scene: .upcomingDay, caption: "日付ごとに固定費を見る"),
+                    Step(scene: .upcomingOpen, caption: "押して固定費を開く")
+                ],
+                action: .records,
+                actionTitle: "記録を見る"
+            ),
+            Feature(
+                systemImage: "square.grid.2x2",
+                title: "すぐ記録のウィジェット",
+                shortTitle: "ウィジェット",
+                lead: "ホーム画面から色で選んで記録できます",
+                points: [
+                    "テンプレートに、カテゴリの色のアイコンを付けます",
+                    "大きいウィジェットでは、今日の記録も色で見分けられます",
+                    "「レシート」から、読み取りをすぐ始められます"
+                ],
+                steps: [
+                    Step(scene: .widgetTiles, caption: "カテゴリの色で選ぶ"),
+                    Step(scene: .widgetReceipt, caption: "「レシート」を押す"),
+                    Step(scene: .receiptCamera, caption: "そのまま読み取りが始まる")
+                ],
+                action: nil,
+                actionTitle: ""
             )
         ]
     )

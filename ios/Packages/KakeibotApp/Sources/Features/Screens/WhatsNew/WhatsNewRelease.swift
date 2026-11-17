@@ -11,6 +11,7 @@ public struct WhatsNewRelease: Identifiable, Sendable {
 public extension WhatsNewRelease {
     enum Action: Hashable, Sendable {
         case entry
+        case records
         case assets
         case setup(SetupItem)
     }

@@ -269,7 +269,7 @@ private extension WidgetGuideStage {
 
     func recordRow(_ record: Record) -> some View {
         HStack(spacing: 8) {
-            IconTile(icon(record.glyph, color: record.color), size: 24)
+            IconTile(Self.icon(record.glyph, color: record.color), size: 24)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(record.title)
@@ -292,7 +292,7 @@ private extension WidgetGuideStage {
         isLarge: Bool = false
     ) -> some View {
         HStack(spacing: 8) {
-            IconTile(icon(tile.glyph, color: tile.color), size: isLarge ? 30 : 26)
+            IconTile(Self.icon(tile.glyph, color: tile.color), size: isLarge ? 30 : 26)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(tile.name)
@@ -339,19 +339,5 @@ private extension WidgetGuideStage {
         .padding(8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 4)
-    }
-
-    func icon(
-        _ glyph: Icon.Glyph,
-        color: String
-    ) -> Icon {
-        Icon(
-            emoji: nil,
-            text: nil,
-            glyph: glyph,
-            color: color,
-            createdAt: .distantPast,
-            updatedAt: .distantPast
-        )
     }
 }

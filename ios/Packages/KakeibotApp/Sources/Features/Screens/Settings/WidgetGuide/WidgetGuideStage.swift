@@ -79,6 +79,20 @@ extension WidgetGuideStage {
         "moon.fill",
         "plus.forwardslash.minus"
     ]
+
+    static func icon(
+        _ glyph: Icon.Glyph,
+        color: String
+    ) -> Icon {
+        Icon(
+            emoji: nil,
+            text: nil,
+            glyph: glyph,
+            color: color,
+            createdAt: .distantPast,
+            updatedAt: .distantPast
+        )
+    }
 }
 
 private extension WidgetGuideStage {

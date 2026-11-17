@@ -1,5 +1,7 @@
 ・Kakeibot now works on iPad. Home, Review and Assets are laid out in two columns so you can see your budget at a glance on the large screen.
 ・With a keyboard connected to iPad, you can type amounts with the number keys.
+・The records list now shows recurrings from tomorrow to the end of the month as "Upcoming recurrings", grouped by date.
+・The Quick Record widget now shows category icons in their colors, and "Receipt" starts scanning right away.
 ・"Net worth and trend" in Assets is now its own card, separate from your cash on hand.
 ・Shared wallets now show a mark next to their names.
 ・Choosing a card now scrolls to its billing date.
