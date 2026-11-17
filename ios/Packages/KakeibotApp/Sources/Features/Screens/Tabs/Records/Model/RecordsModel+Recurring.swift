@@ -45,20 +45,18 @@ public extension RecordsModel {
         return Set(dates).sorted()
     }
 
-    func listCaption(before item: ListDay) -> String? {
-        let days = listDays
-
+    func listCaptions(in days: [ListDay]) -> [LocalDate: String] {
         guard let firstFuture = days.first(where: { $0.date > today }) else {
-            return nil
+            return [:]
         }
 
-        if item == firstFuture {
-            return Self.futureCaption
+        var captions = [firstFuture.date: Self.futureCaption]
+
+        if let firstPast = days.first(where: { $0.date <= today }) {
+            captions[firstPast.date] = Self.pastCaption
         }
 
-        let firstPast = days.first { $0.date <= today }
-
-        return item == firstPast ? Self.pastCaption : nil
+        return captions
     }
 
     func listRecurrings(on date: LocalDate) -> [Recurring] {

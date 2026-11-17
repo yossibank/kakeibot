@@ -241,9 +241,12 @@ private extension RecordsView {
                 )
             }
 
-            ForEach(model.listDays) { item in
+            let days = model.listDays
+            let captions = model.listCaptions(in: days)
+
+            ForEach(days) { item in
                 if selection == nil,
-                   let caption = model.listCaption(before: item) {
+                   let caption = captions[item.date] {
                     listCaption(caption)
                 }
 
