@@ -70,6 +70,11 @@ extension WhatsNewScene {
         case padHome
         case padReview
         case padKeyboard
+        case upcomingCaptions
+        case upcomingDay
+        case upcomingOpen
+        case widgetTiles
+        case widgetReceipt
     }
 }
 
@@ -170,6 +175,12 @@ private extension WhatsNewScene {
 
         case .padHome, .padReview, .padKeyboard:
             WhatsNewPadScene(kind: kind)
+
+        case .upcomingCaptions, .upcomingDay, .upcomingOpen:
+            WhatsNewUpcomingScene(kind: kind)
+
+        case .widgetTiles, .widgetReceipt:
+            WhatsNewWidgetScene(kind: kind)
         }
     }
 

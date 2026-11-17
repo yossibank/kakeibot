@@ -127,6 +127,9 @@ extension MainView {
                 tab = .home
                 sheet = .new
 
+            case .records:
+                tab = .records
+
             case .assets:
                 tab = .assets
 
