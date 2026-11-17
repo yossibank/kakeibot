@@ -137,6 +137,22 @@ private extension SnapshotTests {
             recorded: nil
         )
 
+        let zero = QuickRecordWidgetSummary(
+            todayExpense: 0,
+            tiles: sample.tiles,
+            todayRecords: [],
+            todayCount: 0,
+            recorded: nil
+        )
+
+        let one = QuickRecordWidgetSummary(
+            todayExpense: sample.todayExpense,
+            tiles: sample.tiles,
+            todayRecords: Array(sample.todayRecords.prefix(1)),
+            todayCount: 1,
+            recorded: nil
+        )
+
         let none = QuickRecordWidgetSummary(
             todayExpense: 0,
             tiles: [],
@@ -150,6 +166,8 @@ private extension SnapshotTests {
             ("undo", undo),
             ("long", long),
             ("two", two),
+            ("zero", zero),
+            ("one", one),
             ("none", none)
         ]
     }

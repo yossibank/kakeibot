@@ -9,13 +9,8 @@ struct QuickRecordWidgetView: View {
     let entry: QuickRecordWidgetEntry
 
     var body: some View {
-        ViewThatFits(in: .vertical) {
-            layout(Self.regular)
-            layout(Self.tight)
-            layout(Self.tight.limited(2))
-            layout(Self.tight.limited(1))
-            layout(Self.compact.limited(2))
-            layout(Self.compact.limited(1))
+        GeometryReader { proxy in
+            layout(metrics(fitting: proxy.size.height))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .widgetURL(route.url)
@@ -45,27 +40,21 @@ private extension QuickRecordWidgetView {
         if let summary = entry.summary {
             VStack(spacing: metrics.spacing) {
                 header(of: summary)
-                    .frame(
-                        minHeight: metrics.headerHeight,
-                        maxHeight: headerMaxHeight(of: summary, metrics: metrics)
-                    )
-                    .layoutPriority(1)
+                    .frame(height: metrics.headerHeight)
 
                 if summary.tiles.isEmpty {
                     emptyTemplateGuide
                 } else {
                     grid(of: summary, metrics: metrics)
-                        .frame(maxHeight: isLarge ? Self.largeGridHeight : nil)
-                        .fixedSize(horizontal: false, vertical: !isLarge)
                 }
 
                 if isLarge {
                     Rectangle()
                         .fill(Palette.line)
                         .frame(height: 1)
-                        .padding(.vertical, 8)
+                        .frame(height: Self.ruleHeight)
 
-                    todayRecords(of: summary, limit: metrics.todayLimit)
+                    todayRecords(of: summary, metrics: metrics)
                 }
             }
         } else {
@@ -105,7 +94,7 @@ private extension QuickRecordWidgetView {
             .padding(.vertical, 2)
             .noticeCapsule()
         } else {
-            HStack(alignment: .firstTextBaseline) {
+            HStack(spacing: 8) {
                 Text("すぐ記録")
                     .textFont(size: .caption)
                     .tracking(1)
@@ -123,7 +112,6 @@ private extension QuickRecordWidgetView {
                     .minimumScaleFactor(0.5)
                     .privacySensitive()
             }
-            .frame(maxHeight: .infinity)
         }
     }
 
@@ -177,13 +165,13 @@ private extension QuickRecordWidgetView {
 
     func todayRecords(
         of summary: QuickRecordWidgetSummary,
-        limit: Int
+        metrics: Metrics
     ) -> some View {
-        let shown = summary.todayRecords.prefix(limit)
+        let shown = summary.todayRecords.prefix(metrics.todaySlots)
         let records = Array(shown)
         let others = summary.todayCount - records.count
 
-        return VStack(alignment: .leading, spacing: 8) {
+        return VStack(alignment: .leading, spacing: Self.todaySpacing) {
             HStack(alignment: .firstTextBaseline) {
                 Text("今日の記録 \(summary.todayCount) 件")
                     .textFont(size: .micro)
@@ -198,20 +186,35 @@ private extension QuickRecordWidgetView {
                         .foregroundStyle(Palette.subtext)
                 }
             }
+            .frame(height: Self.todayTitleHeight)
 
-            if let first = records.first {
-                recordRow(first)
-            } else {
-                Text("今日はまだ記録していません")
-                    .textFont(size: .caption)
-                    .foregroundStyle(Palette.hint)
+            VStack(spacing: Self.todaySpacing) {
+                ForEach(0..<metrics.todaySlots, id: \.self) { index in
+                    todaySlot(at: index, of: records)
+                        .frame(height: Self.recordRowHeight)
+                }
             }
-
-            if let second = records.dropFirst().first {
-                recordRow(second)
+            .overlay(alignment: .leading) {
+                if records.isEmpty {
+                    Text("今日はまだ記録していません")
+                        .textFont(size: .caption)
+                        .foregroundStyle(Palette.hint)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    func todaySlot(
+        at index: Int,
+        of records: [QuickRecordWidgetSummary.Record]
+    ) -> some View {
+        if index < records.count {
+            recordRow(records[index])
+        } else {
+            Color.clear
+        }
     }
 
     func recordRow(_ record: QuickRecordWidgetSummary.Record) -> some View {
@@ -248,46 +251,45 @@ private extension QuickRecordWidgetView {
         let bottom: CGFloat
         let spacing: CGFloat
         let headerHeight: CGFloat
-        let undoHeaderHeight: CGFloat
         let gridSpacing: CGFloat
         let tilePadding: CGFloat
-        let todayLimit: Int
+        let todaySlots: Int
     }
 
     static let columns = 2
-    static let largeGridHeight: CGFloat = 240
+    static let todayTitleHeight: CGFloat = 14
+    static let recordRowHeight: CGFloat = 30
+    static let todaySpacing: CGFloat = 8
+    static let ruleHeight: CGFloat = 17
 
     static let regular = Metrics(
         top: 12,
         bottom: 16,
         spacing: 4,
-        headerHeight: 20,
-        undoHeaderHeight: 32,
+        headerHeight: 32,
         gridSpacing: 8,
         tilePadding: 8,
-        todayLimit: .max
+        todaySlots: 2
     )
 
     static let tight = Metrics(
         top: 8,
         bottom: 8,
         spacing: 4,
-        headerHeight: 20,
-        undoHeaderHeight: 28,
+        headerHeight: 28,
         gridSpacing: 8,
         tilePadding: 8,
-        todayLimit: .max
+        todaySlots: 2
     )
 
     static let compact = Metrics(
         top: 8,
         bottom: 8,
         spacing: 4,
-        headerHeight: 16,
-        undoHeaderHeight: 24,
+        headerHeight: 24,
         gridSpacing: 4,
         tilePadding: 4,
-        todayLimit: .max
+        todaySlots: 2
     )
 
     var route: PlannedNotification.Route {
@@ -298,11 +300,37 @@ private extension QuickRecordWidgetView {
         isLarge ? 3 : 2
     }
 
-    func headerMaxHeight(
-        of summary: QuickRecordWidgetSummary,
-        metrics: Metrics
-    ) -> CGFloat {
-        summary.recorded(at: entry.date) == nil ? metrics.headerHeight : metrics.undoHeaderHeight
+    var tileContentHeight: CGFloat {
+        isLarge ? 40 : 26
+    }
+
+    func metrics(fitting height: CGFloat) -> Metrics {
+        let candidates = [
+            Self.regular,
+            Self.tight,
+            Self.tight.limited(1),
+            Self.compact,
+            Self.compact.limited(1)
+        ]
+
+        let fitting = candidates.first { requiredHeight(of: $0) <= height }
+        return fitting ?? Self.compact.limited(1)
+    }
+
+    func requiredHeight(of metrics: Metrics) -> CGFloat {
+        let rows = CGFloat(rowCount)
+        let tiles = rows * (tileContentHeight + metrics.tilePadding * 2)
+        let grid = tiles + (rows - 1) * metrics.gridSpacing
+        let base = metrics.top + metrics.headerHeight + metrics.spacing + grid + metrics.bottom
+
+        guard isLarge else {
+            return base
+        }
+
+        let slots = CGFloat(metrics.todaySlots)
+        let rule = Self.ruleHeight + metrics.spacing * 2
+        let records = slots * Self.recordRowHeight + (slots - 1) * Self.todaySpacing
+        return base + rule + Self.todayTitleHeight + Self.todaySpacing + records
     }
 }
 
@@ -313,10 +341,9 @@ private extension QuickRecordWidgetView.Metrics {
             bottom: bottom,
             spacing: spacing,
             headerHeight: headerHeight,
-            undoHeaderHeight: undoHeaderHeight,
             gridSpacing: gridSpacing,
             tilePadding: tilePadding,
-            todayLimit: count
+            todaySlots: count
         )
     }
 }

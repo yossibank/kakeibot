@@ -131,6 +131,9 @@ struct RecordsModelTests {
         #expect(model.upcomingDates.map(\.description) == ["2026-10-27"])
         #expect(model.listDays.map(\.date.description) == ["2026-10-27", "2026-10-12"])
         #expect(model.listDays.first?.day == nil)
+        let captions = model.listCaptions(in: model.listDays)
+
+        #expect(model.listDays.map { captions[$0.date] } == ["これから", "これまで"])
     }
 
     @Test

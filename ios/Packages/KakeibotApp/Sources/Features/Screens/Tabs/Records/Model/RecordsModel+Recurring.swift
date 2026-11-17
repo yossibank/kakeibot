@@ -45,6 +45,20 @@ public extension RecordsModel {
         return Set(dates).sorted()
     }
 
+    func listCaptions(in days: [ListDay]) -> [LocalDate: String] {
+        guard let firstFuture = days.first(where: { $0.date > today }) else {
+            return [:]
+        }
+
+        var captions = [firstFuture.date: Self.futureCaption]
+
+        if let firstPast = days.first(where: { $0.date <= today }) {
+            captions[firstPast.date] = Self.pastCaption
+        }
+
+        return captions
+    }
+
     func listRecurrings(on date: LocalDate) -> [Recurring] {
         guard
             filterTitle == nil,
@@ -80,4 +94,6 @@ public extension RecordsModel {
 
 private extension RecordsModel {
     static let recurringTitle = "固定費"
+    static let futureCaption = "これから"
+    static let pastCaption = "これまで"
 }

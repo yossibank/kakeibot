@@ -270,6 +270,15 @@ struct SnapshotTests {
                 to: "settings-widget-guide-large"
             )
             try Self.write(
+                VStack(spacing: 16) {
+                    WidgetGuideStage(place: .home, widget: .quickRecord, size: .medium)
+                    WidgetGuideStage(place: .home, widget: .quickRecord, size: .large)
+                }
+                .padding(16),
+                variant: variant,
+                to: "settings-widget-guide-quick"
+            )
+            try Self.write(
                 WidgetGuideView(
                     database: database,
                     place: .lockScreen

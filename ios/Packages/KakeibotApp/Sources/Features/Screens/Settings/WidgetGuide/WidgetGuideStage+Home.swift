@@ -147,22 +147,20 @@ extension WidgetGuideStage {
     var quickRecordLarge: some View {
         VStack(spacing: 4) {
             quickRecordHeader
-                .frame(height: 20)
 
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
                 ForEach(0..<3, id: \.self) { row in
                     GridRow {
-                        tile(Self.tiles[row * 2], showsDetail: true)
-                        tile(Self.tiles[row * 2 + 1], showsDetail: true)
+                        tile(Self.tiles[row * 2], isLarge: true)
+                        tile(Self.tiles[row * 2 + 1], isLarge: true)
                     }
                 }
             }
-            .fixedSize(horizontal: false, vertical: true)
 
             Rectangle()
                 .fill(Palette.line)
                 .frame(height: 1)
-                .padding(.vertical, 8)
+                .frame(height: 17)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline) {
@@ -177,13 +175,14 @@ extension WidgetGuideStage {
                         .textFont(size: .micro)
                         .foregroundStyle(Palette.subtext)
                 }
+                .frame(height: 14)
 
                 ForEach(Self.records, id: \.self) { record in
                     recordRow(record)
+                        .frame(height: 30)
                 }
             }
         }
-        .frame(maxHeight: .infinity, alignment: .top)
         .padding(.horizontal, 16)
         .padding(.top, 12)
         .padding(.bottom, 16)
@@ -192,10 +191,23 @@ extension WidgetGuideStage {
     }
 
     var quickRecordHeader: some View {
-        HStack(alignment: .firstTextBaseline) {
+        HStack(spacing: 8) {
             Text("すぐ記録")
                 .textFont(size: .caption)
+                .tracking(1)
                 .foregroundStyle(Palette.accent)
+
+            Label("レシート", systemImage: "doc.text.viewfinder")
+                .textFont(size: .micro, weight: .medium)
+                .foregroundStyle(Palette.accent)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .overlay {
+                    Capsule()
+                        .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
+                }
 
             Spacer(minLength: 4)
 
@@ -204,12 +216,12 @@ extension WidgetGuideStage {
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)
         }
+        .frame(height: 32)
     }
 
     var quickRecord: some View {
         VStack(spacing: 4) {
             quickRecordHeader
-                .frame(height: 20)
 
             Grid(horizontalSpacing: 8, verticalSpacing: 8) {
                 GridRow {
@@ -255,17 +267,9 @@ private extension WidgetGuideStage {
             .background(Palette.card.opacity(0.8), in: .rect(cornerRadius: 16))
     }
 
-    func badge(_ systemImage: String) -> some View {
-        Image(systemName: systemImage)
-            .font(.system(size: 10))
-            .foregroundStyle(Palette.accent)
-            .frame(width: Self.markSize, height: Self.markSize)
-            .background(Palette.faint, in: Circle())
-    }
-
     func recordRow(_ record: Record) -> some View {
         HStack(spacing: 8) {
-            badge(record.systemImage)
+            IconTile(icon(record.glyph, color: record.color), size: 24)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(record.title)
@@ -279,63 +283,75 @@ private extension WidgetGuideStage {
 
             Spacer(minLength: 8)
 
-            AmountText(record.amount, font: .size(.small, weight: .medium), color: Palette.text)
+            AmountText(record.amount, type: .expense, font: .size(.small, weight: .medium))
         }
     }
 
     func tile(
         _ tile: Tile,
-        showsDetail: Bool = false
+        isLarge: Bool = false
     ) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 4) {
-                badge(tile.systemImage)
+        HStack(spacing: 8) {
+            IconTile(icon(tile.glyph, color: tile.color), size: isLarge ? 30 : 26)
 
+            VStack(alignment: .leading, spacing: 1) {
                 Text(tile.name)
                     .textFont(size: .caption, weight: .medium)
                     .foregroundStyle(Palette.accentStrong)
                     .lineLimit(1)
-            }
+                    .minimumScaleFactor(0.8)
 
-            if showsDetail {
-                Text(tile.detail)
-                    .textFont(size: .micro)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .padding(.leading, Self.markSize + 4)
-            }
+                if isLarge {
+                    Text(tile.detail)
+                        .textFont(size: .micro)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
 
-            Spacer(minLength: 2)
-
-            HStack(spacing: 4) {
                 if let amount = tile.amount {
                     AmountText(
                         amount,
                         font: .size(.body, weight: .medium),
                         color: Palette.accentStrong
                     )
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
                 } else {
                     Text("毎回入れる")
                         .textFont(size: .micro)
                         .foregroundStyle(Palette.hint)
                 }
+            }
 
-                Spacer(minLength: 0)
+            Spacer(minLength: 0)
 
-                if tile.amount == nil {
-                    EditBadge(size: Self.markSize)
-                } else {
-                    Image(systemName: "plus")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Palette.backgroundTop)
-                        .frame(width: Self.markSize, height: Self.markSize)
-                        .background(Palette.accent, in: Circle())
-                }
+            if tile.amount == nil {
+                EditBadge(size: Self.markSize)
+            } else {
+                Image(systemName: "plus")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(Palette.backgroundTop)
+                    .frame(width: Self.markSize, height: Self.markSize)
+                    .background(Palette.accent, in: Circle())
             }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
+        .padding(8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 3)
+        .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 4)
+    }
+
+    func icon(
+        _ glyph: Icon.Glyph,
+        color: String
+    ) -> Icon {
+        Icon(
+            emoji: nil,
+            text: nil,
+            glyph: glyph,
+            color: color,
+            createdAt: .distantPast,
+            updatedAt: .distantPast
+        )
     }
 }
