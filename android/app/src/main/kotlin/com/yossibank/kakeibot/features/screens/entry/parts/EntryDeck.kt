@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.Weekday
+import com.yossibank.kakeibot.core.concepts.wallet.Wallet
+import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.date.shortName
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
@@ -69,6 +71,7 @@ fun EntryDeck(
             text = when (model.field) {
                 EntryModel.Field.Category -> "カテゴリを選ぶ"
                 EntryModel.Field.Wallet -> "${model.walletTitle}を選ぶ"
+                EntryModel.Field.ToWallet -> "振替先を選ぶ"
                 EntryModel.Field.Date -> "日付を選ぶ"
                 EntryModel.Field.Amount -> "金額を入力"
             },
@@ -77,8 +80,21 @@ fun EntryDeck(
         Box(modifier = Modifier.weight(1f)) {
             when (model.field) {
                 EntryModel.Field.Category -> CategoryGrid(model = model)
-                EntryModel.Field.Wallet -> WalletList(model = model)
+
+                EntryModel.Field.Wallet -> WalletList(
+                    model = model,
+                    selection = model.walletId,
+                    onSelect = model::select,
+                )
+
+                EntryModel.Field.ToWallet -> WalletList(
+                    model = model,
+                    selection = model.toWalletId,
+                    onSelect = model::selectDestination,
+                )
+
                 EntryModel.Field.Date -> DateCalendar(model = model)
+
                 EntryModel.Field.Amount -> AmountKeypad(model = model)
             }
         }
@@ -134,7 +150,11 @@ private fun CategoryGrid(model: EntryModel) {
 }
 
 @Composable
-private fun WalletList(model: EntryModel) {
+private fun WalletList(
+    model: EntryModel,
+    selection: Identifier<Wallet>?,
+    onSelect: (Wallet) -> Unit,
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -143,13 +163,13 @@ private fun WalletList(model: EntryModel) {
             items = model.wallets,
             key = { it.id.toString() },
         ) { wallet ->
-            val isSelected = wallet.id == model.walletId
+            val isSelected = wallet.id == selection
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .choice(isSelected = isSelected)
-                    .clickable { model.select(wallet) }
+                    .clickable { onSelect(wallet) }
                     .padding(
                         horizontal = 12.dp,
                         vertical = 8.dp,

@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
+import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
 import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
 import com.yossibank.kakeibot.store.database.AppDatabase
 
@@ -57,6 +58,8 @@ fun MainView(
                                 isEntryShown = true
                             },
                         )
+                    } else if (tab == MainTab.Assets) {
+                        AssetsView(database = database)
                     } else {
                         TabPlaceholder(tab = tab)
                     }

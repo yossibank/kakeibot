@@ -32,6 +32,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 private val types = listOf(
     Triple(Entry.Kind.expense, "支出", R.drawable.ic_arrow_upward),
     Triple(Entry.Kind.income, "収入", R.drawable.ic_arrow_downward),
+    Triple(Entry.Kind.transfer, "振替", R.drawable.ic_swap),
 )
 
 @Composable
@@ -66,7 +67,7 @@ fun EntryTypeSwitch(
                         color = Palette.accent.opacity(Emphasis.Muted),
                         shape = shape,
                     ).clickable { onSelect(type) }
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

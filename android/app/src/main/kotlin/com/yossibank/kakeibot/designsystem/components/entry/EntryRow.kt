@@ -52,6 +52,15 @@ fun EntryRow(
                 icon = icon,
                 size = 28.dp,
             )
+        } else if (type == Entry.Kind.transfer) {
+            SymbolIcon(
+                painter = painterResource(R.drawable.ic_swap),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(28.dp)
+                    .padding(4.dp),
+                tint = Palette.accent,
+            )
         } else {
             Spacer(modifier = Modifier.size(28.dp))
         }

@@ -34,6 +34,7 @@ class EntryModel(
     enum class Field {
         Category,
         Wallet,
+        ToWallet,
         Date,
         Amount,
     }
@@ -51,6 +52,9 @@ class EntryModel(
         private set
 
     var walletId: Identifier<Wallet>? by mutableStateOf(null)
+        private set
+
+    var toWalletId: Identifier<Wallet>? by mutableStateOf(null)
         private set
 
     var memo: String by mutableStateOf("")
@@ -88,8 +92,15 @@ class EntryModel(
     val wallet: Wallet?
         get() = wallets.firstOrNull { it.id == walletId }
 
+    val toWallet: Wallet?
+        get() = wallets.firstOrNull { it.id == toWalletId }
+
     val walletTitle: String
-        get() = if (type == Entry.Kind.income) "入金先" else "支払い元"
+        get() = when (type) {
+            Entry.Kind.expense -> "支払い元"
+            Entry.Kind.income -> "入金先"
+            Entry.Kind.transfer -> "振替元"
+        }
 
     val dateText: String
         get() {
@@ -140,6 +151,7 @@ class EntryModel(
                 date = entry.date
                 categoryId = entry.categoryId
                 walletId = entry.walletId
+                toWalletId = entry.toWalletId
                 memo = entry.memo ?: ""
             } else {
                 categoryId = categories.firstOrNull()?.id
@@ -164,6 +176,16 @@ class EntryModel(
         this.type = type
 
         categoryId = categories.firstOrNull()?.id
+        toWalletId = if (type == Entry.Kind.transfer) {
+            toWalletId ?: wallets.firstOrNull { it.id != walletId }?.id
+        } else {
+            null
+        }
+
+        if (field == Field.Category || field == Field.ToWallet) {
+            field = Field.Amount
+        }
+
         message = null
     }
 
@@ -176,6 +198,12 @@ class EntryModel(
     fun select(wallet: Wallet) {
         walletId = wallet.id
         field = Field.Amount
+    }
+
+    fun selectDestination(wallet: Wallet) {
+        toWalletId = wallet.id
+        field = Field.Amount
+        message = null
     }
 
     fun select(date: LocalDate) {
@@ -201,6 +229,7 @@ class EntryModel(
             date = date,
             categoryId = categoryId,
             walletId = walletId,
+            toWalletId = toWalletId,
             memo = memo,
         )
 

@@ -29,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
+import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
@@ -46,19 +47,21 @@ fun EntrySlip(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.card()) {
-        SlipRow(
-            title = "カテゴリ",
-            value = model.category?.name ?: "選ぶ",
-            isActive = model.field == EntryModel.Field.Category,
-            onSelect = { model.focus(EntryModel.Field.Category) },
-        ) {
-            IconTile(
-                icon = model.category?.let { model.icon(of = it.iconId) },
-                size = 30.dp,
-            )
-        }
+        if (model.type != Entry.Kind.transfer) {
+            SlipRow(
+                title = "カテゴリ",
+                value = model.category?.name ?: "選ぶ",
+                isActive = model.field == EntryModel.Field.Category,
+                onSelect = { model.focus(EntryModel.Field.Category) },
+            ) {
+                IconTile(
+                    icon = model.category?.let { model.icon(of = it.iconId) },
+                    size = 30.dp,
+                )
+            }
 
-        Divider()
+            Divider()
+        }
 
         SlipRow(
             title = model.walletTitle,
@@ -70,6 +73,22 @@ fun EntrySlip(
                 icon = model.wallet?.let { model.icon(of = it.iconId) },
                 size = 30.dp,
             )
+        }
+
+        if (model.type == Entry.Kind.transfer) {
+            Divider()
+
+            SlipRow(
+                title = "振替先",
+                value = model.toWallet?.name ?: "選ぶ",
+                isActive = model.field == EntryModel.Field.ToWallet,
+                onSelect = { model.focus(EntryModel.Field.ToWallet) },
+            ) {
+                IconTile(
+                    icon = model.toWallet?.let { model.icon(of = it.iconId) },
+                    size = 30.dp,
+                )
+            }
         }
 
         Divider()

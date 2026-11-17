@@ -27,12 +27,29 @@ data class EntryRowItem(
                 id = entry.id,
                 icon = category?.let { list.icons[it.iconId] },
                 title = list.title(of = entry),
-                detail = list.wallets[entry.walletId]?.name,
+                detail = detail(
+                    entry = entry,
+                    list = list,
+                ),
                 memo = entry.memo?.takeIf { it.isNotEmpty() },
                 amount = entry.amount,
                 type = entry.type,
                 isRecurring = entry.recurringId != null,
             )
+        }
+
+        private fun detail(
+            entry: Entry,
+            list: EntryList,
+        ): String? {
+            val source = list.wallets[entry.walletId]?.name
+            val destination = entry.toWalletId?.let { list.wallets[it]?.name }
+
+            return if (destination != null) {
+                "${source ?: ""} → $destination"
+            } else {
+                source
+            }
         }
     }
 }
