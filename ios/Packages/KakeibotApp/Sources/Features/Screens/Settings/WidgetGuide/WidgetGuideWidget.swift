@@ -77,9 +77,9 @@ extension WidgetGuideSize {
 
 extension WidgetGuideSample {
     static let all = [
-        WidgetGuideSample(widget: .budget, size: .small),
-        WidgetGuideSample(widget: .budget, size: .medium),
         WidgetGuideSample(widget: .quickRecord, size: .medium),
-        WidgetGuideSample(widget: .quickRecord, size: .large)
+        WidgetGuideSample(widget: .quickRecord, size: .large),
+        WidgetGuideSample(widget: .budget, size: .small),
+        WidgetGuideSample(widget: .budget, size: .medium)
     ]
 }

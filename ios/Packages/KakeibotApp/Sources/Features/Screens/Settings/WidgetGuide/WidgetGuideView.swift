@@ -16,7 +16,7 @@ public struct WidgetGuideView: View {
     init(
         database: AppDatabase,
         place: WidgetGuidePlace,
-        widget: WidgetGuideWidget = .budget,
+        widget: WidgetGuideWidget = .quickRecord,
         size: WidgetGuideSize = .medium
     ) {
         let hintFlag = SettingsScreenFlag.closedHint(.widgetGuide, in: database)
