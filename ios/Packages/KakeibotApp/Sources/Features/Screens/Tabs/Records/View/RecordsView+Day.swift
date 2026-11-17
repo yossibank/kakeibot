@@ -104,6 +104,16 @@ extension RecordsView {
         .contentShape(.rect)
     }
 
+    func listCaption(_ title: String) -> some View {
+        Text(title)
+            .textFont(.caption2)
+            .tracking(2)
+            .foregroundStyle(Palette.accent)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.top, 4)
+    }
+
     func upcomingCard(on date: LocalDate) -> some View {
         VStack(spacing: 0) {
             dayHeader(date, day: nil)
@@ -198,6 +208,10 @@ extension RecordsView {
                         dayButtons(on: date)
                     }
 
+                    dayHeaderRow(date, day: day, isCompact: true) {
+                        dayButtons(on: date)
+                    }
+
                     dayHeaderStack(date, day: day) {
                         dayButtons(on: date)
                     }
@@ -239,6 +253,7 @@ private extension RecordsView {
     func dayHeaderRow(
         _ date: LocalDate,
         day: EntryDay?,
+        isCompact: Bool = false,
         @ViewBuilder trailing: () -> some View
     ) -> some View {
         HStack(spacing: 12) {
@@ -252,7 +267,7 @@ private extension RecordsView {
                 Spacer(minLength: 8)
 
                 if let day {
-                    dayTotals(day)
+                    dayTotals(day, isCompact: isCompact)
                         .fixedSize()
                 }
             }
@@ -308,6 +323,14 @@ private extension RecordsView {
                 .textFont(.caption)
                 .foregroundStyle(Self.weekdayColor(for: date))
                 .fixedSize()
+
+            if date == model.today {
+                Text("今日")
+                    .textFont(.caption2, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
+                    .fixedSize()
+                    .padding(.leading, -4)
+            }
         }
     }
 
@@ -417,14 +440,27 @@ private extension RecordsView {
         }
     }
 
-    func dayTotals(_ day: EntryDay) -> some View {
+    func dayTotals(
+        _ day: EntryDay,
+        isCompact: Bool = false
+    ) -> some View {
         HStack(spacing: 8) {
             if day.expenseTotal > 0 {
-                AmountText(day.expenseTotal, type: .expense, font: .style(.caption))
+                AmountText(
+                    day.expenseTotal,
+                    type: .expense,
+                    font: .style(.caption),
+                    isCompact: isCompact
+                )
             }
 
             if day.incomeTotal > 0 {
-                AmountText(day.incomeTotal, type: .income, font: .style(.caption))
+                AmountText(
+                    day.incomeTotal,
+                    type: .income,
+                    font: .style(.caption),
+                    isCompact: isCompact
+                )
             }
         }
     }

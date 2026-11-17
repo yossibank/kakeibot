@@ -242,6 +242,11 @@ private extension RecordsView {
             }
 
             ForEach(model.listDays) { item in
+                if selection == nil,
+                   let caption = model.listCaption(before: item) {
+                    listCaption(caption)
+                }
+
                 if let day = item.day {
                     dayCard(day)
                 } else if selection == nil {
