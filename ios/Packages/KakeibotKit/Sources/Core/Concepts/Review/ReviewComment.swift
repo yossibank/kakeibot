@@ -32,6 +32,17 @@ public extension ReviewComment {
         return kept.trimmingCharacters(in: trimmed)
     }
 
+    static func droppingAdvice(_ text: String) -> String {
+        let sentences = text.split(separator: "。", omittingEmptySubsequences: true)
+
+        let kept = sentences.filter { sentence in
+            let body = sentence.trimmingCharacters(in: .whitespacesAndNewlines)
+            return !adviceEndings.contains { body.hasSuffix($0) }
+        }
+
+        return kept.map { "\($0)。" }.joined()
+    }
+
     static func basis(of insights: [ReviewInsight]) -> String {
         insights.map(\.labeledFact).joined(separator: "\n")
     }
@@ -83,6 +94,7 @@ public extension ReviewPeriod.Scale {
 }
 
 private extension ReviewComment {
+    static let adviceEndings = ["ましょう", "ください"]
     static let cutMarks = ["```", "」}", "\"}", "}", "{"]
     static let trimmed = CharacterSet.whitespacesAndNewlines
         .union(CharacterSet(charactersIn: "「」\""))

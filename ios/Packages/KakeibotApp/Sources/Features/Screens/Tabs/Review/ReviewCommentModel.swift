@@ -113,6 +113,13 @@ private extension ReviewCommentModel {
             options: options
         )
 
-        return attempt.map { ReviewComment.cleaned($0.content.body) }
+        guard let response = attempt else {
+            return nil
+        }
+
+        let cleaned = ReviewComment.cleaned(response.content.body)
+        let body = ReviewComment.droppingAdvice(cleaned)
+
+        return body.isEmpty ? nil : body
     }
 }
