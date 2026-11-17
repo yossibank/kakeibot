@@ -58,6 +58,9 @@ public struct ReviewView: View {
         }
         .haptic(.selection, trigger: model.period)
         .haptic(.selection, trigger: model.kind)
+        .task(id: commentTrigger) {
+            await model.refreshComment()
+        }
         .sheet(item: $openShare, onDismiss: openPendingEntry) { share in
             ReviewShareSheet(
                 share: share,

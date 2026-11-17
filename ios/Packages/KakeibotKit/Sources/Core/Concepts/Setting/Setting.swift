@@ -43,6 +43,7 @@ public extension Setting {
         case recordsLayout = "records_layout"
         case reviewScale = "review_scale"
         case reviewKind = "review_kind"
+        case reviewCommentFolded = "review_comment_folded"
         case closedHints = "closed_hints"
         case closedHiddenLists = "closed_hidden_lists"
         case recentSearches = "recent_searches"
