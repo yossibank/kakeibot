@@ -42,6 +42,17 @@ struct ReviewCommentTests {
     }
 
     @Test
+    func dropsAdviceSentences() {
+        let text = "82,600円 残せたのは良い点です。支出のペースを見直してみましょう。"
+        let request = "交際費が増えています。記録を確かめてみてください。"
+        let advice = "支出を見直してみましょう。"
+
+        #expect(ReviewComment.droppingAdvice(text) == "82,600円 残せたのは良い点です。")
+        #expect(ReviewComment.droppingAdvice(request) == "交際費が増えています。")
+        #expect(ReviewComment.droppingAdvice(advice).isEmpty)
+    }
+
+    @Test
     func rewritesWhenBasisChanges() {
         let calendar = Calendar(identifier: .gregorian)
         let comment = Self.comment(createdAt: Self.now)
