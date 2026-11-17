@@ -19,13 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
+import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
+import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetEditSheet
 import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
+import com.yossibank.kakeibot.features.screens.tabs.home.view.HomeView
 import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
 import com.yossibank.kakeibot.store.database.AppDatabase
 
@@ -37,6 +40,7 @@ fun MainView(
     val selection = rememberSaveable(saver = MainTabSelection.Saver) { MainTabSelection() }
     var isEntryShown by rememberSaveable { mutableStateOf(false) }
     var editing by remember { mutableStateOf<Identifier<Entry>?>(null) }
+    var budgetTarget by remember { mutableStateOf<BudgetTarget?>(null) }
 
     Box(
         modifier = Modifier
@@ -49,7 +53,22 @@ fun MainView(
                 value = tab,
             ) {
                 TabContent {
-                    if (tab == MainTab.Records) {
+                    if (tab == MainTab.Home) {
+                        HomeView(
+                            database = database,
+                            today = today,
+                            onEditBudget = { month, amount ->
+                                budgetTarget = BudgetTarget(
+                                    month = month,
+                                    amount = amount,
+                                )
+                            },
+                            onOpenEntry = { id ->
+                                editing = id
+                                isEntryShown = true
+                            },
+                        )
+                    } else if (tab == MainTab.Records) {
                         RecordsView(
                             database = database,
                             today = today,
@@ -91,8 +110,31 @@ fun MainView(
                 onClose = { isEntryShown = false },
             )
         }
+
+        AnimatedVisibility(
+            visible = budgetTarget != null,
+            modifier = Modifier.zIndex(3f),
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it },
+        ) {
+            val target = remember { budgetTarget }
+
+            if (target != null) {
+                BudgetEditSheet(
+                    database = database,
+                    month = target.month,
+                    amount = target.amount,
+                    onClose = { budgetTarget = null },
+                )
+            }
+        }
     }
 }
+
+private data class BudgetTarget(
+    val month: YearMonth,
+    val amount: Int?,
+)
 
 @Composable
 private fun TabPlaceholder(tab: MainTab) {

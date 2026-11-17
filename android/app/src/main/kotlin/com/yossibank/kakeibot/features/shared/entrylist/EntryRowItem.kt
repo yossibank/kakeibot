@@ -20,6 +20,7 @@ data class EntryRowItem(
         fun of(
             entry: Entry,
             list: EntryList,
+            dayLabel: String? = null,
         ): EntryRowItem {
             val category = entry.categoryId?.let { list.categories[it] }
 
@@ -27,10 +28,13 @@ data class EntryRowItem(
                 id = entry.id,
                 icon = category?.let { list.icons[it.iconId] },
                 title = list.title(of = entry),
-                detail = detail(
-                    entry = entry,
-                    list = list,
-                ),
+                detail = listOfNotNull(
+                    dayLabel,
+                    detail(
+                        entry = entry,
+                        list = list,
+                    ),
+                ).joinToString("・").takeIf { it.isNotEmpty() },
                 memo = entry.memo?.takeIf { it.isNotEmpty() },
                 amount = entry.amount,
                 type = entry.type,
