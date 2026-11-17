@@ -24,7 +24,6 @@ class HomeModel(
     val periodText: String
         get() {
             val period = overview?.period ?: return ""
-
             return "${period.start.monthDayText}〜${period.endInclusive.monthDayText}"
         }
 

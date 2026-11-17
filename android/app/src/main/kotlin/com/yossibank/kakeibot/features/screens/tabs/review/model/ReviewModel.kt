@@ -80,7 +80,6 @@ class ReviewModel(
     val rangeText: String
         get() {
             val range = period.range
-
             return "${range.start.monthDayText}〜${range.endInclusive.monthDayText}"
         }
 
