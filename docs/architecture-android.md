@@ -85,6 +85,7 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 | `Features/<フォルダ>/X.swift` | `features/<フォルダ>/X.kt` |
 | `View+Topic.swift` | `ViewTopic.kt` |
 | SF Symbols の絵 | `res/drawable/` の `ic_<名前>.xml` |
+| アイコンの絵柄（`Icon.Glyph`） | `res/drawable/` の `ic_glyph_<名前>.xml`。Material Symbols の絵を使う |
 
 画面の部品は、iOS と同じ名前の Composable で書く。Compose で同じに書けないものは、次のようにする。
 
@@ -98,6 +99,9 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 | 見た目の明暗の上書き | `PaletteScene` がテーマを配り、バーのアイコンの色を合わせる |
 | ガラスの効果 | 背景の色を濃く敷く |
 | 同梱のフォント | 入れない。明朝は端末の serif、ほかは端末の既定で出す |
+| シート（`.sheet`） | 画面の上に、下からせり上がる全画面の層で出す。戻る操作で閉じる |
+
+アイコンの絵柄は、最初から入るカテゴリと口座の分だけ絵を用意している。ほかの絵柄は、仮の絵（`ic_glyph_fallback`）で出す。
 
 ## 🔧 設定
 
