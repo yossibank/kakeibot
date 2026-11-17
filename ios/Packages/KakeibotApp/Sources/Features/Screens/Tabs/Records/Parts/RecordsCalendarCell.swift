@@ -43,24 +43,35 @@ struct RecordsCalendarCell: View {
                 }
                 .animation(Self.stampAnimation, value: stamp?.id)
 
-            VStack(spacing: 0) {
-                markLine {
-                    if expense > 0 {
-                        markAmount(expense, type: .expense)
-                    } else if isNoSpend {
-                        Image(systemName: "leaf.fill")
-                            .sansFont(.micro)
-                            .foregroundStyle(Palette.accent)
-                    } else if hasUpcoming {
-                        Image(systemName: "repeat")
-                            .sansFont(.micro)
-                            .foregroundStyle(Palette.hint)
+            if expense > 0, income > 0 {
+                Text(bothAmounts)
+                    .displayFont(.caption)
+                    .monospacedDigit()
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.6)
+                    .padding(.horizontal, 2)
+                    .frame(height: Self.markLineHeight * 2)
+            } else {
+                VStack(spacing: 0) {
+                    markLine {
+                        if expense > 0 {
+                            markAmount(expense, type: .expense)
+                        } else if isNoSpend {
+                            Image(systemName: "leaf.fill")
+                                .sansFont(.micro)
+                                .foregroundStyle(Palette.accent)
+                        } else if hasUpcoming {
+                            Image(systemName: "repeat")
+                                .sansFont(.micro)
+                                .foregroundStyle(Palette.hint)
+                        }
                     }
-                }
 
-                markLine {
-                    if income > 0 {
-                        markAmount(income, type: .income)
+                    markLine {
+                        if income > 0 {
+                            markAmount(income, type: .income)
+                        }
                     }
                 }
             }
@@ -109,6 +120,16 @@ private extension RecordsCalendarCell {
 
     static var stampAnimation: Animation {
         .bouncy(duration: 0.45, extraBounce: 0.25)
+    }
+
+    var bothAmounts: AttributedString {
+        var expenseText = AttributedString(AmountText.compactText(expense, type: .expense))
+        expenseText.foregroundColor = Palette.accentStrong
+
+        var incomeText = AttributedString(AmountText.compactText(income, type: .income))
+        incomeText.foregroundColor = Palette.accent
+
+        return expenseText + AttributedString("\n") + incomeText
     }
 
     func markLine(@ViewBuilder _ content: () -> some View) -> some View {

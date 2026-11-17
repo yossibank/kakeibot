@@ -184,7 +184,19 @@ extension RecordsView {
     ) -> some View {
         Group {
             if let selection,
-               let day {
+               let day,
+               Self.hasBothTotals(day) {
+                ViewThatFits(in: .horizontal) {
+                    dayHeaderStack(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: true)
+                    }
+
+                    dayHeaderStack(date, day: day) {
+                        daySelectButton(day, in: selection, showsTitle: false)
+                    }
+                }
+            } else if let selection,
+                      let day {
                 ViewThatFits(in: .horizontal) {
                     dayHeaderRow(date, day: day) {
                         daySelectButton(day, in: selection, showsTitle: true)
@@ -201,6 +213,10 @@ extension RecordsView {
                     dayHeaderStack(date, day: day) {
                         daySelectButton(day, in: selection, showsTitle: false)
                     }
+                }
+            } else if let day, Self.hasBothTotals(day) {
+                dayHeaderStack(date, day: day) {
+                    dayButtons(on: date)
                 }
             } else {
                 ViewThatFits(in: .horizontal) {
@@ -449,7 +465,7 @@ private extension RecordsView {
                 AmountText(
                     day.expenseTotal,
                     type: .expense,
-                    font: .style(.caption),
+                    font: .style(.footnote),
                     isCompact: isCompact
                 )
             }
@@ -458,7 +474,7 @@ private extension RecordsView {
                 AmountText(
                     day.incomeTotal,
                     type: .income,
-                    font: .style(.caption),
+                    font: .style(.footnote),
                     isCompact: isCompact
                 )
             }
@@ -480,6 +496,10 @@ private extension RecordsView {
 
     static func hasTotals(_ day: EntryDay) -> Bool {
         day.expenseTotal > 0 || day.incomeTotal > 0
+    }
+
+    static func hasBothTotals(_ day: EntryDay) -> Bool {
+        day.expenseTotal > 0 && day.incomeTotal > 0
     }
 
     func toggleSelection(_ id: Entry.ID) {
