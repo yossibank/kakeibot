@@ -44,7 +44,7 @@ extension QuickRecordWidgetView {
                     .lineLimit(1)
                     .fixedSize()
                     .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
+                    .padding(.vertical, 4)
                     .overlay {
                         Capsule()
                             .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1)
