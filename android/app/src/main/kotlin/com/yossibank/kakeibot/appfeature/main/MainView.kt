@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,20 +15,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
-import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetEditSheet
 import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
 import com.yossibank.kakeibot.features.screens.tabs.home.view.HomeView
 import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
+import com.yossibank.kakeibot.features.screens.tabs.review.view.ReviewView
 import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
@@ -53,34 +50,45 @@ fun MainView(
                 value = tab,
             ) {
                 TabContent {
-                    if (tab == MainTab.Home) {
-                        HomeView(
-                            database = database,
-                            today = today,
-                            onEditBudget = { month, amount ->
-                                budgetTarget = BudgetTarget(
-                                    month = month,
-                                    amount = amount,
-                                )
-                            },
-                            onOpenEntry = { id ->
-                                editing = id
-                                isEntryShown = true
-                            },
-                        )
-                    } else if (tab == MainTab.Records) {
-                        RecordsView(
-                            database = database,
-                            today = today,
-                            onOpenEntry = { id ->
-                                editing = id
-                                isEntryShown = true
-                            },
-                        )
-                    } else if (tab == MainTab.Assets) {
-                        AssetsView(database = database)
-                    } else {
-                        TabPlaceholder(tab = tab)
+                    when (tab) {
+                        MainTab.Home -> {
+                            HomeView(
+                                database = database,
+                                today = today,
+                                onEditBudget = { month, amount ->
+                                    budgetTarget = BudgetTarget(
+                                        month = month,
+                                        amount = amount,
+                                    )
+                                },
+                                onOpenEntry = { id ->
+                                    editing = id
+                                    isEntryShown = true
+                                },
+                            )
+                        }
+
+                        MainTab.Records -> {
+                            RecordsView(
+                                database = database,
+                                today = today,
+                                onOpenEntry = { id ->
+                                    editing = id
+                                    isEntryShown = true
+                                },
+                            )
+                        }
+
+                        MainTab.Review -> {
+                            ReviewView(
+                                database = database,
+                                today = today,
+                            )
+                        }
+
+                        MainTab.Assets -> {
+                            AssetsView(database = database)
+                        }
                     }
                 }
             }
@@ -135,20 +143,3 @@ private data class BudgetTarget(
     val month: YearMonth,
     val amount: Int?,
 )
-
-@Composable
-private fun TabPlaceholder(tab: MainTab) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = tab.title,
-            color = Palette.subtext,
-            style = displayFont(
-                size = FontSize.Title,
-                weight = FontWeight.Light,
-            ),
-        )
-    }
-}
