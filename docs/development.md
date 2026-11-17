@@ -33,7 +33,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター。出力は `.build/test.log` にも残る） | `make test` |
-| 振り返りのひとことのモデルの正しさ（`make test` では走らない。合格の数と文を出す） | `make test-model` |
+| 端末の中のモデルの正しさ（声の入力と振り返りのひとこと）。`make test` では走らず、合格の数と文を出す | `make test-model` |
 | 画面の部品を PNG に描く（下の注） | `make snapshot SNAPSHOT=widget` |
 | Android のビルド（デバッグの APK） | `make android-build` |
 | Android の Core と Store のテスト | `make android-test` |
