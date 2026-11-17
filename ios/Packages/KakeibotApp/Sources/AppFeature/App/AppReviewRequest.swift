@@ -20,8 +20,8 @@ struct AppReviewRequest: Sendable {
 }
 
 extension AppReviewRequest {
-    static let minimumEntries = 30
-    static let minimumDays = 7
+    static let minimumEntries = 10
+    static let minimumDays = 3
 
     func shouldAsk(
         after change: EntryChange,

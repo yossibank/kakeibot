@@ -8,7 +8,7 @@ import Testing
 struct AppReviewRequestTests {
     @Test
     func asksOnceWhenReady() async throws {
-        let setup = try await Setup(entries: 30, daysAgo: 7)
+        let setup = try await Setup(entries: 10, daysAgo: 3)
 
         let first = await setup.request.shouldAsk(after: setup.recorded, at: setup.now)
         let saved = try await setup.database.setting(.reviewRequestedVersion)
@@ -21,7 +21,7 @@ struct AppReviewRequestTests {
 
     @Test
     func asksAgainForNewVersion() async throws {
-        let setup = try await Setup(entries: 30, daysAgo: 7)
+        let setup = try await Setup(entries: 10, daysAgo: 3)
         let next = AppReviewRequest(
             database: setup.database,
             version: "1.3",
@@ -35,8 +35,8 @@ struct AppReviewRequestTests {
     }
 
     @Test
-    func waitsForThirtyEntries() async throws {
-        let setup = try await Setup(entries: 29, daysAgo: 7)
+    func waitsForTenEntries() async throws {
+        let setup = try await Setup(entries: 9, daysAgo: 3)
 
         let asked = await setup.request.shouldAsk(after: setup.recorded, at: setup.now)
         let saved = try await setup.database.setting(.reviewRequestedVersion)
@@ -46,8 +46,8 @@ struct AppReviewRequestTests {
     }
 
     @Test
-    func waitsForSevenDays() async throws {
-        let setup = try await Setup(entries: 30, daysAgo: 6)
+    func waitsForThreeDays() async throws {
+        let setup = try await Setup(entries: 10, daysAgo: 2)
 
         let asked = await setup.request.shouldAsk(after: setup.recorded, at: setup.now)
 
@@ -56,7 +56,7 @@ struct AppReviewRequestTests {
 
     @Test
     func skipsEditsAndDeletes() async throws {
-        let setup = try await Setup(entries: 30, daysAgo: 7)
+        let setup = try await Setup(entries: 10, daysAgo: 3)
         let entry = setup.recorded.entry
         let edited = EntryChange(
             kind: .edited(previous: entry, previousFee: nil),
