@@ -52,6 +52,33 @@ struct ReviewCommentWriteTests {
 
         #expect(deleted == nil)
     }
+
+    @Test
+    func savesBreakdown() async throws {
+        let database = try AppDatabase.inMemory()
+        let row = ReviewBreakdown.Row(name: "セブン", count: 12, previousCount: 8, amount: 8400)
+        let focus = ReviewBreakdown.Focus(
+            name: "食費",
+            count: 12,
+            previousCount: 8,
+            amount: 8400,
+            previousAmount: 5600
+        )
+        let action = ReviewBreakdown.Action(lead: "食費を 8 回ほどに戻すと", amount: 2800)
+        let summary = ReviewBreakdown.Summary(
+            focus: focus,
+            rows: [row],
+            goodPoint: nil,
+            action: action
+        )
+        var comment = Self.comment(body: "食費が増えています。")
+
+        comment.breakdown = summary
+        try await database.saveReviewComment(comment)
+        let saved = try await database.reviewComment(for: Self.period)
+
+        #expect(saved?.breakdown == summary)
+    }
 }
 
 private extension ReviewCommentWriteTests {

@@ -7,24 +7,32 @@ public struct ReviewComment: Codable, Hashable, Sendable {
     public var suggestion: String
     public var basis: String
     public var createdAt: Date
+    public var breakdown: ReviewBreakdown.Summary?
 
     public init(
         period: String,
         body: String,
         suggestion: String,
         basis: String,
-        createdAt: Date
+        createdAt: Date,
+        breakdown: ReviewBreakdown.Summary? = nil
     ) {
         self.period = period
         self.body = body
         self.suggestion = suggestion
         self.basis = basis
         self.createdAt = createdAt
+        self.breakdown = breakdown
     }
 }
 
 public extension ReviewComment {
     static let minimumEntries = 5
+
+    var headline: String {
+        let first = body.split(separator: "。", omittingEmptySubsequences: true).first
+        return first.map { "\($0)。" } ?? body
+    }
 
     static func cleaned(_ text: String) -> String {
         let end = cutMarks.compactMap { text.range(of: $0)?.lowerBound }.min() ?? text.endIndex
@@ -45,6 +53,20 @@ public extension ReviewComment {
 
     static func basis(of insights: [ReviewInsight]) -> String {
         insights.map(\.labeledFact).joined(separator: "\n")
+    }
+
+    static func facts(
+        _ insights: [ReviewInsight],
+        with breakdown: ReviewBreakdown?
+    ) -> [ReviewInsight] {
+        guard
+            let breakdown,
+            let first = insights.first
+        else {
+            return insights
+        }
+
+        return [first] + breakdown.insights.prefix(2)
     }
 
     static func isGrounded(

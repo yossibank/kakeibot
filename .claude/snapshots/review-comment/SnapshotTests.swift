@@ -19,30 +19,59 @@ struct SnapshotTests {
             createdAt: Date()
         )
 
+        let rows = [
+            ReviewBreakdown.Row(name: "いなげや", count: 6, previousCount: 6, amount: 21300),
+            ReviewBreakdown.Row(name: "セブン", count: 12, previousCount: 8, amount: 8400),
+            ReviewBreakdown.Row(name: "パン屋 こむぎ", count: 3, previousCount: 5, amount: 2900)
+        ]
+
+        let summary = ReviewBreakdown.Summary(
+            focus: ReviewBreakdown.Focus(
+                name: "食費",
+                count: 28,
+                previousCount: 20,
+                amount: 39200,
+                previousAmount: 28000
+            ),
+            rows: rows,
+            goodPoint: "外食は、前の月の 6 回から 3 回に減っています。",
+            action: ReviewBreakdown.Action(lead: "食費を前の月と同じ 20 回ほどに戻すと", amount: 11200)
+        )
+
+        let breakdown = ReviewComment(
+            period: "month:2026-11-01",
+            body: "食費が増えたのは、回数が 8 回増えたためです。1 回の額は前の月と変わりません。",
+            suggestion: summary.action?.sentence ?? "",
+            basis: basis,
+            createdAt: Date(),
+            breakdown: summary
+        )
+
         let states: [(String, ReviewModel.CommentState)] = [
             ("ready", .ready(comment)),
+            ("breakdown", .ready(breakdown)),
             ("loading", .loading),
             ("records", .needsRecords(2)),
-            ("folded", .folded),
             ("failed", .failed)
         ]
 
         for variant in Self.variants {
             for (name, state) in states {
-                let card = ReviewCommentCard(
-                    state: state,
-                    title: "今月のひとこと",
-                    until: LocalDate(year: 2026, month: 11, day: 18) ?? LocalDate(
-                        Date(),
-                        in: .current
-                    ),
-                    onRewrite: {},
-                    onRecord: {},
-                    onFold: { _ in }
-                )
+                let view = VStack(spacing: 12) {
+                    ReviewDisplaySwitch(display: .chart, state: state, onSelect: { _ in })
+
+                    ReviewAnalysisView(
+                        state: state,
+                        note: "11/1–11/18 · 42 件",
+                        unit: "月",
+                        currentName: "今月",
+                        onRewrite: {},
+                        onRecord: {}
+                    )
+                }
                 .padding(16)
 
-                try Self.write(card, variant: variant, to: "review-comment-\(name)")
+                try Self.write(view, variant: variant, to: "review-comment-\(name)")
             }
         }
     }
@@ -63,6 +92,7 @@ private extension SnapshotTests {
 
     static let variants = [
         Variant(name: "regular", width: 393, scheme: .dark, textSize: .standard),
+        Variant(name: "light", width: 393, scheme: .light, textSize: .standard),
         Variant(name: "narrow", width: 320, scheme: .light, textSize: .large)
     ]
 
@@ -78,12 +108,15 @@ private extension SnapshotTests {
             textSize: variant.textSize
         )
 
+        let preset: ThemePreset = variant.scheme == .dark ? .black : .white
+
         let content = view
             .frame(width: variant.width)
             .frame(maxHeight: maxHeight, alignment: .top)
             .clipped()
             .background(Palette.background)
             .environment(\.themeStyle, style)
+            .environment(\.palette, preset.palette)
             .environment(\.colorScheme, variant.scheme)
 
         let renderer = ImageRenderer(content: content)

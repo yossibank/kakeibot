@@ -43,6 +43,14 @@ public enum Palette {
         )
     }
 
+    public static var gold: LinearGradient {
+        LinearGradient(
+            colors: [accent, accentDeep],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
     public static func background(of palette: ThemePalette) -> LinearGradient {
         LinearGradient(
             colors: [

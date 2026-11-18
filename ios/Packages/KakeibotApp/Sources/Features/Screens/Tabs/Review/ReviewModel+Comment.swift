@@ -8,8 +8,12 @@ public extension ReviewModel {
         case loading
         case ready(ReviewComment)
         case needsRecords(Int)
-        case folded
         case failed
+    }
+
+    enum Display: Hashable {
+        case chart
+        case analysis
     }
 
     var commentRange: ClosedRange<LocalDate> {
@@ -35,17 +39,6 @@ public extension ReviewModel {
             return
         }
 
-        let isFolded = await (try? database.setting(.reviewCommentFolded)) ?? false
-
-        guard request == commentRequest else {
-            return
-        }
-
-        guard !isFolded else {
-            comment = .folded
-            return
-        }
-
         let count = commentEntryCount
 
         guard count >= ReviewComment.minimumEntries else {
@@ -56,13 +49,15 @@ public extension ReviewModel {
         let key = period.commentKey
         let isCurrent = period.range.contains(today)
         let insights = ReviewInsight.pick(from: insightInput)
-        let basis = ReviewComment.basis(of: insights)
-        let suggestion = insights.first?.suggestion(in: period) ?? ""
+        let input = breakdownInput
         let saved = try? await database.reviewComment(for: key)
 
         guard request == commentRequest else {
             return
         }
+
+        let breakdown = input.flatMap(ReviewBreakdown.make(from:))
+        let basis = ReviewComment.basis(of: ReviewComment.facts(insights, with: breakdown))
 
         if let saved,
            !rewriting,
@@ -80,10 +75,12 @@ public extension ReviewModel {
 
         comment = .loading
 
+        let suggestion = breakdown?.suggestion ?? insights.first?.suggestion(in: period) ?? ""
+
         let body = await Self.write(
             basis: basis,
             scale: period.scale,
-            categories: categoryNames,
+            categories: categoryNames + (breakdown?.names ?? []),
             isCurrent: isCurrent
         )
 
@@ -104,21 +101,22 @@ public extension ReviewModel {
             body: body,
             suggestion: suggestion,
             basis: basis,
-            createdAt: now
+            createdAt: now,
+            breakdown: breakdown?.summary
         )
 
         try? await database.saveReviewComment(new)
 
         comment = .ready(new)
     }
-
-    func foldComment(_ isFolded: Bool) async {
-        try? await database.setSetting(.reviewCommentFolded, to: isFolded)
-        await refreshComment()
-    }
 }
 
 extension ReviewModel {
+    var commentEntryCount: Int {
+        let range = period.range
+        return entries.count { range.contains($0.date) && $0.type != .transfer }
+    }
+
     var insightInput: ReviewInsight.Input {
         let range = period.range
         let isCurrent = range.contains(today)
@@ -140,6 +138,28 @@ extension ReviewModel {
             largestExpense: largestExpense
         )
     }
+
+    var breakdownInput: ReviewBreakdown.Input? {
+        guard
+            let list,
+            let id = breakdownCategory,
+            let category = list.categories[id]
+        else {
+            return nil
+        }
+
+        let range = period.range
+        let comparison = period.comparisonRange(today: today)
+
+        return ReviewBreakdown.Input(
+            category: category.name,
+            scale: scale,
+            isCurrent: range.contains(today),
+            hasPrevious: hasPreviousEntries,
+            current: spends(in: range),
+            previous: spends(in: comparison)
+        )
+    }
 }
 
 private extension ReviewModel {
@@ -155,9 +175,25 @@ private extension ReviewModel {
         list?.categories.values.map(\.name) ?? []
     }
 
-    var commentEntryCount: Int {
-        let range = period.range
-        return entries.count { range.contains($0.date) && $0.type != .transfer }
+    var breakdownCategory: EntryCategory.ID? {
+        let current = summary.expense.byCategory
+        let previous = previousSummary.expense.byCategory
+        let names = list?.categories.mapValues(\.name) ?? [:]
+
+        let ranked = current.keys.sorted { first, second in
+            let firstName = names[first] ?? ""
+            let secondName = names[second] ?? ""
+            return firstName < secondName
+        }
+
+        let rising = ranked
+            .map { ($0, (current[$0] ?? 0) - (previous[$0] ?? 0)) }
+            .filter { $0.1 > 0 }
+            .max { $0.1 < $1.1 }?.0
+
+        let largest = ranked.max { (current[$0] ?? 0) < (current[$1] ?? 0) }
+
+        return hasPreviousEntries ? rising ?? largest : largest
     }
 
     var largestExpense: ReviewInsight.Expense? {
@@ -194,6 +230,25 @@ private extension ReviewModel {
             categories: categories,
             isCurrent: isCurrent
         )
+    }
+
+    func spends(in range: ClosedRange<LocalDate>) -> [ReviewBreakdown.Spend] {
+        entries.compactMap { entry in
+            guard
+                entry.type == .expense,
+                range.contains(entry.date),
+                let id = entry.categoryId,
+                let category = list?.categories[id]
+            else {
+                return nil
+            }
+
+            return ReviewBreakdown.Spend(
+                category: category.name,
+                memo: entry.memo,
+                amount: entry.amount
+            )
+        }
     }
 
     func insightCategories(

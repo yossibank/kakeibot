@@ -41,6 +41,7 @@ public final class ReviewModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
     public internal(set) var comment: CommentState = .hidden
+    public internal(set) var display: Display = .chart
     public internal(set) var showsStoreReviewCard = false
 
     private(set) var entries: [Entry] = []

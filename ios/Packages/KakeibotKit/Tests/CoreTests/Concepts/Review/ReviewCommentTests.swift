@@ -4,6 +4,19 @@ import Testing
 
 struct ReviewCommentTests {
     @Test
+    func takesFirstSentenceAsHeadline() {
+        let comment = ReviewComment(
+            period: "month:2026-11-01",
+            body: "食費が 8 回増えています。外食は減りました。",
+            suggestion: "",
+            basis: "",
+            createdAt: Date()
+        )
+
+        #expect(comment.headline == "食費が 8 回増えています。")
+    }
+
+    @Test
     func acceptsNumbersFromBasis() {
         let text = "食費が、予算の 97% に届いています。残りの 12 日は 1 日 150 円にすると収まります。"
 

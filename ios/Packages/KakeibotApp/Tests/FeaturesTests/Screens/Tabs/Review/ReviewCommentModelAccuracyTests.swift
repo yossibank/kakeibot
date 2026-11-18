@@ -66,7 +66,7 @@ private extension ReviewCommentModelAccuracyTests {
     static let unitPrefixes = ["この", "次の", "前の", "今"]
     static let praiseWords = ["良いこと", "良い変化", "素晴らしい", "順調"]
     static let labelWords = ["良い点：", "気を付けたい点：", "事実："]
-    static let categories = ["食費", "交際費", "交通", "家電", "日用品", "住まい", "趣味"]
+    static let categories = ["食費", "交際費", "交通", "家電", "日用品", "住まい", "趣味", "コンビニ", "外食"]
 
     static let samples = [
         Sample(
@@ -101,6 +101,11 @@ private extension ReviewCommentModelAccuracyTests {
         ),
         Sample(
             basis: "事実：支出は 182,400円 です。前の月より 19,500円 多いです。",
+            scale: .month,
+            isCurrent: false
+        ),
+        Sample(
+            basis: "気を付けたい点：食費が、前の月の 30,000円 から 39,800円 に増えています（32% 増）。\n気を付けたい点：コンビニが、前の月の 8 回から 12 回に増えています。1 回はおよそ 700円 で、前の月と変わりません。\n良い点：外食は、前の月の 6 回から 3 回に減っています。",
             scale: .month,
             isCurrent: false
         )

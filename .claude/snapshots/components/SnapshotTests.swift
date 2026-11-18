@@ -141,12 +141,15 @@ private extension SnapshotTests {
             textSize: variant.textSize
         )
 
+        let preset: ThemePreset = variant.scheme == .dark ? .black : .white
+
         let content = view
             .frame(width: variant.width)
             .frame(maxHeight: maxHeight, alignment: .top)
             .clipped()
             .background(Palette.background)
             .environment(\.themeStyle, style)
+            .environment(\.palette, preset.palette)
             .environment(\.colorScheme, variant.scheme)
 
         let renderer = ImageRenderer(content: content)
