@@ -3,12 +3,20 @@ import DesignSystem
 import SwiftUI
 
 struct ReviewAnalysisView: View {
+    @State var hasAppeared = false
+
     let state: ReviewModel.CommentState
     let note: String
     let unit: String
     let currentName: String
+    let entryCount: Int
+    let focusName: String?
+    let months: [ReviewModel.MonthAmount]
+    let isNew: Bool
+    let newEntries: Int
     let onRewrite: () -> Void
     let onRecord: () -> Void
+    let onOpen: (ReviewModel.Factor) -> Void
 
     var body: some View {
         switch state {
@@ -16,12 +24,17 @@ struct ReviewAnalysisView: View {
             EmptyView()
 
         case .loading:
-            hero {
+            hero(showsHeader: false) {
                 loading
             }
 
         case let .ready(comment):
             ready(comment)
+                .onAppear {
+                    withAnimation(.smooth(duration: 0.9).delay(0.15)) {
+                        hasAppeared = true
+                    }
+                }
 
         case let .needsRecords(count):
             hero {
@@ -36,108 +49,123 @@ struct ReviewAnalysisView: View {
     }
 }
 
-private extension ReviewAnalysisView {
-    var frameMark: some View {
-        Image(systemName: "sparkle")
-            .sansFont(.small, weight: .bold)
-            .foregroundStyle(Palette.accent)
+extension ReviewAnalysisView {
+    static var goldEdge: LinearGradient {
+        LinearGradient(
+            colors: [
+                Palette.accent.opacity(.medium),
+                Palette.accent.opacity(.subtle),
+                Palette.accent.opacity(.muted)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 
-    func action(_ comment: ReviewComment) -> some View {
-        Group {
-            if let action = comment.breakdown?.action {
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("次の一手")
-                            .displayFont(.small, weight: .bold)
-                            .tracking(1)
-                            .opacity(0.8)
+    static var fadingLine: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accent.opacity(.medium), Palette.accent.opacity(0)],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
 
-                        Text(action.lead)
-                            .textFont(.footnote)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(ReviewInsight.yen(action.amount))
-                            .displayFont(.title, weight: .bold)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-
-                        Text("ほど浮きます")
-                            .textFont(.caption)
-                            .opacity(0.8)
-                    }
-                    .layoutPriority(1)
-                }
-                .foregroundStyle(Palette.backgroundBottom)
-                .padding(20)
-                .background {
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(Palette.gold)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 24)
-                                .fill(Self.sheen)
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 24)
-                                .strokeBorder(Color.white.opacity(.soft))
-                        }
-                        .shadow(color: Palette.accentDeep.opacity(.muted), radius: 16, y: 10)
-                }
-            } else {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Image(systemName: "lightbulb")
-                        .foregroundStyle(Palette.accent)
-
-                    Text(comment.suggestion)
-                        .textFont(.footnote)
-                        .foregroundStyle(Palette.accentStrong)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(16)
-                .card()
+    func panel(@ViewBuilder content: () -> some View) -> some View {
+        content()
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Palette.card, in: .rect(cornerRadius: 20))
+            .overlay {
+                RoundedRectangle(cornerRadius: 20)
+                    .strokeBorder(Palette.accent.opacity(.soft))
             }
-        }
     }
 
-    func goodPoint(_ text: String) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "checkmark")
-                .sansFont(.micro, weight: .bold)
-                .foregroundStyle(Palette.backgroundBottom)
-                .frame(width: 20, height: 20)
-                .background(Palette.accent, in: Circle())
+    func panelTitle(_ title: String) -> some View {
+        Text(title)
+            .textFont(.subheadline, weight: .bold)
+            .foregroundStyle(Palette.text)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+    }
+
+    func suggestion(_ text: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Image(systemName: "lightbulb")
+                .foregroundStyle(Palette.accent)
 
             Text(text)
                 .textFont(.footnote)
-                .foregroundStyle(Palette.text)
+                .foregroundStyle(Palette.accentStrong)
                 .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Palette.accent.opacity(.subtle))
+        .padding(16)
+        .card(cornerRadius: 20)
+    }
+}
+
+private extension ReviewAnalysisView {
+    var badge: some View {
+        Image(systemName: "chart.bar.fill")
+            .sansFont(.caption, weight: .bold)
+            .foregroundStyle(Palette.backgroundBottom)
+            .frame(width: 28, height: 28)
+            .background(Palette.gold, in: .rect(cornerRadius: 8))
+            .shadow(color: Palette.accent.opacity(.soft), radius: 4)
+    }
+
+    var header: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 8) {
+                badge
+
+                Text("分析レポート")
+                    .textFont(.subheadline, weight: .bold)
+                    .tracking(0.5)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                if isNew,
+                   case .ready = state {
+                    Text("NEW")
+                        .textFont(.caption2, weight: .bold)
+                        .tracking(1)
+                        .foregroundStyle(Palette.backgroundBottom)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Palette.gold, in: Capsule())
+                        .fixedSize()
+                }
+
+                Spacer(minLength: 8)
+
+                Text(note)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+
+            Rectangle()
+                .fill(Self.fadingLine)
+                .frame(height: 1)
         }
     }
 
-    func hero(@ViewBuilder content: () -> some View) -> some View {
+    func hero(
+        showsHeader: Bool = true,
+        @ViewBuilder content: () -> some View
+    ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(note)
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+            if showsHeader {
+                header
+            }
 
             content()
         }
         .foregroundStyle(Palette.text)
-        .padding(24)
+        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             ZStack {
@@ -151,173 +179,157 @@ private extension ReviewAnalysisView {
                 RoundedRectangle(cornerRadius: 24)
                     .strokeBorder(Self.goldEdge)
             }
-            .overlay {
-                RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 0.5)
-                    .padding(8)
-            }
-            .overlay(alignment: .top) {
-                frameMark
-                    .offset(y: -6)
-            }
-            .overlay(alignment: .bottom) {
-                frameMark
-                    .offset(y: 6)
-            }
-            .shadow(color: Palette.accent.opacity(.soft), radius: 20, y: 12)
+            .shadow(color: Palette.accent.opacity(.subtle), radius: 16, y: 12)
         }
     }
 
     func ready(_ comment: ReviewComment) -> some View {
         VStack(spacing: 12) {
             hero {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("“")
-                        .displayFont(.display, weight: .bold)
-                        .foregroundStyle(Palette.accent)
-                        .frame(height: 20, alignment: .top)
-
-                    Text(highlighted(comment))
-                        .displayFont(.headline, weight: .semibold)
-                        .lineSpacing(6)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    if let point = comment.breakdown?.goodPoint {
-                        goodPoint(point)
-                            .padding(.top, 4)
-                    }
+                if let summary = comment.breakdown {
+                    headline(summary.focus)
+                } else {
+                    quote(comment)
                 }
             }
 
             if let summary = comment.breakdown {
-                focus(summary.focus)
+                if summary.focus.hasPrevious,
+                   summary.focus.amount > summary.focus.previousAmount {
+                    waterfall(summary.focus)
+                } else if months.count >= 2 {
+                    monthChart(summary.focus.name)
+                }
+
+                quote(comment)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Self.quoteFill, in: .rect(cornerRadius: 20))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 20)
+                            .strokeBorder(Palette.accent.opacity(.muted))
+                    }
+
+                metrics(summary.focus)
 
                 if !summary.rows.isEmpty {
                     memo(summary.rows)
                 }
+
+                action(summary, suggestion: comment.suggestion)
+            } else {
+                suggestion(comment.suggestion)
             }
 
-            action(comment)
-
-            rewriteButton
+            rewriteButton(since: comment.createdAt)
                 .padding(.top, 4)
         }
     }
-}
 
-extension ReviewAnalysisView {
-    static var fadingLine: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accent.opacity(.muted), Palette.accent.opacity(0)],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-    }
+    func quote(_ comment: ReviewComment) -> some View {
+        let sentences = Self.sentences(of: comment.body)
+        let rest = sentences.dropFirst().joined()
 
-    var rewriteButton: some View {
-        Button(action: onRewrite) {
-            HStack(spacing: 12) {
-                Image(systemName: "arrow.clockwise")
-                    .sansFont(.small, weight: .bold)
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkle")
+                    .sansFont(.caption, weight: .bold)
                     .foregroundStyle(Palette.backgroundBottom)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 24, height: 24)
                     .background(Palette.gold, in: Circle())
-                    .overlay {
-                        Circle()
-                            .strokeBorder(Color.white.opacity(.soft))
-                    }
+                    .shadow(color: Palette.accent.opacity(.soft), radius: 3)
 
-                Text("分析し直す")
-                    .displayFont(.small, weight: .bold)
-                    .foregroundStyle(Palette.accentStrong)
+                Text("AI のまとめ")
+                    .textFont(.caption2, weight: .bold)
+                    .tracking(1.5)
+                    .foregroundStyle(Palette.accent)
             }
-            .padding(.leading, 4)
-            .padding(.trailing, 24)
-            .frame(minHeight: 48)
-            .background(Self.buttonFill, in: Capsule())
-            .overlay {
-                Capsule()
-                    .strokeBorder(Self.goldEdge)
+
+            Text(highlighted(sentences.first ?? comment.body, in: comment))
+                .displayFont(.headline, weight: .bold)
+                .foregroundStyle(Palette.text)
+                .lineSpacing(6)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if !rest.isEmpty {
+                Text(rest)
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .shadow(color: Palette.accentDeep.opacity(.soft), radius: 10, y: 6)
-            .contentShape(Capsule())
+
+            if let point = comment.breakdown?.goodPoint {
+                goodPoint(point)
+            }
         }
-        .buttonStyle(.plain)
     }
 
-    func sectionTitle(
-        _ number: String,
-        _ title: String
-    ) -> some View {
-        HStack(spacing: 8) {
-            Text(number)
-                .displayFont(.headline, weight: .bold)
-                .foregroundStyle(Palette.accent)
-
-            Text(title)
-                .textFont(.subheadline, weight: .bold)
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
+    func goodPoint(_ text: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
             Rectangle()
-                .fill(Self.fadingLine)
+                .fill(Palette.accent.opacity(.soft))
                 .frame(height: 1)
+
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Image(systemName: "checkmark")
+                    .sansFont(.micro, weight: .bold)
+                    .foregroundStyle(Palette.accent)
+
+                Text(text)
+                    .textFont(.footnote)
+                    .foregroundStyle(Palette.subtext)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
+        .padding(.top, 4)
     }
 }
 
 private extension ReviewAnalysisView {
-    static var buttonFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.cardTop, Palette.accent.opacity(.subtle)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
     static var glow: RadialGradient {
         RadialGradient(
-            colors: [Palette.accent.opacity(.soft), Palette.accent.opacity(0)],
-            center: .topLeading,
+            colors: [Palette.accent.opacity(.subtle), Palette.accent.opacity(0)],
+            center: .topTrailing,
             startRadius: 0,
-            endRadius: 280
+            endRadius: 260
         )
     }
 
-    static var goldEdge: LinearGradient {
+    static var quoteFill: LinearGradient {
         LinearGradient(
-            colors: [
-                Palette.accent,
-                Palette.accent.opacity(.subtle),
-                Palette.accent.opacity(.medium)
-            ],
+            colors: [Palette.accent.opacity(.subtle), Palette.accent.opacity(.faint)],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
     }
 
-    static var sheen: LinearGradient {
-        LinearGradient(
-            stops: [
-                Gradient.Stop(color: Color.white.opacity(0), location: 0.3),
-                Gradient.Stop(color: Color.white.opacity(.soft), location: 0.42),
-                Gradient.Stop(color: Color.white.opacity(0), location: 0.54)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+    static func sentences(of text: String) -> [String] {
+        text
+            .split(separator: "。", omittingEmptySubsequences: true)
+            .map { "\($0)。" }
     }
 
-    func highlighted(_ comment: ReviewComment) -> AttributedString {
-        var text = AttributedString(comment.body)
+    func highlighted(
+        _ sentence: String,
+        in comment: ReviewComment
+    ) -> AttributedString {
+        var text = AttributedString(sentence)
+        let focus = comment.breakdown?.focus
+        let isUp = focus.map { $0.hasPrevious && $0.amount > $0.previousAmount } ?? false
 
-        for match in comment.body.matches(of: #/([0-9]+)%/#) {
-            let isIncrease = comment.basis.contains("\(match.output.1)% 増")
+        if let name = focus?.name,
+           let range = text.range(of: name) {
+            text[range].foregroundColor = Palette.accent
+        }
+
+        for match in sentence.matches(of: #/[0-9][0-9,]*\s?(回|円|%)/#) {
+            let number = String(match.output.0)
+            let isIncrease = isUp || comment.basis.contains("\(number) 増")
 
             guard
                 isIncrease,
-                let range = text.range(of: String(match.output.0))
+                let range = text.range(of: number)
             else {
                 continue
             }
@@ -332,7 +344,7 @@ private extension ReviewAnalysisView {
 #Preview {
     let comment = ReviewComment(
         period: "month:2026-11-01",
-        body: "食費が増えたのは、回数が 8 回増えたためです。1 回の額は前の月と変わりません。",
+        body: "食費が増えたのは、回数が 8 回増えたためです。1 回の金額は前の月と変わりません。",
         suggestion: "食費を前の月と同じ 20 回ほどに戻すと、11,200円 ほど浮きます。",
         basis: "",
         createdAt: Date()
@@ -344,8 +356,14 @@ private extension ReviewAnalysisView {
             note: "11/1–11/18 · 42 件",
             unit: "月",
             currentName: "今月",
+            entryCount: 42,
+            focusName: "食費",
+            months: [],
+            isNew: true,
+            newEntries: 3,
             onRewrite: {},
-            onRecord: {}
+            onRecord: {},
+            onOpen: { _ in }
         )
         .padding(16)
     }

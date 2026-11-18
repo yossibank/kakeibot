@@ -27,6 +27,11 @@ extension ReviewView {
             note: analysisNote,
             unit: model.scale.unitName,
             currentName: currentName,
+            entryCount: model.commentEntryCount,
+            focusName: model.breakdownInput?.category,
+            months: model.breakdownMonths,
+            isNew: model.isWrittenNow,
+            newEntries: newEntries,
             onRewrite: {
                 Task {
                     await model.refreshComment(rewriting: true)
@@ -37,6 +42,9 @@ extension ReviewView {
                 let date = range.contains(model.today) ? model.today : range.lowerBound
 
                 onAddEntry(date)
+            },
+            onOpen: { factor in
+                openShare = model.factorShare(of: factor)
             }
         )
     }
@@ -46,7 +54,6 @@ extension ReviewView {
         if model.comment != .hidden {
             ReviewDisplaySwitch(
                 display: model.display,
-                state: model.comment,
                 onSelect: { display in
                     model.display = display
                 }
@@ -62,6 +69,14 @@ private extension ReviewView {
         let end = range.upperBound
         let span = "\(start.yearMonth.month)/\(start.day)–\(end.yearMonth.month)/\(end.day)"
         return "\(span) · \(model.commentEntryCount) 件"
+    }
+
+    var newEntries: Int {
+        guard case let .ready(comment) = model.comment else {
+            return 0
+        }
+
+        return model.newEntryCount(since: comment.createdAt)
     }
 
     var currentName: String {

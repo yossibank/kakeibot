@@ -72,26 +72,26 @@ extension ReviewView {
                         )
                     }
                 }
-            }
 
-            let tallies = model.stampTallies
+                let tallies = model.stampTallies
 
-            if tallies.isEmpty {
-                stampHint
+                if tallies.isEmpty {
+                    stampHint
+                        .layoutColumn(.trailing)
+                } else {
+                    StampTallyCard(
+                        tallies: tallies,
+                        emptyText: "この期間に押したスタンプはありません",
+                        onOpen: { tally in
+                            openStamp = tally
+                        }
+                    )
                     .layoutColumn(.trailing)
-            } else {
-                StampTallyCard(
-                    tallies: tallies,
-                    emptyText: "この期間に押したスタンプはありません",
-                    onOpen: { tally in
-                        openStamp = tally
-                    }
-                )
-                .layoutColumn(.trailing)
-            }
+                }
 
-            storeReviewCard
-                .layoutColumn(.trailing)
+                storeReviewCard
+                    .layoutColumn(.trailing)
+            }
         }
     }
 }

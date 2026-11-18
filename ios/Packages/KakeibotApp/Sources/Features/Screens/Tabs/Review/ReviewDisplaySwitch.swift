@@ -6,7 +6,6 @@ struct ReviewDisplaySwitch: View {
     @Namespace private var selection
 
     let display: ReviewModel.Display
-    let state: ReviewModel.CommentState
     let onSelect: (ReviewModel.Display) -> Void
 
     var body: some View {
@@ -32,8 +31,6 @@ private extension ReviewDisplaySwitch {
         let isSelected = item == display
         let color = isSelected ? Palette.backgroundBottom : Palette.subtext
         let iconColor = isSelected ? Palette.backgroundBottom : Self.iconColor(of: item)
-        let weight: Font.Weight = isSelected ? .bold : .medium
-        let showsDot = item == .analysis && !isSelected && Self.isReady(state)
 
         return Button {
             onSelect(item)
@@ -44,18 +41,7 @@ private extension ReviewDisplaySwitch {
                     .foregroundStyle(iconColor)
 
                 Text(Self.title(of: item))
-                    .textFont(.subheadline, weight: weight)
-
-                if showsDot {
-                    Circle()
-                        .fill(Palette.increase)
-                        .frame(width: 6, height: 6)
-                        .background {
-                            Circle()
-                                .fill(Palette.increase.opacity(.soft))
-                                .frame(width: 12, height: 12)
-                        }
-                }
+                    .textFont(.subheadline, weight: .bold)
             }
             .foregroundStyle(color)
             .frame(maxWidth: .infinity, minHeight: 44)
@@ -91,14 +77,6 @@ private extension ReviewDisplaySwitch {
         case .chart: Palette.subtext
         case .analysis: Palette.accent
         }
-    }
-
-    static func isReady(_ state: ReviewModel.CommentState) -> Bool {
-        if case .ready = state {
-            return true
-        }
-
-        return false
     }
 
     static func symbol(of item: ReviewModel.Display) -> String {

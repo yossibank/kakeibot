@@ -3,71 +3,76 @@ import DesignSystem
 import SwiftUI
 
 extension ReviewAnalysisView {
-    func focus(_ focus: ReviewBreakdown.Focus) -> some View {
-        let isCountUp = focus.hasPrevious && focus.count > focus.previousCount
-        let isPriceChanged = focus.hasPrevious && !focus.hasSamePrice
-        let isPriceUp = isPriceChanged && focus.unitPrice > focus.previousUnitPrice
+    func waterfall(_ focus: ReviewBreakdown.Focus) -> some View {
+        let steps = steps(of: focus)
+        let top = steps.map { max($0.start, $0.end) }.max() ?? 1
 
-        return VStack(alignment: .leading, spacing: 16) {
-            sectionTitle("01", "\(focus.name)の動き")
+        return panel {
+            VStack(alignment: .leading, spacing: 12) {
+                panelTitle("前の\(unit)から\(currentName)まで")
 
-            HStack(spacing: 8) {
-                metric(
-                    "回数",
-                    value: "\(focus.count) 回",
-                    change: countChange(of: focus),
-                    isUp: isCountUp
-                )
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(steps, id: \.self) { step in
+                        Button {
+                            onOpen(step.kind == .previous ? .previous : .current)
+                        } label: {
+                            VStack(spacing: 8) {
+                                column(step, top: max(top, 1))
+                                    .frame(height: Self.chartHeight + 32)
 
-                metric(
-                    "1 回の額",
-                    value: ReviewInsight.yen(focus.unitPrice),
-                    change: priceChange(of: focus),
-                    isUp: isPriceUp
-                )
-            }
-            .fixedSize(horizontal: false, vertical: true)
-
-            if focus.hasPrevious,
-               focus.amount > focus.previousAmount {
-                waterfall(focus)
+                                Text(step.title)
+                                    .textFont(.caption2)
+                                    .foregroundStyle(Self.titleColor(step))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(PressButtonStyle())
+                    }
+                }
+                .overlay(alignment: .top) {
+                    Rectangle()
+                        .fill(Palette.accent.opacity(.muted))
+                        .frame(height: 1)
+                        .offset(y: Self.chartHeight + 32)
+                }
             }
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
     }
 
     func memo(_ rows: [ReviewBreakdown.Row]) -> some View {
-        let cells = rows.map { max($0.count, $0.previousCount) }.max() ?? 0
-        let showsCells = cells <= Self.maximumCells
-        let hasPrevious = rows.contains { $0.previousCount > 0 }
+        let gains = rows.map(Self.gain)
+        let total = gains.compactMap(\.self).filter { $0 > 0 }.reduce(0, +)
+        let largest = rows.map(\.amount).max() ?? 1
+        let showsGain = total > 0
+        let title = showsGain ? "増えた分はどこから" : "同じメモの記録"
 
-        return VStack(alignment: .leading, spacing: 16) {
-            sectionTitle("02", "同じメモの記録")
+        return panel {
+            VStack(alignment: .leading, spacing: 4) {
+                panelTitle(title)
 
-            ForEach(rows, id: \.name) { row in
-                memoRow(
-                    row,
-                    cells: showsCells ? cells : 0,
-                    hasPrevious: hasPrevious
-                )
+                ForEach(rows.indices, id: \.self) { index in
+                    let row = rows[index]
+                    let gain = gains[index] ?? 0
+
+                    let ratio = showsGain
+                        ? Double(max(gain, 0)) / Double(total)
+                        : Double(row.amount) / Double(max(largest, 1))
+
+                    memoRow(
+                        row,
+                        gain: showsGain ? gain : nil,
+                        ratio: ratio,
+                        isFirst: index == 0
+                    )
+                }
             }
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card()
     }
 }
 
 private extension ReviewAnalysisView {
-    enum CellKind {
-        case kept
-        case added
-        case removed
-        case empty
-    }
-
     enum StepKind {
         case previous
         case change
@@ -82,221 +87,138 @@ private extension ReviewAnalysisView {
         let kind: StepKind
     }
 
-    static let maximumCells = 24
+    static let chartHeight: CGFloat = 140
 
-    @ViewBuilder
-    func cell(_ kind: CellKind) -> some View {
-        switch kind {
-        case .kept:
+    func column(
+        _ step: Step,
+        top: Int
+    ) -> some View {
+        let low = CGFloat(min(step.start, step.end))
+        let high = CGFloat(max(step.start, step.end))
+        let scale = Self.chartHeight / CGFloat(top)
+        let color = Self.stepColor(step)
+        let glow = step.kind == .previous ? 0 : 0.2
+
+        return VStack(spacing: 4) {
+            Spacer(minLength: 0)
+
+            Text(step.text)
+                .sansFont(.caption, weight: .semibold)
+                .foregroundStyle(Self.labelColor(step))
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 2)
+                .background(color.opacity(.subtle), in: Capsule())
+                .monospacedDigit()
+
             RoundedRectangle(cornerRadius: 4)
-                .fill(Palette.accent.opacity(.muted).gradient)
+                .fill(Self.stepFill(step))
+                .frame(height: max((high - low) * scale, 3))
+                .shadow(color: color.opacity(glow), radius: 4)
+                .scaleEffect(y: hasAppeared ? 1 : 0.02, anchor: .bottom)
 
-        case .added:
-            RoundedRectangle(cornerRadius: 4)
-                .fill(Palette.increase.gradient)
-                .shadow(color: Palette.increase.opacity(.muted), radius: 3, y: 2)
-
-        case .removed:
-            RoundedRectangle(cornerRadius: 4)
-                .strokeBorder(Palette.subtext.opacity(.medium), style: .dashed)
-
-        case .empty:
             Color.clear
+                .frame(height: low * scale)
         }
+        .frame(maxWidth: .infinity)
     }
 
     func memoRow(
         _ row: ReviewBreakdown.Row,
-        cells: Int,
-        hasPrevious: Bool
+        gain: Int?,
+        ratio: Double,
+        isFirst: Bool
     ) -> some View {
-        let color = Self.changeColor(from: row.previousCount, to: row.count)
+        let isUp = (gain ?? 0) > 0
+        let amount = gain.map(Self.signed) ?? ReviewInsight.yen(row.amount)
+        let count = row.previousCount > 0
+            ? "\(row.previousCount) → \(row.count) 回"
+            : "\(row.count) 回"
+        let color = isUp ? Palette.increase : Palette.accent
+        let isFilled = isUp || gain == nil
 
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(row.name)
-                    .textFont(.subheadline)
-                    .foregroundStyle(Palette.text)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                Text(Self.countText(of: row, hasPrevious: hasPrevious))
-                    .textFont(.caption, weight: .semibold)
-                    .foregroundStyle(color)
-                    .fixedSize()
-
-                Text(ReviewInsight.yen(row.amount))
-                    .displayFont(.small, weight: .semibold)
-                    .foregroundStyle(Palette.text)
-                    .fixedSize()
-                    .frame(minWidth: 72, alignment: .trailing)
-            }
-            .monospacedDigit()
-
-            if cells > 0 {
-                HStack(spacing: 4) {
-                    ForEach(0..<cells, id: \.self) { index in
-                        cell(Self.cellKind(at: index, of: row))
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 10)
-                    }
-                }
-            }
-        }
-    }
-
-    func metric(
-        _ title: String,
-        value: String,
-        change: String?,
-        isUp: Bool
-    ) -> some View {
-        let color = isUp ? Palette.increase : Palette.subtext
-        let top = isUp ? Palette.increase.opacity(.subtle) : Palette.accent.opacity(.faint)
-        let edge = isUp ? Palette.increase.opacity(.soft) : Palette.accent.opacity(.subtle)
-
-        let fill = LinearGradient(
-            colors: [top, top.opacity(0)],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-
-        return VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .textFont(.caption)
-                .foregroundStyle(Palette.subtext)
-
-            Text(value)
-                .displayFont(.title, weight: .bold)
-                .foregroundStyle(Palette.text)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-
-            if let change {
-                Text(change)
-                    .textFont(.caption, weight: .semibold)
-                    .foregroundStyle(color)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(color.opacity(.subtle), in: Capsule())
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(fill, in: .rect(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(edge)
-        }
-    }
-
-    func stepBar(
-        _ step: Step,
-        scale: Int
-    ) -> some View {
-        let low = min(step.start, step.end)
-        let high = max(step.start, step.end)
-        let color = Self.stepColor(step)
-
-        return GeometryReader { proxy in
-            let width = proxy.size.width
-            let left = width * CGFloat(low) / CGFloat(max(scale, 1))
-            let length = max(width * CGFloat(high - low) / CGFloat(max(scale, 1)), 2)
-
-            Capsule()
-                .fill(color.gradient)
-                .frame(width: length)
-                .shadow(color: color.opacity(.soft), radius: 3, y: 2)
-                .offset(x: left)
-        }
-        .frame(height: 14)
-    }
-
-    func waterfall(_ focus: ReviewBreakdown.Focus) -> some View {
-        let steps = steps(of: focus)
-        let scale = steps.map { max($0.start, $0.end) }.max() ?? 1
-
-        return VStack(alignment: .leading, spacing: 12) {
-            ForEach(steps, id: \.self) { step in
-                HStack(spacing: 8) {
-                    Text(step.title)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
+        return Button {
+            onOpen(.memo(row.name))
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(row.name)
+                        .textFont(.footnote)
+                        .foregroundStyle(Palette.text)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
-                        .frame(width: 84, alignment: .leading)
 
-                    stepBar(step, scale: scale)
-
-                    Text(step.text)
-                        .displayFont(.small, weight: .semibold)
-                        .foregroundStyle(Self.stepTextColor(step))
+                    Text(count)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
                         .fixedSize()
-                        .frame(minWidth: 76, alignment: .trailing)
+
+                    Spacer(minLength: 4)
+
+                    Text(amount)
+                        .displayFont(.small, weight: .semibold)
+                        .foregroundStyle(isUp ? Palette.increase : Palette.text)
+                        .fixedSize()
+
+                    if gain != nil {
+                        Text("\(Int((ratio * 100).rounded()))%")
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+                            .fixedSize()
+                            .frame(minWidth: 32, alignment: .trailing)
+                    }
+
+                    Image(systemName: "chevron.right")
+                        .sansFont(.micro, weight: .bold)
+                        .foregroundStyle(Palette.subtext.opacity(.medium))
                 }
                 .monospacedDigit()
+
+                Capsule()
+                    .fill(Palette.accent.opacity(.faint))
+                    .frame(height: 6)
+                    .overlay(alignment: .leading) {
+                        GeometryReader { proxy in
+                            Capsule()
+                                .fill(color.gradient)
+                                .opacity(isFilled ? 1 : 0)
+                                .frame(width: proxy.size.width * ratio * (hasAppeared ? 1 : 0))
+                        }
+                    }
+            }
+            .padding(.vertical, 12)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .overlay(alignment: .top) {
+            if !isFirst {
+                Rectangle()
+                    .fill(Palette.accent.opacity(.subtle))
+                    .frame(height: 1)
             }
         }
-        .padding(16)
-        .background(Palette.faint, in: .rect(cornerRadius: 16))
     }
 }
 
 private extension ReviewAnalysisView {
-    static func cellKind(
-        at index: Int,
-        of row: ReviewBreakdown.Row
-    ) -> CellKind {
-        let kept = min(row.count, row.previousCount)
-
-        if index < kept {
-            return .kept
+    static func gain(of row: ReviewBreakdown.Row) -> Int? {
+        guard
+            row.previousCount > 0,
+            let previous = row.previousAmount
+        else {
+            return nil
         }
 
-        if index < row.count {
-            return .added
-        }
-
-        return index < row.previousCount ? .removed : .empty
+        return row.amount - previous
     }
 
-    static func changeColor(
-        from previous: Int,
-        to current: Int
-    ) -> Color {
-        current > previous && previous > 0
-            ? Palette.increase
-            : Palette.subtext
-    }
-
-    static func countText(
-        of row: ReviewBreakdown.Row,
-        hasPrevious: Bool
-    ) -> String {
-        guard hasPrevious else {
-            return "\(row.count) 回"
+    static func labelColor(_ step: Step) -> Color {
+        switch step.kind {
+        case .previous: Palette.text
+        case .change: step.end > step.start ? Palette.increase : Palette.subtext
+        case .current: Palette.accentStrong
         }
-
-        let mark = if row.count > row.previousCount {
-            " ▲"
-        } else if row.count < row.previousCount {
-            " ▼"
-        } else {
-            ""
-        }
-
-        return "\(row.previousCount) → \(row.count) 回\(mark)"
-    }
-
-    static func signed(_ amount: Int) -> String {
-        if amount > 0 {
-            return "+\(ReviewInsight.yen(amount))"
-        }
-
-        return amount < 0 ? "−\(ReviewInsight.yen(-amount))" : "±0円"
     }
 
     static func stepColor(_ step: Step) -> Color {
@@ -307,42 +229,17 @@ private extension ReviewAnalysisView {
         }
     }
 
-    static func stepTextColor(_ step: Step) -> Color {
-        guard step.kind == .change else {
-            return Palette.text
+    static func stepFill(_ step: Step) -> AnyShapeStyle {
+        switch step.kind {
+        case .previous: AnyShapeStyle(Palette.accent.opacity(.muted).gradient)
+        case .change: AnyShapeStyle(stepColor(step).gradient)
+        case .current: AnyShapeStyle(Palette.gold)
         }
-
-        return step.end > step.start ? Palette.increase : Palette.subtext
     }
 
-    func countChange(of focus: ReviewBreakdown.Focus) -> String? {
-        guard focus.hasPrevious else {
-            return nil
-        }
-
-        let diff = focus.count - focus.previousCount
-
-        if diff == 0 {
-            return "± 前の\(unit)と同じ"
-        }
-
-        let mark = diff > 0 ? "▲" : "▼"
-        return "\(mark) \(abs(diff)) 回（\(focus.previousCount) 回）"
-    }
-
-    func priceChange(of focus: ReviewBreakdown.Focus) -> String? {
-        guard focus.hasPrevious else {
-            return nil
-        }
-
-        guard !focus.hasSamePrice else {
-            return "± 前の\(unit)と同じ"
-        }
-
-        let diff = focus.unitPrice - focus.previousUnitPrice
-        let mark = diff > 0 ? "▲" : "▼"
-
-        return "\(mark) \(ReviewInsight.yen(abs(diff)))"
+    static func titleColor(_ step: Step) -> Color {
+        let isUp = step.kind == .change && step.end > step.start
+        return isUp ? Palette.increase : Palette.subtext
     }
 
     func steps(of focus: ReviewBreakdown.Focus) -> [Step] {
@@ -365,7 +262,7 @@ private extension ReviewAnalysisView {
                 kind: .change
             ),
             Step(
-                title: "1 回の額の分",
+                title: "金額の分",
                 start: counted,
                 end: focus.amount,
                 text: Self.signed(focus.priceEffect),

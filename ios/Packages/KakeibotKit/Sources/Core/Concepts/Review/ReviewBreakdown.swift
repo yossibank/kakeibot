@@ -27,17 +27,20 @@ public extension ReviewBreakdown {
         public let count: Int
         public let previousCount: Int
         public let amount: Int
+        public let previousAmount: Int?
 
         public init(
             name: String,
             count: Int,
             previousCount: Int,
-            amount: Int
+            amount: Int,
+            previousAmount: Int? = nil
         ) {
             self.name = name
             self.count = count
             self.previousCount = previousCount
             self.amount = amount
+            self.previousAmount = previousAmount
         }
     }
 
@@ -129,6 +132,11 @@ public extension ReviewBreakdown {
 
     var suggestion: String? {
         summary.action?.sentence
+    }
+
+    static func normalized(_ memo: String?) -> String? {
+        let trimmed = memo?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed.precomposedStringWithCompatibilityMapping
     }
 
     static func make(from input: Input) -> ReviewBreakdown? {
@@ -244,7 +252,8 @@ extension ReviewBreakdown {
                 name: name,
                 count: count,
                 previousCount: previousCount,
-                amount: amount
+                amount: amount,
+                previousAmount: previousAmount
             )
         }
 
@@ -261,11 +270,6 @@ extension ReviewBreakdown {
 }
 
 private extension ReviewBreakdown {
-    static func normalized(_ memo: String?) -> String? {
-        let trimmed = memo?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? nil : trimmed.precomposedStringWithCompatibilityMapping
-    }
-
     static func tallies(
         of input: Input,
         name: (Spend) -> String?

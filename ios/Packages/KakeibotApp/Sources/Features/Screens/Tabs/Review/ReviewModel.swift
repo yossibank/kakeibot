@@ -40,9 +40,12 @@ public final class ReviewModel: ScreenModel {
     }
 
     public internal(set) var errorNotice = ErrorNotice()
-    public internal(set) var comment: CommentState = .hidden
-    public internal(set) var display: Display = .chart
     public internal(set) var showsStoreReviewCard = false
+
+    public internal(set) var comment: CommentState = ReviewModel.initialComment
+    public internal(set) var display: Display = .chart
+
+    var writtenComments: Set<ReviewComment> = []
 
     private(set) var entries: [Entry] = []
 
@@ -148,6 +151,10 @@ public extension ReviewModel {
     func rows(for share: Share) -> [EntryRowItem] {
         if let key = share.id.base as? MoveKey {
             return moveRows(to: key.walletId)
+        }
+
+        if let key = share.id.base as? FactorKey {
+            return factorRows(of: key)
         }
 
         guard

@@ -76,6 +76,20 @@ public extension ReviewComment {
             && named.allSatisfy { basis.contains($0) }
     }
 
+    static func grounded(
+        _ text: String,
+        in basis: String,
+        categories: [String]
+    ) -> String {
+        let sentences = text.split(separator: "。", omittingEmptySubsequences: true)
+
+        let kept = sentences.filter { sentence in
+            isGrounded(String(sentence), in: basis, categories: categories)
+        }
+
+        return kept.map { "\($0)。" }.joined()
+    }
+
     func needsRewrite(
         basis: String,
         isCurrent: Bool,

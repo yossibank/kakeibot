@@ -20,26 +20,54 @@ extension ReviewAnalysisView {
                 }
             }
 
-            rewriteButton
+            rewriteButton(since: nil)
         }
     }
 
     var loading: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("記録を読んでいます")
-                .textFont(.footnote)
-                .foregroundStyle(Palette.subtext)
+        TimelineView(.animation) { context in
+            let time = context.date.timeIntervalSinceReferenceDate
+            let turn = time.truncatingRemainder(dividingBy: 1.1) / 1.1
+            let pulse = 0.35 + 0.65 * (1 + sin(time * 4.5)) / 2
 
-            HStack(alignment: .bottom, spacing: 8) {
-                ForEach(Self.loadingBars.indices, id: \.self) { index in
-                    let bar = Self.loadingBars[index]
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .stroke(Palette.accent.opacity(.subtle), lineWidth: 3)
 
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Palette.accent.opacity(bar.opacity).gradient)
-                        .frame(height: bar.height)
+                        Circle()
+                            .trim(from: 0, to: 0.2)
+                            .stroke(
+                                Palette.accent,
+                                style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                            )
+                            .rotationEffect(.degrees(turn * 360))
+
+                        Image(systemName: "sparkle")
+                            .sansFont(.body, weight: .bold)
+                            .foregroundStyle(Palette.accent)
+                    }
+                    .frame(width: 44, height: 44)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("分析しています")
+                            .textFont(.subheadline, weight: .bold)
+
+                        Text("\(note)の記録")
+                            .textFont(.caption2)
+                            .foregroundStyle(Palette.subtext)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 12) {
+                    loadingStep("記録を読みました", detail: "\(entryCount) 件", pulse: nil)
+                    loadingStep("前の\(unit)と比べました", detail: focusName, pulse: nil)
+                    loadingStep("AI がまとめています", detail: nil, pulse: pulse)
                 }
             }
-            .frame(height: 48, alignment: .bottom)
         }
     }
 
@@ -75,17 +103,45 @@ extension ReviewAnalysisView {
 }
 
 private extension ReviewAnalysisView {
-    struct LoadingBar: Hashable {
-        let height: CGFloat
-        let opacity: Double
-    }
+    func loadingStep(
+        _ title: String,
+        detail: String?,
+        pulse: Double?
+    ) -> some View {
+        HStack(spacing: 12) {
+            if let pulse {
+                Circle()
+                    .fill(Palette.accent)
+                    .frame(width: 8, height: 8)
+                    .frame(width: 20, height: 20)
+                    .overlay {
+                        Circle()
+                            .strokeBorder(Palette.accent, lineWidth: 2)
+                    }
+                    .opacity(pulse)
+            } else {
+                Image(systemName: "checkmark")
+                    .sansFont(.micro, weight: .bold)
+                    .foregroundStyle(Palette.backgroundBottom)
+                    .frame(width: 20, height: 20)
+                    .background(Palette.gold, in: Circle())
+            }
 
-    static let loadingBars = [
-        LoadingBar(height: 14, opacity: 0.25),
-        LoadingBar(height: 26, opacity: 0.35),
-        LoadingBar(height: 20, opacity: 0.45),
-        LoadingBar(height: 38, opacity: 0.6),
-        LoadingBar(height: 30, opacity: 0.75),
-        LoadingBar(height: 48, opacity: 1)
-    ]
+            Text(title)
+                .textFont(.footnote, weight: pulse == nil ? .regular : .bold)
+                .foregroundStyle(pulse == nil ? Palette.text : Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            Spacer(minLength: 8)
+
+            if let detail {
+                Text(detail)
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
+    }
 }

@@ -17,8 +17,20 @@ struct ReviewBreakdownTests {
         ])
         #expect(breakdown.suggestion == "次の月は、食費を 14 回ほどにすると、6,500円 ほど浮きます。")
         #expect(breakdown.summary.rows == [
-            ReviewBreakdown.Row(name: "いなげや", count: 6, previousCount: 6, amount: 21000),
-            ReviewBreakdown.Row(name: "セブン", count: 12, previousCount: 8, amount: 8400)
+            ReviewBreakdown.Row(
+                name: "いなげや",
+                count: 6,
+                previousCount: 6,
+                amount: 21000,
+                previousAmount: 21000
+            ),
+            ReviewBreakdown.Row(
+                name: "セブン",
+                count: 12,
+                previousCount: 8,
+                amount: 8400,
+                previousAmount: 5600
+            )
         ])
     }
 
@@ -106,7 +118,8 @@ struct ReviewBreakdownTests {
             name: "セブン",
             count: 4,
             previousCount: 0,
-            amount: 2800
+            amount: 2800,
+            previousAmount: 0
         )])
     }
 

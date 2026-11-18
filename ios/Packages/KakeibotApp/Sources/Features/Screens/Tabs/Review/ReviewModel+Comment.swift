@@ -107,11 +107,24 @@ public extension ReviewModel {
 
         try? await database.saveReviewComment(new)
 
+        writtenComments.insert(new)
         comment = .ready(new)
     }
 }
 
 extension ReviewModel {
+    static var initialComment: CommentState {
+        canWriteComment ? .loading : .hidden
+    }
+
+    var isWrittenNow: Bool {
+        guard case let .ready(comment) = comment else {
+            return false
+        }
+
+        return writtenComments.contains(comment)
+    }
+
     var commentEntryCount: Int {
         let range = period.range
         return entries.count { range.contains($0.date) && $0.type != .transfer }
@@ -137,6 +150,44 @@ extension ReviewModel {
             categories: insightCategories(current: current, previous: previous),
             largestExpense: largestExpense
         )
+    }
+
+    var breakdownCategory: EntryCategory.ID? {
+        let current = summary.expense.byCategory
+        let previous = previousSummary.expense.byCategory
+        let names = list?.categories.mapValues(\.name) ?? [:]
+        let range = period.range
+
+        let counts = entries.reduce(into: [EntryCategory.ID: Int]()) { counts, entry in
+            guard
+                entry.type == .expense,
+                range.contains(entry.date),
+                let id = entry.categoryId
+            else {
+                return
+            }
+
+            counts[id, default: 0] += 1
+        }
+
+        let enough = current.keys.filter { id in
+            counts[id, default: 0] >= ReviewBreakdown.minimumCount
+        }
+
+        let ranked = enough.sorted { first, second in
+            let firstName = names[first] ?? ""
+            let secondName = names[second] ?? ""
+            return firstName < secondName
+        }
+
+        let rising = ranked
+            .map { ($0, (current[$0] ?? 0) - (previous[$0] ?? 0)) }
+            .filter { $0.1 > 0 }
+            .max { $0.1 < $1.1 }?.0
+
+        let largest = ranked.max { (current[$0] ?? 0) < (current[$1] ?? 0) }
+
+        return hasPreviousEntries ? rising ?? largest : largest
     }
 
     var breakdownInput: ReviewBreakdown.Input? {
@@ -173,27 +224,6 @@ private extension ReviewModel {
 
     var categoryNames: [String] {
         list?.categories.values.map(\.name) ?? []
-    }
-
-    var breakdownCategory: EntryCategory.ID? {
-        let current = summary.expense.byCategory
-        let previous = previousSummary.expense.byCategory
-        let names = list?.categories.mapValues(\.name) ?? [:]
-
-        let ranked = current.keys.sorted { first, second in
-            let firstName = names[first] ?? ""
-            let secondName = names[second] ?? ""
-            return firstName < secondName
-        }
-
-        let rising = ranked
-            .map { ($0, (current[$0] ?? 0) - (previous[$0] ?? 0)) }
-            .filter { $0.1 > 0 }
-            .max { $0.1 < $1.1 }?.0
-
-        let largest = ranked.max { (current[$0] ?? 0) < (current[$1] ?? 0) }
-
-        return hasPreviousEntries ? rising ?? largest : largest
     }
 
     var largestExpense: ReviewInsight.Expense? {
