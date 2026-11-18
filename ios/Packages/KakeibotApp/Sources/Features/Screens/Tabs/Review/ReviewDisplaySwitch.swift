@@ -10,50 +10,12 @@ struct ReviewDisplaySwitch: View {
     let onSelect: (ReviewModel.Display) -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 4) {
-                segment(.chart)
-                segment(.analysis)
-            }
-            .padding(4)
-            .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
-
-            if display == .chart,
-               let teaser {
-                Rectangle()
-                    .fill(Self.divider)
-                    .frame(height: 1)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 4)
-
-                Button {
-                    onSelect(.analysis)
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: "sparkle")
-                            .sansFont(.caption, weight: .bold)
-                            .foregroundStyle(Palette.accent)
-                            .frame(width: 28, height: 28)
-                            .background(Palette.accent.opacity(.subtle), in: Circle())
-
-                        Text(teaser)
-                            .displayFont(.small, weight: .semibold)
-                            .foregroundStyle(Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Image(systemName: "chevron.right")
-                            .sansFont(.caption, weight: .semibold)
-                            .foregroundStyle(Palette.accent)
-                    }
-                    .padding(.horizontal, 8)
-                    .frame(minHeight: 48)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
+        HStack(spacing: 4) {
+            segment(.chart)
+            segment(.analysis)
         }
+        .padding(4)
+        .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
         .padding(4)
         .background(Palette.card, in: .rect(cornerRadius: 20))
         .overlay {
@@ -86,11 +48,11 @@ private extension ReviewDisplaySwitch {
 
                 if showsDot {
                     Circle()
-                        .fill(Palette.rose)
+                        .fill(Palette.increase)
                         .frame(width: 6, height: 6)
                         .background {
                             Circle()
-                                .fill(Palette.rose.opacity(.soft))
+                                .fill(Palette.increase.opacity(.soft))
                                 .frame(width: 12, height: 12)
                         }
                 }
@@ -112,18 +74,6 @@ private extension ReviewDisplaySwitch {
 }
 
 private extension ReviewDisplaySwitch {
-    static var divider: LinearGradient {
-        LinearGradient(
-            colors: [
-                Palette.accent.opacity(0),
-                Palette.accent.opacity(.medium),
-                Palette.accent.opacity(0)
-            ],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-    }
-
     static var edge: LinearGradient {
         LinearGradient(
             colors: [
@@ -134,15 +84,6 @@ private extension ReviewDisplaySwitch {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-    }
-
-    var teaser: String? {
-        switch state {
-        case .hidden, .failed: nil
-        case .loading: "記録を分析しています"
-        case let .ready(comment): comment.headline
-        case let .needsRecords(count): "あと \(ReviewComment.minimumEntries - count) 件で分析できます"
-        }
     }
 
     static func iconColor(of item: ReviewModel.Display) -> Color {

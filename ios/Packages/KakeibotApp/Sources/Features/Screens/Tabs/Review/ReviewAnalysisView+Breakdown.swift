@@ -93,8 +93,8 @@ private extension ReviewAnalysisView {
 
         case .added:
             RoundedRectangle(cornerRadius: 4)
-                .fill(Palette.rose.gradient)
-                .shadow(color: Palette.rose.opacity(.muted), radius: 3, y: 2)
+                .fill(Palette.increase.gradient)
+                .shadow(color: Palette.increase.opacity(.muted), radius: 3, y: 2)
 
         case .removed:
             RoundedRectangle(cornerRadius: 4)
@@ -152,9 +152,9 @@ private extension ReviewAnalysisView {
         change: String?,
         isUp: Bool
     ) -> some View {
-        let color = isUp ? Palette.rose : Palette.subtext
-        let top = isUp ? Palette.rose.opacity(.subtle) : Palette.accent.opacity(.faint)
-        let edge = isUp ? Palette.rose.opacity(.soft) : Palette.accent.opacity(.subtle)
+        let color = isUp ? Palette.increase : Palette.subtext
+        let top = isUp ? Palette.increase.opacity(.subtle) : Palette.accent.opacity(.faint)
+        let edge = isUp ? Palette.increase.opacity(.soft) : Palette.accent.opacity(.subtle)
 
         let fill = LinearGradient(
             colors: [top, top.opacity(0)],
@@ -268,7 +268,7 @@ private extension ReviewAnalysisView {
         to current: Int
     ) -> Color {
         current > previous && previous > 0
-            ? Palette.rose
+            ? Palette.increase
             : Palette.subtext
     }
 
@@ -302,7 +302,7 @@ private extension ReviewAnalysisView {
     static func stepColor(_ step: Step) -> Color {
         switch step.kind {
         case .previous: Palette.accent.opacity(.muted)
-        case .change: step.end > step.start ? Palette.rose : Palette.subtext.opacity(.medium)
+        case .change: step.end > step.start ? Palette.increase : Palette.subtext.opacity(.medium)
         case .current: Palette.accent
         }
     }
@@ -312,7 +312,7 @@ private extension ReviewAnalysisView {
             return Palette.text
         }
 
-        return step.end > step.start ? Palette.rose : Palette.subtext
+        return step.end > step.start ? Palette.increase : Palette.subtext
     }
 
     func countChange(of focus: ReviewBreakdown.Focus) -> String? {

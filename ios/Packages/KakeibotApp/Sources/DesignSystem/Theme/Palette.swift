@@ -15,6 +15,7 @@ public enum Palette {
     public static let subtext = Color(themed: \.subtext)
     public static let hint = Color(themed: \.hint)
     public static let rose = Color(semantic: .rose)
+    public static let increase = Color(semantic: .rose, rose: 0xC2410C)
     public static let amber = Color(semantic: .amber)
     public static let holiday = Color(semantic: .holiday)
     public static let saturday = Color(semantic: .saturday)

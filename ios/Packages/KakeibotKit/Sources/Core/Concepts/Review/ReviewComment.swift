@@ -29,11 +29,6 @@ public struct ReviewComment: Codable, Hashable, Sendable {
 public extension ReviewComment {
     static let minimumEntries = 5
 
-    var headline: String {
-        let first = body.split(separator: "。", omittingEmptySubsequences: true).first
-        return first.map { "\($0)。" } ?? body
-    }
-
     static func cleaned(_ text: String) -> String {
         let end = cutMarks.compactMap { text.range(of: $0)?.lowerBound }.min() ?? text.endIndex
         let kept = text[..<end]

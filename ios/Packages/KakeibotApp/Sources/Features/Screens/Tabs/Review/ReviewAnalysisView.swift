@@ -37,14 +37,20 @@ struct ReviewAnalysisView: View {
 }
 
 private extension ReviewAnalysisView {
+    var frameMark: some View {
+        Image(systemName: "sparkle")
+            .sansFont(.small, weight: .bold)
+            .foregroundStyle(Palette.accent)
+    }
+
     func action(_ comment: ReviewComment) -> some View {
         Group {
             if let action = comment.breakdown?.action {
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("NEXT ACTION")
-                            .sansFont(.micro, weight: .bold)
-                            .tracking(2)
+                        Text("次の一手")
+                            .displayFont(.small, weight: .bold)
+                            .tracking(1)
                             .opacity(0.8)
 
                         Text(action.lead)
@@ -122,25 +128,16 @@ private extension ReviewAnalysisView {
 
     func hero(@ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("ANALYSIS")
-                    .sansFont(.caption, weight: .bold)
-                    .tracking(2.4)
-                    .foregroundStyle(Palette.accent)
-
-                Spacer()
-
-                Text(note)
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
+            Text(note)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
             content()
         }
         .foregroundStyle(Palette.text)
-        .padding(20)
+        .padding(24)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background {
             ZStack {
@@ -149,15 +146,23 @@ private extension ReviewAnalysisView {
 
                 RoundedRectangle(cornerRadius: 24)
                     .fill(Self.glow)
-
-                ReviewTrendLine()
-                    .stroke(Palette.accent.opacity(.muted), lineWidth: 1.6)
-                    .padding(.vertical, 24)
             }
-            .clipShape(.rect(cornerRadius: 24))
             .overlay {
                 RoundedRectangle(cornerRadius: 24)
                     .strokeBorder(Self.goldEdge)
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 0.5)
+                    .padding(8)
+            }
+            .overlay(alignment: .top) {
+                frameMark
+                    .offset(y: -6)
+            }
+            .overlay(alignment: .bottom) {
+                frameMark
+                    .offset(y: 6)
             }
             .shadow(color: Palette.accent.opacity(.soft), radius: 20, y: 12)
         }
@@ -211,17 +216,31 @@ extension ReviewAnalysisView {
 
     var rewriteButton: some View {
         Button(action: onRewrite) {
-            Label("分析し直す", systemImage: "arrow.clockwise")
-                .textFont(.footnote, weight: .semibold)
-                .foregroundStyle(Palette.accent)
-                .padding(.horizontal, 20)
-                .frame(minHeight: 44)
-                .background(Palette.card, in: Capsule())
-                .overlay {
-                    Capsule()
-                        .strokeBorder(Palette.accent.opacity(.muted))
-                }
-                .contentShape(Capsule())
+            HStack(spacing: 12) {
+                Image(systemName: "arrow.clockwise")
+                    .sansFont(.small, weight: .bold)
+                    .foregroundStyle(Palette.backgroundBottom)
+                    .frame(width: 40, height: 40)
+                    .background(Palette.gold, in: Circle())
+                    .overlay {
+                        Circle()
+                            .strokeBorder(Color.white.opacity(.soft))
+                    }
+
+                Text("分析し直す")
+                    .displayFont(.small, weight: .bold)
+                    .foregroundStyle(Palette.accentStrong)
+            }
+            .padding(.leading, 4)
+            .padding(.trailing, 24)
+            .frame(minHeight: 48)
+            .background(Self.buttonFill, in: Capsule())
+            .overlay {
+                Capsule()
+                    .strokeBorder(Self.goldEdge)
+            }
+            .shadow(color: Palette.accentDeep.opacity(.soft), radius: 10, y: 6)
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
     }
@@ -249,6 +268,14 @@ extension ReviewAnalysisView {
 }
 
 private extension ReviewAnalysisView {
+    static var buttonFill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.cardTop, Palette.accent.opacity(.subtle)],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
     static var glow: RadialGradient {
         RadialGradient(
             colors: [Palette.accent.opacity(.soft), Palette.accent.opacity(0)],
@@ -295,37 +322,10 @@ private extension ReviewAnalysisView {
                 continue
             }
 
-            text[range].foregroundColor = Palette.rose
+            text[range].foregroundColor = Palette.increase
         }
 
         return text
-    }
-}
-
-private struct ReviewTrendLine: Shape {
-    func path(in rect: CGRect) -> Path {
-        let points: [CGPoint] = [
-            CGPoint(x: 0.5, y: 0.9),
-            CGPoint(x: 0.6, y: 0.72),
-            CGPoint(x: 0.7, y: 0.78),
-            CGPoint(x: 0.8, y: 0.45),
-            CGPoint(x: 0.9, y: 0.52),
-            CGPoint(x: 1, y: 0.1)
-        ]
-
-        var path = Path()
-
-        for (index, point) in points.enumerated() {
-            let position = CGPoint(x: rect.width * point.x, y: rect.height * point.y)
-
-            if index == 0 {
-                path.move(to: position)
-            } else {
-                path.addLine(to: position)
-            }
-        }
-
-        return path
     }
 }
 
