@@ -5,6 +5,7 @@ import SwiftUI
 
 public struct ReviewView: View {
     @Environment(\.themeStyle.corner) var corner
+    @Environment(\.openURL) var openURL
 
     @Bindable private(set) var model: ReviewModel
 
@@ -60,6 +61,9 @@ public struct ReviewView: View {
         .haptic(.selection, trigger: model.kind)
         .task(id: commentTrigger) {
             await model.refreshComment()
+        }
+        .task(id: model.list?.entries.count) {
+            await model.refreshStoreReviewCard()
         }
         .sheet(item: $openShare, onDismiss: openPendingEntry) { share in
             ReviewShareSheet(

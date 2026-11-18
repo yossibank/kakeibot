@@ -58,6 +58,8 @@ expense・income の列は、描画に使わない。
 | review_scale | `week` `month` `year` | 空なら月 |
 | review_kind | `expense` `income` `balance` | 空なら支出 |
 | review_comment_folded | `true` なら、振り返りのひとことを 1 行に畳む | 畳んでいる間は、ひとことを作らない。Android は持たない |
+| store_review_card_closed | `true` なら、振り返りのレビューの札を出さない | Android は持たない |
+| store_review_opened | `true` なら、レビューのお願いを出さない | 札の「レビューを書く」を押すと `true` にする。Android は持たない |
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの | 空ならすべて出す。画面の名前は、表の下の一覧にある |
 | closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ | 空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで | |
