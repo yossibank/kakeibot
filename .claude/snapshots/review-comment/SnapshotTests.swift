@@ -19,30 +19,115 @@ struct SnapshotTests {
             createdAt: Date()
         )
 
+        let rows = [
+            ReviewBreakdown.Row(
+                name: "いなげや",
+                count: 6,
+                previousCount: 6,
+                amount: 21300,
+                previousAmount: 21300
+            ),
+            ReviewBreakdown.Row(
+                name: "セブン",
+                count: 12,
+                previousCount: 8,
+                amount: 8400,
+                previousAmount: 5600
+            ),
+            ReviewBreakdown.Row(
+                name: "パン屋 こむぎ",
+                count: 3,
+                previousCount: 5,
+                amount: 2900,
+                previousAmount: 4800
+            )
+        ]
+
+        let summary = ReviewBreakdown.Summary(
+            focus: ReviewBreakdown.Focus(
+                name: "食費",
+                count: 28,
+                previousCount: 20,
+                amount: 39200,
+                previousAmount: 28000
+            ),
+            rows: rows,
+            goodPoint: "外食は、前の月の 6 回から 3 回に減っています。",
+            action: ReviewBreakdown.Action(lead: "食費を前の月と同じ 20 回ほどに戻すと", amount: 11200)
+        )
+
+        let breakdown = ReviewComment(
+            period: "month:2026-11-01",
+            body: "食費が増えたのは、回数が 8 回増えたためです。1 回の金額は前の月と変わりません。",
+            suggestion: summary.action?.sentence ?? "",
+            basis: basis,
+            createdAt: Date(),
+            breakdown: summary
+        )
+
+        let yearSummary = ReviewBreakdown.Summary(
+            focus: ReviewBreakdown.Focus(
+                name: "食費",
+                count: 120,
+                previousCount: 0,
+                amount: 384_000,
+                previousAmount: 0
+            ),
+            rows: [],
+            goodPoint: nil,
+            action: nil
+        )
+
+        let year = ReviewComment(
+            period: "year:2026-01-01",
+            body: "食費は 120 回で、1 回はおよそ 3,200円 です。",
+            suggestion: "内訳の上位 3 つのカテゴリを確かめてみましょう。",
+            basis: basis,
+            createdAt: Date(),
+            breakdown: yearSummary
+        )
+
+        let months = [28000, 31000, 33000, 30000, 52000, 34000, 36000, 32000, 35000, 38000, 35000]
+            .enumerated()
+            .map { index, amount in
+                ReviewModel.MonthAmount(month: index + 1, amount: amount)
+            }
+
         let states: [(String, ReviewModel.CommentState)] = [
             ("ready", .ready(comment)),
+            ("breakdown", .ready(breakdown)),
+            ("year", .ready(year)),
             ("loading", .loading),
             ("records", .needsRecords(2)),
-            ("folded", .folded),
             ("failed", .failed)
         ]
 
         for variant in Self.variants {
             for (name, state) in states {
-                let card = ReviewCommentCard(
-                    state: state,
-                    title: "今月のひとこと",
-                    until: LocalDate(year: 2026, month: 11, day: 18) ?? LocalDate(
-                        Date(),
-                        in: .current
-                    ),
-                    onRewrite: {},
-                    onRecord: {},
-                    onFold: { _ in }
-                )
+                let view = VStack(spacing: 12) {
+                    ReviewDisplaySwitch(
+                        display: .chart,
+                        onSelect: { _ in }
+                    )
+
+                    ReviewAnalysisView(
+                        state: state,
+                        note: "11/1–11/18 · 42 件",
+                        unit: "月",
+                        currentName: "今月",
+                        entryCount: 42,
+                        focusName: "食費",
+                        months: name == "year" ? months : [],
+                        isNew: name == "breakdown",
+                        newEntries: name == "breakdown" ? 3 : 0,
+                        onRewrite: {},
+                        onRecord: {},
+                        onOpen: { _ in }
+                    )
+                }
                 .padding(16)
 
-                try Self.write(card, variant: variant, to: "review-comment-\(name)")
+                try Self.write(view, variant: variant, to: "review-comment-\(name)")
             }
         }
     }
@@ -63,6 +148,7 @@ private extension SnapshotTests {
 
     static let variants = [
         Variant(name: "regular", width: 393, scheme: .dark, textSize: .standard),
+        Variant(name: "light", width: 393, scheme: .light, textSize: .standard),
         Variant(name: "narrow", width: 320, scheme: .light, textSize: .large)
     ]
 
@@ -78,12 +164,15 @@ private extension SnapshotTests {
             textSize: variant.textSize
         )
 
+        let preset: ThemePreset = variant.scheme == .dark ? .black : .white
+
         let content = view
             .frame(width: variant.width)
             .frame(maxHeight: maxHeight, alignment: .top)
             .clipped()
             .background(Palette.background)
             .environment(\.themeStyle, style)
+            .environment(\.palette, preset.palette)
             .environment(\.colorScheme, variant.scheme)
 
         let renderer = ImageRenderer(content: content)

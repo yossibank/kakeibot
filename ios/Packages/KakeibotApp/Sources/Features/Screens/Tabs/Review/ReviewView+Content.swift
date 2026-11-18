@@ -5,8 +5,6 @@ import SwiftUI
 extension ReviewView {
     var content: some View {
         TwoColumnStack(spacing: 12) {
-            commentCard
-
             HStack(spacing: 8) {
                 ForEach(ReviewKind.allCases, id: \.self) { kind in
                     kindTile(kind)
@@ -14,79 +12,86 @@ extension ReviewView {
             }
             .animation(.snappy, value: model.kind)
 
-            detailCard
+            displaySwitch
 
-            if model.kind == .balance {
-                let moves = model.moves
-
-                if !moves.isEmpty {
-                    moveCard(moves)
-                }
-            }
-
-            if model.kind != .balance {
-                let categoryShares = model.categoryShares
-                let walletShares = model.walletShares
-
-                if model.list == nil {
-                    EmptyView()
-                } else if categoryShares.isEmpty,
-                          walletShares.isEmpty {
-                    PlaceholderEmpty(
-                        systemImage: "chart.pie",
-                        text: "この期間の記録はありません",
-                        onRecord: {
-                            onAddEntry(recordDate)
-                        }
-                    )
-                    .padding(.horizontal, 16)
-                    .card()
-                    .layoutColumn(.trailing)
-                } else {
-                    ReviewSharesCard(
-                        title: "カテゴリごと",
-                        type: model.entryType,
-                        shares: categoryShares,
-                        total: ReviewSharesCard.Total(
-                            title: totalTitle,
-                            amount: model.total
-                        ),
-                        onOpen: { share in
-                            openShare = share
-                        }
-                    )
-                    .layoutColumn(.trailing)
-
-                    ReviewSharesCard(
-                        title: "口座ごと",
-                        type: model.entryType,
-                        shares: walletShares,
-                        total: nil,
-                        onOpen: { share in
-                            openShare = share
-                        }
-                    )
-                }
-            }
-
-            let tallies = model.stampTallies
-
-            if tallies.isEmpty {
-                stampHint
+            if showsAnalysis {
+                analysisView
                     .layoutColumn(.trailing)
             } else {
-                StampTallyCard(
-                    tallies: tallies,
-                    emptyText: "この期間に押したスタンプはありません",
-                    onOpen: { tally in
-                        openStamp = tally
-                    }
-                )
-                .layoutColumn(.trailing)
-            }
+                detailCard
 
-            storeReviewCard
-                .layoutColumn(.trailing)
+                if model.kind == .balance {
+                    let moves = model.moves
+
+                    if !moves.isEmpty {
+                        moveCard(moves)
+                    }
+                }
+
+                if model.kind != .balance {
+                    let categoryShares = model.categoryShares
+                    let walletShares = model.walletShares
+
+                    if model.list == nil {
+                        EmptyView()
+                    } else if categoryShares.isEmpty,
+                              walletShares.isEmpty {
+                        PlaceholderEmpty(
+                            systemImage: "chart.pie",
+                            text: "この期間の記録はありません",
+                            onRecord: {
+                                onAddEntry(recordDate)
+                            }
+                        )
+                        .padding(.horizontal, 16)
+                        .card()
+                        .layoutColumn(.trailing)
+                    } else {
+                        ReviewSharesCard(
+                            title: "カテゴリごと",
+                            type: model.entryType,
+                            shares: categoryShares,
+                            total: ReviewSharesCard.Total(
+                                title: totalTitle,
+                                amount: model.total
+                            ),
+                            onOpen: { share in
+                                openShare = share
+                            }
+                        )
+                        .layoutColumn(.trailing)
+
+                        ReviewSharesCard(
+                            title: "口座ごと",
+                            type: model.entryType,
+                            shares: walletShares,
+                            total: nil,
+                            onOpen: { share in
+                                openShare = share
+                            }
+                        )
+                    }
+                }
+
+                let tallies = model.stampTallies
+
+                if tallies.isEmpty {
+                    stampHint
+                        .layoutColumn(.trailing)
+                } else {
+                    StampTallyCard(
+                        tallies: tallies,
+                        emptyText: "この期間に押したスタンプはありません",
+                        onOpen: { tally in
+                            openStamp = tally
+                        }
+                    )
+                    .layoutColumn(.trailing)
+                }
+
+                storeReviewCard
+                    .layoutColumn(.trailing)
+            }
         }
     }
 }

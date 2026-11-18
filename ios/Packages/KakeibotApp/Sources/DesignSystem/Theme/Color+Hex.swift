@@ -52,6 +52,21 @@ extension Color {
     }
 
     init(
+        semantic: ThemePalette.Semantic,
+        rose alternative: UInt32
+    ) {
+        let color = UIColor { traits in
+            let palette = traits[PaletteTrait.self]
+            let isRose = palette == ThemePreset.rose.palette
+            let rgb = isRose ? alternative : palette.color(semantic)
+
+            return UIColor(rgb: rgb)
+        }
+
+        self.init(uiColor: color)
+    }
+
+    init(
         themed role: KeyPath<ThemePalette, UInt32> & Sendable,
         lightOpacity: CGFloat = 1
     ) {

@@ -7,19 +7,22 @@ public struct ReviewComment: Codable, Hashable, Sendable {
     public var suggestion: String
     public var basis: String
     public var createdAt: Date
+    public var breakdown: ReviewBreakdown.Summary?
 
     public init(
         period: String,
         body: String,
         suggestion: String,
         basis: String,
-        createdAt: Date
+        createdAt: Date,
+        breakdown: ReviewBreakdown.Summary? = nil
     ) {
         self.period = period
         self.body = body
         self.suggestion = suggestion
         self.basis = basis
         self.createdAt = createdAt
+        self.breakdown = breakdown
     }
 }
 
@@ -47,6 +50,20 @@ public extension ReviewComment {
         insights.map(\.labeledFact).joined(separator: "\n")
     }
 
+    static func facts(
+        _ insights: [ReviewInsight],
+        with breakdown: ReviewBreakdown?
+    ) -> [ReviewInsight] {
+        guard
+            let breakdown,
+            let first = insights.first
+        else {
+            return insights
+        }
+
+        return [first] + breakdown.insights.prefix(2)
+    }
+
     static func isGrounded(
         _ text: String,
         in basis: String,
@@ -57,6 +74,20 @@ public extension ReviewComment {
 
         return numbers(in: text).isSubset(of: allowed)
             && named.allSatisfy { basis.contains($0) }
+    }
+
+    static func grounded(
+        _ text: String,
+        in basis: String,
+        categories: [String]
+    ) -> String {
+        let sentences = text.split(separator: "。", omittingEmptySubsequences: true)
+
+        let kept = sentences.filter { sentence in
+            isGrounded(String(sentence), in: basis, categories: categories)
+        }
+
+        return kept.map { "\($0)。" }.joined()
     }
 
     func needsRewrite(

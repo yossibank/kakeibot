@@ -57,7 +57,6 @@ expense・income の列は、描画に使わない。
 | records_layout | `calendar` `list` | 空ならカレンダー |
 | review_scale | `week` `month` `year` | 空なら月 |
 | review_kind | `expense` `income` `balance` | 空なら支出 |
-| review_comment_folded | `true` なら、振り返りのひとことを 1 行に畳む | 畳んでいる間は、ひとことを作らない。Android は持たない |
 | store_review_card_closed | `true` なら、振り返りのレビューの札を出さない | Android は持たない |
 | store_review_opened | `true` なら、レビューのお願いを出さない | 札の「レビューを書く」を押すと `true` にする。Android は持たない |
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの | 空ならすべて出す。画面の名前は、表の下の一覧にある |
@@ -105,3 +104,4 @@ closed_hints に入る画面の名前は、次のとおり。
 | suggestion | TEXT | 提案の文 |
 | basis | TEXT | 作った時にモデルへ渡した事実の文。変わったら作り直す |
 | created_at | TEXT | |
+| breakdown | TEXT | 分析の値（`ReviewBreakdown.Summary`）の JSON。カテゴリの前後の回数と額・同じメモの行・良い点・浮く額を持つ |

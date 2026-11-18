@@ -9,7 +9,7 @@ struct MigrationV041Tests {
         let migrator = AppDatabase.migrator
 
         try migrator.migrate(queue, upTo: "v40")
-        try migrator.migrate(queue)
+        try migrator.migrate(queue, upTo: "v41")
 
         let columns = try queue.read { db in
             try db.columns(in: "review_comment").map(\.name)

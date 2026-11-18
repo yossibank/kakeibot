@@ -33,6 +33,19 @@ struct ReviewCommentTests {
     }
 
     @Test
+    func keepsOnlyGroundedSentences() {
+        let basis = "気を付けたい点：住まいの 1 回の出費 78,000円 が、支出の 42% を占めています。\n良い点：収入の 280,000円 から、95,540円 残せました。"
+        let text = "収入の 280,000 円から 95,540 円が残りました。住まいの 1 回の出費 78,000 円が支出の 42% を占めています。住まいの出費は前月より 18,000 円増えました。"
+        let invented = "住まいの出費は前月より 18,000 円増えました。"
+
+        let kept = ReviewComment.grounded(text, in: basis, categories: ["住まい"])
+        let empty = ReviewComment.grounded(invented, in: basis, categories: ["住まい"])
+
+        #expect(kept == "収入の 280,000 円から 95,540 円が残りました。住まいの 1 回の出費 78,000 円が支出の 42% を占めています。")
+        #expect(empty.isEmpty)
+    }
+
+    @Test
     func cutsBrokenTail() {
         let broken = "次の期間に支出のペースを確認してみましょう。」} }  ```  ```  ```json  {"
         let quoted = "「残りの日は控えめにすると収まります。」"
