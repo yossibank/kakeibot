@@ -35,6 +35,18 @@ struct AppReviewRequestTests {
     }
 
     @Test
+    func skipsAfterOpeningStoreReview() async throws {
+        let setup = try await Setup(entries: 10, daysAgo: 3)
+        try await setup.database.setSetting(.storeReviewOpened, to: true)
+
+        let asked = await setup.request.shouldAsk(after: setup.recorded, at: setup.now)
+        let saved = try await setup.database.setting(.reviewRequestedVersion)
+
+        #expect(!asked)
+        #expect(saved == nil)
+    }
+
+    @Test
     func waitsForTenEntries() async throws {
         let setup = try await Setup(entries: 9, daysAgo: 3)
 

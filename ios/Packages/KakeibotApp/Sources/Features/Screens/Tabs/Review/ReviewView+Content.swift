@@ -84,6 +84,9 @@ extension ReviewView {
                 )
                 .layoutColumn(.trailing)
             }
+
+            storeReviewCard
+                .layoutColumn(.trailing)
         }
     }
 }

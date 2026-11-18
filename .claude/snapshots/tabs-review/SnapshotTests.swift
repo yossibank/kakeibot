@@ -22,6 +22,8 @@ struct SnapshotTests {
             model.list != nil
         }
 
+        await model.refreshStoreReviewCard()
+
         for kind in [ReviewKind.expense, .balance] {
             model.setKind(kind)
 

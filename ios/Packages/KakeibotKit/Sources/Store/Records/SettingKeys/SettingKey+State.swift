@@ -105,6 +105,14 @@ public extension SettingKey where Value == Bool {
         Self(flag: .reviewCommentFolded)
     }
 
+    static var storeReviewCardClosed: Self {
+        Self(flag: .storeReviewCardClosed)
+    }
+
+    static var storeReviewOpened: Self {
+        Self(flag: .storeReviewOpened)
+    }
+
     static var settingsOpened: Self {
         Self(flag: .settingsOpened)
     }

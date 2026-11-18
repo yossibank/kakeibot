@@ -11,6 +11,10 @@ public extension AppDatabase {
         when isReady: @escaping @Sendable (EntryHistory) -> Bool
     ) async throws -> Bool {
         try await writer.write { db in
+            guard try !Self.setting(.storeReviewOpened, in: db) else {
+                return false
+            }
+
             guard try Self.setting(.reviewRequestedVersion, in: db) != version else {
                 return false
             }

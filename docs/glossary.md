@@ -67,4 +67,5 @@
 | 今月のひとこと | 振り返りのひとこと | `ReviewComment`・`ReviewCommentCard` | 振り返りのタイルの上に出す、AI が書いた気づきと、コードで選んだ提案 |
 |  | ひとことの事実 | `ReviewInsight` | コードで見つけてモデルに渡す、予算のペースや増えたカテゴリなどの事実 |
 | | レビューのお願い | `AppReviewRequest` | App Store の評価を頼む OS のダイアログを出すこと。振り返りの `ReviewModel` とは別のもの |
+| | レビューの札 | `ReviewView.storeReviewCard` | 振り返りの一番下に出す、App Store のレビューを書く画面を開く札 |
 | 休日なら、土日・祝日のとき | 休日のずらし | `HolidayShift` | 固定費の日と月の始まりが休日に当たったら、そのまま・前の平日・次の平日にすること |
