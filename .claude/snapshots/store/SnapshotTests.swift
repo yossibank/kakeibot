@@ -126,7 +126,7 @@ extension SnapshotTests {
     }
 
     enum Lead {
-        case free
+        case adFree
         case note(String)
     }
 
@@ -318,8 +318,8 @@ private struct StoreHeadline: View {
             }
 
             switch lead {
-            case .free:
-                freeBand
+            case .adFree:
+                adFreeBand
 
             case let .note(note):
                 Text(note)
@@ -332,29 +332,21 @@ private struct StoreHeadline: View {
 }
 
 private extension StoreHeadline {
-    var freeBand: some View {
-        HStack(spacing: 10 * scale) {
-            Text("無料")
-
-            Circle()
-                .fill(StoreInk.accent)
-                .frame(width: 4 * scale, height: 4 * scale)
-
-            Text("広告なし")
-        }
-        .font(.display(size: 19 * scale, weight: .bold, in: .mincho))
-        .tracking(2.6 * scale)
-        .foregroundStyle(StoreInk.accent)
-        .padding(.horizontal, 12 * scale)
-        .padding(.vertical, 5 * scale)
-        .overlay(alignment: .top) {
-            StoreInk.accent
-                .frame(height: 1)
-        }
-        .overlay(alignment: .bottom) {
-            StoreInk.accent
-                .frame(height: 1)
-        }
+    var adFreeBand: some View {
+        Text("広告なし")
+            .font(.display(size: 19 * scale, weight: .bold, in: .mincho))
+            .tracking(2.6 * scale)
+            .foregroundStyle(StoreInk.accent)
+            .padding(.horizontal, 12 * scale)
+            .padding(.vertical, 5 * scale)
+            .overlay(alignment: .top) {
+                StoreInk.accent
+                    .frame(height: 1)
+            }
+            .overlay(alignment: .bottom) {
+                StoreInk.accent
+                    .frame(height: 1)
+            }
     }
 }
 
@@ -615,19 +607,25 @@ private struct StoreBanner: View {
         let zoom = canvas.size.width / Self.designWidth
         let height = canvas.size.height / zoom
 
-        HStack(spacing: 40) {
-            VStack(alignment: .leading, spacing: 14) {
-                StoreHeadline(lines: ["好きな色で、", "続く家計簿。"], lead: .free, scale: 1.15)
+        HStack(spacing: 28) {
+            VStack(alignment: .leading, spacing: 20) {
+                StoreHeadline(
+                    lines: ["続けられる、", "家計簿。"],
+                    lead: .note("選ぶ・撮る・押すだけ"),
+                    scale: 1
+                )
 
-                Text("色も字体も、着せ替え")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(StoreInk.note)
+                Text("テーマもフォントも、\n自分好みにカスタマイズ")
+                    .font(.system(size: 15, weight: .medium))
+                    .lineSpacing(4)
+                    .foregroundStyle(StoreInk.accent)
             }
             .fixedSize()
 
             phones(height: height)
         }
-        .frame(width: Self.designWidth, height: height)
+        .padding(.leading, 44)
+        .frame(width: Self.designWidth, height: height, alignment: .leading)
         .background {
             StoreRings(rings: rings(height: height))
         }
@@ -654,7 +652,7 @@ private extension StoreBanner {
 
 private extension StoreBanner {
     func phones(height: CGFloat) -> some View {
-        let limit: CGFloat = canvas == .header ? 150 : 180
+        let limit: CGFloat = canvas == .header ? 150 : 200
         let width = min(height * 0.52, limit)
 
         return ZStack(alignment: .top) {
@@ -669,7 +667,7 @@ private extension StoreBanner {
             phone(shots[0], width: width)
                 .offset(y: height * 0.1)
         }
-        .frame(width: width * 2.2, height: height, alignment: .top)
+        .frame(width: width * 2.4, height: height, alignment: .top)
     }
 
     func phone(
@@ -773,18 +771,18 @@ private struct Line: Shape {
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
-    static let bannerShots = ["04-theme-navy", "04-theme-rose", "04-theme-sage"]
+    static let bannerShots = ["04-theme-rose", "03-receipt", "02-entry-black"]
 
     static let outerPages = [
         Page(
             file: "01-home",
             lines: ["今月あと", "いくら？"],
-            lead: .free,
+            lead: .adFree,
             art: .phone("outer-01-home")
         ),
         Page(
             file: "02-theme",
-            lines: ["色も、", "着せ替え。"],
+            lines: ["テーマも、", "着せ替え。"],
             lead: .note("ライトとダークの 12 色から選べます"),
             art: .fan(
                 left: "outer-04-theme-rose",
@@ -807,7 +805,7 @@ private extension SnapshotTests {
         ),
         Page(
             file: "05-font",
-            lines: ["字体も、", "選べる"],
+            lines: ["フォントも、", "選べる"],
             lead: .note("手書きやドットなど 6 種類"),
             art: .compare(
                 "outer-05-font-hand",
@@ -840,14 +838,14 @@ private extension SnapshotTests {
         Shot(
             file: "01-home",
             lines: ["今月あと", "いくら？"],
-            lead: .free,
+            lead: .adFree,
             phones: [
                 Phone(name: "04-theme-navy", x: 34, y: 200, width: 270, angle: -3)
             ]
         ),
         Shot(
             file: "02-theme",
-            lines: ["色も、", "着せ替え。"],
+            lines: ["テーマも、", "着せ替え。"],
             lead: .note("ライトとダークの 12 色から選べます"),
             phones: [
                 Phone(
@@ -887,7 +885,7 @@ private extension SnapshotTests {
         ),
         Shot(
             file: "05-font",
-            lines: ["字体も、", "選べる"],
+            lines: ["フォントも、", "選べる"],
             lead: .note("手書きやドットなど 6 種類"),
             phones: [
                 Phone(name: "05-font-hand", x: 12, y: 196, width: 250, angle: -4),
@@ -948,7 +946,7 @@ private extension SnapshotTests {
         Page(
             file: "01-home",
             lines: ["広い画面で、", "家計をひと目で"],
-            lead: .free,
+            lead: .adFree,
             art: .phone("inner-01-home")
         ),
         Page(
