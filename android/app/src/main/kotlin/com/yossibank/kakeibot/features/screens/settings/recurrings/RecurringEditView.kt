@@ -14,8 +14,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
@@ -28,6 +31,7 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
+import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -61,6 +65,7 @@ fun RecurringEditView(
     }
 
     val scope = rememberCoroutineScope()
+    var isConfirmingDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(model) {
         model.load()
@@ -75,13 +80,7 @@ fun RecurringEditView(
             if (model.isEditing) {
                 RoundIconButton(
                     icon = R.drawable.ic_trash,
-                    onSelect = {
-                        scope.launch {
-                            if (model.delete()) {
-                                onClose()
-                            }
-                        }
-                    },
+                    onSelect = { isConfirmingDelete = true },
                 )
             }
         }
@@ -242,6 +241,23 @@ fun RecurringEditView(
                     }
                 }
             },
+        )
+    }
+
+    if (isConfirmingDelete) {
+        DeleteDialog(
+            title = "この固定費を削除しますか",
+            message = "これまでに作った記録は残ります",
+            onConfirm = {
+                isConfirmingDelete = false
+
+                scope.launch {
+                    if (model.delete()) {
+                        onClose()
+                    }
+                }
+            },
+            onDismiss = { isConfirmingDelete = false },
         )
     }
 }

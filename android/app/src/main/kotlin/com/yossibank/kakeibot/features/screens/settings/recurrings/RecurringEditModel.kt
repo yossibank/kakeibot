@@ -56,6 +56,9 @@ class RecurringEditModel(
     var message: String by mutableStateOf("")
         private set
 
+    var isSaving: Boolean by mutableStateOf(false)
+        private set
+
     private var options: EntryOptions? by mutableStateOf(null)
 
     val isEditing: Boolean
@@ -123,7 +126,23 @@ class RecurringEditModel(
     }
 
     suspend fun save(): Boolean {
-        val draft = RecurringDraft(
+        if (isSaving) {
+            return false
+        }
+
+        val base = editing?.let { RecurringDraft(recurring = it) }
+            ?: RecurringDraft(
+                type = type,
+                amount = 0,
+                categoryId = null,
+                walletId = null,
+                frequency = frequency,
+                month = month,
+                day = day,
+                startDate = today,
+            )
+
+        val draft = base.copy(
             type = type,
             amount = calculator.amount,
             categoryId = categoryId,
@@ -132,7 +151,6 @@ class RecurringEditModel(
             frequency = frequency,
             month = month,
             day = day,
-            startDate = editing?.startDate ?: today,
         )
 
         val problem = draft.problems.firstOrNull()
@@ -148,6 +166,8 @@ class RecurringEditModel(
             return false
         }
 
+        isSaving = true
+
         try {
             database.saveRecurring(
                 draft = draft,
@@ -162,11 +182,19 @@ class RecurringEditModel(
         } catch (_: Exception) {
             message = "保存できませんでした"
             return false
+        } finally {
+            isSaving = false
         }
     }
 
     suspend fun delete(): Boolean {
-        val editing = editing ?: return false
+        val editing = editing
+
+        if (editing == null || isSaving) {
+            return false
+        }
+
+        isSaving = true
 
         try {
             database.deleteRecurring(
@@ -180,6 +208,8 @@ class RecurringEditModel(
         } catch (_: Exception) {
             message = "削除できませんでした"
             return false
+        } finally {
+            isSaving = false
         }
     }
 }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,7 +38,12 @@ fun MainView(
 ) {
     val selection = rememberSaveable(saver = MainTabSelection.Saver) { MainTabSelection() }
     var isEntryShown by rememberSaveable { mutableStateOf(false) }
-    var editing by remember { mutableStateOf<Identifier<Entry>?>(null) }
+    var editing by rememberSaveable(
+        stateSaver = Saver<Identifier<Entry>?, String>(
+            save = { it?.toString() },
+            restore = { Identifier.parse(it) },
+        ),
+    ) { mutableStateOf(null) }
     var budgetTarget by remember { mutableStateOf<BudgetTarget?>(null) }
     var isSettingsShown by rememberSaveable { mutableStateOf(false) }
 

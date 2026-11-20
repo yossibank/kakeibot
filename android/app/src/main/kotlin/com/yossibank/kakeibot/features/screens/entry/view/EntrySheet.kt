@@ -20,10 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +41,7 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -173,6 +172,7 @@ fun EntrySheet(
 
     if (isConfirmingDelete) {
         DeleteDialog(
+            title = "この記録を削除しますか",
             onConfirm = {
                 isConfirmingDelete = false
 
@@ -275,41 +275,4 @@ private fun RoundButton(
     ) {
         content()
     }
-}
-
-@Composable
-private fun DeleteDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(
-                    text = "削除する",
-                    color = Palette.rose,
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = "やめる",
-                    color = Palette.subtext,
-                )
-            }
-        },
-        title = {
-            Text(
-                text = "この記録を削除しますか",
-                color = Palette.text,
-                style = textFont(
-                    size = FontSize.Body,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-        },
-        containerColor = Palette.backgroundTop,
-    )
 }
