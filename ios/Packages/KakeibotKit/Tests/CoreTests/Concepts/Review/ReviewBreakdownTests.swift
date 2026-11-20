@@ -92,6 +92,34 @@ struct ReviewBreakdownTests {
     }
 
     @Test
+    func treatsSmallPriceRiseAsChangeWhenItLeads() {
+        let focus = ReviewBreakdown.Focus(
+            name: "食費",
+            count: 22,
+            previousCount: 21,
+            amount: 26076,
+            previousAmount: 23220
+        )
+
+        #expect(focus.priceEffect > focus.countEffect)
+        #expect(!focus.hasSamePrice)
+    }
+
+    @Test
+    func keepsSmallPriceRiseAsSameWhenCountLeads() {
+        let focus = ReviewBreakdown.Focus(
+            name: "食費",
+            count: 15,
+            previousCount: 10,
+            amount: 15750,
+            previousAmount: 10000
+        )
+
+        #expect(focus.priceEffect <= focus.countEffect)
+        #expect(focus.hasSamePrice)
+    }
+
+    @Test
     func describesPaceWithoutPreviousPeriod() throws {
         let input = Self.input(
             current: Self.spends("食費", "セブン", 3, 700),
