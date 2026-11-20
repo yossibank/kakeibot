@@ -19,6 +19,7 @@ The app is in Japanese and amounts are in yen.
 ■ Clear reviews
 ・See totals of spending and income by week, month and year
 ・Breakdowns by category and account, compared with the previous period
+・On supported devices, AI analyzes why your spending went up
 ・Track loan repayments and investment plans
 
 ■ Make it yours
