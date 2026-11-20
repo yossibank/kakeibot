@@ -205,7 +205,8 @@ public extension ReviewBreakdown.Focus {
     }
 
     var hasSamePrice: Bool {
-        abs(unitPrice - previousUnitPrice) * 100 < previousUnitPrice * 15
+        let isSmall = abs(unitPrice - previousUnitPrice) * 100 < previousUnitPrice * 15
+        return isSmall && abs(priceEffect) <= abs(countEffect)
     }
 
     var unitPrice: Int {
