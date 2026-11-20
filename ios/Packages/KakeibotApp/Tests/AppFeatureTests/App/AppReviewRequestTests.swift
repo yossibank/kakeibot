@@ -20,6 +20,28 @@ struct AppReviewRequestTests {
     }
 
     @Test
+    func closesStoreReviewCardWhenAsking() async throws {
+        let setup = try await Setup(entries: 10, daysAgo: 3)
+
+        let asked = await setup.request.shouldAsk(after: setup.recorded, at: setup.now)
+        let closed = try await setup.database.setting(.storeReviewCardClosed)
+
+        #expect(asked)
+        #expect(closed)
+    }
+
+    @Test
+    func keepsStoreReviewCardWhenWaiting() async throws {
+        let setup = try await Setup(entries: 10, daysAgo: 2)
+
+        let asked = await setup.request.shouldAsk(after: setup.recorded, at: setup.now)
+        let closed = try await setup.database.setting(.storeReviewCardClosed)
+
+        #expect(!asked)
+        #expect(!closed)
+    }
+
+    @Test
     func asksAgainForNewVersion() async throws {
         let setup = try await Setup(entries: 10, daysAgo: 3)
         let next = AppReviewRequest(
