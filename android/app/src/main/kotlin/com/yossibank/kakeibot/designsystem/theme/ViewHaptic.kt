@@ -13,6 +13,7 @@ enum class Haptic(
 ) {
     Selection(HapticFeedbackType.TextHandleMove),
     Impact(HapticFeedbackType.LongPress),
+    LightImpact(HapticFeedbackType.ContextClick),
 }
 
 @Composable
