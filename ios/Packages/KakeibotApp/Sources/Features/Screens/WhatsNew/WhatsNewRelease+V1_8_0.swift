@@ -11,8 +11,9 @@ extension WhatsNewRelease {
                 points: [
                     "「グラフ / 分析」で、分析に切り替えます",
                     "増えた理由と、カテゴリの動きを並べます",
-                    "対応する端末では、AI のまとめも出します"
+                    "AI のまとめで、月の動きを短く伝えます"
                 ],
+                note: "iOS 26 以降で、Apple Intelligence をオンにした端末で使えます",
                 steps: [
                     Step(scene: .analysisSwitch, caption: "分析に切り替える"),
                     Step(scene: .analysisReason, caption: "増えた理由を見る"),

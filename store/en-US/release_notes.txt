@@ -1,2 +1,2 @@
-・Review now has "Analysis". Switch between "Chart / Analysis" to see why your spending went up, how each category changed, records with the same memo, and what-if estimates side by side.
-・On supported devices, the analysis in Review now includes an AI summary.
+・Review now has "Analysis". Switch between "Chart / Analysis" to see why your spending went up, how each category changed, an AI summary, records with the same memo, and what-if estimates side by side.
+・Analysis is available on iOS 26 or later with Apple Intelligence turned on.
