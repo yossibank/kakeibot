@@ -12,9 +12,9 @@
 | :---: | :---: | :---: |
 | <img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"> | <img src="store/screenshots/6.9/02-theme.png" width="200" alt="テーマで見た目を着せ替える"> | <img src="store/screenshots/6.9/03-entry.png" width="200" alt="金額と分類を入れて記録する"> |
 
-| レシートの読み取り | 振り返り | 月末の見込み |
+| レシートの読み取り | 振り返りの分析 | 月末の見込み |
 | :---: | :---: | :---: |
-| <img src="store/screenshots/6.9/07-receipt.png" width="200" alt="レシートを撮って記録する"> | <img src="store/screenshots/6.9/09-review.png" width="200" alt="月の支出を振り返る"> | <img src="store/screenshots/6.9/10-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
+| <img src="store/screenshots/6.9/06-receipt.png" width="200" alt="レシートを撮って記録する"> | <img src="store/screenshots/6.9/08-analysis.png" width="200" alt="支出が増えた理由を AI が分析する"> | <img src="store/screenshots/6.9/09-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
 
 ## 🗺️ 全体像
 

@@ -893,15 +893,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "06-backdrop",
-            lines: ["背景も、", "和紙や方眼に"],
-            lead: .note("角の丸みや行の間隔まで"),
-            phones: [
-                Phone(name: "05-look-backdrop", x: 20, y: 196, width: 280, angle: 2)
-            ]
-        ),
-        Shot(
-            file: "07-receipt",
+            file: "06-receipt",
             lines: ["レシートを", "撮れば入る"],
             lead: .note("品名・合計・日付を読み取り"),
             phones: [
@@ -909,7 +901,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "08-share",
+            file: "07-share",
             lines: ["ふたりで、", "ひとつの家計"],
             lead: .note("共有の財布をいっしょに"),
             phones: [
@@ -917,15 +909,16 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "09-review",
-            lines: ["何に使ったか", "すぐ分かる"],
-            lead: .note("内訳と前の月との比べ"),
+            file: "08-analysis",
+            lines: ["増えた理由を、", "AI が分析"],
+            lead: .note("増えたカテゴリと、AI のまとめ"),
             phones: [
-                Phone(name: "07-review-black", x: 20, y: 196, width: 280, angle: -2)
+                Phone(name: "08-analysis-black", x: 12, y: 196, width: 250, angle: -4),
+                Phone(name: "08-analysis-ai-black", x: 112, y: 280, width: 220, angle: 4)
             ]
         ),
         Shot(
-            file: "10-outlook",
+            file: "09-outlook",
             lines: ["月末の残りが", "先に分かる"],
             lead: .note("固定費と予定から見込みます"),
             phones: [
@@ -933,7 +926,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "11-assets",
+            file: "10-assets",
             lines: ["残高も、", "引き落としも"],
             lead: .note("口座とカードをまとめて"),
             phones: [
