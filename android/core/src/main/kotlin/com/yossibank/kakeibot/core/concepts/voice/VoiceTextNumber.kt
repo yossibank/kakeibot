@@ -228,7 +228,6 @@ private fun recent(
     today: LocalDate,
 ): LocalDate? {
     val date = LocalDate.of(year = today.year, month = month, day = day) ?: return null
-
     return if (date > today) LocalDate.of(year = today.year - 1, month = month, day = day) else date
 }
 

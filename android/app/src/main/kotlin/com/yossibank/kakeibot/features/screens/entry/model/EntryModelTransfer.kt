@@ -129,6 +129,10 @@ fun EntryModel.payOffLoan() {
 }
 
 fun EntryModel.applyRoute(route: TransferRoute) {
+    if (route.walletId != walletId) {
+        billMonth = null
+    }
+
     walletId = route.walletId
     toWalletId = route.toWalletId
 }

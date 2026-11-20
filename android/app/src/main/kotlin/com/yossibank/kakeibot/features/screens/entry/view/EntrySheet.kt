@@ -75,7 +75,7 @@ import com.yossibank.kakeibot.features.screens.entry.sheet.EntryItemSheet
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceCard
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceNotice
-import com.yossibank.kakeibot.features.screens.settings.templates.TemplateEditView
+import com.yossibank.kakeibot.features.screens.settings.templates.TemplateEditSheet
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
@@ -292,7 +292,7 @@ fun EntrySheet(
         }
 
         templateDraft?.let { draft ->
-            TemplateEditView(
+            TemplateEditSheet(
                 database = database,
                 draft = draft,
                 onSave = {

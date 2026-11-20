@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun TemplateEditView(
+fun TemplateEditSheet(
     database: AppDatabase,
     draft: EntryTemplateDraft,
     onSave: (EntryTemplate) -> Unit,
