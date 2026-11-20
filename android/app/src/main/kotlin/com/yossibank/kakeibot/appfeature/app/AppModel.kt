@@ -8,20 +8,25 @@ import androidx.lifecycle.viewModelScope
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.theme.ThemeLook
 import com.yossibank.kakeibot.core.concepts.theme.ThemeStyle
+import com.yossibank.kakeibot.notifications.NotificationScheduler
 import com.yossibank.kakeibot.store.database.AppDatabase
+import com.yossibank.kakeibot.store.queries.methods.notificationInputUpdates
 import com.yossibank.kakeibot.store.queries.methods.style
 import com.yossibank.kakeibot.store.queries.methods.styleUpdates
 import com.yossibank.kakeibot.store.queries.methods.themeLook
 import com.yossibank.kakeibot.store.queries.methods.themeLookUpdates
 import com.yossibank.kakeibot.store.writes.methods.generateRecurringEntries
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 
 class AppModel(
     private val currentDay: () -> LocalDate = ::deviceDay,
+    private val scheduler: NotificationScheduler? = null,
 ) : ViewModel() {
     var launch: Launch by mutableStateOf(Launch.Opening)
         private set
@@ -36,6 +41,7 @@ class AppModel(
         private set
 
     private var opening: Job? = null
+    private var notifications: Job? = null
 
     sealed interface Launch {
         data object Opening : Launch
@@ -66,6 +72,7 @@ class AppModel(
                 launch = Launch.Ready(opened)
 
                 observeTheme(opened)
+                observeNotifications(opened)
             } catch (error: CancellationException) {
                 throw error
             } catch (_: Exception) {
@@ -98,6 +105,8 @@ class AppModel(
         viewModelScope.launch {
             generateRecurring(database)
         }
+
+        observeNotifications(database)
     }
 
     override fun onCleared() {
@@ -111,6 +120,27 @@ class AppModel(
 
         viewModelScope.launch {
             database.styleUpdates().collect { style = it }
+        }
+    }
+
+    private fun observeNotifications(database: AppDatabase) {
+        val scheduler = scheduler ?: return
+        val day = today
+
+        notifications?.cancel()
+
+        notifications = viewModelScope.launch {
+            try {
+                database.notificationInputUpdates(from = day).collect { input ->
+                    withContext(Dispatchers.IO) {
+                        scheduler.apply(input.plan(today = day))
+                    }
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                return@launch
+            }
         }
     }
 

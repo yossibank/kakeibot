@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
-import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.designsystem.components.budget.budgetText
 import com.yossibank.kakeibot.designsystem.components.dial.HalfDial
 import com.yossibank.kakeibot.designsystem.components.entry.EntryRow
 import com.yossibank.kakeibot.designsystem.components.surface.card
@@ -48,7 +48,7 @@ import kotlin.math.abs
 fun HomeView(
     database: AppDatabase,
     today: LocalDate,
-    onEditBudget: (YearMonth, Int?) -> Unit,
+    onOpenBudget: () -> Unit,
     onOpenEntry: (Identifier<Entry>) -> Unit,
     onOpenSettings: () -> Unit,
 ) {
@@ -99,7 +99,7 @@ fun HomeView(
         item(key = "budget") {
             BudgetCard(
                 model = model,
-                onEditBudget = onEditBudget,
+                onOpenBudget = onOpenBudget,
             )
         }
 
@@ -115,7 +115,7 @@ fun HomeView(
 @Composable
 private fun BudgetCard(
     model: HomeModel,
-    onEditBudget: (YearMonth, Int?) -> Unit,
+    onOpenBudget: () -> Unit,
 ) {
     val overview = model.overview
     val usage = model.usage
@@ -132,9 +132,8 @@ private fun BudgetCard(
 
         Row(
             modifier = Modifier
-                .clickable {
-                    overview?.let { onEditBudget(it.month, usage?.baseBudget) }
-                }.padding(
+                .clickable(onClick = onOpenBudget)
+                .padding(
                     horizontal = 12.dp,
                     vertical = 4.dp,
                 ),
@@ -142,7 +141,7 @@ private fun BudgetCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = usage?.let { "予算 ${AmountText.text(it.baseBudget)}" } ?: "月の予算を決める",
+                text = usage?.budgetText ?: "予算を決めると、あといくら使えるかが出ます",
                 color = if (usage == null) Palette.accent else Palette.subtext,
                 style = textFont(style = FontTextStyle.Subheadline),
             )

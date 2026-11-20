@@ -83,6 +83,7 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 | `AppFeature/<フォルダ>/X.swift` | `appfeature/<フォルダ>/X.kt` |
 | `DesignSystem/<フォルダ>/X.swift` | `designsystem/<フォルダ>/X.kt` |
 | `Features/<フォルダ>/X.swift` | `features/<フォルダ>/X.kt` |
+| `Notifications/X.swift` | `notifications/X.kt`。予約・届いた通知・再起動の受け口を置く |
 | `View+Topic.swift` | `ViewTopic.kt` |
 | SF Symbols の絵 | `res/drawable/` の `ic_<名前>.xml` |
 | アイコンの絵柄（`Icon.Glyph`） | `res/drawable/` の `ic_glyph_<名前>.xml`。Material Symbols の絵を使う |

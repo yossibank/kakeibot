@@ -11,6 +11,7 @@ import com.yossibank.kakeibot.store.snapshot.snapshot
 import com.yossibank.kakeibot.store.writes.methods.RecurringWriteException
 import com.yossibank.kakeibot.store.writes.methods.deleteEntry
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
+import com.yossibank.kakeibot.store.writes.methods.deleteRecurrings
 import com.yossibank.kakeibot.store.writes.methods.generateRecurringEntries
 import com.yossibank.kakeibot.store.writes.methods.markNoSpendDay
 import com.yossibank.kakeibot.store.writes.methods.reorderRecurrings
@@ -163,6 +164,35 @@ class RecurringWriteEditTest {
         assertTrue(snapshot.entries.all { it.recurringId == null })
         assertEquals(listOf(id), restored.recurrings.map { it.id })
         assertTrue(restored.entries.all { it.recurringId == id })
+
+        setup.database.close()
+    }
+
+    @Test
+    fun deletesRecurringsInOneDeletion() = runTest {
+        val setup = RecurringWriteTest.Setup.make()
+        val today = assertNotNull(LocalDate.parse("2026-02-28"))
+
+        setup.database.generateRecurringEntries(
+            through = today,
+            at = setup.now,
+        )
+
+        val ids = setup.database.snapshot().recurrings.map { it.id }
+
+        val deletion = setup.database.deleteRecurrings(
+            ids = ids,
+            at = setup.now,
+        )
+
+        val snapshot = setup.database.snapshot()
+        setup.database.restore(deletion)
+        val restored = setup.database.snapshot()
+
+        assertFalse(ids.isEmpty())
+        assertTrue(snapshot.recurrings.isEmpty())
+        assertEquals(ids, restored.recurrings.map { it.id })
+        assertTrue(restored.entries.all { it.recurringId in ids })
 
         setup.database.close()
     }

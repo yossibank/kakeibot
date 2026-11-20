@@ -22,12 +22,17 @@ import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.PaletteScene
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.notifications.NotificationScheduler
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.file
 
 @Composable
-fun RootView(model: AppModel = viewModel { AppModel() }) {
+fun RootView(
+    link: String?,
+    onOpenLink: () -> Unit,
+) {
     val context = LocalContext.current.applicationContext
+    val model: AppModel = viewModel { AppModel(scheduler = NotificationScheduler(context)) }
 
     val openDatabase: suspend () -> AppDatabase = {
         AppDatabase.file(context)
@@ -59,6 +64,8 @@ fun RootView(model: AppModel = viewModel { AppModel() }) {
                 is AppModel.Launch.Ready -> MainView(
                     database = launch.database,
                     today = model.today,
+                    link = link,
+                    onOpenLink = onOpenLink,
                 )
 
                 AppModel.Launch.Failed -> OpenFailedView {

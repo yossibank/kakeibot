@@ -143,6 +143,18 @@ suspend fun AppDatabase.deleteRecurring(
     )
 }
 
+suspend fun AppDatabase.deleteRecurrings(
+    ids: List<Identifier<Recurring>>,
+    at: Instant,
+): Deletion = write {
+    val recurrings = ids.mapNotNull { findRecurring(it) }
+
+    deleteRecurrings(
+        recurrings = recurrings,
+        at = at,
+    )
+}
+
 suspend fun AppDatabase.reorderRecurrings(
     ids: List<Identifier<Recurring>>,
     at: Instant,

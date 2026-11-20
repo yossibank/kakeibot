@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
@@ -18,12 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
-import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
+import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
-import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetEditSheet
+import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.menu.SettingsMenuSheet
 import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
 import com.yossibank.kakeibot.features.screens.tabs.home.view.HomeView
@@ -35,6 +39,8 @@ import com.yossibank.kakeibot.store.database.AppDatabase
 fun MainView(
     database: AppDatabase,
     today: LocalDate,
+    link: String?,
+    onOpenLink: () -> Unit,
 ) {
     val selection = rememberSaveable(saver = MainTabSelection.Saver) { MainTabSelection() }
     var isEntryShown by rememberSaveable { mutableStateOf(false) }
@@ -44,8 +50,37 @@ fun MainView(
             restore = { Identifier.parse(it) },
         ),
     ) { mutableStateOf(null) }
-    var budgetTarget by remember { mutableStateOf<BudgetTarget?>(null) }
+    var isBudgetShown by rememberSaveable { mutableStateOf(false) }
     var isSettingsShown by rememberSaveable { mutableStateOf(false) }
+    var settingsRecurring by remember { mutableStateOf<Identifier<Recurring>?>(null) }
+    var settingsRound by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(link) {
+        val route = link?.let { PlannedNotification.Route.of(link = it) } ?: return@LaunchedEffect
+
+        onOpenLink()
+
+        isEntryShown = false
+        isBudgetShown = false
+        isSettingsShown = false
+
+        when (route) {
+            is PlannedNotification.Route.Recurring -> {
+                settingsRecurring = route.id
+                settingsRound += 1
+                isSettingsShown = true
+            }
+
+            is PlannedNotification.Route.Entry -> {
+                editing = null
+                isEntryShown = true
+            }
+
+            else -> {
+                selection.select(MainTab.Home)
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -63,12 +98,7 @@ fun MainView(
                             HomeView(
                                 database = database,
                                 today = today,
-                                onEditBudget = { month, amount ->
-                                    budgetTarget = BudgetTarget(
-                                        month = month,
-                                        amount = amount,
-                                    )
-                                },
+                                onOpenBudget = { isBudgetShown = true },
                                 onOpenEntry = { id ->
                                     editing = id
                                     isEntryShown = true
@@ -134,34 +164,30 @@ fun MainView(
             enter = slideInVertically { it },
             exit = slideOutVertically { it },
         ) {
-            SettingsMenuSheet(
-                database = database,
-                today = today,
-                onClose = { isSettingsShown = false },
-            )
+            key(settingsRound) {
+                SettingsMenuSheet(
+                    database = database,
+                    today = today,
+                    onClose = {
+                        isSettingsShown = false
+                        settingsRecurring = null
+                    },
+                    openRecurring = settingsRecurring,
+                )
+            }
         }
 
         AnimatedVisibility(
-            visible = budgetTarget != null,
+            visible = isBudgetShown,
             modifier = Modifier.zIndex(3f),
             enter = slideInVertically { it },
             exit = slideOutVertically { it },
         ) {
-            val target = remember { budgetTarget }
-
-            if (target != null) {
-                BudgetEditSheet(
-                    database = database,
-                    month = target.month,
-                    amount = target.amount,
-                    onClose = { budgetTarget = null },
-                )
-            }
+            BudgetListView(
+                database = database,
+                today = today,
+                onBack = { isBudgetShown = false },
+            )
         }
     }
 }
-
-private data class BudgetTarget(
-    val month: YearMonth,
-    val amount: Int?,
-)
