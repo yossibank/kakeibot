@@ -20,21 +20,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
+import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
+import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.period.MonthStartView
 import com.yossibank.kakeibot.features.screens.settings.period.WeekStartView
 import com.yossibank.kakeibot.features.screens.settings.period.title
-import com.yossibank.kakeibot.features.screens.settings.recurrings.RecurringEditView
 import com.yossibank.kakeibot.features.screens.settings.recurrings.RecurringListView
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHintButton
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroCard
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroNote
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsRow
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsScreenFlag
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -48,15 +55,13 @@ import kotlinx.coroutines.launch
 private sealed interface Screen {
     data object Menu : Screen
 
+    data object Budgets : Screen
+
     data object MonthStart : Screen
 
     data object WeekStart : Screen
 
     data object Recurrings : Screen
-
-    data class RecurringEdit(
-        val recurring: Recurring?,
-    ) : Screen
 }
 
 @Composable
@@ -64,8 +69,11 @@ fun SettingsMenuSheet(
     database: AppDatabase,
     today: LocalDate,
     onClose: () -> Unit,
+    openRecurring: Identifier<Recurring>? = null,
 ) {
-    var screen by remember { mutableStateOf<Screen>(Screen.Menu) }
+    var screen by remember {
+        mutableStateOf(if (openRecurring != null) Screen.Recurrings else Screen.Menu)
+    }
 
     val monthStartDay by remember(database) { database.settingUpdates(SettingKey.monthStartDay) }
         .collectAsState(initial = MonthStartDay.first)
@@ -77,6 +85,10 @@ fun SettingsMenuSheet(
         .collectAsState(initial = emptyList())
 
     val scope = rememberCoroutineScope()
+
+    val monthStartHint = remember(database) {
+        SettingsScreenFlag.closedHint(SettingsScreen.monthStartDay, database)
+    }
 
     fun <Value> store(
         key: SettingKey<Value>,
@@ -99,7 +111,6 @@ fun SettingsMenuSheet(
     fun back() {
         when (screen) {
             Screen.Menu -> onClose()
-            is Screen.RecurringEdit -> screen = Screen.Recurrings
             else -> screen = Screen.Menu
         }
     }
@@ -120,7 +131,7 @@ fun SettingsMenuSheet(
             ),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        when (val current = screen) {
+        when (screen) {
             Screen.Menu -> {
                 SettingsHeader(
                     title = "設定",
@@ -136,6 +147,22 @@ fun SettingsMenuSheet(
                         .card(),
                 ) {
                     SettingsRow(
+                        title = "予算",
+                        value = "",
+                        onSelect = { screen = Screen.Budgets },
+                    )
+
+                    SettingsDivider()
+
+                    SettingsRow(
+                        title = "固定費",
+                        value = "${recurrings.size} 件",
+                        onSelect = { screen = Screen.Recurrings },
+                    )
+
+                    SettingsDivider()
+
+                    SettingsRow(
                         title = "月の始まり",
                         value = monthStartDay.title,
                         onSelect = { screen = Screen.MonthStart },
@@ -148,14 +175,6 @@ fun SettingsMenuSheet(
                         value = weekStart.title,
                         onSelect = { screen = Screen.WeekStart },
                     )
-
-                    SettingsDivider()
-
-                    SettingsRow(
-                        title = "固定費",
-                        value = "${recurrings.size} 件",
-                        onSelect = { screen = Screen.Recurrings },
-                    )
                 }
             }
 
@@ -164,10 +183,24 @@ fun SettingsMenuSheet(
                     title = "月の始まり",
                     isRoot = false,
                     onBack = ::back,
+                ) {
+                    SettingsHintButton(flag = monthStartHint)
+                }
+
+                SettingsIntroCard(
+                    icon = R.drawable.ic_calendar,
+                    headline = "給料日に合わせて" to "1 か月を数えられます",
+                    flag = monthStartHint,
+                    notes = listOf(
+                        SettingsIntroNote(R.drawable.ic_chevron_right, "給料日から、次の給料日の前日までです"),
+                        SettingsIntroNote(R.drawable.ic_calendar, "29〜31 日が無い月は、月末からです"),
+                        SettingsIntroNote(R.drawable.ic_swap, "土日・祝日は、平日にずらせます"),
+                    ),
                 )
 
                 MonthStartView(
                     selection = monthStartDay,
+                    today = today,
                     onSelect = {
                         store(
                             key = SettingKey.monthStartDay,
@@ -195,23 +228,24 @@ fun SettingsMenuSheet(
                 )
             }
 
-            Screen.Recurrings -> {
-                RecurringListView(
-                    database = database,
-                    today = today,
-                    onBack = ::back,
-                    onEdit = { screen = Screen.RecurringEdit(recurring = it) },
-                )
-            }
-
-            is Screen.RecurringEdit -> {
-                RecurringEditView(
-                    database = database,
-                    today = today,
-                    editing = current.recurring,
-                    onClose = ::back,
-                )
-            }
+            Screen.Budgets, Screen.Recurrings -> {}
         }
+    }
+
+    if (screen == Screen.Budgets) {
+        BudgetListView(
+            database = database,
+            today = today,
+            onBack = ::back,
+        )
+    }
+
+    if (screen == Screen.Recurrings) {
+        RecurringListView(
+            database = database,
+            today = today,
+            onBack = ::back,
+            opening = openRecurring,
+        )
     }
 }
