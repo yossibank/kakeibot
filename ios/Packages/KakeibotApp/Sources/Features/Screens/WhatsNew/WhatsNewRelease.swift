@@ -12,6 +12,7 @@ public extension WhatsNewRelease {
     enum Action: Hashable, Sendable {
         case entry
         case records
+        case review
         case assets
         case setup(SetupItem)
     }
@@ -44,6 +45,7 @@ extension WhatsNewRelease {
     }
 
     static let all = [
+        v1_8_0,
         v1_7_0,
         v1_6_0,
         v1_5_0,
