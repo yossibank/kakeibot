@@ -130,6 +130,9 @@ extension MainView {
             case .records:
                 tab = .records
 
+            case .review:
+                tab = .review
+
             case .assets:
                 tab = .assets
 
