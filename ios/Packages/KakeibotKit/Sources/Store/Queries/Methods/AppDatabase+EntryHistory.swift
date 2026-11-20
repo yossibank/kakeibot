@@ -24,6 +24,7 @@ public extension AppDatabase {
             }
 
             try Self.setSetting(.reviewRequestedVersion, to: version, in: db)
+            try Self.setSetting(.storeReviewCardClosed, to: true, in: db)
 
             return true
         }
