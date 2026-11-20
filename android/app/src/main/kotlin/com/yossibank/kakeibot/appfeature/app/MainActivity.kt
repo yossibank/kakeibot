@@ -17,8 +17,10 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
 
-        if (savedInstanceState == null) {
-            link = intent.getStringExtra(EXTRA_LINK)
+        link = if (savedInstanceState == null) {
+            intent.getStringExtra(EXTRA_LINK)
+        } else {
+            savedInstanceState.getString(EXTRA_LINK)
         }
 
         setContent {
@@ -27,6 +29,12 @@ class MainActivity : ComponentActivity() {
                 onOpenLink = { link = null },
             )
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString(EXTRA_LINK, link)
     }
 
     override fun onNewIntent(intent: Intent) {

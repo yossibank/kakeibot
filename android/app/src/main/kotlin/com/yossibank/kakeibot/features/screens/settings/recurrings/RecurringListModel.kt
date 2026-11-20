@@ -22,6 +22,7 @@ import com.yossibank.kakeibot.store.queries.types.title
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
+import com.yossibank.kakeibot.store.writes.methods.deleteRecurrings
 import com.yossibank.kakeibot.store.writes.methods.reorderRecurrings
 import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
@@ -185,14 +186,10 @@ class RecurringListModel(
         var deletion: Deletion? = null
 
         run {
-            val deletions = ids.map {
-                database.deleteRecurring(
-                    id = it,
-                    at = Instant.now(),
-                )
-            }
-
-            deletion = Deletion.merging(deletions)
+            deletion = database.deleteRecurrings(
+                ids = ids,
+                at = Instant.now(),
+            )
         }
 
         return deletion

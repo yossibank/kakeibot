@@ -17,8 +17,10 @@ import com.yossibank.kakeibot.store.queries.methods.themeLook
 import com.yossibank.kakeibot.store.queries.methods.themeLookUpdates
 import com.yossibank.kakeibot.store.writes.methods.generateRecurringEntries
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 
@@ -130,7 +132,9 @@ class AppModel(
         notifications = viewModelScope.launch {
             try {
                 database.notificationInputUpdates(from = day).collect { input ->
-                    scheduler.apply(input.plan(today = day))
+                    withContext(Dispatchers.IO) {
+                        scheduler.apply(input.plan(today = day))
+                    }
                 }
             } catch (error: CancellationException) {
                 throw error
