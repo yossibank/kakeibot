@@ -51,7 +51,7 @@ public struct EntrySheet: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
+        FloatingInputReader { proxy in
             ZStack(alignment: .top) {
                 fittedContent(in: proxy.size.height)
                     .floatingInput(isPresented: isEditingMemo) {
@@ -168,7 +168,6 @@ public struct EntrySheet: View {
                 }
             }
         }
-        .ignoresSafeArea(.keyboard)
     }
 }
 

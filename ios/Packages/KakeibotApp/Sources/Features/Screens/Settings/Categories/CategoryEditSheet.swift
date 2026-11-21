@@ -44,7 +44,7 @@ public struct CategoryEditSheet: View {
     }
 
     public var body: some View {
-        GeometryReader { _ in
+        FloatingInputReader { _ in
             ZStack {
                 content
                     .ignoresSafeArea(keyboardRegions)
@@ -57,7 +57,6 @@ public struct CategoryEditSheet: View {
                     }
             }
         }
-        .ignoresSafeArea(.keyboard)
         .iconEditorDrawer(
             isPresented: $isEditingIcon,
             model: model.icon,
