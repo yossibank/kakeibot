@@ -10,7 +10,7 @@ struct ReviewProgressView: View {
     let closingTitle: String
     let closingDate: LocalDate
     let nextGoalTitle: String
-    let previousTitle: String
+    let previousTitle: String?
     let onOpenPrevious: () -> Void
 
     var body: some View {
@@ -77,25 +77,27 @@ private extension ReviewProgressView {
                 closingRow("arrow.right", nextGoalTitle)
             }
 
-            Button(action: onOpenPrevious) {
-                HStack {
-                    Text(previousTitle)
-                        .textFont(.footnote, weight: .bold)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+            if let previousTitle {
+                Button(action: onOpenPrevious) {
+                    HStack {
+                        Text(previousTitle)
+                            .textFont(.footnote, weight: .bold)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
 
-                    Spacer(minLength: 8)
+                        Spacer(minLength: 8)
 
-                    Image(systemName: "chevron.right")
-                        .sansFont(.small, weight: .bold)
+                        Image(systemName: "chevron.right")
+                            .sansFont(.small, weight: .bold)
+                    }
+                    .foregroundStyle(Palette.accent)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .card(cornerRadius: 16)
+                    .contentShape(.rect)
                 }
-                .foregroundStyle(Palette.accent)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .card(cornerRadius: 16)
-                .contentShape(.rect)
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)

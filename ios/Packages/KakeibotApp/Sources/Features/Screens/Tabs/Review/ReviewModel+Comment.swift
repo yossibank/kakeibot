@@ -178,6 +178,10 @@ extension ReviewModel {
         canWriteComment ? .loading : .hidden
     }
 
+    var canShowAnalysis: Bool {
+        Self.canWriteComment
+    }
+
     var isWrittenNow: Bool {
         guard case let .ready(comment) = comment else {
             return false

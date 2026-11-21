@@ -174,6 +174,7 @@ private extension ReviewView {
     var progressView: some View {
         let period = model.period
         let closingDate = period.range.upperBound.adding(days: 1)
+        let previousTitle = "\(Self.name(of: period.previous))のふりかえりを見る"
 
         return ReviewProgressView(
             pace: model.pace,
@@ -183,7 +184,7 @@ private extension ReviewView {
             closingTitle: "\(analysisName)のふりかえり",
             closingDate: closingDate,
             nextGoalTitle: "\(Self.name(of: period.adding(1)))の一手",
-            previousTitle: "\(Self.name(of: period.previous))のふりかえりを見る",
+            previousTitle: model.canShowAnalysis ? previousTitle : nil,
             onOpenPrevious: {
                 move(by: -1)
             }

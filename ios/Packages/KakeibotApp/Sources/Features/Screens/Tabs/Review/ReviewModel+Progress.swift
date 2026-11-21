@@ -36,7 +36,9 @@ extension ReviewModel {
     }
 
     var goalItems: [ReviewProgressView.GoalItem] {
-        goals.compactMap { goal in
+        let key = period.commentKey
+
+        return goals.filter { $0.period == key }.compactMap { goal in
             let category = goal.categoryId.flatMap { list?.categories[$0]?.name }
 
             guard let name = goal.memo ?? category else {
