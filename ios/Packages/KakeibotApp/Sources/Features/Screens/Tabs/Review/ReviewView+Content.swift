@@ -25,11 +25,11 @@ extension ReviewView {
             if model.kind != .balance {
                 let categoryShares = model.categoryShares
                 let walletShares = model.walletShares
+                let isEmpty = categoryShares.isEmpty && walletShares.isEmpty
 
                 if model.list == nil {
                     EmptyView()
-                } else if categoryShares.isEmpty,
-                          walletShares.isEmpty {
+                } else if isEmpty {
                     PlaceholderEmpty(
                         systemImage: "chart.pie",
                         text: "この期間の記録はありません",
