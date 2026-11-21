@@ -12,6 +12,22 @@ extension ReviewAnalysisView {
         }
     }
 
+    struct Trial {
+        struct Term: Hashable {
+            let title: String
+            let value: String
+        }
+
+        let lead: String
+        let name: String
+        let before: Int
+        let saved: Int
+        let sign: String
+        let terms: [Term]
+        let kept: Int?
+        let cut: Int
+    }
+
     @ViewBuilder
     func action(
         _ summary: ReviewBreakdown.Summary,
@@ -19,74 +35,12 @@ extension ReviewAnalysisView {
     ) -> some View {
         if let action = summary.action,
            summary.focus.amount > 0 {
-            trial(action, amount: summary.focus.amount, current: "今")
+            trial(savingTrial(summary.focus, action: action))
         } else if let monthly = monthTrial {
-            trial(monthly.action, amount: monthly.peak.amount, current: "\(monthly.peak.month)月")
+            trial(peakTrial(monthly))
         } else {
             suggestion(text)
         }
-    }
-
-    func rewriteButton(since date: Date?) -> some View {
-        let hasNew = date != nil && newEntries > 0
-        let title = hasNew ? "新しい記録で再分析" : "再分析する"
-        let detail = hasNew ? "前回のあとに \(newEntries) 件増えました" : date.map(Self.lastText)
-
-        return Button(action: onRewrite) {
-            HStack(spacing: 12) {
-                Image(systemName: "arrow.clockwise")
-                    .sansFont(.small, weight: .bold)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 36, height: 36)
-                    .background(Palette.backgroundBottom.opacity(.strong), in: Circle())
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .textFont(.subheadline, weight: .bold)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                    if let detail {
-                        Text(detail)
-                            .textFont(.caption2)
-                            .opacity(0.75)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-                }
-
-                Spacer(minLength: 0)
-
-                if hasNew {
-                    Text("+\(newEntries) 件")
-                        .textFont(.caption2, weight: .bold)
-                        .foregroundStyle(Palette.accent)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            Palette.backgroundBottom.opacity(.strong),
-                            in: .rect(cornerRadius: 8)
-                        )
-                }
-            }
-            .foregroundStyle(Palette.backgroundBottom)
-            .padding(.horizontal, 16)
-            .frame(maxWidth: .infinity, minHeight: 60)
-            .background {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Palette.gold)
-                    .overlay {
-                        glint
-                    }
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(Color.white.opacity(.soft))
-                    }
-                    .shadow(color: Palette.accentDeep.opacity(.muted), radius: 10, y: 6)
-            }
-            .contentShape(.rect)
-        }
-        .buttonStyle(PressButtonStyle())
     }
 
     static func signed(_ amount: Int) -> String {
@@ -99,84 +53,64 @@ extension ReviewAnalysisView {
 }
 
 private extension ReviewAnalysisView {
-    var glint: some View {
-        GeometryReader { proxy in
-            LinearGradient(
-                colors: [
-                    Color.white.opacity(0),
-                    Color.white.opacity(.soft),
-                    Color.white.opacity(0)
-                ],
-                startPoint: .leading,
-                endPoint: .trailing
-            )
-            .frame(width: proxy.size.width * 0.4)
-            .keyframeAnimator(initialValue: CGFloat(-0.5), repeating: true) { view, value in
-                view.offset(x: proxy.size.width * value)
-            } keyframes: { _ in
-                LinearKeyframe(-0.5, duration: 5)
-                CubicKeyframe(1.2, duration: 2)
-            }
-        }
-        .clipShape(.rect(cornerRadius: 16))
-        .allowsHitTesting(false)
-    }
-
-    func trial(
-        _ action: ReviewBreakdown.Action,
-        amount: Int,
-        current: String
-    ) -> some View {
-        let after = max(amount - action.amount, 0)
-        let ratio = Double(after) / Double(amount)
-
-        return VStack(alignment: .leading, spacing: 12) {
+    func trial(_ trial: Trial) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text("試算")
+                Text("次の一手")
                     .textFont(.caption2, weight: .bold)
                     .tracking(1)
                     .foregroundStyle(Palette.backgroundBottom)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
                     .background(Palette.gold, in: .rect(cornerRadius: 8))
+                    .fixedSize()
 
-                Text(action.lead)
+                Text(trial.lead)
                     .textFont(.footnote, weight: .bold)
                     .foregroundStyle(Palette.text)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            VStack(spacing: 8) {
-                trialBar(
-                    current,
-                    amount: amount,
-                    ratio: 1,
-                    fill: AnyShapeStyle(Palette.accent.opacity(.soft))
-                )
+            if let kept = trial.kept {
+                HStack(spacing: 8) {
+                    dots(kept, base: kept, dashed: trial.cut)
 
-                trialBar(
-                    "試算",
-                    amount: after,
-                    ratio: ratio,
-                    fill: AnyShapeStyle(Palette.gold)
-                )
+                    Text("\(trial.cut) 回へらす")
+                        .textFont(.caption, weight: .bold)
+                        .foregroundStyle(Palette.accentStrong)
+                        .fixedSize()
+                }
             }
 
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Spacer(minLength: 0)
+            formula(trial)
 
-                Text("浮く金額")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
+            HStack(alignment: .bottom, spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("\(trial.name)は")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
 
-                Text(ReviewInsight.yen(action.amount))
-                    .displayFont(.title, weight: .bold)
-                    .foregroundStyle(Palette.gold)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .monospacedDigit()
+                    Text(trial.change)
+                        .textFont(.footnote, weight: .bold)
+                        .foregroundStyle(Palette.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+
+                Spacer(minLength: 8)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("浮く金額")
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.subtext)
+
+                    Text(ReviewInsight.yen(trial.saved))
+                        .displayFont(.title, weight: .bold)
+                        .foregroundStyle(Palette.gold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
             }
-            .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 12)
             .overlay(alignment: .top) {
                 Rectangle()
@@ -184,6 +118,7 @@ private extension ReviewAnalysisView {
                     .frame(height: 1)
             }
         }
+        .monospacedDigit()
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Self.trialFill, in: .rect(cornerRadius: 20))
@@ -194,41 +129,64 @@ private extension ReviewAnalysisView {
         .shadow(color: Palette.accent.opacity(.subtle), radius: 12, y: 8)
     }
 
-    func trialBar(
-        _ title: String,
-        amount: Int,
-        ratio: Double,
-        fill: AnyShapeStyle
-    ) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-                .frame(width: 32, alignment: .leading)
+    func formula(_ trial: Trial) -> some View {
+        VStack(spacing: 8) {
+            ForEach(Array(trial.terms.enumerated()), id: \.offset) { index, term in
+                formulaRow(
+                    index == 0 ? "" : trial.sign,
+                    title: term.title,
+                    value: term.value
+                )
+            }
 
-            Capsule()
-                .fill(Palette.accent.opacity(.faint))
-                .frame(height: 10)
-                .overlay(alignment: .leading) {
-                    GeometryReader { proxy in
-                        Capsule()
-                            .fill(fill)
-                            .frame(width: proxy.size.width * ratio * (hasAppeared ? 1 : 0))
-                    }
-                }
+            Rectangle()
+                .fill(Palette.accent.opacity(.soft))
+                .frame(height: 1)
 
-            Text(ReviewInsight.yen(amount))
-                .sansFont(.caption, weight: .semibold)
-                .foregroundStyle(Palette.text)
-                .monospacedDigit()
-                .fixedSize()
-                .frame(minWidth: 64, alignment: .trailing)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text("＝")
+                    .textFont(.footnote, weight: .bold)
+                    .foregroundStyle(Palette.accent)
+
+                Spacer(minLength: 8)
+
+                Text(ReviewInsight.yen(trial.saved))
+                    .textFont(.subheadline, weight: .bold)
+                    .foregroundStyle(Palette.accentStrong)
+            }
+        }
+        .padding(12)
+        .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(Palette.accent.opacity(.subtle))
         }
     }
 
-    static func lastText(_ date: Date) -> String {
-        let text = date.formatted(.dateTime.month(.defaultDigits).day().hour().minute())
-        return "前回 \(text)"
+    func formulaRow(
+        _ sign: String,
+        title: String,
+        value: String
+    ) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(sign)
+                .textFont(.footnote, weight: .bold)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 12, alignment: .leading)
+
+            Text(title)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            Spacer(minLength: 8)
+
+            Text(value)
+                .textFont(.footnote, weight: .bold)
+                .foregroundStyle(Palette.text)
+                .fixedSize()
+        }
     }
 }
 
@@ -239,5 +197,68 @@ private extension ReviewAnalysisView {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
+    }
+
+    func savingTrial(
+        _ focus: ReviewBreakdown.Focus,
+        action: ReviewBreakdown.Action
+    ) -> Trial {
+        let cut = focus.count - focus.previousCount
+        let isCount = cut > 0
+        let hasDots = isCount && focus.count <= Self.maximumDots
+        let price = ReviewInsight.yen(focus.unitPrice)
+        let difference = focus.unitPrice - focus.previousUnitPrice
+        let gap = Self.signed(difference)
+        let saved = isCount ? cut * focus.unitPrice : difference * focus.count
+
+        let countTerms = [
+            Trial.Term(title: "へらす回数", value: "\(cut) 回"),
+            Trial.Term(title: "\(currentName)の 1 回あたり", value: price)
+        ]
+
+        let priceTerms = [
+            Trial.Term(title: "1 回の差", value: gap),
+            Trial.Term(title: "\(currentName)の回数", value: "\(focus.count) 回")
+        ]
+
+        let terms = isCount ? countTerms : priceTerms
+
+        return Trial(
+            lead: action.lead,
+            name: focus.name,
+            before: focus.amount,
+            saved: saved,
+            sign: "×",
+            terms: terms,
+            kept: hasDots ? focus.previousCount : nil,
+            cut: max(cut, 0)
+        )
+    }
+
+    func peakTrial(_ monthly: MonthTrial) -> Trial {
+        let month = "\(monthly.peak.month)月"
+
+        let terms = [
+            Trial.Term(title: month, value: ReviewInsight.yen(monthly.peak.amount)),
+            Trial.Term(title: "月の平均", value: ReviewInsight.yen(monthly.average))
+        ]
+
+        return Trial(
+            lead: monthly.action.lead,
+            name: month,
+            before: monthly.peak.amount,
+            saved: monthly.action.amount,
+            sign: "−",
+            terms: terms,
+            kept: nil,
+            cut: 0
+        )
+    }
+}
+
+private extension ReviewAnalysisView.Trial {
+    var change: String {
+        let after = ReviewInsight.yen(before - saved)
+        return "\(ReviewInsight.yen(before)) → \(after)"
     }
 }

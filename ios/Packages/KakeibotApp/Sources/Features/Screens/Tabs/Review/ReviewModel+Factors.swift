@@ -48,10 +48,39 @@ extension ReviewModel {
         }
     }
 
+    var spentCategoryNames: [String] {
+        summary.expense.byCategory.keys.compactMap { list?.categories[$0]?.name }
+    }
+
     func factorShare(of factor: Factor) -> Share? {
+        breakdownCategory.flatMap { factorShare(of: factor, in: $0) }
+    }
+
+    func categoryShare(named name: String) -> Share? {
+        let id = summary.expense.byCategory.keys.first { list?.categories[$0]?.name == name }
+        return id.flatMap { factorShare(of: .current, in: $0) }
+    }
+
+    func factorRows(of key: FactorKey) -> [EntryRowItem] {
+        guard let list else {
+            return []
+        }
+
+        return factorEntries(of: key)
+            .sorted { $0.date > $1.date }
+            .map { entry in
+                EntryRowItem.dated(entry, in: list)
+            }
+    }
+}
+
+private extension ReviewModel {
+    func factorShare(
+        of factor: Factor,
+        in id: EntryCategory.ID
+    ) -> Share? {
         guard
             let list,
-            let id = breakdownCategory,
             let category = list.categories[id]
         else {
             return nil
@@ -76,30 +105,6 @@ extension ReviewModel {
         )
     }
 
-    func factorRows(of key: FactorKey) -> [EntryRowItem] {
-        guard let list else {
-            return []
-        }
-
-        return factorEntries(of: key)
-            .sorted { $0.date > $1.date }
-            .map { entry in
-                EntryRowItem.dated(entry, in: list)
-            }
-    }
-
-    func newEntryCount(since date: Date) -> Int {
-        let range = period.range
-
-        return entries.count { entry in
-            range.contains(entry.date)
-                && entry.type != .transfer
-                && entry.createdAt > date
-        }
-    }
-}
-
-private extension ReviewModel {
     func factorEntries(of key: FactorKey) -> [Entry] {
         let range = key.factor == .previous ? period.comparisonRange(today: today) : period.range
 

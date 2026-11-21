@@ -15,7 +15,7 @@ struct ReviewBreakdownTests {
             "食費が、前の月の 14 回から 18 回に増えています。1 回はおよそ 1,633円 で、前の月と変わりません。",
             "食費の増えた分のうち、セブンが 2,800円 を占めています。"
         ])
-        #expect(breakdown.suggestion == "次の月は、食費を 14 回ほどにすると、6,500円 ほど浮きます。")
+        #expect(breakdown.suggestion == "次の月は、食費を 14 回ほどにすると、6,532円 浮きます。")
         #expect(breakdown.summary.rows == [
             ReviewBreakdown.Row(
                 name: "いなげや",
@@ -48,7 +48,7 @@ struct ReviewBreakdownTests {
         #expect(breakdown.insights.map(\.fact) == [
             "外食の 1 回が、前の月のおよそ 2,000円 から 3,000円 に上がっています。回数は 4 回です。"
         ])
-        #expect(breakdown.suggestion == "外食の 1 回を前の月の 2,000円 ほどに戻すと、4,000円 ほど浮きます。")
+        #expect(breakdown.suggestion == "外食の 1 回を前の月の 2,000円 ほどに戻すと、4,000円 浮きます。")
         #expect(breakdown.summary.rows.isEmpty)
     }
 
@@ -156,6 +156,20 @@ struct ReviewBreakdownTests {
         let input = Self.input(current: Self.spends("食費", "セブン", 2, 700), previous: [])
 
         #expect(ReviewBreakdown.make(from: input) == nil)
+    }
+
+    @Test
+    func picksRisingCategoryWithFewRecords() throws {
+        let input = Self.input(
+            category: "水道光熱費",
+            current: Self.spends("水道光熱費", nil, 1, 10685),
+            previous: Self.spends("水道光熱費", nil, 1, 1595)
+        )
+
+        let breakdown = try #require(ReviewBreakdown.make(from: input))
+
+        #expect(breakdown.summary.focus.name == "水道光熱費")
+        #expect(breakdown.summary.focus.previousAmount == 1595)
     }
 
     @Test

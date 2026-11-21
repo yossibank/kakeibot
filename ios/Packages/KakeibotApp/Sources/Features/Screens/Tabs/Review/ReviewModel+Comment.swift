@@ -11,19 +11,46 @@ public extension ReviewModel {
         case failed
     }
 
-    enum Display: Hashable {
-        case chart
-        case analysis
-    }
-
     var commentRange: ClosedRange<LocalDate> {
         let range = period.range
         let end = range.contains(today) ? today : range.upperBound
         return range.lowerBound...end
     }
 
+    var hasNewAnalysis: Bool {
+        newAnalysisKey == period.commentKey
+    }
+
+    func refreshAnalysisMark() async {
+        let key = period.commentKey
+
+        guard
+            Self.canWriteComment,
+            list != nil,
+            commentEntryCount >= ReviewComment.minimumEntries
+        else {
+            markAnalysis(key, isNew: false)
+            return
+        }
+
+        let basis = commentFacts.basis
+        let saved: ReviewComment?
+
+        do {
+            saved = try await database.reviewComment(for: key)
+        } catch {
+            return
+        }
+
+        guard !Task.isCancelled else {
+            return
+        }
+
+        markAnalysis(key, isNew: saved?.needsRewrite(basis: basis) ?? true)
+    }
+
     func refreshComment(
-        rewriting: Bool = false,
+        retrying: Bool = false,
         now: Date = Date()
     ) async {
         commentRequest += 1
@@ -48,43 +75,48 @@ public extension ReviewModel {
 
         let key = period.commentKey
         let isCurrent = period.range.contains(today)
-        let insights = ReviewInsight.pick(from: insightInput)
-        let input = breakdownInput
+        let facts = commentFacts
+        let breakdown = facts.breakdown
         let saved = try? await database.reviewComment(for: key)
 
         guard request == commentRequest else {
             return
         }
 
-        let breakdown = input.flatMap(ReviewBreakdown.make(from:))
-        let basis = ReviewComment.basis(of: ReviewComment.facts(insights, with: breakdown))
+        savedComments[key] = saved
 
         if let saved,
-           !rewriting,
-           !saved.needsRewrite(basis: basis, isCurrent: isCurrent, today: now, calendar: .current) {
+           !saved.needsRewrite(basis: facts.basis) {
+            markAnalysis(key, isNew: false)
             comment = .ready(saved)
+            await loadNeighborComments()
             return
         }
 
-        if !rewriting,
+        if !retrying,
            let failedAt = commentFailedAt[key],
            Calendar.current.isDate(failedAt, inSameDayAs: now) {
             comment = saved.map(CommentState.ready) ?? .failed
             return
         }
 
+        let suggestion = breakdown?.suggestion ?? facts.insights.first?.suggestion(in: period) ?? ""
+
         comment = .loading
 
-        let suggestion = breakdown?.suggestion ?? insights.first?.suggestion(in: period) ?? ""
-
         let body = await Self.write(
-            basis: basis,
+            basis: facts.basis,
             scale: period.scale,
             categories: categoryNames + (breakdown?.names ?? []),
             isCurrent: isCurrent
         )
 
         guard request == commentRequest else {
+            return
+        }
+
+        guard !Task.isCancelled else {
+            comment = saved.map(CommentState.ready) ?? .loading
             return
         }
 
@@ -100,15 +132,43 @@ public extension ReviewModel {
             period: key,
             body: body,
             suggestion: suggestion,
-            basis: basis,
+            basis: facts.basis,
             createdAt: now,
             breakdown: breakdown?.summary
         )
 
         try? await database.saveReviewComment(new)
 
+        savedComments[key] = new
         writtenComments.insert(new)
+        markAnalysis(key, isNew: false)
         comment = .ready(new)
+    }
+
+    func showSavedComment() {
+        guard
+            Self.canWriteComment,
+            list != nil
+        else {
+            return
+        }
+
+        let count = commentEntryCount
+
+        guard count >= ReviewComment.minimumEntries else {
+            comment = .needsRecords(count)
+            return
+        }
+
+        guard
+            let saved = savedComments[period.commentKey],
+            !saved.needsRewrite(basis: commentFacts.basis)
+        else {
+            comment = .loading
+            return
+        }
+
+        comment = .ready(saved)
     }
 }
 
@@ -170,22 +230,23 @@ extension ReviewModel {
             counts[id, default: 0] += 1
         }
 
-        let enough = current.keys.filter { id in
-            counts[id, default: 0] >= ReviewBreakdown.minimumCount
-        }
-
-        let ranked = enough.sorted { first, second in
+        let ranked = current.keys.sorted { first, second in
             let firstName = names[first] ?? ""
             let secondName = names[second] ?? ""
             return firstName < secondName
         }
 
+        let enough = ranked.filter { id in
+            counts[id, default: 0] >= ReviewBreakdown.minimumCount
+        }
+
         let rising = ranked
+            .filter { previous[$0] != nil }
             .map { ($0, (current[$0] ?? 0) - (previous[$0] ?? 0)) }
             .filter { $0.1 > 0 }
             .max { $0.1 < $1.1 }?.0
 
-        let largest = ranked.max { (current[$0] ?? 0) < (current[$1] ?? 0) }
+        let largest = enough.max { (current[$0] ?? 0) < (current[$1] ?? 0) }
 
         return hasPreviousEntries ? rising ?? largest : largest
     }
@@ -214,6 +275,12 @@ extension ReviewModel {
 }
 
 private extension ReviewModel {
+    struct CommentFacts {
+        let insights: [ReviewInsight]
+        let breakdown: ReviewBreakdown?
+        let basis: String
+    }
+
     static var canWriteComment: Bool {
         guard #available(iOS 26.0, *) else {
             return false
@@ -224,6 +291,18 @@ private extension ReviewModel {
 
     var categoryNames: [String] {
         list?.categories.values.map(\.name) ?? []
+    }
+
+    var commentFacts: CommentFacts {
+        let insights = ReviewInsight.pick(from: insightInput)
+        let breakdown = breakdownInput.flatMap(ReviewBreakdown.make(from:))
+        let facts = ReviewComment.facts(insights, with: breakdown)
+
+        return CommentFacts(
+            insights: insights,
+            breakdown: breakdown,
+            basis: ReviewComment.basis(of: facts)
+        )
     }
 
     var largestExpense: ReviewInsight.Expense? {
@@ -260,6 +339,29 @@ private extension ReviewModel {
             categories: categories,
             isCurrent: isCurrent
         )
+    }
+
+    func loadNeighborComments() async {
+        let keys = [period.adding(-1), period.adding(1)].map(\.commentKey)
+
+        for key in keys where savedComments[key] == nil {
+            guard let saved = try? await database.reviewComment(for: key) else {
+                continue
+            }
+
+            savedComments[key] = saved
+        }
+    }
+
+    func markAnalysis(
+        _ key: String,
+        isNew: Bool
+    ) {
+        if isNew {
+            newAnalysisKey = key
+        } else if newAnalysisKey == key {
+            newAnalysisKey = nil
+        }
     }
 
     func spends(in range: ClosedRange<LocalDate>) -> [ReviewBreakdown.Spend] {
@@ -306,6 +408,6 @@ private extension ReviewModel {
                 budget: budget
             )
         }
-        .sorted { $0.amount > $1.amount }
+        .sorted { $0.amount == $1.amount ? $0.name < $1.name : $0.amount > $1.amount }
     }
 }

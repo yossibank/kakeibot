@@ -142,10 +142,11 @@ public extension ReviewBreakdown {
     static func make(from input: Input) -> ReviewBreakdown? {
         let categories = tallies(of: input) { $0.category }
 
-        guard
-            let target = categories.first(where: { $0.name == input.category }),
-            target.count >= minimumCount
-        else {
+        guard let target = categories.first(where: { $0.name == input.category }) else {
+            return nil
+        }
+
+        guard target.count >= minimumCount || isRising(target, in: input) else {
             return nil
         }
 
@@ -228,7 +229,7 @@ public extension ReviewBreakdown.Focus {
 
 public extension ReviewBreakdown.Action {
     var sentence: String {
-        "\(lead)、\(ReviewInsight.yen(amount)) ほど浮きます。"
+        "\(lead)、\(ReviewInsight.yen(amount)) 浮きます。"
     }
 }
 
@@ -298,6 +299,13 @@ private extension ReviewBreakdown {
         return tallies.values.sorted {
             $0.amount == $1.amount ? $0.name < $1.name : $0.amount > $1.amount
         }
+    }
+
+    static func isRising(
+        _ tally: Tally,
+        in input: Input
+    ) -> Bool {
+        input.hasPrevious && tally.previousCount > 0 && tally.amount > tally.previousAmount
     }
 
     static func memoTallies(of input: Input) -> [Tally] {

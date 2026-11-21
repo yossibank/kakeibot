@@ -29,10 +29,45 @@ public struct ReviewComment: Codable, Hashable, Sendable {
 public extension ReviewComment {
     static let minimumEntries = 5
 
+    var increasedNumbers: Set<Int> {
+        let sentences = basis.split { "。\n".contains($0) }
+
+        let numbers = sentences
+            .filter { sentence in
+                Self.increaseWords.contains { sentence.contains($0) }
+            }
+            .reduce(into: Set<Int>()) { numbers, sentence in
+                numbers.formUnion(Self.numbers(in: String(sentence)))
+            }
+
+        return numbers.filter { $0 > 1 }
+    }
+
     static func cleaned(_ text: String) -> String {
         let end = cutMarks.compactMap { text.range(of: $0)?.lowerBound }.min() ?? text.endIndex
         let kept = text[..<end]
         return kept.trimmingCharacters(in: trimmed)
+    }
+
+    static func normalizedNumbers(_ text: String) -> String {
+        let halfWidth = String(text.map { halfWidthMarks[$0] ?? $0 })
+
+        return halfWidth.replacing(#/[0-9]+(?:,[0-9]+)+/#) { match in
+            let digits = match.output.filter(\.isNumber)
+            let value = Int(digits) ?? 0
+            return value.formatted(.number.locale(locale))
+        }
+    }
+
+    static func numbers(in text: String) -> Set<Int> {
+        let matches = text.matches(of: #/[0-9０-９][0-9０-９,，]*/#)
+
+        let values = matches.compactMap { match in
+            let digits = match.output.compactMap(\.wholeNumberValue)
+            return digits.isEmpty ? nil : digits.reduce(0) { $0 * 10 + $1 }
+        }
+
+        return Set(values)
     }
 
     static func droppingAdvice(_ text: String) -> String {
@@ -90,21 +125,8 @@ public extension ReviewComment {
         return kept.map { "\($0)。" }.joined()
     }
 
-    func needsRewrite(
-        basis: String,
-        isCurrent: Bool,
-        today: Date,
-        calendar: Calendar
-    ) -> Bool {
-        guard basis != self.basis else {
-            return false
-        }
-
-        guard isCurrent else {
-            return true
-        }
-
-        return !calendar.isDate(createdAt, inSameDayAs: today)
+    func needsRewrite(basis: String) -> Bool {
+        basis != self.basis
     }
 }
 
@@ -126,18 +148,15 @@ public extension ReviewPeriod.Scale {
 
 private extension ReviewComment {
     static let adviceEndings = ["ましょう", "ください"]
+    static let increaseWords = ["増", "上が"]
     static let cutMarks = ["```", "」}", "\"}", "}", "{"]
+    static let locale = Locale(identifier: "ja_JP")
     static let trimmed = CharacterSet.whitespacesAndNewlines
         .union(CharacterSet(charactersIn: "「」\""))
 
-    static func numbers(in text: String) -> Set<Int> {
-        let matches = text.matches(of: #/[0-9０-９][0-9０-９,，]*/#)
-
-        let values = matches.compactMap { match in
-            let digits = match.output.compactMap(\.wholeNumberValue)
-            return digits.isEmpty ? nil : digits.reduce(0) { $0 * 10 + $1 }
-        }
-
-        return Set(values)
-    }
+    static let halfWidthMarks: [Character: Character] = {
+        let full = Array("０１２３４５６７８９，％")
+        let half = Array("0123456789,%")
+        return Dictionary(uniqueKeysWithValues: zip(full, half))
+    }()
 }

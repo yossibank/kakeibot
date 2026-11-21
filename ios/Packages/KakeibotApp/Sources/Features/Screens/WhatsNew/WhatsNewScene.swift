@@ -76,6 +76,7 @@ extension WhatsNewScene {
         case widgetTiles
         case widgetReceipt
         case analysisSwitch
+        case analysisBanner
         case analysisReason
         case analysisSummary
     }
@@ -185,7 +186,7 @@ private extension WhatsNewScene {
         case .widgetTiles, .widgetReceipt:
             WhatsNewWidgetScene(kind: kind)
 
-        case .analysisSwitch, .analysisReason, .analysisSummary:
+        case .analysisSwitch, .analysisBanner, .analysisReason, .analysisSummary:
             WhatsNewAnalysisScene(kind: kind)
         }
     }

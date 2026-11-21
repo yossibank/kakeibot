@@ -20,7 +20,7 @@ extension ReviewAnalysisView {
                 }
             }
 
-            rewriteButton(since: nil)
+            PrimaryButton("もう一度", action: onRetry)
         }
     }
 
@@ -54,7 +54,7 @@ extension ReviewAnalysisView {
                         Text("分析しています")
                             .textFont(.subheadline, weight: .bold)
 
-                        Text("\(note)の記録")
+                        Text("\(currentSpan) の記録")
                             .textFont(.caption2)
                             .foregroundStyle(Palette.subtext)
                             .lineLimit(1)
