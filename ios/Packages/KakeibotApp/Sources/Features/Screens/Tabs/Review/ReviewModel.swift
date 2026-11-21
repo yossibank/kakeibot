@@ -11,6 +11,7 @@ public final class ReviewModel: ScreenModel {
         didSet {
             moveCache = [:]
             upcomingCache = [:]
+            closingCache = [:]
         }
     }
 
@@ -36,6 +37,7 @@ public final class ReviewModel: ScreenModel {
             summaries = [:]
             moveCache = [:]
             upcomingCache = [:]
+            closingCache = [:]
         }
     }
 
@@ -59,6 +61,7 @@ public final class ReviewModel: ScreenModel {
 
     @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
     @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
+    @ObservationIgnored var closingCache: [ClosingKey: ReviewClosingView.Content] = [:]
     @ObservationIgnored var commentRequest = 0
     @ObservationIgnored var commentFailedAt: [String: Date] = [:]
     @ObservationIgnored var savedComments: [String: ReviewComment] = [:]

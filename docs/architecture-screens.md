@@ -18,6 +18,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | MainView の知らせ | 記録・削除の取り消し・失敗の知らせを、タブの帯の上の 1 か所に出す。どれかが出たら他を消し、タブの画面の `errorBanner` は環境の `noticeRound` を進めて消す |
 | ReviewView のひとこと | 締めた期間で、渡す事実（`ReviewInsight.Input`）が変わると、`task(id:)` で「NEW」を決め直す。分析レポートを開いている間は、同じ所で作り直すかを決める |
 | ReviewView の途中経過 | 今の期間では、シートに `ReviewProgressView` を出し、AI を使わない。期間が変わると、`task(id:)` で一手（`ReviewGoal`）を読み直す |
+| ReviewView の締めのレポート | 締めた期間では、シートの頭に `ReviewClosingView` を出す。中身は、開いた時の記録からコードで数える |
 | ReviewView のレビューの札 | 記録の数が変わると、`task(id:)` で出すかを決め直す |
 
 記録の一覧（`EntryList`）の見張りは、`AppDatabase` が 1 つだけ持つ。見張りの型は `ValueObservation` で、見張る画面と入力シートのあいだで共有する。中身が変わらない書き込みでは、値を渡さない。

@@ -50,9 +50,7 @@ public struct ReviewView: View {
 
                 periodBar
 
-                if model.isCurrentPeriod || model.comment != .hidden {
-                    analysisBanner
-                }
+                analysisBanner
 
                 content
                     .pageSlide(slide, page: model.period)

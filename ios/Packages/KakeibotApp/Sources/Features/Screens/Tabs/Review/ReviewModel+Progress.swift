@@ -8,7 +8,7 @@ extension ReviewModel {
     var pace: ReviewPace? {
         let spent = ReviewSummary(entries: entries, in: commentRange).expense.total
 
-        if let limit = budgetLimit {
+        if let limit = budgetLimit(of: period) {
             return ReviewPace(
                 limit: limit,
                 basis: .budget,
@@ -74,9 +74,9 @@ extension ReviewModel {
     }
 }
 
-private extension ReviewModel {
-    var budgetLimit: Int? {
-        guard scale == .month else {
+extension ReviewModel {
+    func budgetLimit(of period: ReviewPeriod) -> Int? {
+        guard period.scale == .month else {
             return nil
         }
 

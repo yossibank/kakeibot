@@ -36,7 +36,7 @@ extension ReviewView {
                     .shadow(color: Palette.accent.opacity(.muted), radius: 8, y: 4)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(model.isCurrentPeriod ? "途中経過" : "AI 分析レポート")
+                    Text(model.isCurrentPeriod ? "途中経過" : "締めのレポート")
                         .textFont(.caption2, weight: .bold)
                         .tracking(2)
                         .foregroundStyle(Palette.accent)
@@ -167,7 +167,16 @@ private extension ReviewView {
         if model.isCurrentPeriod {
             progressView
         } else {
-            analysisView
+            VStack(spacing: 12) {
+                ReviewClosingView(
+                    content: model.closingContent,
+                    name: analysisName,
+                    previousName: Self.name(of: model.period.previous),
+                    unit: model.scale.unitName
+                )
+
+                analysisView
+            }
         }
     }
 
@@ -184,7 +193,7 @@ private extension ReviewView {
             closingTitle: "\(analysisName)のふりかえり",
             closingDate: closingDate,
             nextGoalTitle: "\(Self.name(of: period.adding(1)))の一手",
-            previousTitle: model.canShowAnalysis ? previousTitle : nil,
+            previousTitle: previousTitle,
             onOpenPrevious: {
                 move(by: -1)
             }
@@ -248,7 +257,7 @@ private extension ReviewView {
     }
 
     var bannerTitle: String {
-        model.isCurrentPeriod ? "\(analysisName)の途中経過を見る" : "\(analysisName)の分析を見る"
+        model.isCurrentPeriod ? "\(analysisName)の途中経過を見る" : "\(analysisName)のレポートを見る"
     }
 
     var analysisName: String {
