@@ -19,6 +19,8 @@
 
 VoiceOver などのアクセシビリティの対応は入れない。`accessibility` で始まるモディファイアや、読み上げのためだけの値や引数を書かない。
 
+`floatingInput` を使う画面は、外側を `FloatingInputReader` で包む。`GeometryReader` で包まない。
+
 ## 構成
 
 ファイルとフォルダの置き場所と名前は、[architecture-naming](docs/architecture-naming.md) に従う。共通の構成は、claude-config の `docs/app/ios-architecture.md` にある。

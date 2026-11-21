@@ -36,7 +36,7 @@ public struct TemplateEditSheet: View {
     }
 
     public var body: some View {
-        GeometryReader { _ in
+        FloatingInputReader { _ in
             ZStack(alignment: .bottom) {
                 content
                     .ignoresSafeArea(keyboardRegions)
