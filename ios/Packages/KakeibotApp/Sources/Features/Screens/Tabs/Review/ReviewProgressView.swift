@@ -6,7 +6,7 @@ struct ReviewProgressView: View {
     let pace: ReviewPace?
     let unit: String
     let currentName: String
-    let goals: [GoalItem]
+    let goals: [ReviewGoalItem]
     let closingTitle: String
     let closingDate: LocalDate
     let nextGoalTitle: String
@@ -24,18 +24,6 @@ struct ReviewProgressView: View {
             }
 
             closingCard
-        }
-    }
-}
-
-extension ReviewProgressView {
-    struct GoalItem: Identifiable {
-        let goal: ReviewGoal
-        let name: String
-        let progress: ReviewGoal.Progress
-
-        var id: ReviewGoal.ID {
-            goal.id
         }
     }
 }

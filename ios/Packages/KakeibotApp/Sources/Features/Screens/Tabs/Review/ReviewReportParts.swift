@@ -104,10 +104,39 @@ struct ReviewReportStat: View {
     }
 }
 
+struct ReviewGoalItem: Identifiable {
+    let goal: ReviewGoal
+    let name: String
+    let categoryName: String
+    let progress: ReviewGoal.Progress
+
+    var id: ReviewGoal.ID {
+        goal.id
+    }
+
+    func title(unit: String) -> String {
+        switch goal.kind {
+        case .count: "\(name)を、\(unit) \(goal.target) 回までに"
+        case .average: "\(name)の 1 回を、\(ReviewInsight.yen(goal.target)) までに"
+        }
+    }
+
+    func value(_ number: Int) -> String {
+        switch goal.kind {
+        case .count: "\(number) 回"
+        case .average: ReviewInsight.yen(number)
+        }
+    }
+}
+
 extension View {
     func reviewHero() -> some View {
         padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .reviewTicket()
+    }
+
+    func reviewTicket() -> some View {
+        frame(maxWidth: .infinity, alignment: .leading)
             .background {
                 RoundedRectangle(cornerRadius: 28)
                     .fill(Palette.card)

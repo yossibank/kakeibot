@@ -71,6 +71,7 @@ expense・income の列は、描画に使わない。
 | backup_exported_at | バックアップを JSON で最後に書き出した日時。ISO 8601 | 書き出しのファイルには含めない。読み込んだときは、そのファイルを書き出した日時にする |
 | review_requested_version | レビューのお願いを出したアプリの版 | 空なら、まだ出していない |
 | whats_new_seen_version | 最後に見たお知らせの版 | 空なら、まだ見ていない。最初の設定を終えた時は、その時の一番新しい版にする |
+| review_seen_reports | 開いた締めのレポートの期間の鍵（`month:2026-10-01` の形）を , でつないだもの | 週・月・年ごとに、最後に開いた 1 つだけを残す |
 
 closed_hints に入る画面の名前は、次のとおり。
 
@@ -108,7 +109,7 @@ closed_hints に入る画面の名前は、次のとおり。
 
 ### review_goal
 
-締めのレポートで決めた一手（`ReviewGoal`）を、1 つずつ 1 行で持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/review-report.md](decisions/review-report.md#一手の保存) にある。
+振り返りを開いた時に決めた一手（`ReviewGoal`）を、1 つずつ 1 行で持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/review-report.md](decisions/review-report.md#一手の保存) にある。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |

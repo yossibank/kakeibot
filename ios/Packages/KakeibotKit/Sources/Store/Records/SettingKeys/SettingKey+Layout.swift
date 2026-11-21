@@ -25,6 +25,21 @@ public extension SettingKey where Value == [HomeSection] {
     }
 }
 
+public extension SettingKey where Value == Set<String> {
+    static var reviewSeenReports: Self {
+        Self(
+            .reviewSeenReports,
+            default: [],
+            decode: { text in
+                Set(text.split(separator: ",").map(String.init))
+            },
+            encode: { keys in
+                keys.isEmpty ? nil : keys.sorted().joined(separator: ",")
+            }
+        )
+    }
+}
+
 public extension SettingKey where Value == Set<HomeSection> {
     static var homeHiddenSections: Self {
         Self(
