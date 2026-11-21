@@ -1,7 +1,7 @@
 # 設定とテーマとひとことの表
 
 > [!NOTE]
-> テーマの表・設定の表・振り返りのひとことの表の形が分かる。
+> テーマの表・設定の表・振り返りのひとことと一手の表の形が分かる。
 > ほかの表と共通の決まりは [data](data.md) にある。
 
 ## 🗄️ 表
@@ -105,3 +105,22 @@ closed_hints に入る画面の名前は、次のとおり。
 | basis | TEXT | 作った時にモデルへ渡した事実の文。変わったら作り直す |
 | created_at | TEXT | |
 | breakdown | TEXT | 分析の値（`ReviewBreakdown.Summary`）の JSON。カテゴリの前後の回数と額・同じメモの行・良い点・浮く額を持つ |
+
+### review_goal
+
+締めのレポートで決めた一手（`ReviewGoal`）を、1 つずつ 1 行で持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/review-report.md](decisions/review-report.md#一手の保存) にある。
+
+| 列 | 型 | 補足 |
+| --- | --- | --- |
+| id | TEXT | 主キー |
+| period | TEXT | 一手を守る期間。形は `review_comment` の period と同じで、索引を張る |
+| kind | TEXT | `count`（回数）・`average`（1 回の平均） |
+| category_id | TEXT | 対象のカテゴリ。カテゴリを消すと、一手も消える |
+| memo | TEXT | 対象を同じメモの記録に絞る時のメモ。NULL はカテゴリ全体 |
+| baseline | INTEGER | 決めた時の値。回数か、1 回の平均の円 |
+| target | INTEGER | 目標の値。期間の終わりにこの値以下なら達成 |
+| saving | INTEGER | 守れた時に浮く金額の見込み（円） |
+| result | INTEGER | 締めた時の実際の値。答え合わせの前は NULL |
+| saved | INTEGER | 締めた時に浮いた金額（円）。答え合わせの前は NULL |
+| created_at | TEXT | |
+| checked_at | TEXT | 答え合わせをした日時。答え合わせの前は NULL |

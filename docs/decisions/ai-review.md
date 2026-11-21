@@ -3,6 +3,7 @@
 > [!NOTE]
 > 振り返りの AI のひとことの置き場所・中身・書き方と、作る時・作り直す時の決定が分かる。
 > 無料と Pro の範囲は [pro](pro.md)、保存する表は [data-settings](../data-settings.md#review_comment) にある。
+> 途中経過と締めのレポートの分け方と一手の保存は、[review-report](review-report.md) にある。
 
 ## ひとことの置き場所
 
