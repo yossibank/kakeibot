@@ -21,6 +21,19 @@ struct QuickRecordWidgetSummaryTests {
     }
 
     @Test
+    func shortensTileDetailWithoutWallet() async throws {
+        let setup = try await Setup()
+        try await setup.saveTemplate("ガス", type: .expense)
+        let category = try #require(setup.categoryName)
+        let wallet = try #require(setup.options.wallets.first?.name)
+
+        let tile = try #require(try await setup.summary().tiles.first)
+
+        #expect(tile.detail == "\(category)・\(wallet)")
+        #expect(tile.shortDetail == category)
+    }
+
+    @Test
     func showsTwoRecordsOfTodayAndCountsAll() async throws {
         let setup = try await Setup()
 

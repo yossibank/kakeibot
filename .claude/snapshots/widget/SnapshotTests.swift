@@ -105,6 +105,7 @@ private extension SnapshotTests {
                 id: tile.id,
                 name: "子どもの習い事の月謝まとめ払い",
                 detail: "子どもの習い事・みずほ銀行",
+                shortDetail: "子どもの習い事",
                 amount: tile.amount.map { $0 * 10000 },
                 icon: tile.icon
             )
@@ -120,6 +121,25 @@ private extension SnapshotTests {
                 icon: record.icon
             )
         }
+
+        let wideTiles = sample.tiles.enumerated().map { index, tile in
+            QuickRecordWidgetSummary.Tile(
+                id: tile.id,
+                name: index.isMultiple(of: 2) ? "大阪ガス" : tile.name,
+                detail: index.isMultiple(of: 2) ? "水道光熱費・楽天カード" : tile.detail,
+                shortDetail: index.isMultiple(of: 2) ? "水道光熱費" : tile.shortDetail,
+                amount: tile.amount,
+                icon: tile.icon
+            )
+        }
+
+        let wide = QuickRecordWidgetSummary(
+            todayExpense: sample.todayExpense,
+            tiles: wideTiles,
+            todayRecords: sample.todayRecords,
+            todayCount: sample.todayCount,
+            recorded: nil
+        )
 
         let long = QuickRecordWidgetSummary(
             todayExpense: 12_345_678,
@@ -164,6 +184,7 @@ private extension SnapshotTests {
         return [
             ("normal", sample),
             ("undo", undo),
+            ("wide", wide),
             ("long", long),
             ("two", two),
             ("zero", zero),
