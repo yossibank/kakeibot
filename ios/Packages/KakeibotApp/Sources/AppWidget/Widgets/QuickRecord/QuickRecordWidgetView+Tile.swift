@@ -33,34 +33,9 @@ private extension QuickRecordWidgetView {
             IconTile(tile.icon, size: iconSize)
                 .foregroundStyle(Palette.accentStrong)
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(tile.name)
-                    .textFont(size: .caption, weight: .medium)
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                if isLarge {
-                    ViewThatFits(in: .horizontal) {
-                        detailText(tile.detail)
-                        detailText(tile.shortDetail)
-                    }
-                }
-
-                if let amount = tile.amount {
-                    AmountText(
-                        amount,
-                        font: .size(.body, weight: .medium),
-                        color: Palette.accentStrong
-                    )
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .privacySensitive()
-                } else {
-                    Text("毎回入れる")
-                        .textFont(size: .micro)
-                        .foregroundStyle(Palette.hint)
-                }
+            ViewThatFits(in: .vertical) {
+                tileText(tile, spacing: 4)
+                tileText(tile, spacing: 1)
             }
 
             Spacer(minLength: 0)
@@ -76,9 +51,44 @@ private extension QuickRecordWidgetView {
             }
         }
         .padding(.horizontal, 8)
-        .padding(.vertical, padding)
+        .padding(.vertical, padding / 2)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 4)
+    }
+
+    func tileText(
+        _ tile: QuickRecordWidgetSummary.Tile,
+        spacing: CGFloat
+    ) -> some View {
+        VStack(alignment: .leading, spacing: spacing) {
+            Text(tile.name)
+                .textFont(size: .caption, weight: .medium)
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            if isLarge {
+                ViewThatFits(in: .horizontal) {
+                    detailText(tile.detail)
+                    detailText(tile.shortDetail)
+                }
+            }
+
+            if let amount = tile.amount {
+                AmountText(
+                    amount,
+                    font: .size(.body, weight: .medium),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .privacySensitive()
+            } else {
+                Text("毎回入れる")
+                    .textFont(size: .micro)
+                    .foregroundStyle(Palette.hint)
+            }
+        }
     }
 
     func detailText(_ detail: String) -> some View {
