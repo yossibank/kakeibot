@@ -54,7 +54,6 @@ public struct EntrySheet: View {
         GeometryReader { proxy in
             ZStack(alignment: .top) {
                 fittedContent(in: proxy.size.height)
-                    .ignoresSafeArea(.keyboard)
                     .floatingInput(isPresented: isEditingMemo) {
                         editMemo(false)
                     } card: {
@@ -283,7 +282,7 @@ private extension EntrySheet {
                     .padding(.bottom, bottomGap)
             }
             .padding(.horizontal, 8)
-            .ignoresSafeArea(.container, edges: .bottom)
+            .ignoresSafeArea(edges: .bottom)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
