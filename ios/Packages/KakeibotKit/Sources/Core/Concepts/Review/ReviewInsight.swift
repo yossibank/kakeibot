@@ -119,7 +119,9 @@ public extension ReviewInsight {
     }
 
     static func pick(from input: Input) -> [ReviewInsight] {
-        let ranked = all(from: input).sorted { $0.weight > $1.weight }
+        let ranked = all(from: input).sorted {
+            $0.weight == $1.weight ? $0.fact < $1.fact : $0.weight > $1.weight
+        }
 
         guard let first = ranked.first else {
             return [total(from: input)]

@@ -55,6 +55,28 @@ struct ReviewCommentTests {
     }
 
     @Test
+    func normalizesFullWidthNumbers() {
+        let text = "水道光熱費が前の月の１，５９５円から１，０６８５円に増えています。これは５６９％の増加です。"
+
+        let normalized = ReviewComment.normalizedNumbers(text)
+
+        #expect(normalized == "水道光熱費が前の月の1,595円から10,685円に増えています。これは569%の増加です。")
+    }
+
+    @Test
+    func picksNumbersOfIncreasedFacts() {
+        let comment = ReviewComment(
+            period: "month:2026-10-01",
+            body: "",
+            suggestion: "",
+            basis: "気を付けたい点：水道光熱費が、前の月の 1,595円 から 10,685円 に増えています（569% 増）。\n良い点：食費が、前の月の 30,100円 から 21,800円 に減っています（27% 減）。",
+            createdAt: Date()
+        )
+
+        #expect(comment.increasedNumbers == [1595, 10685, 569])
+    }
+
+    @Test
     func dropsAdviceSentences() {
         let text = "82,600円 残せたのは良い点です。支出のペースを見直してみましょう。"
         let request = "交際費が増えています。記録を確かめてみてください。"
@@ -67,43 +89,10 @@ struct ReviewCommentTests {
 
     @Test
     func rewritesWhenBasisChanges() {
-        let calendar = Calendar(identifier: .gregorian)
         let comment = Self.comment(createdAt: Self.now)
-        let sameDay = Self.now.addingTimeInterval(3600)
-        let nextDay = Self.now.addingTimeInterval(86400)
 
-        let unchanged = comment.needsRewrite(
-            basis: Self.basis,
-            isCurrent: true,
-            today: nextDay,
-            calendar: calendar
-        )
-
-        let today = comment.needsRewrite(
-            basis: "別の事実",
-            isCurrent: true,
-            today: sameDay,
-            calendar: calendar
-        )
-
-        let tomorrow = comment.needsRewrite(
-            basis: "別の事実",
-            isCurrent: true,
-            today: nextDay,
-            calendar: calendar
-        )
-
-        let finished = comment.needsRewrite(
-            basis: "別の事実",
-            isCurrent: false,
-            today: sameDay,
-            calendar: calendar
-        )
-
-        #expect(!unchanged)
-        #expect(!today)
-        #expect(tomorrow)
-        #expect(finished)
+        #expect(!comment.needsRewrite(basis: Self.basis))
+        #expect(comment.needsRewrite(basis: "別の事実"))
     }
 
     @Test

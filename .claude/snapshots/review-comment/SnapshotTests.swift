@@ -93,8 +93,31 @@ struct SnapshotTests {
                 ReviewModel.MonthAmount(month: index + 1, amount: amount)
             }
 
+        let risingSummary = ReviewBreakdown.Summary(
+            focus: ReviewBreakdown.Focus(
+                name: "水道光熱費",
+                count: 1,
+                previousCount: 1,
+                amount: 10685,
+                previousAmount: 1595
+            ),
+            rows: [],
+            goodPoint: "ふるさと納税は、前の月の 5 回から 0 回に減っています。",
+            action: nil
+        )
+
+        let rising = ReviewComment(
+            period: "month:2026-10-01",
+            body: "水道光熱費が前の月の１，５９５円から１，０６８５円に増えています。日用品の支出が、前の月の 13,522円 から 0円 に減っています。ふるさと納税の支出が、前の月の 5 回から 0 回に減っています。",
+            suggestion: "次の月は、水道光熱費を 10,685円 より少し下に抑えてみましょう。",
+            basis: "気を付けたい点：水道光熱費が、前の月の 1,595円 から 10,685円 に増えています（569% 増）。",
+            createdAt: Date(),
+            breakdown: risingSummary
+        )
+
         let states: [(String, ReviewModel.CommentState)] = [
             ("ready", .ready(comment)),
+            ("rising", .ready(rising)),
             ("breakdown", .ready(breakdown)),
             ("year", .ready(year)),
             ("loading", .loading),
@@ -104,27 +127,22 @@ struct SnapshotTests {
 
         for variant in Self.variants {
             for (name, state) in states {
-                let view = VStack(spacing: 12) {
-                    ReviewDisplaySwitch(
-                        display: .chart,
-                        onSelect: { _ in }
-                    )
-
-                    ReviewAnalysisView(
-                        state: state,
-                        note: "11/1–11/18 · 42 件",
-                        unit: "月",
-                        currentName: "今月",
-                        entryCount: 42,
-                        focusName: "食費",
-                        months: name == "year" ? months : [],
-                        isNew: name == "breakdown",
-                        newEntries: name == "breakdown" ? 3 : 0,
-                        onRewrite: {},
-                        onRecord: {},
-                        onOpen: { _ in }
-                    )
-                }
+                let view = ReviewAnalysisView(
+                    state: state,
+                    unit: "月",
+                    currentName: "今月",
+                    entryCount: 42,
+                    focusName: "食費",
+                    months: name == "year" ? months : [],
+                    categories: ["食費", "水道光熱費", "ふるさと納税", "日用品"],
+                    previousSpan: "10/1〜10/18",
+                    currentSpan: "11/1〜11/18",
+                    isNew: name == "breakdown",
+                    onRetry: {},
+                    onRecord: {},
+                    onOpen: { _ in },
+                    onOpenCategory: { _ in }
+                )
                 .padding(16)
 
                 try Self.write(view, variant: variant, to: "review-comment-\(name)")

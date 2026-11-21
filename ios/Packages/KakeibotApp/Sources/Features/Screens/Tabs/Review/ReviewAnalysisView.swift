@@ -6,17 +6,19 @@ struct ReviewAnalysisView: View {
     @State var hasAppeared = false
 
     let state: ReviewModel.CommentState
-    let note: String
     let unit: String
     let currentName: String
     let entryCount: Int
     let focusName: String?
     let months: [ReviewModel.MonthAmount]
+    let categories: [String]
+    let previousSpan: String
+    let currentSpan: String
     let isNew: Bool
-    let newEntries: Int
-    let onRewrite: () -> Void
+    let onRetry: () -> Void
     let onRecord: () -> Void
     let onOpen: (ReviewModel.Factor) -> Void
+    let onOpenCategory: (String) -> Void
 
     var body: some View {
         switch state {
@@ -24,7 +26,7 @@ struct ReviewAnalysisView: View {
             EmptyView()
 
         case .loading:
-            hero(showsHeader: false) {
+            hero {
                 loading
             }
 
@@ -59,14 +61,6 @@ extension ReviewAnalysisView {
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
-        )
-    }
-
-    static var fadingLine: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accent.opacity(.medium), Palette.accent.opacity(0)],
-            startPoint: .leading,
-            endPoint: .trailing
         )
     }
 
@@ -106,111 +100,40 @@ extension ReviewAnalysisView {
 }
 
 private extension ReviewAnalysisView {
-    var badge: some View {
-        Image(systemName: "chart.bar.fill")
-            .sansFont(.caption, weight: .bold)
-            .foregroundStyle(Palette.backgroundBottom)
-            .frame(width: 28, height: 28)
-            .background(Palette.gold, in: .rect(cornerRadius: 8))
-            .shadow(color: Palette.accent.opacity(.soft), radius: 4)
-    }
+    func hero(@ViewBuilder content: () -> some View) -> some View {
+        content()
+            .foregroundStyle(Palette.text)
+            .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Palette.card)
 
-    var header: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 8) {
-                badge
-
-                Text("分析レポート")
-                    .textFont(.subheadline, weight: .bold)
-                    .tracking(0.5)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                if isNew,
-                   case .ready = state {
-                    Text("NEW")
-                        .textFont(.caption2, weight: .bold)
-                        .tracking(1)
-                        .foregroundStyle(Palette.backgroundBottom)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .background(Palette.gold, in: Capsule())
-                        .fixedSize()
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Self.glow)
                 }
-
-                Spacer(minLength: 8)
-
-                Text(note)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 24)
+                        .strokeBorder(Self.goldEdge)
+                }
+                .shadow(color: Palette.accent.opacity(.subtle), radius: 16, y: 12)
             }
-
-            Rectangle()
-                .fill(Self.fadingLine)
-                .frame(height: 1)
-        }
-    }
-
-    func hero(
-        showsHeader: Bool = true,
-        @ViewBuilder content: () -> some View
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if showsHeader {
-                header
-            }
-
-            content()
-        }
-        .foregroundStyle(Palette.text)
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            ZStack {
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Palette.card)
-
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Self.glow)
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 24)
-                    .strokeBorder(Self.goldEdge)
-            }
-            .shadow(color: Palette.accent.opacity(.subtle), radius: 16, y: 12)
-        }
     }
 
     func ready(_ comment: ReviewComment) -> some View {
         VStack(spacing: 12) {
             hero {
-                if let summary = comment.breakdown {
-                    headline(summary.focus)
-                } else {
-                    quote(comment)
-                }
+                quote(comment)
             }
 
             if let summary = comment.breakdown {
-                if summary.focus.hasPrevious,
-                   summary.focus.amount > summary.focus.previousAmount {
-                    waterfall(summary.focus)
-                } else if months.count >= 2 {
+                compare(summary.focus)
+
+                if !summary.focus.hasPrevious,
+                   months.count >= 2 {
                     monthChart(summary.focus.name)
                 }
-
-                quote(comment)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Self.quoteFill, in: .rect(cornerRadius: 20))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 20)
-                            .strokeBorder(Palette.accent.opacity(.muted))
-                    }
-
-                metrics(summary.focus)
 
                 if !summary.rows.isEmpty {
                     memo(summary.rows)
@@ -221,14 +144,21 @@ private extension ReviewAnalysisView {
                 suggestion(comment.suggestion)
             }
 
-            rewriteButton(since: comment.createdAt)
+            Text(Self.madeText(comment.createdAt))
+                .textFont(.caption2)
+                .foregroundStyle(Palette.hint)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
                 .padding(.top, 4)
         }
     }
 
     func quote(_ comment: ReviewComment) -> some View {
-        let sentences = Self.sentences(of: comment.body)
-        let rest = sentences.dropFirst().joined()
+        let body = ReviewComment.normalizedNumbers(comment.body)
+        let point = comment.breakdown?.goodPoint
+        let focus = comment.breakdown?.focus.rising
+        let sentences = Self.sentences(of: body)
+        let rest = sentences.dropFirst().filter { !repeats($0, in: point) }.joined()
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
@@ -243,26 +173,49 @@ private extension ReviewAnalysisView {
                     .textFont(.caption2, weight: .bold)
                     .tracking(1.5)
                     .foregroundStyle(Palette.accent)
+
+                Spacer(minLength: 8)
+
+                if isNew {
+                    Text("NEW")
+                        .textFont(.caption2, weight: .bold)
+                        .tracking(1)
+                        .foregroundStyle(Palette.backgroundBottom)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(Palette.gold, in: Capsule())
+                        .fixedSize()
+                }
             }
 
-            Text(highlighted(sentences.first ?? comment.body, in: comment))
+            if let focus {
+                headline(focus)
+            }
+
+            Text(linked(highlighted(sentences.first ?? body, in: comment)))
                 .displayFont(.headline, weight: .bold)
                 .foregroundStyle(Palette.text)
                 .lineSpacing(6)
                 .fixedSize(horizontal: false, vertical: true)
 
             if !rest.isEmpty {
-                Text(rest)
+                Text(linked(AttributedString(rest)))
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            if let point = comment.breakdown?.goodPoint {
+            if let focus {
+                reasonChips(focus)
+            }
+
+            if let point {
                 goodPoint(point)
             }
         }
+        .tint(Palette.accent)
+        .environment(\.openURL, OpenURLAction(handler: openCategory))
     }
 
     func goodPoint(_ text: String) -> some View {
@@ -276,7 +229,7 @@ private extension ReviewAnalysisView {
                     .sansFont(.micro, weight: .bold)
                     .foregroundStyle(Palette.accent)
 
-                Text(text)
+                Text(linked(AttributedString(text)))
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
@@ -287,6 +240,8 @@ private extension ReviewAnalysisView {
 }
 
 private extension ReviewAnalysisView {
+    static let categoryScheme = "kakeibot-category"
+
     static var glow: RadialGradient {
         RadialGradient(
             colors: [Palette.accent.opacity(.subtle), Palette.accent.opacity(0)],
@@ -296,12 +251,9 @@ private extension ReviewAnalysisView {
         )
     }
 
-    static var quoteFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accent.opacity(.subtle), Palette.accent.opacity(.faint)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+    static func madeText(_ date: Date) -> String {
+        let made = date.formatted(.dateTime.month(.defaultDigits).day().hour().minute())
+        return "記録が変わると、次に開いた時に新しくなります · \(made)"
     }
 
     static func sentences(of text: String) -> [String] {
@@ -310,25 +262,46 @@ private extension ReviewAnalysisView {
             .map { "\($0)。" }
     }
 
+    static func categoryURL(of name: String) -> URL? {
+        var components = URLComponents()
+        components.scheme = categoryScheme
+        components.host = "open"
+        components.queryItems = [URLQueryItem(name: "name", value: name)]
+        return components.url
+    }
+
+    func repeats(
+        _ sentence: String,
+        in point: String?
+    ) -> Bool {
+        guard let point else {
+            return false
+        }
+
+        let numbers = ReviewComment.numbers(in: sentence)
+
+        guard
+            !numbers.isEmpty,
+            numbers == ReviewComment.numbers(in: point)
+        else {
+            return false
+        }
+
+        return categories.contains { sentence.contains($0) && point.contains($0) }
+    }
+
     func highlighted(
         _ sentence: String,
         in comment: ReviewComment
     ) -> AttributedString {
         var text = AttributedString(sentence)
-        let focus = comment.breakdown?.focus
-        let isUp = focus.map { $0.hasPrevious && $0.amount > $0.previousAmount } ?? false
-
-        if let name = focus?.name,
-           let range = text.range(of: name) {
-            text[range].foregroundColor = Palette.accent
-        }
+        let increased = comment.increasedNumbers
 
         for match in sentence.matches(of: #/[0-9][0-9,]*\s?(回|円|%)/#) {
             let number = String(match.output.0)
-            let isIncrease = isUp || comment.basis.contains("\(number) 増")
 
             guard
-                isIncrease,
+                !ReviewComment.numbers(in: number).isDisjoint(with: increased),
                 let range = text.range(of: number)
             else {
                 continue
@@ -339,13 +312,51 @@ private extension ReviewAnalysisView {
 
         return text
     }
+
+    func linked(_ text: AttributedString) -> AttributedString {
+        var text = text
+        let names = categories.sorted { $0.count > $1.count }
+
+        for name in names {
+            guard let url = Self.categoryURL(of: name) else {
+                continue
+            }
+
+            var start = text.startIndex
+
+            while let range = text[start...].range(of: name) {
+                if text[range].link == nil {
+                    text[range].link = url
+                    text[range].foregroundColor = Palette.accent
+                }
+
+                start = range.upperBound
+            }
+        }
+
+        return text
+    }
+
+    func openCategory(_ url: URL) -> OpenURLAction.Result {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+
+        guard
+            components?.scheme == Self.categoryScheme,
+            let name = components?.queryItems?.first?.value
+        else {
+            return .systemAction
+        }
+
+        onOpenCategory(name)
+        return .handled
+    }
 }
 
 #Preview {
     let comment = ReviewComment(
         period: "month:2026-11-01",
         body: "食費が増えたのは、回数が 8 回増えたためです。1 回の金額は前の月と変わりません。",
-        suggestion: "食費を前の月と同じ 20 回ほどに戻すと、11,200円 ほど浮きます。",
+        suggestion: "食費を前の月と同じ 20 回ほどに戻すと、11,200円 浮きます。",
         basis: "",
         createdAt: Date()
     )
@@ -353,17 +364,19 @@ private extension ReviewAnalysisView {
     ScrollView {
         ReviewAnalysisView(
             state: .ready(comment),
-            note: "11/1–11/18 · 42 件",
             unit: "月",
             currentName: "今月",
             entryCount: 42,
             focusName: "食費",
             months: [],
+            categories: ["食費"],
+            previousSpan: "10/1〜10/18",
+            currentSpan: "11/1〜11/18",
             isNew: true,
-            newEntries: 3,
-            onRewrite: {},
+            onRetry: {},
             onRecord: {},
-            onOpen: { _ in }
+            onOpen: { _ in },
+            onOpenCategory: { _ in }
         )
         .padding(16)
     }

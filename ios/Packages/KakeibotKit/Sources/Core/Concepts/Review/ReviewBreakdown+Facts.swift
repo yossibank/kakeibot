@@ -92,7 +92,7 @@ extension ReviewBreakdown {
         let name = tally.name
 
         if tally.count > tally.previousCount {
-            let saved = (tally.count - tally.previousCount) * tally.unitPrice / 100 * 100
+            let saved = (tally.count - tally.previousCount) * tally.unitPrice
             let times = tally.previousCount
 
             guard saved >= 100 else {
@@ -106,7 +106,7 @@ extension ReviewBreakdown {
             return Action(lead: lead, amount: saved)
         }
 
-        let saved = (tally.unitPrice - tally.previousUnitPrice) * tally.count / 100 * 100
+        let saved = (tally.unitPrice - tally.previousUnitPrice) * tally.count
         let price = ReviewInsight.yen(tally.previousUnitPrice)
 
         guard saved >= 100 else {

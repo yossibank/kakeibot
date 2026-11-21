@@ -11,11 +11,14 @@ public struct ReviewView: View {
 
     @State var openShare: ReviewModel.Share?
     @State var openStamp: StampCalendar.Tally?
+    @State var showsAnalysis = false
+    @State var analysisShare: ReviewModel.Share?
+    @State var pendingRecord: LocalDate?
+    @State var slide = PageSlide()
 
     @State private var pendingEntry: Entry.ID?
     @State private var pendingRecurring: Recurring.ID?
     @State private var pendingDay: LocalDate?
-    @State private var slide = PageSlide()
 
     let onAddEntry: (LocalDate) -> Void
     let onOpenRecurrings: () -> Void
@@ -47,6 +50,10 @@ public struct ReviewView: View {
 
                 periodBar
 
+                if model.comment != .hidden {
+                    analysisBanner
+                }
+
                 content
                     .pageSlide(slide, page: model.period)
             }
@@ -60,19 +67,16 @@ public struct ReviewView: View {
         .haptic(.selection, trigger: model.period)
         .haptic(.selection, trigger: model.kind)
         .task(id: commentTrigger) {
-            await model.refreshComment()
+            await model.refreshAnalysisMark()
         }
         .task(id: model.list?.entries.count) {
             await model.refreshStoreReviewCard()
         }
         .sheet(item: $openShare, onDismiss: openPendingEntry) { share in
-            ReviewShareSheet(
-                share: share,
-                periodTitle: periodTitle,
-                rows: model.rows(for: share)
-            ) { id in
-                choose(id, in: share)
-            }
+            shareSheet(share)
+        }
+        .sheet(isPresented: $showsAnalysis, onDismiss: openAfterAnalysis) {
+            analysisSheet
         }
         .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
             StampDaysSheet(
@@ -95,13 +99,89 @@ public struct ReviewView: View {
     }
 }
 
+extension ReviewView {
+    var periodTextTransition: ContentTransition {
+        .numericText(countsDown: !model.isMovingForward)
+    }
+
+    var periodTitle: String {
+        let range = model.period.range
+        let month = range.upperBound.yearMonth
+
+        switch model.scale {
+        case .week: return PeriodText.range(range, today: model.today)
+        case .month: return "\(String(month.year))年 \(month.month)月"
+        case .year: return "\(String(month.year))年"
+        }
+    }
+
+    var currentPeriodTitle: String {
+        switch model.scale {
+        case .week: "今週"
+        case .month: "今月"
+        case .year: "今年"
+        }
+    }
+
+    func shareSheet(_ share: ReviewModel.Share) -> some View {
+        ReviewShareSheet(
+            share: share,
+            periodTitle: periodTitle,
+            rows: model.rows(for: share)
+        ) { id in
+            choose(id, in: share)
+        }
+    }
+
+    static func count(of direction: PageSwipeDirection) -> Int {
+        direction == .forward ? 1 : -1
+    }
+
+    func openPendingEntry() {
+        if let pendingRecurring {
+            self.pendingRecurring = nil
+            onOpenRecurring(pendingRecurring)
+            return
+        }
+
+        guard let pendingEntry else {
+            return
+        }
+
+        self.pendingEntry = nil
+
+        onOpenEntry(pendingEntry)
+    }
+
+    func move(_ direction: PageSwipeDirection) {
+        move(by: Self.count(of: direction))
+    }
+
+    func canMove(_ direction: PageSwipeDirection) -> Bool {
+        model.canMove(by: Self.count(of: direction))
+    }
+
+    func move(by count: Int) {
+        guard model.canMove(by: count) else {
+            return
+        }
+
+        PageSlide.run($slide, forward: count > 0) {
+            model.move(by: count)
+        }
+    }
+
+    func moveToCurrentPeriod() {
+        PageSlide.run($slide, forward: true) {
+            model.moveToCurrent()
+        }
+    }
+}
+
 private extension ReviewView {
     var header: some View {
         TabHeader("振り返り") {
-            CapsulePicker(
-                selection: scaleBinding,
-                options: Self.scaleOptions
-            )
+            CapsulePicker(selection: scaleBinding, options: Self.scaleOptions)
         }
     }
 
@@ -145,38 +225,11 @@ private extension ReviewView {
         }
     }
 
-    var periodTextTransition: ContentTransition {
-        .numericText(countsDown: !model.isMovingForward)
-    }
-
-    var periodTitle: String {
-        let range = model.period.range
-        let month = range.upperBound.yearMonth
-
-        switch model.scale {
-        case .week: return PeriodText.range(range, today: model.today)
-        case .month: return "\(String(month.year))年 \(month.month)月"
-        case .year: return "\(String(month.year))年"
-        }
-    }
-
-    var currentPeriodTitle: String {
-        switch model.scale {
-        case .week: "今週"
-        case .month: "今月"
-        case .year: "今年"
-        }
-    }
-
     var periodSubtitle: String? {
         switch model.scale {
         case .week: nil
         case .month, .year: PeriodText.range(model.period.range)
         }
-    }
-
-    static func count(of direction: PageSwipeDirection) -> Int {
-        direction == .forward ? 1 : -1
     }
 
     func choose(
@@ -192,7 +245,12 @@ private extension ReviewView {
             pendingEntry = id
         }
 
-        openShare = nil
+        if analysisShare == nil {
+            openShare = nil
+        } else {
+            analysisShare = nil
+            showsAnalysis = false
+        }
     }
 
     func openPendingDay() {
@@ -203,45 +261,5 @@ private extension ReviewView {
         self.pendingDay = nil
 
         onOpenDay(pendingDay)
-    }
-
-    func openPendingEntry() {
-        if let pendingRecurring {
-            self.pendingRecurring = nil
-            onOpenRecurring(pendingRecurring)
-            return
-        }
-
-        guard let pendingEntry else {
-            return
-        }
-
-        self.pendingEntry = nil
-
-        onOpenEntry(pendingEntry)
-    }
-
-    func move(_ direction: PageSwipeDirection) {
-        move(by: Self.count(of: direction))
-    }
-
-    func canMove(_ direction: PageSwipeDirection) -> Bool {
-        model.canMove(by: Self.count(of: direction))
-    }
-
-    func move(by count: Int) {
-        guard model.canMove(by: count) else {
-            return
-        }
-
-        PageSlide.run($slide, forward: count > 0) {
-            model.move(by: count)
-        }
-    }
-
-    func moveToCurrentPeriod() {
-        PageSlide.run($slide, forward: true) {
-            model.moveToCurrent()
-        }
     }
 }

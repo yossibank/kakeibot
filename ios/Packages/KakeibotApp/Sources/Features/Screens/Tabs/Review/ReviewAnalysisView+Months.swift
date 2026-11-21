@@ -6,6 +6,7 @@ extension ReviewAnalysisView {
     struct MonthTrial {
         let action: ReviewBreakdown.Action
         let peak: ReviewModel.MonthAmount
+        let average: Int
     }
 
     var monthTrial: MonthTrial? {
@@ -18,15 +19,21 @@ extension ReviewAnalysisView {
             return nil
         }
 
-        let average = used.map(\.amount).reduce(0, +) / used.count / 100 * 100
-        let saved = (peak.amount - average) / 100 * 100
+        let average = used.map(\.amount).reduce(0, +) / used.count
+        let saved = peak.amount - average
 
         guard saved >= 100 else {
             return nil
         }
 
         let lead = "いちばん多い \(peak.month)月を、月の平均の \(ReviewInsight.yen(average)) ほどにすると"
-        return MonthTrial(action: ReviewBreakdown.Action(lead: lead, amount: saved), peak: peak)
+        let action = ReviewBreakdown.Action(lead: lead, amount: saved)
+
+        return MonthTrial(
+            action: action,
+            peak: peak,
+            average: average
+        )
     }
 
     func monthChart(_ name: String) -> some View {

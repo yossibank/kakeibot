@@ -92,6 +92,24 @@ struct ReviewInsightTests {
         #expect(labels == ["気を付けたい点", "良い点"])
         #expect(total.first?.labeledFact.hasPrefix("事実：") == true)
     }
+
+    @Test
+    func picksSameFactsInAnyCategoryOrder() {
+        let food = ReviewInsight.Category(name: "食費", amount: 15000, previous: 30000, budget: nil)
+        let train = ReviewInsight.Category(name: "交通", amount: 20000, previous: 40000, budget: nil)
+        let fun = ReviewInsight.Category(name: "交際費", amount: 5000, previous: 25000, budget: nil)
+
+        let forward = ReviewInsight.pick(from: Self.input(
+            elapsedDays: 10,
+            categories: [food, train, fun]
+        ))
+        let backward = ReviewInsight.pick(from: Self.input(
+            elapsedDays: 10,
+            categories: [fun, train, food]
+        ))
+
+        #expect(forward.map(\.fact) == backward.map(\.fact))
+    }
 }
 
 private extension ReviewInsightTests {
