@@ -61,4 +61,4 @@ App Store に送る前に、TestFlight のビルドを実機に入れて、キ�
 - [ ] ホームのテンプレートの棚、記録の検索、アイコンの文字
 
 > [!IMPORTANT]
-> シミュレーターで入力の画面を確かめる時は、画面のキーボードを出す。Simulator の「I/O → Keyboard → Connect Hardware Keyboard」を外す。
+> シミュレーターで入力の画面を確かめる時は、画面のキーボードを出す。DeviceHub の「Device → Keyboard」を開く。「Toggle Software Keyboard」を押す。
