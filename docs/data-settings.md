@@ -109,7 +109,7 @@ closed_hints に入る画面の名前は、次のとおり。
 
 ### review_goal
 
-締めのレポートで決めた一手（`ReviewGoal`）を、1 つずつ 1 行で持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/review-report.md](decisions/review-report.md#一手の保存) にある。
+振り返りを開いた時に決めた一手（`ReviewGoal`）を、1 つずつ 1 行で持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/review-report.md](decisions/review-report.md#一手の保存) にある。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |

@@ -32,10 +32,13 @@ extension ReviewModel {
         let nextGoal = goals.first { $0.period == next.commentKey }
         let nextItem = nextGoal.flatMap { goalItem($0, in: next) }
         let count = entries.count { period.range.contains($0.date) && $0.type != .transfer }
+        let hasMore = closingContent.rows.contains { $0.row.tone == .more }
 
         let nextCard: ReviewClosingView.Next = if let nextItem {
             .goal(nextItem, reason: reason(for: nextItem))
-        } else if next == currentPeriod, count >= ReviewComment.minimumEntries {
+        } else if next == currentPeriod,
+                  count >= ReviewComment.minimumEntries,
+                  !hasMore {
             .rest
         } else {
             .none
