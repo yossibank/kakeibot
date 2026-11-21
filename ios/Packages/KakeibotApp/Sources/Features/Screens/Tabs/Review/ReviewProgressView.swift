@@ -10,7 +10,7 @@ struct ReviewProgressView: View {
     let closingTitle: String
     let closingDate: LocalDate
     let nextGoalTitle: String
-    let previousTitle: String?
+    let previousTitle: String
     let onOpenPrevious: () -> Void
 
     var body: some View {
@@ -38,27 +38,12 @@ extension ReviewProgressView {
             goal.id
         }
     }
-
-    func label(_ title: String) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .textFont(.caption2, weight: .bold)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
-            Rectangle()
-                .fill(Self.labelLine)
-                .frame(height: 1)
-        }
-    }
 }
 
 private extension ReviewProgressView {
     var closingCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            label(closingTitle)
+            ReviewReportLabel(title: closingTitle)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(closingDate.yearMonth.month)/\(closingDate.day) に届きます")
@@ -77,27 +62,25 @@ private extension ReviewProgressView {
                 closingRow("arrow.right", nextGoalTitle)
             }
 
-            if let previousTitle {
-                Button(action: onOpenPrevious) {
-                    HStack {
-                        Text(previousTitle)
-                            .textFont(.footnote, weight: .bold)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+            Button(action: onOpenPrevious) {
+                HStack {
+                    Text(previousTitle)
+                        .textFont(.footnote, weight: .bold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
 
-                        Spacer(minLength: 8)
+                    Spacer(minLength: 8)
 
-                        Image(systemName: "chevron.right")
-                            .sansFont(.small, weight: .bold)
-                    }
-                    .foregroundStyle(Palette.accent)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .card(cornerRadius: 16)
-                    .contentShape(.rect)
+                    Image(systemName: "chevron.right")
+                        .sansFont(.small, weight: .bold)
                 }
-                .buttonStyle(.plain)
+                .foregroundStyle(Palette.accent)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .card(cornerRadius: 16)
+                .contentShape(.rect)
             }
+            .buttonStyle(.plain)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -111,11 +94,14 @@ private extension ReviewProgressView {
     }
 
     func paceCard(_ pace: ReviewPace) -> some View {
-        VStack(alignment: .leading, spacing: 16) {
-            label("いまのペース")
+        let limitName = pace.limitName(unit: unit)
+        let leadColor = pace.lead >= 0 ? Palette.accent : Palette.increase
+
+        return VStack(alignment: .leading, spacing: 16) {
+            ReviewReportLabel(title: "いまのペース")
 
             HStack(spacing: 16) {
-                gauge(pace)
+                ReviewReportGauge(pace: pace, limitName: limitName, showsMarker: true)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text(Self.verdictText(pace))
@@ -131,7 +117,7 @@ private extension ReviewProgressView {
 
                         Text(Self.leadText(pace))
                             .displayFont(.body, weight: .bold)
-                            .foregroundStyle(pace.lead >= 0 ? Palette.accent : Palette.increase)
+                            .foregroundStyle(leadColor)
                             .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
@@ -142,123 +128,37 @@ private extension ReviewProgressView {
 
             Grid(horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
-                    stat(
-                        "使った",
+                    ReviewReportStat(
+                        title: "使った",
                         value: ReviewInsight.yen(pace.spent),
-                        note: "\(limitName(pace)) \(ReviewInsight.yen(pace.limit))"
+                        note: "\(limitName) \(ReviewInsight.yen(pace.limit))"
                     )
 
-                    stat(
-                        "今日までの目安",
-                        value: "\(Self.percent(pace.elapsedRatio))%",
+                    ReviewReportStat(
+                        title: "今日までの目安",
+                        value: "\(ReviewPace.percent(pace.elapsedRatio))%",
                         note: "ゲージの針の位置"
                     )
                 }
 
                 GridRow {
-                    stat(
-                        "残りの 1 日に使える",
+                    ReviewReportStat(
+                        title: "残りの 1 日に使える",
                         value: ReviewInsight.yen(pace.perDay),
                         note: Self.perDayNote(pace)
                     )
 
-                    stat(
-                        "このままだと\(unit)末",
+                    ReviewReportStat(
+                        title: "このままだと\(unit)末",
                         value: Self.projectedText(pace),
                         note: "今のペースの見込み",
                         color: pace.projectedLeft >= 0 ? Palette.accent : Palette.increase
                     )
                 }
             }
-            .background(Palette.accent.opacity(.soft))
-            .clipShape(.rect(cornerRadius: 16))
+            .reviewStatGrid()
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: 28)
-                .fill(Palette.card)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 28)
-                        .fill(Self.glow)
-                }
-                .overlay {
-                    RoundedRectangle(cornerRadius: 28)
-                        .strokeBorder(Palette.accent.opacity(.muted))
-                }
-                .shadow(color: Palette.accent.opacity(.subtle), radius: 16, y: 12)
-        }
-    }
-
-    func gauge(_ pace: ReviewPace) -> some View {
-        let used = min(pace.usedRatio, 1)
-        let color = pace.verdict == .over ? Palette.increase : Palette.accent
-
-        return ZStack {
-            Circle()
-                .stroke(Palette.accent.opacity(.subtle), lineWidth: 10)
-
-            Circle()
-                .trim(from: 0, to: used)
-                .stroke(color, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-
-            Capsule()
-                .fill(Palette.text)
-                .frame(width: 3, height: 20)
-                .offset(y: -60)
-                .rotationEffect(.degrees(360 * pace.elapsedRatio))
-
-            VStack(spacing: 0) {
-                Text("\(limitName(pace))の")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-
-                Text("\(Self.percent(pace.usedRatio))%")
-                    .displayFont(.title, weight: .bold)
-                    .foregroundStyle(Palette.text)
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-
-                Text("使いました")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-            }
-            .padding(.horizontal, 16)
-        }
-        .frame(width: 120, height: 120)
-    }
-
-    func stat(
-        _ title: String,
-        value: String,
-        note: String,
-        color: Color = Palette.text
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
-            Text(value)
-                .displayFont(.headline, weight: .bold)
-                .foregroundStyle(color)
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-
-            Text(note)
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(Palette.cardBottom)
+        .reviewHero()
     }
 
     func closingRow(
@@ -290,27 +190,6 @@ private extension ReviewProgressView {
 }
 
 private extension ReviewProgressView {
-    static var glow: RadialGradient {
-        RadialGradient(
-            colors: [Palette.accent.opacity(.subtle), .clear],
-            center: .topTrailing,
-            startRadius: 0,
-            endRadius: 240
-        )
-    }
-
-    static var labelLine: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accent.opacity(.muted), .clear],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-    }
-
-    static func percent(_ ratio: Double) -> Int {
-        Int((ratio * 100).rounded())
-    }
-
     static func verdictText(_ pace: ReviewPace) -> String {
         switch (pace.basis, pace.verdict) {
         case (.budget, .onTrack): "おおむね順調"
@@ -338,16 +217,5 @@ private extension ReviewProgressView {
     static func projectedText(_ pace: ReviewPace) -> String {
         let amount = ReviewInsight.yen(abs(pace.projectedLeft))
         return pace.projectedLeft >= 0 ? "\(amount) 余る" : "\(amount) 足りない"
-    }
-
-    static func periodsUnit(_ unit: String) -> String {
-        unit == "月" ? "か月" : unit
-    }
-
-    func limitName(_ pace: ReviewPace) -> String {
-        switch pace.basis {
-        case .budget: "予算"
-        case let .average(periods): "\(periods) \(Self.periodsUnit(unit))の平均"
-        }
     }
 }

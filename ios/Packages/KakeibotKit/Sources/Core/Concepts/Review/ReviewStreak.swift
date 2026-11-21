@@ -1,0 +1,42 @@
+public struct ReviewStreak: Hashable, Sendable {
+    public let days: Set<LocalDate>
+    public let longest: Int
+    public let count: Int
+
+    public init(
+        entries: [Entry],
+        in range: ClosedRange<LocalDate>
+    ) {
+        let recorded = entries.filter { range.contains($0.date) && $0.recurringId == nil }
+        let days = Set(recorded.map(\.date))
+
+        var longest = 0
+        var run = 0
+        var day = range.lowerBound
+
+        while day <= range.upperBound {
+            run = days.contains(day) ? run + 1 : 0
+            longest = max(longest, run)
+            day = day.adding(days: 1)
+        }
+
+        self.days = days
+        self.longest = longest
+        self.count = recorded.count
+    }
+}
+
+public extension ReviewStreak {
+    static func continuing(
+        entries: [Entry],
+        periods: [ClosedRange<LocalDate>]
+    ) -> Int {
+        let recorded = entries.filter { $0.recurringId == nil }
+
+        let index = periods.firstIndex { range in
+            !recorded.contains { range.contains($0.date) }
+        }
+
+        return index ?? periods.count
+    }
+}

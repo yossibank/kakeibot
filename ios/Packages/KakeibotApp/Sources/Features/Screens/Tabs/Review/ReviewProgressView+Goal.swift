@@ -7,7 +7,7 @@ extension ReviewProgressView {
         let isOnTrack = item.goal.isOnTrack(item.progress)
 
         return VStack(alignment: .leading, spacing: 12) {
-            label("\(currentName)の一手")
+            ReviewReportLabel(title: "\(currentName)の一手")
 
             Text(Self.goalTitle(item, unit: unit))
                 .displayFont(.headline, weight: .bold)
@@ -50,9 +50,11 @@ private extension ReviewProgressView {
     }
 
     func goalStatus(_ isOnTrack: Bool) -> some View {
-        Text(isOnTrack ? "このままなら達成" : "このままだと届きません")
+        let color = isOnTrack ? Palette.accent : Palette.increase
+
+        return Text(isOnTrack ? "このままなら達成" : "このままだと届きません")
             .textFont(.caption, weight: .bold)
-            .foregroundStyle(isOnTrack ? Palette.accent : Palette.increase)
+            .foregroundStyle(color)
             .fixedSize()
     }
 
@@ -62,8 +64,10 @@ private extension ReviewProgressView {
     ) -> some View {
         HStack(spacing: 4) {
             ForEach(0..<max(target, 1), id: \.self) { index in
+                let fill = index < count ? Palette.accent : Palette.accent.opacity(.subtle)
+
                 Capsule()
-                    .fill(index < count ? Palette.accent : Palette.accent.opacity(.subtle))
+                    .fill(fill)
                     .frame(height: 8)
             }
         }
