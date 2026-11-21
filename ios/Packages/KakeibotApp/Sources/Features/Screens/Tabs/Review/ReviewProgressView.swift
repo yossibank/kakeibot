@@ -38,6 +38,21 @@ extension ReviewProgressView {
             goal.id
         }
     }
+
+    func label(_ title: String) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .textFont(.caption2, weight: .bold)
+                .tracking(2)
+                .foregroundStyle(Palette.accent)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            Rectangle()
+                .fill(Self.labelLine)
+                .frame(height: 1)
+        }
+    }
 }
 
 private extension ReviewProgressView {
@@ -244,70 +259,6 @@ private extension ReviewProgressView {
         .background(Palette.cardBottom)
     }
 
-    func goalCard(_ item: GoalItem) -> some View {
-        let isOnTrack = item.goal.isOnTrack(item.progress)
-
-        return VStack(alignment: .leading, spacing: 12) {
-            label("\(currentName)の一手")
-
-            Text(Self.goalTitle(item, unit: unit))
-                .displayFont(.headline, weight: .bold)
-                .foregroundStyle(Palette.text)
-                .fixedSize(horizontal: false, vertical: true)
-
-            if item.goal.kind == .count {
-                pips(count: item.progress.count, target: item.goal.target)
-            }
-
-            ViewThatFits(in: .horizontal) {
-                HStack {
-                    goalNote(item)
-
-                    Spacer(minLength: 8)
-
-                    goalStatus(isOnTrack)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    goalNote(item)
-
-                    goalStatus(isOnTrack)
-                }
-            }
-        }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .card(cornerRadius: 24)
-    }
-
-    func goalNote(_ item: GoalItem) -> some View {
-        Text(Self.goalNote(item))
-            .textFont(.caption)
-            .foregroundStyle(Palette.subtext)
-            .monospacedDigit()
-            .fixedSize()
-    }
-
-    func goalStatus(_ isOnTrack: Bool) -> some View {
-        Text(isOnTrack ? "このままなら達成" : "このままだと届きません")
-            .textFont(.caption, weight: .bold)
-            .foregroundStyle(isOnTrack ? Palette.accent : Palette.increase)
-            .fixedSize()
-    }
-
-    func pips(
-        count: Int,
-        target: Int
-    ) -> some View {
-        HStack(spacing: 4) {
-            ForEach(0..<max(target, 1), id: \.self) { index in
-                Capsule()
-                    .fill(index < count ? Palette.accent : Palette.accent.opacity(.subtle))
-                    .frame(height: 8)
-            }
-        }
-    }
-
     func closingRow(
         _ systemImage: String,
         _ title: String
@@ -331,21 +282,6 @@ private extension ReviewProgressView {
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(Palette.line)
-                .frame(height: 1)
-        }
-    }
-
-    func label(_ title: String) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-                .textFont(.caption2, weight: .bold)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-
-            Rectangle()
-                .fill(Self.labelLine)
                 .frame(height: 1)
         }
     }
@@ -400,31 +336,6 @@ private extension ReviewProgressView {
     static func projectedText(_ pace: ReviewPace) -> String {
         let amount = ReviewInsight.yen(abs(pace.projectedLeft))
         return pace.projectedLeft >= 0 ? "\(amount) 余る" : "\(amount) 足りない"
-    }
-
-    static func goalTitle(
-        _ item: GoalItem,
-        unit: String
-    ) -> String {
-        switch item.goal.kind {
-        case .count: "\(item.name)を、\(unit) \(item.goal.target) 回までに"
-        case .average: "\(item.name)の 1 回を、\(ReviewInsight.yen(item.goal.target)) までに"
-        }
-    }
-
-    static func goalNote(_ item: GoalItem) -> String {
-        let goal = item.goal
-        let progress = item.progress
-
-        switch goal.kind {
-        case .count:
-            let left = max(goal.target - progress.count, 0)
-            return "今 \(progress.count) 回　あと \(left) 回まで"
-
-        case .average:
-            let average = ReviewInsight.yen(goal.current(of: progress))
-            return "今の 1 回の平均 \(average)（\(progress.count) 回）"
-        }
     }
 
     static func periodsUnit(_ unit: String) -> String {
