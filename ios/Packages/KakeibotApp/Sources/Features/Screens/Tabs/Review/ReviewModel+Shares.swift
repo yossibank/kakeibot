@@ -127,6 +127,17 @@ public extension ReviewModel {
     }
 }
 
+extension ReviewModel {
+    func carryover(into month: YearMonth) -> Int {
+        list?.budgetCarryover(
+            budgets: budgets,
+            from: carryoverFrom,
+            into: month,
+            startingOn: monthStartDay
+        ) ?? 0
+    }
+}
+
 private extension ReviewModel {
     struct Ranked {
         let share: Share
@@ -186,14 +197,5 @@ private extension ReviewModel {
             today: today,
             periodEnd: period.range.upperBound
         )
-    }
-
-    func carryover(into month: YearMonth) -> Int {
-        list?.budgetCarryover(
-            budgets: budgets,
-            from: carryoverFrom,
-            into: month,
-            startingOn: monthStartDay
-        ) ?? 0
     }
 }

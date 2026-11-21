@@ -27,6 +27,7 @@ public extension ReviewModel {
         guard
             Self.canWriteComment,
             list != nil,
+            !isCurrentPeriod,
             commentEntryCount >= ReviewComment.minimumEntries
         else {
             markAnalysis(key, isNew: false)
@@ -175,6 +176,10 @@ public extension ReviewModel {
 extension ReviewModel {
     static var initialComment: CommentState {
         canWriteComment ? .loading : .hidden
+    }
+
+    var canShowAnalysis: Bool {
+        Self.canWriteComment
     }
 
     var isWrittenNow: Bool {

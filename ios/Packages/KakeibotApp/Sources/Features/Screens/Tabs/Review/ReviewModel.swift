@@ -44,6 +44,7 @@ public final class ReviewModel: ScreenModel {
 
     public internal(set) var comment: CommentState = ReviewModel.initialComment
     public internal(set) var newAnalysisKey: String?
+    public internal(set) var goals: [ReviewGoal] = []
 
     var writtenComments: Set<ReviewComment> = []
 

@@ -67,6 +67,7 @@
 | 分析 | 振り返りのひとこと | `ReviewComment`・`ReviewAnalysisView` | 振り返りの期間の下の金の帯から開く分析レポートに出す、AI が書いた気づきと、コードで選んだ提案 |
 |  | ひとことの事実 | `ReviewInsight` | コードで見つけてモデルに渡す、予算のペースや増えたカテゴリなどの事実 |
 | 内訳 | ひとことの内訳 | `ReviewBreakdown` | 1 つのカテゴリの回数と 1 回の金額を前の期間と比べ、同じメモの記録を束ねたもの |
+| 途中経過 | いまのペース | `ReviewPace`・`ReviewProgressView` | 今の期間に使った額を、予算か直近の平均と比べた進み具合 |
 | 一手 | 振り返りの一手 | `ReviewGoal` | 締めのレポートで決め、次の期間に守る目標。締めた時に答え合わせをする |
 | | レビューのお願い | `AppReviewRequest` | App Store の評価を頼む OS のダイアログを出すこと。振り返りの `ReviewModel` とは別のもの |
 | | レビューの札 | `ReviewView.storeReviewCard` | 振り返りの一番下に出す、App Store のレビューを書く画面を開く札 |
