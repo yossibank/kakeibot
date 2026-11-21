@@ -47,11 +47,11 @@ extension RecordsView {
             adjustmentList(on: date)
 
             let upcoming = model.upcomingRecurrings(on: date)
+            let isEmptyDay = day == nil && model.list != nil
 
             if !upcoming.isEmpty {
                 upcomingList(upcoming, on: date)
-            } else if day == nil,
-                      model.list != nil {
+            } else if isEmptyDay {
                 Text("この日の記録はありません")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
