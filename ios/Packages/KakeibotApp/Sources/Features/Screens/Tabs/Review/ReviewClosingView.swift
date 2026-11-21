@@ -4,13 +4,19 @@ import SwiftUI
 
 struct ReviewClosingView: View {
     let content: Content
+    let goals: Goals
     let name: String
     let previousName: String
     let unit: String
+    let onOpenCategory: (String) -> Void
 
     var body: some View {
         VStack(spacing: 12) {
             resultCard
+
+            if let answer = goals.answer {
+                answerCard(answer)
+            }
 
             if content.scale != .week {
                 streakCard
@@ -23,6 +29,8 @@ struct ReviewClosingView: View {
                     goodCard
                 }
             }
+
+            nextCard
         }
     }
 }

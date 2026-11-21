@@ -41,13 +41,14 @@ struct SnapshotTests {
             createdAt: Date()
         )
 
-        let item = ReviewProgressView.GoalItem(
+        let item = ReviewGoalItem(
             goal: goal,
             name: "外食",
+            categoryName: "食費",
             progress: ReviewGoal.Progress(count: 6, amount: 9000, projectedCount: 8)
         )
 
-        let cases: [(String, ReviewPace?, [ReviewProgressView.GoalItem])] = [
+        let cases: [(String, ReviewPace?, [ReviewGoalItem])] = [
             ("budget", budget, [item]),
             ("average", over, []),
             ("first", nil, [])

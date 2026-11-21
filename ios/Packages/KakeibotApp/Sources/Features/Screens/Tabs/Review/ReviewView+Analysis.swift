@@ -19,6 +19,10 @@ extension ReviewView {
 
     var analysisBanner: some View {
         Button {
+            if model.hasNewReport {
+                move(by: -1)
+            }
+
             showsAnalysis = true
         } label: {
             HStack(spacing: 12) {
@@ -36,7 +40,7 @@ extension ReviewView {
                     .shadow(color: Palette.accent.opacity(.muted), radius: 8, y: 4)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(model.isCurrentPeriod ? "途中経過" : "締めのレポート")
+                    Text(bannerLabel)
                         .textFont(.caption2, weight: .bold)
                         .tracking(2)
                         .foregroundStyle(Palette.accent)
@@ -51,7 +55,7 @@ extension ReviewView {
 
                 Spacer(minLength: 8)
 
-                if model.hasNewAnalysis {
+                if showsNewMark {
                     Text("NEW")
                         .sansFont(.micro, weight: .bold)
                         .tracking(1)
@@ -76,7 +80,7 @@ extension ReviewView {
                     .strokeBorder(Palette.accent.opacity(.medium))
             }
             .shadow(color: Palette.accent.opacity(.subtle), radius: 12, y: 6)
-            .animation(.smooth, value: model.hasNewAnalysis)
+            .animation(.smooth, value: showsNewMark)
             .contentShape(.rect)
         }
         .buttonStyle(ReviewAnalysisView.PressButtonStyle())
@@ -170,12 +174,19 @@ private extension ReviewView {
             VStack(spacing: 12) {
                 ReviewClosingView(
                     content: model.closingContent,
+                    goals: model.closingGoals(),
                     name: analysisName,
-                    previousName: Self.name(of: model.period.previous),
-                    unit: model.scale.unitName
+                    previousName: model.period.previous.displayName,
+                    unit: model.scale.unitName,
+                    onOpenCategory: { name in
+                        analysisShare = model.categoryShare(named: name)
+                    }
                 )
 
                 analysisView
+            }
+            .task(id: model.period) {
+                await model.markReportSeen()
             }
         }
     }
@@ -183,7 +194,7 @@ private extension ReviewView {
     var progressView: some View {
         let period = model.period
         let closingDate = period.range.upperBound.adding(days: 1)
-        let previousTitle = "\(Self.name(of: period.previous))のふりかえりを見る"
+        let previousTitle = "\(period.previous.displayName)のふりかえりを見る"
 
         return ReviewProgressView(
             pace: model.pace,
@@ -192,7 +203,7 @@ private extension ReviewView {
             goals: model.goalItems,
             closingTitle: "\(analysisName)のふりかえり",
             closingDate: closingDate,
-            nextGoalTitle: "\(Self.name(of: period.adding(1)))の一手",
+            nextGoalTitle: "\(period.adding(1).displayName)の一手",
             previousTitle: previousTitle,
             onOpenPrevious: {
                 move(by: -1)
@@ -256,8 +267,24 @@ private extension ReviewView {
         )
     }
 
+    var showsNewMark: Bool {
+        model.hasNewAnalysis || model.hasNewReport
+    }
+
+    var bannerLabel: String {
+        model.isCurrentPeriod && !model.hasNewReport
+            ? "途中経過"
+            : "締めのレポート"
+    }
+
     var bannerTitle: String {
-        model.isCurrentPeriod ? "\(analysisName)の途中経過を見る" : "\(analysisName)のレポートを見る"
+        if model.hasNewReport {
+            return "\(model.period.previous.displayName)のレポートが届きました"
+        }
+
+        return model.isCurrentPeriod
+            ? "\(analysisName)の途中経過を見る"
+            : "\(analysisName)のレポートを見る"
     }
 
     var analysisName: String {
@@ -287,17 +314,6 @@ private extension ReviewView {
         case .week: isCurrent ? "今週" : "この週"
         case .month: isCurrent ? "今月" : "この月"
         case .year: isCurrent ? "今年" : "この年"
-        }
-    }
-
-    static func name(of period: ReviewPeriod) -> String {
-        let start = period.range.lowerBound
-        let month = period.range.upperBound.yearMonth
-
-        return switch period.scale {
-        case .week: "\(start.yearMonth.month)/\(start.day) の週"
-        case .month: "\(month.month)月"
-        case .year: "\(String(month.year))年"
         }
     }
 

@@ -35,42 +35,52 @@ extension ReviewModel {
         )
     }
 
-    var goalItems: [ReviewProgressView.GoalItem] {
+    var goalItems: [ReviewGoalItem] {
         let key = period.commentKey
 
         return goals.filter { $0.period == key }.compactMap { goal in
-            let category = goal.categoryId.flatMap { list?.categories[$0]?.name }
-
-            guard let name = goal.memo ?? category else {
-                return nil
-            }
-
-            let progress = goal.progress(
-                of: entries,
-                in: period.range,
-                today: today
-            )
-
-            return ReviewProgressView.GoalItem(
-                goal: goal,
-                name: name,
-                progress: progress
-            )
+            goalItem(goal, in: period)
         }
+    }
+
+    func goalItem(
+        _ goal: ReviewGoal,
+        in period: ReviewPeriod
+    ) -> ReviewGoalItem? {
+        guard let category = goal.categoryId.flatMap({ list?.categories[$0]?.name }) else {
+            return nil
+        }
+
+        let progress = goal.progress(
+            of: entries,
+            in: period.range,
+            today: today
+        )
+
+        return ReviewGoalItem(
+            goal: goal,
+            name: goal.memo ?? category,
+            categoryName: category,
+            progress: progress
+        )
     }
 
     func loadGoals() async {
         let key = period.commentKey
+        let nextKey = period.adding(1).commentKey
 
-        guard let loaded = try? await database.reviewGoals(for: key) else {
+        do {
+            let loaded = try await database.reviewGoals(for: key)
+            let next = try await database.reviewGoals(for: nextKey)
+
+            guard key == period.commentKey else {
+                return
+            }
+
+            goals = loaded + next
+        } catch {
             return
         }
-
-        guard key == period.commentKey else {
-            return
-        }
-
-        goals = loaded
     }
 }
 

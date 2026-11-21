@@ -67,6 +67,9 @@ public struct ReviewView: View {
         .task(id: commentTrigger) {
             await model.refreshAnalysisMark()
         }
+        .task(id: model.goalTrigger) {
+            await model.refreshGoals()
+        }
         .task(id: model.list?.entries.count) {
             await model.refreshStoreReviewCard()
         }

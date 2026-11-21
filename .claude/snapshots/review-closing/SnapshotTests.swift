@@ -75,6 +75,47 @@ struct SnapshotTests {
             amount: 32000
         )
 
+        let answer = ReviewGoalItem(
+            goal: ReviewGoal(
+                period: "month:2026-10-01",
+                kind: .count,
+                categoryId: EntryCategory.ID(),
+                memo: "外食",
+                baseline: 9,
+                target: 7,
+                saving: 3000,
+                result: 6,
+                saved: 4500,
+                createdAt: Date(),
+                checkedAt: Date()
+            ),
+            name: "外食",
+            categoryName: "食費",
+            progress: ReviewGoal.Progress(count: 6, amount: 9000, projectedCount: 6)
+        )
+
+        let next = ReviewGoalItem(
+            goal: ReviewGoal(
+                period: "month:2026-11-01",
+                kind: .average,
+                categoryId: EntryCategory.ID(),
+                baseline: 2400,
+                target: 1800,
+                saving: 4800,
+                createdAt: Date()
+            ),
+            name: "日用品",
+            categoryName: "日用品",
+            progress: ReviewGoal.Progress(count: 0, amount: 0, projectedCount: 0)
+        )
+
+        let reason = "10月は日用品がいつもより 3,200円 多めでした。"
+
+        let goalCases: [String: (ReviewGoalItem?, ReviewClosingView.Next)] = [
+            "budget": (answer, .goal(next, reason: reason)),
+            "average": (nil, .rest)
+        ]
+
         let cases: [(String, ReviewPeriod.Scale, ReviewPace?, Bool)] = [
             ("budget", .month, budget, true),
             ("average", .month, over, false),
@@ -99,11 +140,23 @@ struct SnapshotTests {
                     budgetStreak: isFull ? 3 : 0
                 )
 
+                let goalCase = goalCases[name]
+
+                let goals = ReviewClosingView.Goals(
+                    answer: goalCase?.0,
+                    next: goalCase?.1 ?? .none,
+                    nextName: "11月",
+                    nextStart: range.upperBound.adding(days: 1),
+                    checkDate: range.upperBound.adding(days: 31)
+                )
+
                 let view = ReviewClosingView(
                     content: content,
+                    goals: goals,
                     name: "10月",
                     previousName: "9月",
-                    unit: "月"
+                    unit: "月",
+                    onOpenCategory: { _ in }
                 )
                 .padding(16)
 

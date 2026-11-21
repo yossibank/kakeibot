@@ -3,13 +3,13 @@ import DesignSystem
 import SwiftUI
 
 extension ReviewProgressView {
-    func goalCard(_ item: GoalItem) -> some View {
+    func goalCard(_ item: ReviewGoalItem) -> some View {
         let isOnTrack = item.goal.isOnTrack(item.progress)
 
         return VStack(alignment: .leading, spacing: 12) {
             ReviewReportLabel(title: "\(currentName)の一手")
 
-            Text(Self.goalTitle(item, unit: unit))
+            Text(item.title(unit: unit))
                 .displayFont(.headline, weight: .bold)
                 .foregroundStyle(Palette.text)
                 .fixedSize(horizontal: false, vertical: true)
@@ -41,7 +41,7 @@ extension ReviewProgressView {
 }
 
 private extension ReviewProgressView {
-    func goalNote(_ item: GoalItem) -> some View {
+    func goalNote(_ item: ReviewGoalItem) -> some View {
         Text(Self.goalNote(item))
             .textFont(.caption)
             .foregroundStyle(Palette.subtext)
@@ -75,17 +75,7 @@ private extension ReviewProgressView {
 }
 
 private extension ReviewProgressView {
-    static func goalTitle(
-        _ item: GoalItem,
-        unit: String
-    ) -> String {
-        switch item.goal.kind {
-        case .count: "\(item.name)を、\(unit) \(item.goal.target) 回までに"
-        case .average: "\(item.name)の 1 回を、\(ReviewInsight.yen(item.goal.target)) までに"
-        }
-    }
-
-    static func goalNote(_ item: GoalItem) -> String {
+    static func goalNote(_ item: ReviewGoalItem) -> String {
         let goal = item.goal
         let progress = item.progress
 
