@@ -169,6 +169,7 @@ public struct EntrySheet: View {
                 }
             }
         }
+        .ignoresSafeArea(.keyboard)
     }
 }
 
