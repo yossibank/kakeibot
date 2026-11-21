@@ -57,6 +57,7 @@ public struct CategoryEditSheet: View {
                     }
             }
         }
+        .ignoresSafeArea(.keyboard)
         .iconEditorDrawer(
             isPresented: $isEditingIcon,
             model: model.icon,
