@@ -111,6 +111,7 @@ extension AppDatabase {
         migrator.registerMigration("v40", migrate: MigrationV040.migrate)
         migrator.registerMigration("v41", migrate: MigrationV041.migrate)
         migrator.registerMigration("v42", migrate: MigrationV042.migrate)
+        migrator.registerMigration("v43", migrate: MigrationV043.migrate)
 
         return migrator
     }

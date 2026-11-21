@@ -90,7 +90,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 表ごとに、列と型と補足を書く。型は SQLite の型で書く。
 
-`theme`・`setting`・`review_comment` は [data-settings](data-settings.md) にある。同期のための表は [data-sync](data-sync.md) にある。
+設定と振り返りの表は [data-settings](data-settings.md) にある。同期のための表は [data-sync](data-sync.md) にある。
 
 ### icon
 

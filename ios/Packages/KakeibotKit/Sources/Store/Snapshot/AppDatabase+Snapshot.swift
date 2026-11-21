@@ -62,6 +62,7 @@ private extension AppDatabase {
     ) throws {
         try ExportV1.Tables.deleteAll(in: db)
         _ = try ReviewComment.deleteAll(db)
+        _ = try ReviewGoal.deleteAll(db)
         try tables.insert(into: db)
     }
 

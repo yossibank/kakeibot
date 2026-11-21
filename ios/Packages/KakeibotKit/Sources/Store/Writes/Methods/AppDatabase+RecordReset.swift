@@ -31,6 +31,7 @@ public extension AppDatabase {
             _ = try CalendarStamp.deleteAll(db)
             _ = try NoSpendDay.deleteAll(db)
             _ = try ReviewComment.deleteAll(db)
+            _ = try ReviewGoal.deleteAll(db)
             try Self.recalculateCardBills(change, in: db, at: now)
         }
     }
