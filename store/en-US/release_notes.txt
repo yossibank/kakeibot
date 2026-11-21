@@ -1,2 +1,3 @@
-・Review now has "Analysis". Switch between "Chart / Analysis" to see why your spending went up, how each category changed, an AI summary, records with the same memo, and what-if estimates side by side.
-・Analysis is available on iOS 26 or later with Apple Intelligence turned on.
+・Fixed an issue where the entry screen could freeze when opening the keyboard for a memo or an item name.
+・Fixed an issue where the app froze when adding a tag to a category.
+・Fixed an issue where the bottom button moved up when opening the memo keyboard.
