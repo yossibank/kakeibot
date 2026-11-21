@@ -36,12 +36,12 @@ extension ReviewView {
                     .shadow(color: Palette.accent.opacity(.muted), radius: 8, y: 4)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("AI 分析レポート")
+                    Text(model.isCurrentPeriod ? "途中経過" : "AI 分析レポート")
                         .textFont(.caption2, weight: .bold)
                         .tracking(2)
                         .foregroundStyle(Palette.accent)
 
-                    Text("\(analysisName)の分析を見る")
+                    Text(bannerTitle)
                         .textFont(.subheadline, weight: .bold)
                         .foregroundStyle(Palette.text)
                         .lineLimit(1)
@@ -116,7 +116,7 @@ extension ReviewView {
             .padding(.horizontal, 16)
 
             ScrollView {
-                analysisView
+                sheetContent
                     .padding(.horizontal, 16)
                     .padding(.bottom, 24)
                     .pageSlide(slide, page: model.period)
@@ -130,7 +130,14 @@ extension ReviewView {
         .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task(id: commentTrigger) {
+            guard !model.isCurrentPeriod else {
+                return
+            }
+
             await model.refreshComment()
+        }
+        .task(id: model.period.commentKey) {
+            await model.loadGoals()
         }
         .sheet(item: $analysisShare) { share in
             shareSheet(share)
@@ -155,6 +162,34 @@ extension ReviewView {
 }
 
 private extension ReviewView {
+    @ViewBuilder
+    var sheetContent: some View {
+        if model.isCurrentPeriod {
+            progressView
+        } else {
+            analysisView
+        }
+    }
+
+    var progressView: some View {
+        let period = model.period
+        let closingDate = period.range.upperBound.adding(days: 1)
+
+        return ReviewProgressView(
+            pace: model.pace,
+            unit: model.scale.unitName,
+            currentName: currentName,
+            goals: model.goalItems,
+            closingTitle: "\(analysisName)のふりかえり",
+            closingDate: closingDate,
+            nextGoalTitle: "\(Self.name(of: period.adding(1)))の一手",
+            previousTitle: "\(Self.name(of: period.previous))のふりかえりを見る",
+            onOpenPrevious: {
+                move(by: -1)
+            }
+        )
+    }
+
     var analysisView: some View {
         ReviewAnalysisView(
             state: model.comment,
@@ -211,6 +246,10 @@ private extension ReviewView {
         )
     }
 
+    var bannerTitle: String {
+        model.isCurrentPeriod ? "\(analysisName)の途中経過を見る" : "\(analysisName)の分析を見る"
+    }
+
     var analysisName: String {
         let month = model.period.range.upperBound.yearMonth
 
@@ -238,6 +277,17 @@ private extension ReviewView {
         case .week: isCurrent ? "今週" : "この週"
         case .month: isCurrent ? "今月" : "この月"
         case .year: isCurrent ? "今年" : "この年"
+        }
+    }
+
+    static func name(of period: ReviewPeriod) -> String {
+        let start = period.range.lowerBound
+        let month = period.range.upperBound.yearMonth
+
+        return switch period.scale {
+        case .week: "\(start.yearMonth.month)/\(start.day) の週"
+        case .month: "\(month.month)月"
+        case .year: "\(String(month.year))年"
         }
     }
 
