@@ -33,6 +33,7 @@ extension ReviewClosingView {
         let range: ClosedRange<LocalDate>
         let weekStart: Weekday
         let pace: ReviewPace?
+        let spent: Int
         let previousTotal: Int?
         let rows: [CompareRow]
         let averagePeriods: Int
@@ -62,7 +63,7 @@ extension ReviewClosingView {
     }
 
     var spent: Int {
-        content.pace?.spent ?? 0
+        content.spent
     }
 
     var totalDays: Int {

@@ -89,6 +89,7 @@ struct SnapshotTests {
                     range: range,
                     weekStart: .sunday,
                     pace: pace,
+                    spent: pace?.spent ?? 52000,
                     previousTotal: isFull ? 146_400 : nil,
                     rows: isFull ? rows : [],
                     averagePeriods: 3,
