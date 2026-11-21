@@ -115,6 +115,11 @@ public extension ReviewModel {
             return
         }
 
+        guard !Task.isCancelled else {
+            comment = saved.map(CommentState.ready) ?? .loading
+            return
+        }
+
         guard let body else {
             commentFailedAt[key] = now
             comment = saved.map(CommentState.ready) ?? .failed

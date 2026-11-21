@@ -12,6 +12,10 @@ struct WhatsNewAnalysisScene: View {
         case .analysisSummary:
             summary
 
+        case .analysisBanner:
+            banner
+                .whatsNewTapped()
+
         default:
             displaySwitch
                 .whatsNewTapped()
@@ -40,6 +44,41 @@ private extension WhatsNewAnalysisScene {
         .padding(4)
         .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
         .padding(4)
+        .background(Palette.card, in: .rect(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Palette.accent.opacity(.medium))
+        }
+        .padding(.horizontal, 4)
+    }
+
+    var banner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "chart.bar.xaxis")
+                .sansFont(.small, weight: .bold)
+                .foregroundStyle(Palette.backgroundBottom)
+                .frame(width: 28, height: 28)
+                .background(Palette.gold, in: .rect(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("AI 分析レポート")
+                    .textFont(size: .micro, weight: .bold)
+                    .foregroundStyle(Palette.accent)
+
+                Text("11月の分析を見る")
+                    .textFont(size: .caption, weight: .bold)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+
+            Spacer(minLength: 4)
+
+            Image(systemName: "chevron.right")
+                .textFont(size: .micro, weight: .bold)
+                .foregroundStyle(Palette.accent)
+        }
+        .padding(8)
         .background(Palette.card, in: .rect(cornerRadius: 16))
         .overlay {
             RoundedRectangle(cornerRadius: 16)
