@@ -16,6 +16,7 @@ extension QuickRecordWidgetSummary {
         let id: EntryTemplate.ID
         let name: String
         let detail: String
+        let shortDetail: String
         let amount: Int?
         let icon: Icon?
     }
@@ -52,13 +53,14 @@ extension QuickRecordWidgetSummary {
         let today = list?.days.first { $0.date == overview.today }
 
         let tiles = ordered.prefix(Self.limit).map { template in
-            let detail = list?.detailParts(for: template).rowDetail ?? ""
+            let parts = list?.detailParts(for: template) ?? []
             let icon = list?.icon(for: template)
 
             return Tile(
                 id: template.id,
                 name: template.name,
-                detail: detail,
+                detail: parts.rowDetail ?? "",
+                shortDetail: Array(parts.prefix(2)).rowDetail ?? "",
                 amount: template.amount,
                 icon: icon
             )
@@ -131,6 +133,7 @@ extension QuickRecordWidgetSummary {
                 id: EntryTemplate.ID(),
                 name: name,
                 detail: detail,
+                shortDetail: String(detail.prefix { $0 != "・" }),
                 amount: amount,
                 icon: sampleIcon(glyph, color: color)
             )

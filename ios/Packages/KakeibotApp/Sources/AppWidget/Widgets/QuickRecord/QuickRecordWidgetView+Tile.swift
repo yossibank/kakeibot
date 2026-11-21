@@ -41,11 +41,10 @@ private extension QuickRecordWidgetView {
                     .minimumScaleFactor(0.8)
 
                 if isLarge {
-                    Text(tile.detail)
-                        .textFont(size: .micro)
-                        .foregroundStyle(Palette.subtext)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
+                    ViewThatFits(in: .horizontal) {
+                        detailText(tile.detail)
+                        detailText(tile.shortDetail)
+                    }
                 }
 
                 if let amount = tile.amount {
@@ -80,6 +79,14 @@ private extension QuickRecordWidgetView {
         .padding(.vertical, padding)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 4)
+    }
+
+    func detailText(_ detail: String) -> some View {
+        Text(detail)
+            .textFont(size: .micro)
+            .foregroundStyle(Palette.subtext)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
     }
 }
 
