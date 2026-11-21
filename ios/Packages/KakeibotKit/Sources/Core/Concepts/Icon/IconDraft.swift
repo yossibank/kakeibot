@@ -26,10 +26,11 @@ public extension IconDraft {
         case text(String)
 
         public init(_ icon: Icon) {
+            let emoji = icon.emoji ?? ""
+
             if let glyph = icon.glyph {
                 self = .glyph(glyph)
-            } else if let emoji = icon.emoji,
-                      !emoji.isEmpty {
+            } else if !emoji.isEmpty {
                 self = .emoji(emoji)
             } else {
                 self = .text(icon.text ?? "")
