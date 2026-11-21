@@ -49,3 +49,16 @@ DEBUG のビルドは、起動の引数 `-open` で設定の画面を直接開�
 ```sh
 xcrun simctl launch booted com.yossibank.kakeibot -open homeSections
 ```
+
+## 🧪 申請の前に実機で回る
+
+App Store に送る前に、TestFlight のビルドを実機に入れて、キーボードを出す画面を回る。各画面で入力欄を押し、固まらないこととキーボードの上に欄が見えることを確かめる。
+
+- [ ] 入力シートのメモと品目の名前
+- [ ] カテゴリの編集の名前とタグ
+- [ ] テンプレートの編集の名前とメモ
+- [ ] 口座・固定費・ポイントの規則・テーマ・目標の編集
+- [ ] ホームのテンプレートの棚、記録の検索、アイコンの文字
+
+> [!IMPORTANT]
+> シミュレーターで入力の画面を確かめる時は、画面のキーボードを出す。Simulator の「I/O → Keyboard → Connect Hardware Keyboard」を外す。
