@@ -92,7 +92,7 @@ private extension EntryReceiptModel {
 
     static let locale = Locale(identifier: "ja_JP")
 
-    static let options = GenerationOptions(sampling: .greedy)
+    static let options = GenerationOptions(samplingMode: .greedy)
 
     static let instructions = """
     日本のレシートを文字認識した行が「番号: 文字」の形で並ぶ。人がこのレシートを見て家計簿に書く内容を、行の番号で答える。

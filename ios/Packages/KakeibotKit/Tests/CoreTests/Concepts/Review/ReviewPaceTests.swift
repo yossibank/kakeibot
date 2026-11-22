@@ -34,8 +34,8 @@ struct ReviewPaceTests {
 
     @Test
     func clampsDaysOutsideThePeriod() throws {
-        let early = try Self.pace(spent: 0, today: #require(LocalDate("2026-10-20")))
-        let late = try Self.pace(spent: 0, today: #require(LocalDate("2026-12-05")))
+        let early = try Self.pace(spent: 0, today: LocalDate("2026-10-20"))
+        let late = try Self.pace(spent: 0, today: LocalDate("2026-12-05"))
 
         #expect(early.elapsedDays == 1)
         #expect(late.elapsedDays == 30)

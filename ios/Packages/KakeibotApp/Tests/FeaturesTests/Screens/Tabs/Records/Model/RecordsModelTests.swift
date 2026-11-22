@@ -336,7 +336,7 @@ struct RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
         model.move(months: -3)
-        model.selectedDate = try #require(LocalDate("2026-07-03"))
+        model.selectedDate = LocalDate("2026-07-03")
         model.isSearching = true
         model.searchText = "ランチ"
 

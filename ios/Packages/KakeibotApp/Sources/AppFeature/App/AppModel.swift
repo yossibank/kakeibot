@@ -244,10 +244,11 @@ extension AppModel {
             }
 
             group.addTask {
-                await self.watch(database.syncChangeUpdates()) {
-                    await engine.enqueuePending()
-                    await sharedEngine.enqueuePending()
-                }
+                await self.enqueueSyncChanges(
+                    in: database,
+                    engine: engine,
+                    sharedEngine: sharedEngine
+                )
             }
         }
     }
@@ -332,6 +333,17 @@ private extension AppModel {
         }
 
         return "「\(title)」に参加しました"
+    }
+
+    func enqueueSyncChanges(
+        in database: AppDatabase,
+        engine: SyncEngine,
+        sharedEngine: SyncEngine
+    ) async {
+        await watch(database.syncChangeUpdates()) {
+            await engine.enqueuePending()
+            await sharedEngine.enqueuePending()
+        }
     }
 
     func observeLook(in database: AppDatabase) async {

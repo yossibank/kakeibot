@@ -10,7 +10,6 @@ struct SyncConflictTests {
         let a = try await SyncTests.Setup()
         let b = try await SyncTests.Setup()
         let keyA = SyncKey(table: .budget, id: "bA")
-        let keyB = SyncKey(table: .budget, id: "bB")
 
         try await a.execute(
             "INSERT INTO budget (id, category_id, from_month, amount) VALUES ('bA', NULL, '2026-11', 50000)"

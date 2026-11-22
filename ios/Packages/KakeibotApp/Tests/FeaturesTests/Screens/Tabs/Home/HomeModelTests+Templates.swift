@@ -154,7 +154,7 @@ extension HomeModelTests {
 
         let kept = try #require(await home.record(lunch))
 
-        try await setup.database.saveTags([], for: tag.categoryId, at: Date())
+        _ = try await setup.database.saveTags([], for: tag.categoryId, at: Date())
         let dropped = try #require(await home.record(lunch))
 
         #expect(kept.entry.tagId == tag.id)
