@@ -92,7 +92,12 @@ struct SnapshotTests {
             ),
             name: "外食",
             categoryName: "食費",
-            progress: ReviewGoal.Progress(count: 6, amount: 9000, projectedCount: 6)
+            progress: ReviewGoal.Progress(
+                count: 6,
+                amount: 9000,
+                projectedCount: 6,
+                elapsedRatio: 1
+            )
         )
 
         let next = ReviewGoalItem(
@@ -107,7 +112,12 @@ struct SnapshotTests {
             ),
             name: "日用品",
             categoryName: "日用品",
-            progress: ReviewGoal.Progress(count: 0, amount: 0, projectedCount: 0)
+            progress: ReviewGoal.Progress(
+                count: 0,
+                amount: 0,
+                projectedCount: 0,
+                elapsedRatio: 0
+            )
         )
 
         let reason = ReviewClosingView.Reason(
@@ -168,7 +178,8 @@ struct SnapshotTests {
                     name: "10月",
                     previousName: "9月",
                     unit: "月",
-                    onOpenGoal: { _ in }
+                    onOpenGoal: { _ in },
+                    onOpenWhy: { _, _ in }
                 )
                 .padding(16)
 
@@ -190,7 +201,18 @@ extension SnapshotTests {
 private extension SnapshotTests {
     static let directory = "__OUT__"
     static let summary = "予算内で締めました。食費が多めでしたが、日用品を抑えられています。"
-    static let why = "「外食」の記録が 6 件あり、18 件のうち 11 件が土日でした。"
+    static let why = ReviewCompare.Why(
+        parts: [
+            .text("「外食」の記録が "),
+            .number("6"),
+            .text(" 件あり、"),
+            .number("18"),
+            .text(" 件のうち "),
+            .number("11"),
+            .text(" 件が土日でした。")
+        ],
+        memo: "外食"
+    )
     static let maxHeight: CGFloat = 2400
 
     static let variants = [

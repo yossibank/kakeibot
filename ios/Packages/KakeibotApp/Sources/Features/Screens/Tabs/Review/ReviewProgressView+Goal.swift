@@ -4,33 +4,37 @@ import SwiftUI
 
 extension ReviewProgressView {
     func goalCard(_ item: ReviewGoalItem) -> some View {
-        let isOnTrack = item.goal.isOnTrack(item.progress)
+        let status = item.goal.status(of: item.progress)
 
         return VStack(alignment: .leading, spacing: 12) {
             ReviewReportLabel(title: "\(currentName)の一手")
 
-            Text(item.title(unit: unit))
-                .displayFont(.headline, weight: .bold)
-                .foregroundStyle(Palette.text)
-                .fixedSize(horizontal: false, vertical: true)
+            ReviewEmphasisText(
+                parts: item.titleParts(unit: unit),
+                face: .display(.headline),
+                weight: .bold,
+                numberFace: .display(.title),
+                color: Palette.text
+            )
+            .fixedSize(horizontal: false, vertical: true)
 
             if item.goal.kind == .count {
                 pips(count: item.progress.count, target: item.goal.target)
             }
 
             ViewThatFits(in: .horizontal) {
-                HStack {
+                HStack(alignment: .lastTextBaseline) {
                     goalNote(item)
 
                     Spacer(minLength: 8)
 
-                    goalStatus(isOnTrack)
+                    goalStatus(status)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     goalNote(item)
 
-                    goalStatus(isOnTrack)
+                    goalStatus(status)
                 }
             }
         }
@@ -42,20 +46,26 @@ extension ReviewProgressView {
 
 private extension ReviewProgressView {
     func goalNote(_ item: ReviewGoalItem) -> some View {
-        Text(Self.goalNote(item))
-            .textFont(.caption)
-            .foregroundStyle(Palette.subtext)
-            .monospacedDigit()
-            .fixedSize()
+        ReviewEmphasisText(
+            parts: Self.goalNote(item),
+            face: .text(.caption),
+            weight: nil,
+            numberFace: .display(.body),
+            color: Palette.subtext
+        )
+        .fixedSize()
     }
 
-    func goalStatus(_ isOnTrack: Bool) -> some View {
-        let color = isOnTrack ? Palette.accent : Palette.increase
+    @ViewBuilder
+    func goalStatus(_ status: ReviewGoal.Status?) -> some View {
+        if let status {
+            let color = status == .within ? Palette.accent : Palette.increase
 
-        return Text(isOnTrack ? "このままなら達成" : "このままだと届きません")
-            .textFont(.caption, weight: .bold)
-            .foregroundStyle(color)
-            .fixedSize()
+            Text(Self.statusText(status))
+                .textFont(.caption, weight: .bold)
+                .foregroundStyle(color)
+                .fixedSize()
+        }
     }
 
     func pips(
@@ -75,18 +85,38 @@ private extension ReviewProgressView {
 }
 
 private extension ReviewProgressView {
-    static func goalNote(_ item: ReviewGoalItem) -> String {
+    static func goalNote(_ item: ReviewGoalItem) -> [ReviewEmphasisText.Part] {
         let goal = item.goal
         let progress = item.progress
 
         switch goal.kind {
         case .count:
             let left = max(goal.target - progress.count, 0)
-            return "今 \(progress.count) 回　あと \(left) 回まで"
+
+            return [
+                .plain("今 "),
+                .number("\(progress.count)"),
+                .plain(" 回　あと "),
+                .number("\(left)"),
+                .plain(" 回まで")
+            ]
 
         case .average:
-            let average = ReviewYen.text(goal.current(of: progress))
-            return "今の 1 回の平均 \(average)（\(progress.count) 回）"
+            let average = ReviewYen.number(goal.current(of: progress))
+
+            return [
+                .plain("今の 1 回の平均 "),
+                .number(average),
+                .plain("円（\(progress.count) 回）")
+            ]
+        }
+    }
+
+    static func statusText(_ status: ReviewGoal.Status) -> String {
+        switch status {
+        case .within: "このペースなら収まりそう"
+        case .likelyOver: "このペースだと超えそう"
+        case .over: "上限を超えました"
         }
     }
 }

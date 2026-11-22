@@ -10,7 +10,7 @@ struct ReviewCompareWhyTests {
 
         let why = try Self.why(entries)
 
-        #expect(why == "「外食」の記録が 5 件あり、5 件のうち 4 件が土日でした。")
+        #expect(why?.text == "「外食」の記録が 5 件あり、5 件のうち 4 件が土日でした。")
     }
 
     @Test
@@ -20,7 +20,18 @@ struct ReviewCompareWhyTests {
 
         let why = try Self.why(entries)
 
-        #expect(why == "「外食」の記録が 4 件ありました。")
+        #expect(why?.text == "「外食」の記録が 4 件ありました。")
+        #expect(why?.memo == "外食")
+    }
+
+    @Test
+    func marksTheNumbers() throws {
+        let entries = try Self.entries("2026-10", days: [0, 1, 4, 5], memo: "外食")
+            + Self.entries("2026-09", days: [0])
+
+        let why = try Self.why(entries)
+
+        #expect(why?.parts == [.text("「外食」の記録が "), .number("4"), .text(" 件ありました。")])
     }
 
     @Test
@@ -30,7 +41,7 @@ struct ReviewCompareWhyTests {
 
         let why = try Self.why(entries)
 
-        #expect(why == "記録が 4 件で、いつもの 1 件より多めでした。")
+        #expect(why?.text == "記録が 4 件で、いつもの 1 件より多めでした。")
     }
 
     @Test
@@ -41,7 +52,7 @@ struct ReviewCompareWhyTests {
 
         let why = try Self.why(entries)
 
-        #expect(why == "8,000円 の記録が 1 件ありました。")
+        #expect(why?.text == "8,000円 の記録が 1 件ありました。")
     }
 
     @Test
@@ -51,7 +62,7 @@ struct ReviewCompareWhyTests {
 
         let why = try Self.why(entries)
 
-        #expect(why == "1 回あたりの額が、いつもより高めでした。")
+        #expect(why?.text == "1 回あたりの額が、いつもより高めでした。")
     }
 }
 
@@ -82,7 +93,7 @@ private extension ReviewCompareWhyTests {
         }
     }
 
-    static func why(_ entries: [Entry]) throws -> String? {
+    static func why(_ entries: [Entry]) throws -> ReviewCompare.Why? {
         let range = try month("2026-10")
         let history = try ["2026-09", "2026-08", "2026-07"].map(month)
 

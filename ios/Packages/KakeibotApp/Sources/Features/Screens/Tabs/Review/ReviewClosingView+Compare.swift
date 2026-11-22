@@ -160,20 +160,34 @@ private extension ReviewClosingView {
             }
 
             if let why = notes.whys[item.id] {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Image(systemName: "sparkles")
-                        .sansFont(.micro, weight: .bold)
-                        .foregroundStyle(Palette.gold)
+                Button {
+                    onOpenWhy(item, why)
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .sansFont(.micro, weight: .bold)
+                            .foregroundStyle(Palette.gold)
 
-                    Text(why)
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.text)
+                        ReviewEmphasisText(
+                            parts: ReviewEmphasisText.parts(of: why),
+                            face: .text(.caption),
+                            weight: nil,
+                            numberFace: .display(.body),
+                            color: Palette.text
+                        )
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Image(systemName: "chevron.right")
+                            .sansFont(.micro, weight: .bold)
+                            .foregroundStyle(Palette.accent)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
+                    .contentShape(.rect)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
+                .buttonStyle(.plain)
                 .padding(.top, 4)
             }
         }
