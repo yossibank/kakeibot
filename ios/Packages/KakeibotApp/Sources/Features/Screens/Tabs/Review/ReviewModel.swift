@@ -167,6 +167,10 @@ public extension ReviewModel {
             return factorRows(of: key)
         }
 
+        if let key = share.id.base as? MonthKey {
+            return monthRows(of: key)
+        }
+
         guard
             let list,
             let type = entryType

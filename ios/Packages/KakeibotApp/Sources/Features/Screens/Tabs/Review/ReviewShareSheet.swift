@@ -93,6 +93,8 @@ private extension ReviewShareSheet {
     var badge: some View {
         if share.id == ReviewModel.recurringShareId {
             IconBadge(systemImage: "repeat", size: 40)
+        } else if share.id.base is ReviewModel.MonthKey {
+            IconBadge(systemImage: "calendar", size: 40)
         } else {
             IconBadge(share.icon, size: 40)
         }
