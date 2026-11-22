@@ -909,12 +909,12 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "08-analysis",
-            lines: ["増えた理由を、", "AI が分析"],
-            lead: .note("増えたカテゴリと、AI のまとめ"),
+            file: "08-review",
+            lines: ["締めたら、", "届くレポート"],
+            lead: .note("いまのペースと、次の一手"),
             phones: [
-                Phone(name: "08-analysis-black", x: 12, y: 196, width: 250, angle: -4),
-                Phone(name: "08-analysis-ai-black", x: 112, y: 280, width: 220, angle: 4)
+                Phone(name: "08-review-pace-black", x: 12, y: 196, width: 250, angle: -4),
+                Phone(name: "08-review-closing-black", x: 112, y: 280, width: 220, angle: 4)
             ]
         ),
         Shot(
