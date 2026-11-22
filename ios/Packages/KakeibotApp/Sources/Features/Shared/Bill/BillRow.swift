@@ -62,7 +62,7 @@ extension BillRow {
         case detailed
     }
 
-    static func share(of bill: CardBill) -> Double {
+    nonisolated static func share(of bill: CardBill) -> Double {
         guard bill.balanceBefore > 0 else {
             return 1
         }

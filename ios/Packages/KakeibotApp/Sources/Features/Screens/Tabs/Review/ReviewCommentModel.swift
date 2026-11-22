@@ -62,9 +62,9 @@ private extension ReviewCommentModel {
     static let maximumTokens = 160
 
     static let attempts = [
-        GenerationOptions(sampling: .greedy, maximumResponseTokens: maximumTokens),
+        GenerationOptions(samplingMode: .greedy, maximumResponseTokens: maximumTokens),
         GenerationOptions(
-            sampling: .random(probabilityThreshold: 0.9, seed: 1),
+            samplingMode: .random(probabilityThreshold: 0.9, seed: 1),
             maximumResponseTokens: maximumTokens
         )
     ]

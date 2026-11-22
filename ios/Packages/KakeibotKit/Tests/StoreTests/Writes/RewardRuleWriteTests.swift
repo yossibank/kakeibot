@@ -123,7 +123,7 @@ struct RewardRuleWriteTests {
         let goal = try await setup.database.saveRewardGoal(shoes, at: setup.now)
         try await setup.database.setRewardGoalPurchased(goal.id, isPurchased: true, at: setup.now)
 
-        try? await setup.database.deleteRewardRule(rule.id)
+        _ = try? await setup.database.deleteRewardRule(rule.id)
         let bank = try await setup.database.rewardBank()
 
         #expect(bank.balance == 0)

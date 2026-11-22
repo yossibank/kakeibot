@@ -37,7 +37,7 @@ public struct TwoColumnStack<Content: View>: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .onGeometryChange(for: Bool.self) { proxy in
+        .onGeometryChange(for: Bool.self) { [minWidth] proxy in
             proxy.size.width >= minWidth
         } action: { isWide in
             self.isWide = isWide

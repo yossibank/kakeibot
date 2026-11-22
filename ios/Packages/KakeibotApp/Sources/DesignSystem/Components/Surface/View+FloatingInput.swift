@@ -59,7 +59,7 @@ struct FloatingInputLayer<Card: View>: ViewModifier {
 }
 
 extension FloatingInputLayer {
-    static func lift(
+    nonisolated static func lift(
         for layer: CGRect,
         keyboardTop: CGFloat
     ) -> CGFloat {

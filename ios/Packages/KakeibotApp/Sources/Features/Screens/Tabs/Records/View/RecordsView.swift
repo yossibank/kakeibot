@@ -274,7 +274,8 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
-    static let wideCalendarWidth: CGFloat = 560
+    nonisolated static let wideCalendarWidth: CGFloat = 560
+
     static let listWidth: CGFloat = 720
 
     static let layoutOptions: [CapsulePicker<RecordsLayout>.Option] = [

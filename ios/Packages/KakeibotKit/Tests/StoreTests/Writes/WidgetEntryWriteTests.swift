@@ -62,7 +62,7 @@ struct WidgetEntryWriteTests {
             at: setup.now
         )
 
-        try await setup.database.saveTags([], for: food, at: setup.now)
+        _ = try await setup.database.saveTags([], for: food, at: setup.now)
 
         let dropped = try await setup.database.recordFromWidget(
             template.id,
@@ -85,7 +85,7 @@ struct WidgetEntryWriteTests {
 
         let template = try await setup.database.saveTemplate(draft, at: setup.now)
         let before = try await setup.database.entryDraft(for: template, on: setup.today)
-        try await setup.database.saveTags([], for: food, at: setup.now)
+        _ = try await setup.database.saveTags([], for: food, at: setup.now)
         let after = try await setup.database.entryDraft(for: template, on: setup.today)
 
         #expect(before?.tagId == tag.id)

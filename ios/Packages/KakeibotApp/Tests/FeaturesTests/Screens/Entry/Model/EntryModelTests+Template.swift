@@ -60,7 +60,7 @@ extension EntryModelTests {
         let setup = try await TemplateSetup()
         let tag = try await setup.saveTag("買い置き")
         let stock = try await setup.saveTemplate(name: "買い置き", amount: 500, tagId: tag.id)
-        try await setup.database.saveTags([], for: tag.categoryId, at: Date())
+        _ = try await setup.database.saveTags([], for: tag.categoryId, at: Date())
         let model = EntryModel(database: setup.database, date: setup.date)
         await model.load()
 
@@ -79,7 +79,7 @@ extension EntryModelTests {
         await first.load()
         first.apply(stock)
         let entry = try #require(await first.save()?.entry)
-        try await setup.database.saveTags([], for: tag.categoryId, at: Date())
+        _ = try await setup.database.saveTags([], for: tag.categoryId, at: Date())
         let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
         await model.load()
 

@@ -105,7 +105,7 @@ enum EntryVoiceModel {
 private extension EntryVoiceModel {
     static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Voice")
     static let locale = Locale(identifier: "ja_JP")
-    static let options = GenerationOptions(sampling: .greedy)
+    static let options = GenerationOptions(samplingMode: .greedy)
     static let categoryKey = "category"
     static let walletKey = "wallet"
     static let none = "当たるものが無い"
