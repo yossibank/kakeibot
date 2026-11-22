@@ -101,7 +101,7 @@ private extension ReviewModel {
         }
 
         let name = period.displayName
-        let difference = ReviewInsight.yen(row.row.difference)
+        let difference = ReviewYen.text(row.row.difference)
         let first = "\(name)は\(item.categoryName)がいつもより \(difference) 多めでした。"
 
         guard let memo = item.goal.memo else {
@@ -116,15 +116,15 @@ private extension ReviewModel {
         let unit = scale.unitName
 
         let spent = reasonRow.map { row in
-            let amount = ReviewInsight.yen(row.row.amount)
-            let average = ReviewInsight.yen(row.row.average)
+            let amount = ReviewYen.text(row.row.amount)
+            let average = ReviewYen.text(row.row.average)
 
             return "\(item.categoryName)は、この\(unit)に \(amount) 使いました。いつもは \(average) です。"
         }
 
         let value = switch goal.kind {
         case .count: "\(item.name)の記録は、この\(unit)に \(goal.baseline) 回でした。"
-        case .average: "\(item.name)の 1 回の平均は、この\(unit)は \(ReviewInsight.yen(goal.baseline)) でした。"
+        case .average: "\(item.name)の 1 回の平均は、この\(unit)は \(ReviewYen.text(goal.baseline)) でした。"
         }
 
         return [spent, value].compactMap(\.self).joined(separator: "\n")

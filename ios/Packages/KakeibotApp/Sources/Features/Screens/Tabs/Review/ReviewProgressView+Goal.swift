@@ -85,7 +85,7 @@ private extension ReviewProgressView {
             return "今 \(progress.count) 回　あと \(left) 回まで"
 
         case .average:
-            let average = ReviewInsight.yen(goal.current(of: progress))
+            let average = ReviewYen.text(goal.current(of: progress))
             return "今の 1 回の平均 \(average)（\(progress.count) 回）"
         }
     }

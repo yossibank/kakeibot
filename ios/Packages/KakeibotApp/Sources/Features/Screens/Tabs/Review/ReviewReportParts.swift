@@ -117,14 +117,14 @@ struct ReviewGoalItem: Identifiable {
     func title(unit: String) -> String {
         switch goal.kind {
         case .count: "\(name)を、\(unit) \(goal.target) 回までに"
-        case .average: "\(name)の 1 回を、\(ReviewInsight.yen(goal.target)) までに"
+        case .average: "\(name)の 1 回を、\(ReviewYen.text(goal.target)) までに"
         }
     }
 
     func value(_ number: Int) -> String {
         switch goal.kind {
         case .count: "\(number) 回"
-        case .average: ReviewInsight.yen(number)
+        case .average: ReviewYen.text(number)
         }
     }
 }
@@ -158,13 +158,13 @@ extension View {
     }
 }
 
-extension ReviewInsight {
+extension ReviewYen {
     static func signed(_ amount: Int) -> String {
         if amount > 0 {
-            return "+\(yen(amount))"
+            return "+\(text(amount))"
         }
 
-        return amount < 0 ? "−\(yen(-amount))" : "±0円"
+        return amount < 0 ? "−\(text(-amount))" : "±0円"
     }
 }
 
