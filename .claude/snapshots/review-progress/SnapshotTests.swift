@@ -30,6 +30,14 @@ struct SnapshotTests {
             today: today
         )
 
+        let exceeded = ReviewPace(
+            limit: 200_000,
+            basis: .budget,
+            spent: 2_074_020,
+            range: start...end,
+            today: today
+        )
+
         let goal = ReviewGoal(
             period: "month:2026-11-01",
             kind: .count,
@@ -48,21 +56,60 @@ struct SnapshotTests {
             progress: ReviewGoal.Progress(count: 6, amount: 9000, projectedCount: 8)
         )
 
-        let cases: [(String, ReviewPace?, [ReviewGoalItem])] = [
-            ("budget", budget, [item]),
-            ("average", over, []),
-            ("first", nil, [])
+        let totals = [
+            182_000,
+            164_500,
+            171_000,
+            158_200,
+            149_800,
+            176_300,
+            203_400,
+            168_900,
+            155_000,
+            160_200,
+            98400,
+            0
+        ]
+
+        let months = totals.enumerated().map { index, total in
+            let state: ReviewYearProgress.State = if index < 10 {
+                .closed
+            } else if index == 10 {
+                .current
+            } else {
+                .upcoming
+            }
+
+            return ReviewYearProgress.Month(
+                id: index,
+                name: "\(index + 1)月",
+                total: total,
+                state: state,
+                isWithinBudget: index < 10 ? total <= 170_000 : nil
+            )
+        }
+
+        let year = ReviewYearProgress(months: months, spent: 1_787_700, previousSpent: 1_842_000)
+
+        let cases: [(String, ReviewPace?, ReviewYearProgress?, [ReviewGoalItem])] = [
+            ("budget", budget, nil, [item]),
+            ("average", over, nil, []),
+            ("exceeded", exceeded, nil, []),
+            ("first", nil, nil, []),
+            ("year", nil, year, [])
         ]
 
         for variant in Self.variants {
-            for (name, pace, goals) in cases {
+            for (name, pace, year, goals) in cases {
                 let view = ReviewProgressView(
                     pace: pace,
+                    year: year,
                     unit: "月",
                     currentName: "今月",
                     goals: goals,
                     closingTitle: "11月のふりかえり",
                     closingDate: closing,
+                    closingDaysLeft: 10,
                     nextGoalTitle: "12月の一手",
                     previousTitle: "10月のふりかえりを見る",
                     onOpenPrevious: {}

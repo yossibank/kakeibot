@@ -44,6 +44,41 @@ struct ReviewStreakTests {
 
         #expect(count == 2)
     }
+
+    @Test
+    func countsNoSpendDaysAsRecordedDays() throws {
+        let entries = try [
+            Self.entry("2026-10-01"),
+            Self.entry("2026-10-03")
+        ]
+
+        let noSpendDays = try Set(["2026-10-02", "2026-10-03", "2026-11-01"].map(Self.day))
+        let streak = try ReviewStreak(
+            entries: entries,
+            noSpendDays: noSpendDays,
+            in: Self.month("2026-10")
+        )
+
+        #expect(streak.days.count == 3)
+        #expect(try streak.noSpendDays == [Self.day("2026-10-02")])
+        #expect(streak.longest == 3)
+        #expect(streak.count == 2)
+    }
+
+    @Test
+    func continuesThroughPeriodsWithOnlyNoSpendDays() throws {
+        let entries = try [Self.entry("2026-10-01")]
+        let noSpendDays = try Set([Self.day("2026-09-10")])
+        let periods = try ["2026-10", "2026-09", "2026-08"].map(Self.month)
+
+        let count = ReviewStreak.continuing(
+            entries: entries,
+            noSpendDays: noSpendDays,
+            periods: periods
+        )
+
+        #expect(count == 2)
+    }
 }
 
 private extension ReviewStreakTests {
@@ -64,6 +99,10 @@ private extension ReviewStreakTests {
             createdAt: now,
             updatedAt: now
         )
+    }
+
+    static func day(_ text: String) throws -> LocalDate {
+        try #require(LocalDate(text))
     }
 
     static func month(_ text: String) throws -> ClosedRange<LocalDate> {

@@ -1,14 +1,18 @@
 public struct ReviewStreak: Hashable, Sendable {
     public let days: Set<LocalDate>
+    public let noSpendDays: Set<LocalDate>
     public let longest: Int
     public let count: Int
 
     public init(
         entries: [Entry],
+        noSpendDays: Set<LocalDate> = [],
         in range: ClosedRange<LocalDate>
     ) {
         let recorded = entries.filter { range.contains($0.date) && $0.recurringId == nil }
-        let days = Set(recorded.map(\.date))
+        let entryDays = Set(recorded.map(\.date))
+        let quietDays = noSpendDays.filter { range.contains($0) }.subtracting(entryDays)
+        let days = entryDays.union(quietDays)
 
         var longest = 0
         var run = 0
@@ -21,6 +25,7 @@ public struct ReviewStreak: Hashable, Sendable {
         }
 
         self.days = days
+        self.noSpendDays = quietDays
         self.longest = longest
         self.count = recorded.count
     }
@@ -29,12 +34,15 @@ public struct ReviewStreak: Hashable, Sendable {
 public extension ReviewStreak {
     static func continuing(
         entries: [Entry],
+        noSpendDays: Set<LocalDate> = [],
         periods: [ClosedRange<LocalDate>]
     ) -> Int {
         let recorded = entries.filter { $0.recurringId == nil }
 
         let index = periods.firstIndex { range in
-            !recorded.contains { range.contains($0.date) }
+            let hasEntry = recorded.contains { range.contains($0.date) }
+            let hasNoSpendDay = noSpendDays.contains { range.contains($0) }
+            return !hasEntry && !hasNoSpendDay
         }
 
         return index ?? periods.count

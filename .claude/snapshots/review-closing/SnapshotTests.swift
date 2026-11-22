@@ -28,7 +28,8 @@ struct SnapshotTests {
             )
         }
 
-        let streak = ReviewStreak(entries: entries, in: range)
+        let noSpendDays: Set = [start.adding(days: 4), start.adding(days: 11)]
+        let streak = ReviewStreak(entries: entries, noSpendDays: noSpendDays, in: range)
 
         let budget = ReviewPace(
             limit: 150_000,
@@ -128,9 +129,12 @@ struct SnapshotTests {
 
         for variant in Self.variants {
             for (name, scale, pace, isFull) in cases {
+                let weekRange = start.adding(days: 3)...start.adding(days: 9)
+                let shownRange = scale == .week ? weekRange : range
+
                 let content = ReviewClosingView.Content(
                     scale: scale,
-                    range: range,
+                    range: shownRange,
                     weekStart: .sunday,
                     pace: pace,
                     spent: pace?.spent ?? 52000,
@@ -153,9 +157,14 @@ struct SnapshotTests {
                     checkDate: range.upperBound.adding(days: 31)
                 )
 
+                let whys = Dictionary(uniqueKeysWithValues: rows.prefix(1)
+                    .map { ($0.id, Self.why) })
+                let notes = ReviewClosingView.Notes(summary: Self.summary, whys: whys)
+
                 let view = ReviewClosingView(
                     content: content,
                     goals: goals,
+                    notes: isFull ? notes : .empty,
                     name: "10月",
                     previousName: "9月",
                     unit: "月",
@@ -180,6 +189,8 @@ extension SnapshotTests {
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
+    static let summary = "予算内で締めました。食費が多めでしたが、日用品を抑えられています。"
+    static let why = "「外食」の記録が 6 件あり、18 件のうち 11 件が土日でした。"
     static let maxHeight: CGFloat = 2400
 
     static let variants = [

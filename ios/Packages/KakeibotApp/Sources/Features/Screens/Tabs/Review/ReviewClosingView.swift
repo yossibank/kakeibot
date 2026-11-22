@@ -5,6 +5,7 @@ import SwiftUI
 struct ReviewClosingView: View {
     let content: Content
     let goals: Goals
+    let notes: Notes
     let name: String
     let previousName: String
     let unit: String
@@ -14,20 +15,22 @@ struct ReviewClosingView: View {
         VStack(spacing: 12) {
             resultCard
 
+            if let summary = notes.summary {
+                summaryCard(summary)
+            }
+
             if let answer = goals.answer {
                 answerCard(answer)
             }
 
-            if content.scale != .week {
-                streakCard
+            streakCard
 
-                if !content.rows.isEmpty {
-                    compareCard
-                }
+            if !content.rows.isEmpty {
+                compareCard
+            }
 
-                if !goodItems.isEmpty {
-                    goodCard
-                }
+            if !goodItems.isEmpty {
+                goodCard
             }
 
             nextCard
@@ -66,6 +69,13 @@ extension ReviewClosingView {
         let amount: Int
     }
 
+    struct Notes {
+        static let empty = Notes(summary: nil, whys: [:])
+
+        let summary: String?
+        let whys: [EntryCategory.ID: String]
+    }
+
     var periodsUnit: String {
         ReviewPace.periodsUnit(unit)
     }
@@ -81,69 +91,78 @@ extension ReviewClosingView {
 
 private extension ReviewClosingView {
     var resultCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        let perDay = ReviewYen.number(spent / totalDays)
+        let spentText = ReviewYen.number(spent)
+        let limitName = content.pace?.limitName(unit: unit) ?? ""
+
+        return VStack(alignment: .leading, spacing: 16) {
             ReviewReportLabel(title: "\(name)の結果")
 
-            HStack(spacing: 16) {
-                if let pace = content.pace {
-                    ReviewReportGauge(
-                        pace: pace,
-                        limitName: pace.limitName(unit: unit),
-                        showsMarker: false
-                    )
-                }
+            ReviewReportGaugeRow(pace: content.pace, limitName: limitName, showsMarker: false) {
+                VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(verdictText)
+                            .displayFont(.title, weight: .bold)
+                            .foregroundStyle(Palette.gold)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.5)
+                            .fixedSize(horizontal: false, vertical: true)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(verdictText)
-                        .displayFont(.title, weight: .bold)
-                        .foregroundStyle(Palette.gold)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.5)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    if let pace = content.pace {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(leadCaption(pace))
-                                .textFont(.caption)
-                                .foregroundStyle(Palette.subtext)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-
-                            Text(Self.leftText(pace))
-                                .displayFont(.body, weight: .bold)
-                                .foregroundStyle(Self.leftColor(pace))
-                                .monospacedDigit()
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
-                                .fixedSize(horizontal: false, vertical: true)
+                        if let streakTitle {
+                            ReviewReportChip(systemImage: "rosette", title: streakTitle)
                         }
                     }
+
+                    if let pace = content.pace {
+                        let left = ReviewYen.number(abs(pace.remaining))
+
+                        Rectangle()
+                            .fill(Palette.line)
+                            .frame(height: 1)
+
+                        ReviewReportLead(
+                            caption: Self.leadCaption(pace),
+                            value: left,
+                            suffix: Self.leftSuffix(pace),
+                            color: Self.leftColor(pace)
+                        )
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Grid(horizontalSpacing: 1, verticalSpacing: 1) {
                 GridRow {
                     ReviewReportStat(
                         title: "使った",
-                        value: ReviewYen.text(spent),
+                        systemImage: "yensign.circle",
+                        value: spentText,
+                        unit: "円",
                         note: spentNote
                     )
 
                     ReviewReportStat(
                         title: "1 日あたり",
-                        value: ReviewYen.text(spent / totalDays),
+                        systemImage: "calendar",
+                        value: perDay,
+                        unit: "円",
                         note: "\(totalDays) 日で割った額"
                     )
                 }
 
                 if let previousTotal = content.previousTotal {
+                    let difference = spent - previousTotal
+                    let color = difference <= 0 ? Palette.accent : Palette.increase
+                    let symbol = difference <= 0 ? "arrow.down.right" : "arrow.up.right"
+                    let value = ReviewYen.signedNumber(difference)
+
                     GridRow {
                         ReviewReportStat(
                             title: "\(previousName)より",
-                            value: ReviewYen.signed(spent - previousTotal),
+                            systemImage: symbol,
+                            value: value,
+                            unit: "円",
                             note: "\(previousName) \(ReviewYen.text(previousTotal))",
-                            color: spent <= previousTotal ? Palette.accent : Palette.increase
+                            color: color
                         )
                         .gridCellColumns(2)
                     }
@@ -152,6 +171,28 @@ private extension ReviewClosingView {
             .reviewStatGrid()
         }
         .reviewHero()
+    }
+
+    func summaryCard(_ summary: String) -> some View {
+        let sparkle = Text(Image(systemName: "sparkles"))
+
+        return VStack(alignment: .leading, spacing: 12) {
+            ReviewReportLabel(title: "AI のひとこと")
+
+            Text(summary)
+                .displayFont(.headline, weight: .bold)
+                .foregroundStyle(Palette.text)
+                .lineSpacing(4)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("\(sparkle) 端末の中の AI が、この\(unit)の数字からまとめました")
+                .textFont(.caption2, weight: .bold)
+                .foregroundStyle(Palette.accent)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card(cornerRadius: 24)
     }
 }
 
@@ -174,6 +215,18 @@ private extension ReviewClosingView {
         }
     }
 
+    var streakTitle: String? {
+        let isBudget = content.pace?.basis == .budget
+        let continues = isBudget
+            && content.budgetStreak >= 2
+
+        guard continues else {
+            return nil
+        }
+
+        return "\(content.budgetStreak) \(periodsUnit)つづけて予算内"
+    }
+
     var spentNote: String {
         guard let pace = content.pace else {
             return "\(content.streak.count) 件の記録"
@@ -186,21 +239,14 @@ private extension ReviewClosingView {
         pace.remaining >= 0 ? Palette.accent : Palette.increase
     }
 
-    static func leftText(_ pace: ReviewPace) -> String {
-        let amount = ReviewYen.text(abs(pace.remaining))
-
+    static func leftSuffix(_ pace: ReviewPace) -> String {
         switch pace.basis {
-        case .budget: return pace.remaining >= 0 ? "\(amount) 余り" : "\(amount) 超え"
-        case .average: return pace.remaining >= 0 ? "\(amount) 少ない" : "\(amount) 多い"
+        case .budget: pace.remaining >= 0 ? "余り" : "超え"
+        case .average: pace.remaining >= 0 ? "少ない" : "多い"
         }
     }
 
-    func leadCaption(_ pace: ReviewPace) -> String {
-        if pace.basis == .budget,
-           content.budgetStreak >= 2 {
-            return "\(content.budgetStreak) \(periodsUnit)つづけて"
-        }
-
-        return pace.basis == .budget ? "予算より" : "平均より"
+    static func leadCaption(_ pace: ReviewPace) -> String {
+        pace.basis == .budget ? "予算より" : "平均より"
     }
 }

@@ -54,6 +54,18 @@ private extension ReviewModel {
         let previousTotal = ReviewSummary(entries: entries, in: previous).expense.total
         let periods = (0..<Self.streakLimit).map { period.adding(-$0).range }
 
+        let streak = ReviewStreak(
+            entries: entries,
+            noSpendDays: noSpendDays,
+            in: period.range
+        )
+
+        let continuing = ReviewStreak.continuing(
+            entries: entries,
+            noSpendDays: noSpendDays,
+            periods: periods
+        )
+
         return ReviewClosingView.Content(
             scale: scale,
             range: period.range,
@@ -72,8 +84,8 @@ private extension ReviewModel {
                     amount: entry.amount
                 )
             },
-            streak: ReviewStreak(entries: entries, in: period.range),
-            continuing: ReviewStreak.continuing(entries: entries, periods: periods),
+            streak: streak,
+            continuing: continuing,
             budgetStreak: budgetStreak
         )
     }

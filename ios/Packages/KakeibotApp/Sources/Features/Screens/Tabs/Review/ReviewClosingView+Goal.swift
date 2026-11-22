@@ -41,49 +41,64 @@ extension ReviewClosingView {
         let isAchieved = goal.isAchieved ?? false
         let result = goal.result ?? 0
 
+        let scale = Double(max(goal.baseline, result, goal.target)) * 1.15
+        let targetRatio = Double(goal.target) / max(scale, 1)
+        let baselineRatio = Double(goal.baseline) / max(scale, 1)
+        let resultRatio = Double(result) / max(scale, 1)
+        let resultFill = isAchieved ? AnyShapeStyle(Palette.gold) : AnyShapeStyle(Palette.increase)
+
         return VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 2) {
-                ReviewReportLabel(title: "\(name)の一手")
+            ReviewReportLabel(title: "\(name)の一手")
 
-                Text("答え合わせ")
-                    .displayFont(.headline, weight: .bold)
-                    .foregroundStyle(Palette.text)
-                    .padding(.top, 8)
-
-                Text("「\(item.title(unit: unit))」")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            HStack(spacing: 16) {
-                seal(isAchieved)
-
+            HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(goal.kind == .count ? "\(unit)の回数" : "1 回の平均")
+                    Text("答え合わせ")
+                        .displayFont(.headline, weight: .bold)
+                        .foregroundStyle(Palette.text)
+
+                    Text("「\(item.title(unit: unit))」")
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
-
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Text(item.value(goal.baseline))
-                            .textFont(.subheadline)
-                            .foregroundStyle(Palette.subtext)
-                            .strikethrough()
-                            .monospacedDigit()
-
-                        Image(systemName: "arrow.right")
-                            .sansFont(.caption, weight: .bold)
-                            .foregroundStyle(Palette.accent)
-
-                        Text(item.value(result))
-                            .displayFont(.headline, weight: .bold)
-                            .foregroundStyle(Palette.text)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                    }
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+
+                seal(isAchieved)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(goal.kind == .count ? "\(unit)の回数" : "1 回の平均")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+
+                goalBar(
+                    previousName,
+                    value: item.value(goal.baseline),
+                    ratio: baselineRatio,
+                    target: targetRatio,
+                    fill: AnyShapeStyle(Palette.subtext.opacity(.medium)),
+                    isCurrent: false
+                )
+
+                goalBar(
+                    name,
+                    value: item.value(result),
+                    ratio: resultRatio,
+                    target: targetRatio,
+                    fill: resultFill,
+                    isCurrent: true
+                )
+
+                HStack(spacing: 4) {
+                    Rectangle()
+                        .fill(Palette.text)
+                        .frame(width: 2, height: 10)
+
+                    Text("目標 \(item.value(goal.target))")
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                        .monospacedDigit()
+                }
             }
 
             HStack {
@@ -170,10 +185,8 @@ private extension ReviewClosingView {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Text("\(name) \(item.value(goal.baseline)) → 目標 \(item.value(goal.target))")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .monospacedDigit()
+                goalStep(item)
+                    .padding(.top, 4)
             }
             .padding(20)
 
@@ -235,6 +248,111 @@ private extension ReviewClosingView {
         .reviewTicket()
     }
 
+    func goalBar(
+        _ title: String,
+        value: String,
+        ratio: Double,
+        target: Double,
+        fill: AnyShapeStyle,
+        isCurrent: Bool
+    ) -> some View {
+        let valueColor = isCurrent ? Palette.accent : Palette.subtext
+
+        return HStack(spacing: 8) {
+            Text(title)
+                .textFont(.caption2)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(width: 40, alignment: .leading)
+
+            Capsule()
+                .fill(Palette.accent.opacity(.subtle))
+                .frame(height: 12)
+                .overlay {
+                    GeometryReader { proxy in
+                        let width = proxy.size.width
+
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(fill)
+                                .frame(width: width * min(ratio, 1), height: proxy.size.height)
+
+                            Rectangle()
+                                .fill(Palette.text)
+                                .frame(width: 2, height: 20)
+                                .offset(x: width * target - 1)
+                        }
+                        .frame(height: proxy.size.height)
+                    }
+                }
+
+            Text(value)
+                .displayFont(style: .subheadline, weight: .bold)
+                .foregroundStyle(valueColor)
+                .monospacedDigit()
+                .fixedSize()
+                .frame(minWidth: 52, alignment: .trailing)
+        }
+    }
+
+    func goalStep(_ item: ReviewGoalItem) -> some View {
+        let goal = item.goal
+        let caption = goal.kind == .count ? "\(name)の回数" : "\(name)の 1 回"
+        let change = Self.changePercent(from: goal.baseline, to: goal.target)
+
+        return HStack(spacing: 8) {
+            VStack(spacing: 2) {
+                Text(caption)
+                    .textFont(.caption2)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Text(item.value(goal.baseline))
+                    .displayFont(.headline, weight: .bold)
+                    .monospacedDigit()
+                    .fixedSize()
+            }
+            .foregroundStyle(Palette.subtext)
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(Palette.subtext.opacity(.faint), in: .rect(cornerRadius: 16))
+
+            VStack(spacing: 4) {
+                Image(systemName: "arrow.right")
+                    .sansFont(.small, weight: .bold)
+                    .foregroundStyle(Palette.cardBottom)
+                    .frame(width: 28, height: 28)
+                    .background(Palette.gold, in: Circle())
+
+                Text("\(change)%")
+                    .textFont(.caption2, weight: .bold)
+                    .foregroundStyle(Palette.accent)
+                    .monospacedDigit()
+                    .fixedSize()
+            }
+
+            VStack(spacing: 2) {
+                Text("目標")
+                    .textFont(.caption2, weight: .bold)
+                    .foregroundStyle(Palette.accent)
+
+                Text(item.value(goal.target))
+                    .displayFont(.headline, weight: .bold)
+                    .foregroundStyle(Palette.gold)
+                    .monospacedDigit()
+                    .fixedSize()
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity)
+            .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(Palette.accent.opacity(.strong), lineWidth: 1.5)
+            }
+        }
+    }
+
     func seal(_ isAchieved: Bool) -> some View {
         let color = isAchieved ? Palette.accent : Palette.subtext
 
@@ -242,7 +360,7 @@ private extension ReviewClosingView {
             .displayFont(.headline, weight: .bold)
             .foregroundStyle(color)
             .multilineTextAlignment(.center)
-            .frame(width: 80, height: 80)
+            .frame(width: 72, height: 72)
             .overlay {
                 Circle()
                     .strokeBorder(color, lineWidth: 2.5)
@@ -257,6 +375,20 @@ private extension ReviewClosingView {
 }
 
 private extension ReviewClosingView {
+    static func changePercent(
+        from baseline: Int,
+        to target: Int
+    ) -> String {
+        guard baseline > 0 else {
+            return "0"
+        }
+
+        let ratio = Double(target - baseline) / Double(baseline) * 100
+        let percent = Int(ratio.rounded())
+
+        return percent < 0 ? "−\(-percent)" : "+\(percent)"
+    }
+
     static func reasonText(_ reason: Reason) -> Text {
         guard reason.isWritten else {
             return Text(reason.text)
