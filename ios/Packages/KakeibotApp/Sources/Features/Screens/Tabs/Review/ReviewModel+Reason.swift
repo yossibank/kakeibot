@@ -3,6 +3,17 @@ import Foundation
 import Store
 
 extension ReviewModel {
+    struct ReasonTrigger: Hashable {
+        let period: String
+        let goalId: ReviewGoal.ID?
+    }
+
+    var reasonTrigger: ReasonTrigger {
+        let next = period.adding(1).commentKey
+        let goal = goals.first { $0.period == next }
+        return ReasonTrigger(period: period.commentKey, goalId: goal?.id)
+    }
+
     func goalReason(for item: ReviewGoalItem) -> String? {
         reasons[period.commentKey] ?? factReason(for: item)
     }

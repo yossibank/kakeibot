@@ -130,6 +130,8 @@ extension ReviewView {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .task(id: model.period.commentKey) {
             await model.loadGoals()
+        }
+        .task(id: model.reasonTrigger) {
             await model.refreshReason()
         }
         .sheet(item: $analysisShare) { share in

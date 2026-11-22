@@ -1,4 +1,0 @@
-DesignSystem
-Features
-Core:KakeibotKit
-Store:KakeibotKit
