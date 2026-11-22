@@ -19,7 +19,8 @@ public final class AssetsModel: ScreenModel {
     private var summary: AssetsSummary
 
     @ObservationIgnored private var latestInput: AssetsSummary.Input
-    @ObservationIgnored private var refreshCount = 0
+    @ObservationIgnored private var isRefreshing = false
+    @ObservationIgnored private var needsRefresh = false
 
     public init(
         database: AppDatabase,
@@ -41,6 +42,10 @@ public extension AssetsModel {
             summary.input.today
         }
         set {
+            guard newValue != latestInput.today else {
+                return
+            }
+
             latestInput.today = newValue
             refreshLater()
         }
@@ -169,17 +174,26 @@ private extension AssetsModel {
     }
 
     func refresh() async {
-        refreshCount += 1
+        needsRefresh = true
 
-        let count = refreshCount
-        let summary = await AssetsSummary.make(latestInput)
-
-        guard count == refreshCount else {
+        guard !isRefreshing else {
             return
         }
 
-        self.summary = summary
-        billPage = min(billPage, max(summary.billPages.count - 1, 0))
+        isRefreshing = true
+
+        defer {
+            isRefreshing = false
+        }
+
+        while needsRefresh {
+            needsRefresh = false
+
+            let summary = await AssetsSummary.make(latestInput)
+
+            self.summary = summary
+            billPage = min(billPage, max(summary.billPages.count - 1, 0))
+        }
     }
 
     func observe() async {
