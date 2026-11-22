@@ -1,7 +1,7 @@
-# 設定とテーマとひとことの表
+# 設定とテーマと一手の理由の表
 
 > [!NOTE]
-> テーマの表・設定の表・振り返りのひとことと一手の表の形が分かる。
+> テーマの表・設定の表・振り返りの一手の理由と一手の表の形が分かる。
 > ほかの表と共通の決まりは [data](data.md) にある。
 
 ## 🗄️ 表
@@ -96,16 +96,16 @@ closed_hints に入る画面の名前は、次のとおり。
 
 ### review_comment
 
-振り返りの AI のひとことを、期間ごとに 1 行持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/ai-review.md](decisions/ai-review.md#ひとことの保存) にある。
+締めのレポートの一手の理由（AI の文）を、締めた期間ごとに 1 行持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/ai-review.md](decisions/ai-review.md#一手の理由の保存) にある。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |
 | period | TEXT | 主キー。`month:2026-11-01` のように、週・月・年と期間の初日をつなぐ |
-| body | TEXT | 気づきの文 |
-| suggestion | TEXT | 提案の文 |
+| body | TEXT | 一手の理由の文 |
+| suggestion | TEXT | 今は空文字 |
 | basis | TEXT | 作った時にモデルへ渡した事実の文。変わったら作り直す |
 | created_at | TEXT | |
-| breakdown | TEXT | 分析の値（`ReviewBreakdown.Summary`）の JSON。カテゴリの前後の回数と額・同じメモの行・良い点・浮く額を持つ |
+| breakdown | TEXT | 今は書かない（NULL） |
 
 ### review_goal
 

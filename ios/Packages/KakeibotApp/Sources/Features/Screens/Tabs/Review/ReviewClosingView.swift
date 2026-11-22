@@ -8,7 +8,7 @@ struct ReviewClosingView: View {
     let name: String
     let previousName: String
     let unit: String
-    let onOpenCategory: (String) -> Void
+    let onOpenGoal: (ReviewGoalItem) -> Void
 
     var body: some View {
         VStack(spacing: 12) {
@@ -141,7 +141,7 @@ private extension ReviewClosingView {
                     GridRow {
                         ReviewReportStat(
                             title: "\(previousName)より",
-                            value: ReviewAnalysisView.signed(spent - previousTotal),
+                            value: ReviewInsight.signed(spent - previousTotal),
                             note: "\(previousName) \(ReviewInsight.yen(previousTotal))",
                             color: spent <= previousTotal ? Palette.accent : Palette.increase
                         )

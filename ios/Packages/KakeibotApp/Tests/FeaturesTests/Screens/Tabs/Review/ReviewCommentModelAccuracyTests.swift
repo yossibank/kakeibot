@@ -22,7 +22,6 @@ struct ReviewCommentModelAccuracyTests {
                 basis: sample.basis,
                 scale: sample.scale,
                 categories: Self.categories,
-                isCurrent: sample.isCurrent,
                 onReject: { text in
                     rejected.append(text)
                 }
@@ -57,57 +56,34 @@ private extension ReviewCommentModelAccuracyTests {
     struct Sample {
         let basis: String
         let scale: ReviewPeriod.Scale
-        let isCurrent: Bool
     }
 
     static let minimumRate = 0.8
     static let forbiddenWords = ["投資", "借入", "ローン", "保険", "すべき", "危ない", "みましょう", "```", "{", "}"]
     static let politeEndings = ["です。", "ます。", "ました。", "ません。", "でしょう。", "ましょう。", "ください。"]
     static let unitPrefixes = ["この", "次の", "前の", "今"]
-    static let praiseWords = ["良いこと", "良い変化", "素晴らしい", "順調"]
-    static let labelWords = ["良い点：", "気を付けたい点：", "事実："]
     static let categories = ["食費", "交際費", "交通", "家電", "日用品", "住まい", "趣味", "コンビニ", "外食"]
 
     static let samples = [
         Sample(
-            basis: "気を付けたい点：食費は、月の 60% が過ぎたところで、予算の 97% を使っています。予算に収めるには、残りの 12 日を 1 日 150円 にします。",
-            scale: .month,
-            isCurrent: true
+            basis: "食費は、この月に 39,800円 使いました。いつもは 30,000円 です。\n外食の記録は、この月に 9 回でした。",
+            scale: .month
         ),
         Sample(
-            basis: "気を付けたい点：交際費が、前の月の 8,000円 から 21,000円 に増えています（162% 増）。\n良い点：交通が、前の月の 26,100円 から 21,800円 に減っています（16% 減）。",
-            scale: .month,
-            isCurrent: false
+            basis: "日用品は、この月に 9,600円 使いました。いつもは 6,400円 です。\n日用品の 1 回の平均は、この月は 2,400円 でした。",
+            scale: .month
         ),
         Sample(
-            basis: "気を付けたい点：収入の 150,000円 より、支出が 32,400円 多くなっています。",
-            scale: .month,
-            isCurrent: true
+            basis: "交際費は、この月に 21,000円 使いました。いつもは 8,000円 です。\n交際費の記録は、この月に 6 回でした。",
+            scale: .month
         ),
         Sample(
-            basis: "気を付けたい点：家電の 1 回の出費 48,000円 が、支出の 26% を占めています。",
-            scale: .year,
-            isCurrent: false
+            basis: "コンビニは、この週に 4,200円 使いました。いつもは 2,100円 です。\nコンビニの記録は、この週に 6 回でした。",
+            scale: .week
         ),
         Sample(
-            basis: "良い点：収入の 265,000円 から、82,600円 残せました。",
-            scale: .month,
-            isCurrent: false
-        ),
-        Sample(
-            basis: "良い点：予算のあるカテゴリは、どれも週の 40% のペースの内に収まっています。",
-            scale: .week,
-            isCurrent: true
-        ),
-        Sample(
-            basis: "事実：支出は 182,400円 です。前の月より 19,500円 多いです。",
-            scale: .month,
-            isCurrent: false
-        ),
-        Sample(
-            basis: "気を付けたい点：食費が、前の月の 30,000円 から 39,800円 に増えています（32% 増）。\n気を付けたい点：コンビニが、前の月の 8 回から 12 回に増えています。1 回はおよそ 700円 で、前の月と変わりません。\n良い点：外食は、前の月の 6 回から 3 回に減っています。",
-            scale: .month,
-            isCurrent: false
+            basis: "趣味は、この年に 186,000円 使いました。いつもは 120,000円 です。\n趣味の 1 回の平均は、この年は 15,500円 でした。",
+            scale: .year
         )
     ]
 
@@ -118,15 +94,10 @@ private extension ReviewCommentModelAccuracyTests {
         let forbidden = forbiddenWords.filter { body.contains($0) }
         let impolite = isPolite(body) ? [] : ["丁寧語で終わらない"]
         let units = wrongUnits(in: body, scale: sample.scale)
-        let hasGood = sample.basis.contains("良い点：")
-        let praise = hasGood ? [] : praiseWords.filter { body.contains($0) }
-        let labels = labelWords.filter { body.contains($0) }
 
         return forbidden.map { "「\($0)」" }
             + impolite
             + units.map { "単位「\($0)」" }
-            + praise.map { "褒め違い「\($0)」" }
-            + labels.map { "印「\($0)」" }
     }
 
     static func isPolite(_ text: String) -> Bool {

@@ -13,7 +13,6 @@ public struct ReviewView: View {
     @State var openStamp: StampCalendar.Tally?
     @State var showsAnalysis = false
     @State var analysisShare: ReviewModel.Share?
-    @State var pendingRecord: LocalDate?
     @State var slide = PageSlide()
 
     @State private var pendingEntry: Entry.ID?
@@ -64,9 +63,6 @@ public struct ReviewView: View {
         }
         .haptic(.selection, trigger: model.period)
         .haptic(.selection, trigger: model.kind)
-        .task(id: commentTrigger) {
-            await model.refreshAnalysisMark()
-        }
         .task(id: model.goalTrigger) {
             await model.refreshGoals()
         }
@@ -76,7 +72,7 @@ public struct ReviewView: View {
         .sheet(item: $openShare, onDismiss: openPendingEntry) { share in
             shareSheet(share)
         }
-        .sheet(isPresented: $showsAnalysis, onDismiss: openAfterAnalysis) {
+        .sheet(isPresented: $showsAnalysis, onDismiss: openPendingEntry) {
             analysisSheet
         }
         .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in

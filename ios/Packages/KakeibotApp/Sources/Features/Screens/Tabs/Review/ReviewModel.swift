@@ -44,12 +44,10 @@ public final class ReviewModel: ScreenModel {
     public internal(set) var errorNotice = ErrorNotice()
     public internal(set) var showsStoreReviewCard = false
 
-    public internal(set) var comment: CommentState = ReviewModel.initialComment
-    public internal(set) var newAnalysisKey: String?
     public internal(set) var goals: [ReviewGoal] = []
     public internal(set) var newReportKey: String?
 
-    var writtenComments: Set<ReviewComment> = []
+    var reasons: [String: String] = [:]
 
     private(set) var entries: [Entry] = []
 
@@ -63,9 +61,7 @@ public final class ReviewModel: ScreenModel {
     @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
     @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
     @ObservationIgnored var closingCache: [ClosingKey: ReviewClosingView.Content] = [:]
-    @ObservationIgnored var commentRequest = 0
-    @ObservationIgnored var commentFailedAt: [String: Date] = [:]
-    @ObservationIgnored var savedComments: [String: ReviewComment] = [:]
+    @ObservationIgnored var reasonRequests: Set<String> = []
 
     let database: AppDatabase
 
@@ -251,8 +247,6 @@ public extension ReviewModel {
         isMovingForward = to > from
         self.scale = scale
         offset = 0
-
-        showSavedComment()
     }
 
     func setKind(_ kind: ReviewKind) {
@@ -279,8 +273,6 @@ public extension ReviewModel {
 
         isMovingForward = count > 0
         offset += count
-
-        showSavedComment()
     }
 
     func moveToCurrent() {
@@ -290,8 +282,6 @@ public extension ReviewModel {
 
         isMovingForward = true
         offset = 0
-
-        showSavedComment()
     }
 }
 

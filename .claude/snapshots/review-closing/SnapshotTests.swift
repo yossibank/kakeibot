@@ -156,7 +156,7 @@ struct SnapshotTests {
                     name: "10月",
                     previousName: "9月",
                     unit: "月",
-                    onOpenCategory: { _ in }
+                    onOpenGoal: { _ in }
                 )
                 .padding(16)
 
