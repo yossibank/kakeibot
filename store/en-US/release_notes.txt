@@ -1,3 +1,5 @@
-・Fixed an issue where the entry screen could freeze when opening the keyboard for a memo or an item name.
-・Fixed an issue where the app froze when adding a tag to a category.
-・Fixed an issue where the bottom button moved up when opening the memo keyboard.
+・Reviews are new. The current period shows your pace and the month-end outlook.
+・When a period closes, a report arrives with the results and your next step. The next step is checked when the following period closes.
+・Tap a bar in the yearly review to open that month's records.
+・Widget tiles are easier to read.
+・The Assets screen runs more smoothly.
