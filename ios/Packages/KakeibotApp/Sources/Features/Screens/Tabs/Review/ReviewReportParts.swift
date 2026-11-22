@@ -161,9 +161,26 @@ struct ReviewGoalItem: Identifiable {
     }
 
     func title(unit: String) -> String {
+        ReviewEmphasisText.plain(titleParts(unit: unit))
+    }
+
+    func titleParts(unit: String) -> [ReviewEmphasisText.Part] {
         switch goal.kind {
-        case .count: "\(name)を、\(unit) \(goal.target) 回までに"
-        case .average: "\(name)の 1 回を、\(ReviewYen.text(goal.target)) までに"
+        case .count:
+            [
+                .name(name),
+                .plain("を、\(unit) "),
+                .number("\(goal.target)"),
+                .plain(" 回までに")
+            ]
+
+        case .average:
+            [
+                .name(name),
+                .plain("の 1 回を、"),
+                .number(ReviewYen.number(goal.target)),
+                .plain("円 までに")
+            ]
         }
     }
 

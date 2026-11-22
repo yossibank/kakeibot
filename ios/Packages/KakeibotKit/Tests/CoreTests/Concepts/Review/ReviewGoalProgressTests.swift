@@ -20,7 +20,7 @@ struct ReviewGoalProgressTests {
         #expect(progress.amount == 3000)
         #expect(progress.projectedCount == 2)
         #expect(goal.current(of: progress) == 2)
-        #expect(goal.isOnTrack(progress))
+        #expect(goal.status(of: progress) == .within)
     }
 
     @Test
@@ -47,7 +47,7 @@ struct ReviewGoalProgressTests {
         let progress = try Self.progress(of: goal, entries: entries)
 
         #expect(goal.current(of: progress) == 2250)
-        #expect(!goal.isOnTrack(progress))
+        #expect(goal.status(of: progress) == .likelyOver)
     }
 
     @Test
@@ -58,7 +58,28 @@ struct ReviewGoalProgressTests {
         let progress = try Self.progress(of: goal, entries: entries)
 
         #expect(progress.projectedCount == 8)
-        #expect(!goal.isOnTrack(progress))
+        #expect(goal.status(of: progress) == .likelyOver)
+    }
+
+    @Test
+    func holdsTheWarningEarlyInThePeriod() throws {
+        let goal = Self.goal(kind: .count, target: 7)
+        let entries = try (1...2).map { try Self.entry(day: $0, amount: 1000) }
+
+        let progress = try Self.progress(of: goal, entries: entries, today: "2026-11-02")
+
+        #expect(progress.projectedCount == 30)
+        #expect(goal.status(of: progress) == nil)
+    }
+
+    @Test
+    func tellsTheGoalIsOverEvenEarly() throws {
+        let goal = Self.goal(kind: .count, target: 2)
+        let entries = try (1...3).map { try Self.entry(day: $0, amount: 1000) }
+
+        let progress = try Self.progress(of: goal, entries: entries, today: "2026-11-03")
+
+        #expect(goal.status(of: progress) == .over)
     }
 }
 
@@ -106,11 +127,12 @@ private extension ReviewGoalProgressTests {
 
     static func progress(
         of goal: ReviewGoal,
-        entries: [Entry]
+        entries: [Entry],
+        today: String = "2026-11-21"
     ) throws -> ReviewGoal.Progress {
         let start = try #require(LocalDate("2026-11-01"))
         let end = try #require(LocalDate("2026-11-30"))
-        let today = try #require(LocalDate("2026-11-21"))
+        let today = try #require(LocalDate(today))
         return goal.progress(of: entries, in: start...end, today: today)
     }
 }

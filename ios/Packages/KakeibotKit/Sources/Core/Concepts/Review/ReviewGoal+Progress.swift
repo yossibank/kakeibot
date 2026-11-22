@@ -3,16 +3,25 @@ public extension ReviewGoal {
         public let count: Int
         public let amount: Int
         public let projectedCount: Int
+        public let elapsedRatio: Double
 
         public init(
             count: Int,
             amount: Int,
-            projectedCount: Int
+            projectedCount: Int,
+            elapsedRatio: Double
         ) {
             self.count = count
             self.amount = amount
             self.projectedCount = projectedCount
+            self.elapsedRatio = elapsedRatio
         }
+    }
+
+    enum Status: Hashable, Sendable {
+        case within
+        case likelyOver
+        case over
     }
 
     func progress(
@@ -41,7 +50,8 @@ public extension ReviewGoal {
         return Progress(
             count: matched.count,
             amount: matched.reduce(0) { $0 + $1.amount },
-            projectedCount: pace.projected
+            projectedCount: pace.projected,
+            elapsedRatio: pace.elapsedRatio
         )
     }
 
@@ -55,13 +65,27 @@ public extension ReviewGoal {
         }
     }
 
-    func isOnTrack(_ progress: Progress) -> Bool {
-        switch kind {
-        case .count:
-            progress.projectedCount <= target
+    func status(of progress: Progress) -> Status? {
+        let isOver = kind == .count
+            && progress.count > target
 
-        case .average:
-            current(of: progress) <= target
+        let isWithin = switch kind {
+        case .count: progress.projectedCount <= target
+        case .average: current(of: progress) <= target
         }
+
+        if isOver {
+            return .over
+        }
+
+        if isWithin {
+            return .within
+        }
+
+        return progress.elapsedRatio < Self.settledRatio ? nil : .likelyOver
     }
+}
+
+private extension ReviewGoal {
+    static let settledRatio = 0.3
 }

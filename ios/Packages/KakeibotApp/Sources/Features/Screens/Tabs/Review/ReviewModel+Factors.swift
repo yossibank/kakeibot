@@ -13,24 +13,27 @@ extension ReviewModel {
     }
 
     func goalShare(of item: ReviewGoalItem) -> Share? {
-        guard
-            let list,
-            let id = item.goal.categoryId,
-            let category = list.categories[id]
-        else {
+        guard let id = item.goal.categoryId else {
             return nil
         }
 
-        let key = FactorKey(categoryId: id, memo: item.goal.memo, range: period.range)
-        let amount = factorEntries(of: key).reduce(0) { $0 + $1.amount }
+        return factorShare(
+            categoryId: id,
+            memo: item.goal.memo,
+            name: item.name
+        )
+    }
 
-        return Share(
-            id: AnyHashable(key),
-            name: item.name,
-            icon: list.icons[category.iconId],
-            amount: amount,
-            ratio: 0,
-            usage: nil
+    func whyShare(
+        of row: ReviewClosingView.CompareRow,
+        why: ReviewCompare.Why
+    ) -> Share? {
+        let name = why.memo.map { "\(row.name) · \($0)" } ?? row.name
+
+        return factorShare(
+            categoryId: row.id,
+            memo: why.memo,
+            name: name
         )
     }
 
@@ -48,6 +51,31 @@ extension ReviewModel {
 }
 
 private extension ReviewModel {
+    func factorShare(
+        categoryId: EntryCategory.ID,
+        memo: String?,
+        name: String
+    ) -> Share? {
+        guard
+            let list,
+            let category = list.categories[categoryId]
+        else {
+            return nil
+        }
+
+        let key = FactorKey(categoryId: categoryId, memo: memo, range: period.range)
+        let amount = factorEntries(of: key).reduce(0) { $0 + $1.amount }
+
+        return Share(
+            id: AnyHashable(key),
+            name: name,
+            icon: list.icons[category.iconId],
+            amount: amount,
+            ratio: 0,
+            usage: nil
+        )
+    }
+
     func factorEntries(of key: FactorKey) -> [Entry] {
         entries.filter { entry in
             let isMemo = key.memo.map { ReviewGoal.normalizedMemo(entry.memo) == $0 } ?? true

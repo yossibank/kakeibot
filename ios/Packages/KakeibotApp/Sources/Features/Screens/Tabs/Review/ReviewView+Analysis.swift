@@ -156,6 +156,9 @@ private extension ReviewView {
                 unit: model.scale.unitName,
                 onOpenGoal: { item in
                     analysisShare = model.goalShare(of: item)
+                },
+                onOpenWhy: { row, why in
+                    analysisShare = model.whyShare(of: row, why: why)
                 }
             )
             .task(id: model.period) {

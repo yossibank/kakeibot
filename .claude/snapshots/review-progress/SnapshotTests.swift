@@ -53,7 +53,12 @@ struct SnapshotTests {
             goal: goal,
             name: "外食",
             categoryName: "食費",
-            progress: ReviewGoal.Progress(count: 6, amount: 9000, projectedCount: 8)
+            progress: ReviewGoal.Progress(
+                count: 6,
+                amount: 9000,
+                projectedCount: 8,
+                elapsedRatio: 0.7
+            )
         )
 
         let totals = [

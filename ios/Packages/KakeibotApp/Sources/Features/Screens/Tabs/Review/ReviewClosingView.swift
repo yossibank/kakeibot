@@ -10,6 +10,7 @@ struct ReviewClosingView: View {
     let previousName: String
     let unit: String
     let onOpenGoal: (ReviewGoalItem) -> Void
+    let onOpenWhy: (CompareRow, ReviewCompare.Why) -> Void
 
     var body: some View {
         VStack(spacing: 12) {
@@ -73,7 +74,7 @@ extension ReviewClosingView {
         static let empty = Notes(summary: nil, whys: [:])
 
         let summary: String?
-        let whys: [EntryCategory.ID: String]
+        let whys: [EntryCategory.ID: ReviewCompare.Why]
     }
 
     var periodsUnit: String {
