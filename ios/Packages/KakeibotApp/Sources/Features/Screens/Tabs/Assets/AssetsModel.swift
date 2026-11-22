@@ -7,13 +7,6 @@ import Store
 @MainActor
 @Observable
 public final class AssetsModel: ScreenModel {
-    public var today: LocalDate {
-        didSet {
-            latestInput.today = today
-            refreshLater()
-        }
-    }
-
     public var billPage = 0
 
     public private(set) var isListFailed = false
@@ -35,7 +28,6 @@ public final class AssetsModel: ScreenModel {
         let input = AssetsSummary.Input(today: today)
 
         self.database = database
-        self.today = today
         self.latestInput = input
         self.summary = AssetsSummary(input)
     }
@@ -43,6 +35,16 @@ public final class AssetsModel: ScreenModel {
 
 public extension AssetsModel {
     static let monthCount = AssetsSummary.Input.monthCount
+
+    var today: LocalDate {
+        get {
+            summary.input.today
+        }
+        set {
+            latestInput.today = newValue
+            refreshLater()
+        }
+    }
 
     var list: EntryList? {
         summary.input.list
