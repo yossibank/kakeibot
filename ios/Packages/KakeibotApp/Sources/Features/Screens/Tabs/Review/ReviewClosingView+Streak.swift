@@ -92,31 +92,42 @@ private extension ReviewClosingView {
         )
     }
 
-    var calendarDays: [LocalDate?] {
+    var calendarWeeks: [[LocalDate?]] {
         let weekdays = Weekday.week(startingOn: content.weekStart)
         let start = content.range.lowerBound
         let blanks = weekdays.firstIndex(of: start.weekday) ?? 0
         let days = (0..<totalDays).map { start.adding(days: $0) }
-        return Array(repeating: nil, count: blanks) + days
+        let cells: [LocalDate?] = Array(repeating: nil, count: blanks) + days
+
+        return stride(from: 0, to: cells.count, by: 7).map { index in
+            let week = Array(cells[index..<min(index + 7, cells.count)])
+            return week + Array(repeating: nil, count: 7 - week.count)
+        }
     }
 
     var calendar: some View {
         let weekdays = Weekday.week(startingOn: content.weekStart)
-        let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 7)
 
-        return LazyVGrid(columns: columns, spacing: 4) {
-            ForEach(weekdays, id: \.self) { weekday in
-                Text(weekday.shortName)
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
+        return Grid(horizontalSpacing: 0, verticalSpacing: 4) {
+            GridRow {
+                ForEach(weekdays, id: \.self) { weekday in
+                    Text(weekday.shortName)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                        .frame(maxWidth: .infinity)
+                }
             }
 
-            ForEach(Array(calendarDays.enumerated()), id: \.offset) { _, day in
-                if let day {
-                    dayCell(day)
-                } else {
-                    Color.clear
-                        .frame(height: Self.dayHeight)
+            ForEach(Array(calendarWeeks.enumerated()), id: \.offset) { _, week in
+                GridRow {
+                    ForEach(Array(week.enumerated()), id: \.offset) { _, day in
+                        if let day {
+                            dayCell(day)
+                        } else {
+                            Color.clear
+                                .frame(height: Self.dayHeight)
+                        }
+                    }
                 }
             }
         }
@@ -135,6 +146,7 @@ private extension ReviewClosingView {
             Text("\(day.day)")
                 .sansFont(.micro, weight: .bold)
         }
+        .frame(maxWidth: .infinity)
         .frame(height: Self.dayHeight)
     }
 
