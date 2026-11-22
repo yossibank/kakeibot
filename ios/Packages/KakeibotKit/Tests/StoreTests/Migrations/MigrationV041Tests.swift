@@ -21,7 +21,7 @@ struct MigrationV041Tests {
     @Test
     func doesNotRecordChangesWhileSyncing() throws {
         let queue = try DatabaseQueue()
-        try AppDatabase.migrator.migrate(queue)
+        try AppDatabase.migrator.migrate(queue, upTo: "v41")
 
         let count = try queue.write { db in
             try db.execute(sql: "UPDATE sync_state SET enabled = 1")

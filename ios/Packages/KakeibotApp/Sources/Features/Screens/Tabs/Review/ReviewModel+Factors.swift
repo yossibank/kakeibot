@@ -50,7 +50,7 @@ extension ReviewModel {
 private extension ReviewModel {
     func factorEntries(of key: FactorKey) -> [Entry] {
         entries.filter { entry in
-            let isMemo = key.memo.map { ReviewBreakdown.normalized(entry.memo) == $0 } ?? true
+            let isMemo = key.memo.map { ReviewGoal.normalizedMemo(entry.memo) == $0 } ?? true
 
             return entry.type == .expense
                 && key.range.contains(entry.date)

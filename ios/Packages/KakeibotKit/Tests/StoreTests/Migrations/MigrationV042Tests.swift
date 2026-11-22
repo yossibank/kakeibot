@@ -1,4 +1,3 @@
-import Core
 import GRDB
 @testable import Store
 import Testing
@@ -13,13 +12,14 @@ struct MigrationV042Tests {
         try queue.write { db in
             try db.execute(sql: Self.insertComment)
         }
-        try migrator.migrate(queue)
+        try migrator.migrate(queue, upTo: "v42")
 
-        let comment = try queue.read { db in
-            try ReviewComment.fetchOne(db, key: "month:2026-11-01")
+        let row = try queue.read { db in
+            try Row.fetchOne(db, sql: "SELECT body, breakdown FROM review_comment")
         }
 
-        #expect(comment?.breakdown == nil)
+        #expect(row?["body"] == "食費が増えています。")
+        #expect(row?["breakdown"] == DatabaseValue.null)
     }
 }
 
