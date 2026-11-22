@@ -21,85 +21,131 @@ struct ReviewReportLabel: View {
     }
 }
 
-struct ReviewReportGauge: View {
-    let pace: ReviewPace
-    let limitName: String
-    let showsMarker: Bool
+struct ReviewReportLead: View {
+    let caption: String
+    let value: String
+    let suffix: String
+    let color: Color
 
     var body: some View {
-        let used = min(pace.usedRatio, 1)
-        let color = pace.verdict == .over ? Palette.increase : Palette.accent
+        VStack(alignment: .leading, spacing: 2) {
+            Text(caption)
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
-        ZStack {
-            Circle()
-                .stroke(Palette.accent.opacity(.subtle), lineWidth: 10)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    amount
+                        .fixedSize()
 
-            Circle()
-                .trim(from: 0, to: used)
-                .stroke(color, style: StrokeStyle(lineWidth: 10, lineCap: .round))
-                .rotationEffect(.degrees(-90))
+                    suffixText
+                        .padding(.leading, 2)
+                }
 
-            if showsMarker {
-                Capsule()
-                    .fill(Palette.text)
-                    .frame(width: 3, height: 20)
-                    .offset(y: -60)
-                    .rotationEffect(.degrees(360 * pace.elapsedRatio))
+                VStack(alignment: .leading, spacing: 0) {
+                    amount
+
+                    suffixText
+                }
             }
-
-            VStack(spacing: 0) {
-                Text("\(limitName)の")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                Text("\(ReviewPace.percent(pace.usedRatio))%")
-                    .displayFont(.title, weight: .bold)
-                    .foregroundStyle(Palette.text)
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-
-                Text("使いました")
-                    .textFont(.caption2)
-                    .foregroundStyle(Palette.subtext)
-            }
-            .padding(.horizontal, 16)
+            .foregroundStyle(color)
         }
-        .frame(width: 120, height: 120)
+    }
+}
+
+private extension ReviewReportLead {
+    var amount: some View {
+        HStack(alignment: .lastTextBaseline, spacing: 2) {
+            Text(value)
+                .displayFont(.title, weight: .bold)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+
+            Text("円")
+                .displayFont(.small, weight: .bold)
+                .fixedSize()
+        }
+    }
+
+    var suffixText: some View {
+        Text(suffix)
+            .textFont(.footnote, weight: .bold)
+            .fixedSize()
+    }
+}
+
+struct ReviewReportChip: View {
+    let systemImage: String
+    let title: String
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .sansFont(.micro, weight: .bold)
+
+            Text(title)
+                .textFont(.caption2, weight: .bold)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundStyle(Palette.accent)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 12))
     }
 }
 
 struct ReviewReportStat: View {
     let title: String
+    let systemImage: String
     let value: String
-    let note: String
+    let unit: String
+    var note: String?
+    var badge: String?
+    var progress: Double?
     var color: Color = Palette.text
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title)
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+        VStack(alignment: .leading, spacing: 4) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 4) {
+                    titleText
 
-            Text(value)
-                .displayFont(.headline, weight: .bold)
-                .foregroundStyle(color)
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
+                    Spacer(minLength: 4)
 
-            Text(note)
-                .textFont(.caption2)
-                .foregroundStyle(Palette.subtext)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                    Image(systemName: systemImage)
+                        .sansFont(.small, weight: .semibold)
+                        .foregroundStyle(Palette.accent)
+                        .frame(width: 24, height: 24)
+                        .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 8))
+                }
+
+                titleText
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(height: 24)
+
+            HStack(alignment: .lastTextBaseline, spacing: 2) {
+                Text(value)
+                    .displayFont(style: .title2, weight: .bold)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+
+                Text(unit)
+                    .textFont(.caption, weight: .bold)
+                    .fixedSize()
+            }
+            .foregroundStyle(color)
+            .frame(height: Self.valueHeight, alignment: .bottomLeading)
+
+            detail
         }
         .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background(Palette.accent.opacity(.faint))
         .background(Palette.cardBottom)
     }
 }
@@ -166,6 +212,14 @@ extension ReviewYen {
 
         return amount < 0 ? "−\(text(-amount))" : "±0円"
     }
+
+    static func signedNumber(_ amount: Int) -> String {
+        if amount > 0 {
+            return "+\(number(amount))"
+        }
+
+        return amount < 0 ? "−\(number(-amount))" : "±0"
+    }
 }
 
 extension ReviewPace {
@@ -201,5 +255,56 @@ private extension ReviewReportLabel {
             startRadius: 0,
             endRadius: 240
         )
+    }
+}
+
+private extension ReviewReportStat {
+    static let valueHeight: CGFloat = 30
+
+    var titleText: some View {
+        Text(title)
+            .textFont(.caption2)
+            .foregroundStyle(Palette.subtext)
+            .lineLimit(1)
+    }
+
+    @ViewBuilder
+    var detail: some View {
+        if let progress {
+            let clamped = min(max(progress, 0), 1)
+
+            Capsule()
+                .fill(Palette.accent.opacity(.subtle))
+                .frame(height: 4)
+                .overlay(alignment: .leading) {
+                    GeometryReader { proxy in
+                        Capsule()
+                            .fill(Palette.gold)
+                            .frame(width: proxy.size.width * clamped)
+                    }
+                }
+                .padding(.top, 8)
+        } else {
+            HStack(spacing: 4) {
+                if let badge {
+                    Text(badge)
+                        .textFont(.caption2, weight: .bold)
+                        .foregroundStyle(color)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 1)
+                        .background(color.opacity(.subtle), in: Capsule())
+                        .fixedSize()
+                }
+
+                if let note {
+                    Text(note)
+                        .textFont(.caption2)
+                        .foregroundStyle(Palette.subtext)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
     }
 }

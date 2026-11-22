@@ -10,33 +10,55 @@ extension ReviewClosingView {
             HStack(spacing: 8) {
                 ReviewReportLabel(title: "記録のつづき")
 
-                Text("最長 \(streak.longest) 日")
-                    .textFont(.caption2, weight: .bold)
-                    .foregroundStyle(Palette.accent)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .background(Palette.accent.opacity(.subtle), in: Capsule())
-                    .fixedSize()
+                HStack(spacing: 4) {
+                    Image(systemName: "flame.fill")
+                        .sansFont(.micro, weight: .bold)
+
+                    Text("最長 \(streak.longest) 日")
+                        .textFont(.caption2, weight: .bold)
+                }
+                .foregroundStyle(Palette.cardBottom)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Palette.gold, in: Capsule())
+                .fixedSize()
             }
 
             Text("\(streak.days.count) 日 記録しました")
                 .displayFont(.headline, weight: .bold)
                 .foregroundStyle(Palette.text)
 
-            if content.scale == .month {
+            if content.scale != .year {
                 calendar
+
+                legend
             }
 
             HStack(spacing: 0) {
-                trioItem("\(streak.days.count)", unit: "日", title: "記録した日")
+                trioItem(
+                    "calendar",
+                    value: "\(streak.days.count)",
+                    unit: "日",
+                    title: "記録した日"
+                )
 
                 Divider()
 
-                trioItem("\(streak.count)", unit: "件", title: "\(name)の記録")
+                trioItem(
+                    "square.and.pencil",
+                    value: "\(streak.count)",
+                    unit: "件",
+                    title: "\(name)の記録"
+                )
 
                 Divider()
 
-                trioItem("\(content.continuing)", unit: periodsUnit, title: "続けている")
+                trioItem(
+                    "rosette",
+                    value: "\(content.continuing)",
+                    unit: periodsUnit,
+                    title: "続けている"
+                )
             }
             .padding(.top, 12)
             .overlay(alignment: .top) {
@@ -52,6 +74,24 @@ extension ReviewClosingView {
 }
 
 private extension ReviewClosingView {
+    enum DayMark {
+        case recorded
+        case noSpend
+        case empty
+    }
+
+    static let dayHeight: CGFloat = 32
+    static let circleSize: CGFloat = 28
+
+    static var recordedFill: RadialGradient {
+        RadialGradient(
+            colors: [Palette.accentDeep, Palette.accent],
+            center: .topLeading,
+            startRadius: 0,
+            endRadius: 32
+        )
+    }
+
     var calendarDays: [LocalDate?] {
         let weekdays = Weekday.week(startingOn: content.weekStart)
         let start = content.range.lowerBound
@@ -71,63 +111,104 @@ private extension ReviewClosingView {
                     .foregroundStyle(Palette.subtext)
             }
 
-            ForEach(Array(calendarDays.enumerated()), id: \.offset) { index, day in
+            ForEach(Array(calendarDays.enumerated()), id: \.offset) { _, day in
                 if let day {
-                    dayCell(day, column: index % 7)
+                    dayCell(day)
                 } else {
                     Color.clear
-                        .frame(height: 28)
+                        .frame(height: Self.dayHeight)
                 }
             }
         }
     }
 
-    func dayCell(
-        _ day: LocalDate,
-        column: Int
-    ) -> some View {
-        let days = content.streak.days
-        let isOn = days.contains(day)
-        let joinsLeft = isOn && column > 0 && days.contains(day.adding(days: -1))
-        let joinsRight = isOn && column < 6 && days.contains(day.adding(days: 1))
-        let band = Palette.accent.opacity(.soft)
-        let leftBand = joinsLeft ? band : .clear
-        let rightBand = joinsRight ? band : .clear
-        let textColor = isOn ? Palette.backgroundBottom : Palette.subtext
+    var legend: some View {
+        HStack(spacing: 12) {
+            legendItem(.recorded, title: "記録した日")
+            legendItem(.noSpend, title: "支出なしの日")
+            legendItem(.empty, title: "記録なし")
+        }
+    }
 
-        return ZStack {
-            HStack(spacing: 0) {
-                Rectangle()
-                    .fill(leftBand)
-
-                Rectangle()
-                    .fill(rightBand)
-            }
-            .frame(height: 16)
-
+    func dayCell(_ day: LocalDate) -> some View {
+        dayCircle(mark(on: day), size: Self.circleSize) {
             Text("\(day.day)")
                 .sansFont(.micro, weight: .bold)
-                .foregroundStyle(textColor)
-                .frame(width: 24, height: 24)
-                .background {
-                    if isOn {
-                        Circle()
-                            .fill(Palette.gold)
-                    } else {
-                        Circle()
-                            .strokeBorder(Palette.line)
-                    }
-                }
         }
-        .frame(height: 28)
+        .frame(height: Self.dayHeight)
+    }
+
+    func dayCircle(
+        _ mark: DayMark,
+        size: CGFloat,
+        @ViewBuilder label: () -> some View
+    ) -> some View {
+        label()
+            .frame(width: size, height: size)
+            .foregroundStyle(Self.textColor(of: mark))
+            .background {
+                switch mark {
+                case .recorded:
+                    Circle()
+                        .fill(Self.recordedFill)
+                        .shadow(color: Palette.accent.opacity(.muted), radius: 3, y: 2)
+
+                case .noSpend:
+                    Circle()
+                        .fill(Palette.accent.opacity(.subtle))
+                        .overlay {
+                            Circle()
+                                .strokeBorder(Palette.accent, lineWidth: 1.5)
+                        }
+
+                case .empty:
+                    Circle()
+                        .strokeBorder(Palette.line, style: .dashed)
+                }
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if mark == .noSpend,
+                   size >= Self.circleSize {
+                    Image(systemName: "checkmark")
+                        .sansFont(.micro, weight: .black)
+                        .imageScale(.small)
+                        .foregroundStyle(Palette.cardBottom)
+                        .frame(width: 12, height: 12)
+                        .background(Palette.accent, in: Circle())
+                        .offset(x: 2, y: 2)
+                }
+            }
+    }
+
+    func legendItem(
+        _ mark: DayMark,
+        title: String
+    ) -> some View {
+        HStack(spacing: 4) {
+            dayCircle(mark, size: 12) {
+                Color.clear
+            }
+
+            Text(title)
+                .textFont(.caption2)
+                .foregroundStyle(Palette.subtext)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
     }
 
     func trioItem(
-        _ value: String,
+        _ systemImage: String,
+        value: String,
         unit: String,
         title: String
     ) -> some View {
         VStack(spacing: 2) {
+            Image(systemName: systemImage)
+                .sansFont(.small, weight: .semibold)
+                .foregroundStyle(Palette.accent)
+                .padding(.bottom, 2)
+
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text(value)
                     .displayFont(.headline, weight: .bold)
@@ -146,5 +227,23 @@ private extension ReviewClosingView {
                 .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    static func textColor(of mark: DayMark) -> Color {
+        switch mark {
+        case .recorded: Palette.cardBottom
+        case .noSpend: Palette.accent
+        case .empty: Palette.subtext
+        }
+    }
+
+    func mark(on day: LocalDate) -> DayMark {
+        let streak = content.streak
+
+        if streak.noSpendDays.contains(day) {
+            return .noSpend
+        }
+
+        return streak.days.contains(day) ? .recorded : .empty
     }
 }

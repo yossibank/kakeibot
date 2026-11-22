@@ -15,24 +15,17 @@ extension ReviewView {
     var analysisBanner: some View {
         Button {
             if model.hasNewReport {
-                move(by: -1)
+                model.move(by: -1)
             }
 
             showsAnalysis = true
         } label: {
             HStack(spacing: 12) {
-                Image(systemName: "chart.bar.xaxis")
-                    .sansFont(.headline, weight: .bold)
-                    .foregroundStyle(Palette.backgroundBottom)
+                Image(systemName: bannerSymbol)
+                    .sansFont(.body, weight: .semibold)
+                    .foregroundStyle(Palette.accent)
                     .frame(width: 40, height: 40)
-                    .background(Self.bannerIconFill, in: .rect(cornerRadius: 12))
-                    .overlay(alignment: .topTrailing) {
-                        Image(systemName: "sparkle")
-                            .sansFont(.micro, weight: .bold)
-                            .foregroundStyle(Palette.backgroundBottom)
-                            .offset(x: -4, y: 4)
-                    }
-                    .shadow(color: Palette.accent.opacity(.muted), radius: 8, y: 4)
+                    .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 12))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(bannerLabel)
@@ -41,7 +34,7 @@ extension ReviewView {
                         .foregroundStyle(Palette.accent)
 
                     Text(bannerTitle)
-                        .textFont(.subheadline, weight: .bold)
+                        .displayFont(style: .subheadline, weight: .bold)
                         .foregroundStyle(Palette.text)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
@@ -57,7 +50,7 @@ extension ReviewView {
                         .foregroundStyle(Palette.backgroundBottom)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Palette.accentStrong, in: Capsule())
+                        .background(Palette.gold, in: Capsule())
                         .fixedSize()
                         .transition(.scale.combined(with: .opacity))
                 }
@@ -69,10 +62,10 @@ extension ReviewView {
             .padding(.vertical, 8)
             .padding(.leading, 8)
             .padding(.trailing, 16)
-            .background(Self.bannerFill, in: .rect(cornerRadius: 20))
+            .background(Palette.card, in: .rect(cornerRadius: 20))
             .overlay {
                 RoundedRectangle(cornerRadius: 20)
-                    .strokeBorder(Palette.accent.opacity(.medium))
+                    .strokeBorder(Palette.accent.opacity(.muted))
             }
             .shadow(color: Palette.accent.opacity(.subtle), radius: 12, y: 6)
             .animation(.smooth, value: model.hasNewReport)
@@ -134,6 +127,9 @@ extension ReviewView {
         .task(id: model.reasonTrigger) {
             await model.refreshReason()
         }
+        .task(id: model.noteTrigger) {
+            await model.refreshNotes()
+        }
         .sheet(item: $analysisShare) { share in
             shareSheet(share)
         }
@@ -154,6 +150,7 @@ private extension ReviewView {
             ReviewClosingView(
                 content: model.closingContent,
                 goals: model.closingGoals(),
+                notes: model.closingNotes,
                 name: analysisName,
                 previousName: model.period.previous.displayName,
                 unit: model.scale.unitName,
@@ -171,14 +168,17 @@ private extension ReviewView {
         let period = model.period
         let closingDate = period.range.upperBound.adding(days: 1)
         let previousTitle = "\(period.previous.displayName)のふりかえりを見る"
+        let daysLeft = model.today.days(until: closingDate)
 
         return ReviewProgressView(
             pace: model.pace,
+            year: model.yearProgress,
             unit: model.scale.unitName,
             currentName: currentName,
             goals: model.goalItems,
             closingTitle: "\(analysisName)のふりかえり",
             closingDate: closingDate,
+            closingDaysLeft: daysLeft,
             nextGoalTitle: "\(period.adding(1).displayName)の一手",
             previousTitle: previousTitle,
             onOpenPrevious: {
@@ -189,25 +189,10 @@ private extension ReviewView {
 }
 
 private extension ReviewView {
-    static var bannerFill: LinearGradient {
-        LinearGradient(
-            colors: [
-                Palette.accent.opacity(.muted),
-                Palette.accent.opacity(.faint),
-                Palette.cardBottom
-            ],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-    }
-
-    static var bannerIconFill: RadialGradient {
-        RadialGradient(
-            colors: [Palette.accentStrong, Palette.accent, Palette.accentDeep],
-            center: .topLeading,
-            startRadius: 0,
-            endRadius: 48
-        )
+    var bannerSymbol: String {
+        model.isCurrentPeriod && !model.hasNewReport
+            ? "chart.bar.xaxis"
+            : "envelope.open"
     }
 
     var bannerLabel: String {

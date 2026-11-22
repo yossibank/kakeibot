@@ -48,8 +48,15 @@ public final class ReviewModel: ScreenModel {
     public internal(set) var newReportKey: String?
 
     var reasons: [String: String] = [:]
+    var notes: [String: String] = [:]
 
     private(set) var entries: [Entry] = []
+
+    private(set) var noSpendDays: Set<LocalDate> = [] {
+        didSet {
+            closingCache = [:]
+        }
+    }
 
     private(set) var recurrings: [Recurring] = [] {
         didSet {
@@ -62,6 +69,7 @@ public final class ReviewModel: ScreenModel {
     @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
     @ObservationIgnored var closingCache: [ClosingKey: ReviewClosingView.Content] = [:]
     @ObservationIgnored var reasonRequests: Set<String> = []
+    @ObservationIgnored var noteRequests: Set<String> = []
 
     let database: AppDatabase
 
@@ -213,6 +221,10 @@ public extension ReviewModel {
             }
 
             group.addTask {
+                await self.observeNoSpendDays()
+            }
+
+            group.addTask {
                 await self.observeRecurrings()
             }
 
@@ -335,6 +347,15 @@ private extension ReviewModel {
             failure: Self.loadFailedMessage
         ) { calendar in
             stampCalendar = calendar
+        }
+    }
+
+    func observeNoSpendDays() async {
+        await observe(
+            database.noSpendDayUpdates(),
+            failure: Self.loadFailedMessage
+        ) { days in
+            noSpendDays = days
         }
     }
 

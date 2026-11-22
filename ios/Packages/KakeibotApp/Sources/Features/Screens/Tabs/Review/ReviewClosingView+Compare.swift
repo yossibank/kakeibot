@@ -63,26 +63,7 @@ extension ReviewClosingView {
             }
 
             if let special = content.special {
-                HStack(spacing: 8) {
-                    Text("特別")
-                        .textFont(.caption2, weight: .bold)
-                        .foregroundStyle(Palette.amber)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 2)
-                        .overlay {
-                            Capsule()
-                                .strokeBorder(Palette.amber)
-                        }
-                        .fixedSize()
-
-                    Text(Self.specialText(special))
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.text)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(12)
-                .background(Palette.amber.opacity(.subtle), in: .rect(cornerRadius: 16))
+                specialCard(special)
             }
         }
         .padding(20)
@@ -96,7 +77,7 @@ extension ReviewClosingView {
 
             VStack(spacing: 0) {
                 ForEach(goodItems) { item in
-                    goodRow(item)
+                    goodRow(item, isLast: item.id == goodItems.last?.id)
                 }
             }
         }
@@ -108,6 +89,22 @@ extension ReviewClosingView {
 
 private extension ReviewClosingView {
     static let goodLimit = 2
+
+    static var specialFill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.amber.opacity(.medium), Palette.amber],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var specialGlow: LinearGradient {
+        LinearGradient(
+            colors: [Palette.amber.opacity(.subtle), Palette.amber.opacity(.faint)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
 
     var compareScale: Int {
         let largest = content.rows.map { max($0.row.amount, $0.row.average) }.max() ?? 0
@@ -161,6 +158,24 @@ private extension ReviewClosingView {
                     .foregroundStyle(color)
                     .monospacedDigit()
             }
+
+            if let why = notes.whys[item.id] {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .sansFont(.micro, weight: .bold)
+                        .foregroundStyle(Palette.gold)
+
+                    Text(why)
+                        .textFont(.caption)
+                        .foregroundStyle(Palette.text)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
+                .padding(.top, 4)
+            }
         }
         .padding(.vertical, 12)
         .overlay(alignment: .top) {
@@ -208,7 +223,88 @@ private extension ReviewClosingView {
         .frame(height: 14)
     }
 
-    func goodRow(_ item: GoodItem) -> some View {
+    func specialCard(_ special: Special) -> some View {
+        let date = "\(special.date.yearMonth.month)/\(special.date.day)"
+        let amount = ReviewYen.number(special.amount)
+
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles")
+                    .sansFont(.small, weight: .bold)
+                    .foregroundStyle(Palette.cardBottom)
+                    .frame(width: 32, height: 32)
+                    .background(Self.specialFill, in: .rect(cornerRadius: 12))
+
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("特別な支出")
+                        .textFont(.caption2, weight: .bold)
+                        .tracking(1.5)
+                        .foregroundStyle(Palette.amber)
+
+                    Text(special.name)
+                        .displayFont(style: .subheadline, weight: .bold)
+                        .foregroundStyle(Palette.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+
+                Spacer(minLength: 8)
+
+                Text(date)
+                    .textFont(.caption2, weight: .bold)
+                    .foregroundStyle(Palette.amber)
+                    .monospacedDigit()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .overlay {
+                        Capsule()
+                            .strokeBorder(Palette.amber.opacity(.medium))
+                    }
+                    .fixedSize()
+            }
+
+            HStack(alignment: .lastTextBaseline, spacing: 8) {
+                Text("平均の計算から外しています")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Spacer(minLength: 0)
+
+                HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    Text(amount)
+                        .displayFont(.headline, weight: .bold)
+                        .monospacedDigit()
+
+                    Text("円")
+                        .displayFont(.small, weight: .bold)
+                }
+                .foregroundStyle(Palette.amber)
+                .fixedSize()
+            }
+            .padding(.top, 12)
+            .overlay(alignment: .top) {
+                Rectangle()
+                    .fill(Palette.amber.opacity(.soft))
+                    .frame(height: 1)
+            }
+        }
+        .padding(16)
+        .background {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Self.specialGlow)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16)
+                        .strokeBorder(Palette.amber.opacity(.muted))
+                }
+        }
+    }
+
+    func goodRow(
+        _ item: GoodItem,
+        isLast: Bool
+    ) -> some View {
         HStack(spacing: 12) {
             Image(systemName: item.systemImage)
                 .sansFont(.small, weight: .bold)
@@ -239,7 +335,8 @@ private extension ReviewClosingView {
                 .monospacedDigit()
                 .fixedSize()
         }
-        .padding(.vertical, 12)
+        .padding(.top, 12)
+        .padding(.bottom, isLast ? 0 : 12)
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(Palette.line)
@@ -261,10 +358,5 @@ private extension ReviewClosingView {
         case .less: "少なめ"
         case .usual: "いつもどおり"
         }
-    }
-
-    static func specialText(_ special: Special) -> String {
-        let date = "\(special.date.yearMonth.month)/\(special.date.day)"
-        return "\(date) \(special.name) \(ReviewYen.text(special.amount)) は外して比べています"
     }
 }

@@ -96,12 +96,12 @@ closed_hints に入る画面の名前は、次のとおり。
 
 ### review_comment
 
-締めのレポートの一手の理由（AI の文）を、締めた期間ごとに 1 行持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/ai-review.md](decisions/ai-review.md#一手の理由の保存) にある。
+締めのレポートの一手の理由と総評（AI の文）を、締めた期間ごとに 1 行ずつ持つ。iOS だけに持ち、同期・書き出しには入れない。決定は [decisions/ai-review.md](decisions/ai-review.md#一手の理由の保存) にある。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |
-| period | TEXT | 主キー。`month:2026-11-01` のように、週・月・年と期間の初日をつなぐ |
-| body | TEXT | 一手の理由の文 |
+| period | TEXT | 主キー。`month:2026-11-01` のように週・月・年と期間の初日をつなぎ、総評は頭に `summary:` を付ける |
+| body | TEXT | 一手の理由か総評の文 |
 | basis | TEXT | 作った時にモデルへ渡した事実の文。変わったら作り直す |
 | created_at | TEXT | |
 

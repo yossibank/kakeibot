@@ -49,7 +49,7 @@ test-model:
 	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
 	@rm -rf .build/model-test.xcresult .build/model-test
 	@mkdir -p .build/model-test
-	-set -o pipefail; TEST_RUNNER_KAKEIBOT_MODEL_TESTS=1 $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never -resultBundlePath .build/model-test.xcresult -only-testing:FeaturesTests/ReviewCommentModelAccuracyTests -only-testing:FeaturesTests/EntryVoiceModelAccuracyTests test >| .build/model-test.log 2>&1
+	-set -o pipefail; TEST_RUNNER_KAKEIBOT_MODEL_TESTS=1 $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never -resultBundlePath .build/model-test.xcresult -only-testing:FeaturesTests/ReviewCommentModelAccuracyTests -only-testing:FeaturesTests/ReviewNoteModelAccuracyTests -only-testing:FeaturesTests/EntryVoiceModelAccuracyTests test >| .build/model-test.log 2>&1
 	@xcrun xcresulttool export attachments --path .build/model-test.xcresult --output-path .build/model-test >/dev/null
 	@for f in .build/model-test/*.txt; do cat "$$f"; echo; done
 	@grep -E '(passed|failed) after' .build/model-test.log | tail -1
