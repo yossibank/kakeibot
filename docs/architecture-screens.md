@@ -21,6 +21,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | ReviewView の締めのレポート | 締めた期間では、シートの頭に `ReviewClosingView` を出す。中身は、開いた時の記録からコードで数える |
 | ReviewView の一手 | 今の期間が変わると、`task(id:)` で直前の期間の一手を答え合わせし、次の一手を作る。開いた締めのレポートは、setting の `review_seen_reports` に残す |
 | ReviewView のレビューの札 | 記録の数が変わると、`task(id:)` で出すかを決め直す |
+| AssetsModel の集計 | 受けた値から、MainActor の外で `AssetsSummary` を組み立てる。記録の一覧と集計は一緒に差し替え、古い組み立ての結果は捨てる |
 
 記録の一覧（`EntryList`）の見張りは、`AppDatabase` が 1 つだけ持つ。見張りの型は `ValueObservation` で、見張る画面と入力シートのあいだで共有する。中身が変わらない書き込みでは、値を渡さない。
 

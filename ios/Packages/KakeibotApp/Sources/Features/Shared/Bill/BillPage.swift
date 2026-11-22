@@ -1,6 +1,6 @@
 import Core
 
-public struct BillPage: Equatable {
+public struct BillPage: Equatable, Sendable {
     public let month: YearMonth
     public let bills: [CardBill]
 }
