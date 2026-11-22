@@ -3,8 +3,14 @@ import Foundation
 import Store
 
 extension ReviewModel {
-    var noteTrigger: GoalTrigger {
-        GoalTrigger(period: period, isLoaded: list != nil)
+    struct NoteTrigger: Hashable {
+        let period: String
+        let basis: String?
+    }
+
+    var noteTrigger: NoteTrigger {
+        let basis = list == nil ? nil : closingFacts.basis
+        return NoteTrigger(period: period.commentKey, basis: basis)
     }
 
     var closingNotes: ReviewClosingView.Notes {
@@ -31,19 +37,21 @@ extension ReviewModel {
 
     func refreshNotes(now: Date = Date()) async {
         let key = Self.summaryKey(period.commentKey)
+        let facts = closingFacts
+        let basis = facts.basis
+        let request = "\(key)\n\(basis)"
 
         guard
+            list != nil,
             !isCurrentPeriod,
-            !noteRequests.contains(key),
+            !noteRequests.contains(request),
             entryCount(in: period.range) >= ReviewComment.minimumEntries
         else {
             return
         }
 
-        noteRequests.insert(key)
+        noteRequests.insert(request)
 
-        let facts = closingFacts
-        let basis = facts.basis
         let saved = try? await database.reviewComment(for: key)
 
         if let saved,
@@ -56,6 +64,7 @@ extension ReviewModel {
 
         guard let body = await Self.writeSummary(facts: facts, scale: scale, categories: names)
         else {
+            noteRequests.remove(request)
             return
         }
 
