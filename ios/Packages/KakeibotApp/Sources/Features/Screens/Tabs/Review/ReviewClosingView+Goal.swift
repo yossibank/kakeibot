@@ -11,10 +11,15 @@ extension ReviewClosingView {
         let checkDate: LocalDate
     }
 
+    struct Reason: Hashable {
+        let text: String
+        let isWritten: Bool
+    }
+
     enum Next {
         case none
         case rest
-        case goal(ReviewGoalItem, reason: String?)
+        case goal(ReviewGoalItem, reason: Reason?)
     }
 
     @ViewBuilder
@@ -131,7 +136,7 @@ private extension ReviewClosingView {
 
     func ticket(
         _ item: ReviewGoalItem,
-        reason: String?
+        reason: Reason?
     ) -> some View {
         let goal = item.goal
         let start = goals.nextStart
@@ -159,7 +164,7 @@ private extension ReviewClosingView {
                     .fixedSize(horizontal: false, vertical: true)
 
                 if let reason {
-                    Text(reason)
+                    Self.reasonText(reason)
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
                         .fixedSize(horizontal: false, vertical: true)
@@ -248,5 +253,18 @@ private extension ReviewClosingView {
                     .padding(4)
             }
             .rotationEffect(.degrees(-12))
+    }
+}
+
+private extension ReviewClosingView {
+    static func reasonText(_ reason: Reason) -> Text {
+        guard reason.isWritten else {
+            return Text(reason.text)
+        }
+
+        let sparkle = Text(Image(systemName: "sparkles"))
+            .foregroundStyle(Palette.gold)
+
+        return Text("\(sparkle) \(reason.text)")
     }
 }

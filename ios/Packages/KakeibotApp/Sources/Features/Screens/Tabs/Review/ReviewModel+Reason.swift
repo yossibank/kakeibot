@@ -14,8 +14,14 @@ extension ReviewModel {
         return ReasonTrigger(period: period.commentKey, goalId: goal?.id)
     }
 
-    func goalReason(for item: ReviewGoalItem) -> String? {
-        reasons[period.commentKey] ?? factReason(for: item)
+    func goalReason(for item: ReviewGoalItem) -> ReviewClosingView.Reason? {
+        if let written = reasons[period.commentKey] {
+            return ReviewClosingView.Reason(text: written, isWritten: true)
+        }
+
+        return factReason(for: item).map { text in
+            ReviewClosingView.Reason(text: text, isWritten: false)
+        }
     }
 
     func refreshReason(now: Date = Date()) async {
