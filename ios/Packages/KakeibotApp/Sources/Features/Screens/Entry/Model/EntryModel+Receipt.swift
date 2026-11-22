@@ -44,11 +44,13 @@ public extension EntryModel {
             taxIncluded = renamed.taxIncluded
         }
 
+        let adjusts = !renamed.items.isEmpty && canAdjustToItems
+
         if let total = renamed.total,
            (1...AmountCalculator.maxValue).contains(total) {
             calculator = AmountCalculator(amount: total)
             setsAmount = true
-        } else if !renamed.items.isEmpty, canAdjustToItems {
+        } else if adjusts {
             adjustToItems()
             setsAmount = itemTotal > 0
         }
