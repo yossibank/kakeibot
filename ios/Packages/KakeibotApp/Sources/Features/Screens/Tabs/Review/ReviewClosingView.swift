@@ -126,13 +126,13 @@ private extension ReviewClosingView {
                 GridRow {
                     ReviewReportStat(
                         title: "使った",
-                        value: ReviewInsight.yen(spent),
+                        value: ReviewYen.text(spent),
                         note: spentNote
                     )
 
                     ReviewReportStat(
                         title: "1 日あたり",
-                        value: ReviewInsight.yen(spent / totalDays),
+                        value: ReviewYen.text(spent / totalDays),
                         note: "\(totalDays) 日で割った額"
                     )
                 }
@@ -141,8 +141,8 @@ private extension ReviewClosingView {
                     GridRow {
                         ReviewReportStat(
                             title: "\(previousName)より",
-                            value: ReviewInsight.signed(spent - previousTotal),
-                            note: "\(previousName) \(ReviewInsight.yen(previousTotal))",
+                            value: ReviewYen.signed(spent - previousTotal),
+                            note: "\(previousName) \(ReviewYen.text(previousTotal))",
                             color: spent <= previousTotal ? Palette.accent : Palette.increase
                         )
                         .gridCellColumns(2)
@@ -179,7 +179,7 @@ private extension ReviewClosingView {
             return "\(content.streak.count) 件の記録"
         }
 
-        return "\(pace.limitName(unit: unit)) \(ReviewInsight.yen(pace.limit))"
+        return "\(pace.limitName(unit: unit)) \(ReviewYen.text(pace.limit))"
     }
 
     static func leftColor(_ pace: ReviewPace) -> Color {
@@ -187,7 +187,7 @@ private extension ReviewClosingView {
     }
 
     static func leftText(_ pace: ReviewPace) -> String {
-        let amount = ReviewInsight.yen(abs(pace.remaining))
+        let amount = ReviewYen.text(abs(pace.remaining))
 
         switch pace.basis {
         case .budget: return pace.remaining >= 0 ? "\(amount) 余り" : "\(amount) 超え"

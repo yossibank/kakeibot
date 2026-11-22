@@ -88,7 +88,7 @@ extension ReviewClosingView {
 
                 Spacer(minLength: 8)
 
-                Text(ReviewInsight.yen(goal.saved ?? 0))
+                Text(ReviewYen.text(goal.saved ?? 0))
                     .displayFont(.title, weight: .bold)
                     .foregroundStyle(Palette.accent)
                     .monospacedDigit()
@@ -187,7 +187,7 @@ private extension ReviewClosingView {
 
                 Spacer(minLength: 8)
 
-                Text(ReviewInsight.yen(goal.saving))
+                Text(ReviewYen.text(goal.saving))
                     .displayFont(.largeTitle, weight: .bold)
                     .foregroundStyle(Palette.gold)
                     .monospacedDigit()

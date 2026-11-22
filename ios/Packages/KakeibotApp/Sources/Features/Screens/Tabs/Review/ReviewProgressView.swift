@@ -118,8 +118,8 @@ private extension ReviewProgressView {
                 GridRow {
                     ReviewReportStat(
                         title: "使った",
-                        value: ReviewInsight.yen(pace.spent),
-                        note: "\(limitName) \(ReviewInsight.yen(pace.limit))"
+                        value: ReviewYen.text(pace.spent),
+                        note: "\(limitName) \(ReviewYen.text(pace.limit))"
                     )
 
                     ReviewReportStat(
@@ -132,7 +132,7 @@ private extension ReviewProgressView {
                 GridRow {
                     ReviewReportStat(
                         title: "残りの 1 日に使える",
-                        value: ReviewInsight.yen(pace.perDay),
+                        value: ReviewYen.text(pace.perDay),
                         note: Self.perDayNote(pace)
                     )
 
@@ -190,20 +190,20 @@ private extension ReviewProgressView {
     }
 
     static func leadText(_ pace: ReviewPace) -> String {
-        let amount = ReviewInsight.yen(abs(pace.lead))
+        let amount = ReviewYen.text(abs(pace.lead))
         return pace.lead >= 0 ? "\(amount) 少ない" : "\(amount) 多い"
     }
 
     static func perDayNote(_ pace: ReviewPace) -> String {
         guard pace.remaining > 0 else {
-            return "\(ReviewInsight.yen(-pace.remaining)) 超えています"
+            return "\(ReviewYen.text(-pace.remaining)) 超えています"
         }
 
-        return "\(ReviewInsight.yen(pace.remaining)) ÷ \(pace.daysLeft) 日"
+        return "\(ReviewYen.text(pace.remaining)) ÷ \(pace.daysLeft) 日"
     }
 
     static func projectedText(_ pace: ReviewPace) -> String {
-        let amount = ReviewInsight.yen(abs(pace.projectedLeft))
+        let amount = ReviewYen.text(abs(pace.projectedLeft))
         return pace.projectedLeft >= 0 ? "\(amount) 余る" : "\(amount) 足りない"
     }
 }

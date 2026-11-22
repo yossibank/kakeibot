@@ -20,8 +20,8 @@ extension ReviewClosingView {
                     id: item.name,
                     systemImage: "arrow.down",
                     title: "\(item.name)が少なめ",
-                    detail: "平均 \(ReviewInsight.yen(item.row.average)) → \(ReviewInsight.yen(item.row.amount))",
-                    value: ReviewInsight.signed(item.row.difference)
+                    detail: "平均 \(ReviewYen.text(item.row.average)) → \(ReviewYen.text(item.row.amount))",
+                    value: ReviewYen.signed(item.row.difference)
                 )
             }
 
@@ -139,7 +139,7 @@ private extension ReviewClosingView {
 
                 Spacer(minLength: 8)
 
-                Text(ReviewInsight.yen(row.amount))
+                Text(ReviewYen.text(row.amount))
                     .displayFont(.body, weight: .bold)
                     .foregroundStyle(Palette.text)
                     .monospacedDigit()
@@ -149,14 +149,14 @@ private extension ReviewClosingView {
             track(row, scale: scale, color: color)
 
             HStack {
-                Text("平均 \(ReviewInsight.yen(row.average))")
+                Text("平均 \(ReviewYen.text(row.average))")
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .monospacedDigit()
 
                 Spacer(minLength: 8)
 
-                Text(ReviewInsight.signed(row.difference))
+                Text(ReviewYen.signed(row.difference))
                     .textFont(.caption, weight: .bold)
                     .foregroundStyle(color)
                     .monospacedDigit()
@@ -265,6 +265,6 @@ private extension ReviewClosingView {
 
     static func specialText(_ special: Special) -> String {
         let date = "\(special.date.yearMonth.month)/\(special.date.day)"
-        return "\(date) \(special.name) \(ReviewInsight.yen(special.amount)) は外して比べています"
+        return "\(date) \(special.name) \(ReviewYen.text(special.amount)) は外して比べています"
     }
 }
