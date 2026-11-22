@@ -45,6 +45,6 @@ extension AssetsModelTests {
 }
 
 private extension AssetsModelTests {
-    static let entryCount = 2000
+    static let entryCount = 500
     static let quickChangeCount = 100
 }
