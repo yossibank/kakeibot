@@ -23,6 +23,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/docs-check.py` の fixtures | fixtures の `description` と `summary` も見る |
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
 | `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数かを確かめ、`make verify` で走る。2 以下と、式の中の値は見ない |
+| `scripts/no-warnings.sh` | `make verify` のアプリのビルドを包む。外のパッケージを除き、`warning:` が 1 件でも出たら失敗にする |
 | `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON を整形する。`make format` と pre-commit で直し、`make verify-docs` で確かめる |
 | claude-config の書き方を確かめるフック | `docs-check.py`・`swift-style-check.py`・`kotlin-style-check.py`。`.md` は `make verify-docs`、`.swift` と `.kt` は `make verify` で全部にかける |
 | `spec/` | `export-format.md`、`fixtures.md`、`fixtures/` |

@@ -73,7 +73,7 @@ verify: verify-docs
 	scripts/verify.sh kotlin-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-style-check.py $$(git ls-files '*.kt')
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
-	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
+	scripts/verify.sh app-build scripts/no-warnings.sh $(XCODEBUILD) $(ANY_SIMULATOR) build
 	scripts/verify.sh android-test $(GRADLE) :core:test :store:jvmTest
 	scripts/verify.sh android-build $(GRADLE) :app:assembleDebug
 
