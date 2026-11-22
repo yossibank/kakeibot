@@ -14,6 +14,7 @@ struct ReviewProgressView: View {
     let nextGoalTitle: String
     let previousTitle: String
     let onOpenPrevious: () -> Void
+    let onOpenMonth: (ReviewYearProgress.Month) -> Void
 
     var body: some View {
         VStack(spacing: 12) {

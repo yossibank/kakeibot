@@ -1,6 +1,10 @@
 import Core
 
 extension ReviewModel {
+    struct MonthKey: Hashable {
+        let range: ClosedRange<LocalDate>
+    }
+
     var yearProgress: ReviewYearProgress? {
         guard
             scale == .year,
@@ -36,6 +40,30 @@ extension ReviewModel {
             previousSpent: hasPrevious ? previousSpent : nil
         )
     }
+
+    func monthShare(of month: ReviewYearProgress.Month) -> Share {
+        Share(
+            id: AnyHashable(MonthKey(range: month.range)),
+            name: month.name,
+            icon: nil,
+            amount: month.total,
+            ratio: 0,
+            usage: nil
+        )
+    }
+
+    func monthRows(of key: MonthKey) -> [EntryRowItem] {
+        guard let list else {
+            return []
+        }
+
+        return entries
+            .filter { $0.type == .expense && key.range.contains($0.date) }
+            .sorted { $0.date > $1.date }
+            .map { entry in
+                EntryRowItem.dated(entry, in: list)
+            }
+    }
 }
 
 private extension ReviewModel {
@@ -60,6 +88,7 @@ private extension ReviewModel {
 
         return ReviewYearProgress.Month(
             id: index,
+            range: month.range,
             name: month.displayName,
             total: total,
             state: state,

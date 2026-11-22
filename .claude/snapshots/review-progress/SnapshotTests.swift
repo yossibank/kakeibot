@@ -87,6 +87,7 @@ struct SnapshotTests {
 
             return ReviewYearProgress.Month(
                 id: index,
+                range: closing...closing,
                 name: "\(index + 1)月",
                 total: total,
                 state: state,
@@ -117,7 +118,8 @@ struct SnapshotTests {
                     closingDaysLeft: 10,
                     nextGoalTitle: "12月の一手",
                     previousTitle: "10月のふりかえりを見る",
-                    onOpenPrevious: {}
+                    onOpenPrevious: {},
+                    onOpenMonth: { _ in }
                 )
                 .padding(16)
 

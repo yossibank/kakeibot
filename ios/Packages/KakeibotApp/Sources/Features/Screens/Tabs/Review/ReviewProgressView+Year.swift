@@ -101,7 +101,14 @@ private extension ReviewProgressView {
         return VStack(spacing: 4) {
             HStack(alignment: .bottom, spacing: 4) {
                 ForEach(year.months) { month in
-                    yearBar(month, ratio: Double(month.total) / Double(largest))
+                    Button {
+                        onOpenMonth(month)
+                    } label: {
+                        yearBar(month, ratio: Double(month.total) / Double(largest))
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(month.state == .upcoming)
                 }
             }
             .frame(height: Self.chartHeight)

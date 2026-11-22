@@ -186,6 +186,9 @@ private extension ReviewView {
             previousTitle: previousTitle,
             onOpenPrevious: {
                 move(by: -1)
+            },
+            onOpenMonth: { month in
+                analysisShare = model.monthShare(of: month)
             }
         )
     }
