@@ -335,8 +335,9 @@ struct RecordsModelTests {
     func opensCurrentMonthWithSearchClosed() async throws {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, today: setup.today)
+        let selected = try #require(LocalDate("2026-07-03"))
         model.move(months: -3)
-        model.selectedDate = LocalDate("2026-07-03")
+        model.selectedDate = selected
         model.isSearching = true
         model.searchText = "ランチ"
 
