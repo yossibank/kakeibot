@@ -1,7 +1,7 @@
 import Core
 
 public extension AssetsModel {
-    struct WalletRow: Equatable {
+    struct WalletRow: Equatable, Sendable {
         public let wallet: Wallet
         public let icon: Icon?
         public let balance: Int
@@ -11,37 +11,37 @@ public extension AssetsModel {
         public let repaidRatio: Double?
     }
 
-    struct Unpaid: Equatable {
+    struct Unpaid: Equatable, Sendable {
         public let total: Int
         public let bills: [UnpaidBill]
         public let later: [EntryRowItem]
     }
 
-    struct UnpaidBill: Equatable {
+    struct UnpaidBill: Equatable, Sendable {
         public let bill: CardBill
         public let total: Int
         public let rows: [EntryRowItem]
     }
 
-    enum Repayment: Equatable {
+    enum Repayment: Equatable, Sendable {
         case unset
         case finished
         case open
         case until(LoanPayoff)
     }
 
-    struct WalletSection: Equatable {
+    struct WalletSection: Equatable, Sendable {
         public let role: Wallet.Kind.Role
         public let rows: [WalletRow]
     }
 
-    struct MonthTotal: Equatable {
+    struct MonthTotal: Equatable, Sendable {
         public let month: YearMonth
         public let total: Int
         public let netWorth: Int
     }
 
-    struct UpcomingBill: Equatable {
+    struct UpcomingBill: Equatable, Sendable {
         public let bill: CardBill
         public let title: String
         public let icon: Icon?
@@ -78,6 +78,16 @@ public extension AssetsModel.WalletRow {
 public extension AssetsModel.Unpaid {
     var count: Int {
         bills.reduce(later.count) { $0 + $1.rows.count }
+    }
+}
+
+extension AssetsModel.WalletSection {
+    static func sections(of rows: [AssetsModel.WalletRow]) -> [Self] {
+        Wallet.Kind.Role.allCases.compactMap { role in
+            let members = rows.filter { $0.wallet.kind.role == role }
+
+            return members.isEmpty ? nil : Self(role: role, rows: members)
+        }
     }
 }
 

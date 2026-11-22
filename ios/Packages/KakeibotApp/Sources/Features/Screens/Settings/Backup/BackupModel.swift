@@ -283,30 +283,43 @@ private extension BackupModel {
         of kind: FileKind,
         at date: Date
     ) -> String {
-        let formatter = DateFormatter()
+        let day = text(
+            of: date,
+            format: "\(year: .defaultDigits)-\(month: .twoDigits)-\(day: .twoDigits)"
+        )
 
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd"
-
-        return "kakeibot-\(formatter.string(from: date)).\(kind.rawValue)"
+        return "kakeibot-\(day).\(kind.rawValue)"
     }
 
     static func dayText(_ date: Date) -> String {
-        let formatter = DateFormatter()
-
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "yyyy/M/d"
-
-        return formatter.string(from: date)
+        text(
+            of: date,
+            format: "\(year: .defaultDigits)/\(month: .defaultDigits)/\(day: .defaultDigits)"
+        )
     }
 
     static func dayTimeText(_ date: Date) -> String {
-        let formatter = DateFormatter()
+        let hour = Date.FormatStyle.Symbol.VerbatimHour.defaultDigits(
+            clock: .twentyFourHour,
+            hourCycle: .zeroBased
+        )
 
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.dateFormat = "yyyy/M/d H:mm"
+        let time = text(of: date, format: "\(hour: hour):\(minute: .twoDigits)")
 
-        return formatter.string(from: date)
+        return "\(dayText(date)) \(time)"
+    }
+
+    static func text(
+        of date: Date,
+        format: Date.FormatString
+    ) -> String {
+        let style = Date.VerbatimFormatStyle(
+            format: format,
+            timeZone: .current,
+            calendar: Calendar(identifier: .gregorian)
+        )
+
+        return date.formatted(style)
     }
 
     func accept(_ export: Result<ExportV1, any Error>) -> Bool {

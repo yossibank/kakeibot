@@ -7,77 +7,93 @@ import Store
 @MainActor
 @Observable
 public final class AssetsModel: ScreenModel {
-    public var today: LocalDate {
-        didSet {
-            update()
-        }
-    }
-
     public var billPage = 0
 
     public private(set) var isListFailed = false
     public private(set) var rewardBank: RewardBank?
-    public private(set) var holdings: Holdings
-    public private(set) var outlook: Outlook
-    public private(set) var changeFromLastMonth = 0
-    public private(set) var rows: [WalletRow] = []
-    public private(set) var upcomingBills: [UpcomingBill] = []
-    public private(set) var billPages: [BillPage] = []
-    public private(set) var monthTotals: [MonthTotal] = []
-    public private(set) var plans: [Plan] = []
-
-    public private(set) var monthStartDay: MonthStartDay = .first {
-        didSet {
-            update()
-        }
-    }
-
-    public private(set) var list: EntryList? {
-        didSet {
-            update()
-        }
-    }
 
     public internal(set) var errorNotice = ErrorNotice()
 
     let database: AppDatabase
 
-    private var entries: [Entry] = []
-    private var entriesByWallet: [Wallet.ID: [Entry]] = [:]
+    private var summary: AssetsSummary
 
-    private var recurrings: [Recurring] = [] {
-        didSet {
-            update()
-        }
-    }
+    @ObservationIgnored private var latestInput: AssetsSummary.Input
+    @ObservationIgnored private var isRefreshing = false
+    @ObservationIgnored private var needsRefresh = false
 
     public init(
         database: AppDatabase,
         today: LocalDate
     ) {
+        let input = AssetsSummary.Input(today: today)
+
         self.database = database
-        self.today = today
-
-        self.holdings = Holdings(
-            onHand: 0,
-            cards: 0,
-            investments: 0,
-            loans: 0
-        )
-
-        self.outlook = Outlook(
-            end: today,
-            start: 0,
-            items: [],
-            later: []
-        )
-
-        update()
+        self.latestInput = input
+        self.summary = AssetsSummary(input)
     }
 }
 
 public extension AssetsModel {
-    static let monthCount = 6
+    static let monthCount = AssetsSummary.Input.monthCount
+
+    var today: LocalDate {
+        get {
+            summary.input.today
+        }
+        set {
+            guard newValue != latestInput.today else {
+                return
+            }
+
+            latestInput.today = newValue
+            refreshLater()
+        }
+    }
+
+    var list: EntryList? {
+        summary.input.list
+    }
+
+    var monthStartDay: MonthStartDay {
+        summary.input.monthStartDay
+    }
+
+    var holdings: Holdings {
+        summary.holdings
+    }
+
+    var outlook: Outlook {
+        summary.outlook
+    }
+
+    var changeFromLastMonth: Int {
+        summary.changeFromLastMonth
+    }
+
+    var rows: [WalletRow] {
+        summary.rows
+    }
+
+    var sections: [WalletSection] {
+        summary.sections
+    }
+
+    var upcomingBills: [UpcomingBill] {
+        summary.upcomingBills
+    }
+
+    var billPages: [BillPage] {
+        summary.billPages
+    }
+
+    var monthTotals: [MonthTotal] {
+        summary.monthTotals
+    }
+
+    var plans: [Plan] {
+        summary.plans
+    }
 
     var currentMonth: YearMonth {
         today.periodMonth(startingOn: monthStartDay)
@@ -88,17 +104,7 @@ public extension AssetsModel {
     }
 
     var showsNetWorth: Bool {
-        wallets.contains { [.investment, .loan].contains($0.kind.role) }
-    }
-
-    var sections: [WalletSection] {
-        let rows = rows
-
-        return Wallet.Kind.Role.allCases.compactMap { role in
-            let members = rows.filter { $0.wallet.kind.role == role }
-
-            return members.isEmpty ? nil : WalletSection(role: role, rows: members)
-        }
+        summary.wallets.contains { [.investment, .loan].contains($0.kind.role) }
     }
 
     var shownBillPage: BillPage? {
@@ -148,279 +154,46 @@ public extension AssetsModel {
 
     func load() async {
         do {
-            list = try await database.entryList()
-            recurrings = try await database.recurrings()
+            latestInput.list = try await database.entryList()
+            latestInput.recurrings = try await database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
+
+        await refresh()
     }
 }
 
 private extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
-    static let billTitle = "引き落とし"
 
-    var wallets: [Wallet] {
-        let wallets = list.map { Array($0.wallets.values) } ?? []
-
-        return wallets
-            .filter { $0.archivedAt == nil }
-            .sorted { $0.sortOrder < $1.sortOrder }
-    }
-
-    var valuations: [Valuation] {
-        list?.valuations ?? []
-    }
-
-    var adjustments: [Adjustment] {
-        list?.adjustments ?? []
-    }
-
-    static func rows(
-        of entries: [Entry],
-        in list: EntryList
-    ) -> [EntryRowItem] {
-        entries
-            .sorted { $0.date < $1.date }
-            .map { EntryRowItem.dated($0, in: list) }
-    }
-
-    func update() {
-        entries = list?.entries ?? []
-        entriesByWallet = list?.entriesByWallet ?? [:]
-        holdings = makeHoldings()
-        changeFromLastMonth = makeChangeFromLastMonth()
-        billPages = makeBillPages()
-        billPage = min(billPage, max(billPages.count - 1, 0))
-        upcomingBills = makeUpcomingBills()
-        rows = makeRows()
-        monthTotals = makeMonthTotals()
-        plans = makePlans(in: wallets)
-
-        outlook = makeOutlook(
-            in: wallets,
-            recurrings: recurrings,
-            monthStartDay: monthStartDay
-        )
-    }
-
-    func makeHoldings() -> Holdings {
-        Holdings(
-            wallets: wallets,
-            entriesByWallet: entriesByWallet,
-            valuations: valuations,
-            adjustments: adjustments,
-            through: today
-        )
-    }
-
-    func makeChangeFromLastMonth() -> Int {
-        let lastMonth = currentMonth.adding(months: -1)
-        let end = lastMonth.period(startingOn: monthStartDay).upperBound
-
-        let previous = Holdings(
-            wallets: wallets,
-            entriesByWallet: entriesByWallet,
-            valuations: valuations,
-            adjustments: adjustments,
-            through: end
-        )
-
-        return total - previous.available
-    }
-
-    func makeBillPages() -> [BillPage] {
-        let bills = list?.upcomingCardBills(
-            recurrings: recurrings,
-            after: today,
-            count: BillPage.limit
-        )
-
-        return BillPage.pages(of: bills ?? [])
-    }
-
-    func makeUpcomingBills() -> [UpcomingBill] {
-        guard let list else {
-            return []
-        }
-
-        let bills = billPages.flatMap(\.bills)
-
-        return bills.map { bill in
-            let card = bill.recurring.toWalletId
-            let month = bill.month
-
-            let moved = entries
-                .filter { $0.walletId == card && $0.billMonth != nil }
-                .sorted { $0.date < $1.date }
-
-            let movedIn = moved
-                .filter { $0.billMonth == month }
-                .map { EntryRowItem.dated($0, in: list) }
-
-            let movedOut = moved
-                .filter { entry in
-                    entry.billMonth != month
-                        && bill.period?.contains(entry.date) == true
-                }
-                .map { EntryRowItem.dated($0, in: list) }
-
-            return UpcomingBill(
-                bill: bill,
-                title: list.title(of: bill.recurring) ?? Self.billTitle,
-                icon: list.icon(of: bill.recurring),
-                source: list.wallets[bill.recurring.walletId]?.name,
-                movedIn: movedIn,
-                movedOut: movedOut
-            )
+    func refreshLater() {
+        Task {
+            await refresh()
         }
     }
 
-    func makeRows() -> [WalletRow] {
-        let bills = upcomingBills
+    func refresh() async {
+        needsRefresh = true
 
-        return wallets.map { wallet in
-            let cardBills = bills.map(\.bill).filter { $0.recurring.toWalletId == wallet.id }
-            let balance = balance(of: wallet)
-            let ratio = repaidRatio(of: wallet, balance: balance)
-
-            return WalletRow(
-                wallet: wallet,
-                icon: list?.icons[wallet.iconId],
-                balance: balance,
-                bills: cardBills,
-                unpaid: unpaid(of: cardBills),
-                repayment: repayment(of: wallet),
-                repaidRatio: ratio
-            )
-        }
-    }
-
-    func unpaid(of bills: [CardBill]) -> Unpaid? {
-        guard
-            let list,
-            let last = bills.last,
-            let card = last.recurring.toWalletId,
-            let period = last.period
-        else {
-            return nil
+        guard !isRefreshing else {
+            return
         }
 
-        let billed = bills.compactMap { bill in
-            bill.recurring.billedEntries(paidOn: bill.date, entries: entries).map { (bill, $0) }
+        isRefreshing = true
+
+        defer {
+            isRefreshing = false
         }
 
-        guard billed.count == bills.count else {
-            return nil
+        while needsRefresh {
+            needsRefresh = false
+
+            let summary = await AssetsSummary.make(latestInput)
+
+            self.summary = summary
+            billPage = min(billPage, max(summary.billPages.count - 1, 0))
         }
-
-        var billedIds: Set<Entry.ID> = []
-
-        let groups = billed.map { bill, billedEntries in
-            let recorded = billedEntries.filter { $0.date <= today && !billedIds.contains($0.id) }
-
-            billedIds.formUnion(billedEntries.map(\.id))
-
-            return UnpaidBill(
-                bill: bill,
-                total: recorded.billedTotal,
-                rows: Self.rows(of: recorded, in: list)
-            )
-        }
-
-        let later = entries
-            .filter { $0.walletId == card && $0.date <= today }
-            .filter { !billedIds.contains($0.id) }
-            .filter { entry in
-                entry.billMonth.map { $0 > last.month } ?? (entry.date > period.upperBound)
-            }
-
-        let laterTotal = later.billedTotal
-        let total = groups.reduce(laterTotal) { $0 + $1.total }
-
-        let unpaid = Unpaid(
-            total: total,
-            bills: groups,
-            later: Self.rows(of: later, in: list)
-        )
-
-        return unpaid.count > 0 ? unpaid : nil
-    }
-
-    func makeMonthTotals() -> [MonthTotal] {
-        (0..<Self.monthCount).reversed().map { offset in
-            let month = currentMonth.adding(months: -offset)
-            let period = month.period(startingOn: monthStartDay)
-            let end = offset == 0 ? today : period.upperBound
-
-            let holdings = Holdings(
-                wallets: wallets,
-                entriesByWallet: entriesByWallet,
-                valuations: valuations,
-                adjustments: adjustments,
-                through: end
-            )
-
-            return MonthTotal(
-                month: month,
-                total: holdings.available,
-                netWorth: holdings.netWorth
-            )
-        }
-    }
-
-    func balance(of wallet: Wallet) -> Int {
-        wallet.balance(
-            with: entriesByWallet[wallet.id] ?? [],
-            valuations: valuations,
-            adjustments: adjustments,
-            through: today
-        )
-    }
-
-    func repaidRatio(
-        of wallet: Wallet,
-        balance: Int
-    ) -> Double? {
-        guard
-            wallet.kind == .loan,
-            let loanAmount = wallet.loanAmount,
-            loanAmount > 0
-        else {
-            return nil
-        }
-
-        let repaid = Wallet.repaid(borrowed: loanAmount, balance: balance)
-
-        return Double(repaid) / Double(loanAmount)
-    }
-
-    func repayment(of wallet: Wallet) -> Repayment? {
-        guard wallet.kind == .loan else {
-            return nil
-        }
-
-        let balance = balance(of: wallet)
-
-        let repayments = recurrings.filter { recurring in
-            recurring.type == .transfer && recurring.toWalletId == wallet.id
-        }
-
-        if balance >= 0 {
-            return .finished
-        }
-
-        if repayments.isEmpty {
-            return .unset
-        }
-
-        let payoff = LoanPayoff(
-            balance: balance,
-            repayments: repayments,
-            after: today
-        )
-
-        return payoff.map(Repayment.until) ?? .open
     }
 
     func observe() async {
@@ -430,7 +203,8 @@ private extension AssetsModel {
             database.entryListUpdates(),
             failure: Self.loadFailedMessage
         ) { list in
-            self.list = list
+            latestInput.list = list
+            refreshLater()
         }
     }
 
@@ -448,7 +222,8 @@ private extension AssetsModel {
             database.recurringUpdates(),
             failure: Self.loadFailedMessage
         ) { recurrings in
-            self.recurrings = recurrings
+            latestInput.recurrings = recurrings
+            refreshLater()
         }
     }
 
@@ -457,7 +232,8 @@ private extension AssetsModel {
             database.settingUpdates(.monthStartDay),
             failure: Self.loadFailedMessage
         ) { startDay in
-            monthStartDay = startDay
+            latestInput.monthStartDay = startDay
+            refreshLater()
         }
     }
 }

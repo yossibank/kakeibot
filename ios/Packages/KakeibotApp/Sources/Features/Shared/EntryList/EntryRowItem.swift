@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import Store
 
-public struct EntryRowItem: Identifiable, Equatable {
+public struct EntryRowItem: Identifiable, Equatable, Sendable {
     public let id: Entry.ID
     public let icon: Icon?
     public let title: String
