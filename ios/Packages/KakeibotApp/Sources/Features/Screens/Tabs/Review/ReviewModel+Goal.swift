@@ -31,7 +31,7 @@ extension ReviewModel {
         let checked = answer.map { answered($0, now: now) }
         let nextGoal = goals.first { $0.period == next.commentKey }
         let nextItem = nextGoal.flatMap { goalItem($0, in: next) }
-        let count = entries.count { period.range.contains($0.date) && $0.type != .transfer }
+        let count = entryCount(in: period.range)
         let hasMore = closingContent.rows.contains { $0.row.tone == .more }
 
         let rests = next == currentPeriod
@@ -39,7 +39,7 @@ extension ReviewModel {
             && !hasMore
 
         let nextCard: ReviewClosingView.Next = if let nextItem {
-            .goal(nextItem, reason: reason(for: nextItem))
+            .goal(nextItem, reason: goalReason(for: nextItem))
         } else if rests {
             .rest
         } else {
@@ -117,24 +117,6 @@ private extension ReviewModel {
         return goal.checked(entries: entries, in: period.range, now: now)
     }
 
-    func reason(for item: ReviewGoalItem) -> String? {
-        let row = closingContent.rows.first { $0.row.categoryId == item.goal.categoryId }
-
-        guard let row else {
-            return nil
-        }
-
-        let name = period.displayName
-        let difference = ReviewInsight.yen(row.row.difference)
-        let first = "\(name)は\(item.categoryName)がいつもより \(difference) 多めでした。"
-
-        guard let memo = item.goal.memo else {
-            return first
-        }
-
-        return first + "増えたのは\(memo)です。"
-    }
-
     func checkGoals(
         of closed: ReviewPeriod,
         now: Date
@@ -153,7 +135,7 @@ private extension ReviewModel {
         now: Date
     ) async throws {
         let existing = try await database.reviewGoals(for: current.commentKey)
-        let count = entries.count { closed.range.contains($0.date) && $0.type != .transfer }
+        let count = entryCount(in: closed.range)
 
         guard
             existing.isEmpty,

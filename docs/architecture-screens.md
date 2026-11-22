@@ -16,7 +16,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | MainView のタブの選択 | `MainTabSelection` が持ち、`MainTabLayer` とタブの帯（`MainTabBar`）だけが読む。MainView の `body` が読むと、切り替えのたびに 4 つのタブを組み直して重いため読まない |
 | MainView のシート | 新規・編集・設定・振替・お知らせなど。テンプレート（`EntryTemplate`）・口座（`Wallet`）・固定費（`Recurring`）も開く |
 | MainView の知らせ | 記録・削除の取り消し・失敗の知らせを、タブの帯の上の 1 か所に出す。どれかが出たら他を消し、タブの画面の `errorBanner` は環境の `noticeRound` を進めて消す |
-| ReviewView のひとこと | 締めた期間で、渡す事実（`ReviewInsight.Input`）が変わると、`task(id:)` で「NEW」を決め直す。分析レポートを開いている間は、同じ所で作り直すかを決める |
+| ReviewView の一手の理由 | 締めた期間のシートを開くと、`task(id:)` で保存した文を読み、渡す事実が変わっていれば書き直す。同じ期間は、セッションの中で 1 度だけ頼み、書けなければ次に開いた時に頼む |
 | ReviewView の途中経過 | 今の期間では、シートに `ReviewProgressView` を出し、AI を使わない。期間が変わると、`task(id:)` で一手（`ReviewGoal`）を読み直す |
 | ReviewView の締めのレポート | 締めた期間では、シートの頭に `ReviewClosingView` を出す。中身は、開いた時の記録からコードで数える |
 | ReviewView の一手 | 今の期間が変わると、`task(id:)` で直前の期間の一手を答え合わせし、次の一手を作る。開いた締めのレポートは、setting の `review_seen_reports` に残す |

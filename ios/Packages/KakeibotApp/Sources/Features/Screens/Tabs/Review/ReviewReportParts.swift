@@ -158,6 +158,16 @@ extension View {
     }
 }
 
+extension ReviewInsight {
+    static func signed(_ amount: Int) -> String {
+        if amount > 0 {
+            return "+\(yen(amount))"
+        }
+
+        return amount < 0 ? "−\(yen(-amount))" : "±0円"
+    }
+}
+
 extension ReviewPace {
     static func percent(_ ratio: Double) -> Int {
         Int((ratio * 100).rounded())

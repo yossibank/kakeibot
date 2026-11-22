@@ -204,10 +204,10 @@ private extension ReviewClosingView {
                     .frame(maxWidth: .infinity)
 
                 Button {
-                    onOpenCategory(item.categoryName)
+                    onOpenGoal(item)
                 } label: {
                     HStack {
-                        Text("\(item.categoryName)をくわしく見る")
+                        Text("\(item.name)をくわしく見る")
                             .textFont(.footnote, weight: .bold)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)

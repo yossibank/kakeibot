@@ -21,7 +21,7 @@ extension ReviewClosingView {
                     systemImage: "arrow.down",
                     title: "\(item.name)が少なめ",
                     detail: "平均 \(ReviewInsight.yen(item.row.average)) → \(ReviewInsight.yen(item.row.amount))",
-                    value: ReviewAnalysisView.signed(item.row.difference)
+                    value: ReviewInsight.signed(item.row.difference)
                 )
             }
 
@@ -156,7 +156,7 @@ private extension ReviewClosingView {
 
                 Spacer(minLength: 8)
 
-                Text(ReviewAnalysisView.signed(row.difference))
+                Text(ReviewInsight.signed(row.difference))
                     .textFont(.caption, weight: .bold)
                     .foregroundStyle(color)
                     .monospacedDigit()

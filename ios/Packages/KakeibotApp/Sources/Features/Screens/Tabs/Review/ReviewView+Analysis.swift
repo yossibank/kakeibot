@@ -3,18 +3,13 @@ import DesignSystem
 import SwiftUI
 
 extension ReviewView {
-    struct CommentTrigger: Hashable {
-        let key: String
-        let input: ReviewInsight.Input?
-        let breakdown: ReviewBreakdown.Input?
-    }
-
-    var commentTrigger: CommentTrigger {
-        CommentTrigger(
-            key: model.period.commentKey,
-            input: model.list == nil ? nil : model.insightInput,
-            breakdown: model.breakdownInput
-        )
+    struct PressButtonStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .scaleEffect(configuration.isPressed ? 0.98 : 1)
+                .brightness(configuration.isPressed ? -0.06 : 0)
+                .animation(.snappy(duration: 0.15), value: configuration.isPressed)
+        }
     }
 
     var analysisBanner: some View {
@@ -55,7 +50,7 @@ extension ReviewView {
 
                 Spacer(minLength: 8)
 
-                if showsNewMark {
+                if model.hasNewReport {
                     Text("NEW")
                         .sansFont(.micro, weight: .bold)
                         .tracking(1)
@@ -80,10 +75,10 @@ extension ReviewView {
                     .strokeBorder(Palette.accent.opacity(.medium))
             }
             .shadow(color: Palette.accent.opacity(.subtle), radius: 12, y: 6)
-            .animation(.smooth, value: showsNewMark)
+            .animation(.smooth, value: model.hasNewReport)
             .contentShape(.rect)
         }
-        .buttonStyle(ReviewAnalysisView.PressButtonStyle())
+        .buttonStyle(PressButtonStyle())
     }
 
     var analysisSheet: some View {
@@ -95,7 +90,7 @@ extension ReviewView {
 
                 Spacer()
 
-                Text("分析レポート")
+                Text("ふりかえり")
                     .displayFont(.body)
                     .foregroundStyle(Palette.accent)
 
@@ -133,15 +128,9 @@ extension ReviewView {
         }
         .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .task(id: commentTrigger) {
-            guard !model.isCurrentPeriod else {
-                return
-            }
-
-            await model.refreshComment()
-        }
         .task(id: model.period.commentKey) {
             await model.loadGoals()
+            await model.refreshReason()
         }
         .sheet(item: $analysisShare) { share in
             shareSheet(share)
@@ -152,17 +141,6 @@ extension ReviewView {
         }
         .presentationSizing(.tallForm)
     }
-
-    func openAfterAnalysis() {
-        guard let pendingRecord else {
-            openPendingEntry()
-            return
-        }
-
-        self.pendingRecord = nil
-
-        onAddEntry(pendingRecord)
-    }
 }
 
 private extension ReviewView {
@@ -171,20 +149,16 @@ private extension ReviewView {
         if model.isCurrentPeriod {
             progressView
         } else {
-            VStack(spacing: 12) {
-                ReviewClosingView(
-                    content: model.closingContent,
-                    goals: model.closingGoals(),
-                    name: analysisName,
-                    previousName: model.period.previous.displayName,
-                    unit: model.scale.unitName,
-                    onOpenCategory: { name in
-                        analysisShare = model.categoryShare(named: name)
-                    }
-                )
-
-                analysisView
-            }
+            ReviewClosingView(
+                content: model.closingContent,
+                goals: model.closingGoals(),
+                name: analysisName,
+                previousName: model.period.previous.displayName,
+                unit: model.scale.unitName,
+                onOpenGoal: { item in
+                    analysisShare = model.goalShare(of: item)
+                }
+            )
             .task(id: model.period) {
                 await model.markReportSeen()
             }
@@ -210,39 +184,6 @@ private extension ReviewView {
             }
         )
     }
-
-    var analysisView: some View {
-        ReviewAnalysisView(
-            state: model.comment,
-            unit: model.scale.unitName,
-            currentName: currentName,
-            entryCount: model.commentEntryCount,
-            focusName: model.breakdownInput?.category,
-            months: model.breakdownMonths,
-            categories: model.spentCategoryNames,
-            previousSpan: previousSpan,
-            currentSpan: Self.span(of: model.commentRange, separator: "〜"),
-            isNew: model.isWrittenNow,
-            onRetry: {
-                Task {
-                    await model.refreshComment(retrying: true)
-                }
-            },
-            onRecord: {
-                let range = model.period.range
-                let date = range.contains(model.today) ? model.today : range.lowerBound
-
-                pendingRecord = date
-                showsAnalysis = false
-            },
-            onOpen: { factor in
-                analysisShare = model.factorShare(of: factor)
-            },
-            onOpenCategory: { name in
-                analysisShare = model.categoryShare(named: name)
-            }
-        )
-    }
 }
 
 private extension ReviewView {
@@ -265,10 +206,6 @@ private extension ReviewView {
             startRadius: 0,
             endRadius: 48
         )
-    }
-
-    var showsNewMark: Bool {
-        model.hasNewAnalysis || model.hasNewReport
     }
 
     var bannerLabel: String {
@@ -298,13 +235,9 @@ private extension ReviewView {
     }
 
     var analysisNote: String {
-        let span = Self.span(of: model.commentRange, separator: "〜")
-        return "\(span) · \(model.commentEntryCount) 件の記録"
-    }
-
-    var previousSpan: String {
-        let range = model.period.comparisonRange(today: model.today)
-        return Self.span(of: range, separator: "〜")
+        let span = Self.span(of: model.elapsedRange, separator: "〜")
+        let count = model.entryCount(in: model.period.range)
+        return "\(span) · \(count) 件の記録"
     }
 
     var currentName: String {

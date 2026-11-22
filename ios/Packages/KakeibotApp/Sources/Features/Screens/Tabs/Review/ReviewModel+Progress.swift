@@ -5,8 +5,14 @@ import Store
 extension ReviewModel {
     static let averagePeriods = 3
 
+    var elapsedRange: ClosedRange<LocalDate> {
+        let range = period.range
+        let end = range.contains(today) ? today : range.upperBound
+        return range.lowerBound...end
+    }
+
     var pace: ReviewPace? {
-        let spent = ReviewSummary(entries: entries, in: commentRange).expense.total
+        let spent = ReviewSummary(entries: entries, in: elapsedRange).expense.total
 
         if let limit = budgetLimit(of: period) {
             return ReviewPace(

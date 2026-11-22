@@ -14,7 +14,6 @@ enum ReviewCommentModel {
         basis: String,
         scale: ReviewPeriod.Scale,
         categories: [String],
-        isCurrent: Bool,
         onReject: (String) -> Void = { _ in }
     ) async -> String? {
         guard isUsable else {
@@ -25,7 +24,6 @@ enum ReviewCommentModel {
             let attempt = await respond(
                 basis: basis,
                 scale: scale,
-                isCurrent: isCurrent,
                 options: options
             )
 
@@ -56,12 +54,12 @@ enum ReviewCommentModel {
 private extension ReviewCommentModel {
     @Generable
     struct Comment {
-        @Guide(description: "事実から分かる気づき。1〜3 文の丁寧語")
+        @Guide(description: "次の目標を決めた理由。1〜2 文の丁寧語")
         var body: String
     }
 
     static let locale = Locale(identifier: "ja_JP")
-    static let maximumTokens = 200
+    static let maximumTokens = 160
 
     static let attempts = [
         GenerationOptions(sampling: .greedy, maximumResponseTokens: maximumTokens),
@@ -72,32 +70,23 @@ private extension ReviewCommentModel {
     ]
 
     static let instructions = """
-    家計簿アプリの振り返りの画面に出す、短いひとことを書く。読む人は、自分の家計を見直したい人である。
+    家計簿アプリの振り返りで、次の期間の目標を決めた理由を、短く書く。読む人は、自分の家計を見直したい人である。
     渡された事実だけを使う。事実に無い数字・理由・品物・店・カテゴリは書かない。数字は事実に書かれたとおりに写す。
-    body には、事実から分かる気づきを 1〜3 文で書く。グラフを見れば分かる合計の言い直しより、ペースや増え方を書く。
-    文の数は、事実の行の数までにする。回数や 1 回の金額の事実があれば、増えた理由として書く。
-    見直しの提案は別に出すので、body には提案や「〜してみましょう」を書かない。
-    目標の額や割合を新しく作らない。事実に無い割合を計算しない。
-    事実の頭の「良い点」「気を付けたい点」「事実」の印は、文に写さない。
+    body には、締めた期間に何が増えたかを 1〜2 文で書く。回数や 1 回の金額の事実があれば、増えた理由として書く。
+    目標そのものは別に出すので、目標の値や「〜してみましょう」を書かない。目標の額や割合を新しく作らない。
     丁寧語（です・ます）で書き、責めない。「〜すべき」「危ない」のような強い言い方をしない。
-    事実の頭の「良い点」は認め、「気を付けたい点」は良いこととして書かない。「事実」は良い悪いを決めずに書く。
     投資・借入・保険・クレジットカードの申し込みなど、金融の商品は勧めない。ほかの家庭とは比べない。
     """
 
     static func respond(
         basis: String,
         scale: ReviewPeriod.Scale,
-        isCurrent: Bool,
         options: GenerationOptions
     ) async -> String? {
         let name = scale.unitName
 
-        let timing = isCurrent
-            ? "この\(name)はまだ途中である。"
-            : "この\(name)は終わった。"
-
         let prompt = """
-        \(timing)
+        この\(name)は終わった。
         期間は「\(name)」と呼ぶ。ほかの単位（週・月・年）で書かない。
         事実：
         \(basis)
