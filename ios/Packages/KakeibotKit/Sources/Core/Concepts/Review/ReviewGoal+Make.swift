@@ -11,11 +11,68 @@ public extension ReviewGoal {
         now: Date
     ) -> ReviewGoal? {
         let compare = ReviewCompare(entries: entries, in: range, history: history)
+        let rising = compare.rows.filter { $0.tone == .more }
 
-        guard let row = compare.rows.first(where: { $0.tone == .more }) else {
-            return nil
+        for row in rising {
+            let goal = make(
+                row: row,
+                compare: compare,
+                entries: entries,
+                closed: range,
+                history: history,
+                period: period,
+                now: now
+            )
+
+            if let goal {
+                return goal
+            }
         }
 
+        return nil
+    }
+
+    static func normalizedMemo(_ memo: String?) -> String? {
+        let trimmed = memo?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed.precomposedStringWithCompatibilityMapping
+    }
+
+    func checked(
+        entries: [Entry],
+        in range: ClosedRange<LocalDate>,
+        now: Date
+    ) -> ReviewGoal {
+        let progress = progress(of: entries, in: range, today: range.upperBound)
+        let result = current(of: progress)
+        let reduced = max(baseline - result, 0)
+
+        var goal = self
+
+        goal.result = result
+        goal.checkedAt = now
+
+        switch kind {
+        case .count:
+            goal.saved = reduced * saving / max(baseline - target, 1)
+
+        case .average:
+            goal.saved = reduced * progress.count
+        }
+
+        return goal
+    }
+}
+
+private extension ReviewGoal {
+    static func make(
+        row: ReviewCompare.Row,
+        compare: ReviewCompare,
+        entries: [Entry],
+        closed range: ClosedRange<LocalDate>,
+        history: [ClosedRange<LocalDate>],
+        period: String,
+        now: Date
+    ) -> ReviewGoal? {
         let expenses = entries.filter { entry in
             entry.type == .expense
                 && entry.categoryId == row.categoryId
@@ -53,36 +110,6 @@ public extension ReviewGoal {
             saving: shape.saving,
             createdAt: now
         )
-    }
-
-    static func normalizedMemo(_ memo: String?) -> String? {
-        let trimmed = memo?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? nil : trimmed.precomposedStringWithCompatibilityMapping
-    }
-
-    func checked(
-        entries: [Entry],
-        in range: ClosedRange<LocalDate>,
-        now: Date
-    ) -> ReviewGoal {
-        let progress = progress(of: entries, in: range, today: range.upperBound)
-        let result = current(of: progress)
-        let reduced = max(baseline - result, 0)
-
-        var goal = self
-
-        goal.result = result
-        goal.checkedAt = now
-
-        switch kind {
-        case .count:
-            goal.saved = reduced * saving / max(baseline - target, 1)
-
-        case .average:
-            goal.saved = reduced * progress.count
-        }
-
-        return goal
     }
 }
 

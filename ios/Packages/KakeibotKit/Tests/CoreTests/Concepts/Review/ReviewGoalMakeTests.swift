@@ -33,6 +33,18 @@ struct ReviewGoalMakeTests {
     }
 
     @Test
+    func skipsARisingCategoryWithoutHistory() throws {
+        let entries = try Self.entries("2026-09", count: 5, amount: 1500, memo: "外食")
+            + Self.entries("2026-10", count: 9, amount: 1500, memo: "外食")
+            + Self.entries("2026-10", count: 1, amount: 8000, category: Self.utility)
+
+        let goal = try #require(try Self.make(entries))
+
+        #expect(goal.categoryId == Self.food)
+        #expect(goal.kind == .count)
+    }
+
+    @Test
     func restsWithoutARisingCategory() throws {
         let entries = try Self.entries("2026-09", count: 5, amount: 1000)
             + Self.entries("2026-10", count: 5, amount: 1000)
@@ -65,6 +77,7 @@ struct ReviewGoalMakeTests {
 
 private extension ReviewGoalMakeTests {
     static let food = EntryCategory.ID()
+    static let utility = EntryCategory.ID()
     static let wallet = Wallet.ID()
     static let now = Date(timeIntervalSince1970: 1_794_000_000)
 
@@ -72,7 +85,8 @@ private extension ReviewGoalMakeTests {
         _ month: String,
         count: Int,
         amount: Int,
-        memo: String? = nil
+        memo: String? = nil,
+        category: EntryCategory.ID = food
     ) throws -> [Entry] {
         let start = try Self.month(month).lowerBound
 
@@ -81,7 +95,7 @@ private extension ReviewGoalMakeTests {
                 type: .expense,
                 amount: amount,
                 date: start.adding(days: index),
-                categoryId: food,
+                categoryId: category,
                 walletId: wallet,
                 memo: memo,
                 createdAt: now,
