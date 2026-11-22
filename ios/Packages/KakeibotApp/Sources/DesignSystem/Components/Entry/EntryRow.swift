@@ -86,20 +86,20 @@ public struct EntryRow: View {
                             tagCard(tag)
                         }
                     }
-                } else if let detail, let memo, route == nil {
+                } else if let detailMemo {
                     ViewThatFits(in: .horizontal) {
                         HStack(alignment: .firstTextBaseline, spacing: 8) {
-                            detailText(detail)
+                            detailText(detailMemo.detail)
                                 .fixedSize()
 
-                            EntryMemo(memo)
+                            EntryMemo(detailMemo.memo)
                                 .fixedSize()
                         }
 
                         VStack(alignment: .leading, spacing: 4) {
-                            detailText(detail)
+                            detailText(detailMemo.detail)
 
-                            EntryMemo(memo)
+                            EntryMemo(detailMemo.memo)
                         }
                     }
                 } else if let detail {
@@ -141,6 +141,25 @@ private extension EntryRow {
             .lineLimit(1)
             .truncationMode(.tail)
             .minimumScaleFactor(0.8)
+    }
+}
+
+private extension EntryRow {
+    struct DetailMemo {
+        let detail: String
+        let memo: String
+    }
+
+    var detailMemo: DetailMemo? {
+        guard
+            route == nil,
+            let detail,
+            let memo
+        else {
+            return nil
+        }
+
+        return DetailMemo(detail: detail, memo: memo)
     }
 }
 
