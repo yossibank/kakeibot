@@ -109,7 +109,10 @@ struct SnapshotTests {
             progress: ReviewGoal.Progress(count: 0, amount: 0, projectedCount: 0)
         )
 
-        let reason = "10月は日用品がいつもより 3,200円 多めでした。"
+        let reason = ReviewClosingView.Reason(
+            text: "10月は日用品をまとめて買った日が多く、1 回の平均が 2,400円 になりました。",
+            isWritten: true
+        )
 
         let goalCases: [String: (ReviewGoalItem?, ReviewClosingView.Next)] = [
             "budget": (answer, .goal(next, reason: reason)),
