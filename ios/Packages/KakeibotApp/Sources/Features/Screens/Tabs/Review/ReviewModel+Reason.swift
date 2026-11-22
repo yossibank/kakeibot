@@ -56,7 +56,6 @@ extension ReviewModel {
         let comment = ReviewComment(
             period: key,
             body: body,
-            suggestion: "",
             basis: basis,
             createdAt: now
         )

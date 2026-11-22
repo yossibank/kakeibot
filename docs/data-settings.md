@@ -102,10 +102,8 @@ closed_hints に入る画面の名前は、次のとおり。
 | --- | --- | --- |
 | period | TEXT | 主キー。`month:2026-11-01` のように、週・月・年と期間の初日をつなぐ |
 | body | TEXT | 一手の理由の文 |
-| suggestion | TEXT | 今は空文字 |
 | basis | TEXT | 作った時にモデルへ渡した事実の文。変わったら作り直す |
 | created_at | TEXT | |
-| breakdown | TEXT | 今は書かない（NULL） |
 
 ### review_goal
 

@@ -20,14 +20,14 @@ public extension ReviewGoal {
         in range: ClosedRange<LocalDate>,
         today: LocalDate
     ) -> Progress {
-        let memo = ReviewBreakdown.normalized(memo)
+        let memo = Self.normalizedMemo(memo)
 
         let matched = entries.filter { entry in
             entry.type == .expense
                 && range.contains(entry.date)
                 && entry.date <= today
                 && entry.categoryId == categoryId
-                && (memo == nil || ReviewBreakdown.normalized(entry.memo) == memo)
+                && (memo == nil || Self.normalizedMemo(entry.memo) == memo)
         }
 
         let pace = ReviewPace(

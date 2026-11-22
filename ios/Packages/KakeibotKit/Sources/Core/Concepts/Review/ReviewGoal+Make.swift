@@ -55,6 +55,11 @@ public extension ReviewGoal {
         )
     }
 
+    static func normalizedMemo(_ memo: String?) -> String? {
+        let trimmed = memo?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed.precomposedStringWithCompatibilityMapping
+    }
+
     func checked(
         entries: [Entry],
         in range: ClosedRange<LocalDate>,
@@ -111,7 +116,7 @@ private extension ReviewGoal {
             periods: Int
         ) {
             let matches: (Entry) -> Bool = { entry in
-                memo == nil || ReviewBreakdown.normalized(entry.memo) == memo
+                memo == nil || ReviewGoal.normalizedMemo(entry.memo) == memo
             }
 
             let now = current.filter(matches)
@@ -137,11 +142,11 @@ private extension ReviewGoal {
         past: [Entry],
         periods: Int
     ) -> String? {
-        let names = Set(current.compactMap { ReviewBreakdown.normalized($0.memo) })
+        let names = Set(current.compactMap { normalizedMemo($0.memo) })
 
         let rises = names.map { name in
-            let now = current.count { ReviewBreakdown.normalized($0.memo) == name }
-            let before = past.count { ReviewBreakdown.normalized($0.memo) == name }
+            let now = current.count { normalizedMemo($0.memo) == name }
+            let before = past.count { normalizedMemo($0.memo) == name }
             let rise = Double(now) - Double(before) / Double(max(periods, 1))
 
             return (name: name, rise: rise)
