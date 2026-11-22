@@ -256,7 +256,7 @@ private extension RecordsView {
         isCompact: Bool = false,
         @ViewBuilder trailing: () -> some View
     ) -> some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .dayTotals, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 dayTitle(date)
 
@@ -269,6 +269,7 @@ private extension RecordsView {
                 if let day {
                     dayTotals(day, isCompact: isCompact)
                         .fixedSize()
+                        .alignmentGuide(.dayTotals) { $0[VerticalAlignment.center] }
                 }
             }
 
@@ -489,4 +490,14 @@ private extension RecordsView {
 
         self.selection = model.toggling(id, in: selection)
     }
+}
+
+private extension VerticalAlignment {
+    enum DayTotals: AlignmentID {
+        static func defaultValue(in context: ViewDimensions) -> CGFloat {
+            context[VerticalAlignment.center]
+        }
+    }
+
+    static let dayTotals = VerticalAlignment(DayTotals.self)
 }

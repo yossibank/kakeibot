@@ -252,6 +252,7 @@ private extension RecordsView {
 
                 if let day = item.day {
                     dayCard(day)
+                        .id(DayCardID(date: item.date, isSelecting: selection != nil))
                 } else if selection == nil {
                     upcomingCard(on: item.date)
                 }
@@ -274,6 +275,11 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    struct DayCardID: Hashable {
+        let date: LocalDate
+        let isSelecting: Bool
+    }
+
     nonisolated static let wideCalendarWidth: CGFloat = 560
 
     static let listWidth: CGFloat = 720
