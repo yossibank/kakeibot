@@ -309,7 +309,8 @@ private extension AssetsView {
                 .padding(.leading, 44)
                 .padding(.top, -4)
                 .padding(.bottom, 4)
-                .contentShape(.rect)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .tapArea(Self.unpaidTapOutsets)
             }
             .buttonStyle(.plain)
         }
@@ -319,6 +320,13 @@ private extension AssetsView {
 private extension AssetsView {
     static let nameMinWidth: CGFloat = 64
     static let labeledNameMinWidth: CGFloat = 48
+
+    static let unpaidTapOutsets = EdgeInsets(
+        top: 0,
+        leading: 0,
+        bottom: 8,
+        trailing: 0
+    )
 
     @ViewBuilder
     func debtDetail(of row: AssetsModel.WalletRow) -> some View {
