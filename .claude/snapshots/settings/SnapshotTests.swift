@@ -18,7 +18,7 @@ struct SnapshotTests {
         let sheet = SettingsMenuSheet(database: database, today: today, appIcon: AppIconListModel())
         let wallets = WalletListView(database: database)
         let rules = RewardRuleListView(database: database)
-        let categories = CategoryListView(database: database)
+        let categories = SettingsBoardPage(CategoryBoard(database: database, kind: .expense))
         let walletEdit = WalletEditModel(database: database, editing: longWallet?.id)
 
         let reminder = ReminderModel(

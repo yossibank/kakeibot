@@ -195,7 +195,7 @@ KakeibotApp/
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今に戻るボタン |
 | `Features/Shared/Placeholder/` | タブで記録が無いときと読み込めないときの表示。設定の一覧が空なら `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |
 | `Features/Shared/Pro/` | Pro を買ったかと、止めた所の下に出すカード。StoreKit の中身は AppFeature が渡す |
-| `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Hint・Icon・Input・Layout・Tile）。画面の上のヘッダーは `Layout/` に置く |
+| `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Drag・Hint・Icon・Input・Layout・Tile）。画面の上のヘッダーは `Layout/` に、持ち上げと置き場所の部品は `Drag/` に置く |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
 | `Features/Shared/Wallet/` | 口座の役割ごとの、残高に添える言葉と額の色。資産のタブと設定の口座で使う |

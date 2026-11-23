@@ -6,12 +6,12 @@ import Store
 
 @MainActor
 @Observable
-public final class CategoryListModel: ScreenModel {
+public final class CategoryListModel {
     public var kind: EntryCategory.Kind = .expense
     public var movingOrder: [EntryCategory.ID]?
     public var errorNotice = ErrorNotice()
 
-    public private(set) var list: CategoryList?
+    public internal(set) var snapshot: CategoryList?
 
     private let database: AppDatabase
 
@@ -21,42 +21,30 @@ public final class CategoryListModel: ScreenModel {
 }
 
 public extension CategoryListModel {
-    var visible: [EntryCategory] {
-        categories(isHidden: false)
-    }
-
-    var hidden: [EntryCategory] {
-        categories(isHidden: true)
-    }
-
     func icon(for category: EntryCategory) -> Icon? {
-        list?.icons[category.iconId]
-    }
-
-    func load() async {
-        do {
-            list = try await database.categoryList()
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
-    func observe() async {
-        await observe(database.categoryListUpdates(), into: \.list)
+        snapshot?.icons[category.iconId]
     }
 }
 
-extension CategoryListModel {
+extension CategoryListModel: SettingsBoardListModel {
+    typealias Item = EntryCategory
+
     static let loadFailedMessage = "カテゴリを読めませんでした"
-}
 
-private extension CategoryListModel {
-    func categories(isHidden: Bool) -> [EntryCategory] {
-        let categories = list?.categories ?? []
+    func read() async throws -> CategoryList {
+        try await database.categoryList()
+    }
 
-        return categories.filter { category in
-            category.kind == kind && (category.archivedAt != nil) == isHidden
-        }
+    func updates() -> some AsyncSequence<CategoryList, any Error> {
+        database.categoryListUpdates()
+    }
+
+    func items(in snapshot: CategoryList) -> [EntryCategory] {
+        snapshot.categories.filter { $0.kind == kind }
+    }
+
+    func isHidden(_ item: EntryCategory) -> Bool {
+        item.archivedAt != nil
     }
 }
 

@@ -1,5 +1,5 @@
 import DesignSystem
-import Features
+@testable import Features
 import Store
 import Testing
 

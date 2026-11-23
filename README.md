@@ -58,6 +58,7 @@ flowchart LR
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
 | 画面の組み立て・見張り・通知とウィジェット | [docs/architecture-screens.md](docs/architecture-screens.md) |
+| 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | データの形 | [docs/data.md](docs/data.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |
 | 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
