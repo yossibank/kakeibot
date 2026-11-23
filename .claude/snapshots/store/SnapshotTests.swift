@@ -9,9 +9,9 @@ struct SnapshotTests {
     @Test
     func render() throws {
         for (canvas, pages) in Self.pageSets {
-            for page in pages {
+            for (index, page) in pages.enumerated() where canvas.shows(page) {
                 let art = try Self.load(page.art)
-                let view = StorePage(page: page, art: art, canvas: canvas)
+                let view = StorePage(page: page, index: index, art: art, canvas: canvas)
 
                 try Self.write(view, canvas: canvas, to: page.file)
             }
@@ -64,11 +64,19 @@ extension SnapshotTests {
         var folder: String {
             switch self {
             case .phone: "6.9"
-            case .duoOuter: "duo-outer"
-            case .duoInner: "duo-inner"
+            case .duoOuter, .duoInner: "duo"
             case .pad: "13"
             case .header: "header"
             case .search: "search"
+            }
+        }
+
+        var device: String {
+            switch self {
+            case .duoOuter: "outer"
+            case .duoInner: "inner"
+            case .pad: "pad"
+            case .phone, .header, .search: ""
             }
         }
 
@@ -93,6 +101,16 @@ extension SnapshotTests {
             switch self {
             case .pad: 2.2
             default: 1.15
+            }
+        }
+
+        func shows(_ page: Page) -> Bool {
+            let isOuter = ["03-receipt", "04-entry", "07-font", "09-outlook"].contains(page.file)
+
+            switch self {
+            case .duoOuter: return isOuter
+            case .duoInner: return !isOuter
+            case .phone, .pad, .header, .search: return true
             }
         }
     }
@@ -150,7 +168,9 @@ private struct PanoramaPage: View {
         let zoom = canvas.size.width / Self.designWidth
 
         ZStack(alignment: .topLeading) {
-            StoreRings(rings: Self.rings, shift: Self.pitch * CGFloat(index))
+            ForEach(Array(Self.waves.enumerated()), id: \.offset) { _, wave in
+                wave.shifted(by: Self.pitch * CGFloat(index))
+            }
 
             ForEach(Array(zip(shot.phones, images).enumerated()), id: \.offset) { _, pair in
                 phone(pair.0, image: pair.1)
@@ -176,44 +196,17 @@ private extension PanoramaPage {
     static let designWidth: CGFloat = 320
     static let pitch: CGFloat = 336
 
-    static let rings = [
-        StoreRings.Ring(
-            x: 496,
-            y: 900,
-            radius: 640,
-            paint: .stroke(opacity: 0.7, width: 2, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 496,
-            y: 900,
-            radius: 600,
-            paint: .stroke(opacity: 0.3, width: 1, dash: [2, 14])
-        ),
-        StoreRings.Ring(
-            x: 496,
-            y: 900,
-            radius: 690,
-            paint: .stroke(opacity: 0.18, width: 1, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 1340,
-            y: 680,
-            radius: 250,
-            paint: .stroke(opacity: 0.4, width: 2, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 2016,
-            y: 660,
-            radius: 320,
-            paint: .stroke(opacity: 0.55, width: 2, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 2016,
-            y: 660,
-            radius: 290,
-            paint: .stroke(opacity: 0.25, width: 1, dash: [2, 14])
-        ),
-        StoreRings.Ring(x: 2900, y: 620, radius: 210, paint: .fill(Color(rgb: 0xF4E9E4)))
+    static let waves = [
+        StoreWave(y: 212, amplitude: 9, period: 1008, phase: 0, opacity: 0.75, width: 2, dash: []),
+        StoreWave(
+            y: 220,
+            amplitude: 9,
+            period: 1008,
+            phase: 60,
+            opacity: 0.35,
+            width: 1,
+            dash: [2, 12]
+        )
     ]
 
     func phone(
@@ -224,6 +217,49 @@ private extension PanoramaPage {
             .shadow(color: .black.opacity(0.5), radius: 30, y: 30)
             .rotationEffect(.degrees(phone.angle), anchor: phone.anchor)
             .offset(x: phone.x, y: phone.y)
+    }
+}
+
+private struct StoreWave: View {
+    let y: CGFloat
+    let amplitude: CGFloat
+    let period: CGFloat
+    let phase: CGFloat
+    let opacity: Double
+    let width: CGFloat
+    let dash: [CGFloat]
+    var shift: CGFloat = 0
+
+    var body: some View {
+        Canvas { context, size in
+            var path = Path()
+            let step: CGFloat = 4
+
+            for x in stride(from: CGFloat(0), through: size.width, by: step) {
+                let angle = (x + shift + phase) / period * 2 * .pi
+                let point = CGPoint(x: x, y: y + amplitude * sin(angle))
+
+                if x == 0 {
+                    path.move(to: point)
+                } else {
+                    path.addLine(to: point)
+                }
+            }
+
+            context.stroke(
+                path,
+                with: .color(StoreInk.accent.opacity(opacity)),
+                style: StrokeStyle(lineWidth: width, dash: dash)
+            )
+        }
+    }
+}
+
+private extension StoreWave {
+    func shifted(by offset: CGFloat) -> StoreWave {
+        var wave = self
+        wave.shift = offset
+        return wave
     }
 }
 
@@ -352,6 +388,7 @@ private extension StoreHeadline {
 
 private struct StorePage: View {
     let page: SnapshotTests.Page
+    let index: Int
     let art: SnapshotTests.LoadedArt
     let canvas: SnapshotTests.Canvas
 
@@ -372,7 +409,9 @@ private struct StorePage: View {
         }
         .frame(width: canvas.size.width, height: canvas.size.height, alignment: .top)
         .background {
-            StoreRings(rings: rings)
+            ForEach(Array(waves.enumerated()), id: \.offset) { _, wave in
+                wave
+            }
         }
         .background(StoreInk.ground)
         .clipped()
@@ -408,14 +447,32 @@ private extension StorePage {
         ReceiptLine(name: "洗剤", amount: "¥456")
     ]
 
-    var rings: [StoreRings.Ring] {
-        let size = canvas.size
+    var waves: [StoreWave] {
+        let zoom = canvas.size.width / 320
+        let swing = canvas.size.width / 440
+        let y = canvas.headerHeight - 4
+        let shift = canvas.size.width * 1.05 * CGFloat(index)
 
-        return StoreRings.arcs(
-            x: size.width * 1.1,
-            y: size.height * 1.15,
-            radius: max(size.width, size.height) * 0.85
-        )
+        return [
+            StoreWave(
+                y: y,
+                amplitude: 9 * swing,
+                period: 1008 * zoom,
+                phase: 0,
+                opacity: 0.75,
+                width: 2 * swing,
+                dash: []
+            ),
+            StoreWave(
+                y: y + 8 * swing,
+                amplitude: 9 * swing,
+                period: 1008 * zoom,
+                phase: 60 * zoom,
+                opacity: 0.35,
+                width: swing,
+                dash: [2 * swing, 12 * swing]
+            )
+        ].map { $0.shifted(by: shift) }
     }
 
     var header: some View {
@@ -561,7 +618,7 @@ private extension StorePage {
                         .background(StoreInk.accent.opacity(0.2), in: .capsule)
                 }
             }
-            .offset(y: -12)
+            .offset(y: 8)
         }
     }
 
@@ -819,67 +876,6 @@ private extension SnapshotTests {
     static let searchShots = ["01-home", "08-review-closing-black"]
     static let headerShots = ["02-entry-black", "03-receipt", "01-home", "08-review-closing-black"]
 
-    static let outerPages = [
-        Page(
-            file: "01-home",
-            lines: ["今月あと", "いくら？"],
-            lead: .adFree,
-            art: .phone("outer-01-home")
-        ),
-        Page(
-            file: "02-theme",
-            lines: ["テーマも、", "着せ替え。"],
-            lead: .note("ライトとダークの 12 色から選べます"),
-            art: .fan(
-                left: "outer-04-theme-rose",
-                center: "outer-01-home",
-                right: "outer-04-theme-navy",
-                labels: ["ローズ", "ホワイト", "ネイビー"]
-            )
-        ),
-        Page(
-            file: "03-entry",
-            lines: ["記録は、", "タップ 1 回"],
-            lead: .note("テンプレートと電卓ですばやく"),
-            art: .phone("outer-02-entry")
-        ),
-        Page(
-            file: "04-receipt",
-            lines: ["レシートを", "撮れば入る"],
-            lead: .note("品名・合計・日付を読み取り"),
-            art: .receipt("outer-03-receipt")
-        ),
-        Page(
-            file: "05-font",
-            lines: ["フォントも、", "選べる"],
-            lead: .note("手書きやドットなど 6 種類"),
-            art: .compare(
-                "outer-05-font-hand",
-                parts: ["outer-01-home", "outer-05-font-hand"],
-                labels: ["明朝", "手書き"],
-                crop: CGRect(x: 52, y: 200, width: 1040, height: 560)
-            )
-        ),
-        Page(
-            file: "06-assets",
-            lines: ["残高も、", "引き落としも"],
-            lead: .note("口座とカードをまとめて"),
-            art: .phone("outer-06-assets")
-        ),
-        Page(
-            file: "07-review",
-            lines: ["何に使ったか", "すぐ分かる"],
-            lead: .note("内訳と前の月との比べ"),
-            art: .phone("outer-07-review")
-        ),
-        Page(
-            file: "08-records",
-            lines: ["毎日の支出を", "カレンダーで"],
-            lead: .note("使わなかった日には印がつきます"),
-            art: .phone("outer-08-records")
-        )
-    ]
-
     static let shots = [
         Shot(
             file: "01-home",
@@ -981,53 +977,11 @@ private extension SnapshotTests {
         )
     ]
 
-    static let innerPages = [
-        Page(
-            file: "01-home",
-            lines: ["広い画面で、", "家計をひと目で"],
-            lead: .adFree,
-            art: .phone("inner-01-home")
-        ),
-        Page(
-            file: "02-review",
-            lines: ["何に使ったか、", "並べて分かる"],
-            lead: .note("内訳と前の月との比べを 2 列で"),
-            art: .phone("inner-02-review")
-        ),
-        Page(
-            file: "03-assets",
-            lines: ["残高も引き落としも、", "まとめて"],
-            lead: .note("口座ごとの残高と、カードの引き落とし日"),
-            art: .phone("inner-03-assets")
-        ),
-        Page(
-            file: "04-records",
-            lines: ["毎日の支出を、", "カレンダーで"],
-            lead: .note("使わなかった日には印がつきます"),
-            art: .phone("inner-04-records")
-        ),
-        Page(
-            file: "05-entry",
-            lines: ["よく使う支出は、", "タップ 1 回"],
-            lead: .note("テンプレートと電卓ですばやく記録"),
-            art: .phone("inner-05-entry")
-        )
-    ]
-
-    static let padPages = innerPages.map { page in
-        Page(
-            file: page.file,
-            lines: page.lines,
-            lead: page.lead,
-            art: .phone("pad-\(page.file)")
-        )
-    }
-
     static var pageSets: [(Canvas, [Page])] {
         [
-            (.duoOuter, outerPages),
-            (.duoInner, innerPages),
-            (.pad, padPages)
+            (.duoOuter, pages(for: .duoOuter)),
+            (.duoInner, pages(for: .duoInner)),
+            (.pad, pages(for: .pad))
         ]
     }
 
@@ -1038,6 +992,101 @@ private extension SnapshotTests {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appending(path: "store/screenshots/raw")
+    }
+
+    static func pages(for canvas: Canvas) -> [Page] {
+        let device = canvas.device
+        let receipt = receiptArt(for: canvas)
+        let font = fontArt(for: canvas)
+
+        return [
+            Page(
+                file: "01-home",
+                lines: ["今月あと", "いくら？"],
+                lead: .adFree,
+                art: .phone("\(device)-01-home")
+            ),
+            Page(
+                file: "02-review",
+                lines: ["何に使ったか", "すぐ分かる"],
+                lead: .note("内訳と前の月との比べ"),
+                art: .phone("\(device)-02-review")
+            ),
+            Page(
+                file: "03-receipt",
+                lines: ["レシートを", "撮れば入る"],
+                lead: .note("品名・合計・日付を読み取り"),
+                art: receipt
+            ),
+            Page(
+                file: "04-entry",
+                lines: ["記録は、", "タップ 1 回"],
+                lead: .note("テンプレートと電卓ですばやく"),
+                art: .phone("\(device)-04-entry")
+            ),
+            Page(
+                file: "05-theme",
+                lines: ["テーマも、", "着せ替え。"],
+                lead: .note("ライトとダークの 12 色から選べます"),
+                art: .fan(
+                    left: "\(device)-05-theme-rose",
+                    center: "\(device)-01-home",
+                    right: "\(device)-05-theme-navy",
+                    labels: ["ローズ", "ホワイト", "ネイビー"]
+                )
+            ),
+            Page(
+                file: "06-records",
+                lines: ["毎日の支出を", "カレンダーで"],
+                lead: .note("使わなかった日には印がつきます"),
+                art: .phone("\(device)-06-records")
+            ),
+            Page(
+                file: "07-font",
+                lines: ["フォントも、", "選べる"],
+                lead: .note("手書きやドットなど 6 種類"),
+                art: font
+            ),
+            Page(
+                file: "08-report",
+                lines: ["締めたら、", "届くレポート"],
+                lead: .note("予算との差と、AI のひとこと"),
+                art: .phone("\(device)-08-report")
+            ),
+            Page(
+                file: "09-outlook",
+                lines: ["月末の残りが", "先に分かる"],
+                lead: .note("固定費と予定から見込みます"),
+                art: .phone("\(device)-09-outlook")
+            ),
+            Page(
+                file: "10-assets",
+                lines: ["残高も、", "引き落としも"],
+                lead: .note("口座とカードをまとめて"),
+                art: .phone("\(device)-10-assets")
+            )
+        ]
+    }
+
+    static func receiptArt(for canvas: Canvas) -> Art {
+        guard canvas == .duoOuter else {
+            return .phone("\(canvas.device)-03-receipt")
+        }
+
+        return .receipt("outer-03-receipt")
+    }
+
+    static func fontArt(for canvas: Canvas) -> Art {
+        guard canvas == .duoOuter else {
+            return .phone("\(canvas.device)-07-font-hand")
+        }
+
+        return .compare(
+            "outer-07-font-hand",
+            parts: ["outer-01-home", "outer-07-font-hand"],
+            labels: ["明朝", "手書き"],
+            crop: CGRect(x: 52, y: 200, width: 1040, height: 560)
+        )
     }
 
     static func image(_ name: String) throws -> UIImage {
