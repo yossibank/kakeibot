@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class MonthStartDayModel {
+public final class MonthStartDayModel: SettingSaving {
     public private(set) var startDay: MonthStartDay = .first
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -57,7 +57,7 @@ public extension MonthStartDayModel {
         do {
             startDay = try await database.setting(.monthStartDay)
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            errorNotice.show(SettingMessage.loadFailed)
         }
     }
 
@@ -73,19 +73,13 @@ public extension MonthStartDayModel {
 }
 
 private extension MonthStartDayModel {
-    static let loadFailedMessage = "設定を読めませんでした"
-    static let saveFailedMessage = "設定を保存できませんでした"
-
     func save(_ startDay: MonthStartDay) async {
         let previous = self.startDay
 
         self.startDay = startDay
 
-        do {
-            try await database.setSetting(.monthStartDay, to: startDay)
-        } catch {
+        await saveSetting(startDay, for: .monthStartDay, in: database) {
             self.startDay = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

@@ -35,10 +35,11 @@ public final class WalletEditModel {
         color: WalletEditModel.defaultColor
     )
 
-    private var baseline: WalletDraft?
+    private(set) var baseline: WalletDraft?
+
+    let editingId: Wallet.ID?
 
     private let database: AppDatabase
-    private let editingId: Wallet.ID?
 
     public init(
         database: AppDatabase,
@@ -57,14 +58,6 @@ public final class WalletEditModel {
 }
 
 public extension WalletEditModel {
-    var isEditing: Bool {
-        editingId != nil
-    }
-
-    var isChanged: Bool {
-        baseline.map { $0 != draft } ?? false
-    }
-
     static func glyph(for kind: Wallet.Kind) -> Icon.Glyph {
         switch kind {
         case .cash: .cash
@@ -115,7 +108,7 @@ public extension WalletEditModel {
             await loadBalance()
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
@@ -126,7 +119,7 @@ public extension WalletEditModel {
             await loadBalance()
             return deletion
         } catch {
-            errorNotice.show(Self.deleteFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
             return nil
         }
     }
@@ -224,7 +217,7 @@ public extension WalletEditModel {
         do {
             return try await database.saveWallet(draft, editing: editingId, at: Date())
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }
@@ -242,7 +235,7 @@ public extension WalletEditModel {
             errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
             return false
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
@@ -276,9 +269,7 @@ extension WalletEditModel {
 private extension WalletEditModel {
     static let defaultColor = "#C9A465"
     static let loadFailedMessage = "口座を読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
     static let restoreFailedMessage = "元に戻せませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
 
     static var today: LocalDate {
         LocalDate(Date(), in: .current)
@@ -352,5 +343,15 @@ private extension WalletEditModel {
         isNegative = draft.initialBalance < 0
         calculator = AmountCalculator(amount: abs(draft.initialBalance))
         loanAmount = AmountCalculator(amount: draft.loanAmount ?? 0)
+    }
+}
+
+extension WalletEditModel: SettingsEditModel {
+    var edited: WalletDraft {
+        draft
+    }
+
+    var problemMessage: String? {
+        draft.problems.first?.message
     }
 }

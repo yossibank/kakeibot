@@ -9,17 +9,18 @@ import Store
 public final class RewardRuleEditModel {
     public var name = ""
     public private(set) var calculator = AmountCalculator()
-    public private(set) var isHidden = false
+    public internal(set) var isHidden = false
     public private(set) var hasLogs = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
     public let icon = SettingsIconEditorModel(glyph: .giftbox)
 
-    private var baseline: RewardRuleDraft?
+    private(set) var baseline: RewardRuleDraft?
+
+    let editingId: RewardRule.ID?
 
     private let database: AppDatabase
-    private let editingId: RewardRule.ID?
 
     public init(
         database: AppDatabase,
@@ -32,10 +33,6 @@ public final class RewardRuleEditModel {
 }
 
 public extension RewardRuleEditModel {
-    var isEditing: Bool {
-        editingId != nil
-    }
-
     var amount: Int? {
         calculator.amount > 0 ? calculator.amount : nil
     }
@@ -45,21 +42,6 @@ public extension RewardRuleEditModel {
             name: name,
             amount: calculator.amount,
             icon: icon.draft
-        )
-    }
-
-    var isChanged: Bool {
-        baseline.map { $0 != draft } ?? false
-    }
-
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first?.message,
-            isEditing: isEditing
         )
     }
 
@@ -107,48 +89,37 @@ public extension RewardRuleEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
-        }
-    }
-
-    func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId else {
-            return false
-        }
-
-        do {
-            try await database.setRewardRuleHidden(
-                editingId,
-                isHidden: isHidden,
-                at: Date()
-            )
-
-            self.isHidden = isHidden
-
-            return true
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return false
-        }
-    }
-
-    func delete() async -> Deletion? {
-        guard let editingId else {
-            return nil
-        }
-
-        do {
-            return try await database.deleteRewardRule(editingId)
-        } catch {
-            errorNotice.show(Self.deleteFailedMessage, for: error)
-            return nil
         }
     }
 }
 
 private extension RewardRuleEditModel {
-    static let saveFailedMessage = "保存できませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
     static let loadFailedMessage = "決まりを読めませんでした"
+}
+
+extension RewardRuleEditModel: SettingsEditRemoving {
+    var edited: RewardRuleDraft {
+        draft
+    }
+
+    var problemMessage: String? {
+        draft.problems.first?.message
+    }
+
+    func remove(_ id: RewardRule.ID) async throws -> Deletion {
+        try await database.deleteRewardRule(id)
+    }
+
+    func saveHidden(
+        _ id: RewardRule.ID,
+        isHidden: Bool
+    ) async throws {
+        try await database.setRewardRuleHidden(
+            id,
+            isHidden: isHidden,
+            at: Date()
+        )
+    }
 }

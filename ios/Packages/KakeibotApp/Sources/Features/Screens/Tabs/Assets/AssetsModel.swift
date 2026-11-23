@@ -133,23 +133,20 @@ public extension AssetsModel {
     }
 
     func run() async {
-        await withDiscardingTaskGroup { group in
-            group.addTask {
+        await observeAll([
+            {
                 await self.observe()
-            }
-
-            group.addTask {
+            },
+            {
                 await self.observeMonthStartDay()
-            }
-
-            group.addTask {
+            },
+            {
                 await self.observeRecurrings()
+            },
+            {
+                await self.observe(self.database.rewardBankUpdates(), into: \.rewardBank)
             }
-
-            group.addTask {
-                await self.observeRewardBank()
-            }
-        }
+        ])
     }
 
     func load() async {
@@ -164,9 +161,11 @@ public extension AssetsModel {
     }
 }
 
-private extension AssetsModel {
+extension AssetsModel {
     static let loadFailedMessage = "残高を読めませんでした"
+}
 
+private extension AssetsModel {
     func refreshLater() {
         Task {
             await refresh()
@@ -192,7 +191,7 @@ private extension AssetsModel {
             let summary = await AssetsSummary.make(latestInput)
 
             self.summary = summary
-            billPage = min(billPage, max(summary.billPages.count - 1, 0))
+            billPage = BillPage.clamped(billPage, in: summary.billPages)
         }
     }
 
@@ -205,15 +204,6 @@ private extension AssetsModel {
         ) { list in
             latestInput.list = list
             refreshLater()
-        }
-    }
-
-    func observeRewardBank() async {
-        await observe(
-            database.rewardBankUpdates(),
-            failure: Self.loadFailedMessage
-        ) { bank in
-            rewardBank = bank
         }
     }
 

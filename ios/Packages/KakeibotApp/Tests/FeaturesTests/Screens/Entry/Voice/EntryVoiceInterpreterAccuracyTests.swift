@@ -5,7 +5,7 @@ import FoundationModels
 import Testing
 
 @MainActor
-struct EntryVoiceModelAccuracyTests {
+struct EntryVoiceInterpreterAccuracyTests {
     @Test(.enabled(if: isModelUsable))
     func choosesCategoriesAndWalletsWell() async throws {
         guard #available(iOS 26.0, *) else {
@@ -20,7 +20,7 @@ struct EntryVoiceModelAccuracyTests {
         var misses: [String] = []
 
         for spoken in fixture.cases where spoken.modelCategory != nil || spoken.modelWallet != nil {
-            let choice = await EntryVoiceModel.choose(
+            let choice = await EntryVoiceInterpreter.choose(
                 in: spoken.text,
                 categories: fixture.categories,
                 wallets: fixture.wallets,
@@ -64,7 +64,7 @@ struct EntryVoiceModelAccuracyTests {
     }
 }
 
-private extension EntryVoiceModelAccuracyTests {
+private extension EntryVoiceInterpreterAccuracyTests {
     struct Fixture: Decodable {
         let categories: [String]
         let wallets: [String]

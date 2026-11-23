@@ -5,7 +5,7 @@ import FoundationModels
 import Testing
 
 @MainActor
-struct ReviewCommentModelAccuracyTests {
+struct ReviewCommentWriterAccuracyTests {
     @Test(.enabled(if: isModelUsable))
     func writesGroundedPoliteComments() async {
         guard #available(iOS 26.0, *) else {
@@ -18,7 +18,7 @@ struct ReviewCommentModelAccuracyTests {
         for sample in Self.samples {
             var rejected: [String] = []
 
-            let body = await ReviewCommentModel.write(
+            let body = await ReviewCommentWriter.write(
                 basis: sample.basis,
                 scale: sample.scale,
                 categories: Self.categories,
@@ -52,7 +52,7 @@ struct ReviewCommentModelAccuracyTests {
     }
 }
 
-private extension ReviewCommentModelAccuracyTests {
+private extension ReviewCommentWriterAccuracyTests {
     struct Sample {
         let basis: String
         let scale: ReviewPeriod.Scale

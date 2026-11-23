@@ -130,6 +130,6 @@ private extension ReviewModel {
             return nil
         }
 
-        return await ReviewNoteModel.summary(facts: facts, scale: scale, categories: categories)
+        return await ReviewNoteWriter.summary(facts: facts, scale: scale, categories: categories)
     }
 }

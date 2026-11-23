@@ -4,7 +4,7 @@ import FoundationModels
 
 @available(iOS 26.0, *)
 @MainActor
-enum ReviewNoteModel {
+enum ReviewNoteWriter {
     static func summary(
         facts: ReviewClosingFacts,
         scale: ReviewPeriod.Scale,
@@ -14,7 +14,7 @@ enum ReviewNoteModel {
         let detail = facts.detail
 
         guard
-            ReviewCommentModel.isUsable,
+            ReviewCommentWriter.isUsable,
             !detail.isEmpty
         else {
             return nil
@@ -46,7 +46,7 @@ enum ReviewNoteModel {
 }
 
 @available(iOS 26.0, *)
-private extension ReviewNoteModel {
+private extension ReviewNoteWriter {
     @Generable
     struct Summary {
         @Guide(description: "締めた期間の様子を書いた 1 文の丁寧語。数字は書かない")

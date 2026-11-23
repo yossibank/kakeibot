@@ -111,7 +111,7 @@ public struct BackupView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .task {
-            await model.loadSync()
+            await model.observeSync()
         }
         .task {
             await model.loadPrevious()

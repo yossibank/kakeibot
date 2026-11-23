@@ -89,7 +89,7 @@ public extension ReviewModel {
         _ = list
         _ = recurrings
 
-        if let cached = upcomingCache[range] {
+        if let cached = cache.upcoming[range] {
             return cached > 0 ? cached : nil
         }
 
@@ -104,7 +104,7 @@ public extension ReviewModel {
             .filter { $0.status == .upcoming && $0.recurring.type == type }
             .reduce(0) { $0 + $1.amount }
 
-        upcomingCache[range] = total
+        cache.upcoming[range] = total
 
         return total > 0 ? total : nil
     }

@@ -84,6 +84,8 @@ extension ScreenModelTests {
 
     @MainActor
     final class Model: ScreenModel {
+        static let loadFailedMessage = "読めませんでした"
+
         var errorNotice = ErrorNotice()
     }
 }

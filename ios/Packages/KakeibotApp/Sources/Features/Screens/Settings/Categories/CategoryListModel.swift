@@ -42,18 +42,15 @@ public extension CategoryListModel {
     }
 
     func observe() async {
-        await observe(
-            database.categoryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
+        await observe(database.categoryListUpdates(), into: \.list)
     }
 }
 
-private extension CategoryListModel {
+extension CategoryListModel {
     static let loadFailedMessage = "カテゴリを読めませんでした"
+}
 
+private extension CategoryListModel {
     func categories(isHidden: Bool) -> [EntryCategory] {
         let categories = list?.categories ?? []
 
@@ -64,10 +61,6 @@ private extension CategoryListModel {
 }
 
 extension CategoryListModel: SettingsBoardModel {
-    public func reload() async {
-        await load()
-    }
-
     public func saveOrder(_ ids: [EntryCategory.ID]) async throws {
         let ids = ids + hidden.map(\.id)
         try await database.reorderCategories(ids, at: Date())

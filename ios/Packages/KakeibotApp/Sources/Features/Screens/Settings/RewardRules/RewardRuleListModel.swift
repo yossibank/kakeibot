@@ -45,28 +45,21 @@ public extension RewardRuleListModel {
     }
 
     func observe() async {
-        await observe(
-            database.rewardRuleListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
+        await observe(database.rewardRuleListUpdates(), into: \.list)
     }
 }
 
-private extension RewardRuleListModel {
+extension RewardRuleListModel {
     static let loadFailedMessage = "決まりを読めませんでした"
+}
 
+private extension RewardRuleListModel {
     func rules(isHidden: Bool) -> [RewardRule] {
         (list?.rules ?? []).filter { $0.isActive != isHidden }
     }
 }
 
 extension RewardRuleListModel: SettingsBoardModel {
-    public func reload() async {
-        await load()
-    }
-
     public func saveOrder(_ ids: [RewardRule.ID]) async throws {
         let ids = ids + hidden.map(\.id)
         try await database.reorderRewardRules(ids, at: Date())

@@ -10,8 +10,6 @@ public final class SyncModel {
     public private(set) var isOn = false
     public private(set) var account = SyncAccount.available
     public private(set) var isWorking = false
-    public private(set) var pendingCount: Int?
-    public private(set) var isPendingFailed = false
     public private(set) var stopReason: SyncStopReason?
     public private(set) var sendProblem: SyncSendProblem?
     public private(set) var isFetching = false
@@ -23,13 +21,14 @@ public final class SyncModel {
     public internal(set) var workingWallet: Wallet.ID?
     public internal(set) var invitation: WalletShare?
     public internal(set) var opened: WalletShare?
-    public internal(set) var participants: [SyncParticipant]?
-    public internal(set) var isParticipantsFailed = false
     public internal(set) var errorNotice = ErrorNotice()
+
+    var members: Loadable<[SyncParticipant]> = .loading
 
     let database: AppDatabase
     let cloud: SyncCloud
 
+    private var pending: Loadable<Int> = .loading
     private var requestedOn: Bool?
 
     public init(
@@ -44,6 +43,22 @@ public final class SyncModel {
 public extension SyncModel {
     var isAvailable: Bool {
         account == .available
+    }
+
+    var pendingCount: Int? {
+        pending.value
+    }
+
+    var isPendingFailed: Bool {
+        pending.isFailed
+    }
+
+    var participants: [SyncParticipant]? {
+        members.value
+    }
+
+    var isParticipantsFailed: Bool {
+        members.isFailed
     }
 
     var isChoosing: Bool {
@@ -115,23 +130,20 @@ public extension SyncModel {
     }
 
     func observe() async {
-        await withDiscardingTaskGroup { group in
-            group.addTask {
+        await observeAll([
+            {
                 await self.observeStatus()
-            }
-
-            group.addTask {
+            },
+            {
                 await self.observePending()
+            },
+            {
+                await self.observe(self.database.walletShareUpdates(), into: \.shares)
+            },
+            {
+                await self.observe(self.database.joinedShareUpdates(), into: \.joined)
             }
-
-            group.addTask {
-                await self.observeShares()
-            }
-
-            group.addTask {
-                await self.observeJoined()
-            }
-        }
+        ])
     }
 
     func request(_ isOn: Bool) -> Bool {
@@ -199,8 +211,11 @@ public extension SyncModel {
 
 extension SyncModel: ScreenModel {}
 
-private extension SyncModel {
+extension SyncModel {
     static let loadFailedMessage = "同期の状態を読めませんでした"
+}
+
+private extension SyncModel {
     static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
 
     func observeStatus() async {
@@ -217,29 +232,16 @@ private extension SyncModel {
     }
 
     func observePending() async {
-        isPendingFailed = await observe(
+        let isFailed = await observe(
             database.pendingSyncCountUpdates(),
             failure: Self.loadFailedMessage
         ) { count in
-            self.pendingCount = count
+            self.pending = .loaded(count)
         }
-    }
 
-    func observeShares() async {
-        await observe(
-            database.walletShareUpdates(),
-            failure: Self.loadFailedMessage
-        ) { shares in
-            self.shares = shares
-        }
-    }
-
-    func observeJoined() async {
-        await observe(
-            database.joinedShareUpdates(),
-            failure: Self.loadFailedMessage
-        ) { joined in
-            self.joined = joined
+        if isFailed,
+           !pending.isLoaded {
+            pending = .failed
         }
     }
 

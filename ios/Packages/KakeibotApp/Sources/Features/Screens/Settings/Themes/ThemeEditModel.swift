@@ -11,9 +11,10 @@ public final class ThemeEditModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private let baseline: ThemeDraft
+    let baseline: ThemeDraft?
+    let editingId: Theme.ID?
+
     private let database: AppDatabase
-    private let editingId: Theme.ID?
 
     public init(
         database: AppDatabase,
@@ -36,25 +37,6 @@ public extension ThemeEditModel {
         case text
         case subtext
         case accent
-    }
-
-    var isEditing: Bool {
-        editingId != nil
-    }
-
-    var isChanged: Bool {
-        draft != baseline
-    }
-
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first?.message,
-            isEditing: isEditing
-        )
     }
 
     var palette: ThemePalette {
@@ -120,7 +102,7 @@ public extension ThemeEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
@@ -133,7 +115,7 @@ public extension ThemeEditModel {
         do {
             return try await database.deleteTheme(editingId)
         } catch {
-            errorNotice.show(Self.deleteFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
             return nil
         }
     }
@@ -211,9 +193,6 @@ public extension ThemeEditModel.Slot {
 }
 
 private extension ThemeEditModel {
-    static let saveFailedMessage = "保存できませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
-
     static func isLight(_ hex: String) -> Bool {
         let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
         let onBlack = ThemePalette.contrast(rgb, 0x000000)
@@ -243,5 +222,15 @@ private extension ThemeEditModel {
         }
 
         return slot.roles.isDisjoint(with: palette.unreadableRoles)
+    }
+}
+
+extension ThemeEditModel: SettingsEditModel {
+    var edited: ThemeDraft {
+        draft
+    }
+
+    var problemMessage: String? {
+        draft.problems.first?.message
     }
 }

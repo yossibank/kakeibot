@@ -7,17 +7,15 @@ import Store
 @Observable
 public final class SetupModel: ScreenModel {
     public private(set) var progress: SetupProgress?
-    public private(set) var isCardClosed = true
     public private(set) var isEntryOpened = true
     public private(set) var launchScreen: LaunchScreen = .home
     public private(set) var theme: ThemeChoice = .system
     public private(set) var customThemes: [Theme] = []
-    public private(set) var seenNewsVersion: String?
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private var isCardClosedLoaded = false
-    private var isNewsLoaded = false
+    private var cardClosed: Bool?
+    private var seenNews: Loadable<String?> = .loading
 
     private let database: AppDatabase
 
@@ -35,8 +33,16 @@ public extension SetupModel {
         return SetupItem.home.filter { !$0.isDone(in: progress) }
     }
 
+    var isCardClosed: Bool {
+        cardClosed ?? true
+    }
+
+    var seenNewsVersion: String? {
+        seenNews.value ?? nil
+    }
+
     var isLoaded: Bool {
-        progress != nil && isCardClosedLoaded
+        progress != nil && cardClosed != nil
     }
 
     var showsCard: Bool {
@@ -48,7 +54,10 @@ public extension SetupModel {
     }
 
     var hasUnreadNews: Bool {
-        isNewsLoaded && AppVersion.isNewer(WhatsNewRelease.latestVersion, than: seenNewsVersion)
+        seenNews.isLoaded && AppVersion.isNewer(
+            WhatsNewRelease.latestVersion,
+            than: seenNewsVersion
+        )
     }
 
     func isDone(_ item: SetupItem) -> Bool {
@@ -56,35 +65,38 @@ public extension SetupModel {
     }
 
     func run() async {
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observeProgress()
-            }
-
-            group.addTask {
-                await self.observeCardClosed()
-            }
-
-            group.addTask {
-                await self.observeEntryOpened()
-            }
-
-            group.addTask {
-                await self.observeLaunchScreen()
-            }
-
-            group.addTask {
-                await self.observeTheme()
-            }
-
-            group.addTask {
-                await self.observeCustomThemes()
-            }
-
-            group.addTask {
+        await observeAll([
+            {
+                await self.observe(self.database.setupProgressUpdates(), into: \.progress)
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.setupCardClosed),
+                    into: \.cardClosed
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.entryOpened),
+                    into: \.isEntryOpened
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.launchScreen),
+                    into: \.launchScreen
+                )
+            },
+            {
+                await self.observe(self.database.settingUpdates(.theme), into: \.theme)
+            },
+            {
+                await self.observe(self.database.customThemeUpdates(), into: \.customThemes)
+            },
+            {
                 await self.observeSeenNews()
             }
-        }
+        ])
     }
 
     func markNewsSeen() async {
@@ -94,7 +106,7 @@ public extension SetupModel {
             return
         }
 
-        seenNewsVersion = version
+        seenNews = .loaded(version)
 
         do {
             try await database.setSetting(.whatsNewSeenVersion, to: version)
@@ -114,77 +126,24 @@ public extension SetupModel {
     }
 
     func closeCard() async {
-        isCardClosed = true
+        cardClosed = true
         await save(.setupCardClosed, to: true)
     }
 }
 
-private extension SetupModel {
+extension SetupModel {
     static let loadFailedMessage = "設定を読めませんでした"
+}
+
+private extension SetupModel {
     static let saveFailedMessage = "設定を保存できませんでした"
-
-    func observeProgress() async {
-        await observe(
-            database.setupProgressUpdates(),
-            failure: Self.loadFailedMessage
-        ) { progress in
-            self.progress = progress
-        }
-    }
-
-    func observeCardClosed() async {
-        await observe(
-            database.settingUpdates(.setupCardClosed),
-            failure: Self.loadFailedMessage
-        ) { isClosed in
-            isCardClosed = isClosed
-            isCardClosedLoaded = true
-        }
-    }
-
-    func observeEntryOpened() async {
-        await observe(
-            database.settingUpdates(.entryOpened),
-            failure: Self.loadFailedMessage
-        ) { isOpened in
-            isEntryOpened = isOpened
-        }
-    }
-
-    func observeLaunchScreen() async {
-        await observe(
-            database.settingUpdates(.launchScreen),
-            failure: Self.loadFailedMessage
-        ) { screen in
-            launchScreen = screen
-        }
-    }
-
-    func observeTheme() async {
-        await observe(
-            database.settingUpdates(.theme),
-            failure: Self.loadFailedMessage
-        ) { theme in
-            self.theme = theme
-        }
-    }
-
-    func observeCustomThemes() async {
-        await observe(
-            database.customThemeUpdates(),
-            failure: Self.loadFailedMessage
-        ) { themes in
-            customThemes = themes
-        }
-    }
 
     func observeSeenNews() async {
         await observe(
             database.settingUpdates(.whatsNewSeenVersion),
             failure: Self.loadFailedMessage
         ) { version in
-            seenNewsVersion = version
-            isNewsLoaded = true
+            seenNews = .loaded(version)
         }
     }
 

@@ -44,7 +44,7 @@ public extension ThemeListModel {
             current = try await database.setting(.theme)
             customThemes = try await database.customThemes()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            errorNotice.show(SettingMessage.loadFailed)
         }
     }
 
@@ -61,7 +61,7 @@ public extension ThemeListModel {
             try await database.setSetting(.theme, to: choice)
         } catch {
             current = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingMessage.saveFailed, for: error)
             return
         }
 
@@ -99,7 +99,5 @@ public extension ThemeListModel {
 }
 
 private extension ThemeListModel {
-    static let loadFailedMessage = "設定を読めませんでした"
-    static let saveFailedMessage = "設定を保存できませんでした"
     static let restoreFailedMessage = "元に戻せませんでした"
 }

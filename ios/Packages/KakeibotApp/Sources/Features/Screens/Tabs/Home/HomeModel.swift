@@ -28,12 +28,6 @@ public final class HomeModel: ScreenModel {
     public private(set) var billPages: [BillPage] = []
     public private(set) var syncStatus = SyncStatus.off
 
-    public private(set) var monthStartDay: MonthStartDay = .first {
-        didSet {
-            updateOverview()
-        }
-    }
-
     public private(set) var templateOrder: TemplateOrder = .manual {
         didSet {
             updateTemplates()
@@ -60,19 +54,7 @@ public final class HomeModel: ScreenModel {
         }
     }
 
-    private var budgets: [Budget] = [] {
-        didSet {
-            updateOverview()
-        }
-    }
-
-    private var recurrings: [Recurring] = [] {
-        didSet {
-            updateOverview()
-        }
-    }
-
-    private var carryoverFrom: YearMonth? {
+    private var input = Input() {
         didSet {
             updateOverview()
         }
@@ -99,6 +81,10 @@ public final class HomeModel: ScreenModel {
 
 public extension HomeModel {
     static let recentLimit = 5
+
+    var monthStartDay: MonthStartDay {
+        input.monthStartDay
+    }
 
     var showsNoRecords: Bool {
         list != nil && recentRows.isEmpty
@@ -136,53 +122,60 @@ public extension HomeModel {
         await loadTemplateOrder()
         await loadHomeLayout()
 
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observe()
-            }
-
-            group.addTask {
-                await self.observeTemplates()
-            }
-
-            group.addTask {
-                await self.observeBudgets()
-            }
-
-            group.addTask {
-                await self.observeRecurrings()
-            }
-
-            group.addTask {
-                await self.observeMonthStartDay()
-            }
-
-            group.addTask {
-                await self.observeCarryoverFrom()
-            }
-
-            group.addTask {
-                await self.observeHomeSections()
-            }
-
-            group.addTask {
-                await self.observeHomeHiddenSections()
-            }
-
-            group.addTask {
-                await self.observeStamps()
-            }
-
-            group.addTask {
+        await observeAll([
+            {
+                await self.observe(
+                    self.database.entryListUpdates(),
+                    into: \.list,
+                    failing: \.isListFailed
+                )
+            },
+            {
+                await self.observe(self.database.templateUpdates(), into: \.allTemplates)
+            },
+            {
+                await self.observe(self.database.budgetUpdates(), into: \.input.budgets)
+            },
+            {
+                await self.observe(self.database.recurringUpdates(), into: \.input.recurrings)
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.monthStartDay),
+                    into: \.input.monthStartDay
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.budgetCarryoverFrom),
+                    into: \.input.carryoverFrom
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.homeSections),
+                    into: \.homeSections
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.homeHiddenSections),
+                    into: \.homeHiddenSections
+                )
+            },
+            {
+                await self.observe(self.database.stampCalendarUpdates(), into: \.stampCalendar)
+            },
+            {
                 await self.observeSyncStatus()
             }
-        }
+        ])
     }
 
     func load() async {
         do {
             list = try await database.entryList()
-            recurrings = try await database.recurrings()
+            input.recurrings = try await database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -257,49 +250,21 @@ public extension HomeModel {
     }
 }
 
-private extension HomeModel {
+extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
+}
+
+private extension HomeModel {
+    struct Input {
+        var budgets: [Budget] = []
+        var recurrings: [Recurring] = []
+        var monthStartDay: MonthStartDay = .first
+        var carryoverFrom: YearMonth?
+    }
+
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let layoutSaveFailedMessage = "設定を保存できませんでした"
-
-    func observe() async {
-        isListFailed = false
-
-        isListFailed = await observe(
-            database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
-    }
-
-    func observeTemplates() async {
-        await observe(
-            database.templateUpdates(),
-            failure: Self.loadFailedMessage
-        ) { templates in
-            allTemplates = templates
-        }
-    }
-
-    func observeRecurrings() async {
-        await observe(
-            database.recurringUpdates(),
-            failure: Self.loadFailedMessage
-        ) { recurrings in
-            self.recurrings = recurrings
-        }
-    }
-
-    func observeBudgets() async {
-        await observe(
-            database.budgetUpdates(),
-            failure: Self.loadFailedMessage
-        ) { budgets in
-            self.budgets = budgets
-        }
-    }
 
     func loadHomeLayout() async {
         do {
@@ -307,33 +272,6 @@ private extension HomeModel {
             homeHiddenSections = try await database.setting(.homeHiddenSections)
         } catch {
             errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
-    func observeHomeSections() async {
-        await observe(
-            database.settingUpdates(.homeSections),
-            failure: Self.loadFailedMessage
-        ) { sections in
-            homeSections = sections
-        }
-    }
-
-    func observeHomeHiddenSections() async {
-        await observe(
-            database.settingUpdates(.homeHiddenSections),
-            failure: Self.loadFailedMessage
-        ) { sections in
-            homeHiddenSections = sections
-        }
-    }
-
-    func observeStamps() async {
-        await observe(
-            database.stampCalendarUpdates(),
-            failure: Self.loadFailedMessage
-        ) { calendar in
-            stampCalendar = calendar
         }
     }
 
@@ -347,42 +285,24 @@ private extension HomeModel {
         }
     }
 
-    func observeMonthStartDay() async {
-        await observe(
-            database.settingUpdates(.monthStartDay),
-            failure: Self.loadFailedMessage
-        ) { startDay in
-            monthStartDay = startDay
-        }
-    }
-
-    func observeCarryoverFrom() async {
-        await observe(
-            database.settingUpdates(.budgetCarryoverFrom),
-            failure: Self.loadFailedMessage
-        ) { month in
-            carryoverFrom = month
-        }
-    }
-
     func updateOverview() {
         let bills = list?.upcomingCardBills(
-            recurrings: recurrings,
+            recurrings: input.recurrings,
             after: today,
             count: BillPage.limit
         )
 
         overview = MonthOverview(
             list: list,
-            budgets: budgets,
-            recurrings: recurrings,
-            monthStartDay: monthStartDay,
-            carryoverFrom: carryoverFrom,
+            budgets: input.budgets,
+            recurrings: input.recurrings,
+            monthStartDay: input.monthStartDay,
+            carryoverFrom: input.carryoverFrom,
             today: today
         )
 
         billPages = BillPage.pages(of: bills ?? [])
-        billPage = min(billPage, max(billPages.count - 1, 0))
+        billPage = BillPage.clamped(billPage, in: billPages)
     }
 
     func updateTemplates() {

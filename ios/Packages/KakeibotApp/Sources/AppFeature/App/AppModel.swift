@@ -16,6 +16,8 @@ import WidgetKit
 final class AppModel {
     var notice = ErrorNotice()
     var isPro = false
+    var syncEngine: SyncEngine?
+    var sharedSyncEngine: SyncEngine?
 
     private(set) var launch: Launch = .opening
     private(set) var today: LocalDate
@@ -25,17 +27,15 @@ final class AppModel {
     private(set) var syncActivity = SyncActivity(isSyncEnabled: false, isSharing: false)
 
     let proStore: ProStore
+    let shareInbox: SyncShareInbox
 
     private let openDatabase: @Sendable () throws -> AppDatabase
     private let currentDay: @Sendable () -> LocalDate
     private let scheduler: NotificationScheduler
     private let router: NotificationRouter
-    private let shareInbox: SyncShareInbox
     private let retryDelays: [Duration]
 
     private var hasStoppedObservation = false
-    private var syncEngine: SyncEngine?
-    private var sharedSyncEngine: SyncEngine?
     private var widgetReload: Task<Void, Never>?
 
     init(
@@ -64,13 +64,17 @@ extension AppModel {
         case onboarding(AppDatabase)
         case ready(AppDatabase)
         case failed
+
+        var database: AppDatabase? {
+            switch self {
+            case let .onboarding(database), let .ready(database): database
+            case .opening, .failed: nil
+            }
+        }
     }
 
     var hasDatabase: Bool {
-        switch launch {
-        case .onboarding, .ready: true
-        case .opening, .failed: false
-        }
+        launch.database != nil
     }
 
     var route: PlannedNotification.Route? {
@@ -145,42 +149,37 @@ extension AppModel {
     func refreshDay() async {
         today = currentDay()
 
-        switch launch {
-        case let .onboarding(database), let .ready(database):
-            try? await database.reloadAfterOtherProcesses()
-            await generateRecurring(in: database)
-            await scheduleNotifications(in: database)
-
-        case .opening, .failed:
+        guard let database = launch.database else {
             return
         }
+
+        try? await database.reloadAfterOtherProcesses()
+
+        await generateRecurring(in: database)
+        await scheduleNotifications(in: database)
     }
 
     func rescheduleNotifications() async {
-        switch launch {
-        case let .onboarding(database), let .ready(database):
-            await scheduleNotifications(in: database)
-
-        case .opening, .failed:
+        guard let database = launch.database else {
             return
         }
+
+        await scheduleNotifications(in: database)
     }
 
     func observeTheme() async {
-        switch launch {
-        case let .onboarding(database), let .ready(database):
-            await withDiscardingTaskGroup { group in
-                group.addTask {
-                    await self.observeLook(in: database)
-                }
+        guard let database = launch.database else {
+            return
+        }
 
-                group.addTask {
-                    await self.observeStyle(in: database)
-                }
+        await withDiscardingTaskGroup { group in
+            group.addTask {
+                await self.observeLook(in: database)
             }
 
-        case .opening, .failed:
-            return
+            group.addTask {
+                await self.observeStyle(in: database)
+            }
         }
     }
 
@@ -212,77 +211,6 @@ extension AppModel {
         await watch(database.syncActivityUpdates()) { activity in
             self.syncActivity = activity
         }
-    }
-
-    func syncChanges(in database: AppDatabase) async {
-        await syncEngine?.stop()
-        await sharedSyncEngine?.stop()
-
-        syncEngine = nil
-        sharedSyncEngine = nil
-
-        guard syncActivity.isActive else {
-            return
-        }
-
-        let engine = SyncEngine(database: database, scope: .private)
-        let sharedEngine = SyncEngine(database: database, scope: .shared)
-
-        syncEngine = engine
-        sharedSyncEngine = sharedEngine
-
-        await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
-        await sharedEngine.start(isSyncEnabled: syncActivity.isSyncEnabled)
-
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await engine.fetchChanges()
-            }
-
-            group.addTask {
-                await sharedEngine.fetchChanges()
-            }
-
-            group.addTask {
-                await self.enqueueSyncChanges(
-                    in: database,
-                    engine: engine,
-                    sharedEngine: sharedEngine
-                )
-            }
-        }
-    }
-
-    func acceptShares(in database: AppDatabase) async {
-        let shares = shareInbox.take()
-
-        guard !shares.isEmpty else {
-            return
-        }
-
-        for metadata in shares {
-            do {
-                try await SyncEngine.acceptShare(metadata)
-                notice.inform(Self.joinedMessage(for: metadata))
-            } catch is CancellationError {
-                continue
-            } catch {
-                let code = error as NSError
-                let detail = String(describing: error)
-
-                Self.logger.error(
-                    "\(Self.shareFailedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
-                )
-                notice.show(Self.shareFailedMessage)
-            }
-        }
-
-        let engine = sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
-
-        sharedSyncEngine = engine
-
-        await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
-        await engine.fetchChanges()
     }
 
     func observationID<Base: Hashable>(_ base: Base) -> ObservationID<Base> {
@@ -318,33 +246,8 @@ extension AppModel {
 }
 
 private extension AppModel {
-    static let shareFailedMessage = "共有の口座に参加できませんでした"
-    static let shareJoinedMessage = "共有の口座に参加しました"
     static let widgetReloadDelay: Duration = .seconds(1)
     static let recurringFailedMessage = "固定費を自動で記録できませんでした"
-    static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Sharing")
-
-    static func joinedMessage(for metadata: CKShare.Metadata) -> String {
-        guard
-            let title = metadata.share[CKShare.SystemFieldKey.title] as? String,
-            !title.isEmpty
-        else {
-            return shareJoinedMessage
-        }
-
-        return "「\(title)」に参加しました"
-    }
-
-    func enqueueSyncChanges(
-        in database: AppDatabase,
-        engine: SyncEngine,
-        sharedEngine: SyncEngine
-    ) async {
-        await watch(database.syncChangeUpdates()) {
-            await engine.enqueuePending()
-            await sharedEngine.enqueuePending()
-        }
-    }
 
     func observeLook(in database: AppDatabase) async {
         await watch(database.themeLookUpdates()) { look in

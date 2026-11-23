@@ -1,5 +1,5 @@
 import Core
-import Features
+@testable import Features
 import Store
 import Testing
 

@@ -90,7 +90,7 @@ public extension BackupModel {
         .closedHint(.backup, in: database)
     }
 
-    func loadSync() async {
+    func observeSync() async {
         do {
             for try await activity in database.syncActivityUpdates() {
                 isSyncActive = activity.isActive

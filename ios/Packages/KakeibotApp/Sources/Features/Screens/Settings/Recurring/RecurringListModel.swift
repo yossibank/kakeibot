@@ -99,55 +99,34 @@ public extension RecurringListModel {
     }
 
     func observe() async {
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observeRecurrings()
+        await observeAll([
+            {
+                await self.observe(
+                    self.database.recurringUpdates(includingHidden: true),
+                    into: \.recurrings
+                )
+            },
+            {
+                await self.observe(self.database.entryListUpdates(), into: \.list)
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.monthStartDay),
+                    into: \.monthStartDay
+                )
             }
-
-            group.addTask {
-                await self.observeList()
-            }
-
-            group.addTask {
-                await self.observeMonthStartDay()
-            }
-        }
+        ])
     }
 }
 
-private extension RecurringListModel {
+extension RecurringListModel {
     static let loadFailedMessage = "固定費を読めませんでした"
+}
 
+private extension RecurringListModel {
     func recurrings(isHidden: Bool) -> [Recurring] {
         recurrings.filter { recurring in
             recurring.type == type && (recurring.archivedAt != nil) == isHidden
-        }
-    }
-
-    func observeRecurrings() async {
-        await observe(
-            database.recurringUpdates(includingHidden: true),
-            failure: Self.loadFailedMessage
-        ) { recurrings in
-            self.recurrings = recurrings
-        }
-    }
-
-    func observeList() async {
-        await observe(
-            database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
-    }
-
-    func observeMonthStartDay() async {
-        await observe(
-            database.settingUpdates(.monthStartDay),
-            failure: Self.loadFailedMessage
-        ) { startDay in
-            self.monthStartDay = startDay
         }
     }
 
@@ -185,7 +164,7 @@ private extension RecurringListModel {
 }
 
 extension RecurringListModel: SettingsBoardModel {
-    public func reload() async {
+    public func load() async {
         do {
             recurrings = try await database.recurrings(includingHidden: true)
         } catch {

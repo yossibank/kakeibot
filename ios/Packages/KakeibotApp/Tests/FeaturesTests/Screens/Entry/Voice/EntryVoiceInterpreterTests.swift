@@ -2,7 +2,7 @@
 import Testing
 
 @MainActor
-struct EntryVoiceModelTests {
+struct EntryVoiceInterpreterTests {
     @Test
     func buildsTheSchemaForCategoriesAndWallets() throws {
         guard #available(iOS 26.0, *) else {
@@ -12,6 +12,6 @@ struct EntryVoiceModelTests {
         let categories = ["食費", "交通", "食費", ""]
         let wallets = ["財布", "楽天カード"]
 
-        _ = try EntryVoiceModel.schema(categories: categories, wallets: wallets)
+        _ = try EntryVoiceInterpreter.schema(categories: categories, wallets: wallets)
     }
 }

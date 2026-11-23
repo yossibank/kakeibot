@@ -13,8 +13,7 @@ public extension SyncModel {
         let id = item.wallet.id
 
         opened = item
-        participants = nil
-        isParticipantsFailed = false
+        members = .loading
 
         do {
             let participants = try await cloud.participants(id, item.wallet.name)
@@ -23,13 +22,13 @@ public extension SyncModel {
                 return
             }
 
-            self.participants = participants
+            members = .loaded(participants)
         } catch {
             guard opened?.wallet.id == id else {
                 return
             }
 
-            isParticipantsFailed = true
+            members = .failed
         }
     }
 
@@ -39,8 +38,7 @@ public extension SyncModel {
 
     func closeOpened() {
         opened = nil
-        participants = nil
-        isParticipantsFailed = false
+        members = .loading
     }
 
     func confirmInvitation() async {
