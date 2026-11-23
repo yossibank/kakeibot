@@ -42,18 +42,15 @@ public extension CategoryListModel {
     }
 
     func observe() async {
-        await observe(
-            database.categoryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
+        await observe(database.categoryListUpdates(), into: \.list)
     }
 }
 
-private extension CategoryListModel {
+extension CategoryListModel {
     static let loadFailedMessage = "カテゴリを読めませんでした"
+}
 
+private extension CategoryListModel {
     func categories(isHidden: Bool) -> [EntryCategory] {
         let categories = list?.categories ?? []
 

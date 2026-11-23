@@ -48,42 +48,28 @@ public extension TemplateListModel {
     }
 
     func observe() async {
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observeTemplates()
+        await observeAll([
+            {
+                await self.observe(
+                    self.database.templateUpdates(includingHidden: true),
+                    into: \.templates
+                )
+            },
+            {
+                await self.observe(self.database.entryListUpdates(), into: \.list)
             }
-
-            group.addTask {
-                await self.observeList()
-            }
-        }
+        ])
     }
 }
 
-private extension TemplateListModel {
+extension TemplateListModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
+}
 
+private extension TemplateListModel {
     func templates(isHidden: Bool) -> [EntryTemplate] {
         templates.filter { template in
             template.type == type && (template.archivedAt != nil) == isHidden
-        }
-    }
-
-    func observeTemplates() async {
-        await observe(
-            database.templateUpdates(includingHidden: true),
-            failure: Self.loadFailedMessage
-        ) { templates in
-            self.templates = templates
-        }
-    }
-
-    func observeList() async {
-        await observe(
-            database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
         }
     }
 }

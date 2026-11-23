@@ -41,18 +41,15 @@ public extension StampListModel {
     }
 
     func observe() async {
-        await observe(
-            database.iconShelfUpdates(),
-            failure: Self.loadFailedMessage
-        ) { shelf in
-            self.shelf = shelf
-        }
+        await observe(database.iconShelfUpdates(), into: \.shelf)
     }
 }
 
-private extension StampListModel {
+extension StampListModel {
     static let loadFailedMessage = "スタンプを読めませんでした"
+}
 
+private extension StampListModel {
     func stamps(isHidden: Bool) -> [ShelfIcon] {
         (shelf?.shelfIcons ?? []).filter { ($0.archivedAt != nil) == isHidden }
     }

@@ -236,43 +236,42 @@ public extension RecordsModel {
     func run() async {
         await loadLayout()
 
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observe()
-            }
-
-            group.addTask {
-                await self.observeNoSpendDays()
-            }
-
-            group.addTask {
-                await self.observeStamps()
-            }
-
-            group.addTask {
-                await self.observeStampShelf()
-            }
-
-            group.addTask {
-                await self.observeRewardBank()
-            }
-
-            group.addTask {
-                await self.observeRecurrings()
-            }
-
-            group.addTask {
-                await self.observeWeekStart()
-            }
-
-            group.addTask {
+        await observeAll([
+            {
+                await self.observe(
+                    self.database.entryListUpdates(),
+                    into: \.list,
+                    failing: \.isListFailed
+                )
+            },
+            {
+                await self.observe(self.database.noSpendDayUpdates(), into: \.noSpendDays)
+            },
+            {
+                await self.observe(self.database.stampCalendarUpdates(), into: \.stampCalendar)
+            },
+            {
+                await self.observe(self.database.iconShelfUpdates(), into: \.stampShelf)
+            },
+            {
+                await self.observe(self.database.rewardBankUpdates(), into: \.rewardBank)
+            },
+            {
+                await self.observe(self.database.recurringUpdates(), into: \.recurrings)
+            },
+            {
+                await self.observe(self.database.settingUpdates(.weekStart), into: \.weekStart)
+            },
+            {
                 await self.observeMonthStartDay()
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.recentSearches),
+                    into: \.recentSearches
+                )
             }
-
-            group.addTask {
-                await self.observeRecentSearches()
-            }
-        }
+        ])
     }
 }
 
@@ -371,80 +370,6 @@ private extension RecordsModel {
             try await database.setSetting(.recentSearches, to: recentSearches)
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
-        }
-    }
-
-    func observe() async {
-        isListFailed = false
-
-        isListFailed = await observe(
-            database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
-    }
-
-    func observeNoSpendDays() async {
-        await observe(
-            database.noSpendDayUpdates(),
-            failure: Self.loadFailedMessage
-        ) { days in
-            noSpendDays = days
-        }
-    }
-
-    func observeStamps() async {
-        await observe(
-            database.stampCalendarUpdates(),
-            failure: Self.loadFailedMessage
-        ) { calendar in
-            stampCalendar = calendar
-        }
-    }
-
-    func observeStampShelf() async {
-        await observe(
-            database.iconShelfUpdates(),
-            failure: Self.loadFailedMessage
-        ) { shelf in
-            stampShelf = shelf
-        }
-    }
-
-    func observeRewardBank() async {
-        await observe(
-            database.rewardBankUpdates(),
-            failure: Self.loadFailedMessage
-        ) { bank in
-            rewardBank = bank
-        }
-    }
-
-    func observeRecurrings() async {
-        await observe(
-            database.recurringUpdates(),
-            failure: Self.loadFailedMessage
-        ) { recurrings in
-            self.recurrings = recurrings
-        }
-    }
-
-    func observeRecentSearches() async {
-        await observe(
-            database.settingUpdates(.recentSearches),
-            failure: Self.loadFailedMessage
-        ) { words in
-            recentSearches = words
-        }
-    }
-
-    func observeWeekStart() async {
-        await observe(
-            database.settingUpdates(.weekStart),
-            failure: Self.loadFailedMessage
-        ) { weekStart in
-            self.weekStart = weekStart
         }
     }
 

@@ -59,9 +59,11 @@ public extension WalletListModel {
     }
 }
 
-private extension WalletListModel {
+extension WalletListModel {
     static let loadFailedMessage = "口座を読めませんでした"
+}
 
+private extension WalletListModel {
     static var today: LocalDate {
         LocalDate(Date(), in: .current)
     }

@@ -211,39 +211,42 @@ public extension ReviewModel {
     func run() async {
         await loadSelection()
 
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observe()
+        await observeAll([
+            {
+                await self.observe(
+                    self.database.entryListUpdates(),
+                    into: \.list,
+                    failing: \.isListFailed
+                )
+            },
+            {
+                await self.observe(self.database.budgetUpdates(), into: \.budgets)
+            },
+            {
+                await self.observe(self.database.stampCalendarUpdates(), into: \.stampCalendar)
+            },
+            {
+                await self.observe(self.database.noSpendDayUpdates(), into: \.noSpendDays)
+            },
+            {
+                await self.observe(self.database.recurringUpdates(), into: \.recurrings)
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.monthStartDay),
+                    into: \.monthStartDay
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.budgetCarryoverFrom),
+                    into: \.carryoverFrom
+                )
+            },
+            {
+                await self.observe(self.database.settingUpdates(.weekStart), into: \.weekStart)
             }
-
-            group.addTask {
-                await self.observeBudgets()
-            }
-
-            group.addTask {
-                await self.observeStamps()
-            }
-
-            group.addTask {
-                await self.observeNoSpendDays()
-            }
-
-            group.addTask {
-                await self.observeRecurrings()
-            }
-
-            group.addTask {
-                await self.observeMonthStartDay()
-            }
-
-            group.addTask {
-                await self.observeCarryoverFrom()
-            }
-
-            group.addTask {
-                await self.observeWeekStart()
-            }
-        }
+        ])
     }
 
     func loadSelection() async {
@@ -307,8 +310,11 @@ extension ReviewModel {
     }
 }
 
-private extension ReviewModel {
+extension ReviewModel {
     static let loadFailedMessage = "記録を読めませんでした"
+}
+
+private extension ReviewModel {
     static let saveFailedMessage = "保存できませんでした"
 
     func summary(in range: ClosedRange<LocalDate>) -> ReviewSummary {
@@ -331,80 +337,6 @@ private extension ReviewModel {
         case .expense: summary.expense.total
         case .income: summary.income.total
         case .balance: summary.balance
-        }
-    }
-
-    func observe() async {
-        isListFailed = false
-
-        isListFailed = await observe(
-            database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
-    }
-
-    func observeStamps() async {
-        await observe(
-            database.stampCalendarUpdates(),
-            failure: Self.loadFailedMessage
-        ) { calendar in
-            stampCalendar = calendar
-        }
-    }
-
-    func observeNoSpendDays() async {
-        await observe(
-            database.noSpendDayUpdates(),
-            failure: Self.loadFailedMessage
-        ) { days in
-            noSpendDays = days
-        }
-    }
-
-    func observeBudgets() async {
-        await observe(
-            database.budgetUpdates(),
-            failure: Self.loadFailedMessage
-        ) { budgets in
-            self.budgets = budgets
-        }
-    }
-
-    func observeRecurrings() async {
-        await observe(
-            database.recurringUpdates(),
-            failure: Self.loadFailedMessage
-        ) { recurrings in
-            self.recurrings = recurrings
-        }
-    }
-
-    func observeMonthStartDay() async {
-        await observe(
-            database.settingUpdates(.monthStartDay),
-            failure: Self.loadFailedMessage
-        ) { startDay in
-            monthStartDay = startDay
-        }
-    }
-
-    func observeCarryoverFrom() async {
-        await observe(
-            database.settingUpdates(.budgetCarryoverFrom),
-            failure: Self.loadFailedMessage
-        ) { month in
-            carryoverFrom = month
-        }
-    }
-
-    func observeWeekStart() async {
-        await observe(
-            database.settingUpdates(.weekStart),
-            failure: Self.loadFailedMessage
-        ) { weekStart in
-            self.weekStart = weekStart
         }
     }
 }

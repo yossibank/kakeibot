@@ -56,35 +56,35 @@ public extension SetupModel {
     }
 
     func run() async {
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observeProgress()
-            }
-
-            group.addTask {
+        await observeAll([
+            {
+                await self.observe(self.database.setupProgressUpdates(), into: \.progress)
+            },
+            {
                 await self.observeCardClosed()
-            }
-
-            group.addTask {
-                await self.observeEntryOpened()
-            }
-
-            group.addTask {
-                await self.observeLaunchScreen()
-            }
-
-            group.addTask {
-                await self.observeTheme()
-            }
-
-            group.addTask {
-                await self.observeCustomThemes()
-            }
-
-            group.addTask {
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.entryOpened),
+                    into: \.isEntryOpened
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.launchScreen),
+                    into: \.launchScreen
+                )
+            },
+            {
+                await self.observe(self.database.settingUpdates(.theme), into: \.theme)
+            },
+            {
+                await self.observe(self.database.customThemeUpdates(), into: \.customThemes)
+            },
+            {
                 await self.observeSeenNews()
             }
-        }
+        ])
     }
 
     func markNewsSeen() async {
@@ -119,18 +119,12 @@ public extension SetupModel {
     }
 }
 
-private extension SetupModel {
+extension SetupModel {
     static let loadFailedMessage = "設定を読めませんでした"
-    static let saveFailedMessage = "設定を保存できませんでした"
+}
 
-    func observeProgress() async {
-        await observe(
-            database.setupProgressUpdates(),
-            failure: Self.loadFailedMessage
-        ) { progress in
-            self.progress = progress
-        }
-    }
+private extension SetupModel {
+    static let saveFailedMessage = "設定を保存できませんでした"
 
     func observeCardClosed() async {
         await observe(
@@ -139,42 +133,6 @@ private extension SetupModel {
         ) { isClosed in
             isCardClosed = isClosed
             isCardClosedLoaded = true
-        }
-    }
-
-    func observeEntryOpened() async {
-        await observe(
-            database.settingUpdates(.entryOpened),
-            failure: Self.loadFailedMessage
-        ) { isOpened in
-            isEntryOpened = isOpened
-        }
-    }
-
-    func observeLaunchScreen() async {
-        await observe(
-            database.settingUpdates(.launchScreen),
-            failure: Self.loadFailedMessage
-        ) { screen in
-            launchScreen = screen
-        }
-    }
-
-    func observeTheme() async {
-        await observe(
-            database.settingUpdates(.theme),
-            failure: Self.loadFailedMessage
-        ) { theme in
-            self.theme = theme
-        }
-    }
-
-    func observeCustomThemes() async {
-        await observe(
-            database.customThemeUpdates(),
-            failure: Self.loadFailedMessage
-        ) { themes in
-            customThemes = themes
         }
     }
 

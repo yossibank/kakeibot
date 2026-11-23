@@ -136,47 +136,54 @@ public extension HomeModel {
         await loadTemplateOrder()
         await loadHomeLayout()
 
-        await withDiscardingTaskGroup { group in
-            group.addTask {
-                await self.observe()
-            }
-
-            group.addTask {
-                await self.observeTemplates()
-            }
-
-            group.addTask {
-                await self.observeBudgets()
-            }
-
-            group.addTask {
-                await self.observeRecurrings()
-            }
-
-            group.addTask {
-                await self.observeMonthStartDay()
-            }
-
-            group.addTask {
-                await self.observeCarryoverFrom()
-            }
-
-            group.addTask {
-                await self.observeHomeSections()
-            }
-
-            group.addTask {
-                await self.observeHomeHiddenSections()
-            }
-
-            group.addTask {
-                await self.observeStamps()
-            }
-
-            group.addTask {
+        await observeAll([
+            {
+                await self.observe(
+                    self.database.entryListUpdates(),
+                    into: \.list,
+                    failing: \.isListFailed
+                )
+            },
+            {
+                await self.observe(self.database.templateUpdates(), into: \.allTemplates)
+            },
+            {
+                await self.observe(self.database.budgetUpdates(), into: \.budgets)
+            },
+            {
+                await self.observe(self.database.recurringUpdates(), into: \.recurrings)
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.monthStartDay),
+                    into: \.monthStartDay
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.budgetCarryoverFrom),
+                    into: \.carryoverFrom
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.homeSections),
+                    into: \.homeSections
+                )
+            },
+            {
+                await self.observe(
+                    self.database.settingUpdates(.homeHiddenSections),
+                    into: \.homeHiddenSections
+                )
+            },
+            {
+                await self.observe(self.database.stampCalendarUpdates(), into: \.stampCalendar)
+            },
+            {
                 await self.observeSyncStatus()
             }
-        }
+        ])
     }
 
     func load() async {
@@ -257,49 +264,14 @@ public extension HomeModel {
     }
 }
 
-private extension HomeModel {
+extension HomeModel {
     static let loadFailedMessage = "記録を読めませんでした"
+}
+
+private extension HomeModel {
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let layoutSaveFailedMessage = "設定を保存できませんでした"
-
-    func observe() async {
-        isListFailed = false
-
-        isListFailed = await observe(
-            database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
-            self.list = list
-        }
-    }
-
-    func observeTemplates() async {
-        await observe(
-            database.templateUpdates(),
-            failure: Self.loadFailedMessage
-        ) { templates in
-            allTemplates = templates
-        }
-    }
-
-    func observeRecurrings() async {
-        await observe(
-            database.recurringUpdates(),
-            failure: Self.loadFailedMessage
-        ) { recurrings in
-            self.recurrings = recurrings
-        }
-    }
-
-    func observeBudgets() async {
-        await observe(
-            database.budgetUpdates(),
-            failure: Self.loadFailedMessage
-        ) { budgets in
-            self.budgets = budgets
-        }
-    }
 
     func loadHomeLayout() async {
         do {
@@ -310,33 +282,6 @@ private extension HomeModel {
         }
     }
 
-    func observeHomeSections() async {
-        await observe(
-            database.settingUpdates(.homeSections),
-            failure: Self.loadFailedMessage
-        ) { sections in
-            homeSections = sections
-        }
-    }
-
-    func observeHomeHiddenSections() async {
-        await observe(
-            database.settingUpdates(.homeHiddenSections),
-            failure: Self.loadFailedMessage
-        ) { sections in
-            homeHiddenSections = sections
-        }
-    }
-
-    func observeStamps() async {
-        await observe(
-            database.stampCalendarUpdates(),
-            failure: Self.loadFailedMessage
-        ) { calendar in
-            stampCalendar = calendar
-        }
-    }
-
     func observeSyncStatus() async {
         do {
             for try await status in database.syncStatusUpdates() {
@@ -344,24 +289,6 @@ private extension HomeModel {
             }
         } catch {
             syncStatus = .off
-        }
-    }
-
-    func observeMonthStartDay() async {
-        await observe(
-            database.settingUpdates(.monthStartDay),
-            failure: Self.loadFailedMessage
-        ) { startDay in
-            monthStartDay = startDay
-        }
-    }
-
-    func observeCarryoverFrom() async {
-        await observe(
-            database.settingUpdates(.budgetCarryoverFrom),
-            failure: Self.loadFailedMessage
-        ) { month in
-            carryoverFrom = month
         }
     }
 

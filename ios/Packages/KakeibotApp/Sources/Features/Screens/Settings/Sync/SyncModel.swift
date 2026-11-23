@@ -115,23 +115,20 @@ public extension SyncModel {
     }
 
     func observe() async {
-        await withDiscardingTaskGroup { group in
-            group.addTask {
+        await observeAll([
+            {
                 await self.observeStatus()
-            }
-
-            group.addTask {
+            },
+            {
                 await self.observePending()
+            },
+            {
+                await self.observe(self.database.walletShareUpdates(), into: \.shares)
+            },
+            {
+                await self.observe(self.database.joinedShareUpdates(), into: \.joined)
             }
-
-            group.addTask {
-                await self.observeShares()
-            }
-
-            group.addTask {
-                await self.observeJoined()
-            }
-        }
+        ])
     }
 
     func request(_ isOn: Bool) -> Bool {
@@ -199,8 +196,11 @@ public extension SyncModel {
 
 extension SyncModel: ScreenModel {}
 
-private extension SyncModel {
+extension SyncModel {
     static let loadFailedMessage = "同期の状態を読めませんでした"
+}
+
+private extension SyncModel {
     static let saveFailedMessage = "同期を切り替えられませんでした。時間をおいて試してください"
 
     func observeStatus() async {
@@ -222,24 +222,6 @@ private extension SyncModel {
             failure: Self.loadFailedMessage
         ) { count in
             self.pendingCount = count
-        }
-    }
-
-    func observeShares() async {
-        await observe(
-            database.walletShareUpdates(),
-            failure: Self.loadFailedMessage
-        ) { shares in
-            self.shares = shares
-        }
-    }
-
-    func observeJoined() async {
-        await observe(
-            database.joinedShareUpdates(),
-            failure: Self.loadFailedMessage
-        ) { joined in
-            self.joined = joined
         }
     }
 
