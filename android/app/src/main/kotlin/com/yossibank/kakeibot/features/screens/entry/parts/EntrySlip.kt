@@ -38,6 +38,7 @@ import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Metrics
@@ -185,11 +186,10 @@ private fun SlipRow(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
+        FittedText(
             text = value,
             modifier = Modifier.voiceUnderline(isFromVoice),
             color = Palette.text,
-            maxLines = 1,
             style = textFont(
                 size = FontSize.Body,
                 weight = FontWeight.Medium,
@@ -256,12 +256,10 @@ private fun AmountRow(
                 modifier = Modifier.weight(1f),
             )
         } else {
-            Text(
+            FittedText(
                 text = expression ?: "",
                 modifier = Modifier.weight(1f),
                 color = Palette.hint,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 style = textFont(size = FontSize.Caption),
             )
         }

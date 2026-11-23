@@ -55,6 +55,7 @@ import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.row.FeeChoiceRow
 import com.yossibank.kakeibot.designsystem.components.tag.TagLine
 import com.yossibank.kakeibot.designsystem.components.tag.TagLineItem
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -353,12 +354,10 @@ private fun WalletList(
                     size = 36.dp,
                 )
 
-                Text(
+                FittedText(
                     text = wallet.name,
                     modifier = Modifier.weight(1f),
                     color = Palette.text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(
                         size = FontSize.Body,
                         weight = FontWeight.Medium,
@@ -402,11 +401,9 @@ private fun ChoiceCell(
             size = 40.dp,
         )
 
-        Text(
+        FittedText(
             text = name,
             color = if (isSelected) Palette.accentStrong else Palette.text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
             style = textFont(
                 size = FontSize.Caption,
                 weight = FontWeight.Medium,

@@ -59,6 +59,7 @@ import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.input.PlaceholderTextField
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -274,10 +275,9 @@ private fun Equation(input: EntryItemInput) {
 
         Operator(text = "=")
 
-        Text(
+        FittedText(
             text = AmountText.text(input.lineAmount.toInt()),
             color = if (input.isDiscount) Palette.rose else Palette.accentStrong,
-            maxLines = 1,
             style = displayFont(
                 size = FontSize.Body,
                 weight = FontWeight.Bold,
@@ -311,10 +311,9 @@ private fun Token(
             style = textFont(size = FontSize.Caption),
         )
 
-        Text(
+        FittedText(
             text = value,
             color = if (isSelected) Palette.accentStrong else Palette.text,
-            maxLines = 1,
             style = displayFont(
                 size = FontSize.Body,
                 weight = FontWeight.Bold,
@@ -354,10 +353,9 @@ private fun EntryItemChip(
             .padding(horizontal = 12.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
+        FittedText(
             text = title,
             color = if (isSelected) Palette.accentStrong else Palette.text,
-            maxLines = 1,
             style = textFont(
                 size = FontSize.Caption,
                 weight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,

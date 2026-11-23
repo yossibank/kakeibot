@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Metrics
@@ -104,11 +105,10 @@ fun <Item : Any> BottomDrawer(
                 horizontalAlignment = horizontalAlignment,
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(
+                    FittedText(
                         text = title(current),
                         modifier = Modifier.align(Alignment.Center),
                         color = Palette.accentStrong,
-                        maxLines = 1,
                         style = displayFont(size = FontSize.Body),
                     )
 

@@ -51,6 +51,7 @@ import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.modal.UndoNoticeState
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -271,10 +272,9 @@ private fun TotalCard(
                 style = textFont(style = FontTextStyle.Caption),
             )
 
-            Text(
+            FittedText(
                 text = "${model.month?.month ?: ""}月（${model.periodText}）から使う額",
                 color = Palette.subtext,
-                maxLines = 1,
                 style = textFont(style = FontTextStyle.Caption),
             )
         }
@@ -299,10 +299,9 @@ private fun TotalCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
+                    FittedText(
                         text = usage.carryoverText,
                         color = Palette.subtext,
-                        maxLines = 1,
                         style = textFont(style = FontTextStyle.Caption),
                     )
 
@@ -356,11 +355,9 @@ private fun TotalCard(
                     tint = Palette.accent,
                 )
 
-                Text(
+                FittedText(
                     text = model.recurringText,
                     color = Palette.accent,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(style = FontTextStyle.Caption2),
                 )
             }
@@ -439,12 +436,10 @@ private fun CategoryRow(
                 size = 28.dp,
             )
 
-            Text(
+            FittedText(
                 text = category.name,
                 modifier = Modifier.weight(1f),
                 color = Palette.text,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 style = textFont(style = FontTextStyle.Subheadline),
             )
 
@@ -491,12 +486,10 @@ private fun PlainRow(
             size = 28.dp,
         )
 
-        Text(
+        FittedText(
             text = category.name,
             modifier = Modifier.weight(1f),
             color = Palette.text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
             style = textFont(style = FontTextStyle.Footnote),
         )
 
@@ -530,10 +523,9 @@ private fun UsageLine(
                 modifier = Modifier.weight(1f),
             )
 
-            Text(
+            FittedText(
                 text = usage.remainingText,
                 color = usage.tint,
-                maxLines = 1,
                 style = textFont(style = FontTextStyle.Caption2),
             )
         }
@@ -545,11 +537,10 @@ private fun SpentText(
     spent: Long,
     modifier: Modifier = Modifier,
 ) {
-    Text(
+    FittedText(
         text = "使った額 ${AmountText.text(amount = spent.toInt())}",
         modifier = modifier,
         color = Palette.subtext,
-        maxLines = 1,
         style = textFont(style = FontTextStyle.Caption2),
     )
 }

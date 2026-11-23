@@ -46,6 +46,7 @@ import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -306,12 +307,10 @@ private fun CategoryRow(row: ReviewModel.Row) {
             size = 28.dp,
         )
 
-        Text(
+        FittedText(
             text = row.name,
             modifier = Modifier.weight(1f),
             color = Palette.text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
             style = textFont(style = FontTextStyle.Subheadline),
         )
 

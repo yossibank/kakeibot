@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -53,13 +54,12 @@ fun SettingsHeader(
             modifier = Modifier.align(Alignment.CenterStart),
         )
 
-        Text(
+        FittedText(
             text = title,
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(horizontal = 56.dp),
             color = Palette.accentStrong,
-            maxLines = 1,
             textAlign = TextAlign.Center,
             style = displayFont(size = FontSize.Headline),
         )
@@ -139,10 +139,9 @@ fun SettingsRow(
             style = textFont(style = FontTextStyle.Body),
         )
 
-        Text(
+        FittedText(
             text = value,
             color = Palette.subtext,
-            maxLines = 1,
             style = textFont(style = FontTextStyle.Subheadline),
         )
 
@@ -195,10 +194,9 @@ fun ChoiceChip(
     ) {
         leading()
 
-        Text(
+        FittedText(
             text = title,
             color = if (isSelected) Palette.accentStrong else Palette.text,
-            maxLines = 1,
             style = textFont(
                 size = FontSize.Small,
                 weight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.icon.IconImage
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -198,10 +199,9 @@ private fun Flow(
         )
 
         if (amount > 0) {
-            Text(
+            FittedText(
                 text = AmountText.text(amount),
                 color = Palette.accentStrong,
-                maxLines = 1,
                 style = textFont(size = FontSize.Caption),
             )
         }
@@ -351,17 +351,15 @@ private fun BalanceText(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
+        FittedText(
             text = line.title,
             color = color,
-            maxLines = 1,
             style = textFont(size = FontSize.Caption),
         )
 
-        Text(
+        FittedText(
             text = AmountText.text(line.amount.toInt()),
             color = color,
-            maxLines = 1,
             style = displayFont(size = FontSize.Small),
         )
     }

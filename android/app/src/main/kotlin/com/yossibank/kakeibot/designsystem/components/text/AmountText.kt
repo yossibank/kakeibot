@@ -8,6 +8,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.designsystem.theme.TextScale
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.abs
@@ -102,13 +103,12 @@ fun AmountText(
         null -> Palette.text
     }
 
-    Text(
+    FittedText(
         text = text,
+        style = style.copy(fontFeatureSettings = "tnum"),
         modifier = modifier,
         color = color ?: typeColor,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        style = style.copy(fontFeatureSettings = "tnum"),
+        floor = TextScale.AMOUNT_FLOOR,
     )
 }
 

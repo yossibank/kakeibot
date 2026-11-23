@@ -21,6 +21,7 @@ import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -103,11 +104,9 @@ fun TemplateCard(
             Column(verticalArrangement = Arrangement.spacedBy(size.textSpacing)) {
                 name()
 
-                Text(
+                FittedText(
                     text = detail,
                     color = Palette.subtext,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(style = FontTextStyle.Caption).copy(letterSpacing = 1.sp),
                 )
             }

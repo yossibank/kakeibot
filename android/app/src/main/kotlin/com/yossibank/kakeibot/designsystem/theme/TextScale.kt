@@ -5,6 +5,7 @@ import kotlin.math.floor
 
 object TextScale {
     const val FLOOR = 0.8
+    const val AMOUNT_FLOOR = 0.5
 
     fun fitting(
         available: Float,

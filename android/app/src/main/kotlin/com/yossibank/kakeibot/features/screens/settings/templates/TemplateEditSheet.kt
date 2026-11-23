@@ -57,6 +57,7 @@ import com.yossibank.kakeibot.designsystem.components.template.TemplateCard
 import com.yossibank.kakeibot.designsystem.components.template.TemplateCardAmount
 import com.yossibank.kakeibot.designsystem.components.template.TemplateCardSize
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -251,10 +252,9 @@ fun TemplateEditSheet(
             keyHeight = 42.dp,
         )
 
-        Text(
+        FittedText(
             text = model.message,
             color = Palette.rose,
-            maxLines = 1,
             style = textFont(size = FontSize.Caption),
         )
 
@@ -296,19 +296,16 @@ private fun CapsulePreview(model: TemplateEditModel) {
             )
         }
 
-        Text(
+        FittedText(
             text = model.form.name.ifEmpty { "名前" },
             color = Palette.text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false),
             style = textFont(size = FontSize.Caption),
         )
 
-        Text(
+        FittedText(
             text = model.amount?.let { AmountText.text(it) } ?: "毎回入れる",
             color = Palette.accentStrong,
-            maxLines = 1,
             style = displayFont(size = FontSize.Caption),
         )
     }

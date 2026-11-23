@@ -29,6 +29,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -214,11 +215,9 @@ private fun RecentCard(
                     )
                 }
 
-                Text(
+                FittedText(
                     text = title,
                     color = Palette.text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(
                         size = FontSize.Caption,
                         weight = FontWeight.Bold,
@@ -227,11 +226,9 @@ private fun RecentCard(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
+                FittedText(
                     text = detail,
                     color = Palette.subtext,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
                     style = textFont(size = FontSize.Micro),
                 )
@@ -239,20 +236,18 @@ private fun RecentCard(
                 Spacer(modifier = Modifier.size(8.dp))
 
                 if (amount != null) {
-                    Text(
+                    FittedText(
                         text = AmountText.text(amount),
                         color = Palette.accentStrong,
-                        maxLines = 1,
                         style = displayFont(
                             size = FontSize.Small,
                             weight = FontWeight.SemiBold,
                         ),
                     )
                 } else {
-                    Text(
+                    FittedText(
                         text = "毎回入れる",
                         color = Palette.hint,
-                        maxLines = 1,
                         style = textFont(
                             size = FontSize.Micro,
                             weight = FontWeight.SemiBold,

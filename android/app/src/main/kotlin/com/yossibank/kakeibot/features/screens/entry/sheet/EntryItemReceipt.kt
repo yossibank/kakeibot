@@ -59,6 +59,7 @@ import com.yossibank.kakeibot.designsystem.components.input.PlaceholderTextField
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -216,10 +217,9 @@ fun EntryItemReceipt(
                 ),
             )
 
-            Text(
+            FittedText(
                 text = AmountText.text(model.amount),
                 color = Palette.accentStrong,
-                maxLines = 1,
                 style = displayFont(
                     size = FontSize.Display,
                     weight = FontWeight.Bold,
@@ -340,11 +340,9 @@ private fun ItemLine(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
+                FittedText(
                     text = item.trimmedName,
                     color = if (isNegative) Palette.rose else Palette.text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(size = FontSize.Small),
                 )
 

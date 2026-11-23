@@ -40,6 +40,7 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.designsystem.components.date.shortName
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -293,11 +294,9 @@ private fun RowScope.Chip(
             ).padding(horizontal = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(
+        FittedText(
             text = value ?: label,
             color = if (value != null) Palette.accentStrong else Palette.hint,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
             style = textFont(
                 size = FontSize.Caption,
                 weight = if (value != null) FontWeight.SemiBold else FontWeight.Normal,

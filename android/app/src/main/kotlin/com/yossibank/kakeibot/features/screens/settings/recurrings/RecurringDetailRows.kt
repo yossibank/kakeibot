@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.surface.card
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
@@ -62,10 +63,9 @@ fun RecurringDetailRows(
                     style = textFont(style = FontTextStyle.Subheadline),
                 )
 
-                Text(
+                FittedText(
                     text = row.value,
                     color = if (row.isEmpty) Palette.hint else Palette.accentStrong,
-                    maxLines = 1,
                     style = textFont(style = FontTextStyle.Subheadline),
                 )
 

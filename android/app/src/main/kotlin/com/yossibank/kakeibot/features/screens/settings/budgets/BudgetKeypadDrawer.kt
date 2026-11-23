@@ -45,6 +45,7 @@ import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.modal.BottomDrawer
 import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -192,10 +193,9 @@ private fun SuggestionChip(
             .padding(vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
+        FittedText(
             text = suggestion.title,
             color = Palette.subtext,
-            maxLines = 1,
             style = textFont(style = FontTextStyle.Caption2),
         )
 

@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -168,11 +169,9 @@ private fun WalletCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Text(
+                    FittedText(
                         text = row.name,
                         color = Palette.text,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                         style = textFont(style = FontTextStyle.Subheadline),
                     )
 

@@ -58,6 +58,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
 import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
 import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Haptic
@@ -221,10 +222,9 @@ fun EntrySheet(
                     )
                 }
 
-                Text(
+                FittedText(
                     text = model.message,
                     color = Palette.rose,
-                    maxLines = 1,
                     style = textFont(size = FontSize.Caption),
                 )
 
