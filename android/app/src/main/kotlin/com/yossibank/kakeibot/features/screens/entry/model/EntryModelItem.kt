@@ -70,11 +70,6 @@ fun EntryModel.updateItem(
     }
 }
 
-data class RemovedItem(
-    val index: Int,
-    val item: EntryItem.Draft,
-)
-
 fun EntryModel.removeItem(index: Int): RemovedItem? {
     val item = form.items.getOrNull(index) ?: return null
 

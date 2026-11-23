@@ -18,7 +18,7 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
     }
 }
 
-final class AppSceneDelegate: NSObject, UIWindowSceneDelegate {
+private final class AppSceneDelegate: NSObject, UIWindowSceneDelegate {
     func scene(
         _ scene: UIScene,
         willConnectTo session: UISceneSession,

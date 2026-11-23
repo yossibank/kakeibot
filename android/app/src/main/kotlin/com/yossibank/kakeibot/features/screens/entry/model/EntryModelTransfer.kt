@@ -15,11 +15,6 @@ data class TransferRoute(
     val toWalletId: Identifier<Wallet>,
 )
 
-data class BalanceLine(
-    val title: String,
-    val amount: Long,
-)
-
 val EntryModel.frequentRoutes: List<TransferRoute>
     get() {
         val shown = wallets.map { it.id }.toSet()

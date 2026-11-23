@@ -3,17 +3,6 @@ enum WidgetGuideWidget: CaseIterable, Hashable {
     case quickRecord
 }
 
-struct WidgetGuideSample: Hashable {
-    let widget: WidgetGuideWidget
-    let size: WidgetGuideSize
-}
-
-enum WidgetGuideSize: Hashable {
-    case small
-    case medium
-    case large
-}
-
 extension WidgetGuideWidget {
     var title: String {
         switch self {
@@ -63,23 +52,4 @@ extension WidgetGuideWidget {
             ]
         }
     }
-}
-
-extension WidgetGuideSize {
-    var title: String {
-        switch self {
-        case .small: "小"
-        case .medium: "中"
-        case .large: "大"
-        }
-    }
-}
-
-extension WidgetGuideSample {
-    static let all = [
-        WidgetGuideSample(widget: .quickRecord, size: .medium),
-        WidgetGuideSample(widget: .quickRecord, size: .large),
-        WidgetGuideSample(widget: .budget, size: .small),
-        WidgetGuideSample(widget: .budget, size: .medium)
-    ]
 }

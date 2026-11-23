@@ -77,7 +77,7 @@ extension View {
     }
 }
 
-struct SettingsShowZone: View {
+private struct SettingsShowZone: View {
     let isTargeted: Bool
 
     var body: some View {

@@ -41,10 +41,8 @@
 
 | 拡張する型 | 書き方 | 例 |
 | --- | --- | --- |
-| 入れ子の型 | 親から `.` を抜いてつなげる。親は省かない | `Wallet.Kind.Role` は `WalletKindRole+Balance` |
-| `AppDatabase` の中のエラー | `AppDatabase` だけを省く | `AppDatabase.WalletWriteError` は `WalletWriteError+Message` |
-| 標準の型 | 標準の型の名前のまま書く | `Array+RowDetail` |
-| 型引数を絞った標準の型 | 絞った意味の名前で書いてよい | `ClosedRange<LocalDate>` は `DateRange+Weeks` |
+| 入れ子の型 | 親から `.` を抜いてつなげる。親は省かない | `AppDatabaseWalletWriteError+Message` |
+| 標準の型 | 型引数を絞っても、標準の型の名前のまま書く | `ClosedRange<LocalDate>` は `ClosedRange+Weeks` |
 
 `<役割>` の語は、足すものでそろえる。
 

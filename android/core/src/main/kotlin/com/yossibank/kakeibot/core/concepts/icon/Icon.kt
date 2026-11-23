@@ -1,13 +1,7 @@
 package com.yossibank.kakeibot.core.concepts.icon
 
 import com.yossibank.kakeibot.core.shared.Identifier
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import java.time.Instant
 
 data class Icon(
@@ -298,21 +292,4 @@ data class Icon(
             fun known(rawValue: String): Glyph = of(rawValue) ?: other
         }
     }
-}
-
-object GlyphSerializer : KSerializer<Icon.Glyph> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
-        "Icon.Glyph",
-        PrimitiveKind.STRING,
-    )
-
-    override fun serialize(
-        encoder: Encoder,
-        value: Icon.Glyph,
-    ) {
-        encoder.encodeString(value.rawValue)
-    }
-
-    override fun deserialize(decoder: Decoder): Icon.Glyph =
-        Icon.Glyph.known(decoder.decodeString())
 }

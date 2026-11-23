@@ -16,8 +16,3 @@ struct PaletteKey: EnvironmentKey, UITraitBridgedEnvironmentKey {
         mutableTraits[PaletteTrait.self] = value
     }
 }
-
-struct PaletteTrait: UITraitDefinition {
-    static let defaultValue = ThemePreset.white.palette
-    static let affectsColorAppearance = true
-}
