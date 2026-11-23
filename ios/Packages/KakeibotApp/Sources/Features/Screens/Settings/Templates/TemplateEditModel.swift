@@ -32,14 +32,15 @@ public final class TemplateEditModel {
     public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
     public private(set) var cardBills: [Recurring] = []
-    public private(set) var isHidden = false
+    public internal(set) var isHidden = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private var baseline: EntryTemplateDraft?
+    private(set) var baseline: EntryTemplateDraft?
+
+    let editingId: EntryTemplate.ID?
 
     private let database: AppDatabase
-    private let editingId: EntryTemplate.ID?
 
     public init(
         database: AppDatabase,
@@ -73,10 +74,6 @@ public final class TemplateEditModel {
 }
 
 public extension TemplateEditModel {
-    var isEditing: Bool {
-        editingId != nil
-    }
-
     var amount: Int? {
         calculator.amount > 0 ? calculator.amount : nil
     }
@@ -104,19 +101,6 @@ public extension TemplateEditModel {
 
     var billRecurring: Recurring? {
         cardBills.cardBill(paidBy: walletId)
-    }
-
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        let problem = draft.problems.first.map(message)
-        return SettingsSaveTitle.text(problem: problem, isEditing: isEditing)
-    }
-
-    var isChanged: Bool {
-        baseline.map { $0 != draft } ?? false
     }
 
     var categories: [EntryCategory] {
@@ -220,52 +204,21 @@ public extension TemplateEditModel {
         do {
             return try await database.saveTemplate(draft, editing: editingId, at: Date())
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
-        }
-    }
-
-    func delete() async -> Deletion? {
-        guard let editingId else {
-            return nil
-        }
-
-        do {
-            return try await database.deleteTemplate(editingId)
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return nil
-        }
-    }
-
-    func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId else {
-            return false
-        }
-
-        do {
-            try await database.setTemplateHidden(editingId, isHidden: isHidden, at: Date())
-
-            self.isHidden = isHidden
-
-            return true
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return false
         }
     }
 }
 
 private extension TemplateEditModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
 
     func message(for problem: EntryTemplateDraft.Problem) -> String {
         switch problem {
         case .emptyName: "名前を入れてください"
         case .missingCategory: "カテゴリを選んでください"
         case .missingWallet: "\(walletTitle)を選んでください"
-        case .amountNotPositive, .transfer: Self.saveFailedMessage
+        case .amountNotPositive, .transfer: SettingsEditMessage.saveFailed
         }
     }
 
@@ -292,5 +245,28 @@ private extension TemplateEditModel {
         walletId = draft.walletId
         memo = draft.memo
         billShift = draft.billShift
+    }
+}
+
+extension TemplateEditModel: SettingsEditRemoving {
+    static let deleteFailedMessage = SettingsEditMessage.saveFailed
+
+    var edited: EntryTemplateDraft {
+        draft
+    }
+
+    var problemMessage: String? {
+        draft.problems.first.map(message)
+    }
+
+    func remove(_ id: EntryTemplate.ID) async throws -> Deletion {
+        try await database.deleteTemplate(id)
+    }
+
+    func saveHidden(
+        _ id: EntryTemplate.ID,
+        isHidden: Bool
+    ) async throws {
+        try await database.setTemplateHidden(id, isHidden: isHidden, at: Date())
     }
 }

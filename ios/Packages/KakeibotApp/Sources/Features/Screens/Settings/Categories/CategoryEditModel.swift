@@ -10,7 +10,7 @@ public final class CategoryEditModel {
     public var name = ""
 
     public private(set) var tags: [EditingTag] = []
-    public private(set) var isHidden = false
+    public internal(set) var isHidden = false
     public private(set) var hasEntries = false
     public private(set) var tagProblem: String?
 
@@ -19,10 +19,11 @@ public final class CategoryEditModel {
     public let kind: EntryCategory.Kind
     public let icon = SettingsIconEditorModel(glyph: .food)
 
-    private var baseline: Snapshot?
+    private(set) var baseline: Snapshot?
+
+    let editingId: EntryCategory.ID?
 
     private let database: AppDatabase
-    private let editingId: EntryCategory.ID?
 
     public init(
         database: AppDatabase,
@@ -32,7 +33,14 @@ public final class CategoryEditModel {
         self.database = database
         self.kind = kind
         self.editingId = id
-        self.baseline = snapshot
+        self.baseline = edited
+    }
+}
+
+extension CategoryEditModel {
+    struct Snapshot: Equatable {
+        let draft: EntryCategoryDraft
+        let tags: [EntryTagDraft]
     }
 }
 
@@ -43,31 +51,12 @@ public extension CategoryEditModel {
         public var draft: EntryTagDraft
     }
 
-    var isEditing: Bool {
-        editingId != nil
-    }
-
-    var isChanged: Bool {
-        baseline.map { $0 != snapshot } ?? false
-    }
-
     var draft: EntryCategoryDraft {
         EntryCategoryDraft(
             kind: kind,
             name: name,
             mark: icon.mark,
             color: icon.color
-        )
-    }
-
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first?.message,
-            isEditing: isEditing
         )
     }
 
@@ -160,7 +149,7 @@ public extension CategoryEditModel {
             tags = list.tags.filter { $0.categoryId == editingId }.map(EditingTag.init)
             isHidden = category.archivedAt != nil
             hasEntries = entries.contains { $0.categoryId == editingId }
-            baseline = snapshot
+            baseline = edited
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -175,69 +164,15 @@ public extension CategoryEditModel {
                 at: Date()
             )
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return nil
-        }
-    }
-
-    func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId else {
-            return false
-        }
-
-        do {
-            try await database.setCategoryHidden(
-                editingId,
-                isHidden: isHidden,
-                at: Date()
-            )
-
-            self.isHidden = isHidden
-
-            return true
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return false
-        }
-    }
-
-    func delete() async -> Deletion? {
-        guard let editingId else {
-            return nil
-        }
-
-        do {
-            return try await database.deleteCategory(
-                editingId,
-                at: Date()
-            )
-        } catch AppDatabase.CategoryWriteError.hasEntries {
-            errorNotice.show(Self.inUseMessage)
-            return nil
-        } catch {
-            errorNotice.show(Self.deleteFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }
 }
 
 private extension CategoryEditModel {
-    struct Snapshot: Equatable {
-        let draft: EntryCategoryDraft
-        let tags: [EntryTagDraft]
-    }
-
     static let loadFailedMessage = "カテゴリを読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
     static let inUseMessage = "記録があるので削除できません。非表示にできます"
-
-    var snapshot: Snapshot {
-        Snapshot(
-            draft: draft,
-            tags: tags.map(\.draft)
-        )
-    }
 
     func check(
         _ tag: EntryTagDraft,
@@ -271,5 +206,43 @@ private extension CategoryEditModel {
 extension CategoryEditModel.EditingTag {
     init(_ tag: EntryTag) {
         self.init(id: UUID(), draft: EntryTagDraft(tag))
+    }
+}
+
+extension CategoryEditModel: SettingsEditRemoving {
+    var edited: Snapshot {
+        Snapshot(
+            draft: draft,
+            tags: tags.map(\.draft)
+        )
+    }
+
+    var problemMessage: String? {
+        draft.problems.first?.message
+    }
+
+    func remove(_ id: EntryCategory.ID) async throws -> Deletion {
+        try await database.deleteCategory(
+            id,
+            at: Date()
+        )
+    }
+
+    func deleteFailedMessage(for error: any Error) -> String? {
+        switch error {
+        case AppDatabase.CategoryWriteError.hasEntries: Self.inUseMessage
+        default: nil
+        }
+    }
+
+    func saveHidden(
+        _ id: EntryCategory.ID,
+        isHidden: Bool
+    ) async throws {
+        try await database.setCategoryHidden(
+            id,
+            isHidden: isHidden,
+            at: Date()
+        )
     }
 }

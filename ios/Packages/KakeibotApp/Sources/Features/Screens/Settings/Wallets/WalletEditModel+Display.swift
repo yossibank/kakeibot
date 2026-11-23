@@ -21,14 +21,6 @@ public extension WalletEditModel {
         )
     }
 
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        SettingsSaveTitle.text(problem: draft.problems.first?.message, isEditing: isEditing)
-    }
-
     var showsPayment: Bool {
         isEditing && (kind == .card || kind == .loan)
     }

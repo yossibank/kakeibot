@@ -7,16 +7,17 @@ import Store
 @MainActor
 @Observable
 public final class StampEditModel {
-    public private(set) var isHidden = false
+    public internal(set) var isHidden = false
 
     public internal(set) var errorNotice = ErrorNotice()
 
     public let icon = SettingsIconEditorModel(glyph: .star)
 
-    private var baseline: IconDraft?
+    private(set) var baseline: IconDraft?
+
+    let editingId: ShelfIcon.ID?
 
     private let database: AppDatabase
-    private let editingId: ShelfIcon.ID?
 
     public init(
         database: AppDatabase,
@@ -29,25 +30,6 @@ public final class StampEditModel {
 }
 
 public extension StampEditModel {
-    var isEditing: Bool {
-        editingId != nil
-    }
-
-    var isChanged: Bool {
-        baseline.map { $0 != icon.draft } ?? false
-    }
-
-    var canSave: Bool {
-        icon.draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: icon.draft.problems.first?.message,
-            isEditing: isEditing
-        )
-    }
-
     func load() async {
         guard let editingId else {
             return
@@ -84,48 +66,37 @@ public extension StampEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
-        }
-    }
-
-    func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId else {
-            return false
-        }
-
-        do {
-            try await database.setShelfIconHidden(
-                editingId,
-                isHidden: isHidden,
-                at: Date()
-            )
-
-            self.isHidden = isHidden
-
-            return true
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return false
-        }
-    }
-
-    func delete() async -> Deletion? {
-        guard let editingId else {
-            return nil
-        }
-
-        do {
-            return try await database.deleteShelfIcon(editingId)
-        } catch {
-            errorNotice.show(Self.deleteFailedMessage, for: error)
-            return nil
         }
     }
 }
 
 private extension StampEditModel {
-    static let saveFailedMessage = "保存できませんでした"
-    static let deleteFailedMessage = "削除できませんでした"
     static let loadFailedMessage = "スタンプを読めませんでした"
+}
+
+extension StampEditModel: SettingsEditRemoving {
+    var edited: IconDraft {
+        icon.draft
+    }
+
+    var problemMessage: String? {
+        icon.draft.problems.first?.message
+    }
+
+    func remove(_ id: ShelfIcon.ID) async throws -> Deletion {
+        try await database.deleteShelfIcon(id)
+    }
+
+    func saveHidden(
+        _ id: ShelfIcon.ID,
+        isHidden: Bool
+    ) async throws {
+        try await database.setShelfIconHidden(
+            id,
+            isHidden: isHidden,
+            at: Date()
+        )
+    }
 }
