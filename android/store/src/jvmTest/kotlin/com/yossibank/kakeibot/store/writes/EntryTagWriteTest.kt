@@ -18,10 +18,10 @@ import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.types.detailParts
 import com.yossibank.kakeibot.store.writes.methods.CategoryWriteError
 import com.yossibank.kakeibot.store.writes.methods.CategoryWriteException
+import com.yossibank.kakeibot.store.writes.methods.EntryWriteError
+import com.yossibank.kakeibot.store.writes.methods.EntryWriteException
 import com.yossibank.kakeibot.store.writes.methods.TemplateWriteError
 import com.yossibank.kakeibot.store.writes.methods.TemplateWriteException
-import com.yossibank.kakeibot.store.writes.methods.WriteError
-import com.yossibank.kakeibot.store.writes.methods.WriteException
 import com.yossibank.kakeibot.store.writes.methods.saveCategory
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.saveTags
@@ -217,11 +217,11 @@ class EntryTagWriteTest {
             tagId = tag.id,
         )
 
-        val error = assertFailsWith<WriteException> {
+        val error = assertFailsWith<EntryWriteException> {
             setup.database.saveEntry(draft, at = setup.now)
         }
 
-        assertEquals(WriteError.tagMismatch, error.error)
+        assertEquals(EntryWriteError.tagMismatch, error.error)
 
         setup.database.close()
     }

@@ -1,0 +1,95 @@
+package com.yossibank.kakeibot.features.screens.entry.model
+
+import com.yossibank.kakeibot.core.concepts.category.EntryCategory
+import com.yossibank.kakeibot.core.concepts.category.EntryTag
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
+import com.yossibank.kakeibot.core.concepts.date.YearMonth
+import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryItem
+import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
+import com.yossibank.kakeibot.core.concepts.wallet.Wallet
+import com.yossibank.kakeibot.core.shared.Identifier
+
+data class EntryForm(
+    val date: LocalDate,
+    val type: Entry.Kind = Entry.Kind.expense,
+    val categoryId: Identifier<EntryCategory>? = null,
+    val tagId: Identifier<EntryTag>? = null,
+    val walletId: Identifier<Wallet>? = null,
+    val toWalletId: Identifier<Wallet>? = null,
+    val memo: String = "",
+    val billMonth: YearMonth? = null,
+    val items: List<EntryItem.Draft> = emptyList(),
+    val taxIncluded: Boolean = false,
+    val templateId: Identifier<EntryTemplate>? = null,
+) {
+    val store: String
+        get() = memo.split("\n").first()
+
+    fun withWallet(id: Identifier<Wallet>?): EntryForm {
+        if (id == walletId) {
+            return this
+        }
+
+        return copy(
+            walletId = id,
+            billMonth = null,
+        )
+    }
+
+    fun withCategory(id: Identifier<EntryCategory>?): EntryForm {
+        if (id == categoryId) {
+            return this
+        }
+
+        return copy(
+            categoryId = id,
+            tagId = null,
+        )
+    }
+
+    fun withDate(date: LocalDate): EntryForm {
+        if (date == this.date) {
+            return this
+        }
+
+        return copy(
+            date = date,
+            billMonth = null,
+        )
+    }
+
+    fun withStore(store: String): EntryForm {
+        val lines = memo.split("\n").toMutableList()
+        lines[0] = store.replace("\n", " ")
+        return copy(memo = lines.joinToString("\n"))
+    }
+
+    fun cleared(): EntryForm = copy(
+        tagId = null,
+        memo = "",
+        billMonth = null,
+        items = emptyList(),
+        taxIncluded = false,
+        templateId = null,
+    )
+
+    companion object {
+        fun of(
+            entry: Entry,
+            items: List<EntryItem.Draft>,
+        ): EntryForm = EntryForm(
+            date = entry.date,
+            type = entry.type,
+            categoryId = entry.categoryId,
+            tagId = entry.tagId,
+            walletId = entry.walletId,
+            toWalletId = entry.toWalletId,
+            memo = entry.memo ?: "",
+            billMonth = entry.billMonth,
+            items = items,
+            taxIncluded = entry.taxIncluded,
+            templateId = entry.templateId,
+        )
+    }
+}

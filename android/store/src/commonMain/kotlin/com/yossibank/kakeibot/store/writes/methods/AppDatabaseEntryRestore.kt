@@ -14,7 +14,7 @@ suspend fun AppDatabase.restoreEntry(
     fee: Entry? = null,
     items: List<EntryItem>? = null,
     restoringNoSpend: List<NoSpendDay> = emptyList(),
-    at: Instant = Instant.now(),
+    at: Instant,
 ) {
     write {
         val restored = listOfNotNull(entry, fee)
@@ -58,7 +58,7 @@ suspend fun AppDatabase.restoreEntry(
 suspend fun AppDatabase.restoreEntries(
     entries: List<Entry>,
     items: List<EntryItem>? = null,
-    at: Instant = Instant.now(),
+    at: Instant,
 ) {
     write {
         val change = CardBillChange(

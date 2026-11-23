@@ -64,8 +64,18 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
 import com.yossibank.kakeibot.features.screens.entry.model.feeChoices
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
 import com.yossibank.kakeibot.features.screens.entry.model.showsItems
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
 @Composable
@@ -113,13 +123,13 @@ fun EntryDeck(
 
                 EntryModel.Field.Wallet -> WalletList(
                     model = model,
-                    selection = model.walletId,
+                    selection = model.form.walletId,
                     onSelect = model::select,
                 )
 
                 EntryModel.Field.ToWallet -> WalletList(
                     model = model,
-                    selection = model.toWalletId,
+                    selection = model.form.toWalletId,
                     onSelect = model::selectDestination,
                 )
 
@@ -232,7 +242,7 @@ private fun CategoryArea(
         if (tags.isNotEmpty()) {
             TagLine(
                 tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                selection = model.tagId,
+                selection = model.form.tagId,
                 onSelect = model::toggleTag,
             )
         }
@@ -303,7 +313,7 @@ private fun CategoryGrid(
             ChoiceCell(
                 icon = model.icon(of = category.iconId),
                 name = category.name,
-                isSelected = category.id == model.categoryId,
+                isSelected = category.id == model.form.categoryId,
                 onSelect = { model.select(category) },
             )
         }
@@ -423,7 +433,7 @@ private fun Modifier.choice(isSelected: Boolean): Modifier {
 @Composable
 private fun DateCalendar(model: EntryModel) {
     MonthCalendar(
-        selection = model.date,
+        selection = model.form.date,
         today = model.today,
         onSelect = model::select,
     )

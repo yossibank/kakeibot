@@ -19,6 +19,7 @@ import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.saveRecurring
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -243,7 +244,7 @@ class RecurringWriteEditTest {
             at = setup.now,
         )
 
-        setup.database.deleteEntry(gone)
+        setup.database.deleteEntry(gone, at = Instant.now())
         setup.database.restore(deletion)
         val restored = setup.database.snapshot()
 

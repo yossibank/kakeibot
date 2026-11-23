@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
+import com.yossibank.kakeibot.designsystem.components.modal.UndoNotice
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -39,89 +40,14 @@ fun EntryVoiceNotice(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(16.dp))
-    val tint = if (notice.canUndo) Palette.accent else Palette.amber
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(Palette.panel)
-            .border(
-                width = 1.dp,
-                color = tint.opacity(Emphasis.Medium),
-                shape = shape,
-            ).clickable(onClick = onClose)
-            .padding(
-                horizontal = 16.dp,
-                vertical = 12.dp,
-            ),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(
-                if (notice.canUndo) R.drawable.ic_check else R.drawable.ic_mic,
-            ),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = tint,
-        )
-
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = notice.title,
-                color = Palette.text,
-                style = textFont(
-                    size = FontSize.Small,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-
-            notice.message?.let { message ->
-                Text(
-                    text = message,
-                    color = Palette.subtext,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = textFont(size = FontSize.Caption),
-                )
-            }
-
-            notice.hint?.let { hint ->
-                Text(
-                    text = hint,
-                    color = Palette.hint,
-                    style = textFont(size = FontSize.Caption),
-                )
-            }
-        }
-
-        if (notice.canUndo) {
-            Box(
-                modifier = Modifier
-                    .height(32.dp)
-                    .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = Palette.accent.opacity(Emphasis.Medium),
-                        shape = CircleShape,
-                    ).clickable(onClick = onUndo)
-                    .padding(horizontal = 12.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = "取り消す",
-                    color = Palette.accent,
-                    style = textFont(
-                        size = FontSize.Caption,
-                        weight = FontWeight.SemiBold,
-                    ),
-                )
-            }
-        }
-    }
+    UndoNotice(
+        title = notice.title,
+        icon = if (notice.canUndo) R.drawable.ic_check else R.drawable.ic_mic,
+        modifier = modifier,
+        detail = notice.message,
+        hint = notice.hint,
+        tint = if (notice.canUndo) Palette.accent else Palette.amber,
+        onTap = onClose,
+        onUndo = onUndo.takeIf { notice.canUndo },
+    )
 }

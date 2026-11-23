@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,18 +55,30 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
+import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
 import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Haptic
 import com.yossibank.kakeibot.designsystem.theme.HapticEffect
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
+import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
 import com.yossibank.kakeibot.features.screens.entry.model.showsVoice
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryDeck
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryRecentRow
 import com.yossibank.kakeibot.features.screens.entry.parts.EntrySlip
@@ -75,6 +88,7 @@ import com.yossibank.kakeibot.features.screens.entry.sheet.EntryItemSheet
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceCard
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceNotice
+import com.yossibank.kakeibot.features.screens.entry.voice.rememberVoiceStarter
 import com.yossibank.kakeibot.features.screens.settings.templates.TemplateEditSheet
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
@@ -108,19 +122,15 @@ fun EntrySheet(
         )
     }
 
-    val permission =
-        rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission(),
-        ) { isGranted ->
-            if (isGranted) {
-                voice.start(
-                    model = model,
-                    today = today,
-                )
-            } else {
-                voice.deny()
-            }
-        }
+    val startVoice = rememberVoiceStarter(
+        voice = voice,
+        model = model,
+        today = today,
+    )
+
+    SideEffect {
+        model.today = today
+    }
 
     LaunchedEffect(model) {
         model.load()
@@ -161,32 +171,28 @@ fun EntrySheet(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 EntryTypeSwitch(
-                    selection = model.type,
+                    selection = model.form.type,
                     onSelect = model::select,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                CloseButton(onClose = onClose)
+                CircleIconButton(
+                    icon = R.drawable.ic_close,
+                    onClick = onClose,
+                    size = 36.dp,
+                    iconSize = 20.dp,
+                    tint = Palette.subtext,
+                )
             }
 
             EntrySlip(
                 model = model,
                 onOpenItems = { isShowingItems = true },
-                onVoice = if (voice.isAvailable && model.showsVoice && !voice.isActive) {
-                    {
-                        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) ==
-                            PackageManager.PERMISSION_GRANTED
-                        ) {
-                            voice.start(model = model, today = today)
-                        } else {
-                            permission.launch(Manifest.permission.RECORD_AUDIO)
-                        }
-                    }
-                } else {
-                    null
+                onVoice = startVoice.takeIf {
+                    voice.isAvailable && model.showsVoice && !voice.isActive
                 },
-                listening = voice.takeIf { it.step == EntryVoiceFlow.Step.Listening },
+                listening = voice.listening,
             )
 
             DeckPanel(modifier = Modifier.weight(1f)) {
@@ -216,7 +222,7 @@ fun EntrySheet(
                 }
 
                 Text(
-                    text = model.message ?: "",
+                    text = model.message,
                     color = Palette.rose,
                     maxLines = 1,
                     style = textFont(size = FontSize.Caption),
@@ -225,52 +231,11 @@ fun EntrySheet(
                 if (!voice.isActive && model.showsRecent && model.hasRecent) {
                     EntryRecentRow(model = model)
                 } else {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        SaveButton(
-                            title = if (model.isEditing) "保存する" else "記録する",
-                            modifier = Modifier.weight(1f),
-                            onSave = {
-                                scope.launch {
-                                    if (model.save()) {
-                                        onClose()
-                                    }
-                                }
-                            },
-                        )
-
-                        if (model.isEditing) {
-                            RoundButton(onSelect = { isConfirmingDelete = true }) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_trash),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(22.dp),
-                                    tint = Palette.rose,
-                                )
-                            }
-                        } else {
-                            RoundButton(
-                                onSelect = {
-                                    scope.launch {
-                                        if (model.save()) {
-                                            model.startNext()
-                                        }
-                                    }
-                                },
-                            ) {
-                                Text(
-                                    text = "続けて",
-                                    color = Palette.accent,
-                                    style = textFont(
-                                        size = FontSize.Caption,
-                                        weight = FontWeight.SemiBold,
-                                    ),
-                                )
-                            }
-                        }
-                    }
+                    ActionBar(
+                        model = model,
+                        onSaved = onClose,
+                        onDelete = { isConfirmingDelete = true },
+                    )
                 }
             }
         }
@@ -358,50 +323,58 @@ private fun DeckPanel(
 }
 
 @Composable
-private fun CloseButton(onClose: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .size(36.dp)
-            .clip(CircleShape)
-            .background(Palette.card)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Muted),
-                shape = CircleShape,
-            ).clickable(onClick = onClose),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_close),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = Palette.subtext,
-        )
-    }
-}
-
-@Composable
-private fun SaveButton(
-    title: String,
-    onSave: () -> Unit,
-    modifier: Modifier = Modifier,
+private fun ActionBar(
+    model: EntryModel,
+    onSaved: () -> Unit,
+    onDelete: () -> Unit,
 ) {
-    Box(
-        modifier = modifier
-            .height(52.dp)
-            .clip(CircleShape)
-            .background(Brush.verticalGradient(listOf(Palette.accentDeep, Palette.accent)))
-            .clickable(onClick = onSave),
-        contentAlignment = Alignment.Center,
+    val scope = rememberCoroutineScope()
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = title,
-            color = Palette.backgroundTop,
-            style = textFont(
-                size = FontSize.Body,
-                weight = FontWeight.SemiBold,
-            ),
+        PrimaryButton(
+            title = if (model.isEditing) "保存する" else "記録する",
+            onClick = {
+                scope.launch {
+                    if (model.save()) {
+                        onSaved()
+                    }
+                }
+            },
+            modifier = Modifier.weight(1f),
         )
+
+        if (model.isEditing) {
+            RoundButton(onSelect = onDelete) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_trash),
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = Palette.rose,
+                )
+            }
+        } else {
+            RoundButton(
+                onSelect = {
+                    scope.launch {
+                        if (model.save()) {
+                            model.startNext()
+                        }
+                    }
+                },
+            ) {
+                Text(
+                    text = "続けて",
+                    color = Palette.accent,
+                    style = textFont(
+                        size = FontSize.Caption,
+                        weight = FontWeight.SemiBold,
+                    ),
+                )
+            }
+        }
     }
 }
 
@@ -412,7 +385,7 @@ private fun RoundButton(
 ) {
     Box(
         modifier = Modifier
-            .size(52.dp)
+            .size(Metrics.buttonHeight)
             .clip(CircleShape)
             .border(
                 width = 1.dp,

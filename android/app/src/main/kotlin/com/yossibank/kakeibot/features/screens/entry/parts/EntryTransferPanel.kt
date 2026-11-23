@@ -51,18 +51,27 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.BalanceLine
-import com.yossibank.kakeibot.features.screens.entry.model.DESTINATION_TITLE
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.TransferRoute
 import com.yossibank.kakeibot.features.screens.entry.model.afterLine
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
 import com.yossibank.kakeibot.features.screens.entry.model.applyRoute
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
 import com.yossibank.kakeibot.features.screens.entry.model.currentLine
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
 import com.yossibank.kakeibot.features.screens.entry.model.frequentRoutes
 import com.yossibank.kakeibot.features.screens.entry.model.idleAfterLine
 import com.yossibank.kakeibot.features.screens.entry.model.isOverSourceBalance
 import com.yossibank.kakeibot.features.screens.entry.model.loanRemaining
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.payOffLoan
 import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 
 @Composable
 fun EntryTransferArea(
@@ -260,7 +269,7 @@ private fun WalletCard(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             RoleTag(
-                title = if (isSource) model.walletTitle else DESTINATION_TITLE,
+                title = if (isSource) model.walletTitle else EntryText.destinationTitle,
                 isSource = isSource,
             )
 
@@ -386,7 +395,8 @@ private fun RouteChip(
     model: EntryModel,
     route: TransferRoute,
 ) {
-    val isApplied = model.walletId == route.walletId && model.toWalletId == route.toWalletId
+    val isApplied =
+        model.form.walletId == route.walletId && model.form.toWalletId == route.toWalletId
     val fill = if (isApplied) Palette.accent.opacity(Emphasis.Soft) else Color.Transparent
     val rim = if (isApplied) Palette.accent else Palette.accent.opacity(Emphasis.Muted)
     val style = textFont(size = FontSize.Caption)

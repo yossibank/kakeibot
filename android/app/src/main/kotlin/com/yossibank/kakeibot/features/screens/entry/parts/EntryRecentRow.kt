@@ -38,12 +38,22 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.recentEntries
 import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
 val EntryModel.hasRecent: Boolean
-    get() = if (type == Entry.Kind.transfer) {
+    get() = if (form.type == Entry.Kind.transfer) {
         recentTransfers.isNotEmpty()
     } else {
         templates.isNotEmpty() || recentEntries.isNotEmpty()
@@ -59,7 +69,7 @@ fun EntryRecentRow(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = if (model.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
+            text = if (model.form.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
             modifier = Modifier.padding(horizontal = 4.dp),
             color = Palette.subtext,
             style = textFont(
@@ -72,7 +82,7 @@ fun EntryRecentRow(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (model.type == Entry.Kind.transfer) {
+            if (model.form.type == Entry.Kind.transfer) {
                 model.recentTransfers.forEach { transfer ->
                     TransferCard(
                         model = model,

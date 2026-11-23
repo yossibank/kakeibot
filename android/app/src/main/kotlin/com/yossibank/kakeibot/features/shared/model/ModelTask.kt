@@ -24,7 +24,15 @@ class ModelTask {
     }
 
     suspend fun <Value : Any> attempt(
-        failure: String? = null,
+        failure: String,
+        action: suspend () -> Value,
+    ): Value? = attempt(
+        describe = { failure },
+        action = action,
+    )
+
+    suspend fun <Value : Any> attempt(
+        describe: (Exception) -> String,
         action: suspend () -> Value,
     ): Value? {
         running += 1
@@ -36,11 +44,8 @@ class ModelTask {
             return value
         } catch (error: CancellationException) {
             throw error
-        } catch (_: Exception) {
-            if (failure != null) {
-                message = failure
-            }
-
+        } catch (error: Exception) {
+            message = describe(error)
             return null
         } finally {
             running -= 1
@@ -50,6 +55,7 @@ class ModelTask {
     companion object {
         const val saveFailed = "保存できませんでした"
         const val restoreFailed = "元に戻せませんでした"
+        const val loadFailed = "読み込めませんでした"
 
         suspend fun <Value : Any> quiet(action: suspend () -> Value): Value? = try {
             action()

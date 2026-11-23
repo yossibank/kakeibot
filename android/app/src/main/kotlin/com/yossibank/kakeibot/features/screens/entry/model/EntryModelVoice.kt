@@ -13,13 +13,8 @@ import com.yossibank.kakeibot.core.shared.Identifier
 const val RECENT_MEMO_LIMIT = 6
 
 data class VoiceUndo(
+    val form: EntryForm,
     val calculator: AmountCalculator,
-    val date: LocalDate,
-    val categoryId: Identifier<EntryCategory>?,
-    val tagId: Identifier<EntryTag>?,
-    val walletId: Identifier<Wallet>?,
-    val billMonth: YearMonth?,
-    val memo: String,
 )
 
 data class VoiceFilled(
@@ -29,16 +24,16 @@ data class VoiceFilled(
 )
 
 val EntryModel.isWalletFromVoice: Boolean
-    get() = voiceFilled?.walletId?.let { it == walletId } ?: false
+    get() = voiceFilled?.walletId?.let { it == form.walletId } ?: false
 
 val EntryModel.isDateFromVoice: Boolean
-    get() = voiceFilled?.date?.let { it == date } ?: false
+    get() = voiceFilled?.date?.let { it == form.date } ?: false
 
 val EntryModel.isMemoFromVoice: Boolean
     get() = voiceFilled?.memo?.let { it.isNotEmpty() && it == store } ?: false
 
 val EntryModel.showsVoice: Boolean
-    get() = type != Entry.Kind.transfer && field == EntryModel.Field.Amount
+    get() = form.type != Entry.Kind.transfer && field == EntryModel.Field.Amount
 
 val EntryModel.voiceHints: List<String>
     get() {
@@ -67,66 +62,57 @@ fun EntryModel.voiceReading(
 
 fun EntryModel.apply(reading: VoiceReading): VoiceUndo {
     val undo = VoiceUndo(
+        form = form,
         calculator = calculator,
-        date = date,
-        categoryId = categoryId,
-        tagId = tagId,
-        walletId = walletId,
-        billMonth = billMonth,
-        memo = memo,
     )
 
     val amount = reading.amount
+    val isAmountValid = amount != null && amount in 1..AmountCalculator.maxValue
+    val categoryId = reading.categoryId?.takeIf { id -> categories.any { it.id == id } }
 
-    if (amount != null && amount in 1..AmountCalculator.maxValue) {
-        calculator = AmountCalculator(amount = amount)
+    var next = form
+
+    reading.walletId?.let { next = next.withWallet(it) }
+    categoryId?.let { next = next.withCategory(it) }
+    reading.date?.let { next = next.withDate(it) }
+    reading.memo?.let { next = next.withStore(it) }
+
+    fill(
+        form = next,
+        calculator = if (amount != null &&
+            isAmountValid
+        ) {
+            AmountCalculator(amount = amount)
+        } else {
+            calculator
+        },
+        voiceFilled = VoiceFilled(
+            walletId = reading.walletId,
+            date = reading.date,
+            memo = reading.memo,
+        ),
+    )
+
+    if (isAmountValid) {
         focus(EntryModel.Field.Amount)
     }
-
-    reading.walletId?.let { id ->
-        if (id != walletId) {
-            billMonth = null
-        }
-
-        walletId = id
-    }
-
-    reading.categoryId?.let { id ->
-        if (categories.any { it.id == id }) {
-            if (id != categoryId) {
-                tagId = null
-            }
-
-            categoryId = id
-        }
-    }
-
-    reading.date?.let { date ->
-        if (date != this.date) {
-            billMonth = null
-        }
-
-        this.date = date
-    }
-
-    reading.memo?.let { store = it }
-
-    voiceFilled = VoiceFilled(
-        walletId = reading.walletId,
-        date = reading.date,
-        memo = reading.memo,
-    )
 
     return undo
 }
 
 fun EntryModel.undo(undo: VoiceUndo) {
-    walletId = undo.walletId
-    categoryId = undo.categoryId
-    tagId = undo.tagId
-    calculator = undo.calculator
-    date = undo.date
-    billMonth = undo.billMonth
-    memo = undo.memo
-    voiceFilled = null
+    val restored = form.copy(
+        date = undo.form.date,
+        categoryId = undo.form.categoryId,
+        tagId = undo.form.tagId,
+        walletId = undo.form.walletId,
+        memo = undo.form.memo,
+        billMonth = undo.form.billMonth,
+    )
+
+    fill(
+        form = restored,
+        calculator = undo.calculator,
+        voiceFilled = null,
+    )
 }

@@ -18,6 +18,7 @@ import com.yossibank.kakeibot.store.writes.methods.restoreEntries
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -165,7 +166,7 @@ class EntryItemWriteTest {
         val draft = setup.draft.copy(items = itemDrafts)
         val entry = setup.database.saveEntry(draft, at = setup.now)
 
-        setup.database.deleteEntry(entry.id)
+        setup.database.deleteEntry(entry.id, at = Instant.now())
 
         assertTrue(setup.database.snapshot().entryItems.isEmpty())
 
@@ -179,11 +180,12 @@ class EntryItemWriteTest {
         val entry = setup.database.saveEntry(draft, at = setup.now)
         val items = setup.database.entryItems(of = listOf(entry.id))
 
-        val deleted = setup.database.deleteEntries(listOf(entry.id))
+        val deleted = setup.database.deleteEntries(listOf(entry.id), at = Instant.now())
 
         setup.database.restoreEntries(
             deleted,
             items = items,
+            at = Instant.now(),
         )
 
         assertEquals(items, setup.database.entryItems(of = entry.id))

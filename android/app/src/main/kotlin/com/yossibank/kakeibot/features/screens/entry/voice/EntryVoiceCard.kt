@@ -49,6 +49,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 
 @Composable
 fun EntryVoiceCard(
@@ -72,19 +73,28 @@ fun EntryVoiceCard(
             ).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        when (flow.step) {
-            EntryVoiceFlow.Step.Denied -> Denied(
-                onCancel = flow::cancel,
-                onOpenSettings = onOpenSettings,
-            )
+        when (val phase = flow.phase) {
+            EntryVoiceFlow.Phase.Denied -> {
+                Denied(
+                    onCancel = flow::cancel,
+                    onOpenSettings = onOpenSettings,
+                )
+            }
 
-            EntryVoiceFlow.Step.Reading -> Reading(text = flow.transcript)
+            is EntryVoiceFlow.Phase.Reading -> {
+                Reading(text = phase.transcript)
+            }
 
-            else -> Listening(
-                flow = flow,
-                model = model,
-                today = today,
-            )
+            is EntryVoiceFlow.Phase.Listening -> {
+                Listening(
+                    flow = flow,
+                    listening = phase,
+                    model = model,
+                    today = today,
+                )
+            }
+
+            EntryVoiceFlow.Phase.Idle -> {}
         }
     }
 }
@@ -92,11 +102,12 @@ fun EntryVoiceCard(
 @Composable
 private fun ColumnScope.Listening(
     flow: EntryVoiceFlow,
+    listening: EntryVoiceFlow.Phase.Listening,
     model: EntryModel,
     today: LocalDate,
 ) {
     EntryVoiceWave(
-        levels = flow.levels,
+        levels = listening.levels,
         reach = 15,
         height = 40.dp,
         modifier = Modifier.fillMaxWidth(),
@@ -109,19 +120,19 @@ private fun ColumnScope.Listening(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = flow.transcript.ifEmpty { "話してください\n$EXAMPLE" },
-            color = if (flow.transcript.isEmpty()) Palette.hint else Palette.text,
+            text = listening.transcript.ifEmpty { "話してください\n$EXAMPLE" },
+            color = if (listening.transcript.isEmpty()) Palette.hint else Palette.text,
             textAlign = TextAlign.Center,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             style = textFont(
-                size = if (flow.transcript.isEmpty()) FontSize.Small else FontSize.Body,
+                size = if (listening.transcript.isEmpty()) FontSize.Small else FontSize.Body,
                 weight = FontWeight.Medium,
             ),
         )
     }
 
-    val reading = flow.preview
+    val reading = listening.preview
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Chip(
@@ -140,7 +151,12 @@ private fun ColumnScope.Listening(
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Chip(
             label = "日付",
-            value = reading?.date?.let { dateText(it, today) },
+            value = reading?.date?.let { date ->
+                EntryText.relativeDate(
+                    date = date,
+                    today = today,
+                )
+            },
         )
 
         Chip(
@@ -164,7 +180,7 @@ private fun ColumnScope.Listening(
         )
 
         FinishButton(
-            silenceStart = flow.silenceStart,
+            silenceStart = listening.silenceStart,
             duration = flow.silenceMillis,
             onSelect = flow::finish,
         )
@@ -370,19 +386,6 @@ private fun RowScope.FinishButton(
             ),
         )
     }
-}
-
-private fun dateText(
-    date: LocalDate,
-    today: LocalDate,
-): String {
-    val name = when (date.days(until = today)) {
-        0 -> "今日"
-        1 -> "昨日"
-        else -> date.monthDayText
-    }
-
-    return "$name（${date.weekday.shortName}）"
 }
 
 private const val EXAMPLE = "例：昨日 ランチ 980円 カードで"

@@ -135,8 +135,8 @@ class EntryTemplateWriteTest {
 
         setup.database.deleteTemplate(template.id)
         val kept = setup.database.entry(entry.id)
-        setup.database.deleteEntry(entry.id)
-        setup.database.restoreEntry(entry)
+        setup.database.deleteEntry(entry.id, at = Instant.now())
+        setup.database.restoreEntry(entry, at = Instant.now())
         val restored = setup.database.entry(entry.id)
 
         assertEquals(template.id, entry.templateId)

@@ -21,7 +21,7 @@ suspend fun AppDatabase.deletableRecordCount(): Int = read {
     counts.sum()
 }
 
-suspend fun AppDatabase.deleteAllRecords(at: Instant = Instant.now()) {
+suspend fun AppDatabase.deleteAllRecords(at: Instant) {
     write {
         val entries = entryDao().all().map { it.decoded(EntryRecord::entry) }
         val change = CardBillChange(before = entries)
