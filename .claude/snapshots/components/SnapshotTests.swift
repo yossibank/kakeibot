@@ -103,10 +103,10 @@ struct SnapshotTests {
         .padding(16)
 
         for variant in Self.variants {
-            try Self.write(entryRows, variant: variant, to: "parts-entry-rows")
-            try Self.write(calendar, variant: variant, to: "parts-calendar")
-            try Self.write(tagViews, variant: variant, to: "parts-tags")
-            try Self.write(templates, variant: variant, to: "parts-templates")
+            try Self.write(entryRows, variant: variant, title: "部品 › 記録の行", to: "parts-entry-rows")
+            try Self.write(calendar, variant: variant, title: "部品 › カレンダー", to: "parts-calendar")
+            try Self.write(tagViews, variant: variant, title: "部品 › タグ", to: "parts-tags")
+            try Self.write(templates, variant: variant, title: "部品 › テンプレート", to: "parts-templates")
         }
     }
 }
@@ -117,6 +117,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -132,6 +144,7 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -161,5 +174,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }

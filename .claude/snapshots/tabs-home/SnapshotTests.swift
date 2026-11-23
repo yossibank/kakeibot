@@ -55,15 +55,25 @@ struct SnapshotTests {
 
             let sheet = HomeRecurringSheet(model: model) { _ in }
 
-            try Self.write(view, variant: variant, to: "home")
-            try Self.write(view.billCard.padding(16), variant: variant, to: "home-bills")
+            try Self.write(view, variant: variant, title: "ホーム", to: "home")
+            try Self.write(
+                view.billCard.padding(16),
+                variant: variant,
+                title: "ホーム › これからの引き落とし",
+                to: "home-bills"
+            )
 
             model.billPage = 1
 
-            try Self.write(view.billCard.padding(16), variant: variant, to: "home-bills-next")
+            try Self.write(
+                view.billCard.padding(16),
+                variant: variant,
+                title: "ホーム › これからの引き落とし › 次の月",
+                to: "home-bills-next"
+            )
 
             model.billPage = 0
-            try Self.write(sheet, variant: variant, to: "home-recurring")
+            try Self.write(sheet, variant: variant, title: "ホーム › 固定費", to: "home-recurring")
         }
 
         for task in tasks {
@@ -78,6 +88,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -244,6 +266,7 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -270,5 +293,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }

@@ -35,8 +35,13 @@ struct SnapshotTests {
         for variant in Self.variants {
             let view = HomeSectionListView(model: model, database: database)
 
-            try Self.write(view, variant: variant, to: "home-sections")
-            try Self.write(thumbnails, variant: variant, to: "home-sections-thumbnails")
+            try Self.write(view, variant: variant, title: "設定 › ホームの並び", to: "home-sections")
+            try Self.write(
+                thumbnails,
+                variant: variant,
+                title: "設定 › ホームの並び › 小さな絵",
+                to: "home-sections-thumbnails"
+            )
         }
     }
 }
@@ -47,6 +52,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -157,6 +174,7 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -183,5 +201,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }

@@ -32,30 +32,40 @@ struct SnapshotTests {
                 onMarkReward: {}
             )
 
-            try Self.write(view, variant: variant, to: "assets")
+            try Self.write(view, variant: variant, title: "資産", to: "assets")
 
             let reward = AssetsRewardSheet(model: model)
                 .frame(height: 1400)
 
-            try Self.write(reward, variant: variant, to: "assets-reward")
+            try Self.write(reward, variant: variant, title: "資産 › ごほうび", to: "assets-reward")
 
             let adding = AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: nil))
                 .frame(height: 852)
 
-            try Self.write(adding, variant: variant, to: "assets-goal-new")
+            try Self.write(adding, variant: variant, title: "資産 › 目標の追加", to: "assets-goal-new")
 
             let goal = try #require(model.waitingGoals.first)
 
             let editing = AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: goal))
                 .frame(height: 852)
 
-            try Self.write(editing, variant: variant, to: "assets-goal-edit")
+            try Self.write(editing, variant: variant, title: "資産 › 目標の編集", to: "assets-goal-edit")
 
-            try Self.write(view.billCard.padding(16), variant: variant, to: "assets-bills")
+            try Self.write(
+                view.billCard.padding(16),
+                variant: variant,
+                title: "資産 › これからの引き落とし",
+                to: "assets-bills"
+            )
 
             model.billPage = 1
 
-            try Self.write(view.billCard.padding(16), variant: variant, to: "assets-bills-next")
+            try Self.write(
+                view.billCard.padding(16),
+                variant: variant,
+                title: "資産 › これからの引き落とし › 次の月",
+                to: "assets-bills-next"
+            )
 
             model.billPage = 0
 
@@ -64,7 +74,7 @@ struct SnapshotTests {
             let unpaidSheet = AssetsEntrySheet(content: content) { _ in }
                 .frame(height: 1200)
 
-            try Self.write(unpaidSheet, variant: variant, to: "assets-unpaid")
+            try Self.write(unpaidSheet, variant: variant, title: "資産 › 未払いの記録", to: "assets-unpaid")
 
             let outlookSheet = AssetsOutlookSheet(
                 model: model,
@@ -77,13 +87,17 @@ struct SnapshotTests {
                 .padding(.top, 28)
                 .background(Palette.panel)
 
-            try Self.write(outlook, variant: variant, to: "assets-outlook")
+            try Self.write(outlook, variant: variant, title: "資産 › 月末の見込み", to: "assets-outlook")
 
             let wallet = try #require(model.rows.first)
 
-            for (name, keys) in [
-                ("assets-adjust", [AmountCalculator.Key]()),
-                ("assets-adjust-typed", [.digit(4), .digit(8), .digit(2), .doubleZero])
+            for (name, title, keys) in [
+                ("assets-adjust", "資産 › 残高の調整", [AmountCalculator.Key]()),
+                (
+                    "assets-adjust-typed",
+                    "資産 › 残高の調整 › 金額を入れた時",
+                    [.digit(4), .digit(8), .digit(2), .doubleZero]
+                )
             ] {
                 let adjust = model.adjustModel(for: wallet)
 
@@ -96,7 +110,7 @@ struct SnapshotTests {
                     .padding(.top, 28)
                     .background(Palette.panel)
 
-                try Self.write(sheet, variant: variant, to: name)
+                try Self.write(sheet, variant: variant, title: title, to: name)
             }
         }
 
@@ -121,7 +135,7 @@ struct SnapshotTests {
                 onMarkReward: {}
             )
 
-            try Self.write(view, variant: variant, to: "assets-empty")
+            try Self.write(view, variant: variant, title: "資産 › 口座なし", to: "assets-empty")
         }
 
         emptyTask.cancel()
@@ -134,6 +148,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -322,6 +348,7 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -348,5 +375,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }

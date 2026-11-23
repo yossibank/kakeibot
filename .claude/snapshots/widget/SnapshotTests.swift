@@ -12,7 +12,7 @@ struct SnapshotTests {
     func render() throws {
         let today = LocalDate(Date(), in: .current)
 
-        for (name, summary) in Self.cases(on: today) {
+        for (name, title, summary) in Self.cases(on: today) {
             let entry = BudgetWidgetEntry(
                 date: Date(),
                 summary: summary,
@@ -25,11 +25,16 @@ struct SnapshotTests {
                     .frame(width: shape.size.width, height: shape.size.height)
                     .background(shape.background)
 
-                try Self.write(view, to: "\(name)-\(shape.name).png")
+                try Self.write(
+                    view,
+                    title: "ウィジェット › あといくら › \(title)",
+                    variant: shape.label,
+                    to: "\(name)-\(shape.name).png"
+                )
             }
         }
 
-        for (name, summary) in Self.quickCases() {
+        for (name, title, summary) in Self.quickCases() {
             let entry = QuickRecordWidgetEntry(
                 date: Date(),
                 summary: summary,
@@ -46,7 +51,12 @@ struct SnapshotTests {
                 let height = Int(size.height)
                 let fileName = "quick-\(name)-\(width)x\(height).png"
 
-                try Self.write(view, to: fileName)
+                try Self.write(
+                    view,
+                    title: "ウィジェット › すぐ記録 › \(title)",
+                    variant: "\(shape == .systemMedium ? "中" : "大") \(width)×\(height)",
+                    to: fileName
+                )
             }
         }
     }
@@ -55,6 +65,7 @@ struct SnapshotTests {
 extension SnapshotTests {
     struct Shape {
         let name: String
+        let label: String
         let size: CGSize
         let background: Color
         let view: (BudgetWidgetEntry) -> AnyView
@@ -65,11 +76,11 @@ private extension SnapshotTests {
     static let directory = "__OUT__"
 
     static let shapes: [Shape] = [
-        home("small", .systemSmall, CGSize(width: 170, height: 170)),
-        home("medium", .systemMedium, CGSize(width: 364, height: 170)),
-        lock("circular", .accessoryCircular, CGSize(width: 76, height: 76)),
-        lock("rectangular", .accessoryRectangular, CGSize(width: 172, height: 76)),
-        lock("inline", .accessoryInline, CGSize(width: 260, height: 24))
+        home("small", "小", .systemSmall, CGSize(width: 170, height: 170)),
+        home("medium", "中", .systemMedium, CGSize(width: 364, height: 170)),
+        lock("circular", "ロック画面・円形", .accessoryCircular, CGSize(width: 76, height: 76)),
+        lock("rectangular", "ロック画面・長方形", .accessoryRectangular, CGSize(width: 172, height: 76)),
+        lock("inline", "ロック画面・1 行", .accessoryInline, CGSize(width: 260, height: 24))
     ]
 
     static let quickShapes: [(WidgetFamily, CGSize)] = [
@@ -81,7 +92,7 @@ private extension SnapshotTests {
         (.systemLarge, CGSize(width: 321, height: 324))
     ]
 
-    static func quickCases() -> [(String, QuickRecordWidgetSummary)] {
+    static func quickCases() -> [(String, String, QuickRecordWidgetSummary)] {
         let sample = QuickRecordWidgetSummary.sample()
         let until = Date().addingTimeInterval(60)
 
@@ -182,18 +193,18 @@ private extension SnapshotTests {
         )
 
         return [
-            ("normal", sample),
-            ("undo", undo),
-            ("wide", wide),
-            ("long", long),
-            ("two", two),
-            ("zero", zero),
-            ("one", one),
-            ("none", none)
+            ("normal", "通常", sample),
+            ("undo", "取り消し", undo),
+            ("wide", "項目の長さが混在", wide),
+            ("long", "長い名前と大きな金額", long),
+            ("two", "項目 2 件", two),
+            ("zero", "今日の記録なし", zero),
+            ("one", "今日の記録 1 件", one),
+            ("none", "項目なし", none)
         ]
     }
 
-    static func cases(on today: LocalDate) -> [(String, BudgetWidgetSummary?)] {
+    static func cases(on today: LocalDate) -> [(String, String, BudgetWidgetSummary?)] {
         let periodEnd = today.adding(days: 8)
 
         let over = BudgetUsage(
@@ -238,34 +249,36 @@ private extension SnapshotTests {
         )
 
         return [
-            ("normal", .sample(on: today)),
-            ("huge", hugeSummary),
-            ("over", overSummary),
-            ("nobudget", noBudget),
-            ("empty", nil)
+            ("normal", "通常", .sample(on: today)),
+            ("huge", "大きな金額", hugeSummary),
+            ("over", "予算超過", overSummary),
+            ("nobudget", "予算なし", noBudget),
+            ("empty", "空", nil)
         ]
     }
 
     static func home(
         _ name: String,
+        _ label: String,
         _ family: WidgetFamily,
         _ size: CGSize
     ) -> Shape {
         let background = Color(white: 0.97)
 
-        return Shape(name: name, size: size, background: background) { entry in
+        return Shape(name: name, label: label, size: size, background: background) { entry in
             AnyView(BudgetWidgetView(entry: entry, family: family))
         }
     }
 
     static func lock(
         _ name: String,
+        _ label: String,
         _ family: WidgetFamily,
         _ size: CGSize
     ) -> Shape {
         let background = Color(white: 0.2)
 
-        return Shape(name: name, size: size, background: background) { entry in
+        return Shape(name: name, label: label, size: size, background: background) { entry in
             AnyView(
                 BudgetLockWidgetView(entry: entry, family: family)
                     .environment(\.colorScheme, .dark)
@@ -275,6 +288,8 @@ private extension SnapshotTests {
 
     static func write(
         _ view: some View,
+        title: String,
+        variant: String = "",
         to name: String
     ) throws {
         let renderer = ImageRenderer(content: view)
@@ -285,5 +300,7 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: name)
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(directory: directory, file: name, title: title, variant: variant)
     }
 }

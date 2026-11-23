@@ -13,7 +13,12 @@ struct SnapshotTests {
                 let art = try Self.load(page.art)
                 let view = StorePage(page: page, index: index, art: art, canvas: canvas)
 
-                try Self.write(view, canvas: canvas, to: page.file)
+                try Self.write(
+                    view,
+                    canvas: canvas,
+                    to: page.file,
+                    title: "ストアの画像 › \(page.lines.joined())"
+                )
             }
         }
 
@@ -21,7 +26,12 @@ struct SnapshotTests {
             let images = try shot.phones.map { try Self.image($0.name) }
             let view = PanoramaPage(shot: shot, index: index, images: images)
 
-            try Self.write(view, canvas: .phone, to: shot.file)
+            try Self.write(
+                view,
+                canvas: .phone,
+                to: shot.file,
+                title: "ストアの画像 › \(shot.lines.joined())"
+            )
         }
 
         for canvas in [Canvas.header, .search] {
@@ -29,7 +39,12 @@ struct SnapshotTests {
             let shots = try names.map(Self.image)
             let view = StoreBanner(shots: shots, canvas: canvas)
 
-            try Self.write(view, canvas: canvas, to: canvas.folder)
+            try Self.write(
+                view,
+                canvas: canvas,
+                to: canvas.folder,
+                title: "ストアの画像 › \(canvas == .header ? "ヘッダー" : "検索の画像")"
+            )
         }
     }
 }
@@ -68,6 +83,17 @@ extension SnapshotTests {
             case .pad: "13"
             case .header: "header"
             case .search: "search"
+            }
+        }
+
+        var label: String {
+            switch self {
+            case .phone: "iPhone 6.9"
+            case .duoOuter: "Duo の外の画面"
+            case .duoInner: "Duo の内の画面"
+            case .pad: "iPad 13"
+            case .header: "1920×823"
+            case .search: "1920×1280"
             }
         }
 
@@ -1123,7 +1149,8 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         canvas: Canvas,
-        to name: String
+        to name: String,
+        title: String
     ) throws {
         let renderer = ImageRenderer(content: view)
 
@@ -1135,15 +1162,17 @@ private extension SnapshotTests {
         let data = try #require(UIImage(cgImage: image).pngData())
 
         try data.write(to: output(canvas.folder, name))
+        try record(canvas.folder, name, title: title, variant: canvas.label)
 
         if canvas == .phone {
-            try writeSmall(image, to: name)
+            try writeSmall(image, to: name, title: title)
         }
     }
 
     static func writeSmall(
         _ image: CGImage,
-        to name: String
+        to name: String,
+        title: String
     ) throws {
         let context = try #require(
             CGContext(
@@ -1164,6 +1193,21 @@ private extension SnapshotTests {
         let data = try #require(UIImage(cgImage: small).pngData())
 
         try data.write(to: output("6.3", name))
+        try record("6.3", name, title: title, variant: "iPhone 6.3")
+    }
+
+    static func record(
+        _ folder: String,
+        _ name: String,
+        title: String,
+        variant: String
+    ) throws {
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(folder)_\(name).png",
+            title: title,
+            variant: variant
+        )
     }
 
     static func output(

@@ -39,15 +39,23 @@ struct SnapshotTests {
                     ThemeStyleLookView(model: model),
                     style: style,
                     variant: variant,
+                    title: "設定 › 形と動き › 見本 › \(Self.stateTitle(state.name))",
                     to: "look-\(state.name)"
                 )
-                try Self.write(sheet, style: style, variant: variant, to: "settings-\(state.name)")
+                try Self.write(
+                    sheet,
+                    style: style,
+                    variant: variant,
+                    title: "設定 › 形と動き › \(Self.stateTitle(state.name))",
+                    to: "settings-\(state.name)"
+                )
 
                 if state.name == "standard" {
                     try Self.write(
                         ThemeStyleTextView(model: model),
                         style: style,
                         variant: variant,
+                        title: "設定 › 形と動き › 文字",
                         to: "text"
                     )
                 }
@@ -62,6 +70,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 
     struct State {
@@ -130,6 +150,15 @@ private extension SnapshotTests {
             isOn: true
         )
     ]
+
+    static func stateTitle(_ name: String) -> String {
+        switch name {
+        case "standard": "標準"
+        case "ruled": "罫線"
+        case "grid": "方眼"
+        default: name
+        }
+    }
 
     static func wait(until isReady: () -> Bool) async throws {
         for _ in 0..<300 where !isReady() {
@@ -230,6 +259,7 @@ private extension SnapshotTests {
         _ view: some View,
         style: ThemeStyle,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let palette = ThemeLook.followsDevice.palette(isDark: variant.scheme == .dark)
@@ -252,5 +282,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }
