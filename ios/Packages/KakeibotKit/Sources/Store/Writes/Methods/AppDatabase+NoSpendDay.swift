@@ -20,12 +20,7 @@ public extension AppDatabase {
     ) async throws {
         try await writer.write { db in
             for date in dates {
-                let expenses = try Entry
-                    .filter(Column("date") == date)
-                    .filter(Column("type") == Entry.Kind.expense)
-                    .fetchCount(db)
-
-                guard expenses == 0 else {
+                guard try !Entry.hasExpense(on: date, in: db) else {
                     throw NoSpendDayError.hasExpense
                 }
 

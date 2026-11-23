@@ -15,8 +15,7 @@ private extension AppDatabase {
     static func rewardRuleList(in db: Database) throws -> RewardRuleList {
         let rules = try RewardRule.order(RewardRule.sortOrder, Column("created_at")).fetchAll(db)
         let iconIds = rules.map(\.iconId)
-        let pairs = try Icon.fetchAll(db, keys: iconIds).map { ($0.id, $0) }
-        let icons = Dictionary(uniqueKeysWithValues: pairs)
+        let icons = try Icon.byID(iconIds, in: db)
         let totals = try rewardTotals(in: db)
         return RewardRuleList(rules: rules, icons: icons, totals: totals)
     }

@@ -83,9 +83,7 @@ private extension AppDatabase {
 
         let wallets = try rows.map { try Wallet(row: $0) }
         let iconIds = wallets.map(\.iconId)
-        let icons = try Icon.fetchAll(db, keys: iconIds)
-        let iconPairs = icons.map { ($0.id, $0) }
-        let iconsByID = Dictionary(uniqueKeysWithValues: iconPairs)
+        let iconsByID = try Icon.byID(iconIds, in: db)
 
         return zip(wallets, rows).map { wallet, row in
             WalletShare(wallet: wallet, icon: iconsByID[wallet.iconId], isShared: row["is_shared"])
@@ -105,9 +103,7 @@ private extension AppDatabase {
 
         let wallets = try rows.map { try Wallet(row: $0) }
         let iconIds = wallets.map(\.iconId)
-        let icons = try Icon.fetchAll(db, keys: iconIds)
-        let iconPairs = icons.map { ($0.id, $0) }
-        let iconsByID = Dictionary(uniqueKeysWithValues: iconPairs)
+        let iconsByID = try Icon.byID(iconIds, in: db)
 
         return zip(wallets, rows).map { wallet, row in
             JoinedShare(

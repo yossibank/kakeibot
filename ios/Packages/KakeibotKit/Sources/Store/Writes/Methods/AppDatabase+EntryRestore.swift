@@ -58,15 +58,8 @@ extension AppDatabase {
         _ days: [NoSpendDay],
         in db: Database
     ) throws {
-        for day in days {
-            let expenses = try Entry
-                .filter(Column("date") == day.date)
-                .filter(Column("type") == Entry.Kind.expense)
-                .fetchCount(db)
-
-            if expenses == 0 {
-                try day.save(db)
-            }
+        for day in days where try !Entry.hasExpense(on: day.date, in: db) {
+            try day.save(db)
         }
     }
 }
