@@ -6,7 +6,8 @@ extension ReviewView {
     @ViewBuilder
     func upcomingRow(
         _ upcoming: Int,
-        tapOutsets: EdgeInsets
+        tapOutsets: EdgeInsets,
+        minHeight: CGFloat?
     ) -> some View {
         if model.scale == .month {
             Button(action: onOpenRecurrings) {
@@ -16,13 +17,13 @@ extension ReviewView {
                     Image(systemName: "chevron.right")
                         .sansFont(.micro, weight: .semibold)
                 }
-                .upcomingRowStyle()
+                .upcomingRowStyle(minHeight: minHeight)
                 .tapArea(tapOutsets)
             }
             .buttonStyle(.plain)
         } else {
             upcomingLabel(upcoming)
-                .upcomingRowStyle()
+                .upcomingRowStyle(minHeight: minHeight)
         }
     }
 }
@@ -62,10 +63,10 @@ private extension ReviewView {
 }
 
 private extension View {
-    func upcomingRowStyle() -> some View {
+    func upcomingRowStyle(minHeight: CGFloat?) -> some View {
         textFont(.caption)
             .monospacedDigit()
             .foregroundStyle(Palette.subtext)
-            .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .leading)
     }
 }

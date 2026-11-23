@@ -69,10 +69,7 @@ extension ReviewView {
 
             let tallies = model.stampTallies
 
-            if tallies.isEmpty {
-                stampHint
-                    .layoutColumn(.trailing)
-            } else {
+            if !tallies.isEmpty {
                 StampTallyCard(
                     tallies: tallies,
                     emptyText: "この期間に押したスタンプはありません",
@@ -127,7 +124,11 @@ private extension ReviewView {
                             .textFont(.caption)
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
-                            .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
+                            .frame(
+                                maxWidth: .infinity,
+                                minHeight: rowMinHeight,
+                                alignment: .leading
+                            )
                             .tapArea(Self.rowTapOutsets(top: true, bottom: isLastRow(.recurring)))
                         }
                         .buttonStyle(.plain)
@@ -139,7 +140,11 @@ private extension ReviewView {
                             bottom: isLastRow(.upcoming)
                         )
 
-                        upcomingRow(upcoming, tapOutsets: outsets)
+                        upcomingRow(
+                            upcoming,
+                            tapOutsets: outsets,
+                            minHeight: rowMinHeight
+                        )
                     }
 
                     if showsMoveRow {
@@ -155,7 +160,11 @@ private extension ReviewView {
                             .textFont(.caption)
                             .monospacedDigit()
                             .foregroundStyle(Palette.subtext)
-                            .frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
+                            .frame(
+                                maxWidth: .infinity,
+                                minHeight: rowMinHeight,
+                                alignment: .leading
+                            )
                             .tapArea(Self.rowTapOutsets(top: isFirstRow(.move), bottom: true))
                         }
                         .buttonStyle(.plain)
@@ -204,19 +213,6 @@ private extension ReviewView {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card()
-    }
-
-    var stampHint: some View {
-        Label("記録のカレンダーで日を選ぶと、スタンプを押せます", systemImage: "seal")
-            .textFont(.footnote)
-            .foregroundStyle(Palette.subtext)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .overlay {
-                RoundedRectangle(cornerRadius: corner.radius(16))
-                    .strokeBorder(Palette.outline, style: .dashed)
-            }
     }
 
     func kindTile(_ kind: ReviewKind) -> some View {
@@ -330,6 +326,10 @@ private extension ReviewView {
         let upcoming: [DetailRow] = hasUpcomingRow ? [.upcoming] : []
         let move: [DetailRow] = showsMoveRow ? [.move] : []
         return recurring + upcoming + move
+    }
+
+    var rowMinHeight: CGFloat? {
+        detailRows.count > 1 ? 24 : nil
     }
 
     var totalTitle: String {
