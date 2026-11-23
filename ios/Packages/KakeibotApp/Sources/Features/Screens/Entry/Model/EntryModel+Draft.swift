@@ -73,7 +73,7 @@ extension EntryModel {
         case EntryDraft.Problem.missingCategory: "カテゴリを選んでください"
         case EntryDraft.Problem.missingDestination: "振替先を選んでください"
         case EntryDraft.Problem.sameWallet: "振替元と振替先を別にしてください"
-        case AppDatabase.WriteError.entryNotFound: "記録が見つかりませんでした"
+        case AppDatabase.EntryWriteError.entryNotFound: "記録が見つかりませんでした"
         case _ where AppDatabase.isStorageFull(error): ErrorNotice.storageFullMessage
         default: "保存できませんでした"
         }

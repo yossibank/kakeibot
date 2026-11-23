@@ -146,7 +146,7 @@ struct EntryTagWriteTests {
         draft.categoryId = other.id
         draft.tagId = tag.id
 
-        await #expect(throws: AppDatabase.WriteError.tagMismatch) {
+        await #expect(throws: AppDatabase.EntryWriteError.tagMismatch) {
             try await setup.database.saveEntry(draft, at: setup.now)
         }
     }

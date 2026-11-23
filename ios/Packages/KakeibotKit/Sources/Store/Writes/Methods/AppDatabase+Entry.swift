@@ -3,7 +3,7 @@ import Foundation
 import GRDB
 
 public extension AppDatabase {
-    enum WriteError: Error, Equatable {
+    enum EntryWriteError: Error, Equatable {
         case entryNotFound
         case tagMismatch
     }
@@ -161,7 +161,7 @@ extension AppDatabase {
         try prepareSharedTransfer(entry, in: db, at: now)
 
         guard try Self.tag(entry.tagId, belongsTo: entry.categoryId, in: db) else {
-            throw WriteError.tagMismatch
+            throw EntryWriteError.tagMismatch
         }
 
         try entry.save(db)
@@ -268,7 +268,7 @@ private extension AppDatabase {
         }
 
         guard let existing = try Entry.fetchOne(db, key: id) else {
-            throw WriteError.entryNotFound
+            throw EntryWriteError.entryNotFound
         }
 
         return try draft.applied(to: existing, at: now)

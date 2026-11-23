@@ -90,7 +90,7 @@ struct EntryWriteTests {
     func rejectsUnknownEntry() async throws {
         let setup = try await Setup()
 
-        await #expect(throws: AppDatabase.WriteError.entryNotFound) {
+        await #expect(throws: AppDatabase.EntryWriteError.entryNotFound) {
             try await setup.database.saveEntry(setup.draft, editing: Entry.ID(), at: setup.now)
         }
     }
