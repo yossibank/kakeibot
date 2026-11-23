@@ -8,7 +8,7 @@ struct SettingsMenuSyncRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let title = status.troubleTitle {
-                SettingsRow(
+                SettingsMenuRow(
                     "同期と共有",
                     systemImage: "icloud",
                     tint: nil,
@@ -16,12 +16,12 @@ struct SettingsMenuSyncRow: View {
                     accessory: troubleValue(title)
                 )
             } else {
-                SettingsRow(
+                SettingsMenuRow(
                     "同期と共有",
                     systemImage: "icloud",
                     tint: nil,
                     trailingImage: "chevron.right",
-                    accessory: SettingsRowValue(
+                    accessory: SettingsMenuRowValue(
                         value: status.isEnabled ? "オン" : "オフ",
                         shortValue: nil
                     )
