@@ -27,7 +27,7 @@ private extension AssetsRewardSheet {
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
-                Text(month.month.title)
+                Text("\(String(month.month.year))年 \(month.month.month)月")
                     .textFont(.footnote, weight: .semibold)
                     .foregroundStyle(Palette.text)
 
