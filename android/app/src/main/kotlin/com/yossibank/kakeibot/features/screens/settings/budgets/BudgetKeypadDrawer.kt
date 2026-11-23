@@ -54,7 +54,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.settingsparts.RoundIconButton
+import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import kotlinx.coroutines.launch
 
 @Composable

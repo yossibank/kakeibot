@@ -26,9 +26,16 @@ Android は、次の技術を使う。
 | `:store` | Room の DB。Kotlin Multiplatform のモジュールで、テストは JVM の SQLite で走る |
 | `:app` | Jetpack Compose のアプリ。iOS の KakeibotApp のターゲットを、パッケージで分ける |
 
-`:core` は、iOS の Core のファイルと 1 対 1 に対応させる。レシートの読み取りは Android に無い。`Concepts/Receipt/` は、書き出しが使う `ItemName` だけを移す。
+`:core` は、iOS の Core のファイルと 1 対 1 に対応させる。次のものは、1 対 1 から外れる。
 
-書き出しの JSON の行は、Android だけの `ExportV1Rows.kt` に書く。表の行の変換は、題材ごとの `ExportV1Rows<題材>.kt` に分ける。
+| 外れるもの | 中身 |
+| --- | --- |
+| `Concepts/Receipt/` | レシートの読み取りは Android に無い。書き出しが使う `ItemName` だけを移す |
+| `Concepts/Review/` | 締めのレポートと一手はまだ移していない。集計の `ReviewKind`・`ReviewPeriod`・`ReviewSummary` だけがある |
+| Android だけのファイル | `ExportJson`・`ExportV1Rows`・`InstantSerializer`・`DraftProblemException`。JSON の読み書きと例外を、Kotlin の形で足す |
+| iOS だけのファイル | `Bundle+Version`・`KeyedEncodingContainer+Null`。Foundation の型の拡張である |
+
+ファイルの名前は、次のとおりに対応させる。
 
 | iOS | Android |
 | --- | --- |
@@ -36,6 +43,10 @@ Android は、次の技術を使う。
 | `Core/Shared/X.swift` | `core/shared/X.kt` |
 | `Type+Topic.swift` | `TypeTopic.kt`。拡張関数で書く |
 | `Tests/CoreTests/.../XTests.swift` | `src/test/.../XTest.kt`。テストの補助は `support/` に置く。`:store` は `src/jvmTest/` に置く |
+| `XTests+Topic.swift`（テストを分けたもの） | `XTopicTest.kt`。話題を `Test` の前に入れ、型の名前も同じにする |
+| `XTests+Topic.swift`（補助の拡張だけのもの） | `XTestTopic.kt`。例は `RecordTestSample.kt`・`CardBillRecalcWriteTestSetup.kt` |
+
+書き出しの JSON の行は、Android だけの `ExportV1Rows.kt` に書く。表の行の変換は、題材ごとの `ExportV1Rows<題材>.kt` に分ける。
 
 型・プロパティ・関数の名前は iOS と同じにする。Kotlin で使えない名前だけ、次のように変える。
 
@@ -59,17 +70,17 @@ Android は、次の技術を使う。
 
 DB を開く入口だけは、Room がターゲットごとに違うので分けている。どちらも、共通の `AppDatabase.open` に Room の Builder を渡す。
 
-`:store` も、iOS の Store のファイルと 1 対 1 に対応させる。同期は Android に無いので、`Store/Sync/` は移さない。マイグレーションは iOS の最新の形から始めるので、`Store/Migrations/` も移さない。
+`:store` も、iOS の Store のファイルと 1 対 1 に対応させる。次のものは、1 対 1 から外れる。
 
-iOS で分けたファイルと変えた名前のうち、次のものは Android に移していない。
-
-| iOS | Android の今の形 |
+| 外れるもの | 中身 |
 | --- | --- |
-| `AppDatabase+EntryItemQuery`（品目の読み出し） | `writes/methods/AppDatabaseEntryItem.kt` に書き込みと一緒にある |
-| `AppDatabase+ReviewRequest`（レビューのお願いの記録） | `queries/methods/AppDatabaseEntryHistory.kt` にある |
-| `MonthPlan`・`SettingKey+Scope` | 無い |
-| `Core/Shared/` の `Draft`・`String+Trimmed`、`Icon+Mark` | 無い。各下書きが検証と空白の除去を持つ |
-| 記録の書き込みの失敗 `EntryWriteError` | `WriteError`・`WriteException` |
+| `Store/Sync/` | 同期は Android に無いので、移さない |
+| `Store/Migrations/` | iOS の最新の形から始めるので、移さない |
+| 振り返りの一手と理由 | `ReviewComment`・`ReviewGoal` の行・読み出し・書き込みは、まだ移していない |
+| Android だけのファイル | `database/` の `AppDatabaseChecks`・`AppDatabaseObservation`。トリガーと見張りを、Room の形で足す |
+| iOS だけのファイル | `AppDatabase+Interruption` と `AppDatabase+StorageFull`。`Database/` にある |
+
+フォルダとファイルは、次のとおりに対応させる。
 
 | iOS | Android |
 | --- | --- |
@@ -80,6 +91,15 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | `removeDuplicates()` | `distinctUntilChanged()` |
 | 失敗を表す enum（`XError`）を投げる | 同じ名前の enum と、それを持つ `XException`。記録の書き込みだけは `EntryWriteError` にする |
 | 書き込みの時刻（`at:`） | 既定値を置かず、呼ぶ側が必ず渡す |
+
+iOS で分けたファイルと変えた名前のうち、次のものは Android に移していない。
+
+| iOS | Android の今の形 |
+| --- | --- |
+| `AppDatabase+EntryItemQuery`（品目の読み出し） | `writes/methods/AppDatabaseEntryItem.kt` に書き込みと一緒にある |
+| `AppDatabase+ReviewRequest`（レビューのお願いの記録） | `queries/methods/AppDatabaseEntryHistory.kt` にある |
+| `MonthPlan`・`SettingKey+Scope` | 無い |
+| `Core/Shared/` の `Draft`・`String+Trimmed`、`Icon+Mark` | 無い。各下書きが検証と空白の除去を持つ |
 
 表ごとの読み出し・挿入・全消しは、`records/rows/` の各ファイルの `<名前>Table` にまとめる。型は `records/protocols/TableBinding.kt` にある。書き出しの読み戻しと、削除の取り消しは、この一覧を順に回す。
 
@@ -140,9 +160,18 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | 横線・縦の区切り | `designsystem/components/surface/` |
 | 置き文字付きの入力欄 | `designsystem/components/input/` の `PlaceholderTextField` |
 | ボタンの高さなどの寸法 | `designsystem/theme/` の `Metrics` |
-| 設定の画面の枠 | `features/shared/settingsparts/` の `SettingsFrame` |
+| 設定の画面の枠 | `features/shared/settingsparts/layout/` の `SettingsFrame` |
 | 期間を前後に送る見出し | `features/shared/period/` の `PeriodStepper` |
 | 通知の許可 | `features/shared/notification/` |
+
+画面のフォルダとファイルで、iOS と違う所は次のとおりである。
+
+| Android | iOS との違い |
+| --- | --- |
+| `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
+| `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
+| `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
+| `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |
 
 ## 🔧 設定
 

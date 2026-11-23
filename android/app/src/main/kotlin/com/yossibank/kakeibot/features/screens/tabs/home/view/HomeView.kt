@@ -46,7 +46,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
-import com.yossibank.kakeibot.features.shared.settingsparts.RoundIconButton
+import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.abs
 

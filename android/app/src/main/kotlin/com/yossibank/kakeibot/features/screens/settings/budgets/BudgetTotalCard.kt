@@ -61,16 +61,16 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHintButton
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroCard
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroNote
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsScreenFlag
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsSwitch
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsUndoNotice
+import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNote
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsScreenFlag
+import com.yossibank.kakeibot.features.shared.settingsparts.input.SettingsSwitch
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
