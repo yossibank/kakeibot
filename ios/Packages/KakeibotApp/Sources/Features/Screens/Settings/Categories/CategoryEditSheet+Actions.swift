@@ -1,6 +1,27 @@
 import SwiftUI
 
 extension CategoryEditSheet {
+    var edit: SettingsEditController<CategoryEditModel> {
+        SettingsEditController(
+            model: model,
+            prompt: $prompt,
+            dismiss: dismiss,
+            onRest: {
+                focus = nil
+            },
+            onHide: onHide,
+            onDelete: onDelete,
+            onSave: {
+                guard let category = await model.save() else {
+                    return false
+                }
+
+                onSave(category)
+                return true
+            }
+        )
+    }
+
     func addTag() {
         showTag(.add, name: "")
     }
@@ -35,7 +56,7 @@ extension CategoryEditSheet {
 
         if startsAddingTag {
             Task {
-                await save()
+                await edit.save()
             }
         }
     }
@@ -44,67 +65,6 @@ extension CategoryEditSheet {
         closeTag()
 
         if startsAddingTag {
-            dismiss()
-        }
-    }
-
-    func close() {
-        focus = nil
-
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
-    }
-
-    func save(hiding: Bool = false) async {
-        focus = nil
-
-        guard let category = await model.save() else {
-            return
-        }
-
-        onSave(category)
-
-        if hiding {
-            guard await model.setHidden(!model.isHidden) else {
-                return
-            }
-
-            if model.isHidden {
-                onHide()
-            }
-        }
-
-        dismiss()
-    }
-
-    func toggleHidden() {
-        guard model.isChanged else {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-
-            return
-        }
-
-        isConfirmingHideChanges = true
-    }
-
-    func setHidden(_ isHidden: Bool) async {
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
             dismiss()
         }
     }

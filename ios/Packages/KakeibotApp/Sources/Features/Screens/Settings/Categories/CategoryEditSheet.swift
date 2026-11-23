@@ -5,8 +5,7 @@ import SwiftUI
 
 public struct CategoryEditSheet: View {
     @State var model: CategoryEditModel
-    @State var isConfirmingDiscard = false
-    @State var isConfirmingHideChanges = false
+    @State var prompt = SettingsEditPrompt()
     @State var tagEdit: TagEdit?
     @State var tagName = ""
     @State var ignoresKeyboard = false
@@ -64,28 +63,8 @@ public struct CategoryEditSheet: View {
             textField: .text,
             below: iconBottom
         )
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .confirmsUnsavedHide(
-            isHidden: model.isHidden,
-            canSave: model.canSave,
-            isPresented: $isConfirmingHideChanges
-        ) {
-            Task {
-                await save(hiding: true)
-            }
-        } onDiscard: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-        }
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            dismiss()
-        }
+        .errorBanner($model.errorNotice)
+        .settingsEditConfirmations(edit)
         .confirmation(
             isPresented: $isConfirmingDelete,
             systemImage: deleteImage,
@@ -96,10 +75,10 @@ public struct CategoryEditSheet: View {
             role: deleteRole
         ) {
             if model.hasEntries {
-                toggleHidden()
+                edit.toggleHidden()
             } else {
                 Task {
-                    await delete()
+                    await edit.delete()
                 }
             }
         }
@@ -154,7 +133,7 @@ private extension CategoryEditSheet {
         } save: {
             PrimaryButton(model.saveTitle) {
                 Task {
-                    await save()
+                    await edit.save()
                 }
             }
             .disabled(!model.canSave)
@@ -162,17 +141,14 @@ private extension CategoryEditSheet {
         .scrollDisabled(isMovingTag)
         .overlay(alignment: .top) {
             header
-                .padding(.horizontal, 20)
+                .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
         }
         .contentShape(.rect)
         .onTapGesture {
             focus = nil
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 
     var header: some View {
@@ -183,9 +159,9 @@ private extension CategoryEditSheet {
             canDelete: !(model.isHidden && model.hasEntries),
             subtitle: kindName
         ) {
-            close()
+            edit.close()
         } onHide: {
-            toggleHidden()
+            edit.toggleHidden()
         } onDelete: {
             isConfirmingDelete = true
         }
@@ -309,6 +285,8 @@ private extension CategoryEditSheet {
         }
     }
 }
+
+extension CategoryEditModel: SettingsEditing {}
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {

@@ -7,8 +7,7 @@ public struct RecurringEditSheet: View {
     @State var model: RecurringEditModel
 
     @State private var panel: Panel?
-    @State private var isConfirmingDiscard = false
-    @State private var isConfirmingHideChanges = false
+    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -32,94 +31,65 @@ public struct RecurringEditSheet: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .bottom) {
-            content
-
-            if let panel {
-                Palette.scrim
-                    .opacity(0.35)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        closePanel()
-                    }
-                    .transition(.opacity)
-                    .zIndex(1)
-
+        content
+            .settingsDrawerLayer(item: panel) {
+                closePanel()
+            } drawer: { panel in
                 SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
                     closePanel()
                 } content: {
                     drawerBody(panel)
                 }
-                .transition(.settingsDrawer)
-                .zIndex(1)
             }
-        }
-        .overlay(alignment: .top) {
-            SettingsEditHeader(
-                title: headerTitle,
-                isEditing: model.isEditing,
-                isHidden: model.isHidden
+            .overlay(alignment: .top) {
+                SettingsEditHeader(
+                    title: headerTitle,
+                    isEditing: model.isEditing,
+                    isHidden: model.isHidden
+                ) {
+                    edit.close()
+                } onHide: {
+                    edit.toggleHidden()
+                } onDelete: {
+                    isConfirmingDelete = true
+                }
+                .padding(.horizontal, SettingsSpacing.side)
+                .padding(.top, SettingsSpacing.top)
+            }
+            .errorBanner($model.errorNotice)
+            .background {
+                Backdrop()
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        focus = nil
+                    }
+            }
+            .settingsEditConfirmations(edit)
+            .confirmation(
+                isPresented: $isConfirmingDelete,
+                systemImage: "trash",
+                title: "この固定費を削除しますか",
+                message: "これまでに作った記録は残ります",
+                keepTitle: "やめる",
+                confirmTitle: "削除する"
             ) {
-                close()
-            } onHide: {
-                toggleHidden()
-            } onDelete: {
-                isConfirmingDelete = true
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, SettingsSpacing.top)
-        }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-                .onTapGesture {
-                    focus = nil
-                }
-        }
-        .confirmsUnsavedHide(
-            isHidden: model.isHidden,
-            canSave: model.canSave,
-            isPresented: $isConfirmingHideChanges
-        ) {
-            Task {
-                await save(hiding: true)
-            }
-        } onDiscard: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-        }
-        .confirmsDiscard(when: model.isChanged, isPresented: $isConfirmingDiscard) {
-            dismiss()
-        }
-        .confirmation(
-            isPresented: $isConfirmingDelete,
-            systemImage: "trash",
-            title: "この固定費を削除しますか",
-            message: "これまでに作った記録は残ります",
-            keepTitle: "やめる",
-            confirmTitle: "削除する"
-        ) {
-            Task {
-                await delete()
-            }
-        }
-        .animation(.snappy, value: model.isNotificationDenied)
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
                 Task {
-                    await model.refreshAuthorization(permission)
+                    await edit.delete()
                 }
             }
-        }
-        .task {
-            await model.load()
-            await model.refreshAuthorization(permission)
-        }
-        .presentationSizing(.tallForm)
+            .animation(.snappy, value: model.isNotificationDenied)
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    Task {
+                        await model.refreshAuthorization(permission)
+                    }
+                }
+            }
+            .task {
+                await model.load()
+                await model.refreshAuthorization(permission)
+            }
+            .presentationSizing(.tallForm)
     }
 }
 
@@ -127,7 +97,7 @@ extension RecurringEditSheet {
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
             Task {
-                await save()
+                await edit.save()
             }
         }
         .disabled(!model.canSave)
@@ -230,6 +200,22 @@ private extension RecurringEditSheet {
         }
     }
 
+    var edit: SettingsEditController<RecurringEditModel> {
+        SettingsEditController(
+            model: model,
+            prompt: $prompt,
+            dismiss: dismiss,
+            onRest: {
+                closePanel()
+            },
+            onHide: onHide,
+            onDelete: onDelete,
+            onSave: {
+                await model.save(permission: permission)
+            }
+        )
+    }
+
     func showsDone(for panel: Panel) -> Bool {
         ![.amount, .fee, .count].contains(panel)
     }
@@ -258,61 +244,6 @@ private extension RecurringEditSheet {
             self.panel = panel
         }
     }
-
-    func close() {
-        closePanel()
-
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
-    }
-
-    func save(hiding: Bool = false) async {
-        closePanel()
-
-        if await model.save(permission: permission) {
-            if hiding {
-                guard await model.setHidden(!model.isHidden) else {
-                    return
-                }
-
-                if model.isHidden {
-                    onHide()
-                }
-            }
-
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
-            dismiss()
-        }
-    }
-
-    func toggleHidden() {
-        guard model.isChanged else {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-
-            return
-        }
-
-        isConfirmingHideChanges = true
-    }
-
-    func setHidden(_ isHidden: Bool) async {
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
-        }
-    }
 }
+
+extension RecurringEditModel: SettingsEditing {}

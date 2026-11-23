@@ -5,8 +5,7 @@ import SwiftUI
 
 public struct StampEditSheet: View {
     @State private var model: StampEditModel
-    @State private var isConfirmingDiscard = false
-    @State private var isConfirmingHideChanges = false
+    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -44,7 +43,7 @@ public struct StampEditSheet: View {
         } save: {
             PrimaryButton(model.saveTitle) {
                 Task {
-                    await save()
+                    await edit.save()
                 }
             }
             .disabled(!model.canSave)
@@ -55,45 +54,22 @@ public struct StampEditSheet: View {
                 isEditing: model.isEditing,
                 isHidden: model.isHidden
             ) {
-                close()
+                edit.close()
             } onHide: {
-                toggleHidden()
+                edit.toggleHidden()
             } onDelete: {
                 isConfirmingDelete = true
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, SettingsSpacing.side)
             .padding(.top, SettingsSpacing.top)
         }
         .contentShape(.rect)
         .onTapGesture {
             focus = nil
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .confirmsUnsavedHide(
-            isHidden: model.isHidden,
-            canSave: model.canSave,
-            isPresented: $isConfirmingHideChanges
-        ) {
-            Task {
-                await save(hiding: true)
-            }
-        } onDiscard: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-        }
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            dismiss()
-        }
+        .backdrop()
+        .errorBanner($model.errorNotice)
+        .settingsEditConfirmations(edit)
         .confirmation(
             isPresented: $isConfirmingDelete,
             systemImage: "trash",
@@ -103,7 +79,7 @@ public struct StampEditSheet: View {
             confirmTitle: "削除する"
         ) {
             Task {
-                await delete()
+                await edit.delete()
             }
         }
         .task {
@@ -118,65 +94,25 @@ private extension StampEditSheet {
         case text
     }
 
-    func close() {
-        focus = nil
-
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
-    }
-
-    func save(hiding: Bool = false) async {
-        focus = nil
-
-        if await model.save() {
-            if hiding {
-                guard await model.setHidden(!model.isHidden) else {
-                    return
-                }
-
-                if model.isHidden {
-                    onHide()
-                }
+    var edit: SettingsEditController<StampEditModel> {
+        SettingsEditController(
+            model: model,
+            prompt: $prompt,
+            dismiss: dismiss,
+            restsOnHide: true,
+            onRest: {
+                focus = nil
+            },
+            onHide: onHide,
+            onDelete: onDelete,
+            onSave: {
+                await model.save()
             }
-
-            dismiss()
-        }
-    }
-
-    func toggleHidden() {
-        guard model.isChanged else {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-
-            return
-        }
-
-        isConfirmingHideChanges = true
-    }
-
-    func setHidden(_ isHidden: Bool) async {
-        focus = nil
-
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
-            dismiss()
-        }
+        )
     }
 }
+
+extension StampEditModel: SettingsEditing {}
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {
