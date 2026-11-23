@@ -42,12 +42,6 @@ public extension AppDatabase {
         }
     }
 
-    func fee(of id: Entry.ID) async throws -> Entry? {
-        try await writer.read { db in
-            try Self.fee(of: id, in: db)
-        }
-    }
-
     @discardableResult
     func deleteEntry(
         _ id: Entry.ID,
@@ -195,13 +189,6 @@ extension AppDatabase {
         _ = try NoSpendDay.deleteOne(db, key: date)
 
         return [day]
-    }
-
-    static func fee(
-        of id: Entry.ID,
-        in db: Database
-    ) throws -> Entry? {
-        try Entry.filter(Column("transfer_id") == id).fetchOne(db)
     }
 
     @discardableResult
