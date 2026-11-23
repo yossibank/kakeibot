@@ -147,29 +147,12 @@ class EntryModel(
             (options?.sharedCategories ?: emptyList())
 
     private val draft: EntryDraft?
-        get() {
-            val walletId = form.walletId ?: return null
-
-            val templateId = allTemplates
-                .firstOrNull { it.id == form.templateId && it.type == form.type }
-                ?.id
-
-            return EntryDraft(
-                type = form.type,
-                amount = amount,
-                date = form.date,
-                categoryId = form.categoryId,
-                tagId = form.tagId,
-                templateId = templateId,
-                walletId = walletId,
-                toWalletId = form.toWalletId,
-                memo = form.memo,
-                billMonth = form.billMonth,
-                fee = fee,
-                items = if (showsItems) form.items else emptyList(),
-                taxIncluded = form.taxIncluded,
-            )
-        }
+        get() = form.draft(
+            amount = amount,
+            fee = fee,
+            templates = allTemplates,
+            includesItems = showsItems,
+        )
 
     fun icon(of: Identifier<Icon>): Icon? = options?.icons?.get(of)
 

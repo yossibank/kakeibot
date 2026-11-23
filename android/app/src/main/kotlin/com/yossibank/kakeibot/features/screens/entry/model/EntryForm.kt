@@ -5,6 +5,7 @@ import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
@@ -63,6 +64,32 @@ data class EntryForm(
         val lines = memo.split("\n").toMutableList()
         lines[0] = store.replace("\n", " ")
         return copy(memo = lines.joinToString("\n"))
+    }
+
+    fun draft(
+        amount: Int,
+        fee: Int,
+        templates: List<EntryTemplate>,
+        includesItems: Boolean,
+    ): EntryDraft? {
+        val walletId = walletId ?: return null
+        val template = templates.firstOrNull { it.id == templateId && it.type == type }
+
+        return EntryDraft(
+            type = type,
+            amount = amount,
+            date = date,
+            categoryId = categoryId,
+            tagId = tagId,
+            templateId = template?.id,
+            walletId = walletId,
+            toWalletId = toWalletId,
+            memo = memo,
+            billMonth = billMonth,
+            fee = fee,
+            items = if (includesItems) items else emptyList(),
+            taxIncluded = taxIncluded,
+        )
     }
 
     fun cleared(): EntryForm = copy(

@@ -146,7 +146,7 @@ fun BudgetListView(
                 .padding(bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            TotalCard(
+            BudgetTotalCard(
                 model = model,
                 onEdit = { model.startEditing(BudgetListModel.Target.Total) },
                 onReset = {
@@ -170,7 +170,7 @@ fun BudgetListView(
                     note = "合計 ${AmountText.text(amount = model.categoriesTotal)}",
                 ) {
                     RowsCard(categories = model.budgeted) { category ->
-                        CategoryRow(
+                        BudgetCategoryRow(
                             model = model,
                             category = category,
                         )
@@ -184,7 +184,7 @@ fun BudgetListView(
                     note = "${model.unbudgeted.size} カテゴリ",
                 ) {
                     RowsCard(categories = model.unbudgeted) { category ->
-                        PlainRow(
+                        BudgetPlainRow(
                             model = model,
                             category = category,
                         )
@@ -246,126 +246,6 @@ private fun BudgetNotices(
 }
 
 @Composable
-private fun TotalCard(
-    model: BudgetListModel,
-    onEdit: () -> Unit,
-    onReset: () -> Unit,
-) {
-    val usage = model.usage(categoryId = null)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .card()
-            .clickable(onClick = onEdit)
-            .padding(vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "月全体",
-                color = Palette.accent,
-                style = textFont(style = FontTextStyle.Caption),
-            )
-
-            FittedText(
-                text = "${model.month?.month ?: ""}月（${model.periodText}）から使う額",
-                color = Palette.subtext,
-                style = textFont(style = FontTextStyle.Caption),
-            )
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            AmountValue(
-                amount = model.totalAmount,
-                size = FontSize.LargeTitle,
-                weight = FontWeight.Bold,
-            )
-
-            EditMark()
-        }
-
-        AnimatedVisibility(visible = model.isCarryoverOn && usage != null) {
-            if (usage != null) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    FittedText(
-                        text = usage.carryoverText,
-                        color = Palette.subtext,
-                        style = textFont(style = FontTextStyle.Caption),
-                    )
-
-                    if (usage.carryover != 0L) {
-                        Text(
-                            text = "0 に戻す",
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .clickable(onClick = onReset)
-                                .card()
-                                .padding(
-                                    horizontal = 10.dp,
-                                    vertical = 4.dp,
-                                ),
-                            color = Palette.accentStrong,
-                            style = textFont(
-                                size = FontSize.Caption,
-                                weight = FontWeight.SemiBold,
-                            ),
-                        )
-                    }
-                }
-            }
-        }
-
-        if (usage != null) {
-            UsageLine(
-                usage = usage,
-                modifier = Modifier.padding(
-                    start = 24.dp,
-                    top = 4.dp,
-                    end = 24.dp,
-                ),
-            )
-        }
-
-        if (model.recurringExpense > 0) {
-            Row(
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    top = 4.dp,
-                    end = 16.dp,
-                ),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_repeat),
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = Palette.accent,
-                )
-
-                FittedText(
-                    text = model.recurringText,
-                    color = Palette.accent,
-                    style = textFont(style = FontTextStyle.Caption2),
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun Section(
     title: String,
     note: String,
@@ -408,188 +288,5 @@ private fun RowsCard(
 
             row(category)
         }
-    }
-}
-
-@Composable
-private fun CategoryRow(
-    model: BudgetListModel,
-    category: EntryCategory,
-) {
-    val usage = model.usage(categoryId = category.id)
-    val spent = model.spent(categoryId = category.id)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = Metrics.rowMinHeight)
-            .clickable { model.startEditing(BudgetListModel.Target.Category(category)) }
-            .padding(vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconTile(
-                icon = model.icon(category),
-                size = 28.dp,
-            )
-
-            FittedText(
-                text = category.name,
-                modifier = Modifier.weight(1f),
-                color = Palette.text,
-                style = textFont(style = FontTextStyle.Subheadline),
-            )
-
-            AmountValue(
-                amount = model.amount(categoryId = category.id),
-                size = FontSize.Body,
-            )
-
-            EditMark()
-        }
-
-        if (usage != null) {
-            UsageLine(
-                usage = usage,
-                modifier = Modifier.padding(start = 40.dp),
-            )
-        } else if (spent > 0) {
-            SpentText(
-                spent = spent,
-                modifier = Modifier.padding(start = 40.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PlainRow(
-    model: BudgetListModel,
-    category: EntryCategory,
-) {
-    val spent = model.spent(categoryId = category.id)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 48.dp)
-            .clickable { model.startEditing(BudgetListModel.Target.Category(category)) }
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        IconTile(
-            icon = model.icon(category),
-            size = 28.dp,
-        )
-
-        FittedText(
-            text = category.name,
-            modifier = Modifier.weight(1f),
-            color = Palette.text,
-            style = textFont(style = FontTextStyle.Footnote),
-        )
-
-        if (spent > 0) {
-            SpentText(spent = spent)
-        }
-
-        Icon(
-            painter = painterResource(R.drawable.ic_add),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Palette.hint,
-        )
-    }
-}
-
-@Composable
-private fun UsageLine(
-    usage: BudgetUsage,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        BudgetUsageBar(usage = usage)
-
-        Row {
-            SpentText(
-                spent = usage.spent,
-                modifier = Modifier.weight(1f),
-            )
-
-            FittedText(
-                text = usage.remainingText,
-                color = usage.tint,
-                style = textFont(style = FontTextStyle.Caption2),
-            )
-        }
-    }
-}
-
-@Composable
-private fun SpentText(
-    spent: Long,
-    modifier: Modifier = Modifier,
-) {
-    FittedText(
-        text = "使った額 ${AmountText.text(amount = spent.toInt())}",
-        modifier = modifier,
-        color = Palette.subtext,
-        style = textFont(style = FontTextStyle.Caption2),
-    )
-}
-
-@Composable
-private fun AmountValue(
-    amount: Int?,
-    size: FontSize,
-    weight: FontWeight = FontWeight.Normal,
-) {
-    if (amount != null) {
-        AmountText(
-            amount = amount,
-            style = displayFont(
-                size = size,
-                weight = weight,
-            ),
-            color = Palette.accentStrong,
-        )
-    } else {
-        Text(
-            text = "なし",
-            color = Palette.hint,
-            style = displayFont(
-                size = size,
-                weight = weight,
-            ),
-        )
-    }
-}
-
-@Composable
-private fun EditMark() {
-    Box(
-        modifier = Modifier
-            .size(20.dp)
-            .clip(CircleShape)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Muted),
-                shape = CircleShape,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_edit),
-            contentDescription = null,
-            modifier = Modifier.size(12.dp),
-            tint = Palette.accent,
-        )
     }
 }

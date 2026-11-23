@@ -132,7 +132,7 @@ fun RecordsView(
 
         if (model.layout == RecordsLayout.calendar) {
             item(key = "calendar") {
-                CalendarCard(model = model)
+                RecordsCalendarCard(model = model)
             }
 
             item(key = "selected") {
@@ -359,126 +359,6 @@ private fun DayHeader(
             )
         }
     }
-}
-
-@Composable
-private fun CalendarCard(model: RecordsModel) {
-    val selected = model.selectedDate
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .card()
-            .padding(
-                horizontal = 8.dp,
-                vertical = 12.dp,
-            ),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            model.weekdays.forEach { weekday ->
-                Text(
-                    text = weekday.shortName,
-                    modifier = Modifier.weight(1f),
-                    color = weekdayColor(weekday = weekday),
-                    textAlign = TextAlign.Center,
-                    style = textFont(style = FontTextStyle.Caption2),
-                )
-            }
-        }
-
-        model.weeks.forEach { week ->
-            Row(modifier = Modifier.fillMaxWidth()) {
-                week.forEach { date ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (date != null) {
-                            CalendarCell(
-                                date = date,
-                                day = model.day(on = date),
-                                isSelected = date == selected,
-                                isToday = date == model.today,
-                                onSelect = { model.select(date) },
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CalendarCell(
-    date: LocalDate,
-    day: EntryDay?,
-    isSelected: Boolean,
-    isToday: Boolean,
-    onSelect: () -> Unit,
-) {
-    val fill = if (isSelected) Palette.accent else Color.Transparent
-    val rim = if (isToday && !isSelected) Palette.accent else Color.Transparent
-
-    val numberColor = when {
-        isSelected -> Palette.backgroundTop
-
-        Holiday.contains(date) -> Palette.holiday
-
-        else -> weekdayColor(weekday = date.weekday).takeIf { it != Palette.subtext }
-            ?: Palette.text
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 62.dp)
-            .clickable(onClick = onSelect)
-            .padding(vertical = 2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(30.dp)
-                .clip(CircleShape)
-                .background(fill)
-                .border(
-                    width = 1.dp,
-                    color = rim,
-                    shape = CircleShape,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = date.day.toString(),
-                color = numberColor,
-                style = displayFont(size = FontSize.Body),
-            )
-        }
-
-        if (day != null && day.expenseTotal > 0) {
-            AmountText(
-                amount = day.expenseTotal.toInt(),
-                style = displayFont(size = FontSize.Micro),
-                type = Entry.Kind.expense,
-                isCompact = true,
-            )
-        }
-
-        if (day != null && day.incomeTotal > 0) {
-            AmountText(
-                amount = day.incomeTotal.toInt(),
-                style = displayFont(size = FontSize.Micro),
-                type = Entry.Kind.income,
-                isCompact = true,
-            )
-        }
-    }
-}
-
-@Composable
-private fun weekdayColor(weekday: Weekday): Color = when (weekday) {
-    Weekday.sunday -> Palette.holiday
-    Weekday.saturday -> Palette.saturday
-    else -> Palette.subtext
 }
 
 private val layouts = listOf(

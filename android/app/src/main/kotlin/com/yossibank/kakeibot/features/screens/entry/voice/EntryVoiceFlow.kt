@@ -19,6 +19,7 @@ import com.yossibank.kakeibot.features.screens.entry.model.apply
 import com.yossibank.kakeibot.features.screens.entry.model.undo
 import com.yossibank.kakeibot.features.screens.entry.model.voiceHints
 import com.yossibank.kakeibot.features.screens.entry.model.voiceReading
+import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceResult.Outcome
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -47,52 +48,12 @@ class EntryVoiceFlow(
         ) : Phase
     }
 
-    enum class Outcome {
-        Applied,
-        MissingAmount,
-        Unheard,
-        Failed,
-        Downloading,
-        Unsupported,
-    }
-
-    data class Notice(
-        val outcome: Outcome,
-        val count: Int,
-        val text: String,
-        val id: UUID = UUID.randomUUID(),
-    ) {
-        val title: String
-            get() = when (outcome) {
-                Outcome.Applied -> "声から $count つ入れました"
-                Outcome.MissingAmount -> "金額が聞き取れませんでした"
-                Outcome.Unheard -> if (text.isEmpty()) "聞き取れませんでした" else "入れられる項目がありませんでした"
-                Outcome.Failed -> "声を聞き取れませんでした。もう一度押してください"
-                Outcome.Downloading -> "日本語の音声認識を準備しています"
-                Outcome.Unsupported -> "この端末では日本語の音声認識が使えません"
-            }
-
-        val message: String?
-            get() = if (text.isEmpty()) null else "「$text」"
-
-        val hint: String?
-            get() = when (outcome) {
-                Outcome.Applied -> null
-                Outcome.Downloading -> "日本語のデータを入れ終えてから、もう一度押してください"
-                Outcome.Unsupported -> "テンキーで入れてください"
-                else -> "もう一度「声」を押して話すか、テンキーで入れてください"
-            }
-
-        val canUndo: Boolean
-            get() = outcome == Outcome.Applied
-    }
-
     val isAvailable: Boolean = isOnDeviceAvailable(context)
 
     var phase: Phase by mutableStateOf(Phase.Idle)
         private set
 
-    var notice: Notice? by mutableStateOf(null)
+    var notice: EntryVoiceResult? by mutableStateOf(null)
         private set
 
     var startCount: Int by mutableStateOf(0)
@@ -229,7 +190,7 @@ class EntryVoiceFlow(
             if (outcome == null) {
                 deny()
             } else {
-                show(Notice(outcome = outcome, count = 0, text = ""))
+                show(EntryVoiceResult(outcome = outcome, count = 0, text = ""))
             }
         }
 
@@ -293,25 +254,43 @@ class EntryVoiceFlow(
             ?: primary
 
         if (text.isEmpty()) {
-            show(Notice(outcome = Outcome.Unheard, count = 0, text = ""))
+            show(EntryVoiceResult(outcome = Outcome.Unheard, count = 0, text = ""))
             return
         }
 
         val reading = model.voiceReading(text = text, today = session.today)
 
         if (reading.isEmpty) {
-            show(Notice(outcome = Outcome.Unheard, count = 0, text = text))
+            show(
+                EntryVoiceResult(
+                    outcome = Outcome.Unheard,
+                    count = 0,
+                    text = text,
+                ),
+            )
             return
         }
 
         val undo = model.apply(reading)
 
         if (reading.amount == null) {
-            show(Notice(outcome = Outcome.MissingAmount, count = reading.count, text = text))
+            show(
+                EntryVoiceResult(
+                    outcome = Outcome.MissingAmount,
+                    count = reading.count,
+                    text = text,
+                ),
+            )
             return
         }
 
-        show(Notice(outcome = Outcome.Applied, count = reading.count, text = text))
+        show(
+            EntryVoiceResult(
+                outcome = Outcome.Applied,
+                count = reading.count,
+                text = text,
+            ),
+        )
         this.undo = undo
     }
 
@@ -327,7 +306,7 @@ class EntryVoiceFlow(
         return Outcome.Downloading
     }
 
-    private fun show(notice: Notice) {
+    private fun show(notice: EntryVoiceResult) {
         noticeJob?.cancel()
         this.notice = notice
 

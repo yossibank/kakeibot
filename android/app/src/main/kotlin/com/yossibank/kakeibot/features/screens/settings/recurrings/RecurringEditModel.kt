@@ -66,8 +66,12 @@ class RecurringEditModel(
     internal var generatedUntil: LocalDate? = null
         private set
 
-    private var options: EntryOptions? by mutableStateOf(null)
-    private var cardBills: List<Recurring> by mutableStateOf(emptyList())
+    internal var options: EntryOptions? by mutableStateOf(null)
+        private set
+
+    internal var cardBills: List<Recurring> by mutableStateOf(emptyList())
+        private set
+
     private var baseline: RecurringDraft? by mutableStateOf(null)
     private var isHolidayShiftChosen = false
 
@@ -84,9 +88,6 @@ class RecurringEditModel(
 
     val fee: Int
         get() = feeCalculator.amount
-
-    val walletTitle: String
-        get() = EntryText.walletTitle(form.type)
 
     val draft: RecurringDraft
         get() = RecurringDraft(
@@ -109,35 +110,6 @@ class RecurringEditModel(
             remindDaysBefore = form.remindDaysBefore,
         )
 
-    val billRecurring: Recurring?
-        get() {
-            if (form.type == Entry.Kind.transfer) {
-                return null
-            }
-
-            return cardBills.cardBill(paidBy = form.walletId)
-        }
-
-    val billDates: List<LocalDate>
-        get() {
-            val bill = billRecurring ?: return emptyList()
-            val next = previewRow.next ?: return emptyList()
-
-            return bill.billDates(
-                used = next,
-                count = Recurring.billChoiceCount,
-            )
-        }
-
-    val canUseClosingDay: Boolean
-        get() = form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.card
-
-    val isCardBill: Boolean
-        get() = canUseClosingDay && form.closingDay != null
-
-    val isLoanRepayment: Boolean
-        get() = form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.loan
-
     val canSave: Boolean
         get() = draft.problems.isEmpty()
 
@@ -149,25 +121,6 @@ class RecurringEditModel(
 
     val isChanged: Boolean
         get() = baseline?.let { it != draft } ?: false
-
-    val categories: List<EntryCategory>
-        get() = when (form.type) {
-            Entry.Kind.expense -> options?.expenseCategories.orEmpty()
-            Entry.Kind.income -> options?.incomeCategories.orEmpty()
-            Entry.Kind.transfer -> emptyList()
-        }
-
-    val wallets: List<Wallet>
-        get() = options?.wallets.orEmpty()
-
-    val selectedCategory: EntryCategory?
-        get() = categories.firstOrNull { it.id == form.categoryId }
-
-    val selectedWallet: Wallet?
-        get() = wallets.firstOrNull { it.id == form.walletId }
-
-    val selectedDestination: Wallet?
-        get() = wallets.firstOrNull { it.id == form.toWalletId }
 
     private val suggestedHolidayShift: HolidayShift
         get() {
@@ -416,16 +369,6 @@ class RecurringEditModel(
         }
 
         form = form.copy(holidayShift = suggestedHolidayShift)
-    }
-
-    private fun message(problem: RecurringDraft.Problem): String = when (problem) {
-        RecurringDraft.Problem.amountNotPositive -> "金額を入れてください"
-        RecurringDraft.Problem.missingCategory -> "カテゴリを選んでください"
-        RecurringDraft.Problem.missingWallet -> "${walletTitle}を選んでください"
-        RecurringDraft.Problem.missingDestination -> "${EntryText.destinationTitle}を選んでください"
-        RecurringDraft.Problem.sameWallet -> "振替元と振替先を別にしてください"
-        RecurringDraft.Problem.endBeforeStart -> "終わりを始まりより後にしてください"
-        else -> ModelTask.saveFailed
     }
 
     private suspend fun loadRecurring() {

@@ -35,7 +35,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 
 @Composable
 fun EntryVoiceNotice(
-    notice: EntryVoiceFlow.Notice,
+    notice: EntryVoiceResult,
     onUndo: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,

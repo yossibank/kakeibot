@@ -86,7 +86,7 @@ fun EntryTransferArea(
     ) {
         EntryTransferPanel(model = model)
 
-        RouteRow(model = model)
+        EntryTransferRoutes(model = model)
 
         if (model.recentTransfers.isEmpty()) {
             Text(
@@ -361,111 +361,6 @@ private fun BalanceText(
             text = AmountText.text(line.amount.toInt()),
             color = color,
             style = displayFont(size = FontSize.Small),
-        )
-    }
-}
-
-@Composable
-private fun RouteRow(model: EntryModel) {
-    val routes = model.frequentRoutes
-
-    if (routes.isEmpty()) {
-        return
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        routes.forEach { route ->
-            RouteChip(
-                model = model,
-                route = route,
-            )
-        }
-    }
-}
-
-@Composable
-private fun RouteChip(
-    model: EntryModel,
-    route: TransferRoute,
-) {
-    val isApplied =
-        model.form.walletId == route.walletId && model.form.toWalletId == route.toWalletId
-    val fill = if (isApplied) Palette.accent.opacity(Emphasis.Soft) else Color.Transparent
-    val rim = if (isApplied) Palette.accent else Palette.accent.opacity(Emphasis.Muted)
-    val style = textFont(size = FontSize.Caption)
-
-    Row(
-        modifier = Modifier
-            .height(32.dp)
-            .clip(CircleShape)
-            .background(fill)
-            .border(
-                width = 1.dp,
-                color = rim,
-                shape = CircleShape,
-            ).clickable { model.applyRoute(route) }
-            .padding(horizontal = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = model.wallet(of = route.walletId)?.name ?: "",
-            color = Palette.text,
-            style = style,
-        )
-
-        Icon(
-            painter = painterResource(R.drawable.ic_chevron_right),
-            contentDescription = null,
-            modifier = Modifier.size(12.dp),
-            tint = Palette.accent,
-        )
-
-        Text(
-            text = model.wallet(of = route.toWalletId)?.name ?: "",
-            color = Palette.text,
-            style = style,
-        )
-    }
-}
-
-@Composable
-private fun PayOffButton(
-    remaining: Long,
-    onSelect: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .height(40.dp)
-            .clip(CircleShape)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Medium),
-                shape = CircleShape,
-            ).clickable(onClick = onSelect)
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_check),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Palette.accent,
-        )
-
-        Text(
-            text = "残り ${AmountText.text(remaining.toInt())} をまとめて返す",
-            color = Palette.accent,
-            style = textFont(
-                size = FontSize.Small,
-                weight = FontWeight.SemiBold,
-            ),
         )
     }
 }
