@@ -6,11 +6,11 @@ import Store
 
 @MainActor
 @Observable
-public final class StampListModel: ScreenModel {
+public final class StampListModel {
     public var movingOrder: [ShelfIcon.ID]?
     public var errorNotice = ErrorNotice()
 
-    public private(set) var shelf: ShelfIconList?
+    public internal(set) var snapshot: ShelfIconList?
 
     private let database: AppDatabase
 
@@ -20,38 +20,30 @@ public final class StampListModel: ScreenModel {
 }
 
 public extension StampListModel {
-    var visible: [ShelfIcon] {
-        stamps(isHidden: false)
-    }
-
-    var hidden: [ShelfIcon] {
-        stamps(isHidden: true)
-    }
-
     func icon(for shelfIcon: ShelfIcon) -> Icon? {
-        shelf?.icons[shelfIcon.iconId]
-    }
-
-    func load() async {
-        do {
-            shelf = try await database.shelfIconList()
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
-    func observe() async {
-        await observe(database.shelfIconListUpdates(), into: \.shelf)
+        snapshot?.icons[shelfIcon.iconId]
     }
 }
 
-extension StampListModel {
+extension StampListModel: SettingsBoardListModel {
+    typealias Item = ShelfIcon
+
     static let loadFailedMessage = "スタンプを読めませんでした"
-}
 
-private extension StampListModel {
-    func stamps(isHidden: Bool) -> [ShelfIcon] {
-        (shelf?.shelfIcons ?? []).filter { ($0.archivedAt != nil) == isHidden }
+    func read() async throws -> ShelfIconList {
+        try await database.shelfIconList()
+    }
+
+    func updates() -> some AsyncSequence<ShelfIconList, any Error> {
+        database.shelfIconListUpdates()
+    }
+
+    func items(in snapshot: ShelfIconList) -> [ShelfIcon] {
+        snapshot.shelfIcons
+    }
+
+    func isHidden(_ item: ShelfIcon) -> Bool {
+        item.archivedAt != nil
     }
 }
 

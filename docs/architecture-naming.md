@@ -13,7 +13,7 @@
 | Migrations | ファイルと型は、3 桁の通し番号で付ける。複数の番号から呼ぶ固定の SQL は `Migration<役割>` に置く |
 | fixtures | `Core/Concepts/` のフォルダ名を小文字にして置く |
 | `Features/Screens/Settings/` | 子フォルダが 20 を超えたら、下の表の領域の子フォルダでまとめる |
-| 設定の一覧の画面 | 型は `<単数>ListModel`・`<単数>ListView` にする |
+| 設定の一覧の画面 | 型は `<単数>ListModel`・`<単数>ListView`・`<単数>Board` にする |
 | `Features/Shared/SettingsParts/` | ファイルの頭に `Settings` を付ける。Core の型の拡張（`<型>+<役割>`）は除く |
 | `AppWidget/Widgets/` | コントロールの `kind` の文字列は、フォルダを移しても変えない |
 | DesignSystem の題材のフォルダ | `Budget/`・`Date/`・`Entry/`・`Tag/`・`Template/` |
@@ -81,6 +81,9 @@
 | --- | --- | --- |
 | `View` | 押し込んで開く画面の本体 | `BudgetListView` |
 | `Screen` | 同じ種類の画面で使う外枠。中身は画面から受け取る | `SettingsBoardScreen` |
+| `Page` | 同じ種類の画面の全体。状態を持ち、画面ごとの設定を受け取る | `SettingsBoardPage` |
+| `Spec` | 同じ種類の画面で変わる所を書くプロトコル | `SettingsBoardSpec` |
+| `Board` | 設定の一覧の画面ごとの `Spec` の型。`<単数>Board` | `StampBoard` |
 | `Sheet` | シートで開く画面。OS の共有シートを出す型にも使う | `EntrySheet`・`SyncShareSheet` |
 | `EditSheet` | 1 件を編集するシート。モデルは `EditModel` で対にする | `WalletEditSheet` |
 | `Card` | 面を持つ 1 かたまり | `StampTallyCard` |

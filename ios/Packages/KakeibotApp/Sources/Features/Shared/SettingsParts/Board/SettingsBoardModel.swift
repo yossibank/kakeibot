@@ -2,7 +2,7 @@ import DesignSystem
 import Store
 
 @MainActor
-public protocol SettingsBoardModel: AnyObject {
+protocol SettingsBoardModel: AnyObject {
     associatedtype Item: Identifiable where Item.ID: Sendable
 
     var movingOrder: [Item.ID]? { get set }
@@ -25,7 +25,7 @@ public protocol SettingsBoardModel: AnyObject {
     ) async throws
 }
 
-public extension SettingsBoardModel {
+extension SettingsBoardModel {
     var shown: [Item] {
         let visible = visible
 
