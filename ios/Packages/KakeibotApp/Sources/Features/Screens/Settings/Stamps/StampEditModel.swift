@@ -58,7 +58,7 @@ public extension StampEditModel {
 
     func save() async -> Bool {
         do {
-            try await database.saveShelfIcon(
+            try await database.save(
                 icon.draft,
                 editing: editingId,
                 at: Date()
@@ -93,7 +93,7 @@ extension StampEditModel: SettingsEditRemoving {
         _ id: ShelfIcon.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setShelfIconHidden(
+        try await database.setHidden(
             id,
             isHidden: isHidden,
             at: Date()

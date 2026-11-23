@@ -330,7 +330,7 @@ struct CardBillRecalcWriteTests {
             initialBalance: 0
         )
 
-        let payer = try await setup.database.saveWallet(draft, at: setup.now)
+        let payer = try await setup.database.save(draft, at: setup.now)
 
         let payerBill = Recurring(
             type: .transfer,

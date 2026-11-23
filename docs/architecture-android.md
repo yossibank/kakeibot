@@ -100,8 +100,23 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | `AppDatabase+ReviewRequest`（レビューのお願いの記録） | `queries/methods/AppDatabaseEntryHistory.kt` にある |
 | `MonthPlan`・`SettingKey+Scope` | 無い |
 | `Core/Shared/` の `Draft`・`String+Trimmed`、`Icon+Mark` | 無い。各下書きが検証と空白の除去を持つ |
+| `Core/Shared/NamedIconDraft` | 無い。各下書きが名前とアイコンの検証を持つ |
 
-表ごとの読み出し・挿入・全消しは、`records/rows/` の各ファイルの `<名前>Table` にまとめる。型は `records/protocols/TableBinding.kt` にある。書き出しの読み戻しと、削除の取り消しは、この一覧を順に回す。
+保存・並べ替え・非表示は、iOS と同じく汎用の関数にする。iOS は型から表を決め、Android は書き込みの束ねを引数で渡す。
+
+| iOS | Android |
+| --- | --- |
+| `AppDatabase+IconBacked`・`AppDatabase+Ordering` | `writes/methods/AppDatabaseIconBacked.kt`・`AppDatabaseOrdering.kt` |
+| 行の型が表の操作を持つ。`SortableRecord`・`HidableRecord` など | 書き込みの束ねが表の操作を持つ。`SortableTable`・`HidableTable` など |
+| 汎用の関数に型を渡す | 汎用の関数に、`writes/types/` の束ね（`WalletTable` など）を渡す |
+| `Store/Writes/Types/IconBackedDraft` | `core/shared/IconBackedDraft.kt` |
+
+Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す。iOS の同じ名前のプロトコルとは役割が違う。
+
+表ごとの読み出し・挿入・全消しは、`records/rows/` の各ファイルにある一覧にまとめる。一覧は `walletTable` など小文字で始まる値で、型は `TableBinding` である。書き出しの読み戻しと、削除の取り消しは、この一覧を順に回す。
+
+> [!NOTE]
+> 大文字で始まる `writes/types/` の `WalletTable` などは、書き込みの束ねである。`records/rows/` の一覧とは別のものである。
 
 表の形は、`store/src/jvmTest/resources/ios-schema.json` と比べて確かめる。このファイルは iOS の DB から書き出したものである。Room で同じに書けないものは、次のように守る。
 

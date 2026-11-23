@@ -61,8 +61,8 @@ private extension SnapshotTests {
             initialBalance: 0
         )
 
-        let bank = try await database.saveWallet(bankDraft, at: now)
-        let pay = try await database.saveWallet(payDraft, at: now)
+        let bank = try await database.save(bankDraft, at: now)
+        let pay = try await database.save(payDraft, at: now)
 
         let options = try await database.entryOptions()
 

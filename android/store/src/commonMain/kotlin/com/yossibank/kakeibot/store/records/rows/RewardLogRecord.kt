@@ -5,13 +5,13 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.reward.RewardLog
 import com.yossibank.kakeibot.core.concepts.reward.RewardRule
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.InsertableDao
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -50,10 +50,7 @@ data class RewardLogTotal(
 )
 
 @Dao
-interface RewardLogRecordDao {
-    @Insert
-    suspend fun insert(record: RewardLogRecord)
-
+interface RewardLogRecordDao : InsertableDao<RewardLogRecord> {
     @Query("SELECT * FROM reward_log ORDER BY id")
     suspend fun all(): List<RewardLogRecord>
 

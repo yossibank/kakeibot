@@ -1,19 +1,14 @@
 import Foundation
 import GRDB
 
-protocol ArchivableRecord: SortableRecord {
+public protocol ArchivableRecord: HidableRecord {
     var archivedAt: Date? { get set }
 }
 
-extension ArchivableRecord {
-    static func unarchivedInOrder() -> QueryInterfaceRequest<Self> {
-        filter(archivedAt == nil).order(sortOrder)
-    }
-
+public extension ArchivableRecord {
     static func setHidden(
         _ id: ID,
         _ isHidden: Bool,
-        orThrow notFound: some Error,
         in db: Database,
         at now: Date
     ) throws {
@@ -25,6 +20,12 @@ extension ArchivableRecord {
         record.updatedAt = now
 
         try record.update(db)
+    }
+}
+
+extension ArchivableRecord {
+    static func unarchivedInOrder() -> QueryInterfaceRequest<Self> {
+        filter(archivedAt == nil).order(sortOrder)
     }
 }
 

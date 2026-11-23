@@ -5,16 +5,15 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.ArchivableRecord
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -55,10 +54,7 @@ data class EntryCategoryRecord(
 ) : ArchivableRecord
 
 @Dao
-interface EntryCategoryRecordDao {
-    @Insert
-    suspend fun insert(record: EntryCategoryRecord)
-
+interface EntryCategoryRecordDao : UpdatableDao<EntryCategoryRecord> {
     @Query("SELECT * FROM category WHERE id = :id")
     suspend fun find(id: String): EntryCategoryRecord?
 
@@ -112,9 +108,6 @@ interface EntryCategoryRecordDao {
         "SELECT * FROM category WHERE archived_at IS NULL AND wallet_id IS NOT NULL ORDER BY sort_order",
     )
     suspend fun unarchivedOfWallets(): List<EntryCategoryRecord>
-
-    @Update
-    suspend fun update(record: EntryCategoryRecord)
 
     @Query("DELETE FROM category WHERE id = :id")
     suspend fun delete(id: String)

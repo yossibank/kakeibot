@@ -259,6 +259,6 @@ extension TemplateEditModel: SettingsEditRemoving {
         _ id: EntryTemplate.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setTemplateHidden(id, isHidden: isHidden, at: Date())
+        try await database.setHidden(id, isHidden: isHidden, at: Date())
     }
 }

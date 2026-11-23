@@ -2,13 +2,15 @@ package com.yossibank.kakeibot.core.concepts.icon
 
 import com.yossibank.kakeibot.core.shared.DraftProblem
 import com.yossibank.kakeibot.core.shared.DraftProblemException
+import com.yossibank.kakeibot.core.shared.IconBackedDraft
+import com.yossibank.kakeibot.core.shared.Identifier
 import java.text.BreakIterator
 import java.time.Instant
 
 data class IconDraft(
     val mark: Mark,
     val color: String,
-) {
+) : IconBackedDraft<ShelfIcon> {
     constructor(icon: Icon) : this(
         mark = Mark.of(icon),
         color = icon.color,
@@ -86,7 +88,7 @@ data class IconDraft(
     private val text: String?
         get() = (mark as? Mark.Text)?.let { trimmed(it.value) }
 
-    fun newIcon(at: Instant): Icon {
+    override fun newIcon(at: Instant): Icon {
         validate()
 
         return Icon(
@@ -99,7 +101,18 @@ data class IconDraft(
         )
     }
 
-    fun applied(
+    override fun newValue(
+        iconId: Identifier<Icon>,
+        sortOrder: Int,
+        at: Instant,
+    ): ShelfIcon = ShelfIcon(
+        iconId = iconId,
+        sortOrder = sortOrder,
+        createdAt = at,
+        updatedAt = at,
+    )
+
+    override fun applied(
         to: Icon,
         at: Instant,
     ): Icon {
@@ -113,6 +126,11 @@ data class IconDraft(
             updatedAt = at,
         )
     }
+
+    override fun applied(
+        to: ShelfIcon,
+        at: Instant,
+    ): ShelfIcon = to.copy(updatedAt = at)
 
     private fun validate() {
         val problem = problems.firstOrNull() ?: return

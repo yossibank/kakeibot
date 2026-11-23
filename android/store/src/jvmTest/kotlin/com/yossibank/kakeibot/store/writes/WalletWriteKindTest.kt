@@ -9,11 +9,12 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.DraftProblem
 import com.yossibank.kakeibot.core.shared.DraftProblemException
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
+import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.saveRecurring
 import com.yossibank.kakeibot.store.writes.methods.saveValuation
-import com.yossibank.kakeibot.store.writes.methods.saveWallet
 import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
+import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -39,7 +40,8 @@ class WalletWriteKindTest {
         setup.database.saveEntry(entry, at = setup.now)
 
         val error = assertFailsWith<DraftProblemException> {
-            setup.database.saveWallet(
+            setup.database.save(
+                WalletTable,
                 setup.draft.copy(kind = Wallet.Kind.card),
                 editing = bank.id,
                 at = setup.now,
@@ -88,7 +90,8 @@ class WalletWriteKindTest {
         )
 
         val error = assertFailsWith<DraftProblemException> {
-            setup.database.saveWallet(
+            setup.database.save(
+                WalletTable,
                 setup.draft.copy(kind = Wallet.Kind.card),
                 editing = cash.id,
                 at = setup.now,
@@ -105,7 +108,7 @@ class WalletWriteKindTest {
         val setup = WalletWriteTest.Setup.make()
         val day = assertNotNull(LocalDate.parse("2026-10-10"))
         val investment = setup.draft.copy(kind = Wallet.Kind.investment)
-        val saved = setup.database.saveWallet(investment, at = setup.now)
+        val saved = setup.database.save(WalletTable, investment, at = setup.now)
 
         setup.database.saveValuation(
             150_000,
@@ -115,7 +118,8 @@ class WalletWriteKindTest {
         )
 
         val error = assertFailsWith<DraftProblemException> {
-            setup.database.saveWallet(
+            setup.database.save(
+                WalletTable,
                 investment.copy(kind = Wallet.Kind.bank),
                 editing = saved.id,
                 at = setup.now,
@@ -130,9 +134,10 @@ class WalletWriteKindTest {
     @Test
     fun changesKindFreelyWithoutRecords() = runTest {
         val setup = WalletWriteTest.Setup.make()
-        val saved = setup.database.saveWallet(setup.draft, at = setup.now)
+        val saved = setup.database.save(WalletTable, setup.draft, at = setup.now)
 
-        val updated = setup.database.saveWallet(
+        val updated = setup.database.save(
+            WalletTable,
             setup.draft.copy(kind = Wallet.Kind.cash),
             editing = saved.id,
             at = setup.now,

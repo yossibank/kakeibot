@@ -218,11 +218,11 @@ private extension SnapshotTests {
             targetAmount: 1_234_567
         )
 
-        let wallet = try await database.saveWallet(walletDraft, at: now)
+        let wallet = try await database.save(walletDraft, at: now)
         let category = try await database.saveCategory(categoryDraft, tags: [], at: now)
         let tagDraft = EntryTagDraft(name: "発表会の衣装と靴")
         let tags = try await database.saveTags([tagDraft], for: category.id, at: now)
-        let rule = try await database.saveRewardRule(ruleDraft, at: now)
+        let rule = try await database.save(ruleDraft, at: now)
         let options = try await database.entryOptions()
 
         _ = try await database.saveRewardGoal(goalDraft, at: now)
@@ -309,7 +309,7 @@ private extension SnapshotTests {
             initialBalance: 0
         )
 
-        let card = try await database.saveWallet(cardDraft, at: now)
+        let card = try await database.save(cardDraft, at: now)
         let lastMonth = today.yearMonth.adding(months: -1)
         let start = try #require(LocalDate(yearMonth: lastMonth, day: 1))
 

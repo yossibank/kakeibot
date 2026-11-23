@@ -1,6 +1,6 @@
 import Foundation
 
-public struct WalletDraft: Draft, Hashable, Sendable {
+public struct WalletDraft: NamedIconDraft, Hashable, Sendable {
     public var kind: Wallet.Kind
     public var name: String
     public var mark: IconDraft.Mark
@@ -46,13 +46,8 @@ public struct WalletDraft: Draft, Hashable, Sendable {
 }
 
 public extension WalletDraft {
-    var icon: IconDraft {
-        IconDraft(mark: mark, color: color)
-    }
-
     var problems: [DraftProblem] {
-        let nameProblems: [DraftProblem] = trimmedName.isEmpty ? [.emptyName] : []
-        return nameProblems + icon.problems + kindProblems
+        namedIconProblems + kindProblems
     }
 
     func locked(
@@ -66,11 +61,6 @@ public extension WalletDraft {
         locked.hasValuations = hasValuations
 
         return locked
-    }
-
-    func newIcon(at now: Date) throws -> Icon {
-        try validate()
-        return try icon.newIcon(at: now)
     }
 
     func newWallet(
@@ -90,14 +80,6 @@ public extension WalletDraft {
             createdAt: now,
             updatedAt: now
         )
-    }
-
-    func applied(
-        to icon: Icon,
-        at now: Date
-    ) throws -> Icon {
-        try validate()
-        return try self.icon.applied(to: icon, at: now)
     }
 
     func applied(
@@ -135,10 +117,6 @@ private extension WalletDraft {
         }
 
         return []
-    }
-
-    var trimmedName: String {
-        name.trimmed
     }
 
     var savedLoanAmount: Int? {

@@ -1,9 +1,12 @@
 import Foundation
 import GRDB
 
-protocol SortableRecord: StoreRecord, Identifiable where ID: DatabaseValueConvertible {
+public protocol SortableRecord: StoreRecord, Identifiable, Sendable
+    where ID: DatabaseValueConvertible & Sendable {
     var sortOrder: Int { get set }
     var updatedAt: Date { get set }
+
+    static var notFound: any Error { get }
 }
 
 extension SortableRecord {
@@ -13,7 +16,6 @@ extension SortableRecord {
 
     static func reorder(
         _ ids: [ID],
-        orThrow notFound: some Error,
         in db: Database,
         at now: Date
     ) throws {

@@ -10,10 +10,11 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
 import com.yossibank.kakeibot.store.writes.methods.deleteWallet
+import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveRecurring
-import com.yossibank.kakeibot.store.writes.methods.saveWallet
 import com.yossibank.kakeibot.store.writes.types.Deletion
 import com.yossibank.kakeibot.store.writes.types.DeletionSubject
+import com.yossibank.kakeibot.store.writes.types.WalletTable
 import com.yossibank.kakeibot.store.writes.types.subject
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -25,7 +26,7 @@ class DeletionSubjectTest {
     @Test
     fun namesDeletedWallet() = runTest {
         val setup = WalletWriteTest.Setup.make()
-        val card = setup.database.saveWallet(setup.draft, at = setup.now)
+        val card = setup.database.save(WalletTable, setup.draft, at = setup.now)
 
         val deletion = setup.database.deleteWallet(
             card.id,
@@ -94,8 +95,8 @@ class DeletionSubjectTest {
     @Test
     fun countsMergedDeletions() = runTest {
         val setup = WalletWriteTest.Setup.make()
-        val first = setup.database.saveWallet(setup.draft, at = setup.now)
-        val second = setup.database.saveWallet(setup.draft, at = setup.now)
+        val first = setup.database.save(WalletTable, setup.draft, at = setup.now)
+        val second = setup.database.save(WalletTable, setup.draft, at = setup.now)
 
         val deletions = listOf(
             setup.database.deleteWallet(

@@ -2,7 +2,7 @@ import Core
 import Foundation
 import WidgetKit
 
-struct BudgetWidgetEntry: TimelineEntry {
+struct BudgetWidgetEntry: WidgetFallbackEntry {
     let date: Date
     let summary: BudgetWidgetSummary?
     let look: ThemeLook

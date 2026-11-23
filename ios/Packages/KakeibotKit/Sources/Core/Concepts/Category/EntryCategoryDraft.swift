@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryCategoryDraft: Draft, Hashable, Sendable {
+public struct EntryCategoryDraft: NamedIconDraft, Hashable, Sendable {
     public var kind: EntryCategory.Kind
     public var name: String
     public var mark: Mark
@@ -32,18 +32,8 @@ public extension EntryCategoryDraft {
 
     static let maxTextLength = IconDraft.maxTextLength
 
-    var icon: IconDraft {
-        IconDraft(mark: mark, color: color)
-    }
-
     var problems: [Problem] {
-        let nameProblems: [Problem] = trimmedName.isEmpty ? [.emptyName] : []
-        return nameProblems + icon.problems
-    }
-
-    func newIcon(at now: Date) throws -> Icon {
-        try validate()
-        return try icon.newIcon(at: now)
+        namedIconProblems
     }
 
     func newCategory(
@@ -64,14 +54,6 @@ public extension EntryCategoryDraft {
     }
 
     func applied(
-        to icon: Icon,
-        at now: Date
-    ) throws -> Icon {
-        try validate()
-        return try self.icon.applied(to: icon, at: now)
-    }
-
-    func applied(
         to category: EntryCategory,
         at now: Date
     ) throws -> EntryCategory {
@@ -83,11 +65,5 @@ public extension EntryCategoryDraft {
         updated.updatedAt = now
 
         return updated
-    }
-}
-
-private extension EntryCategoryDraft {
-    var trimmedName: String {
-        name.trimmed
     }
 }

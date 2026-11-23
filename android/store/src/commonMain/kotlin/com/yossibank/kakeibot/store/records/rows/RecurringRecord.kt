@@ -4,10 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
@@ -17,6 +15,7 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.SortableRecord
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -70,10 +69,7 @@ data class RecurringRecord(
 ) : SortableRecord
 
 @Dao
-interface RecurringRecordDao {
-    @Insert
-    suspend fun insert(record: RecurringRecord)
-
+interface RecurringRecordDao : UpdatableDao<RecurringRecord> {
     @Query("SELECT * FROM recurring ORDER BY id")
     suspend fun all(): List<RecurringRecord>
 
@@ -97,9 +93,6 @@ interface RecurringRecordDao {
 
     @Query("SELECT * FROM recurring WHERE id = :id")
     suspend fun find(id: String): RecurringRecord?
-
-    @Update
-    suspend fun update(record: RecurringRecord)
 
     @Query("SELECT MAX(sort_order) FROM recurring")
     suspend fun maxSortOrder(): Int?

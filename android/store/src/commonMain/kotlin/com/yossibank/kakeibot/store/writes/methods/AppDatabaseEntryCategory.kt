@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.records.rows.recurring
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import com.yossibank.kakeibot.store.writes.types.Deletion
+import com.yossibank.kakeibot.store.writes.types.EntryCategoryTable
 import java.time.Instant
 
 enum class CategoryWriteError {
@@ -45,13 +46,15 @@ suspend fun AppDatabase.saveCategory(
     at: Instant,
 ): EntryCategory = write {
     val category = if (editing != null) {
-        updateCategory(
+        updateIconBacked(
+            table = EntryCategoryTable,
             id = editing,
             with = draft,
             at = at,
         )
     } else {
-        insertCategory(
+        insertIconBacked(
+            table = EntryCategoryTable,
             draft = draft,
             at = at,
         )
@@ -76,38 +79,6 @@ suspend fun AppDatabase.saveTags(
         categoryId = categoryId,
         at = at,
     )
-}
-
-suspend fun AppDatabase.reorderCategories(
-    ids: List<Identifier<EntryCategory>>,
-    at: Instant,
-) {
-    write {
-        reorder(
-            table = "category",
-            ids = ids.map { it.databaseValue },
-            notFound = CategoryWriteException(CategoryWriteError.categoryNotFound),
-            now = at,
-        )
-    }
-}
-
-suspend fun AppDatabase.setCategoryHidden(
-    id: Identifier<EntryCategory>,
-    isHidden: Boolean,
-    at: Instant,
-) {
-    write {
-        val category =
-            findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
-
-        val updated = category.copy(
-            archivedAt = if (isHidden) at else null,
-            updatedAt = at,
-        )
-
-        categoryDao().update(updated.record())
-    }
 }
 
 suspend fun AppDatabase.deleteCategory(
@@ -152,52 +123,6 @@ suspend fun AppDatabase.deleteCategory(
 
 private suspend fun AppDatabase.findCategory(id: Identifier<EntryCategory>): EntryCategory? =
     categoryDao().find(id.databaseValue)?.decoded(EntryCategoryRecord::entryCategory)
-
-private suspend fun AppDatabase.insertCategory(
-    draft: EntryCategoryDraft,
-    at: Instant,
-): EntryCategory {
-    val icon = draft.newIcon(at)
-    val sortOrder = nextSortOrder(categoryDao().maxSortOrderWithoutWallet(draft.kind.rawValue))
-
-    val category = draft.newCategory(
-        iconId = icon.id,
-        sortOrder = sortOrder,
-        at = at,
-    )
-
-    iconDao().insert(icon.record())
-    categoryDao().insert(category.record())
-
-    return category
-}
-
-private suspend fun AppDatabase.updateCategory(
-    id: Identifier<EntryCategory>,
-    with: EntryCategoryDraft,
-    at: Instant,
-): EntryCategory {
-    val existing =
-        findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
-
-    val icon = iconDao().find(existing.iconId.databaseValue)?.decoded(IconRecord::icon)
-        ?: throw CategoryWriteException(CategoryWriteError.iconNotFound)
-
-    val category = with.applied(
-        to = existing,
-        at = at,
-    )
-
-    val updatedIcon = with.applied(
-        to = icon,
-        at = at,
-    )
-
-    iconDao().update(updatedIcon.record())
-    categoryDao().update(category.record())
-
-    return category
-}
 
 private suspend fun AppDatabase.storeTags(
     drafts: List<EntryTagDraft>,

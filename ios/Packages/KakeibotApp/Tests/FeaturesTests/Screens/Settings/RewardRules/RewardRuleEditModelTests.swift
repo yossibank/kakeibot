@@ -39,7 +39,7 @@ struct RewardRuleEditModelTests {
         let database = try AppDatabase.inMemory()
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
-        let rule = try await database.saveRewardRule(draft, at: Date())
+        let rule = try await database.save(draft, at: Date())
         let model = RewardRuleEditModel(database: database, editing: rule.id)
         await model.load()
 
@@ -120,6 +120,6 @@ private extension RewardRuleEditModelTests {
     static func saveRule(in database: AppDatabase) async throws -> RewardRule {
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
-        return try await database.saveRewardRule(draft, at: Date())
+        return try await database.save(draft, at: Date())
     }
 }

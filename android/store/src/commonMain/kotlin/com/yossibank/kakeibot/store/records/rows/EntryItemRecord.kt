@@ -5,7 +5,6 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
@@ -13,6 +12,7 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.InsertableDao
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -50,10 +50,7 @@ data class EntryItemRecord(
 )
 
 @Dao
-interface EntryItemRecordDao {
-    @Insert
-    suspend fun insert(record: EntryItemRecord)
-
+interface EntryItemRecordDao : InsertableDao<EntryItemRecord> {
     @Query("SELECT * FROM entry_item ORDER BY id")
     suspend fun all(): List<EntryItemRecord>
 

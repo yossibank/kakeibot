@@ -149,20 +149,6 @@ suspend fun AppDatabase.deleteRecurrings(
     )
 }
 
-suspend fun AppDatabase.reorderRecurrings(
-    ids: List<Identifier<Recurring>>,
-    at: Instant,
-) {
-    write {
-        reorder(
-            table = "recurring",
-            ids = ids.map { it.databaseValue },
-            notFound = RecurringWriteException(RecurringWriteError.recurringNotFound),
-            now = at,
-        )
-    }
-}
-
 suspend fun AppDatabase.recordRecurring(
     id: Identifier<Recurring>,
     on: LocalDate,

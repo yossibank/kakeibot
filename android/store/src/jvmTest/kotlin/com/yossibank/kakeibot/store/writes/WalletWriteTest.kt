@@ -19,14 +19,15 @@ import com.yossibank.kakeibot.store.snapshot.snapshot
 import com.yossibank.kakeibot.store.writes.methods.WalletWriteError
 import com.yossibank.kakeibot.store.writes.methods.WalletWriteException
 import com.yossibank.kakeibot.store.writes.methods.deleteWallet
-import com.yossibank.kakeibot.store.writes.methods.reorderWallets
+import com.yossibank.kakeibot.store.writes.methods.reorder
 import com.yossibank.kakeibot.store.writes.methods.restore
+import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.saveRecurring
 import com.yossibank.kakeibot.store.writes.methods.saveValuation
-import com.yossibank.kakeibot.store.writes.methods.saveWallet
-import com.yossibank.kakeibot.store.writes.methods.setWalletHidden
+import com.yossibank.kakeibot.store.writes.methods.setHidden
 import com.yossibank.kakeibot.store.writes.types.Deletion
+import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -42,7 +43,7 @@ class WalletWriteTest {
     fun addsWalletAtTheEnd() = runTest {
         val setup = Setup.make()
 
-        val saved = setup.database.saveWallet(setup.draft, at = setup.now)
+        val saved = setup.database.save(WalletTable, setup.draft, at = setup.now)
         val list = setup.database.entryList()
         val icon = assertNotNull(list.icons[saved.iconId])
 
@@ -68,7 +69,8 @@ class WalletWriteTest {
             initialBalance = 120_000,
         )
 
-        val updated = setup.database.saveWallet(
+        val updated = setup.database.save(
+            WalletTable,
             draft,
             editing = bank.id,
             at = later,
@@ -97,10 +99,11 @@ class WalletWriteTest {
             loanAmount = 300_000,
         )
 
-        val saved = setup.database.saveWallet(draft, at = setup.now)
+        val saved = setup.database.save(WalletTable, draft, at = setup.now)
         val list = setup.database.entryList()
 
-        val updated = setup.database.saveWallet(
+        val updated = setup.database.save(
+            WalletTable,
             draft.copy(kind = Wallet.Kind.bank),
             editing = saved.id,
             at = setup.now,
@@ -122,7 +125,8 @@ class WalletWriteTest {
         val cash = setup.wallet(named = "財布")
         val bank = setup.wallet(named = "銀行")
 
-        setup.database.reorderWallets(
+        setup.database.reorder(
+            WalletTable,
             listOf(bank.id, cash.id),
             at = setup.now,
         )
@@ -139,7 +143,8 @@ class WalletWriteTest {
         val setup = Setup.make()
         val bank = setup.wallet(named = "銀行")
 
-        setup.database.setWalletHidden(
+        setup.database.setHidden(
+            WalletTable,
             bank.id,
             isHidden = true,
             at = setup.now,
@@ -147,7 +152,8 @@ class WalletWriteTest {
 
         val hidden = setup.database.entryOptions()
 
-        setup.database.setWalletHidden(
+        setup.database.setHidden(
+            WalletTable,
             bank.id,
             isHidden = false,
             at = setup.now,
@@ -167,14 +173,16 @@ class WalletWriteTest {
         val cash = setup.wallet(named = "財布")
         val bank = setup.wallet(named = "銀行")
 
-        setup.database.setWalletHidden(
+        setup.database.setHidden(
+            WalletTable,
             bank.id,
             isHidden = true,
             at = setup.now,
         )
 
         val error = assertFailsWith<WalletWriteException> {
-            setup.database.setWalletHidden(
+            setup.database.setHidden(
+                WalletTable,
                 cash.id,
                 isHidden = true,
                 at = setup.now,
@@ -190,7 +198,7 @@ class WalletWriteTest {
     fun deletesWalletWithItsRecurringsAndValuations() = runTest {
         val setup = Setup.make()
         val bank = setup.wallet(named = "銀行")
-        val card = setup.database.saveWallet(setup.draft, at = setup.now)
+        val card = setup.database.save(WalletTable, setup.draft, at = setup.now)
         val day = assertNotNull(LocalDate.parse("2026-11-01"))
 
         val draft = RecurringDraft(
@@ -243,7 +251,7 @@ class WalletWriteTest {
     @Test
     fun deletesWalletIconWithWallet() = runTest {
         val setup = Setup.make()
-        val wallet = setup.database.saveWallet(setup.draft, at = setup.now)
+        val wallet = setup.database.save(WalletTable, setup.draft, at = setup.now)
 
         val deletion = setup.database.deleteWallet(
             wallet.id,
@@ -263,8 +271,12 @@ class WalletWriteTest {
     @Test
     fun restoresMergedDeletions() = runTest {
         val setup = Setup.make()
-        val first = setup.database.saveWallet(setup.draft, at = setup.now)
-        val second = setup.database.saveWallet(setup.draft.copy(name = "PayPay"), at = setup.now)
+        val first = setup.database.save(WalletTable, setup.draft, at = setup.now)
+        val second = setup.database.save(
+            WalletTable,
+            setup.draft.copy(name = "PayPay"),
+            at = setup.now,
+        )
 
         val deletions = listOf(
             setup.database.deleteWallet(
@@ -323,7 +335,8 @@ class WalletWriteTest {
         val setup = Setup.make()
 
         val error = assertFailsWith<WalletWriteException> {
-            setup.database.saveWallet(
+            setup.database.save(
+                WalletTable,
                 setup.draft,
                 editing = Identifier(),
                 at = setup.now,

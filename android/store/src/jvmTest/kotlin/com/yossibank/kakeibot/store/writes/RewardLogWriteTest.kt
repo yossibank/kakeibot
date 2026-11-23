@@ -13,9 +13,10 @@ import com.yossibank.kakeibot.store.queries.methods.rewardRuleList
 import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.writes.methods.RewardRuleWriteError
 import com.yossibank.kakeibot.store.writes.methods.RewardRuleWriteException
-import com.yossibank.kakeibot.store.writes.methods.saveRewardRule
+import com.yossibank.kakeibot.store.writes.methods.save
+import com.yossibank.kakeibot.store.writes.methods.setHidden
 import com.yossibank.kakeibot.store.writes.methods.setReward
-import com.yossibank.kakeibot.store.writes.methods.setRewardRuleHidden
+import com.yossibank.kakeibot.store.writes.types.RewardRuleTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -67,7 +68,8 @@ class RewardLogWriteTest {
             icon = setup.icon,
         )
 
-        setup.database.saveRewardRule(
+        setup.database.save(
+            RewardRuleTable,
             draft,
             editing = setup.rule.id,
             at = setup.now,
@@ -142,7 +144,8 @@ class RewardLogWriteTest {
     fun rejectsAchievingHiddenRule() = runTest {
         val setup = Setup.make()
 
-        setup.database.setRewardRuleHidden(
+        setup.database.setHidden(
+            RewardRuleTable,
             setup.rule.id,
             isHidden = true,
             at = setup.now,
@@ -212,7 +215,7 @@ class RewardLogWriteTest {
 
                 return Setup(
                     database = database,
-                    rule = database.saveRewardRule(draft, at = Instant.ofEpochSecond(0)),
+                    rule = database.save(RewardRuleTable, draft, at = Instant.ofEpochSecond(0)),
                     date = assertNotNull(LocalDate.parse("2026-10-22")),
                 )
             }

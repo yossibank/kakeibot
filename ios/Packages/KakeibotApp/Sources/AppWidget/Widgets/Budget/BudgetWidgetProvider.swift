@@ -3,39 +3,11 @@ import Foundation
 import Store
 import WidgetKit
 
-struct BudgetWidgetProvider: TimelineProvider {
-    func placeholder(in context: Context) -> BudgetWidgetEntry {
-        .sample(at: Date())
-    }
-
-    func getSnapshot(
-        in context: Context,
-        completion: @escaping @Sendable (BudgetWidgetEntry) -> Void
-    ) {
-        let isPreview = context.isPreview
-
-        Task {
-            let now = Date()
-            let timeline = await Self.timeline(at: now, isPreview: isPreview)
-            let entry = timeline.entries.first ?? .sample(at: now)
-            completion(entry)
-        }
-    }
-
-    func getTimeline(
-        in context: Context,
-        completion: @escaping @Sendable (Timeline<BudgetWidgetEntry>) -> Void
-    ) {
-        let isPreview = context.isPreview
-
-        Task {
-            let timeline = await Self.timeline(at: Date(), isPreview: isPreview)
-            completion(timeline)
-        }
-    }
+struct BudgetWidgetProvider: WidgetTimelineProvider {
+    typealias Entry = BudgetWidgetEntry
 }
 
-private extension BudgetWidgetProvider {
+extension BudgetWidgetProvider {
     static func timeline(
         at now: Date,
         isPreview: Bool
@@ -46,13 +18,7 @@ private extension BudgetWidgetProvider {
             let database = try? AppDatabase.appGroupForReading(),
             let overview = try? await database.widgetOverview(on: today)
         else {
-            let entry: BudgetWidgetEntry = isPreview
-                ? .sample(at: now)
-                : .empty(at: now)
-
-            let retry = now.addingTimeInterval(WidgetTimeline.retryInterval)
-
-            return Timeline(entries: [entry], policy: .after(retry))
+            return fallbackTimeline(at: now, isPreview: isPreview)
         }
 
         let look = await database.widgetLook()

@@ -143,7 +143,7 @@ struct EntryModelTransferTests {
             initialBalance: -5000
         )
 
-        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let card = try await setup.database.save(wallet, at: Date())
         let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
@@ -167,7 +167,7 @@ struct EntryModelTransferTests {
             initialBalance: -100_000
         )
 
-        let loan = try await setup.database.saveWallet(wallet, at: Date())
+        let loan = try await setup.database.save(wallet, at: Date())
         let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
@@ -246,7 +246,7 @@ struct EntryModelTransferTests {
         let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
-        try await setup.database.setWalletHidden(setup.cash, isHidden: true, at: Date())
+        try await setup.database.setHidden(setup.cash, isHidden: true, at: Date())
         await model.reloadWallets()
 
         #expect(model.walletId != setup.cash)
@@ -260,7 +260,7 @@ struct EntryModelTransferTests {
         let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
 
         await model.load()
-        try await setup.database.setWalletHidden(setup.bank, isHidden: true, at: Date())
+        try await setup.database.setHidden(setup.bank, isHidden: true, at: Date())
         await model.reloadWallets()
 
         #expect(model.walletId == setup.cash)

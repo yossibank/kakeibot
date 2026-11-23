@@ -4,15 +4,14 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.icon.ShelfIcon
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.ArchivableRecord
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -39,10 +38,7 @@ data class ShelfIconRecord(
 ) : ArchivableRecord
 
 @Dao
-interface ShelfIconRecordDao {
-    @Insert
-    suspend fun insert(record: ShelfIconRecord)
-
+interface ShelfIconRecordDao : UpdatableDao<ShelfIconRecord> {
     @Query("SELECT * FROM shelf_icon WHERE id = :id")
     suspend fun find(id: String): ShelfIconRecord?
 
@@ -57,9 +53,6 @@ interface ShelfIconRecordDao {
 
     @Query("SELECT * FROM shelf_icon ORDER BY sort_order")
     suspend fun inOrder(): List<ShelfIconRecord>
-
-    @Update
-    suspend fun update(record: ShelfIconRecord)
 
     @Query("DELETE FROM shelf_icon WHERE id = :id")
     suspend fun delete(id: String)

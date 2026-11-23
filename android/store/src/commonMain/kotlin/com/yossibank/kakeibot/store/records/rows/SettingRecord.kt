@@ -2,11 +2,11 @@ package com.yossibank.kakeibot.store.records.rows
 
 import androidx.room.Dao
 import androidx.room.Entity
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.setting.Setting
+import com.yossibank.kakeibot.store.records.protocols.InsertableDao
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
 import com.yossibank.kakeibot.store.records.protocols.decoded
 
@@ -17,10 +17,7 @@ data class SettingRecord(
 )
 
 @Dao
-interface SettingRecordDao {
-    @Insert
-    suspend fun insert(record: SettingRecord)
-
+interface SettingRecordDao : InsertableDao<SettingRecord> {
     @Upsert
     suspend fun save(record: SettingRecord)
 

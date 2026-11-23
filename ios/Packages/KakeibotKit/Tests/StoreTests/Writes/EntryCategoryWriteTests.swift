@@ -68,7 +68,7 @@ struct EntryCategoryWriteTests {
         let ids = before.map(\.id)
         let reversed = Array(ids.reversed())
 
-        try await setup.database.reorderCategories(reversed, at: setup.now)
+        try await setup.database.reorder(reversed, at: setup.now)
         let after = try await setup.expenseCategories()
 
         #expect(after.map(\.id) == reversed)
@@ -117,9 +117,9 @@ struct EntryCategoryWriteTests {
         let setup = try await Setup()
         let food = try await setup.category(named: "食費")
 
-        try await setup.database.setCategoryHidden(food.id, isHidden: true, at: setup.now)
+        try await setup.database.setHidden(food.id, isHidden: true, at: setup.now)
         let hiddenOptions = try await setup.database.entryOptions()
-        try await setup.database.setCategoryHidden(food.id, isHidden: false, at: setup.now)
+        try await setup.database.setHidden(food.id, isHidden: false, at: setup.now)
         let shownOptions = try await setup.database.entryOptions()
 
         #expect(!hiddenOptions.expenseCategories.contains { $0.id == food.id })

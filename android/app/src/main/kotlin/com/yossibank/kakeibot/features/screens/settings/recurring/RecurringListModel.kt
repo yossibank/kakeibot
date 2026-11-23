@@ -25,10 +25,11 @@ import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurrings
-import com.yossibank.kakeibot.store.writes.methods.reorderRecurrings
+import com.yossibank.kakeibot.store.writes.methods.reorder
 import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
 import com.yossibank.kakeibot.store.writes.types.Deletion
+import com.yossibank.kakeibot.store.writes.types.RecurringTable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -152,7 +153,8 @@ class RecurringListModel(
         val others = recurrings.map { it.id }.filter { it !in order }
 
         task.attempt(failure = ModelTask.saveFailed) {
-            database.reorderRecurrings(
+            database.reorder(
+                RecurringTable,
                 ids = order + others,
                 at = Instant.now(),
             )

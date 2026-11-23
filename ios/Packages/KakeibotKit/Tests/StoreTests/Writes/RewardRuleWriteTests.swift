@@ -29,7 +29,7 @@ struct RewardRuleWriteTests {
         let lunchIcon = IconDraft(mark: .text("弁"), color: "#9C6ADE")
         let draft = RewardRuleDraft(name: " お弁当の日 ", amount: 300, icon: lunchIcon)
 
-        let updated = try await setup.database.saveRewardRule(draft, editing: rule.id, at: later)
+        let updated = try await setup.database.save(draft, editing: rule.id, at: later)
         let list = try await setup.database.rewardRuleList()
         let icon = try #require(list.icons[updated.iconId])
 
@@ -46,7 +46,7 @@ struct RewardRuleWriteTests {
         let draft = RewardRuleDraft(name: "自炊した日", amount: 0, icon: setup.icon)
 
         await #expect(throws: DraftProblem.emptyAmount) {
-            try await setup.database.saveRewardRule(draft, at: setup.now)
+            try await setup.database.save(draft, at: setup.now)
         }
     }
 
@@ -56,7 +56,7 @@ struct RewardRuleWriteTests {
         let first = try await setup.save("自炊した日")
         let second = try await setup.save("歩いて帰った日")
 
-        try await setup.database.reorderRewardRules([second.id, first.id], at: setup.now)
+        try await setup.database.reorder([second.id, first.id], at: setup.now)
         let list = try await setup.database.rewardRuleList()
 
         #expect(list.rules.map(\.id) == [second.id, first.id])
@@ -67,9 +67,9 @@ struct RewardRuleWriteTests {
         let setup = try Setup()
         let rule = try await setup.save("自炊した日")
 
-        try await setup.database.setRewardRuleHidden(rule.id, isHidden: true, at: setup.now)
+        try await setup.database.setHidden(rule.id, isHidden: true, at: setup.now)
         let hidden = try await setup.database.rewardRuleList()
-        try await setup.database.setRewardRuleHidden(rule.id, isHidden: false, at: setup.now)
+        try await setup.database.setHidden(rule.id, isHidden: false, at: setup.now)
         let shown = try await setup.database.rewardRuleList()
 
         #expect(hidden.rules.first?.isActive == false)
@@ -145,7 +145,7 @@ extension RewardRuleWriteTests.Setup {
 
     func save(_ name: String) async throws -> RewardRule {
         let draft = RewardRuleDraft(name: name, amount: 500, icon: icon)
-        return try await database.saveRewardRule(draft, at: now)
+        return try await database.save(draft, at: now)
     }
 
     func logs() async throws -> [RewardLog] {

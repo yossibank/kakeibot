@@ -50,11 +50,11 @@ enum SettingsMenuSampleData {
         today: LocalDate,
         now: Date
     ) async throws {
-        let card = try await database.saveWallet(cardDraft, at: now)
+        let card = try await database.save(cardDraft, at: now)
 
-        _ = try await database.saveWallet(investmentDraft, at: now)
+        _ = try await database.save(investmentDraft, at: now)
 
-        let loan = try await database.saveWallet(loanDraft, at: now)
+        let loan = try await database.save(loanDraft, at: now)
         let options = try await database.entryOptions()
         let book = try Book(options: options, card: card.id, loan: loan.id)
 

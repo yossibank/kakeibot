@@ -13,7 +13,7 @@ extension RecordsModelTests {
         let future = setup.today.adding(days: 1)
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
-        let rule = try await setup.database.saveRewardRule(draft, at: Date())
+        let rule = try await setup.database.save(draft, at: Date())
 
         await model.toggleReward(rule, on: future)
         await model.toggleReward(rule, on: setup.today)
@@ -126,7 +126,7 @@ extension RecordsModelTests {
         try setup.database.insertShelfIfEmpty(at: Date())
         let shelf = try await setup.database.shelfIconList()
         let hidden = try #require(shelf.shelfIcons.last)
-        try await setup.database.setShelfIconHidden(hidden.id, isHidden: true, at: Date())
+        try await setup.database.setHidden(hidden.id, isHidden: true, at: Date())
         let today = setup.today
         let model = RecordsModel(database: setup.database, today: today)
 

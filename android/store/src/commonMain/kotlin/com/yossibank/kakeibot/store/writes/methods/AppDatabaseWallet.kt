@@ -40,60 +40,6 @@ class WalletWriteException(
     val error: WalletWriteError,
 ) : Exception(error.name)
 
-suspend fun AppDatabase.saveWallet(
-    draft: WalletDraft,
-    editing: Identifier<Wallet>? = null,
-    at: Instant,
-): Wallet = write {
-    if (editing != null) {
-        updateWallet(
-            id = editing,
-            with = draft,
-            at = at,
-        )
-    } else {
-        insertWallet(
-            draft = draft,
-            at = at,
-        )
-    }
-}
-
-suspend fun AppDatabase.reorderWallets(
-    ids: List<Identifier<Wallet>>,
-    at: Instant,
-) {
-    write {
-        reorder(
-            table = "wallet",
-            ids = ids.map { it.databaseValue },
-            notFound = WalletWriteException(WalletWriteError.walletNotFound),
-            now = at,
-        )
-    }
-}
-
-suspend fun AppDatabase.setWalletHidden(
-    id: Identifier<Wallet>,
-    isHidden: Boolean,
-    at: Instant,
-) {
-    write {
-        val wallet = findWallet(id) ?: throw WalletWriteException(WalletWriteError.walletNotFound)
-
-        if (isHidden && walletDao().countUnarchived() <= 1) {
-            throw WalletWriteException(WalletWriteError.lastShownWallet)
-        }
-
-        val updated = wallet.copy(
-            archivedAt = if (isHidden) at else null,
-            updatedAt = at,
-        )
-
-        walletDao().update(updated.record())
-    }
-}
-
 suspend fun AppDatabase.deleteWallet(
     id: Identifier<Wallet>,
     at: Instant,
@@ -153,61 +99,10 @@ suspend fun AppDatabase.deleteWallet(
 private suspend fun AppDatabase.findWallet(id: Identifier<Wallet>): Wallet? =
     walletDao().find(id.databaseValue)?.decoded(WalletRecord::wallet)
 
-private suspend fun AppDatabase.insertWallet(
-    draft: WalletDraft,
-    at: Instant,
-): Wallet {
-    val icon = draft.newIcon(at)
-    val sortOrder = nextSortOrder(walletDao().maxSortOrder())
-
-    val wallet = draft.newWallet(
-        iconId = icon.id,
-        sortOrder = sortOrder,
-        at = at,
-    )
-
-    iconDao().insert(icon.record())
-    walletDao().insert(wallet.record())
-
-    return wallet
-}
-
-private suspend fun AppDatabase.updateWallet(
-    id: Identifier<Wallet>,
-    with: WalletDraft,
-    at: Instant,
-): Wallet {
-    val existing = findWallet(id) ?: throw WalletWriteException(WalletWriteError.walletNotFound)
-
-    val icon = iconDao().find(existing.iconId.databaseValue)?.decoded(IconRecord::icon)
-        ?: throw WalletWriteException(WalletWriteError.iconNotFound)
-
-    val locked = with.locked(
-        by = existing,
-        hasRecords = hasRecords(id),
-        hasValuations = hasValuations(id),
-    )
-
-    val wallet = locked.applied(
-        to = existing,
-        at = at,
-    )
-
-    val updatedIcon = with.applied(
-        to = icon,
-        at = at,
-    )
-
-    iconDao().update(updatedIcon.record())
-    walletDao().update(wallet.record())
-
-    return wallet
-}
-
-private suspend fun AppDatabase.hasValuations(id: Identifier<Wallet>): Boolean =
+internal suspend fun AppDatabase.hasValuations(id: Identifier<Wallet>): Boolean =
     valuationDao().countOfWallet(id.databaseValue) > 0
 
-private suspend fun AppDatabase.hasRecords(id: Identifier<Wallet>): Boolean {
+internal suspend fun AppDatabase.hasRecords(id: Identifier<Wallet>): Boolean {
     val key = id.databaseValue
     val hasEntries = entryDao().countOfWallet(key) > 0
     val hasRecurrings = recurringDao().countOfWallet(key) > 0

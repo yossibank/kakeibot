@@ -25,10 +25,10 @@ struct EntryTemplateWriteTests {
 
         let saved = try await setup.database.saveTemplate(setup.draft, at: setup.now)
 
-        try await setup.database.setTemplateHidden(saved.id, isHidden: true, at: setup.now)
+        try await setup.database.setHidden(saved.id, isHidden: true, at: setup.now)
         let shown = try await setup.database.templates()
         let all = try await setup.database.templates(includingHidden: true)
-        try await setup.database.setTemplateHidden(saved.id, isHidden: false, at: setup.now)
+        try await setup.database.setHidden(saved.id, isHidden: false, at: setup.now)
         let restored = try await setup.database.templates()
 
         #expect(shown.isEmpty)
@@ -68,7 +68,7 @@ struct EntryTemplateWriteTests {
 
         let ids = try await setup.database.templates().map(\.id)
         let reversed = Array(ids.reversed())
-        try await setup.database.reorderTemplates(reversed, at: setup.now)
+        try await setup.database.reorder(reversed, at: setup.now)
         let reordered = try await setup.database.templates()
 
         #expect(reordered.map(\.name) == names.reversed())

@@ -17,7 +17,7 @@ extension AssetsModelTests {
             initialBalance: 0
         )
 
-        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let card = try await setup.database.save(wallet, at: Date())
 
         try await setup.save(.expense, 30000, on: "2026-09-20", from: card.id)
         try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
@@ -83,7 +83,7 @@ extension AssetsModelTests {
             initialBalance: 0
         )
 
-        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let card = try await setup.database.save(wallet, at: Date())
 
         try await setup.save(.expense, 30000, on: "2026-09-20", from: card.id)
         try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)

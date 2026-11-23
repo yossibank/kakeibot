@@ -38,7 +38,7 @@ struct RewardLogWriteTests {
         try await setup.achieve(true)
         let draft = RewardRuleDraft(name: "自炊した日", amount: 800, icon: setup.icon)
 
-        try await setup.database.saveRewardRule(draft, editing: setup.rule.id, at: setup.now)
+        try await setup.database.save(draft, editing: setup.rule.id, at: setup.now)
         let bank = try await setup.database.rewardBank()
 
         #expect(bank.logs.map(\.amount) == [500])
@@ -104,7 +104,7 @@ struct RewardLogWriteTests {
     @Test
     func rejectsAchievingHiddenRule() async throws {
         let setup = try await Setup()
-        try await setup.database.setRewardRuleHidden(setup.rule.id, isHidden: true, at: setup.now)
+        try await setup.database.setHidden(setup.rule.id, isHidden: true, at: setup.now)
 
         await #expect(throws: AppDatabase.RewardRuleWriteError.isHidden) {
             try await setup.achieve(true)
@@ -154,7 +154,7 @@ extension RewardLogWriteTests.Setup {
         let database = try AppDatabase.inMemory()
         let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
 
-        self.rule = try await database.saveRewardRule(draft, at: now)
+        self.rule = try await database.save(draft, at: now)
         self.date = try #require(LocalDate("2026-10-22"))
         self.database = database
     }

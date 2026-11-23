@@ -173,7 +173,7 @@ public extension EntryModel {
         )
 
         do {
-            try await database.setCategoryHidden(
+            try await database.setHidden(
                 category.id,
                 isHidden: true,
                 at: Date()
@@ -190,7 +190,7 @@ public extension EntryModel {
 
     func showCategory(_ hidden: HiddenCategory) async {
         do {
-            try await database.setCategoryHidden(
+            try await database.setHidden(
                 hidden.id,
                 isHidden: false,
                 at: Date()

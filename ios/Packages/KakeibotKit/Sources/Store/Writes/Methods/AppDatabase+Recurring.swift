@@ -103,20 +103,6 @@ public extension AppDatabase {
         }
     }
 
-    func reorderRecurrings(
-        _ ids: [Recurring.ID],
-        at now: Date
-    ) async throws {
-        try await writer.write { db in
-            try Recurring.reorder(
-                ids,
-                orThrow: RecurringWriteError.recurringNotFound,
-                in: db,
-                at: now
-            )
-        }
-    }
-
     @discardableResult
     func recordRecurring(
         _ id: Recurring.ID,

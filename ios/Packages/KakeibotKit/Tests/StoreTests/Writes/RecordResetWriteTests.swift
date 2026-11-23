@@ -159,7 +159,7 @@ extension RecordResetWriteTests.Setup {
             icon: IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         )
 
-        let rule = try await database.saveRewardRule(ruleDraft, at: now)
+        let rule = try await database.save(ruleDraft, at: now)
         let entry = try await database.saveEntry(draft(wallet: other, on: day), at: now)
 
         try await database.saveValuation(150_000, of: other, on: day, at: now)

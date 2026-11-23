@@ -4,10 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.concepts.entry.Entry
@@ -16,6 +14,7 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.SortableRecord
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -59,10 +58,7 @@ data class EntryTemplateRecord(
 ) : SortableRecord
 
 @Dao
-interface EntryTemplateRecordDao {
-    @Insert
-    suspend fun insert(record: EntryTemplateRecord)
-
+interface EntryTemplateRecordDao : UpdatableDao<EntryTemplateRecord> {
     @Query("SELECT * FROM template ORDER BY id")
     suspend fun all(): List<EntryTemplateRecord>
 
@@ -80,9 +76,6 @@ interface EntryTemplateRecordDao {
 
     @Query("SELECT * FROM template WHERE id = :id")
     suspend fun find(id: String): EntryTemplateRecord?
-
-    @Update
-    suspend fun update(record: EntryTemplateRecord)
 
     @Query("DELETE FROM template WHERE id = :id")
     suspend fun delete(id: String)

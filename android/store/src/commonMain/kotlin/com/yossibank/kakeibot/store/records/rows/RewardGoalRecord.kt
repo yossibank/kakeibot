@@ -4,14 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.reward.RewardGoal
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -39,10 +38,7 @@ data class RewardGoalRecord(
 )
 
 @Dao
-interface RewardGoalRecordDao {
-    @Insert
-    suspend fun insert(record: RewardGoalRecord)
-
+interface RewardGoalRecordDao : UpdatableDao<RewardGoalRecord> {
     @Query("SELECT * FROM reward_goal ORDER BY id")
     suspend fun all(): List<RewardGoalRecord>
 
@@ -51,9 +47,6 @@ interface RewardGoalRecordDao {
 
     @Query("SELECT * FROM reward_goal WHERE id = :id")
     suspend fun find(id: String): RewardGoalRecord?
-
-    @Update
-    suspend fun update(record: RewardGoalRecord)
 
     @Query("DELETE FROM reward_goal WHERE id = :id")
     suspend fun delete(id: String): Int

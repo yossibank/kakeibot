@@ -83,7 +83,7 @@ private extension SnapshotTests {
             initialBalance: 0
         )
 
-        let card = try await database.saveWallet(wallet, at: Date())
+        let card = try await database.save(wallet, at: Date())
 
         let recurring = RecurringDraft(
             type: .transfer,

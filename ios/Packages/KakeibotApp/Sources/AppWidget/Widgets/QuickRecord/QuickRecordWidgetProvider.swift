@@ -3,39 +3,11 @@ import Foundation
 import Store
 import WidgetKit
 
-struct QuickRecordWidgetProvider: TimelineProvider {
-    func placeholder(in context: Context) -> QuickRecordWidgetEntry {
-        .sample(at: Date())
-    }
-
-    func getSnapshot(
-        in context: Context,
-        completion: @escaping @Sendable (QuickRecordWidgetEntry) -> Void
-    ) {
-        let isPreview = context.isPreview
-
-        Task {
-            let now = Date()
-            let timeline = await Self.timeline(at: now, isPreview: isPreview)
-            let entry = timeline.entries.first ?? .sample(at: now)
-            completion(entry)
-        }
-    }
-
-    func getTimeline(
-        in context: Context,
-        completion: @escaping @Sendable (Timeline<QuickRecordWidgetEntry>) -> Void
-    ) {
-        let isPreview = context.isPreview
-
-        Task {
-            let timeline = await Self.timeline(at: Date(), isPreview: isPreview)
-            completion(timeline)
-        }
-    }
+struct QuickRecordWidgetProvider: WidgetTimelineProvider {
+    typealias Entry = QuickRecordWidgetEntry
 }
 
-private extension QuickRecordWidgetProvider {
+extension QuickRecordWidgetProvider {
     static func timeline(
         at now: Date,
         isPreview: Bool
@@ -49,13 +21,7 @@ private extension QuickRecordWidgetProvider {
             let overview = try? await database.widgetOverview(on: today, including: recordedId),
             let templates = try? await database.templates()
         else {
-            let entry: QuickRecordWidgetEntry = isPreview
-                ? .sample(at: now)
-                : .empty(at: now)
-
-            let retry = now.addingTimeInterval(WidgetTimeline.retryInterval)
-
-            return Timeline(entries: [entry], policy: .after(retry))
+            return fallbackTimeline(at: now, isPreview: isPreview)
         }
 
         let look = await database.widgetLook()

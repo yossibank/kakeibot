@@ -20,10 +20,11 @@ import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.writes.methods.deleteAdjustment
 import com.yossibank.kakeibot.store.writes.methods.deleteWallet
 import com.yossibank.kakeibot.store.writes.methods.restore
+import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveAdjustment
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
-import com.yossibank.kakeibot.store.writes.methods.saveWallet
 import com.yossibank.kakeibot.store.writes.types.DeletionSubject
+import com.yossibank.kakeibot.store.writes.types.WalletTable
 import com.yossibank.kakeibot.store.writes.types.subject
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -129,7 +130,7 @@ class AdjustmentWriteTest {
             initialBalance = 0,
         )
 
-        val wallet = setup.database.saveWallet(draft, at = setup.now)
+        val wallet = setup.database.save(WalletTable, draft, at = setup.now)
 
         setup.database.saveAdjustment(
             700,

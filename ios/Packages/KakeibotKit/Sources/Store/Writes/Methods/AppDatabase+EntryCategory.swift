@@ -19,9 +19,9 @@ public extension AppDatabase {
     ) async throws -> EntryCategory {
         try await writer.write { db in
             let category = if let id {
-                try Self.updateCategory(id, with: draft, in: db, at: now)
+                try Self.updateIconBacked(id, with: draft, in: db, at: now)
             } else {
-                try Self.insertCategory(draft, into: db, at: now)
+                try Self.insertIconBacked(draft, into: db, at: now)
             }
 
             try Self.saveTags(tags, for: category.id, in: db, at: now)
@@ -37,36 +37,6 @@ public extension AppDatabase {
     ) async throws -> [EntryTag] {
         try await writer.write { db in
             try Self.saveTags(drafts, for: categoryId, in: db, at: now)
-        }
-    }
-
-    func reorderCategories(
-        _ ids: [EntryCategory.ID],
-        at now: Date
-    ) async throws {
-        try await writer.write { db in
-            try EntryCategory.reorder(
-                ids,
-                orThrow: CategoryWriteError.categoryNotFound,
-                in: db,
-                at: now
-            )
-        }
-    }
-
-    func setCategoryHidden(
-        _ id: EntryCategory.ID,
-        isHidden: Bool,
-        at now: Date
-    ) async throws {
-        try await writer.write { db in
-            try EntryCategory.setHidden(
-                id,
-                isHidden,
-                orThrow: CategoryWriteError.categoryNotFound,
-                in: db,
-                at: now
-            )
         }
     }
 
@@ -115,48 +85,6 @@ public extension AppDatabase {
 }
 
 private extension AppDatabase {
-    static func insertCategory(
-        _ draft: EntryCategoryDraft,
-        into db: Database,
-        at now: Date
-    ) throws -> EntryCategory {
-        let icon = try draft.newIcon(at: now)
-
-        let sameKind = EntryCategory
-            .filter(Column("kind") == draft.kind.rawValue)
-            .filter(Column("wallet_id") == nil)
-
-        let sortOrder = try EntryCategory.nextSortOrder(of: sameKind, in: db)
-        let category = try draft.newCategory(iconId: icon.id, sortOrder: sortOrder, at: now)
-
-        try icon.insert(db)
-        try category.insert(db)
-
-        return category
-    }
-
-    static func updateCategory(
-        _ id: EntryCategory.ID,
-        with draft: EntryCategoryDraft,
-        in db: Database,
-        at now: Date
-    ) throws -> EntryCategory {
-        guard let existing = try EntryCategory.fetchOne(db, key: id) else {
-            throw CategoryWriteError.categoryNotFound
-        }
-
-        guard let icon = try Icon.fetchOne(db, key: existing.iconId) else {
-            throw CategoryWriteError.iconNotFound
-        }
-
-        let category = try draft.applied(to: existing, at: now)
-
-        try draft.applied(to: icon, at: now).update(db)
-        try category.update(db)
-
-        return category
-    }
-
     @discardableResult
     static func saveTags(
         _ drafts: [EntryTagDraft],

@@ -3,13 +3,12 @@ package com.yossibank.kakeibot.store.records.rows
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -28,10 +27,7 @@ data class IconRecord(
 )
 
 @Dao
-interface IconRecordDao {
-    @Insert
-    suspend fun insert(record: IconRecord)
-
+interface IconRecordDao : UpdatableDao<IconRecord> {
     @Query("SELECT * FROM icon WHERE id = :id")
     suspend fun find(id: String): IconRecord?
 
@@ -43,9 +39,6 @@ interface IconRecordDao {
 
     @Query("SELECT * FROM icon WHERE id IN (:ids)")
     suspend fun withIds(ids: List<String>): List<IconRecord>
-
-    @Update
-    suspend fun update(record: IconRecord)
 
     @Query("DELETE FROM icon WHERE id IN (:ids)")
     suspend fun deleteIds(ids: List<String>)

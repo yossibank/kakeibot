@@ -39,7 +39,7 @@ extension AssetsModelTests {
             initialBalance: 0
         )
 
-        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let card = try await setup.database.save(wallet, at: Date())
         try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
         try await setup.saveRecurring(.transfer, 0, day: 27, from: setup.bank, to: card.id)
         let model = AssetsModel(database: setup.database, today: setup.today)

@@ -3,12 +3,12 @@ package com.yossibank.kakeibot.store.records.rows
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.NoSpendDay
+import com.yossibank.kakeibot.store.records.protocols.InsertableDao
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -23,10 +23,7 @@ data class NoSpendDayRecord(
 )
 
 @Dao
-interface NoSpendDayRecordDao {
-    @Insert
-    suspend fun insert(record: NoSpendDayRecord)
-
+interface NoSpendDayRecordDao : InsertableDao<NoSpendDayRecord> {
     @Query("SELECT * FROM no_spend_day ORDER BY date")
     suspend fun all(): List<NoSpendDayRecord>
 

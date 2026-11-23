@@ -87,7 +87,7 @@ private extension AppDatabase {
     ) async throws {
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let draft = RewardRuleDraft(name: "自炊した日", amount: amount, icon: icon)
-        let rule = try await saveRewardRule(draft, at: now)
+        let rule = try await save(draft, at: now)
         let date = try #require(LocalDate("2026-10-22"))
 
         try await setReward(rule.id, isAchieved: true, on: date, at: now)

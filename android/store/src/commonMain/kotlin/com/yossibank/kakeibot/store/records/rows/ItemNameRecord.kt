@@ -4,12 +4,12 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Index
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.receipt.ItemName
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.InsertableDao
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
@@ -36,10 +36,7 @@ data class ItemNameRecord(
 )
 
 @Dao
-interface ItemNameRecordDao {
-    @Insert
-    suspend fun insert(record: ItemNameRecord)
-
+interface ItemNameRecordDao : InsertableDao<ItemNameRecord> {
     @Query("SELECT * FROM item_name ORDER BY id")
     suspend fun all(): List<ItemNameRecord>
 

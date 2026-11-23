@@ -4,15 +4,14 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.ArchivableRecord
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -43,10 +42,7 @@ data class WalletRecord(
 ) : ArchivableRecord
 
 @Dao
-interface WalletRecordDao {
-    @Insert
-    suspend fun insert(record: WalletRecord)
-
+interface WalletRecordDao : UpdatableDao<WalletRecord> {
     @Query("SELECT * FROM wallet WHERE id = :id")
     suspend fun find(id: String): WalletRecord?
 
@@ -61,9 +57,6 @@ interface WalletRecordDao {
 
     @Query("SELECT * FROM wallet WHERE archived_at IS NULL ORDER BY sort_order")
     suspend fun unarchivedInOrder(): List<WalletRecord>
-
-    @Update
-    suspend fun update(record: WalletRecord)
 
     @Query("DELETE FROM wallet WHERE id = :id")
     suspend fun delete(id: String)

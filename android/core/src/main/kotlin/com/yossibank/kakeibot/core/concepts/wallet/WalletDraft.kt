@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.icon.IconDraft
 import com.yossibank.kakeibot.core.shared.DraftProblem
 import com.yossibank.kakeibot.core.shared.DraftProblemException
+import com.yossibank.kakeibot.core.shared.IconBackedDraft
 import com.yossibank.kakeibot.core.shared.Identifier
 import java.time.Instant
 
@@ -16,7 +17,7 @@ data class WalletDraft(
     val loanAmount: Int? = null,
     val recordedKind: Wallet.Kind? = null,
     val hasValuations: Boolean = false,
-) {
+) : IconBackedDraft<Wallet> {
     constructor(
         wallet: Wallet,
         icon: Icon,
@@ -89,7 +90,7 @@ data class WalletDraft(
         hasValuations = hasValuations,
     )
 
-    fun newIcon(at: Instant): Icon {
+    override fun newIcon(at: Instant): Icon {
         validate()
 
         return icon.newIcon(at)
@@ -114,7 +115,17 @@ data class WalletDraft(
         )
     }
 
-    fun applied(
+    override fun newValue(
+        iconId: Identifier<Icon>,
+        sortOrder: Int,
+        at: Instant,
+    ): Wallet = newWallet(
+        iconId = iconId,
+        sortOrder = sortOrder,
+        at = at,
+    )
+
+    override fun applied(
         to: Icon,
         at: Instant,
     ): Icon {
@@ -126,7 +137,7 @@ data class WalletDraft(
         )
     }
 
-    fun applied(
+    override fun applied(
         to: Wallet,
         at: Instant,
     ): Wallet {

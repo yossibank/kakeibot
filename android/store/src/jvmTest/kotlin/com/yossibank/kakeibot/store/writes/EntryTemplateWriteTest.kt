@@ -14,12 +14,13 @@ import com.yossibank.kakeibot.store.writes.methods.TemplateWriteError
 import com.yossibank.kakeibot.store.writes.methods.TemplateWriteException
 import com.yossibank.kakeibot.store.writes.methods.deleteEntry
 import com.yossibank.kakeibot.store.writes.methods.deleteTemplate
-import com.yossibank.kakeibot.store.writes.methods.reorderTemplates
+import com.yossibank.kakeibot.store.writes.methods.reorder
 import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.restoreEntry
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.saveTemplate
-import com.yossibank.kakeibot.store.writes.methods.setTemplateHidden
+import com.yossibank.kakeibot.store.writes.methods.setHidden
+import com.yossibank.kakeibot.store.writes.types.EntryTemplateTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -52,7 +53,8 @@ class EntryTemplateWriteTest {
 
         val saved = setup.database.saveTemplate(setup.draft, at = setup.now)
 
-        setup.database.setTemplateHidden(
+        setup.database.setHidden(
+            EntryTemplateTable,
             saved.id,
             isHidden = true,
             at = setup.now,
@@ -61,7 +63,8 @@ class EntryTemplateWriteTest {
         val shown = setup.database.templates()
         val all = setup.database.templates(includingHidden = true)
 
-        setup.database.setTemplateHidden(
+        setup.database.setHidden(
+            EntryTemplateTable,
             saved.id,
             isHidden = false,
             at = setup.now,
@@ -112,7 +115,8 @@ class EntryTemplateWriteTest {
 
         val reversed = setup.database.templates().map { it.id }.reversed()
 
-        setup.database.reorderTemplates(
+        setup.database.reorder(
+            EntryTemplateTable,
             reversed,
             at = setup.now,
         )

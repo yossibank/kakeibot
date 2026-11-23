@@ -5,15 +5,14 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.budget.Budget
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import com.yossibank.kakeibot.store.records.values.fromDatabaseValue
@@ -42,10 +41,7 @@ data class BudgetRecord(
 )
 
 @Dao
-interface BudgetRecordDao {
-    @Insert
-    suspend fun insert(record: BudgetRecord)
-
+interface BudgetRecordDao : UpdatableDao<BudgetRecord> {
     @Query("SELECT * FROM budget ORDER BY id")
     suspend fun all(): List<BudgetRecord>
 
@@ -54,9 +50,6 @@ interface BudgetRecordDao {
 
     @Query("SELECT * FROM budget ORDER BY from_month")
     suspend fun inMonthOrder(): List<BudgetRecord>
-
-    @Update
-    suspend fun update(record: BudgetRecord)
 
     @Query("DELETE FROM budget WHERE id = :id")
     suspend fun delete(id: String)

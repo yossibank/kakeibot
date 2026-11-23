@@ -4,15 +4,14 @@ import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.ArchivableRecord
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -40,10 +39,7 @@ data class EntryTagRecord(
 ) : ArchivableRecord
 
 @Dao
-interface EntryTagRecordDao {
-    @Insert
-    suspend fun insert(record: EntryTagRecord)
-
+interface EntryTagRecordDao : UpdatableDao<EntryTagRecord> {
     @Query("SELECT * FROM tag ORDER BY id")
     suspend fun all(): List<EntryTagRecord>
 
@@ -79,9 +75,6 @@ interface EntryTagRecordDao {
 
     @Query("SELECT * FROM tag WHERE id = :id")
     suspend fun find(id: String): EntryTagRecord?
-
-    @Update
-    suspend fun update(record: EntryTagRecord)
 
     @Query("SELECT * FROM tag WHERE category_id = :categoryId")
     suspend fun ofCategory(categoryId: String): List<EntryTagRecord>

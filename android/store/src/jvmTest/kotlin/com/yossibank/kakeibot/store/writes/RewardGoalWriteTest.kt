@@ -13,10 +13,11 @@ import com.yossibank.kakeibot.store.queries.methods.rewardBank
 import com.yossibank.kakeibot.store.writes.methods.RewardGoalWriteError
 import com.yossibank.kakeibot.store.writes.methods.RewardGoalWriteException
 import com.yossibank.kakeibot.store.writes.methods.deleteRewardGoal
+import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveRewardGoal
-import com.yossibank.kakeibot.store.writes.methods.saveRewardRule
 import com.yossibank.kakeibot.store.writes.methods.setReward
 import com.yossibank.kakeibot.store.writes.methods.setRewardGoalPurchased
+import com.yossibank.kakeibot.store.writes.types.RewardRuleTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -178,7 +179,7 @@ private suspend fun AppDatabase.saveSavings(
         icon = icon,
     )
 
-    val rule = saveRewardRule(draft, at = at)
+    val rule = save(RewardRuleTable, draft, at = at)
     val date = assertNotNull(LocalDate.parse("2026-10-22"))
 
     setReward(
