@@ -35,10 +35,10 @@ public struct WalletListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("口座", hint: hintFlag)
-
-            SettingsIntroCard(
+        SettingsBoardScreen(
+            title: "口座",
+            hint: hintFlag,
+            intro: SettingsIntroCard(
                 systemImage: "building.columns",
                 headline: ("お金を置く所ごとに", "残高を分けて数えます"),
                 notes: [
@@ -48,64 +48,23 @@ public struct WalletListView: View {
                     .swipeDelete
                 ],
                 flag: hintFlag
-            )
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    if model.shown.isEmpty {
-                        SettingsEmptyNote(
-                            systemImage: "building.columns",
-                            text: "口座を追加すると、ここに並びます"
-                        )
-                    }
-
-                    board
-
-                    if !model.hidden.isEmpty {
-                        hiddenSection
-                    }
-                }
-                .padding(.vertical, 8)
-                .coordinateSpace(.named(Self.space))
-                .onGeometryChange(for: CGPoint.self) { proxy in
-                    proxy.frame(in: .global).origin
-                } action: { origin in
-                    drag.origin = origin
-                }
-            }
-            .scrollIndicators(.hidden)
-            .scrollDisabled(drag.isLifting)
-            .settingsAutoScroll(drag.autoScroll)
-            .settingsDropZones($drag.zones, showing: drag.showZone)
-            .settingsHideNotice($hiddenId) { id in
-                controller.show(id)
-            }
-            .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
-                controller.restore(deletion)
-            }
-
-            if drag.lift != nil {
-                SettingsHideTarget(zones: $drag.zones, isArmed: drag.isOverHide)
-            } else {
-                AddButton("口座を追加") {
-                    destination = .new
-                }
-            }
-        }
-        .padding(.horizontal, SettingsSpacing.side)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .settingsLiftLayer(drag, scale: 1.03) { id in
+            ),
+            emptyNote: .init(systemImage: "building.columns", text: "口座を追加すると、ここに並びます"),
+            addTitle: "口座を追加",
+            space: Self.space,
+            liftScale: 1.03,
+            controller: controller,
+            errorNotice: $model.errorNotice
+        ) {
+            destination = .new
+        } board: {
+            board
+        } hiddenSection: {
+            hiddenSection
+        } floatingTile: { id in
             floatingTile(id)
         }
         .sharesTextScale(id: model.shown + model.hidden)
-        .errorBanner($model.errorNotice)
-        .backdrop()
-        .toolbar(.hidden, for: .navigationBar)
-        .haptic(.impact(weight: .medium), trigger: drag.liftCount)
-        .haptic(.selection, trigger: model.movingOrder)
-        .haptic(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
             WalletEditSheet(model: editModel(for: destination)) { _ in } onDelete: { deletion in
                 self.deletion = deletion
@@ -134,13 +93,10 @@ public struct WalletListView: View {
                 controller.delete(deleting.id)
             }
         }
-        .confirmation(
+        .settingsDeleteHiddenConfirmation(
             isPresented: $isConfirmingDeleteHidden,
-            systemImage: "trash",
             title: "非表示の口座をまとめて削除しますか",
-            message: "記録がある口座は残ります。使っている固定費・テンプレート・評価額も消えます",
-            keepTitle: "やめる",
-            confirmTitle: "まとめて削除する"
+            message: "記録がある口座は残ります。使っている固定費・テンプレート・評価額も消えます"
         ) {
             controller.deleteHidden()
         }

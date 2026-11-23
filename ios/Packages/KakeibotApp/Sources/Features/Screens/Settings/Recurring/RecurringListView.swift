@@ -96,9 +96,7 @@ public struct RecurringListView: View {
         .errorBanner($model.errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
-        .haptic(.impact(weight: .medium), trigger: drag.liftCount)
-        .haptic(.selection, trigger: model.movingOrder)
-        .haptic(.success, trigger: drag.showCount)
+        .settingsBoardHaptics(drag, movingOrder: model.movingOrder)
         .navigationDestination(item: $destination) { destination in
             RecurringEditSheet(model: model.editModel(for: destination.editingId)) { deletion in
                 self.deletion = deletion
@@ -108,25 +106,19 @@ public struct RecurringListView: View {
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)
         }
-        .confirmation(
+        .settingsDeleteConfirmation(
             isPresented: $isConfirmingDelete,
-            systemImage: "trash",
             title: "この固定費を削除しますか",
-            message: "これまでに作った記録は残ります",
-            keepTitle: "やめる",
-            confirmTitle: "削除する"
+            message: "これまでに作った記録は残ります"
         ) {
             if let deleting {
                 controller.delete(deleting)
             }
         }
-        .confirmation(
+        .settingsDeleteHiddenConfirmation(
             isPresented: $isConfirmingDeleteHidden,
-            systemImage: "trash",
             title: "非表示の固定費をまとめて削除しますか",
-            message: "これまでに作った記録は残ります",
-            keepTitle: "やめる",
-            confirmTitle: "まとめて削除する"
+            message: "これまでに作った記録は残ります"
         ) {
             controller.deleteHidden()
         }

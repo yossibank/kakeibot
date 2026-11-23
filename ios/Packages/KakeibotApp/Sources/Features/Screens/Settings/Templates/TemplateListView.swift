@@ -104,9 +104,7 @@ public struct TemplateListView: View {
         .errorBanner($model.errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
-        .haptic(.impact(weight: .medium), trigger: drag.liftCount)
-        .haptic(.selection, trigger: model.movingOrder)
-        .haptic(.success, trigger: drag.showCount)
+        .settingsBoardHaptics(drag, movingOrder: model.movingOrder)
         .navigationDestination(item: $destination) { destination in
             TemplateEditSheet(
                 model: editModel(for: destination),
@@ -122,25 +120,19 @@ public struct TemplateListView: View {
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)
         }
-        .confirmation(
+        .settingsDeleteConfirmation(
             isPresented: $isConfirmingDelete,
-            systemImage: "trash",
             title: "このテンプレートを削除しますか",
-            message: "このテンプレートで記録したものは残ります",
-            keepTitle: "やめる",
-            confirmTitle: "削除する"
+            message: "このテンプレートで記録したものは残ります"
         ) {
             if let deleting {
                 controller.delete(deleting)
             }
         }
-        .confirmation(
+        .settingsDeleteHiddenConfirmation(
             isPresented: $isConfirmingDeleteHidden,
-            systemImage: "trash",
             title: "非表示のテンプレートをまとめて削除しますか",
-            message: "テンプレートで記録したものは残ります",
-            keepTitle: "やめる",
-            confirmTitle: "まとめて削除する"
+            message: "テンプレートで記録したものは残ります"
         ) {
             controller.deleteHidden()
         }

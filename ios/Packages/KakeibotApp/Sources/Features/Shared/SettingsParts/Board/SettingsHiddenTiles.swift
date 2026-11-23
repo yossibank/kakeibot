@@ -73,3 +73,34 @@ private extension SettingsHiddenTiles {
             )
     }
 }
+
+extension SettingsHiddenTiles {
+    init<Model: SettingsBoardModel>(
+        flag: SettingsScreenFlag,
+        title: String,
+        grid: SettingsBoardGrid,
+        controller: SettingsBoardController<Model>,
+        space: String,
+        @ViewBuilder face: @escaping (Item) -> Face,
+        onTap: @escaping (Item) -> Void,
+        onDeleteAll: @escaping () -> Void
+    ) where Model.Item == Item {
+        self.init(
+            flag: flag,
+            title: title,
+            items: controller.model.hidden,
+            drag: controller.drag,
+            grid: grid,
+            space: space,
+            face: face,
+            onTap: onTap,
+            onFollow: { id, location in
+                controller.followHidden(id, to: location)
+            },
+            onDrop: {
+                controller.dropHidden()
+            },
+            onDeleteAll: onDeleteAll
+        )
+    }
+}

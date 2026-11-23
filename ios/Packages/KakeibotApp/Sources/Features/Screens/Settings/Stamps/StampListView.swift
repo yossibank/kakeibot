@@ -13,11 +13,7 @@ public struct StampListView: View {
     @State private var isConfirmingDeleteHidden = false
     @State private var hiddenList: SettingsScreenFlag
 
-    @State private var grid = SettingsBoardGrid(
-        columns: Self.columnCount,
-        itemHeight: Self.tileHeight,
-        spacing: Self.spacing
-    )
+    @State private var grid = Self.tiles
 
     private let database: AppDatabase
 
@@ -33,10 +29,10 @@ public struct StampListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("スタンプ", hint: hintFlag)
-
-            SettingsIntroCard(
+        SettingsBoardScreen(
+            title: "スタンプ",
+            hint: hintFlag,
+            intro: SettingsIntroCard(
                 systemImage: "seal",
                 headline: ("カレンダーに押して", "その日を残せます"),
                 notes: [
@@ -44,70 +40,23 @@ public struct StampListView: View {
                     .arrange
                 ],
                 flag: hintFlag
-            )
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    if model.shown.isEmpty {
-                        SettingsEmptyNote(
-                            systemImage: "seal",
-                            text: "スタンプを足すと、ここに並びます"
-                        )
-                    }
-
-                    board
-
-                    if !model.hidden.isEmpty {
-                        hiddenSection
-                    }
-                }
-                .padding(.vertical, 8)
-                .coordinateSpace(.named(Self.space))
-                .onGeometryChange(for: CGPoint.self) { proxy in
-                    proxy.frame(in: .global).origin
-                } action: { origin in
-                    drag.origin = origin
-                }
-            }
-            .scrollIndicators(.hidden)
-            .scrollDisabled(drag.isLifting)
-            .settingsAutoScroll(drag.autoScroll)
-            .settingsDropZones($drag.zones, showing: drag.showZone)
-            .settingsHideNotice($hiddenId) { id in
-                controller.show(id)
-            }
-            .deletionNotice($deletion) { deletion in
-                controller.restore(deletion)
-            }
-
-            if drag.lift != nil {
-                SettingsHideTarget(
-                    zones: $drag.zones,
-                    isArmed: drag.isOverHide
-                )
-            } else {
-                AddButton("スタンプを追加") {
-                    destination = .new
-                }
-            }
-        }
-        .padding(.horizontal, SettingsSpacing.side)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .settingsLiftLayer(
-            drag,
-            size: CGSize(width: grid.itemWidth, height: Self.tileHeight),
-            scale: 1.1
-        ) { id in
+            ),
+            emptyNote: .init(systemImage: "seal", text: "スタンプを足すと、ここに並びます"),
+            addTitle: "スタンプを追加",
+            space: Self.space,
+            tileHeight: Self.tiles.itemHeight,
+            liftScale: 1.1,
+            controller: controller,
+            errorNotice: $model.errorNotice
+        ) {
+            destination = .new
+        } board: {
+            board
+        } hiddenSection: {
+            hiddenSection
+        } floatingTile: { id in
             floatingTile(id)
         }
-        .errorBanner($model.errorNotice)
-        .backdrop()
-        .toolbar(.hidden, for: .navigationBar)
-        .haptic(.impact(weight: .medium), trigger: drag.liftCount)
-        .haptic(.selection, trigger: model.movingOrder)
-        .haptic(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
             StampEditSheet(model: editModel(for: destination)) { deletion in
                 self.deletion = deletion
@@ -119,13 +68,10 @@ public struct StampListView: View {
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)
         }
-        .confirmation(
+        .settingsDeleteHiddenConfirmation(
             isPresented: $isConfirmingDeleteHidden,
-            systemImage: "trash",
             title: "非表示のスタンプをまとめて削除しますか",
-            message: "カレンダーに押したスタンプは残ります",
-            keepTitle: "やめる",
-            confirmTitle: "まとめて削除する"
+            message: "カレンダーに押したスタンプは残ります"
         ) {
             controller.deleteHidden()
         }
@@ -139,17 +85,12 @@ private extension StampListView {
     var board: some View {
         SettingsTileBoard(
             grid: $grid,
-            items: model.shown,
-            drag: drag,
+            controller: controller,
             space: Self.space
         ) { shelfIcon in
             tileFace(shelfIcon, isHidden: false)
         } onTap: { shelfIcon in
             destination = .edit(shelfIcon.id)
-        } onFollow: { id, location in
-            controller.follow(id, to: location)
-        } onDrop: {
-            controller.drop()
         }
     }
 
@@ -157,18 +98,13 @@ private extension StampListView {
         SettingsHiddenTiles(
             flag: hiddenList,
             title: "非表示のスタンプ",
-            items: model.hidden,
-            drag: drag,
             grid: grid,
+            controller: controller,
             space: Self.space
         ) { shelfIcon in
             tileFace(shelfIcon, isHidden: true)
         } onTap: { shelfIcon in
             destination = .edit(shelfIcon.id)
-        } onFollow: { id, location in
-            controller.followHidden(id, to: location)
-        } onDrop: {
-            controller.dropHidden()
         } onDeleteAll: {
             isConfirmingDeleteHidden = true
         }
@@ -198,9 +134,7 @@ private extension StampListView {
 
     nonisolated static let space = "StampBoard"
 
-    static let columnCount = 4
-    static let spacing: CGFloat = 8
-    static let tileHeight: CGFloat = 78
+    static let tiles = SettingsBoardGrid(columns: 4, itemHeight: 78, spacing: 8)
 
     var controller: SettingsBoardController<StampListModel> {
         SettingsBoardController(
