@@ -24,9 +24,9 @@ struct SnapshotTests {
             try Self.write(view, canvas: .phone, to: shot.file)
         }
 
-        let shots = try Self.bannerShots.map(Self.image)
-
         for canvas in [Canvas.header, .search] {
+            let names = canvas == .header ? Self.headerShots : Self.searchShots
+            let shots = try names.map(Self.image)
             let view = StoreBanner(shots: shots, canvas: canvas)
 
             try Self.write(view, canvas: canvas, to: canvas.folder)
@@ -607,67 +607,112 @@ private struct StoreBanner: View {
         let zoom = canvas.size.width / Self.designWidth
         let height = canvas.size.height / zoom
 
-        HStack(spacing: 28) {
-            VStack(alignment: .leading, spacing: 20) {
-                StoreHeadline(
-                    lines: ["続けられる、", "家計簿。"],
-                    lead: .note("選ぶ・撮る・押すだけ"),
-                    scale: 1
-                )
-
-                Text("テーマもフォントも、\n自分好みにカスタマイズ")
-                    .font(.system(size: 15, weight: .medium))
-                    .lineSpacing(4)
-                    .foregroundStyle(StoreInk.accent)
+        content(height: height)
+            .frame(width: Self.designWidth, height: height, alignment: .leading)
+            .background {
+                StoreRings(rings: rings(height: height))
             }
-            .fixedSize()
-
-            phones(height: height)
-        }
-        .padding(.leading, 44)
-        .frame(width: Self.designWidth, height: height, alignment: .leading)
-        .background {
-            StoreRings(rings: rings(height: height))
-        }
-        .background(StoreInk.ground)
-        .clipped()
-        .scaleEffect(zoom, anchor: .topLeading)
-        .frame(width: canvas.size.width, height: canvas.size.height, alignment: .topLeading)
-        .environment(\.colorScheme, .light)
-        .environment(
-            \.themeStyle,
-            ThemeStyle(
-                corner: .standard,
-                displayFont: .mincho,
-                textFont: .gothic,
-                textSize: .standard
+            .background(StoreInk.ground)
+            .clipped()
+            .scaleEffect(zoom, anchor: .topLeading)
+            .frame(width: canvas.size.width, height: canvas.size.height, alignment: .topLeading)
+            .environment(\.colorScheme, .light)
+            .environment(
+                \.themeStyle,
+                ThemeStyle(
+                    corner: .standard,
+                    displayFont: .mincho,
+                    textFont: .gothic,
+                    textSize: .standard
+                )
             )
-        )
     }
 }
 
 private extension StoreBanner {
     static let designWidth: CGFloat = 800
+    static let headerLabels = ["1 タップで記録", "レシートは撮るだけ", "残りがひと目で", "締めのレポート"]
 }
 
 private extension StoreBanner {
-    func phones(height: CGFloat) -> some View {
-        let limit: CGFloat = canvas == .header ? 150 : 200
-        let width = min(height * 0.52, limit)
+    var header: some View {
+        VStack(spacing: 14) {
+            HStack(spacing: 16) {
+                Text("記録から振り返りまで、これひとつ。")
+                    .font(.display(size: 28, weight: .bold, in: .mincho))
+                    .foregroundStyle(StoreInk.title)
 
-        return ZStack(alignment: .top) {
-            phone(shots[1], width: width * 0.86)
-                .rotationEffect(.degrees(-8), anchor: .bottom)
-                .offset(x: -width * 0.62, y: height * 0.2)
+                StoreHeadline(lines: [], lead: .adFree, scale: 0.8)
+            }
+            .fixedSize()
 
-            phone(shots[2], width: width * 0.86)
-                .rotationEffect(.degrees(8), anchor: .bottom)
-                .offset(x: width * 0.62, y: height * 0.2)
+            HStack(alignment: .top, spacing: -8) {
+                ForEach(
+                    Array(zip(Self.headerLabels, shots).enumerated()),
+                    id: \.offset
+                ) { index, item in
+                    VStack(spacing: 8) {
+                        Text(item.0)
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(StoreInk.accent)
+                            .fixedSize()
 
-            phone(shots[0], width: width)
-                .offset(y: height * 0.1)
+                        phone(item.1, width: 118)
+                    }
+                    .offset(y: index.isMultiple(of: 2) ? 0 : 16)
+                }
+            }
         }
-        .frame(width: width * 2.4, height: height, alignment: .top)
+        .padding(.top, 22)
+        .frame(width: Self.designWidth, alignment: .top)
+        .frame(maxHeight: .infinity, alignment: .top)
+    }
+
+    @ViewBuilder
+    func content(height: CGFloat) -> some View {
+        switch canvas {
+        case .header:
+            header
+
+        default:
+            search(height: height)
+        }
+    }
+
+    func search(height: CGFloat) -> some View {
+        HStack(spacing: 36) {
+            VStack(alignment: .leading, spacing: 22) {
+                StoreHeadline(
+                    lines: ["今月あと、", "いくら使える？"],
+                    lead: .adFree,
+                    scale: 0.98
+                )
+
+                Text("記録は 1 タップ、レシートは撮るだけ\n月の終わりに、振り返りが届く")
+                    .font(.system(size: 16, weight: .medium))
+                    .lineSpacing(6)
+                    .foregroundStyle(StoreInk.accent)
+            }
+            .fixedSize()
+
+            searchPhones(height: height)
+        }
+        .padding(.leading, 30)
+    }
+
+    func searchPhones(height: CGFloat) -> some View {
+        let width = min(height * 0.4, 210)
+
+        return ZStack(alignment: .topLeading) {
+            phone(shots[0], width: width)
+                .rotationEffect(.degrees(-7), anchor: .bottom)
+                .offset(y: height * 0.08)
+
+            phone(shots[1], width: width * 1.1)
+                .rotationEffect(.degrees(4), anchor: .bottom)
+                .offset(x: width * 0.74, y: height * 0.12)
+        }
+        .frame(width: width * 1.9, height: height, alignment: .topLeading)
     }
 
     func phone(
@@ -771,7 +816,8 @@ private struct Line: Shape {
 
 private extension SnapshotTests {
     static let directory = "__OUT__"
-    static let bannerShots = ["04-theme-rose", "03-receipt", "02-entry-black"]
+    static let searchShots = ["01-home", "08-review-closing-black"]
+    static let headerShots = ["02-entry-black", "03-receipt", "01-home", "08-review-closing-black"]
 
     static let outerPages = [
         Page(
@@ -844,7 +890,32 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "02-theme",
+            file: "02-review",
+            lines: ["締めたら、", "届くレポート"],
+            lead: .note("いまのペースと、次の一手"),
+            phones: [
+                Phone(name: "08-review-pace-black", x: 12, y: 196, width: 250, angle: -4),
+                Phone(name: "08-review-closing-black", x: 112, y: 280, width: 220, angle: 4)
+            ]
+        ),
+        Shot(
+            file: "03-receipt",
+            lines: ["レシートを", "撮れば入る"],
+            lead: .note("品名・合計・日付を読み取り"),
+            phones: [
+                Phone(name: "03-receipt", x: 20, y: 196, width: 280, angle: -2)
+            ]
+        ),
+        Shot(
+            file: "04-entry",
+            lines: ["記録は、", "タップ 1 回"],
+            lead: .note("1 枚のカードと電卓ですばやく"),
+            phones: [
+                Phone(name: "02-entry-black", x: 30, y: 200, width: 270, angle: 3)
+            ]
+        ),
+        Shot(
+            file: "05-theme",
             lines: ["テーマも、", "着せ替え。"],
             lead: .note("ライトとダークの 12 色から選べます"),
             phones: [
@@ -868,15 +939,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "03-entry",
-            lines: ["記録は、", "タップ 1 回"],
-            lead: .note("1 枚のカードと電卓ですばやく"),
-            phones: [
-                Phone(name: "02-entry-black", x: 30, y: 200, width: 270, angle: 3)
-            ]
-        ),
-        Shot(
-            file: "04-voice",
+            file: "06-voice",
             lines: ["話すだけで、", "記録できる"],
             lead: .note("金額・日付・口座を声から読み取り"),
             phones: [
@@ -884,7 +947,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "05-font",
+            file: "07-font",
             lines: ["フォントも、", "選べる"],
             lead: .note("手書きやドットなど 6 種類"),
             phones: [
@@ -893,28 +956,11 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "06-receipt",
-            lines: ["レシートを", "撮れば入る"],
-            lead: .note("品名・合計・日付を読み取り"),
-            phones: [
-                Phone(name: "03-receipt", x: 20, y: 196, width: 280, angle: -2)
-            ]
-        ),
-        Shot(
-            file: "07-share",
+            file: "08-share",
             lines: ["ふたりで、", "ひとつの家計"],
             lead: .note("共有の財布をいっしょに"),
             phones: [
                 Phone(name: "09-share-rose", x: 20, y: 196, width: 280, angle: 2)
-            ]
-        ),
-        Shot(
-            file: "08-review",
-            lines: ["締めたら、", "届くレポート"],
-            lead: .note("いまのペースと、次の一手"),
-            phones: [
-                Phone(name: "08-review-pace-black", x: 12, y: 196, width: 250, angle: -4),
-                Phone(name: "08-review-closing-black", x: 112, y: 280, width: 220, angle: 4)
             ]
         ),
         Shot(
