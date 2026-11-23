@@ -51,7 +51,7 @@ extension RecurringEditSheet {
 
                 countValue
 
-                Keypad(calculator: model.countCalculator) {
+                Keypad(calculator: model.repayment.countCalculator) {
                     closePanel()
                 } onKey: { key in
                     model.pressCount(key)
@@ -67,12 +67,12 @@ extension RecurringEditSheet {
 private extension RecurringEditSheet {
     var countValue: some View {
         VStack(spacing: 4) {
-            Text("\(model.countCalculator.amount) 回")
+            Text("\(model.repayment.countCalculator.amount) 回")
                 .displayFont(.largeTitle, weight: .bold)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .contentTransition(.numericText())
-                .animation(.snappy, value: model.countCalculator.amount)
+                .animation(.snappy, value: model.repayment.countCalculator.amount)
 
             Text(model.scheduledEndDate
                 .map { "終わり \(RecurringText.date($0))" } ?? "回数を入れると、終わりの日が決まります")

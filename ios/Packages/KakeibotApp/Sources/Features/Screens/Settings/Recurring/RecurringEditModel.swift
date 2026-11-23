@@ -28,30 +28,24 @@ public final class RecurringEditModel {
         }
     }
 
-    public private(set) var holidayShift: HolidayShift = .none
-    public private(set) var type: Entry.Kind = .expense
-    public private(set) var calculator = AmountCalculator()
-    public private(set) var feeCalculator = AmountCalculator()
-    public private(set) var countCalculator = AmountCalculator()
-    public private(set) var isCountAuto = true
-    public private(set) var loanBalances: [Wallet.ID: Int] = [:]
-    public private(set) var options: EntryOptions?
-    public private(set) var cardBills: [Recurring] = []
-    public private(set) var isHidden = false
-
+    public internal(set) var type: Entry.Kind = .expense
+    public internal(set) var holidayShift: HolidayShift = .none
+    public internal(set) var calculator = AmountCalculator()
+    public internal(set) var feeCalculator = AmountCalculator()
+    public internal(set) var options: EntryOptions?
+    public internal(set) var cardBills: [Recurring] = []
+    public internal(set) var repayment = Repayment()
+    public internal(set) var isHidden = false
     public internal(set) var authorization: NotificationAuthorization = .allowed
     public internal(set) var errorNotice = ErrorNotice()
 
+    var baseline: RecurringDraft?
+    var isHolidayShiftChosen = false
+
     let today: LocalDate
-
-    private var baseline: RecurringDraft?
-    private var isHolidayShiftChosen = false
-    private var manualFinal: Int?
-    private var generatedUntil: LocalDate?
-
-    private let database: AppDatabase
-    private let editingId: Recurring.ID?
-    private let paidWallet: Wallet.ID?
+    let database: AppDatabase
+    let editingId: Recurring.ID?
+    let paidWallet: Wallet.ID?
 
     public init(
         database: AppDatabase,
@@ -75,10 +69,6 @@ public final class RecurringEditModel {
 public extension RecurringEditModel {
     static let remindChoices: [Int?] = [nil, 0, 1, 3, 7]
     static let destinationTitle = "振替先"
-
-    var isEditing: Bool {
-        editingId != nil
-    }
 
     var amount: Int {
         calculator.amount
@@ -148,96 +138,6 @@ public extension RecurringEditModel {
         type == .transfer && selectedDestination?.kind == .loan
     }
 
-    var loanOwed: Int? {
-        guard
-            isLoanRepayment,
-            let id = toWalletId,
-            let balance = loanBalances[id],
-            balance < 0
-        else {
-            return nil
-        }
-
-        return -balance
-    }
-
-    var autoPlan: RepaymentPlan? {
-        loanOwed.flatMap { RepaymentPlan(owed: $0, amount: amount) }
-    }
-
-    var usesAutoCount: Bool {
-        isCountAuto && autoPlan != nil
-    }
-
-    var repaymentStart: LocalDate {
-        let next = generatedUntil.map { $0.adding(days: 1) } ?? startDate
-        return max(startDate, next)
-    }
-
-    var scheduledEndDate: LocalDate? {
-        guard
-            usesAutoCount,
-            let plan = autoPlan
-        else {
-            return endDate
-        }
-
-        return autoEndDate(of: plan)
-    }
-
-    var finalAmount: Int? {
-        guard isLoanRepayment else {
-            return nil
-        }
-
-        return usesAutoCount ? autoPlan?.finalAmount : manualFinal
-    }
-
-    var plannedRecurring: Recurring {
-        recurring(endDate: scheduledEndDate, finalAmount: finalAmount)
-    }
-
-    var repaymentCount: Int? {
-        scheduledEndDate.map { end in
-            plannedRecurring.dates(from: repaymentStart, through: end).count
-        }
-    }
-
-    var plannedTotal: Int? {
-        let planned = plannedRecurring
-
-        return scheduledEndDate.map { end in
-            planned.dates(from: repaymentStart, through: end)
-                .map(planned.scheduledAmount(paidOn:))
-                .reduce(0, +)
-        }
-    }
-
-    var balanceGap: Int? {
-        guard
-            let owed = loanOwed,
-            let total = plannedTotal,
-            total != owed
-        else {
-            return nil
-        }
-
-        return total - owed
-    }
-
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var saveTitle: String {
-        let problem = draft.problems.first.map(message)
-        return SettingsSaveTitle.text(problem: problem, isEditing: isEditing)
-    }
-
-    var isChanged: Bool {
-        baseline.map { $0 != draft } ?? false
-    }
-
     var categories: [EntryCategory] {
         switch type {
         case .expense: options?.expenseCategories ?? []
@@ -304,66 +204,6 @@ public extension RecurringEditModel {
         feeCalculator = AmountCalculator(amount: amount)
     }
 
-    func prepareCount() {
-        countCalculator = AmountCalculator(amount: repaymentCount ?? 0)
-    }
-
-    func pressCount(_ key: AmountCalculator.Key) {
-        countCalculator.press(key)
-
-        if countCalculator.amount > Recurring.maxCount {
-            countCalculator = AmountCalculator(amount: Recurring.maxCount)
-        }
-
-        let count = countCalculator.amount
-        let end = recurring(endDate: nil, finalAmount: nil).endDate(
-            afterCount: count,
-            from: repaymentStart
-        )
-
-        setEnd(end)
-    }
-
-    func setEnd(_ date: LocalDate?) {
-        isCountAuto = false
-        endDate = date
-        manualFinal = manualFinalAmount(through: date)
-    }
-
-    func useAutoCount() {
-        isCountAuto = true
-        manualFinal = nil
-    }
-
-    func load() async {
-        do {
-            options = try await database.entryOptions()
-            cardBills = try await database.recurrings()
-
-            try await loadLoanBalances()
-            try await loadRecurring()
-            presetPayment()
-
-            if categoryId == nil {
-                categoryId = categories.first?.id
-            }
-
-            suggestHolidayShift()
-
-            if walletId == nil {
-                walletId = wallets.first?.id
-            }
-
-            presetDestination()
-            chooseCountMode()
-            baseline = draft
-        } catch is CancellationError {
-            return
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
     func save(permission: NotificationPermission = .allowed) async -> Bool {
         if let problem = draft.problems.first {
             let text = message(for: problem)
@@ -379,197 +219,13 @@ public extension RecurringEditModel {
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return false
-        }
-    }
-
-    func delete() async -> Deletion? {
-        guard let editingId else {
-            return nil
-        }
-
-        do {
-            return try await database.deleteRecurring(editingId, at: Date())
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-            return nil
-        }
-    }
-
-    func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId else {
-            return false
-        }
-
-        do {
-            try await database.setRecurringHidden(
-                editingId,
-                isHidden: isHidden,
-                today: today,
-                at: Date()
-            )
-
-            self.isHidden = isHidden
-
-            return true
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
 }
 
-private extension RecurringEditModel {
-    static let billClosingDay = 31
-    static let billPaymentDay = 27
-    static let loadFailedMessage = "固定費を読めませんでした"
-    static let saveFailedMessage = "保存できませんでした"
-
-    var suggestedHolidayShift: HolidayShift {
-        guard type != .transfer else {
-            return .next
-        }
-
-        let glyph = selectedCategory.flatMap { icon(for: $0) }?.glyph
-
-        switch glyph {
-        case .salary, .bonus: return .previous
-        case .home, .utility, .phone: return .next
-        default: return .none
-        }
-    }
-
-    func recurring(
-        endDate: LocalDate?,
-        finalAmount: Int?
-    ) -> Recurring {
-        Recurring(
-            type: type,
-            amount: amount,
-            categoryId: nil,
-            walletId: walletId ?? Wallet.ID(),
-            toWalletId: toWalletId,
-            frequency: frequency,
-            month: frequency == .yearly ? month : nil,
-            day: day,
-            holidayShift: holidayShift,
-            finalAmount: finalAmount,
-            startDate: startDate,
-            endDate: endDate,
-            createdAt: Date(),
-            updatedAt: Date()
-        )
-    }
-
-    func autoEndDate(of plan: RepaymentPlan) -> LocalDate? {
-        recurring(endDate: nil, finalAmount: nil).endDate(
-            afterCount: plan.count,
-            from: repaymentStart
-        )
-    }
-
-    func manualFinalAmount(through end: LocalDate?) -> Int? {
-        guard
-            let end,
-            let owed = loanOwed
-        else {
-            return nil
-        }
-
-        let count = recurring(endDate: end, finalAmount: nil)
-            .dates(from: repaymentStart, through: end)
-            .count
-
-        return RepaymentPlan(owed: owed, amount: amount, count: count)?.finalAmount
-    }
-
-    func chooseCountMode() {
-        guard isEditing else {
-            isCountAuto = true
-            return
-        }
-
-        guard
-            let plan = autoPlan,
-            let end = endDate
-        else {
-            isCountAuto = false
-            return
-        }
-
-        isCountAuto = autoEndDate(of: plan) == end && plan.finalAmount == manualFinal
-    }
-
-    func loadLoanBalances() async throws {
-        let list = try await database.latestEntryList()
-
-        let pairs = wallets
-            .filter { $0.kind == .loan }
-            .map { wallet in
-                (wallet.id, list.balance(of: wallet, through: today))
-            }
-
-        loanBalances = Dictionary(uniqueKeysWithValues: pairs)
-    }
-
-    func requestPermissionIfReminding(_ permission: NotificationPermission) async {
-        guard remindDaysBefore != nil else {
-            return
-        }
-
-        await permission.requestIfUndecided()
-    }
-
-    func presetPayment() {
-        guard
-            !isEditing,
-            let target = paidWallet
-        else {
-            return
-        }
-
-        let bank = wallets.first { $0.kind == .bank && $0.id != target }
-        let other = wallets.first { $0.id != target }
-
-        type = .transfer
-        categoryId = nil
-        toWalletId = target
-        walletId = (bank ?? other)?.id
-        day = Self.billPaymentDay
-
-        let name = selectedDestination?.name ?? ""
-
-        if selectedDestination?.kind == .card {
-            closingDay = Self.billClosingDay
-            memo = name
-        } else {
-            memo = "\(name)の返済"
-        }
-    }
-
-    func presetDestination() {
-        guard
-            type == .transfer,
-            toWalletId == nil
-        else {
-            return
-        }
-
-        toWalletId = wallets.first { $0.id != walletId }?.id
-    }
-
-    func suggestHolidayShift() {
-        guard
-            !isEditing,
-            !isHolidayShiftChosen
-        else {
-            return
-        }
-
-        holidayShift = suggestedHolidayShift
-    }
-
+extension RecurringEditModel {
     func message(for problem: RecurringDraft.Problem) -> String {
         switch problem {
         case .amountNotPositive: "金額を入れてください"
@@ -580,42 +236,45 @@ private extension RecurringEditModel {
         case .endBeforeStart: "終わりを始まりより後にしてください"
         case .categoryOnTransfer, .dayOutOfRange, .closingDayOutOfRange,
              .monthOutOfRange, .remindOutOfRange, .feeNegative:
-            Self.saveFailedMessage
+            SettingsEditMessage.saveFailed
         }
     }
+}
 
-    func loadRecurring() async throws {
-        guard let editingId else {
+private extension RecurringEditModel {
+    func requestPermissionIfReminding(_ permission: NotificationPermission) async {
+        guard remindDaysBefore != nil else {
             return
         }
 
-        let recurrings = try await database.recurrings(includingHidden: true)
-        let recurring = recurrings.first { $0.id == editingId }
+        await permission.requestIfUndecided()
+    }
+}
 
-        guard let recurring else {
-            throw AppDatabase.RecurringWriteError.recurringNotFound
-        }
+extension RecurringEditModel: SettingsEditRemoving {
+    static let deleteFailedMessage = SettingsEditMessage.saveFailed
 
-        let draft = RecurringDraft(recurring)
+    var edited: RecurringDraft {
+        draft
+    }
 
-        isHidden = recurring.archivedAt != nil
-        type = draft.type
-        calculator = AmountCalculator(amount: draft.amount)
-        categoryId = draft.categoryId
-        walletId = draft.walletId
-        toWalletId = draft.toWalletId
-        memo = draft.memo
-        frequency = draft.frequency
-        month = draft.month
-        day = draft.day
-        holidayShift = draft.holidayShift
-        closingDay = draft.closingDay
-        feeCalculator = AmountCalculator(amount: draft.fee)
-        manualFinal = recurring.finalAmount
-        generatedUntil = recurring.generatedUntil
-        billShift = draft.billShift
-        startDate = draft.startDate
-        endDate = draft.endDate
-        remindDaysBefore = draft.remindDaysBefore
+    var problemMessage: String? {
+        draft.problems.first.map(message)
+    }
+
+    func remove(_ id: Recurring.ID) async throws -> Deletion {
+        try await database.deleteRecurring(id, at: Date())
+    }
+
+    func saveHidden(
+        _ id: Recurring.ID,
+        isHidden: Bool
+    ) async throws {
+        try await database.setRecurringHidden(
+            id,
+            isHidden: isHidden,
+            today: today,
+            at: Date()
+        )
     }
 }
