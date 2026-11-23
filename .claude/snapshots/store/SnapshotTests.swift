@@ -150,7 +150,9 @@ private struct PanoramaPage: View {
         let zoom = canvas.size.width / Self.designWidth
 
         ZStack(alignment: .topLeading) {
-            StoreRings(rings: Self.rings, shift: Self.pitch * CGFloat(index))
+            ForEach(Array(Self.waves.enumerated()), id: \.offset) { _, wave in
+                wave.shifted(by: Self.pitch * CGFloat(index))
+            }
 
             ForEach(Array(zip(shot.phones, images).enumerated()), id: \.offset) { _, pair in
                 phone(pair.0, image: pair.1)
@@ -176,44 +178,17 @@ private extension PanoramaPage {
     static let designWidth: CGFloat = 320
     static let pitch: CGFloat = 336
 
-    static let rings = [
-        StoreRings.Ring(
-            x: 496,
-            y: 900,
-            radius: 640,
-            paint: .stroke(opacity: 0.7, width: 2, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 496,
-            y: 900,
-            radius: 600,
-            paint: .stroke(opacity: 0.3, width: 1, dash: [2, 14])
-        ),
-        StoreRings.Ring(
-            x: 496,
-            y: 900,
-            radius: 690,
-            paint: .stroke(opacity: 0.18, width: 1, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 1340,
-            y: 680,
-            radius: 250,
-            paint: .stroke(opacity: 0.4, width: 2, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 2016,
-            y: 660,
-            radius: 320,
-            paint: .stroke(opacity: 0.55, width: 2, dash: [])
-        ),
-        StoreRings.Ring(
-            x: 2016,
-            y: 660,
-            radius: 290,
-            paint: .stroke(opacity: 0.25, width: 1, dash: [2, 14])
-        ),
-        StoreRings.Ring(x: 2900, y: 620, radius: 210, paint: .fill(Color(rgb: 0xF4E9E4)))
+    static let waves = [
+        StoreWave(y: 212, amplitude: 9, period: 1008, phase: 0, opacity: 0.75, width: 2, dash: []),
+        StoreWave(
+            y: 220,
+            amplitude: 9,
+            period: 1008,
+            phase: 60,
+            opacity: 0.35,
+            width: 1,
+            dash: [2, 12]
+        )
     ]
 
     func phone(
@@ -224,6 +199,49 @@ private extension PanoramaPage {
             .shadow(color: .black.opacity(0.5), radius: 30, y: 30)
             .rotationEffect(.degrees(phone.angle), anchor: phone.anchor)
             .offset(x: phone.x, y: phone.y)
+    }
+}
+
+private struct StoreWave: View {
+    let y: CGFloat
+    let amplitude: CGFloat
+    let period: CGFloat
+    let phase: CGFloat
+    let opacity: Double
+    let width: CGFloat
+    let dash: [CGFloat]
+    var shift: CGFloat = 0
+
+    var body: some View {
+        Canvas { context, size in
+            var path = Path()
+            let step: CGFloat = 4
+
+            for x in stride(from: CGFloat(0), through: size.width, by: step) {
+                let angle = (x + shift + phase) / period * 2 * .pi
+                let point = CGPoint(x: x, y: y + amplitude * sin(angle))
+
+                if x == 0 {
+                    path.move(to: point)
+                } else {
+                    path.addLine(to: point)
+                }
+            }
+
+            context.stroke(
+                path,
+                with: .color(StoreInk.accent.opacity(opacity)),
+                style: StrokeStyle(lineWidth: width, dash: dash)
+            )
+        }
+    }
+}
+
+private extension StoreWave {
+    func shifted(by offset: CGFloat) -> StoreWave {
+        var wave = self
+        wave.shift = offset
+        return wave
     }
 }
 
