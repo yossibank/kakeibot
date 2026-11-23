@@ -157,8 +157,8 @@ extension ReviewReportGaugeTicks: Shape {
         return Path { path in
             for index in 0...count {
                 let ratio = Double(index) / Double(count)
-                let degrees = ReviewReportGaugeArc.startDegrees + ReviewReportGaugeArc
-                    .sweepDegrees * ratio
+                let sweep = ReviewReportGaugeArc.sweepDegrees * ratio
+                let degrees = ReviewReportGaugeArc.startDegrees + sweep
                 let radians = degrees * .pi / 180
                 let start = Self.point(from: center, at: radians, radius: inner)
                 let end = Self.point(from: center, at: radians, radius: outer)
