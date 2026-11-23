@@ -54,46 +54,6 @@ public extension Wallet {
 }
 
 extension Wallet: Codable {
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case kind
-        case iconId
-        case initialBalance
-        case loanAmount
-        case sortOrder
-        case archivedAt
-        case createdAt
-        case updatedAt
-    }
-
-    public init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let id = try container.decode(ID.self, forKey: .id)
-        let name = try container.decode(String.self, forKey: .name)
-        let kind = try container.decode(Kind.self, forKey: .kind)
-        let iconId = try container.decode(Icon.ID.self, forKey: .iconId)
-        let initialBalance = try container.decode(Int.self, forKey: .initialBalance)
-        let loanAmount = try container.decodeIfPresent(Int.self, forKey: .loanAmount)
-        let sortOrder = try container.decode(Int.self, forKey: .sortOrder)
-        let archivedAt = try container.decodeIfPresent(Date.self, forKey: .archivedAt)
-        let createdAt = try container.decode(Date.self, forKey: .createdAt)
-        let updatedAt = try container.decode(Date.self, forKey: .updatedAt)
-
-        self.init(
-            id: id,
-            name: name,
-            kind: kind,
-            iconId: iconId,
-            initialBalance: initialBalance,
-            loanAmount: loanAmount,
-            sortOrder: sortOrder,
-            archivedAt: archivedAt,
-            createdAt: createdAt,
-            updatedAt: updatedAt
-        )
-    }
-
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
