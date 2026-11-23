@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryTagDraft: Hashable, Sendable {
+public struct EntryTagDraft: Draft, Hashable, Sendable {
     public var id: EntryTag.ID?
     public var name: String
 
@@ -82,12 +82,6 @@ public extension EntryTagDraft {
 
 private extension EntryTagDraft {
     var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    func validate() throws {
-        if let problem = problems.first {
-            throw problem
-        }
+        name.trimmed
     }
 }

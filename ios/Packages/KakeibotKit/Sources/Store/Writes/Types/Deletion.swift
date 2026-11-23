@@ -25,20 +25,54 @@ public extension Deletion {
     init(merging deletions: [Deletion]) {
         self.init()
 
-        self.icons = deletions.flatMap(\.icons)
-        self.wallets = deletions.flatMap(\.wallets)
-        self.categories = deletions.flatMap(\.categories)
-        self.tags = deletions.flatMap(\.tags)
-        self.recurrings = deletions.flatMap(\.recurrings)
-        self.templates = deletions.flatMap(\.templates)
-        self.budgets = deletions.flatMap(\.budgets)
-        self.valuations = deletions.flatMap(\.valuations)
-        self.adjustments = deletions.flatMap(\.adjustments)
-        self.shelfIcons = deletions.flatMap(\.shelfIcons)
-        self.rewardRules = deletions.flatMap(\.rewardRules)
-        self.rewardLogs = deletions.flatMap(\.rewardLogs)
-        self.themes = deletions.flatMap(\.themes)
+        for column in Self.columns {
+            column.merge(&self, deletions)
+        }
+
         self.entries = deletions.flatMap(\.entries)
         self.themeChoice = deletions.lazy.compactMap(\.themeChoice).first
+    }
+}
+
+extension Deletion {
+    var records: [any StoreRecord] {
+        Self.columns.flatMap { $0.records(self) }
+    }
+}
+
+private extension Deletion {
+    static var columns: [DeletionColumn] {
+        [
+            DeletionColumn(\.icons),
+            DeletionColumn(\.wallets),
+            DeletionColumn(\.categories),
+            DeletionColumn(\.tags),
+            DeletionColumn(\.recurrings),
+            DeletionColumn(\.templates),
+            DeletionColumn(\.budgets),
+            DeletionColumn(\.valuations),
+            DeletionColumn(\.adjustments),
+            DeletionColumn(\.shelfIcons),
+            DeletionColumn(\.rewardRules),
+            DeletionColumn(\.rewardLogs),
+            DeletionColumn(\.themes)
+        ]
+    }
+}
+
+private struct DeletionColumn {
+    let merge: (inout Deletion, [Deletion]) -> Void
+    let records: (Deletion) -> [any StoreRecord]
+}
+
+private extension DeletionColumn {
+    init(_ keyPath: WritableKeyPath<Deletion, [some StoreRecord]>) {
+        self.merge = { merged, deletions in
+            merged[keyPath: keyPath] = deletions.flatMap { $0[keyPath: keyPath] }
+        }
+
+        self.records = { deletion in
+            deletion[keyPath: keyPath]
+        }
     }
 }

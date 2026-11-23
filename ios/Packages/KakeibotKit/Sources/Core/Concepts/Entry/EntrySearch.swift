@@ -24,7 +24,7 @@ public extension EntrySearch {
         _ text: String,
         in recent: [String]
     ) -> [String] {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = text.trimmed
 
         guard !trimmed.isEmpty else {
             return recent

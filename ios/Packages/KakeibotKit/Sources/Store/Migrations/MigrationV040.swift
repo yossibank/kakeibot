@@ -13,11 +13,6 @@ enum MigrationV040 {
 
         try db.create(index: "adjustment_wallet_id", on: "adjustment", columns: ["wallet_id"])
 
-        try MigrationV026.createTriggers(
-            on: "adjustment",
-            key: "id",
-            recording: MigrationV028.recording,
-            in: db
-        )
+        try MigrationSyncTriggers.create(on: "adjustment", key: "id", in: db)
     }
 }

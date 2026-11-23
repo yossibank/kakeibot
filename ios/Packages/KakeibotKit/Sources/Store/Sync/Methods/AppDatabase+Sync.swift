@@ -56,22 +56,19 @@ public extension AppDatabase {
 
     func turnOnSyncReplacingLocal() async throws {
         try await writer.write { db in
-            try Self.setApplying(true, in: db)
+            try Self.withApplying(true, in: db) {
+                for table in SyncTable.allCases.reversed() {
+                    let ids = try Self.localIDs(in: table, db: db)
 
-            for table in SyncTable.allCases.reversed() {
-                let ids = try Self.localIDs(in: table, db: db)
-
-                for id in ids {
-                    try db.execute(
-                        sql: "DELETE FROM \(table.rawValue) WHERE \(table.keyColumn) = ?",
-                        arguments: [id]
-                    )
+                    for id in ids {
+                        let key = SyncKey(table: table, id: id)
+                        try Self.deleteLocalRow(for: key, in: db)
+                    }
                 }
-            }
 
-            try Self.clearSync(in: db)
-            try db.execute(sql: Self.turnOnSQL)
-            try Self.setApplying(false, in: db)
+                try Self.clearSync(in: db)
+                try db.execute(sql: Self.turnOnSQL)
+            }
         }
     }
 
@@ -217,6 +214,20 @@ extension AppDatabase {
         try db.execute(sql: "UPDATE sync_state SET applying = ?", arguments: [applying])
     }
 
+    static func withApplying<Result>(
+        _ applying: Bool,
+        in db: Database,
+        _ body: () throws -> Result
+    ) throws -> Result {
+        try setApplying(applying, in: db)
+
+        let result = try body()
+
+        try setApplying(!applying, in: db)
+
+        return result
+    }
+
     static func saveZone(
         for key: SyncKey,
         in db: Database
@@ -231,6 +242,16 @@ extension AppDatabase {
         try Row.fetchOne(
             db,
             sql: "SELECT * FROM \(key.table.rawValue) WHERE \(key.table.keyColumn) = ?",
+            arguments: [key.id]
+        )
+    }
+
+    static func deleteLocalRow(
+        for key: SyncKey,
+        in db: Database
+    ) throws {
+        try db.execute(
+            sql: "DELETE FROM \(key.table.rawValue) WHERE \(key.table.keyColumn) = ?",
             arguments: [key.id]
         )
     }

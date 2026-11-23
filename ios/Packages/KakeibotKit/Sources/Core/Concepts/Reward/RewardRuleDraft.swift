@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RewardRuleDraft: Hashable, Sendable {
+public struct RewardRuleDraft: Draft, Hashable, Sendable {
     public var name: String
     public var amount: Int
     public var icon: IconDraft
@@ -81,12 +81,6 @@ public extension RewardRuleDraft {
 
 private extension RewardRuleDraft {
     var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    func validate() throws {
-        if let problem = problems.first {
-            throw problem
-        }
+        name.trimmed
     }
 }

@@ -26,30 +26,15 @@ public extension SettingKey where Value == WidgetRecord? {
 
 public extension SettingKey where Value == EntryCategory.ID? {
     static var feeCategory: Self {
-        Self(
-            .feeCategoryId,
-            default: nil,
-            decode: { EntryCategory.ID($0) },
-            encode: { $0?.description }
-        )
+        Self(optional: .feeCategoryId)
     }
 
     static var transferOutCategory: Self {
-        Self(
-            .transferOutCategoryId,
-            default: nil,
-            decode: { EntryCategory.ID($0) },
-            encode: { $0?.description }
-        )
+        Self(optional: .transferOutCategoryId)
     }
 
     static var transferInCategory: Self {
-        Self(
-            .transferInCategoryId,
-            default: nil,
-            decode: { EntryCategory.ID($0) },
-            encode: { $0?.description }
-        )
+        Self(optional: .transferInCategoryId)
     }
 }
 
@@ -66,21 +51,11 @@ public extension SettingKey where Value == Date? {
 
 public extension SettingKey where Value == String? {
     static var reviewRequestedVersion: Self {
-        Self(
-            .reviewRequestedVersion,
-            default: nil,
-            decode: { $0 },
-            encode: { $0 }
-        )
+        Self(optional: .reviewRequestedVersion)
     }
 
     static var whatsNewSeenVersion: Self {
-        Self(
-            .whatsNewSeenVersion,
-            default: nil,
-            decode: { $0 },
-            encode: { $0 }
-        )
+        Self(optional: .whatsNewSeenVersion)
     }
 }
 

@@ -39,11 +39,11 @@ struct MigrationFrozenValuesTests {
             "\(table).\(key)"
         }
 
-        let events = MigrationV026.events.map { name, event, row in
+        let events = MigrationSyncTriggers.events.map { name, event, row in
             "\(name) \(event) \(row)"
         }
 
-        let localSettingKeys = MigrationV026.localSettingKeys
+        let localSettingKeys = MigrationSyncTriggers.localSettingKeys
             .split(separator: ",")
             .map { key in
                 key.trimmingCharacters(in: CharacterSet(charactersIn: " '"))
@@ -52,7 +52,8 @@ struct MigrationFrozenValuesTests {
         #expect(tables == Self.syncTables, Self.hint)
         #expect(events == Self.syncEvents, Self.hint)
         #expect(localSettingKeys == Self.localSettingKeys, Self.hint)
-        #expect(MigrationV026.recording == Self.syncRecording, Self.hint)
+        #expect(MigrationSyncTriggers.ownRecording == Self.syncRecording, Self.hint)
+        #expect(MigrationSyncTriggers.sharedRecording == Self.sharedRecording, Self.hint)
     }
 }
 
@@ -151,4 +152,8 @@ extension MigrationFrozenValuesTests {
     ]
 
     static let syncRecording = "(SELECT enabled AND NOT applying FROM sync_state)"
+
+    static let sharedRecording = """
+    (SELECT (enabled OR EXISTS (SELECT 1 FROM sync_share)) AND NOT applying FROM sync_state)
+    """
 }

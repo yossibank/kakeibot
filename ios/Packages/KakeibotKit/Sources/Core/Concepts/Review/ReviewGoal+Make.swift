@@ -33,7 +33,7 @@ public extension ReviewGoal {
     }
 
     static func normalizedMemo(_ memo: String?) -> String? {
-        let trimmed = memo?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let trimmed = memo?.trimmed ?? ""
         return trimmed.isEmpty ? nil : trimmed.precomposedStringWithCompatibilityMapping
     }
 

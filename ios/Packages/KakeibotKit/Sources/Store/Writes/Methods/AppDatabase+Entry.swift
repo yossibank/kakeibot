@@ -3,7 +3,7 @@ import Foundation
 import GRDB
 
 public extension AppDatabase {
-    enum WriteError: Error, Equatable {
+    enum EntryWriteError: Error, Equatable {
         case entryNotFound
         case tagMismatch
     }
@@ -39,12 +39,6 @@ public extension AppDatabase {
             }
 
             try Self.recalculateCardBills(change, in: db, at: now)
-        }
-    }
-
-    func fee(of id: Entry.ID) async throws -> Entry? {
-        try await writer.read { db in
-            try Self.fee(of: id, in: db)
         }
     }
 
@@ -161,7 +155,7 @@ extension AppDatabase {
         try prepareSharedTransfer(entry, in: db, at: now)
 
         guard try Self.tag(entry.tagId, belongsTo: entry.categoryId, in: db) else {
-            throw WriteError.tagMismatch
+            throw EntryWriteError.tagMismatch
         }
 
         try entry.save(db)
@@ -195,13 +189,6 @@ extension AppDatabase {
         _ = try NoSpendDay.deleteOne(db, key: date)
 
         return [day]
-    }
-
-    static func fee(
-        of id: Entry.ID,
-        in db: Database
-    ) throws -> Entry? {
-        try Entry.filter(Column("transfer_id") == id).fetchOne(db)
     }
 
     @discardableResult
@@ -249,8 +236,11 @@ private extension AppDatabase {
     ) throws -> Bool {
         switch change {
         case let .category(id):
-            let category = try EntryCategory.fetchOne(db, key: id)
-            return category?.kind.rawValue == entry.type.rawValue
+            guard let category = try EntryCategory.fetchOne(db, key: id) else {
+                return false
+            }
+
+            return category.kind == entry.type.categoryKind
 
         case let .wallet(id):
             return try entry.transferId == nil && Wallet.exists(db, key: id)
@@ -268,7 +258,7 @@ private extension AppDatabase {
         }
 
         guard let existing = try Entry.fetchOne(db, key: id) else {
-            throw WriteError.entryNotFound
+            throw EntryWriteError.entryNotFound
         }
 
         return try draft.applied(to: existing, at: now)

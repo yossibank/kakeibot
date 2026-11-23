@@ -372,7 +372,7 @@ private extension EntryModel {
         }
 
         guard var entry = try await database.entry(editingId) else {
-            throw AppDatabase.WriteError.entryNotFound
+            throw AppDatabase.EntryWriteError.entryNotFound
         }
 
         if let transferId = entry.transferId,

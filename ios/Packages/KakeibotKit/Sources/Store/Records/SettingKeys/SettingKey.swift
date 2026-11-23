@@ -50,23 +50,31 @@ extension SettingKey where Value: RawRepresentable, Value.RawValue == String {
     }
 }
 
-extension SettingKey where Value == Set<SettingsScreen> {
-    init(
-        screens key: Setting.Key,
-        default defaultValue: Value = []
-    ) {
+extension SettingKey {
+    init<Wrapped: LosslessStringConvertible>(optional key: Setting.Key) where Value == Wrapped? {
         self.init(
             key,
-            default: defaultValue,
+            default: nil,
+            decode: { Wrapped($0) },
+            encode: { $0?.description }
+        )
+    }
+
+    init<Element: RawRepresentable<String> & Hashable>(
+        set key: Setting.Key
+    ) where Value == Set<Element> {
+        self.init(
+            key,
+            default: [],
             decode: { text in
-                let screens = text.split(separator: ",").compactMap { name in
-                    SettingsScreen(rawValue: String(name))
+                let elements = text.split(separator: ",").compactMap { name in
+                    Element(rawValue: String(name))
                 }
 
-                return Set(screens)
+                return Set(elements)
             },
-            encode: { screens in
-                let names = screens.map(\.rawValue).sorted()
+            encode: { elements in
+                let names = elements.map(\.rawValue).sorted()
 
                 return names.isEmpty ? nil : names.joined(separator: ",")
             }

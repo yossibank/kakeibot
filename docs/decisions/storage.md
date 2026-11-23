@@ -25,6 +25,15 @@
 > [!IMPORTANT]
 > 固定した値が今の `allCases` と一致するかは、`MigrationFrozenValuesTests` が確かめる。case を足すと落ちる。
 
+## マイグレーションから呼ぶコード
+
+**決定：マイグレーションは、Core の型と計算を呼ばない。複数の番号で使う SQL は、`MigrationSyncTriggers` のような固定の型に置く。**
+
+| 項目 | 内容 |
+| --- | --- |
+| 理由 | Core の計算を変えると、配った後のマイグレーションの結果まで変わる |
+| 例外 | `MigrationV025` は `Recurring` の予定日の計算を呼ぶ。配った後なので変えない |
+
 ## DB の変更を画面に届ける
 
 **決定：`ValueObservation`。**

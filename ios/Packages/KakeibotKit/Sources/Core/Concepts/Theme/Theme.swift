@@ -25,11 +25,11 @@ public struct Theme: Codable, Hashable, Identifiable, Sendable {
         textPrimary: String,
         textSecondary: String,
         accent: String,
-        expense: String,
+        expense: String = "#E3A3A3",
         income: String,
-        cornerRadius: Int,
-        fontId: String,
-        isBuiltin: Bool,
+        cornerRadius: Int = 16,
+        fontId: String = "system",
+        isBuiltin: Bool = false,
         createdAt: Date,
         updatedAt: Date
     ) {

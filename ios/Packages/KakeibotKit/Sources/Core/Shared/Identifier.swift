@@ -16,7 +16,7 @@ public struct Identifier<Owner>: Hashable, Sendable {
     }
 }
 
-extension Identifier: CustomStringConvertible {
+extension Identifier: LosslessStringConvertible {
     public var description: String {
         uuid.uuidString.lowercased()
     }

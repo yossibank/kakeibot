@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RewardGoalDraft: Hashable, Sendable {
+public struct RewardGoalDraft: Draft, Hashable, Sendable {
     public var name: String
     public var targetAmount: Int
 
@@ -53,12 +53,6 @@ public extension RewardGoalDraft {
 
 private extension RewardGoalDraft {
     var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    func validate() throws {
-        if let problem = problems.first {
-            throw problem
-        }
+        name.trimmed
     }
 }

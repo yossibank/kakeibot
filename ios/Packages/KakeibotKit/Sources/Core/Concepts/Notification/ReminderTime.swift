@@ -57,7 +57,7 @@ extension ReminderTime: Comparable {
     }
 }
 
-extension ReminderTime: CustomStringConvertible {
+extension ReminderTime: LosslessStringConvertible {
     public var description: String {
         let hour = hour < 10 ? "0\(hour)" : "\(hour)"
         let minute = minute < 10 ? "0\(minute)" : "\(minute)"

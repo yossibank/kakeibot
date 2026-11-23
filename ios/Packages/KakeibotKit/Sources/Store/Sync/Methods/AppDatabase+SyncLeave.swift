@@ -109,9 +109,11 @@ private extension AppDatabase {
         let entryIDs = try entries.fetchAll(db).map(\.id)
 
         try detachRewardGoals(from: entryIDs, in: db, at: now)
-        try setApplying(true, in: db)
-        _ = try entries.deleteAll(db)
-        try setApplying(false, in: db)
+
+        try withApplying(true, in: db) {
+            _ = try entries.deleteAll(db)
+        }
+
         _ = try deleteRecurrings(recurrings, in: db, at: now)
 
         try db.execute(
@@ -127,19 +129,18 @@ private extension AppDatabase {
             arguments: [walletID]
         )
 
-        try setApplying(true, in: db)
+        try withApplying(true, in: db) {
+            for sql in [
+                "DELETE FROM valuation WHERE wallet_id = ?1",
+                "DELETE FROM adjustment WHERE wallet_id = ?1",
+                "DELETE FROM tag WHERE category_id IN (\(walletCategories))",
+                "DELETE FROM category WHERE wallet_id = ?1",
+                "DELETE FROM wallet WHERE id = ?1"
+            ] {
+                try db.execute(sql: sql, arguments: [walletID])
+            }
 
-        for sql in [
-            "DELETE FROM valuation WHERE wallet_id = ?1",
-            "DELETE FROM adjustment WHERE wallet_id = ?1",
-            "DELETE FROM tag WHERE category_id IN (\(walletCategories))",
-            "DELETE FROM category WHERE wallet_id = ?1",
-            "DELETE FROM wallet WHERE id = ?1"
-        ] {
-            try db.execute(sql: sql, arguments: [walletID])
+            try Icon.filter(icons.contains(Column("id"))).deleteAll(db)
         }
-
-        try Icon.filter(icons.contains(Column("id"))).deleteAll(db)
-        try setApplying(false, in: db)
     }
 }

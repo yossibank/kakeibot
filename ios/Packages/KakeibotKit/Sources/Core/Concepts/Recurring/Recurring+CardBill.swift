@@ -2,6 +2,10 @@ public extension Recurring {
     static let billChoiceCount = 3
     static let billShiftTitles = ["いつもどおり", "次に回す", "2 回先"]
 
+    var isCardBill: Bool {
+        closingDay != nil
+    }
+
     static func billText(paidOn date: LocalDate) -> String {
         "\(date.monthDayText)払い"
     }
@@ -84,7 +88,7 @@ public extension Recurring {
         for used: LocalDate,
         count: Int
     ) -> [LocalDate] {
-        guard closingDay != nil else {
+        guard isCardBill else {
             return []
         }
 
@@ -119,7 +123,7 @@ public extension [Recurring] {
     func cardBill(paidBy walletId: Wallet.ID?) -> Recurring? {
         first { recurring in
             recurring.type == .transfer
-                && recurring.closingDay != nil
+                && recurring.isCardBill
                 && recurring.toWalletId == walletId
         }
     }

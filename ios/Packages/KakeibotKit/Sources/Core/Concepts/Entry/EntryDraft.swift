@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryDraft: Hashable, Sendable {
+public struct EntryDraft: Draft, Hashable, Sendable {
     public var type: Entry.Kind
     public var amount: Int
     public var date: LocalDate
@@ -184,13 +184,6 @@ private extension EntryDraft {
     }
 
     var trimmedMemo: String? {
-        let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
-    }
-
-    func validate() throws {
-        if let problem = problems.first {
-            throw problem
-        }
+        memo.trimmedOrNil
     }
 }

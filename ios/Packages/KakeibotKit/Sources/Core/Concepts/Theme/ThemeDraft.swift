@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ThemeDraft: Hashable, Sendable {
+public struct ThemeDraft: Draft, Hashable, Sendable {
     public var name: String
     public var background: String
     public var surface: String
@@ -97,11 +97,7 @@ public extension ThemeDraft {
             textPrimary: text,
             textSecondary: subtext,
             accent: accent,
-            expense: Self.expenseColor,
             income: accent,
-            cornerRadius: Self.cornerRadius,
-            fontId: Self.fontId,
-            isBuiltin: false,
             createdAt: now,
             updatedAt: now
         )
@@ -129,12 +125,8 @@ public extension ThemeDraft {
 }
 
 private extension ThemeDraft {
-    static let expenseColor = "#E3A3A3"
-    static let cornerRadius = 16
-    static let fontId = "system"
-
     var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
+        name.trimmed
     }
 
     var nameProblems: [Problem] {
@@ -144,12 +136,6 @@ private extension ThemeDraft {
             [.nameTooLong]
         } else {
             []
-        }
-    }
-
-    func validate() throws {
-        if let problem = problems.first {
-            throw problem
         }
     }
 }

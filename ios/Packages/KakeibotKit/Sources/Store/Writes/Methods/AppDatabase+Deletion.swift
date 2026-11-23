@@ -61,25 +61,3 @@ extension AppDatabase {
             )
     }
 }
-
-private extension Deletion {
-    var records: [any StoreRecord] {
-        let tables: [[any StoreRecord]] = [
-            icons,
-            wallets,
-            categories,
-            tags,
-            recurrings,
-            templates,
-            budgets,
-            valuations,
-            adjustments,
-            shelfIcons,
-            rewardRules,
-            rewardLogs,
-            themes
-        ]
-
-        return tables.flatMap(\.self)
-    }
-}

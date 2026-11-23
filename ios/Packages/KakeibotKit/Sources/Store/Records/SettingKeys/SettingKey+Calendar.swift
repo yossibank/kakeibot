@@ -41,12 +41,7 @@ private extension SettingKey where Value == HolidayShift {
 
 public extension SettingKey where Value == YearMonth? {
     static var budgetCarryoverFrom: Self {
-        Self(
-            .budgetCarryoverFrom,
-            default: nil,
-            decode: { YearMonth($0) },
-            encode: { $0?.description }
-        )
+        Self(optional: .budgetCarryoverFrom)
     }
 }
 
@@ -58,12 +53,7 @@ public extension SettingKey where Value == Weekday {
 
 public extension SettingKey where Value == ReminderTime? {
     static var reminderTime: Self {
-        Self(
-            .reminderTime,
-            default: nil,
-            decode: { ReminderTime($0) },
-            encode: { $0?.description }
-        )
+        Self(optional: .reminderTime)
     }
 }
 

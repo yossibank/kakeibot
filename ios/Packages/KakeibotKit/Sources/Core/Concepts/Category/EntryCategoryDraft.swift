@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryCategoryDraft: Hashable, Sendable {
+public struct EntryCategoryDraft: Draft, Hashable, Sendable {
     public var kind: EntryCategory.Kind
     public var name: String
     public var mark: Mark
@@ -22,9 +22,7 @@ public struct EntryCategoryDraft: Hashable, Sendable {
         _ category: EntryCategory,
         icon: Icon
     ) {
-        let mark = Mark(icon)
-
-        self.init(kind: category.kind, name: category.name, mark: mark, color: icon.color)
+        self.init(kind: category.kind, name: category.name, mark: icon.mark, color: icon.color)
     }
 }
 
@@ -90,12 +88,6 @@ public extension EntryCategoryDraft {
 
 private extension EntryCategoryDraft {
     var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    func validate() throws {
-        if let problem = problems.first {
-            throw problem
-        }
+        name.trimmed
     }
 }

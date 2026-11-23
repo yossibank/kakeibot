@@ -1,6 +1,6 @@
 import Foundation
 
-public struct IconDraft: Hashable, Sendable {
+public struct IconDraft: Draft, Hashable, Sendable {
     public var mark: Mark
     public var color: String
 
@@ -13,30 +13,12 @@ public struct IconDraft: Hashable, Sendable {
     }
 
     public init(_ icon: Icon) {
-        let mark = Mark(icon)
-
-        self.init(mark: mark, color: icon.color)
+        self.init(mark: icon.mark, color: icon.color)
     }
 }
 
 public extension IconDraft {
-    enum Mark: Hashable, Sendable {
-        case glyph(Icon.Glyph)
-        case emoji(String)
-        case text(String)
-
-        public init(_ icon: Icon) {
-            let emoji = icon.emoji ?? ""
-
-            if let glyph = icon.glyph {
-                self = .glyph(glyph)
-            } else if !emoji.isEmpty {
-                self = .emoji(emoji)
-            } else {
-                self = .text(icon.text ?? "")
-            }
-        }
-    }
+    typealias Mark = Icon.Mark
 
     static let maxTextLength = 3
 
@@ -83,10 +65,10 @@ private extension IconDraft {
             return []
 
         case let .emoji(value):
-            return Self.trimmed(value).isEmpty ? [.emptyMark] : []
+            return value.trimmed.isEmpty ? [.emptyMark] : []
 
         case let .text(value):
-            let trimmed = Self.trimmed(value)
+            let trimmed = value.trimmed
 
             if trimmed.isEmpty {
                 return [.emptyMark]
@@ -97,11 +79,7 @@ private extension IconDraft {
     }
 
     var isValidColor: Bool {
-        let digits = color.dropFirst()
-
-        return color.hasPrefix("#")
-            && digits.count == 6
-            && digits.allSatisfy(\.isHexDigit)
+        ThemeHex.rgb(color) != nil
     }
 
     var glyph: Icon.Glyph? {
@@ -114,7 +92,7 @@ private extension IconDraft {
 
     var emoji: String? {
         if case let .emoji(value) = mark {
-            Self.trimmed(value)
+            value.trimmed
         } else {
             nil
         }
@@ -122,19 +100,9 @@ private extension IconDraft {
 
     var text: String? {
         if case let .text(value) = mark {
-            Self.trimmed(value)
+            value.trimmed
         } else {
             nil
-        }
-    }
-
-    static func trimmed(_ value: String) -> String {
-        value.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    func validate() throws {
-        if let problem = problems.first {
-            throw problem
         }
     }
 }

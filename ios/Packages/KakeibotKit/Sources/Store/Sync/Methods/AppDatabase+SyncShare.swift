@@ -48,19 +48,9 @@ extension AppDatabase {
         for key: SyncKey,
         in db: Database
     ) throws -> Wallet.ID? {
-        for candidate in try shareCandidates(for: key, in: db) {
-            let isShared = try Bool.fetchOne(
-                db,
-                sql: "SELECT EXISTS (SELECT 1 FROM sync_share WHERE wallet_id = ?)",
-                arguments: [candidate]
-            ) ?? false
-
-            if isShared {
-                return Wallet.ID(candidate)
-            }
-        }
-
-        return nil
+        try shareCandidates(for: key, in: db)
+            .first { try isSharedWallet($0, in: db) }
+            .flatMap { Wallet.ID($0) }
     }
 
     static func notifyShareChanges(in db: Database) throws {
@@ -83,9 +73,7 @@ private extension AppDatabase {
 
         let wallets = try rows.map { try Wallet(row: $0) }
         let iconIds = wallets.map(\.iconId)
-        let icons = try Icon.fetchAll(db, keys: iconIds)
-        let iconPairs = icons.map { ($0.id, $0) }
-        let iconsByID = Dictionary(uniqueKeysWithValues: iconPairs)
+        let iconsByID = try Icon.byID(iconIds, in: db)
 
         return zip(wallets, rows).map { wallet, row in
             WalletShare(wallet: wallet, icon: iconsByID[wallet.iconId], isShared: row["is_shared"])
@@ -105,9 +93,7 @@ private extension AppDatabase {
 
         let wallets = try rows.map { try Wallet(row: $0) }
         let iconIds = wallets.map(\.iconId)
-        let icons = try Icon.fetchAll(db, keys: iconIds)
-        let iconPairs = icons.map { ($0.id, $0) }
-        let iconsByID = Dictionary(uniqueKeysWithValues: iconPairs)
+        let iconsByID = try Icon.byID(iconIds, in: db)
 
         return zip(wallets, rows).map { wallet, row in
             JoinedShare(

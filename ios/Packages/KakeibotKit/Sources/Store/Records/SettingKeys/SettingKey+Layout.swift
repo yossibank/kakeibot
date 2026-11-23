@@ -42,22 +42,7 @@ public extension SettingKey where Value == Set<String> {
 
 public extension SettingKey where Value == Set<HomeSection> {
     static var homeHiddenSections: Self {
-        Self(
-            .homeHiddenSections,
-            default: [],
-            decode: { text in
-                let sections = text.split(separator: ",").compactMap { name in
-                    HomeSection(rawValue: String(name))
-                }
-
-                return Set(sections)
-            },
-            encode: { sections in
-                let names = sections.map(\.rawValue).sorted()
-
-                return names.isEmpty ? nil : names.joined(separator: ",")
-            }
-        )
+        Self(set: .homeHiddenSections)
     }
 }
 
@@ -81,11 +66,11 @@ public extension SettingKey where Value == ReviewKind {
 
 public extension SettingKey where Value == Set<SettingsScreen> {
     static var closedHints: Self {
-        Self(screens: .closedHints)
+        Self(set: .closedHints)
     }
 
     static var closedHiddenLists: Self {
-        Self(screens: .closedHiddenLists)
+        Self(set: .closedHiddenLists)
     }
 }
 

@@ -70,49 +70,9 @@ extension AppDatabase {
     static var migrator: DatabaseMigrator {
         var migrator = DatabaseMigrator()
 
-        migrator.registerMigration("v1", migrate: MigrationV001.migrate)
-        migrator.registerMigration("v2", migrate: MigrationV002.migrate)
-        migrator.registerMigration("v3", migrate: MigrationV003.migrate)
-        migrator.registerMigration("v4", migrate: MigrationV004.migrate)
-        migrator.registerMigration("v5", migrate: MigrationV005.migrate)
-        migrator.registerMigration("v6", migrate: MigrationV006.migrate)
-        migrator.registerMigration("v7", migrate: MigrationV007.migrate)
-        migrator.registerMigration("v8", migrate: MigrationV008.migrate)
-        migrator.registerMigration("v9", migrate: MigrationV009.migrate)
-        migrator.registerMigration("v10", migrate: MigrationV010.migrate)
-        migrator.registerMigration("v11", migrate: MigrationV011.migrate)
-        migrator.registerMigration("v12", migrate: MigrationV012.migrate)
-        migrator.registerMigration("v13", migrate: MigrationV013.migrate)
-        migrator.registerMigration("v15", migrate: MigrationV015.migrate)
-        migrator.registerMigration("v16", migrate: MigrationV016.migrate)
-        migrator.registerMigration("v17", migrate: MigrationV017.migrate)
-        migrator.registerMigration("v18", migrate: MigrationV018.migrate)
-        migrator.registerMigration("v19", migrate: MigrationV019.migrate)
-        migrator.registerMigration("v20", migrate: MigrationV020.migrate)
-        migrator.registerMigration("v21", migrate: MigrationV021.migrate)
-        migrator.registerMigration("v22", migrate: MigrationV022.migrate)
-        migrator.registerMigration("v23", migrate: MigrationV023.migrate)
-        migrator.registerMigration("v24", migrate: MigrationV024.migrate)
-        migrator.registerMigration("v25", migrate: MigrationV025.migrate)
-        migrator.registerMigration("v26", migrate: MigrationV026.migrate)
-        migrator.registerMigration("v27", migrate: MigrationV027.migrate)
-        migrator.registerMigration("v28", migrate: MigrationV028.migrate)
-        migrator.registerMigration("v29", migrate: MigrationV029.migrate)
-        migrator.registerMigration("v30", migrate: MigrationV030.migrate)
-        migrator.registerMigration("v31", migrate: MigrationV031.migrate)
-        migrator.registerMigration("v32", migrate: MigrationV032.migrate)
-        migrator.registerMigration("v33", migrate: MigrationV033.migrate)
-        migrator.registerMigration("v34", migrate: MigrationV034.migrate)
-        migrator.registerMigration("v35", migrate: MigrationV035.migrate)
-        migrator.registerMigration("v36", migrate: MigrationV036.migrate)
-        migrator.registerMigration("v37", migrate: MigrationV037.migrate)
-        migrator.registerMigration("v38", migrate: MigrationV038.migrate)
-        migrator.registerMigration("v39", migrate: MigrationV039.migrate)
-        migrator.registerMigration("v40", migrate: MigrationV040.migrate)
-        migrator.registerMigration("v41", migrate: MigrationV041.migrate)
-        migrator.registerMigration("v42", migrate: MigrationV042.migrate)
-        migrator.registerMigration("v43", migrate: MigrationV043.migrate)
-        migrator.registerMigration("v44", migrate: MigrationV044.migrate)
+        for (name, migrate) in migrations {
+            migrator.registerMigration(name, migrate: migrate)
+        }
 
         return migrator
     }
@@ -124,6 +84,54 @@ private extension AppDatabase {
     static let busyTimeout: TimeInterval = 5
 
     static let migratedTemplate = try? makeMigratedTemplate()
+
+    static var migrations: [(String, @Sendable (Database) throws -> Void)] {
+        [
+            ("v1", MigrationV001.migrate),
+            ("v2", MigrationV002.migrate),
+            ("v3", MigrationV003.migrate),
+            ("v4", MigrationV004.migrate),
+            ("v5", MigrationV005.migrate),
+            ("v6", MigrationV006.migrate),
+            ("v7", MigrationV007.migrate),
+            ("v8", MigrationV008.migrate),
+            ("v9", MigrationV009.migrate),
+            ("v10", MigrationV010.migrate),
+            ("v11", MigrationV011.migrate),
+            ("v12", MigrationV012.migrate),
+            ("v13", MigrationV013.migrate),
+            ("v15", MigrationV015.migrate),
+            ("v16", MigrationV016.migrate),
+            ("v17", MigrationV017.migrate),
+            ("v18", MigrationV018.migrate),
+            ("v19", MigrationV019.migrate),
+            ("v20", MigrationV020.migrate),
+            ("v21", MigrationV021.migrate),
+            ("v22", MigrationV022.migrate),
+            ("v23", MigrationV023.migrate),
+            ("v24", MigrationV024.migrate),
+            ("v25", MigrationV025.migrate),
+            ("v26", MigrationV026.migrate),
+            ("v27", MigrationV027.migrate),
+            ("v28", MigrationV028.migrate),
+            ("v29", MigrationV029.migrate),
+            ("v30", MigrationV030.migrate),
+            ("v31", MigrationV031.migrate),
+            ("v32", MigrationV032.migrate),
+            ("v33", MigrationV033.migrate),
+            ("v34", MigrationV034.migrate),
+            ("v35", MigrationV035.migrate),
+            ("v36", MigrationV036.migrate),
+            ("v37", MigrationV037.migrate),
+            ("v38", MigrationV038.migrate),
+            ("v39", MigrationV039.migrate),
+            ("v40", MigrationV040.migrate),
+            ("v41", MigrationV041.migrate),
+            ("v42", MigrationV042.migrate),
+            ("v43", MigrationV043.migrate),
+            ("v44", MigrationV044.migrate)
+        ]
+    }
 
     static var groupContainer: URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)

@@ -28,6 +28,12 @@ public extension AppDatabase {
         try await writer.read { try Entry.fetchOne($0, key: id) }
     }
 
+    func fee(of id: Entry.ID) async throws -> Entry? {
+        try await writer.read { db in
+            try Self.fee(of: id, in: db)
+        }
+    }
+
     func recentMemos(limit: Int) async throws -> [String] {
         try await writer.read { db in
             try String.fetchAll(db, sql: Self.recentMemosSQL, arguments: [limit])
@@ -76,6 +82,13 @@ extension AppDatabase {
             items: items,
             sharedWalletIds: sharedWalletIds
         )
+    }
+
+    static func fee(
+        of id: Entry.ID,
+        in db: Database
+    ) throws -> Entry? {
+        try Entry.filter(Column("transfer_id") == id).fetchOne(db)
     }
 
     static func sharedWalletIds(in db: Database) throws -> Set<Wallet.ID> {
@@ -140,11 +153,8 @@ private extension AppDatabase {
             .map(Column.init)
 
         return try Recurring
+            .shownCardBills()
             .select(columns)
-            .filter(Column("archived_at") == nil)
-            .filter(Column("type") == Entry.Kind.transfer)
-            .filter(Column("closing_day") != nil)
-            .order(Recurring.sortOrder, Column("created_at"))
             .fetchAll(db)
     }
 
