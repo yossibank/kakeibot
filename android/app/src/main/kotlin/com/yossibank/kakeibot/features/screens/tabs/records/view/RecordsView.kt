@@ -172,7 +172,7 @@ fun RecordsView(
 private fun SummaryCard(model: RecordsModel) {
     val expense = model.expenseTotal.clamped
     val income = model.incomeTotal.clamped
-    val balance = income - expense
+    val balance = model.balance.clamped
 
     Column(
         modifier = Modifier
@@ -208,7 +208,7 @@ private fun SummaryCard(model: RecordsModel) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = if (balance < 0) "収支 · 赤字" else "収支 · 黒字",
+                text = model.balanceTitle,
                 modifier = Modifier.weight(1f),
                 color = Palette.subtext,
                 style = textFont(style = FontTextStyle.Caption),

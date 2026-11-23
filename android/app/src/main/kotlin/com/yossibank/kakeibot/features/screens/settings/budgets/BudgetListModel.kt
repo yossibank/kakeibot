@@ -93,6 +93,15 @@ class BudgetListModel(
     val periodText: String
         get() = overview?.period?.let(PeriodText::range) ?: ""
 
+    val startText: String
+        get() = "${month?.month ?: ""}月（$periodText）から使う額"
+
+    val categoriesNote: String
+        get() = "合計 ${AmountText.text(amount = categoriesTotal)}"
+
+    val unbudgetedNote: String
+        get() = "${unbudgeted.size} カテゴリ"
+
     val recurringExpense: Long
         get() = overview?.recurringExpense ?: 0L
 

@@ -102,7 +102,7 @@ internal fun BudgetTotalCard(
             )
 
             FittedText(
-                text = "${model.month?.month ?: ""}月（${model.periodText}）から使う額",
+                text = model.startText,
                 color = Palette.subtext,
                 style = textFont(style = FontTextStyle.Caption),
             )

@@ -28,6 +28,8 @@ Android は、次の技術を使う。
 
 `:core` は、iOS の Core のファイルと 1 対 1 に対応させる。レシートの読み取りは Android に無い。`Concepts/Receipt/` は、書き出しが使う `ItemName` だけを移す。
 
+書き出しの JSON の行は、Android だけの `ExportV1Rows.kt` に書く。表の行の変換は、題材ごとの `ExportV1Rows<題材>.kt` に分ける。
+
 | iOS | Android |
 | --- | --- |
 | `Core/Concepts/<概念>/X.swift` | `core/concepts/<概念>/X.kt`。概念の名前は小文字にする |
@@ -76,7 +78,10 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | `AppDatabase` の拡張 | `AppDatabase` の拡張関数（suspend） |
 | 変化を見張る `ValueObservation`（`xxxUpdates()`） | `Flow` を返す拡張関数。読む表の変化を `InvalidationTracker` で受け、読み直す |
 | `removeDuplicates()` | `distinctUntilChanged()` |
-| 失敗を表す enum（`XError`）を投げる | 同じ名前の enum と、それを持つ `XException` |
+| 失敗を表す enum（`XError`）を投げる | 同じ名前の enum と、それを持つ `XException`。記録の書き込みだけは `EntryWriteError` にする |
+| 書き込みの時刻（`at:`） | 既定値を置かず、呼ぶ側が必ず渡す |
+
+表ごとの読み出し・挿入・全消しは、`records/rows/` の各ファイルの `<名前>Table` にまとめる。型は `records/protocols/TableBinding.kt` にある。書き出しの読み戻しと、削除の取り消しは、この一覧を順に回す。
 
 表の形は、`store/src/jvmTest/resources/ios-schema.json` と比べて確かめる。このファイルは iOS の DB から書き出したものである。Room で同じに書けないものは、次のように守る。
 
@@ -113,6 +118,31 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | シート（`.sheet`） | 画面の上に、下からせり上がる全画面の層で出す。戻る操作で閉じる |
 
 アイコンの絵柄は、すべてに Material Symbols の絵を用意している。
+
+画面のモデルは、次の決まりで書く。
+
+| 対象 | 決まり |
+| --- | --- |
+| 入力の下書き | 1 つの `data class` にまとめ、モデルの `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
+| 下書きの決まり | 口座・カテゴリ・日付を変えたときの消し込みは、下書きの型の関数に置く |
+| 保存と読み込みの失敗 | `features/shared/model/` の `ModelTask` に通す。失敗の文と、実行中かどうかを持つ |
+| 今日の日付 | モデルの `today` に持ち、画面が `SideEffect` で入れる |
+| 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を受け取る |
+| 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
+
+複数の画面で使う部品は、次の場所に置く。
+
+| 部品 | 置き場所 |
+| --- | --- |
+| 主ボタン・丸いアイコンのボタン | `designsystem/components/button/` |
+| 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
+| 1 行に収めて縮める文字 | `designsystem/components/text/` の `FittedText` |
+| 横線・縦の区切り | `designsystem/components/surface/` |
+| 置き文字付きの入力欄 | `designsystem/components/input/` の `PlaceholderTextField` |
+| ボタンの高さなどの寸法 | `designsystem/theme/` の `Metrics` |
+| 設定の画面の枠 | `features/shared/settingsparts/` の `SettingsFrame` |
+| 期間を前後に送る見出し | `features/shared/period/` の `PeriodStepper` |
+| 通知の許可 | `features/shared/notification/` |
 
 ## 🔧 設定
 

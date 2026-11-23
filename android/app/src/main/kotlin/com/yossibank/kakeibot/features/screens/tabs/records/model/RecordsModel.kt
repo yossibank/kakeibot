@@ -99,6 +99,12 @@ class RecordsModel(
     val incomeTotal: Long
         get() = days.incomeTotal
 
+    val balance: Long
+        get() = incomeTotal - expenseTotal
+
+    val balanceTitle: String
+        get() = if (balance < 0) "収支 · 赤字" else "収支 · 黒字"
+
     suspend fun observe() {
         coroutineScope {
             launch {

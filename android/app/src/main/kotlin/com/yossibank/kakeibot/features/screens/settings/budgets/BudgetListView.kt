@@ -167,7 +167,7 @@ fun BudgetListView(
             if (model.budgeted.isNotEmpty()) {
                 Section(
                     title = "カテゴリごと",
-                    note = "合計 ${AmountText.text(amount = model.categoriesTotal)}",
+                    note = model.categoriesNote,
                 ) {
                     RowsCard(categories = model.budgeted) { category ->
                         BudgetCategoryRow(
@@ -181,7 +181,7 @@ fun BudgetListView(
             if (model.unbudgeted.isNotEmpty()) {
                 Section(
                     title = "予算なし",
-                    note = "${model.unbudgeted.size} カテゴリ",
+                    note = model.unbudgetedNote,
                 ) {
                     RowsCard(categories = model.unbudgeted) { category ->
                         BudgetPlainRow(

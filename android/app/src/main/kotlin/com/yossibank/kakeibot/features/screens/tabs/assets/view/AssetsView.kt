@@ -207,13 +207,3 @@ private fun Caption(
         ),
     )
 }
-
-@Composable
-private fun Hairline() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Palette.line),
-    )
-}
