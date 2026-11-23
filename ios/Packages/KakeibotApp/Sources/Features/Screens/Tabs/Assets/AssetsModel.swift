@@ -191,7 +191,7 @@ private extension AssetsModel {
             let summary = await AssetsSummary.make(latestInput)
 
             self.summary = summary
-            billPage = min(billPage, max(summary.billPages.count - 1, 0))
+            billPage = BillPage.clamped(billPage, in: summary.billPages)
         }
     }
 

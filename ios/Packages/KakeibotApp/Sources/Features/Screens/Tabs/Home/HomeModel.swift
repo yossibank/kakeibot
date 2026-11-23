@@ -13,13 +13,6 @@ public final class HomeModel: ScreenModel {
         }
     }
 
-    public var today: LocalDate {
-        didSet {
-            updateOverview()
-            updateTemplates()
-        }
-    }
-
     public var billPage = 0
 
     public private(set) var isListFailed = false
@@ -28,21 +21,8 @@ public final class HomeModel: ScreenModel {
     public private(set) var billPages: [BillPage] = []
     public private(set) var syncStatus = SyncStatus.off
 
-    public private(set) var monthStartDay: MonthStartDay = .first {
-        didSet {
-            updateOverview()
-        }
-    }
-
     public private(set) var templateOrder: TemplateOrder = .manual {
         didSet {
-            updateTemplates()
-        }
-    }
-
-    public private(set) var list: EntryList? {
-        didSet {
-            updateOverview()
             updateTemplates()
         }
     }
@@ -60,21 +40,10 @@ public final class HomeModel: ScreenModel {
         }
     }
 
-    private var budgets: [Budget] = [] {
+    private var input: Input {
         didSet {
             updateOverview()
-        }
-    }
-
-    private var recurrings: [Recurring] = [] {
-        didSet {
-            updateOverview()
-        }
-    }
-
-    private var carryoverFrom: YearMonth? {
-        didSet {
-            updateOverview()
+            updateTemplates()
         }
     }
 
@@ -85,7 +54,7 @@ public final class HomeModel: ScreenModel {
         today: LocalDate
     ) {
         self.database = database
-        self.today = today
+        self.input = Input(today: today)
 
         self.overview = MonthOverview(
             list: nil,
@@ -99,6 +68,23 @@ public final class HomeModel: ScreenModel {
 
 public extension HomeModel {
     static let recentLimit = 5
+
+    var today: LocalDate {
+        get {
+            input.today
+        }
+        set {
+            input.today = newValue
+        }
+    }
+
+    var list: EntryList? {
+        input.list
+    }
+
+    var monthStartDay: MonthStartDay {
+        input.monthStartDay
+    }
 
     var showsNoRecords: Bool {
         list != nil && recentRows.isEmpty
@@ -140,7 +126,7 @@ public extension HomeModel {
             {
                 await self.observe(
                     self.database.entryListUpdates(),
-                    into: \.list,
+                    into: \.input.list,
                     failing: \.isListFailed
                 )
             },
@@ -148,21 +134,21 @@ public extension HomeModel {
                 await self.observe(self.database.templateUpdates(), into: \.allTemplates)
             },
             {
-                await self.observe(self.database.budgetUpdates(), into: \.budgets)
+                await self.observe(self.database.budgetUpdates(), into: \.input.budgets)
             },
             {
-                await self.observe(self.database.recurringUpdates(), into: \.recurrings)
+                await self.observe(self.database.recurringUpdates(), into: \.input.recurrings)
             },
             {
                 await self.observe(
                     self.database.settingUpdates(.monthStartDay),
-                    into: \.monthStartDay
+                    into: \.input.monthStartDay
                 )
             },
             {
                 await self.observe(
                     self.database.settingUpdates(.budgetCarryoverFrom),
-                    into: \.carryoverFrom
+                    into: \.input.carryoverFrom
                 )
             },
             {
@@ -188,8 +174,8 @@ public extension HomeModel {
 
     func load() async {
         do {
-            list = try await database.entryList()
-            recurrings = try await database.recurrings()
+            input.list = try await database.entryList()
+            input.recurrings = try await database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -269,6 +255,15 @@ extension HomeModel {
 }
 
 private extension HomeModel {
+    struct Input {
+        var list: EntryList?
+        var budgets: [Budget] = []
+        var recurrings: [Recurring] = []
+        var monthStartDay: MonthStartDay = .first
+        var carryoverFrom: YearMonth?
+        var today: LocalDate
+    }
+
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let layoutSaveFailedMessage = "設定を保存できませんでした"
@@ -293,23 +288,23 @@ private extension HomeModel {
     }
 
     func updateOverview() {
-        let bills = list?.upcomingCardBills(
-            recurrings: recurrings,
-            after: today,
+        let bills = input.list?.upcomingCardBills(
+            recurrings: input.recurrings,
+            after: input.today,
             count: BillPage.limit
         )
 
         overview = MonthOverview(
-            list: list,
-            budgets: budgets,
-            recurrings: recurrings,
-            monthStartDay: monthStartDay,
-            carryoverFrom: carryoverFrom,
-            today: today
+            list: input.list,
+            budgets: input.budgets,
+            recurrings: input.recurrings,
+            monthStartDay: input.monthStartDay,
+            carryoverFrom: input.carryoverFrom,
+            today: input.today
         )
 
         billPages = BillPage.pages(of: bills ?? [])
-        billPage = min(billPage, max(billPages.count - 1, 0))
+        billPage = BillPage.clamped(billPage, in: billPages)
     }
 
     func updateTemplates() {

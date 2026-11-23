@@ -20,6 +20,13 @@ public extension BillPage {
         bills.filter(\.isOpen).count
     }
 
+    static func clamped(
+        _ page: Int,
+        in pages: [BillPage]
+    ) -> Int {
+        min(page, max(pages.count - 1, 0))
+    }
+
     static func pages(of bills: [CardBill]) -> [BillPage] {
         let charged = bills.filter { $0.amount > 0 }
 
