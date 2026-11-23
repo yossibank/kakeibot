@@ -5,7 +5,7 @@ import OSLog
 
 @available(iOS 26.0, *)
 @MainActor
-enum EntryVoiceModel {
+enum EntryVoiceInterpreter {
     private static var prepared: LanguageModelSession?
 
     static func prepare() {
@@ -102,7 +102,7 @@ enum EntryVoiceModel {
 }
 
 @available(iOS 26.0, *)
-private extension EntryVoiceModel {
+private extension EntryVoiceInterpreter {
     static let logger = Logger(subsystem: "com.yossibank.kakeibot", category: "Voice")
     static let locale = Locale(identifier: "ja_JP")
     static let options = GenerationOptions(samplingMode: .greedy)

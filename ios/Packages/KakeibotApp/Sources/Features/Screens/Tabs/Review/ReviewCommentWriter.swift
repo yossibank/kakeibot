@@ -4,7 +4,7 @@ import FoundationModels
 
 @available(iOS 26.0, *)
 @MainActor
-enum ReviewCommentModel {
+enum ReviewCommentWriter {
     static var isUsable: Bool {
         let model = SystemLanguageModel.default
         return model.isAvailable && model.supportsLocale(locale)
@@ -51,7 +51,7 @@ enum ReviewCommentModel {
 }
 
 @available(iOS 26.0, *)
-private extension ReviewCommentModel {
+private extension ReviewCommentWriter {
     @Generable
     struct Comment {
         @Guide(description: "次の目標を決めた理由。1〜2 文の丁寧語")

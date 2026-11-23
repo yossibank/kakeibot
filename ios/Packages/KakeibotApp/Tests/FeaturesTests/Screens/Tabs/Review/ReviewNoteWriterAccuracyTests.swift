@@ -5,7 +5,7 @@ import FoundationModels
 import Testing
 
 @MainActor
-struct ReviewNoteModelAccuracyTests {
+struct ReviewNoteWriterAccuracyTests {
     @Test(.enabled(if: isNoteModelUsable))
     func writesSummariesThatMatchTheFacts() async {
         guard #available(iOS 26.0, *) else {
@@ -17,7 +17,7 @@ struct ReviewNoteModelAccuracyTests {
         for facts in Self.samples {
             var rejected: [String] = []
 
-            let body = await ReviewNoteModel.summary(
+            let body = await ReviewNoteWriter.summary(
                 facts: facts,
                 scale: .month,
                 categories: Self.categories,
@@ -43,7 +43,7 @@ struct ReviewNoteModelAccuracyTests {
     }
 }
 
-private extension ReviewNoteModelAccuracyTests {
+private extension ReviewNoteWriterAccuracyTests {
     static let minimumRate = 0.8
     static let forbiddenWords = ["投資", "借入", "ローン", "保険", "すべき", "危ない", "みましょう", "```", "{", "}"]
     static let politeEndings = ["です。", "ます。", "ました。", "でした。", "ません。", "でしょう。"]

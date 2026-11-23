@@ -48,7 +48,7 @@ enum EntryVoiceReader {
     @MainActor
     static func prepare() {
         if #available(iOS 26.0, *) {
-            EntryVoiceModel.prepare()
+            EntryVoiceInterpreter.prepare()
         }
     }
 
@@ -58,7 +58,7 @@ enum EntryVoiceReader {
             return nil
         }
 
-        return await EntryVoiceModel.choose(
+        return await EntryVoiceInterpreter.choose(
             in: question.text,
             categories: question.categories,
             wallets: question.wallets,

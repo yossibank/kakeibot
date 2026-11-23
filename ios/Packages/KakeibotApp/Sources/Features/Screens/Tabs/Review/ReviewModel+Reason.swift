@@ -88,7 +88,7 @@ private extension ReviewModel {
             return nil
         }
 
-        return await ReviewCommentModel.write(
+        return await ReviewCommentWriter.write(
             basis: basis,
             scale: scale,
             categories: categories

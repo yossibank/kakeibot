@@ -19,7 +19,7 @@ enum EntryReceiptReader {
             !lines.isEmpty,
             !settled.isSettled,
             #available(iOS 26.0, *),
-            let guessed = await EntryReceiptModel.read(pages: pageLines, rules: reading)
+            let guessed = await EntryReceiptInterpreter.read(pages: pageLines, rules: reading)
         else {
             return settled
         }
@@ -30,7 +30,7 @@ enum EntryReceiptReader {
     @MainActor
     static func prepare() {
         if #available(iOS 26.0, *) {
-            EntryReceiptModel.prepare()
+            EntryReceiptInterpreter.prepare()
         }
     }
 }

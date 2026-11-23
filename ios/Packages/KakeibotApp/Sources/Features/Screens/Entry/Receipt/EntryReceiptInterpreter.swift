@@ -4,7 +4,7 @@ import FoundationModels
 
 @available(iOS 26.0, *)
 @MainActor
-enum EntryReceiptModel {
+enum EntryReceiptInterpreter {
     private static var prepared: LanguageModelSession?
 
     static func prepare() {
@@ -50,7 +50,7 @@ enum EntryReceiptModel {
 }
 
 @available(iOS 26.0, *)
-private extension EntryReceiptModel {
+private extension EntryReceiptInterpreter {
     @Generable
     struct Guess {
         @Guide(description: "品名と金額が同じ行か次の行か、品目がどの行で終わるかを、行の番号を挙げて一文で書く")
@@ -225,7 +225,7 @@ private extension EntryReceiptModel {
 }
 
 @available(iOS 26.0, *)
-private extension EntryReceiptModel.Guess {
+private extension EntryReceiptInterpreter.Guess {
     var labels: ReceiptLabels {
         ReceiptLabels(
             storeLine: Self.line(storeLine),
