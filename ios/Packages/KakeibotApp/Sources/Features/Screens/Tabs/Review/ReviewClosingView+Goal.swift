@@ -117,9 +117,12 @@ extension ReviewClosingView {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
+            .background(
+                Palette.accent.opacity(.faint),
+                in: .rect(cornerRadius: ReviewReportRadius.panel)
+            )
             .overlay {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: ReviewReportRadius.panel)
                     .strokeBorder(Palette.accent.opacity(.soft))
             }
         }
@@ -298,7 +301,10 @@ private extension ReviewClosingView {
             .foregroundStyle(Palette.subtext)
             .padding(12)
             .frame(maxWidth: .infinity)
-            .background(Palette.subtext.opacity(.faint), in: .rect(cornerRadius: 16))
+            .background(
+                Palette.subtext.opacity(.faint),
+                in: .rect(cornerRadius: ReviewReportRadius.panel)
+            )
 
             VStack(spacing: 4) {
                 Image(systemName: "arrow.right")
@@ -327,9 +333,12 @@ private extension ReviewClosingView {
             }
             .padding(12)
             .frame(maxWidth: .infinity)
-            .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
+            .background(
+                Palette.accent.opacity(.faint),
+                in: .rect(cornerRadius: ReviewReportRadius.panel)
+            )
             .overlay {
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: ReviewReportRadius.panel)
                     .strokeBorder(Palette.accent.opacity(.strong), lineWidth: 1.5)
             }
         }

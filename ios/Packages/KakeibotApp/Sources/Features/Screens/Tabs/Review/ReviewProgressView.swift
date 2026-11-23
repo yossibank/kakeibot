@@ -217,9 +217,9 @@ private extension ReviewProgressView {
                 .sansFont(.body, weight: .semibold)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 40, height: 40)
-                .background(Palette.cardTop, in: .rect(cornerRadius: 12))
+                .background(Palette.cardTop, in: .rect(cornerRadius: ReviewReportRadius.block))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: ReviewReportRadius.block)
                         .strokeBorder(Palette.accent.opacity(.medium), lineWidth: 1.5)
                 }
                 .shadow(color: Palette.accent.opacity(.subtle), radius: 3, y: 2)

@@ -93,7 +93,10 @@ struct ReviewReportChip: View {
         .foregroundStyle(Palette.accent)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 12))
+        .background(
+            Palette.accent.opacity(.subtle),
+            in: .rect(cornerRadius: ReviewReportRadius.block)
+        )
     }
 }
 
@@ -119,7 +122,10 @@ struct ReviewReportStat: View {
                         .sansFont(.small, weight: .semibold)
                         .foregroundStyle(Palette.accent)
                         .frame(width: 24, height: 24)
-                        .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 8))
+                        .background(
+                            Palette.accent.opacity(.subtle),
+                            in: .rect(cornerRadius: ReviewReportRadius.chip)
+                        )
                 }
 
                 titleText
@@ -201,14 +207,14 @@ extension View {
     func reviewTicket() -> some View {
         frame(maxWidth: .infinity, alignment: .leading)
             .background {
-                RoundedRectangle(cornerRadius: 28)
+                RoundedRectangle(cornerRadius: ReviewReportRadius.hero)
                     .fill(Palette.card)
                     .overlay {
-                        RoundedRectangle(cornerRadius: 28)
+                        RoundedRectangle(cornerRadius: ReviewReportRadius.hero)
                             .fill(ReviewReportLabel.glow)
                     }
                     .overlay {
-                        RoundedRectangle(cornerRadius: 28)
+                        RoundedRectangle(cornerRadius: ReviewReportRadius.hero)
                             .strokeBorder(Palette.accent.opacity(.muted))
                     }
                     .shadow(color: Palette.accent.opacity(.subtle), radius: 16, y: 12)
@@ -217,7 +223,7 @@ extension View {
 
     func reviewStatGrid() -> some View {
         background(Palette.accent.opacity(.soft))
-            .clipShape(.rect(cornerRadius: 16))
+            .clipShape(.rect(cornerRadius: ReviewReportRadius.panel))
     }
 }
 

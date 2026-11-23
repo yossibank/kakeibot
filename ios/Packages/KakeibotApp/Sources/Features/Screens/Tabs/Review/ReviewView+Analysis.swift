@@ -25,7 +25,10 @@ extension ReviewView {
                     .sansFont(.body, weight: .semibold)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 40, height: 40)
-                    .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 12))
+                    .background(
+                        Palette.accent.opacity(.subtle),
+                        in: .rect(cornerRadius: ReviewReportRadius.block)
+                    )
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(bannerLabel)
@@ -61,9 +64,9 @@ extension ReviewView {
             .padding(.vertical, 8)
             .padding(.leading, 8)
             .padding(.trailing, 16)
-            .background(Palette.card, in: .rect(cornerRadius: 20))
+            .background(Palette.card, in: .rect(cornerRadius: ReviewReportRadius.card))
             .overlay {
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: ReviewReportRadius.card)
                     .strokeBorder(Palette.accent.opacity(.muted))
             }
             .shadow(color: Palette.accent.opacity(.subtle), radius: 12, y: 6)

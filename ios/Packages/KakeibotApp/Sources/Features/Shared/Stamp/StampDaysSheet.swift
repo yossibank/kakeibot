@@ -47,9 +47,7 @@ struct StampDaysSheet: View {
                             row(date)
                         }
                         .buttonStyle(.plain)
-                        .overlay(alignment: .top) {
-                            Hairline(thickness: 1)
-                        }
+                        .topHairline()
                     }
                 }
                 .padding(.horizontal, 16)

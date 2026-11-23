@@ -13,3 +13,11 @@ public struct Hairline: View {
             .frame(height: thickness)
     }
 }
+
+public extension View {
+    func topHairline() -> some View {
+        overlay(alignment: .top) {
+            Hairline(thickness: 1)
+        }
+    }
+}

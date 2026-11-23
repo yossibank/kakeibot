@@ -53,9 +53,7 @@ extension ReviewView {
                         moveRow(move)
                     }
                     .buttonStyle(.plain)
-                    .overlay(alignment: .top) {
-                        Hairline(thickness: 1)
-                    }
+                    .topHairline()
                 }
             }
         }

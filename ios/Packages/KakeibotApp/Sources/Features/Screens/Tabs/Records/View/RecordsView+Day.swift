@@ -36,9 +36,7 @@ extension RecordsView {
                 if !upcoming.isEmpty {
                     upcomingList(upcoming, on: day.date)
                         .padding(.top, 8)
-                        .overlay(alignment: .top) {
-                            Hairline(thickness: 1)
-                        }
+                        .topHairline()
                 }
             }
         }
@@ -143,9 +141,7 @@ extension RecordsView {
                 .contentShape(.rect)
             }
             .buttonStyle(.plain)
-            .overlay(alignment: .top) {
-                Hairline(thickness: 1)
-            }
+            .topHairline()
         } else {
             Button {
                 onOpenEntry(row.id)
@@ -153,9 +149,7 @@ extension RecordsView {
                 entryRow(row)
             }
             .buttonStyle(.plain)
-            .overlay(alignment: .top) {
-                Hairline(thickness: 1)
-            }
+            .topHairline()
         }
     }
 
@@ -169,9 +163,7 @@ extension RecordsView {
                     RecordsAdjustmentRow(row: row)
                 }
                 .buttonStyle(.plain)
-                .overlay(alignment: .top) {
-                    Hairline(thickness: 1)
-                }
+                .topHairline()
             }
         }
     }

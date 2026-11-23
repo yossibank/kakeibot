@@ -34,15 +34,11 @@ extension AssetsView {
 
             ForEach(sections) { section in
                 walletSection(section)
-                    .overlay(alignment: .top) {
-                        Hairline(thickness: 1)
-                    }
+                    .topHairline()
             }
 
             addWalletRow(note: addNote, action: onAdd)
-                .overlay(alignment: .top) {
-                    Hairline(thickness: 1)
-                }
+                .topHairline()
         }
         .padding(.horizontal, 16)
         .card()

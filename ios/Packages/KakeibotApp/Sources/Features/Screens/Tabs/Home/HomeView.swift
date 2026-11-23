@@ -183,9 +183,7 @@ private extension HomeView {
                             isRecurring: row.isRecurring
                         )
                     }
-                    .overlay(alignment: .top) {
-                        Hairline(thickness: 1)
-                    }
+                    .topHairline()
                 }
             }
         }
