@@ -14,6 +14,7 @@ import com.yossibank.kakeibot.core.concepts.entry.incomeTotal
 import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
 import com.yossibank.kakeibot.features.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.features.shared.model.ModelTask
 import com.yossibank.kakeibot.features.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
@@ -127,15 +128,11 @@ class RecordsModel(
     suspend fun select(layout: RecordsLayout) {
         this.layout = layout
 
-        try {
+        ModelTask.quiet {
             database.setSetting(
                 key = SettingKey.recordsLayout,
                 to = layout,
             )
-        } catch (error: CancellationException) {
-            throw error
-        } catch (_: Exception) {
-            return
         }
     }
 

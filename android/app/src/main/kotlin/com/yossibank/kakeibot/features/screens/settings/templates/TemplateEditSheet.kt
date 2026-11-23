@@ -45,9 +45,11 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.billShiftTitles
+import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
 import com.yossibank.kakeibot.designsystem.components.icon.IconImage
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
+import com.yossibank.kakeibot.designsystem.components.input.PlaceholderTextField
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.tag.TagLine
 import com.yossibank.kakeibot.designsystem.components.tag.TagLineItem
@@ -65,6 +67,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.shared.settingsparts.ChoiceChip
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
@@ -93,26 +96,12 @@ fun TemplateEditSheet(
 
     BackHandler(onBack = onClose)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Palette.background)
-            .pointerInput(Unit) {}
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .imePadding()
-            .padding(
-                horizontal = 16.dp,
-                vertical = 12.dp,
-            ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    SettingsFrame(
+        title = "テンプレートを追加",
+        isRoot = true,
+        onBack = onClose,
+        followsKeyboard = true,
     ) {
-        SettingsHeader(
-            title = "テンプレートを追加",
-            isRoot = true,
-            onBack = onClose,
-        )
-
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -129,9 +118,16 @@ fun TemplateEditSheet(
                     detail = model.detail,
                     size = TemplateCardSize.Large,
                     name = {
-                        NameField(
-                            value = model.name,
-                            onChange = { model.name = it },
+                        PlaceholderTextField(
+                            value = model.form.name,
+                            onChange = { name -> model.update { copy(name = name) } },
+                            placeholder = "名前を入れる",
+                            style = displayFont(
+                                size = FontSize.Headline,
+                                weight = FontWeight.Medium,
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Palette.accentStrong,
                             onDone = focus::clearFocus,
                         )
                     },
@@ -151,10 +147,14 @@ fun TemplateEditSheet(
                     .fillMaxWidth()
                     .card(),
             ) {
-                TextRow(
-                    value = model.memo,
+                PlaceholderTextField(
+                    value = model.form.memo,
+                    onChange = { memo -> model.update { copy(memo = memo) } },
                     placeholder = "メモを書く",
-                    onChange = { model.memo = it },
+                    style = textFont(style = FontTextStyle.Body),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     onDone = focus::clearFocus,
                 )
             }
@@ -170,7 +170,7 @@ fun TemplateEditSheet(
                 model.categories.forEach { category ->
                     ChoiceChip(
                         title = category.name,
-                        isSelected = category.id == model.categoryId,
+                        isSelected = category.id == model.form.categoryId,
                         onSelect = { model.select(category) },
                     ) {
                         IconTile(
@@ -188,7 +188,7 @@ fun TemplateEditSheet(
 
                 TagLine(
                     tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                    selection = model.tagId,
+                    selection = model.form.tagId,
                     onSelect = model::toggleTag,
                 )
             }
@@ -202,7 +202,7 @@ fun TemplateEditSheet(
                 model.wallets.forEach { wallet ->
                     ChoiceChip(
                         title = wallet.name,
-                        isSelected = wallet.id == model.walletId,
+                        isSelected = wallet.id == model.form.walletId,
                         onSelect = { model.select(wallet) },
                     ) {
                         IconTile(
@@ -220,13 +220,13 @@ fun TemplateEditSheet(
                     Recurring.billShiftTitles.forEachIndexed { index, title ->
                         ChoiceChip(
                             title = title,
-                            isSelected = model.billShift == index,
-                            onSelect = { model.billShift = index },
+                            isSelected = model.form.billShift == index,
+                            onSelect = { model.update { copy(billShift = index) } },
                         )
                     }
                 }
 
-                SettingsCaption(text = billNotes[model.billShift.coerceIn(billNotes.indices)])
+                SettingsCaption(text = billNotes[model.form.billShift.coerceIn(billNotes.indices)])
             }
 
             Column(
@@ -258,99 +258,18 @@ fun TemplateEditSheet(
             style = textFont(size = FontSize.Caption),
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .clip(CircleShape)
-                .background(Brush.verticalGradient(listOf(Palette.accentDeep, Palette.accent)))
-                .clickable {
-                    focus.clearFocus()
+        PrimaryButton(
+            title = "保存する",
+            onClick = {
+                focus.clearFocus()
 
-                    scope.launch {
-                        model.save()?.let(onSave)
-                    }
-                },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "保存する",
-                color = Palette.backgroundTop,
-                style = textFont(
-                    size = FontSize.Body,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-        }
+                scope.launch {
+                    model.save()?.let(onSave)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
-}
-
-@Composable
-private fun TextRow(
-    value: String,
-    placeholder: String,
-    onChange: (String) -> Unit,
-    onDone: () -> Unit,
-) {
-    val style = textFont(style = FontTextStyle.Body)
-
-    BasicTextField(
-        value = value,
-        onValueChange = onChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        textStyle = style.copy(color = Palette.text),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { onDone() }),
-        cursorBrush = SolidColor(Palette.accent),
-        decorationBox = { field ->
-            if (value.isEmpty()) {
-                Text(
-                    text = placeholder,
-                    color = Palette.hint,
-                    style = style,
-                )
-            }
-
-            field()
-        },
-    )
-}
-
-@Composable
-private fun NameField(
-    value: String,
-    onChange: (String) -> Unit,
-    onDone: () -> Unit,
-) {
-    val style = displayFont(
-        size = FontSize.Headline,
-        weight = FontWeight.Medium,
-    )
-
-    BasicTextField(
-        value = value,
-        onValueChange = onChange,
-        modifier = Modifier.fillMaxWidth(),
-        textStyle = style.copy(color = Palette.accentStrong),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { onDone() }),
-        cursorBrush = SolidColor(Palette.accent),
-        decorationBox = { field ->
-            if (value.isEmpty()) {
-                Text(
-                    text = "名前を入れる",
-                    color = Palette.hint,
-                    style = style,
-                )
-            }
-
-            field()
-        },
-    )
 }
 
 @Composable
@@ -378,7 +297,7 @@ private fun CapsulePreview(model: TemplateEditModel) {
         }
 
         Text(
-            text = model.name.ifEmpty { "名前" },
+            text = model.form.name.ifEmpty { "名前" },
             color = Palette.text,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

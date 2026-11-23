@@ -50,5 +50,13 @@ class ModelTask {
     companion object {
         const val saveFailed = "保存できませんでした"
         const val restoreFailed = "元に戻せませんでした"
+
+        suspend fun <Value : Any> quiet(action: suspend () -> Value): Value? = try {
+            action()
+        } catch (error: CancellationException) {
+            throw error
+        } catch (_: Exception) {
+            null
+        }
     }
 }

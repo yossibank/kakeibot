@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import com.yossibank.kakeibot.features.screens.settings.period.title
 import com.yossibank.kakeibot.features.screens.settings.recurrings.RecurringListView
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroCard
@@ -52,16 +54,14 @@ import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
-private sealed interface Screen {
-    data object Menu : Screen
-
-    data object Budgets : Screen
-
-    data object MonthStart : Screen
-
-    data object WeekStart : Screen
-
-    data object Recurrings : Screen
+private enum class Screen(
+    val title: String,
+) {
+    Menu("設定"),
+    Budgets("設定"),
+    MonthStart("月の始まり"),
+    WeekStart("週の始まり"),
+    Recurrings("設定"),
 }
 
 @Composable
@@ -75,37 +75,15 @@ fun SettingsMenuSheet(
         mutableStateOf(if (openRecurring != null) Screen.Recurrings else Screen.Menu)
     }
 
-    val monthStartDay by remember(database) { database.settingUpdates(SettingKey.monthStartDay) }
-        .collectAsState(initial = MonthStartDay.first)
-
-    val weekStart by remember(database) { database.settingUpdates(SettingKey.weekStart) }
-        .collectAsState(initial = Weekday.monday)
-
-    val recurrings by remember(database) { database.recurringUpdates() }
-        .collectAsState(initial = emptyList())
-
+    val model = remember(database) { SettingsMenuModel(database = database) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(model) {
+        model.observe()
+    }
 
     val monthStartHint = remember(database) {
         SettingsScreenFlag.closedHint(SettingsScreen.monthStartDay, database)
-    }
-
-    fun <Value> store(
-        key: SettingKey<Value>,
-        value: Value,
-    ) {
-        scope.launch {
-            try {
-                database.setSetting(
-                    key = key,
-                    to = value,
-                )
-            } catch (error: CancellationException) {
-                throw error
-            } catch (_: Exception) {
-                return@launch
-            }
-        }
     }
 
     fun back() {
@@ -117,28 +95,19 @@ fun SettingsMenuSheet(
 
     BackHandler(onBack = ::back)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Palette.background)
-            .pointerInput(Unit) {}
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .imePadding()
-            .padding(
-                horizontal = 16.dp,
-                vertical = 12.dp,
-            ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    SettingsFrame(
+        title = screen.title,
+        isRoot = screen == Screen.Menu,
+        onBack = ::back,
+        followsKeyboard = true,
+        trailing = {
+            if (screen == Screen.MonthStart) {
+                SettingsHintButton(flag = monthStartHint)
+            }
+        },
     ) {
         when (screen) {
             Screen.Menu -> {
-                SettingsHeader(
-                    title = "設定",
-                    isRoot = true,
-                    onBack = ::back,
-                )
-
                 SettingsCaption(text = "予算と期間")
 
                 Column(
@@ -156,7 +125,7 @@ fun SettingsMenuSheet(
 
                     SettingsRow(
                         title = "固定費",
-                        value = "${recurrings.size} 件",
+                        value = "${model.recurringCount} 件",
                         onSelect = { screen = Screen.Recurrings },
                     )
 
@@ -164,7 +133,7 @@ fun SettingsMenuSheet(
 
                     SettingsRow(
                         title = "月の始まり",
-                        value = monthStartDay.title,
+                        value = model.monthStartDay.title,
                         onSelect = { screen = Screen.MonthStart },
                     )
 
@@ -172,21 +141,13 @@ fun SettingsMenuSheet(
 
                     SettingsRow(
                         title = "週の始まり",
-                        value = weekStart.title,
+                        value = model.weekStart.title,
                         onSelect = { screen = Screen.WeekStart },
                     )
                 }
             }
 
             Screen.MonthStart -> {
-                SettingsHeader(
-                    title = "月の始まり",
-                    isRoot = false,
-                    onBack = ::back,
-                ) {
-                    SettingsHintButton(flag = monthStartHint)
-                }
-
                 SettingsIntroCard(
                     icon = R.drawable.ic_calendar,
                     headline = "給料日に合わせて" to "1 か月を数えられます",
@@ -199,31 +160,29 @@ fun SettingsMenuSheet(
                 )
 
                 MonthStartView(
-                    selection = monthStartDay,
+                    selection = model.monthStartDay,
                     today = today,
-                    onSelect = {
-                        store(
-                            key = SettingKey.monthStartDay,
-                            value = it,
-                        )
+                    onSelect = { day ->
+                        scope.launch {
+                            model.store(
+                                key = SettingKey.monthStartDay,
+                                value = day,
+                            )
+                        }
                     },
                 )
             }
 
             Screen.WeekStart -> {
-                SettingsHeader(
-                    title = "週の始まり",
-                    isRoot = false,
-                    onBack = ::back,
-                )
-
                 WeekStartView(
-                    selection = weekStart,
-                    onSelect = {
-                        store(
-                            key = SettingKey.weekStart,
-                            value = it,
-                        )
+                    selection = model.weekStart,
+                    onSelect = { weekday ->
+                        scope.launch {
+                            model.store(
+                                key = SettingKey.weekStart,
+                                value = weekday,
+                            )
+                        }
                     },
                 )
             }
