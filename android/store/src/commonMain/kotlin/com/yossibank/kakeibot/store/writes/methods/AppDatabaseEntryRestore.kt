@@ -7,6 +7,7 @@ import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.write
 import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.records.values.databaseValue
+import com.yossibank.kakeibot.store.writes.types.CardBillChange
 import java.time.Instant
 
 suspend fun AppDatabase.restoreEntry(

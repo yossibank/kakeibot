@@ -14,13 +14,13 @@ struct ReviewReportGauge: View {
         let track = StrokeStyle(lineWidth: lineWidth, lineCap: .round)
 
         ZStack {
-            ReviewGaugeArc(progress: 1, inset: lineWidth / 2)
+            ReviewReportGaugeArc(progress: 1, inset: lineWidth / 2)
                 .stroke(Palette.accent.opacity(.subtle), style: track)
 
-            ReviewGaugeArc(progress: used, inset: lineWidth / 2)
+            ReviewReportGaugeArc(progress: used, inset: lineWidth / 2)
                 .stroke(color, style: track)
 
-            ReviewGaugeTicks(count: 8, length: size / 26, inset: lineWidth + 6)
+            ReviewReportGaugeTicks(count: 8, length: size / 26, inset: lineWidth + 6)
                 .stroke(Palette.accent.opacity(.medium), lineWidth: 1.5)
 
             if showsMarker {
@@ -35,42 +35,9 @@ struct ReviewReportGauge: View {
     }
 }
 
-struct ReviewReportGaugeRow<Detail: View>: View {
-    let pace: ReviewPace?
-    let limitName: String
-    let showsMarker: Bool
-
-    @ViewBuilder let detail: Detail
-
-    var body: some View {
-        ViewThatFits(in: .horizontal) {
-            row(size: ReviewReportGauge.regularSize)
-            row(size: ReviewReportGauge.compactSize)
-        }
-    }
-}
-
 extension ReviewReportGauge {
     static let regularSize: CGFloat = 160
     static let compactSize: CGFloat = 132
-}
-
-private extension ReviewReportGaugeRow {
-    func row(size: CGFloat) -> some View {
-        HStack(spacing: 16) {
-            if let pace {
-                ReviewReportGauge(
-                    pace: pace,
-                    limitName: limitName,
-                    showsMarker: showsMarker,
-                    size: size
-                )
-            }
-
-            detail
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
 }
 
 private extension ReviewReportGauge {
@@ -80,7 +47,7 @@ private extension ReviewReportGauge {
 
     var needleAngle: Double {
         let elapsed = min(max(pace.elapsedRatio, 0), 1)
-        let sweep = ReviewGaugeArc.sweepDegrees
+        let sweep = ReviewReportGaugeArc.sweepDegrees
         return -sweep / 2 + sweep * elapsed
     }
 
@@ -90,7 +57,7 @@ private extension ReviewReportGauge {
 
     var needle: some View {
         ZStack {
-            ReviewGaugeNeedle(length: size / 3, width: 3.6)
+            ReviewReportGaugeNeedle(length: size / 3, width: 3.6)
                 .fill(Palette.text)
                 .rotationEffect(.degrees(needleAngle))
 
@@ -146,12 +113,12 @@ private extension ReviewReportGauge {
     }
 }
 
-private struct ReviewGaugeArc {
+private struct ReviewReportGaugeArc {
     let progress: Double
     let inset: CGFloat
 }
 
-extension ReviewGaugeArc: Shape {
+extension ReviewReportGaugeArc: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let radius = min(rect.width, rect.height) / 2 - inset
@@ -170,18 +137,18 @@ extension ReviewGaugeArc: Shape {
     }
 }
 
-private extension ReviewGaugeArc {
+private extension ReviewReportGaugeArc {
     static let startDegrees = 150.0
     static let sweepDegrees = 240.0
 }
 
-private struct ReviewGaugeTicks {
+private struct ReviewReportGaugeTicks {
     let count: Int
     let length: CGFloat
     let inset: CGFloat
 }
 
-extension ReviewGaugeTicks: Shape {
+extension ReviewReportGaugeTicks: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let outer = min(rect.width, rect.height) / 2 - inset
@@ -190,7 +157,8 @@ extension ReviewGaugeTicks: Shape {
         return Path { path in
             for index in 0...count {
                 let ratio = Double(index) / Double(count)
-                let degrees = ReviewGaugeArc.startDegrees + ReviewGaugeArc.sweepDegrees * ratio
+                let degrees = ReviewReportGaugeArc.startDegrees + ReviewReportGaugeArc
+                    .sweepDegrees * ratio
                 let radians = degrees * .pi / 180
                 let start = Self.point(from: center, at: radians, radius: inner)
                 let end = Self.point(from: center, at: radians, radius: outer)
@@ -202,7 +170,7 @@ extension ReviewGaugeTicks: Shape {
     }
 }
 
-private extension ReviewGaugeTicks {
+private extension ReviewReportGaugeTicks {
     static func point(
         from center: CGPoint,
         at radians: Double,
@@ -214,12 +182,12 @@ private extension ReviewGaugeTicks {
     }
 }
 
-private struct ReviewGaugeNeedle {
+private struct ReviewReportGaugeNeedle {
     let length: CGFloat
     let width: CGFloat
 }
 
-extension ReviewGaugeNeedle: Shape {
+extension ReviewReportGaugeNeedle: Shape {
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
 

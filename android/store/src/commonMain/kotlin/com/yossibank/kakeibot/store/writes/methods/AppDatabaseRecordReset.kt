@@ -6,6 +6,7 @@ import com.yossibank.kakeibot.store.database.write
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.rows.EntryRecord
 import com.yossibank.kakeibot.store.records.rows.entry
+import com.yossibank.kakeibot.store.writes.types.CardBillChange
 import java.time.Instant
 
 suspend fun AppDatabase.deletableRecordCount(): Int = read {

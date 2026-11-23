@@ -29,15 +29,3 @@ public extension SyncStatus {
         sendProblem: nil
     )
 }
-
-public enum SyncStopReason: String, Sendable {
-    case signedOut = "signed_out"
-    case accountChanged = "account_changed"
-    case cloudReplaced = "cloud_replaced"
-}
-
-public enum SyncSendProblem: String, Sendable {
-    case quotaExceeded = "quota_exceeded"
-    case networkUnavailable = "network_unavailable"
-    case notAllowed = "not_allowed"
-}

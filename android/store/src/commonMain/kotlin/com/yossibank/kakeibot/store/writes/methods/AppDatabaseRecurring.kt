@@ -23,6 +23,7 @@ import com.yossibank.kakeibot.store.records.rows.entry
 import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.records.rows.recurring
 import com.yossibank.kakeibot.store.records.values.databaseValue
+import com.yossibank.kakeibot.store.writes.types.CardBillChange
 import com.yossibank.kakeibot.store.writes.types.Deletion
 import java.time.Instant
 

@@ -60,13 +60,3 @@ data class EntryList(
         days.within(period).expenseTotal
     }
 }
-
-data class EntryOptions(
-    val expenseCategories: List<EntryCategory>,
-    val incomeCategories: List<EntryCategory>,
-    val tags: List<EntryTag>,
-    val wallets: List<Wallet>,
-    val icons: Map<Identifier<Icon>, Icon>,
-    val sharedCategories: List<EntryCategory> = emptyList(),
-    val sharedTags: List<EntryTag> = emptyList(),
-)
