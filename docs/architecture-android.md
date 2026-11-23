@@ -100,7 +100,6 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | `AppDatabase+ReviewRequest`（レビューのお願いの記録） | `queries/methods/AppDatabaseEntryHistory.kt` にある |
 | `MonthPlan`・`SettingKey+Scope` | 無い |
 | `Core/Shared/` の `Draft`・`String+Trimmed`、`Icon+Mark` | 無い。各下書きが検証と空白の除去を持つ |
-| 記録の書き込みの失敗 `EntryWriteError` | `WriteError`・`WriteException` |
 
 表ごとの読み出し・挿入・全消しは、`records/rows/` の各ファイルの `<名前>Table` にまとめる。型は `records/protocols/TableBinding.kt` にある。書き出しの読み戻しと、削除の取り消しは、この一覧を順に回す。
 
