@@ -164,7 +164,7 @@ private extension RecurringListModel {
 }
 
 extension RecurringListModel: SettingsBoardModel {
-    public func reload() async {
+    public func load() async {
         do {
             recurrings = try await database.recurrings(includingHidden: true)
         } catch {

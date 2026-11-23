@@ -56,10 +56,6 @@ private extension StampListModel {
 }
 
 extension StampListModel: SettingsBoardModel {
-    public func reload() async {
-        await load()
-    }
-
     public func saveOrder(_ ids: [ShelfIcon.ID]) async throws {
         let ids = ids + hidden.map(\.id)
         try await database.reorderShelfIcons(ids, at: Date())

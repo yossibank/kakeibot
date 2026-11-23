@@ -60,10 +60,6 @@ private extension RewardRuleListModel {
 }
 
 extension RewardRuleListModel: SettingsBoardModel {
-    public func reload() async {
-        await load()
-    }
-
     public func saveOrder(_ ids: [RewardRule.ID]) async throws {
         let ids = ids + hidden.map(\.id)
         try await database.reorderRewardRules(ids, at: Date())

@@ -10,6 +10,7 @@ public protocol SettingsBoardModel: AnyObject {
     var visible: [Item] { get }
     var hidden: [Item] { get }
 
+    func load() async
     func reload() async
     func saveOrder(_ ids: [Item.ID]) async throws
     func remove(_ id: Item.ID) async throws -> Deletion
@@ -35,6 +36,10 @@ public extension SettingsBoardModel {
         return movingOrder.compactMap { id in
             visible.first { $0.id == id }
         }
+    }
+
+    func reload() async {
+        await load()
     }
 
     func hideFailedMessage(for _: any Error) -> String? {

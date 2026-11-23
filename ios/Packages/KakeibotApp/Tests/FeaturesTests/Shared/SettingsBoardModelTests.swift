@@ -131,7 +131,7 @@ extension SettingsBoardModelTests {
 }
 
 extension SettingsBoardModelTests.FakeBoard {
-    func reload() async {
+    func load() async {
         reloadCount += 1
     }
 

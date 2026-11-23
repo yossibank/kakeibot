@@ -53,9 +53,7 @@ public extension WalletListModel {
     }
 
     func observe() async {
-        await observe(database.entryListUpdates(), failure: Self.loadFailedMessage) { list in
-            self.list = list
-        }
+        await observe(database.entryListUpdates(), into: \.list)
     }
 }
 
@@ -78,10 +76,6 @@ private extension WalletListModel {
 }
 
 extension WalletListModel: SettingsBoardModel {
-    public func reload() async {
-        await load()
-    }
-
     public func saveOrder(_ ids: [Wallet.ID]) async throws {
         let ids = ids + hidden.map(\.id)
         try await database.reorderWallets(ids, at: Date())
