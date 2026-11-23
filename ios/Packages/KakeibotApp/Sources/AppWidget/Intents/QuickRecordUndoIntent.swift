@@ -24,7 +24,8 @@ extension QuickRecordUndoIntent {
     }
 
     func perform() async throws -> some IntentResult {
-        let today = LocalDate(Date(), in: .current)
+        let now = Date()
+        let today = LocalDate(now, in: .current)
 
         guard let id = Entry.ID(entryId) else {
             return .result()
@@ -32,7 +33,7 @@ extension QuickRecordUndoIntent {
 
         let database = try AppDatabase.appGroupForWriting()
 
-        try await database.undoWidgetEntry(id)
+        try await database.undoWidgetEntry(id, at: now)
 
         await database.finishWidgetWrite(today: today)
 

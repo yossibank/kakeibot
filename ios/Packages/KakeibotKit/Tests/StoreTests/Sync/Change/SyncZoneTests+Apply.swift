@@ -11,7 +11,11 @@ extension SyncZoneTests {
         let shared = try await key.recordID(in: setup.sharedZone())
         try await setup.database.saveSyncSystemFields([shared: Data([1]), key.own: Data([2])])
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
+        try await setup.database.applySyncChanges(
+            saved: [],
+            deleted: [key.own],
+            at: StoreFixture.now
+        )
 
         #expect(try await setup.database.syncRecord(for: key) != nil)
         #expect(try await setup.database.syncSystemFields(for: shared) == Data([1]))
@@ -25,7 +29,11 @@ extension SyncZoneTests {
         let shared = try await key.recordID(in: setup.sharedZone())
         try await setup.database.saveSyncSystemFields([shared: Data([1]), key.own: Data([2])])
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [shared])
+        try await setup.database.applySyncChanges(
+            saved: [],
+            deleted: [shared],
+            at: StoreFixture.now
+        )
 
         #expect(try await setup.database.syncRecord(for: key) == nil)
         #expect(try await setup.database.syncSystemFields(for: shared) == nil)
@@ -43,12 +51,14 @@ extension SyncZoneTests {
         try await setup.database.applySyncChanges(
             saved: [],
             deleted: [],
-            systemFields: [zoned: Data([1])]
+            systemFields: [zoned: Data([1])],
+            at: StoreFixture.now
         )
         try await setup.database.applySyncChanges(
             saved: [],
             deleted: [],
-            systemFields: [zoned: Data([2])]
+            systemFields: [zoned: Data([2])],
+            at: StoreFixture.now
         )
 
         let count = try await setup.value("SELECT COUNT(*) FROM sync_share")
@@ -66,7 +76,8 @@ extension SyncZoneTests {
         try await setup.database.applySyncChanges(
             saved: [],
             deleted: [],
-            systemFields: [zoned: Data([1])]
+            systemFields: [zoned: Data([1])],
+            at: StoreFixture.now
         )
 
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")
@@ -113,10 +124,15 @@ extension SyncZoneTests {
             systemFields: [
                 wallet.recordID(in: zone): Data([2]),
                 entry.recordID(in: zone): Data([2])
-            ]
+            ],
+            at: StoreFixture.now
         )
 
-        try await device.database.applySyncChanges(saved: [], deleted: [entry.own])
+        try await device.database.applySyncChanges(
+            saved: [],
+            deleted: [entry.own],
+            at: StoreFixture.now
+        )
 
         #expect(try await device.database.syncRecord(for: entry) != nil)
     }

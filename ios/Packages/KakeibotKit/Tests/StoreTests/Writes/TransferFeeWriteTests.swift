@@ -120,7 +120,7 @@ struct TransferFeeWriteTests {
         let setup = try await Setup()
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
-        try await setup.database.deleteEntry(transfer.id)
+        try await setup.database.deleteEntry(transfer.id, at: StoreFixture.now)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries.isEmpty)
@@ -132,8 +132,8 @@ struct TransferFeeWriteTests {
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let fee = try await setup.database.fee(of: transfer.id)
-        try await setup.database.deleteEntry(transfer.id)
-        try await setup.database.restoreEntry(transfer, fee: fee)
+        try await setup.database.deleteEntry(transfer.id, at: StoreFixture.now)
+        try await setup.database.restoreEntry(transfer, fee: fee, at: StoreFixture.now)
         let snapshot = try setup.database.snapshot()
         let expected = Set([transfer, fee].compactMap(\.self))
 
@@ -148,7 +148,7 @@ struct TransferFeeWriteTests {
 
         let transfer = try await setup.database.saveEntry(draft, at: setup.now)
         try await setup.database.saveEntry(setup.draft, editing: transfer.id, at: setup.now)
-        try await setup.database.restoreEntry(transfer, fee: nil)
+        try await setup.database.restoreEntry(transfer, fee: nil, at: StoreFixture.now)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries == [transfer])
@@ -160,9 +160,9 @@ struct TransferFeeWriteTests {
 
         let transfer = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let fee = try await setup.database.fee(of: transfer.id)
-        let deleted = try await setup.database.deleteEntries([transfer.id])
+        let deleted = try await setup.database.deleteEntries([transfer.id], at: StoreFixture.now)
         let reversed = Array(deleted.reversed())
-        try await setup.database.restoreEntries(reversed)
+        try await setup.database.restoreEntries(reversed, at: StoreFixture.now)
         let snapshot = try setup.database.snapshot()
         let expected = Set([transfer, fee].compactMap(\.self))
 

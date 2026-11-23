@@ -31,7 +31,8 @@ struct SyncShareRecordTests {
         try await partner.database.applySyncChanges(
             saved: [record],
             deleted: [],
-            systemFields: [key.recordID(in: zone): Data([1])]
+            systemFields: [key.recordID(in: zone): Data([1])],
+            at: StoreFixture.now
         )
 
         let waiting = try await partner.value("SELECT COUNT(*) FROM sync_waiting")
@@ -79,7 +80,8 @@ struct SyncShareRecordTests {
         try await setup.database.applySyncChanges(
             saved: [SyncRecord(key: entry, values: values)],
             deleted: [],
-            systemFields: [entry.recordID(in: zone): Data([1])]
+            systemFields: [entry.recordID(in: zone): Data([1])],
+            at: StoreFixture.now
         )
 
         let local = try await setup.database.syncRecord(for: entry)

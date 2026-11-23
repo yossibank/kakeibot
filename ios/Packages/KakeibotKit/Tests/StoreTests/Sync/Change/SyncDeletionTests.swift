@@ -26,7 +26,8 @@ struct SyncDeletionTests {
 
         try await device.database.applySyncChanges(
             saved: [SyncRecord(key: entry, values: values)],
-            deleted: [recurring.own]
+            deleted: [recurring.own],
+            at: StoreFixture.now
         )
 
         #expect(try await device.database.syncRecord(for: recurring) == nil)

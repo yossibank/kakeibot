@@ -24,7 +24,7 @@ class NotificationScheduler(
 
     fun apply(
         plan: List<PlannedNotification>,
-        now: Instant = Instant.now(),
+        now: Instant,
         zone: ZoneId = ZoneId.systemDefault(),
     ) {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {

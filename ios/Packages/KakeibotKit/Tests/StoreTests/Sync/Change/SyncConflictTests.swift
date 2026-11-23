@@ -57,7 +57,11 @@ struct SyncConflictTests {
             ]
         )
 
-        try await setup.database.applySyncChanges(saved: [remote], deleted: [])
+        try await setup.database.applySyncChanges(
+            saved: [remote],
+            deleted: [],
+            at: StoreFixture.now
+        )
 
         let stamps = try await setup.value("SELECT group_concat(id) FROM calendar_stamp")
 
@@ -94,10 +98,15 @@ struct SyncConflictTests {
         try await b.database.applySyncChanges(
             saved: changes.saved,
             deleted: [],
-            systemFields: changes.systemFields
+            systemFields: changes.systemFields,
+            at: StoreFixture.now
         )
 
-        try await b.database.applySyncChanges(saved: [], deleted: changes.deleted)
+        try await b.database.applySyncChanges(
+            saved: [],
+            deleted: changes.deleted,
+            at: StoreFixture.now
+        )
 
         let budgets = try await b.value(Self.budgetIDs)
 
@@ -149,7 +158,8 @@ extension SyncTests.Setup {
         try await database.applySyncChanges(
             saved: changes.saved,
             deleted: changes.deleted,
-            systemFields: changes.systemFields
+            systemFields: changes.systemFields,
+            at: StoreFixture.now
         )
     }
 }

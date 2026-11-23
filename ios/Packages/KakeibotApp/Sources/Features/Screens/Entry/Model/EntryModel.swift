@@ -324,7 +324,7 @@ public extension EntryModel {
         }
 
         do {
-            let deleted = try await database.deleteEntry(original.id)
+            let deleted = try await database.deleteEntry(original.id, at: Date())
             let title = label(for: original)
 
             return EntryChange(

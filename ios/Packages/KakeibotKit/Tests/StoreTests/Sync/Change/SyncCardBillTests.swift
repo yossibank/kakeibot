@@ -20,10 +20,18 @@ struct SyncCardBillTests {
             "updated_at": .text("2026-10-05T00:00:00Z")
         ])
 
-        try await setup.database.applySyncChanges(saved: [record], deleted: [])
+        try await setup.database.applySyncChanges(
+            saved: [record],
+            deleted: [],
+            at: StoreFixture.now
+        )
         let added = try setup.bill()?.amount
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
+        try await setup.database.applySyncChanges(
+            saved: [],
+            deleted: [key.own],
+            at: StoreFixture.now
+        )
         let removed = try setup.bill()?.amount
 
         #expect(added == 13000)
@@ -47,7 +55,11 @@ struct SyncCardBillTests {
             "updated_at": .text("2026-10-05T00:00:00Z")
         ])
 
-        try await setup.database.applySyncChanges(saved: [record], deleted: [])
+        try await setup.database.applySyncChanges(
+            saved: [record],
+            deleted: [],
+            at: StoreFixture.now
+        )
 
         try await setup.database.writer.write { db in
             try db.execute(
@@ -61,7 +73,7 @@ struct SyncCardBillTests {
             )
         }
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [])
+        try await setup.database.applySyncChanges(saved: [], deleted: [], at: StoreFixture.now)
 
         #expect(try setup.bill()?.amount == 13000)
     }

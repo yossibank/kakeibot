@@ -62,7 +62,10 @@ struct HomeModelTests {
         await model.load()
         let entry = try #require(model.periodRecurrings.first?.entry)
 
-        try await setup.database.deleteEntry(entry.id)
+        try await setup.database.deleteEntry(
+            entry.id,
+            at: Date(timeIntervalSince1970: 1_791_000_000)
+        )
         await model.load()
 
         #expect(model.periodRecurrings.map(\.status) == [.missing, .upcoming])

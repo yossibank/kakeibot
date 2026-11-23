@@ -11,6 +11,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 class NotificationBootReceiver : BroadcastReceiver() {
     override fun onReceive(
@@ -28,13 +29,13 @@ class NotificationBootReceiver : BroadcastReceiver() {
             var database: AppDatabase? = null
 
             try {
-                val opened = AppDatabase.file(app)
+                val opened = AppDatabase.file(app, now = Instant.now())
                 database = opened
 
                 val today = AppModel.deviceDay()
                 val plan = opened.notificationInput(from = today).plan(today = today)
 
-                NotificationScheduler(app).apply(plan)
+                NotificationScheduler(app).apply(plan, now = Instant.now())
             } catch (error: CancellationException) {
                 throw error
             } catch (_: Exception) {

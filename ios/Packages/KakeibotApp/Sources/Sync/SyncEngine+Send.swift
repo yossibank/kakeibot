@@ -224,7 +224,8 @@ private extension SyncEngine {
             try await database.applySyncChanges(
                 saved: [remote],
                 deleted: [],
-                systemFields: [id: serverRecord.systemFields]
+                systemFields: [id: serverRecord.systemFields],
+                at: Date()
             )
 
             if try await database.syncRecord(for: id) == remote {

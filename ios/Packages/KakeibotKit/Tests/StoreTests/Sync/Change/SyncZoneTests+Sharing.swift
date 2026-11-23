@@ -15,7 +15,7 @@ extension SyncZoneTests {
         try await setup.database.removeSyncChanges(changes)
         try await setup.execute("UPDATE wallet SET name = 'x' WHERE id = '\(walletID)'")
 
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
 
         #expect(try await setup.pendingKeys() == [])
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")
@@ -93,7 +93,7 @@ extension SyncZoneTests {
         let changes = try await setup.database.pendingSyncChanges()
         try await setup.database.removeSyncChanges(changes)
 
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
         let keys = try await Set(setup.pendingKeys())
         let change = try await setup.change(of: key)
         let wallets = try await setup.value("SELECT COUNT(*) FROM wallet WHERE id = '\(walletID)'")
@@ -121,7 +121,7 @@ extension SyncZoneTests {
         let changes = try await setup.database.pendingSyncChanges()
         try await setup.database.removeSyncChanges(changes)
 
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
 
         #expect(try await setup.pendingKeys() == [])
         #expect(try await setup.value("SELECT COUNT(*) FROM sync_share") == "0")

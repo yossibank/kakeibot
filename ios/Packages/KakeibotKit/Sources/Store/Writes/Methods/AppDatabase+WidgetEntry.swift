@@ -47,7 +47,7 @@ public extension AppDatabase {
 
     func undoWidgetEntry(
         _ id: Entry.ID,
-        at now: Date = Date()
+        at now: Date
     ) async throws {
         try await writer.write { db in
             let entry = try Entry.fetchOne(db, key: id)

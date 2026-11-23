@@ -39,7 +39,7 @@ public extension SettingsMenuResetModel {
 
     func deleteAll() async {
         do {
-            try await database.deleteAllRecords()
+            try await database.deleteAllRecords(at: Date())
             errorNotice.inform(Self.deletedMessage)
         } catch {
             errorNotice.show(Self.deleteFailedMessage, for: error)

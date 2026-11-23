@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.notifications.NotificationScheduler
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.file
+import java.time.Instant
 
 @Composable
 fun RootView(
@@ -35,7 +36,7 @@ fun RootView(
     val model: AppModel = viewModel { AppModel(scheduler = NotificationScheduler(context)) }
 
     val openDatabase: suspend () -> AppDatabase = {
-        AppDatabase.file(context)
+        AppDatabase.file(context, now = Instant.now())
     }
 
     LaunchedEffect(model) {

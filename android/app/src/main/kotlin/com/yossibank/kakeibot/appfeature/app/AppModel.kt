@@ -134,7 +134,7 @@ class AppModel(
             ModelTask.quiet {
                 database.notificationInputUpdates(from = day).collect { input ->
                     withContext(Dispatchers.IO) {
-                        scheduler.apply(input.plan(today = day))
+                        scheduler.apply(input.plan(today = day), now = Instant.now())
                     }
                 }
             }

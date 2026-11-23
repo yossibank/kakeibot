@@ -92,8 +92,8 @@ struct EntryTemplateWriteTests {
 
         try await setup.database.deleteTemplate(template.id)
         let kept = try await setup.database.entry(entry.id)
-        try await setup.database.deleteEntry(entry.id)
-        try await setup.database.restoreEntry(entry)
+        try await setup.database.deleteEntry(entry.id, at: StoreFixture.now)
+        try await setup.database.restoreEntry(entry, at: StoreFixture.now)
         let restored = try await setup.database.entry(entry.id)
 
         #expect(entry.templateId == template.id)

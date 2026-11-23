@@ -17,7 +17,7 @@ public extension AppDatabase {
 
     func endSharing(
         _ walletID: Wallet.ID,
-        at now: Date = Date()
+        at now: Date
     ) async throws {
         try await writer.write { db in
             try Self.endSharing(walletID, in: db, at: now)

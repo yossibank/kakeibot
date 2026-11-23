@@ -25,7 +25,7 @@ extension ReviewModel {
         isCurrentPeriod && newReportKey != nil
     }
 
-    func closingGoals(now: Date = Date()) -> ReviewClosingView.Goals {
+    func closingGoals(now: Date) -> ReviewClosingView.Goals {
         let next = period.adding(1)
         let answer = goals.first { $0.period == period.commentKey }
         let checked = answer.map { answered($0, now: now) }
@@ -55,7 +55,7 @@ extension ReviewModel {
         )
     }
 
-    func refreshGoals(now: Date = Date()) async {
+    func refreshGoals(now: Date) async {
         guard list != nil else {
             return
         }

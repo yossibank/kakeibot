@@ -11,7 +11,7 @@ struct CardBillRecalcWriteTests {
         let added = try await setup.spend(3000, on: "2026-10-05")
         #expect(try setup.bill()?.amount == 13000)
 
-        try await setup.database.deleteEntry(added.id)
+        try await setup.database.deleteEntry(added.id, at: StoreFixture.now)
         #expect(try setup.bill()?.amount == 10000)
     }
 
@@ -21,7 +21,7 @@ struct CardBillRecalcWriteTests {
         let usage = try setup.database.snapshot().entries.first { $0.recurringId == nil }
         let entry = try #require(usage)
 
-        try await setup.database.deleteEntry(entry.id)
+        try await setup.database.deleteEntry(entry.id, at: StoreFixture.now)
 
         #expect(try setup.bill() == nil)
         #expect(try setup.database.snapshot().entries.isEmpty)
@@ -91,10 +91,10 @@ struct CardBillRecalcWriteTests {
         let setup = try await Setup(usage: [10000])
         let entry = try await setup.spend(3000, on: "2026-10-05")
 
-        try await setup.database.deleteEntry(entry.id)
+        try await setup.database.deleteEntry(entry.id, at: StoreFixture.now)
         #expect(try setup.bill()?.amount == 10000)
 
-        try await setup.database.restoreEntry(entry)
+        try await setup.database.restoreEntry(entry, at: StoreFixture.now)
         #expect(try setup.bill()?.amount == 13000)
     }
 
@@ -116,7 +116,7 @@ struct CardBillRecalcWriteTests {
         let entry = try await setup.database.recordFromWidget(template.id, on: date, at: setup.now)
         #expect(try setup.bill()?.amount == 12000)
 
-        try await setup.database.undoWidgetEntry(entry.id)
+        try await setup.database.undoWidgetEntry(entry.id, at: StoreFixture.now)
         #expect(try setup.bill()?.amount == 10000)
     }
 
@@ -126,10 +126,13 @@ struct CardBillRecalcWriteTests {
         let added = try await setup.spend(3000, on: "2026-10-05")
         let bill = try #require(try setup.bill())
 
-        let deleted = try await setup.database.deleteEntries([added.id, bill.id])
+        let deleted = try await setup.database.deleteEntries(
+            [added.id, bill.id],
+            at: StoreFixture.now
+        )
         #expect(try setup.bills().isEmpty)
 
-        try await setup.database.restoreEntries(deleted)
+        try await setup.database.restoreEntries(deleted, at: StoreFixture.now)
         let bills = try setup.bills()
 
         #expect(bills.count == 1)
@@ -143,7 +146,7 @@ struct CardBillRecalcWriteTests {
         let added = try await setup.spend(3000, on: "2026-10-05")
         let later = setup.now.addingTimeInterval(1)
 
-        try await setup.database.deleteEntry(bill.id)
+        try await setup.database.deleteEntry(bill.id, at: StoreFixture.now)
 
         var draft = EntryDraft(added)
         draft.amount = 5000
@@ -159,10 +162,10 @@ struct CardBillRecalcWriteTests {
         let found = try setup.database.snapshot().entries.first { $0.recurringId == nil }
         let usage = try #require(found)
 
-        let deleted = try await setup.database.deleteEntries([usage.id])
+        let deleted = try await setup.database.deleteEntries([usage.id], at: StoreFixture.now)
         #expect(try setup.bills().isEmpty)
 
-        try await setup.database.restoreEntries(deleted)
+        try await setup.database.restoreEntries(deleted, at: StoreFixture.now)
         let bills = try setup.bills()
 
         #expect(bills.count == 1)
@@ -207,7 +210,7 @@ struct CardBillRecalcWriteTests {
         #expect(try setup.bill() == nil)
         #expect(try setup.bill(of: other.id)?.amount == 10000)
 
-        try await setup.database.restoreEntries(previous)
+        try await setup.database.restoreEntries(previous, at: StoreFixture.now)
 
         #expect(try setup.bill()?.amount == 10000)
         #expect(try setup.bill(of: other.id) == nil)
@@ -290,7 +293,7 @@ struct CardBillRecalcWriteTests {
         let bill = try #require(try setup.bill())
         let movedDate = try #require(LocalDate("2026-11-12"))
 
-        try await setup.database.deleteEntry(bill.id)
+        try await setup.database.deleteEntry(bill.id, at: StoreFixture.now)
 
         let moved = Entry(
             type: .transfer,
@@ -305,8 +308,8 @@ struct CardBillRecalcWriteTests {
             updatedAt: setup.now
         )
 
-        try await setup.database.restoreEntries([moved])
-        try await setup.database.restoreEntries([bill])
+        try await setup.database.restoreEntries([moved], at: StoreFixture.now)
+        try await setup.database.restoreEntries([bill], at: StoreFixture.now)
         let bills = try setup.bills()
 
         #expect(bills.count == 1)

@@ -23,7 +23,7 @@ struct SyncLeaveTests {
         let changes = try await setup.database.pendingSyncChanges()
         try await setup.database.removeSyncChanges(changes)
 
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
 
         #expect(try await setup.count("wallet WHERE id = '\(walletID)'") == 0)
         #expect(try await setup.count("entry") == 0)
@@ -56,7 +56,7 @@ struct SyncLeaveTests {
         let changes = try await setup.database.pendingSyncChanges()
         try await setup.database.removeSyncChanges(changes)
 
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
 
         let outgoing = try await setup.row(of: "t-out")
         let incoming = try await setup.row(of: "t-in")
@@ -85,7 +85,7 @@ struct SyncLeaveTests {
         """)
         let before = try await setup.count("category")
 
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
 
         #expect(try await setup.count("category") == before + 1)
         #expect(try await setup.count("category WHERE name = '振替' AND kind = 'income'") == 0)
@@ -110,7 +110,7 @@ struct SyncLeaveTests {
         let changes = try await setup.database.pendingSyncChanges()
         try await setup.database.removeSyncChanges(changes)
 
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
 
         #expect(try await setup.count("entry") == 0)
         #expect(try await setup.pendingKeys() == [])

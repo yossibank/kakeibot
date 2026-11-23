@@ -8,7 +8,7 @@ public extension AppDatabase {
         fee: Entry? = nil,
         items: [EntryItem]? = nil,
         restoringNoSpend days: [NoSpendDay] = [],
-        at now: Date = Date()
+        at now: Date
     ) async throws {
         try await writer.write { db in
             let restored = [entry] + [fee].compactMap(\.self)
@@ -38,7 +38,7 @@ public extension AppDatabase {
     func restoreEntries(
         _ entries: [Entry],
         items: [EntryItem]? = nil,
-        at now: Date = Date()
+        at now: Date
     ) async throws {
         try await writer.write { db in
             var change = CardBillChange()

@@ -118,10 +118,10 @@ extension ReviewView {
             await model.loadGoals()
         }
         .task(id: model.reasonTrigger) {
-            await model.refreshReason()
+            await model.refreshReason(now: Date())
         }
-        .task(id: model.noteTrigger) {
-            await model.refreshNotes()
+        .task(id: model.noteTrigger(now: Date())) {
+            await model.refreshNotes(now: Date())
         }
         .sheet(item: $analysisShare) { share in
             shareSheet(share)
@@ -139,7 +139,7 @@ private extension ReviewView {
         } else {
             ReviewClosingView(
                 content: model.closingContent,
-                goals: model.closingGoals(),
+                goals: model.closingGoals(now: Date()),
                 notes: model.closingNotes,
                 name: analysisName,
                 previousName: model.period.previous.displayName,

@@ -30,7 +30,7 @@ extension SyncEngine {
         else {
             if let walletID = SyncZone.walletID(of: deletion.zoneID.zoneName),
                await isGone(deletion.zoneID) {
-                try? await database.endSharing(walletID)
+                try? await database.endSharing(walletID, at: Date())
             }
 
             return
@@ -81,7 +81,8 @@ extension SyncEngine {
                 saved: saved,
                 deleted: deleted,
                 systemFields: systemFields,
-                owners: owners
+                owners: owners,
+                at: Date()
             )
         } catch {
             try? await database.resetSync(isShared: isShared)
@@ -103,7 +104,7 @@ private extension SyncEngine {
         try? await database.resetSync(isShared: true)
 
         for walletID in owners.keys.compactMap(SyncZone.walletID) {
-            try? await database.endSharing(walletID)
+            try? await database.endSharing(walletID, at: Date())
         }
 
         await restart()
