@@ -46,7 +46,7 @@ struct DeletionNoticeTests {
             initialBalance: 0
         )
 
-        let added = try await database.saveWallet(walletDraft, at: Date())
+        let added = try await database.save(walletDraft, at: Date())
 
         let deletions = try await [
             database.deleteWallet(added.id, at: Date()),

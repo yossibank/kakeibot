@@ -14,7 +14,8 @@ import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
 import com.yossibank.kakeibot.store.writes.methods.generateRecurringEntries
 import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.restoreEntries
-import com.yossibank.kakeibot.store.writes.methods.saveWallet
+import com.yossibank.kakeibot.store.writes.methods.save
+import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -140,7 +141,7 @@ class CardBillRecalcWriteRecurringTest {
             initialBalance = 0,
         )
 
-        val payer = setup.database.saveWallet(draft, at = setup.now)
+        val payer = setup.database.save(WalletTable, draft, at = setup.now)
 
         val payerBill = Recurring(
             type = Entry.Kind.transfer,

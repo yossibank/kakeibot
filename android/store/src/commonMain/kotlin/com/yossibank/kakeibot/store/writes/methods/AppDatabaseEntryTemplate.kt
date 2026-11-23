@@ -66,24 +66,6 @@ suspend fun AppDatabase.saveTemplate(
     template
 }
 
-suspend fun AppDatabase.setTemplateHidden(
-    id: Identifier<EntryTemplate>,
-    isHidden: Boolean,
-    at: Instant,
-) {
-    write {
-        val template =
-            findTemplate(id) ?: throw TemplateWriteException(TemplateWriteError.templateNotFound)
-
-        val updated = template.copy(
-            archivedAt = if (isHidden) at else null,
-            updatedAt = at,
-        )
-
-        templateDao().update(updated.record())
-    }
-}
-
 suspend fun AppDatabase.deleteTemplate(id: Identifier<EntryTemplate>): Deletion = write {
     val key = id.databaseValue
     val templates = listOfNotNull(findTemplate(id))
@@ -97,20 +79,6 @@ suspend fun AppDatabase.deleteTemplate(id: Identifier<EntryTemplate>): Deletion 
     templateDao().delete(key)
 
     deletion
-}
-
-suspend fun AppDatabase.reorderTemplates(
-    ids: List<Identifier<EntryTemplate>>,
-    at: Instant,
-) {
-    write {
-        reorder(
-            table = "template",
-            ids = ids.map { it.databaseValue },
-            notFound = TemplateWriteException(TemplateWriteError.templateNotFound),
-            now = at,
-        )
-    }
 }
 
 private suspend fun AppDatabase.findTemplate(id: Identifier<EntryTemplate>): EntryTemplate? =

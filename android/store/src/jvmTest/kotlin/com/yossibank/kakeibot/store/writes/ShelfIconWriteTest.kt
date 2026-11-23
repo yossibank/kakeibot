@@ -11,9 +11,10 @@ import com.yossibank.kakeibot.store.queries.methods.shelfIconList
 import com.yossibank.kakeibot.store.writes.methods.ShelfIconWriteError
 import com.yossibank.kakeibot.store.writes.methods.ShelfIconWriteException
 import com.yossibank.kakeibot.store.writes.methods.deleteShelfIcon
-import com.yossibank.kakeibot.store.writes.methods.reorderShelfIcons
-import com.yossibank.kakeibot.store.writes.methods.saveShelfIcon
-import com.yossibank.kakeibot.store.writes.methods.setShelfIconHidden
+import com.yossibank.kakeibot.store.writes.methods.reorder
+import com.yossibank.kakeibot.store.writes.methods.save
+import com.yossibank.kakeibot.store.writes.methods.setHidden
+import com.yossibank.kakeibot.store.writes.types.ShelfIconTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -28,7 +29,7 @@ class ShelfIconWriteTest {
     fun addsShelfIconAtTheEnd() = runTest {
         val setup = Setup.make()
 
-        val saved = setup.database.saveShelfIcon(setup.draft, at = setup.now)
+        val saved = setup.database.save(ShelfIconTable, setup.draft, at = setup.now)
         val shelf = setup.database.shelfIconList()
         val icon = assertNotNull(shelf.icons[saved.iconId])
 
@@ -51,7 +52,8 @@ class ShelfIconWriteTest {
             color = "#9C6ADE",
         )
 
-        val updated = setup.database.saveShelfIcon(
+        val updated = setup.database.save(
+            ShelfIconTable,
             draft,
             editing = first.id,
             at = later,
@@ -76,7 +78,7 @@ class ShelfIconWriteTest {
         val shelf = setup.database.shelfIconList()
         val reversed = shelf.shelfIcons.map { it.id }.reversed()
 
-        setup.database.reorderShelfIcons(reversed, at = setup.now)
+        setup.database.reorder(ShelfIconTable, reversed, at = setup.now)
         val reordered = setup.database.shelfIconList()
 
         assertEquals(reversed, reordered.shelfIcons.map { it.id })
@@ -89,7 +91,8 @@ class ShelfIconWriteTest {
         val setup = Setup.make()
         val first = setup.firstShelfIcon()
 
-        setup.database.setShelfIconHidden(
+        setup.database.setHidden(
+            ShelfIconTable,
             first.id,
             isHidden = true,
             at = setup.now,
@@ -98,7 +101,8 @@ class ShelfIconWriteTest {
         val hidden = setup.database.shelfIconList()
         val list = setup.database.entryList()
 
-        setup.database.setShelfIconHidden(
+        setup.database.setHidden(
+            ShelfIconTable,
             first.id,
             isHidden = false,
             at = setup.now,
@@ -133,7 +137,8 @@ class ShelfIconWriteTest {
         val setup = Setup.make()
 
         val saving = assertFailsWith<ShelfIconWriteException> {
-            setup.database.saveShelfIcon(
+            setup.database.save(
+                ShelfIconTable,
                 setup.draft,
                 editing = Identifier(),
                 at = setup.now,
@@ -141,7 +146,8 @@ class ShelfIconWriteTest {
         }
 
         val hiding = assertFailsWith<ShelfIconWriteException> {
-            setup.database.setShelfIconHidden(
+            setup.database.setHidden(
+                ShelfIconTable,
                 Identifier(),
                 isHidden = true,
                 at = setup.now,
@@ -164,7 +170,7 @@ class ShelfIconWriteTest {
         )
 
         assertFailsWith<Exception> {
-            setup.database.saveShelfIcon(draft, at = setup.now)
+            setup.database.save(ShelfIconTable, draft, at = setup.now)
         }
 
         val shelf = setup.database.shelfIconList()

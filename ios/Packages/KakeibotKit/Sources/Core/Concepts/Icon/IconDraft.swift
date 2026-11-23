@@ -28,16 +28,8 @@ public extension IconDraft {
     }
 
     func newIcon(at now: Date) throws -> Icon {
-        try validate()
-
-        return Icon(
-            emoji: emoji,
-            text: text,
-            glyph: glyph,
-            color: color,
-            createdAt: now,
-            updatedAt: now
-        )
+        let blank = Icon(emoji: nil, text: nil, color: color, createdAt: now, updatedAt: now)
+        return try applied(to: blank, at: now)
     }
 
     func applied(

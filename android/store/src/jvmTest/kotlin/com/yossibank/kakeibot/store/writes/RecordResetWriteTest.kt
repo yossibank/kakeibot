@@ -18,12 +18,13 @@ import com.yossibank.kakeibot.store.support.rows
 import com.yossibank.kakeibot.store.writes.methods.deletableRecordCount
 import com.yossibank.kakeibot.store.writes.methods.deleteAllRecords
 import com.yossibank.kakeibot.store.writes.methods.markNoSpendDay
+import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.saveRewardGoal
-import com.yossibank.kakeibot.store.writes.methods.saveRewardRule
 import com.yossibank.kakeibot.store.writes.methods.saveValuation
 import com.yossibank.kakeibot.store.writes.methods.setReward
 import com.yossibank.kakeibot.store.writes.methods.stamp
+import com.yossibank.kakeibot.store.writes.types.RewardRuleTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -129,7 +130,7 @@ class RecordResetWriteTest {
                 ),
             )
 
-            val rule = database.saveRewardRule(ruleDraft, at = now)
+            val rule = database.save(RewardRuleTable, ruleDraft, at = now)
 
             val draft = EntryDraft(
                 type = Entry.Kind.expense,

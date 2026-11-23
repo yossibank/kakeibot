@@ -22,7 +22,7 @@ extension EntryModelTransferTests {
         )
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
-        try await setup.database.setWalletHidden(setup.cash, isHidden: true, at: Date())
+        try await setup.database.setHidden(setup.cash, isHidden: true, at: Date())
         let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
 
         await model.load()
@@ -39,7 +39,7 @@ extension EntryModelTransferTests {
         let setup = try await Setup()
         try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
         let transfer = try #require(setup.database.snapshot().entries.first)
-        try await setup.database.setWalletHidden(setup.bank, isHidden: true, at: Date())
+        try await setup.database.setHidden(setup.bank, isHidden: true, at: Date())
         let model = EntryModel(database: setup.database, editing: transfer.id, date: setup.date)
 
         await model.load()
@@ -63,7 +63,7 @@ extension EntryModelTransferTests {
         )
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
-        try await setup.database.setCategoryHidden(setup.salary, isHidden: true, at: Date())
+        try await setup.database.setHidden(setup.salary, isHidden: true, at: Date())
         let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
 
         await model.load()
@@ -138,7 +138,7 @@ extension EntryModelTransferTests {
         )
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
-        try await setup.database.setCategoryHidden(setup.salary, isHidden: true, at: Date())
+        try await setup.database.setHidden(setup.salary, isHidden: true, at: Date())
         let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
 
         await model.load()

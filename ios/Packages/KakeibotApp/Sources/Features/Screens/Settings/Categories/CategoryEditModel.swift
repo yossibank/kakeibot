@@ -241,7 +241,7 @@ extension CategoryEditModel: SettingsEditRemoving {
         _ id: EntryCategory.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setCategoryHidden(
+        try await database.setHidden(
             id,
             isHidden: isHidden,
             at: Date()

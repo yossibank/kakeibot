@@ -84,7 +84,7 @@ struct ReviewModelTests {
             initialBalance: -1_200_000
         )
 
-        let loan = try await setup.database.saveWallet(wallet, at: now)
+        let loan = try await setup.database.save(wallet, at: now)
         let options = try await setup.database.entryOptions()
 
         let draft = try EntryDraft(
@@ -97,7 +97,7 @@ struct ReviewModelTests {
         )
 
         try await setup.database.saveEntry(draft, at: now)
-        try await setup.database.setWalletHidden(loan.id, isHidden: true, at: now)
+        try await setup.database.setHidden(loan.id, isHidden: true, at: now)
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
@@ -123,7 +123,7 @@ struct ReviewModelTests {
             initialBalance: -100_000
         )
 
-        let loan = try await setup.database.saveWallet(wallet, at: now)
+        let loan = try await setup.database.save(wallet, at: now)
         let options = try await setup.database.entryOptions()
 
         for text in ["2026-10-10", "2026-10-20"] {
@@ -178,7 +178,7 @@ struct ReviewModelTests {
             initialBalance: -100_000
         )
 
-        let loan = try await setup.database.saveWallet(wallet, at: now)
+        let loan = try await setup.database.save(wallet, at: now)
         let options = try await setup.database.entryOptions()
 
         let draft = try EntryDraft(

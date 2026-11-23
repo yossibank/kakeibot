@@ -171,7 +171,7 @@ struct RecurringEditModelTests {
             initialBalance: 0
         )
 
-        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let card = try await setup.database.save(wallet, at: Date())
 
         let model = RecurringEditModel(
             database: setup.database,
@@ -203,7 +203,7 @@ struct RecurringEditModelTests {
             initialBalance: -1_200_000
         )
 
-        let loan = try await setup.database.saveWallet(wallet, at: Date())
+        let loan = try await setup.database.save(wallet, at: Date())
 
         let model = RecurringEditModel(
             database: setup.database,
@@ -336,7 +336,7 @@ private extension RecurringEditModelTests {
             initialBalance: -3_896_752
         )
 
-        let loan = try await setup.database.saveWallet(wallet, at: Date())
+        let loan = try await setup.database.save(wallet, at: Date())
 
         let model = RecurringEditModel(
             database: setup.database,

@@ -19,13 +19,14 @@ import com.yossibank.kakeibot.store.records.rows.rewardLog
 import com.yossibank.kakeibot.store.writes.methods.RewardRuleWriteError
 import com.yossibank.kakeibot.store.writes.methods.RewardRuleWriteException
 import com.yossibank.kakeibot.store.writes.methods.deleteRewardRule
-import com.yossibank.kakeibot.store.writes.methods.reorderRewardRules
+import com.yossibank.kakeibot.store.writes.methods.reorder
 import com.yossibank.kakeibot.store.writes.methods.restore
+import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveRewardGoal
-import com.yossibank.kakeibot.store.writes.methods.saveRewardRule
+import com.yossibank.kakeibot.store.writes.methods.setHidden
 import com.yossibank.kakeibot.store.writes.methods.setReward
 import com.yossibank.kakeibot.store.writes.methods.setRewardGoalPurchased
-import com.yossibank.kakeibot.store.writes.methods.setRewardRuleHidden
+import com.yossibank.kakeibot.store.writes.types.RewardRuleTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -70,7 +71,8 @@ class RewardRuleWriteTest {
             icon = lunchIcon,
         )
 
-        val updated = setup.database.saveRewardRule(
+        val updated = setup.database.save(
+            RewardRuleTable,
             draft,
             editing = rule.id,
             at = later,
@@ -99,7 +101,7 @@ class RewardRuleWriteTest {
         )
 
         val error = assertFailsWith<DraftProblemException> {
-            setup.database.saveRewardRule(draft, at = setup.now)
+            setup.database.save(RewardRuleTable, draft, at = setup.now)
         }
 
         assertEquals(DraftProblem.emptyAmount, error.problem)
@@ -113,7 +115,8 @@ class RewardRuleWriteTest {
         val first = setup.save("自炊した日")
         val second = setup.save("歩いて帰った日")
 
-        setup.database.reorderRewardRules(
+        setup.database.reorder(
+            RewardRuleTable,
             listOf(second.id, first.id),
             at = setup.now,
         )
@@ -130,7 +133,8 @@ class RewardRuleWriteTest {
         val setup = Setup()
         val rule = setup.save("自炊した日")
 
-        setup.database.setRewardRuleHidden(
+        setup.database.setHidden(
+            RewardRuleTable,
             rule.id,
             isHidden = true,
             at = setup.now,
@@ -138,7 +142,8 @@ class RewardRuleWriteTest {
 
         val hidden = setup.database.rewardRuleList()
 
-        setup.database.setRewardRuleHidden(
+        setup.database.setHidden(
+            RewardRuleTable,
             rule.id,
             isHidden = false,
             at = setup.now,
@@ -247,7 +252,7 @@ class RewardRuleWriteTest {
                 icon = icon,
             )
 
-            return database.saveRewardRule(draft, at = now)
+            return database.save(RewardRuleTable, draft, at = now)
         }
 
         suspend fun logs(): List<RewardLog> = database.rewardLogDao().all().map {

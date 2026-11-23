@@ -14,9 +14,10 @@ import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurrings
 import com.yossibank.kakeibot.store.writes.methods.generateRecurringEntries
 import com.yossibank.kakeibot.store.writes.methods.markNoSpendDay
-import com.yossibank.kakeibot.store.writes.methods.reorderRecurrings
+import com.yossibank.kakeibot.store.writes.methods.reorder
 import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.saveRecurring
+import com.yossibank.kakeibot.store.writes.types.RecurringTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -125,7 +126,8 @@ class RecurringWriteEditTest {
 
         val before = setup.database.recurrings().map { it.id }
 
-        setup.database.reorderRecurrings(
+        setup.database.reorder(
+            RecurringTable,
             before.reversed(),
             at = setup.now,
         )

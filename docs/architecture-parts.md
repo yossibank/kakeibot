@@ -20,6 +20,9 @@
 | `SettingsEditModel` | 1 件を編集するモデル。下書きと、保存できるかを持つ | `Features/Shared/SettingsParts/Input/` |
 | `SettingsEditing` | 編集の画面がモデルに頼む操作（非表示・削除）と状態 | `Features/Shared/SettingsParts/Input/` |
 | `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足す | `Features/Shared/SettingsParts/Input/` |
+| `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
+| `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
+| `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |
 | `Draft` | 保存前の下書き。`problems` を返し、`validate()` が最初の問題を投げる | `Core/Shared/` |
 
 ## 🗺️ 画面の部品
@@ -31,6 +34,25 @@
 | `SettingsConfirmation` | 行を非表示・削除する前の確認の文言。`SettingsBoardSpec` が返す | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardDestination` | 新規と編集だけの行き先。`SettingsBoardSpec` の既定の実装がある | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardScreen` | `SettingsBoardPage` の中で使う、設定の一覧の外枠。説明カード・タイルの並び・追加ボタンを組む | `Features/Shared/SettingsParts/Board/` |
+
+## 🗄️ 書き込みの共通の関数
+
+保存・並べ替え・非表示は、表ごとの名前の関数を持たず、次の関数に表の型を渡して呼ぶ。
+
+| 仕組み | 使いどころ | 置き場所 |
+| --- | --- | --- |
+| `AppDatabase.save(_:editing:at:)` | アイコン付きの 1 件（口座・ごほうびのルール・棚のアイコン）の保存。新規と編集を 1 つにする | `Store/Writes/Methods/AppDatabase+IconBacked.swift` |
+| `AppDatabase.reorder(_:at:)` | 並べ替えのできる表の並び順の保存 | `Store/Writes/Methods/AppDatabase+Ordering.swift` |
+| `AppDatabase.setHidden(_:isHidden:at:)` | 非表示にできる表の非表示の切り替え | `Store/Writes/Methods/AppDatabase+Ordering.swift` |
+| `SortableRecord` | 並べ替えのできる表の行。見つからない時のエラーを持つ | `Store/Records/Protocols/` |
+| `HidableRecord` | 非表示にできる表の行。非表示の仕方を表の行が決める | `Store/Records/Protocols/` |
+| `ArchivableRecord` | `archived_at` で非表示にする表の行。`HidableRecord` の既定の実装がある | `Store/Records/Protocols/` |
+| `IconBackedRecord` | アイコンを持つ表の行。アイコンが見つからない時のエラーを持つ | `Store/Records/Protocols/` |
+| `IconBackedDraft` | アイコン付きの 1 件を保存できる下書き。行を作る・直す操作を持つ | `Store/Writes/Types/` |
+| `save(table, …)`・`reorder(table, …)`・`setHidden(table, …)` | Android の同じ関数。表ごとの束ね（`WalletTable` など）を渡す | `store/writes/methods/` |
+| `SortableTable`・`HidableTable`・`ArchivableTable`・`IconBackedTable` | Android の表の束ね。表の名前・エラー・DAO の呼び方を持つ | `store/records/protocols/` |
+| `IconBackedDraft`（Kotlin） | アイコン付きの 1 件の下書き。行を作る・直す操作を持つ | `core/shared/` |
+| `InsertableDao`・`UpdatableDao` | Room の DAO の insert と update。`@Query` は表ごとの DAO に残す | `store/records/protocols/` |
 
 ## 🪜 設定の一覧の画面を足す
 

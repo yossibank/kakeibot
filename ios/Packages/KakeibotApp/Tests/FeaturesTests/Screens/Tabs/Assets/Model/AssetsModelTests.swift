@@ -67,7 +67,7 @@ struct AssetsModelTests {
             initialBalance: 0
         )
 
-        let card = try await setup.database.saveWallet(wallet, at: Date())
+        let card = try await setup.database.save(wallet, at: Date())
 
         try await setup.save(
             .expense,
@@ -147,7 +147,7 @@ struct AssetsModelTests {
             initialBalance: -100_000
         )
 
-        let loan = try await setup.database.saveWallet(wallet, at: Date())
+        let loan = try await setup.database.save(wallet, at: Date())
         try await setup.save(.transfer, 30000, on: "2026-10-20", from: setup.bank, to: loan.id)
 
         let draft = try RecurringDraft(

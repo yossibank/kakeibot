@@ -22,4 +22,8 @@ extension Recurring.Frequency: DatabaseValueConvertible {}
 
 extension HolidayShift: DatabaseValueConvertible {}
 
-extension Recurring: SortableRecord {}
+extension Recurring: SortableRecord {
+    public static var notFound: any Error {
+        AppDatabase.RecurringWriteError.recurringNotFound
+    }
+}

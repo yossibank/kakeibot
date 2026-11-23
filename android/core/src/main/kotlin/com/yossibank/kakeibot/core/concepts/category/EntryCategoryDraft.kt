@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.icon.IconDraft
 import com.yossibank.kakeibot.core.shared.DraftProblem
 import com.yossibank.kakeibot.core.shared.DraftProblemException
+import com.yossibank.kakeibot.core.shared.IconBackedDraft
 import com.yossibank.kakeibot.core.shared.Identifier
 import java.time.Instant
 
@@ -12,7 +13,7 @@ data class EntryCategoryDraft(
     val name: String,
     val mark: IconDraft.Mark,
     val color: String,
-) {
+) : IconBackedDraft<EntryCategory> {
     constructor(
         category: EntryCategory,
         icon: Icon,
@@ -45,7 +46,7 @@ data class EntryCategoryDraft(
     private val trimmedName: String
         get() = name.trim()
 
-    fun newIcon(at: Instant): Icon {
+    override fun newIcon(at: Instant): Icon {
         validate()
 
         return icon.newIcon(at)
@@ -68,7 +69,17 @@ data class EntryCategoryDraft(
         )
     }
 
-    fun applied(
+    override fun newValue(
+        iconId: Identifier<Icon>,
+        sortOrder: Int,
+        at: Instant,
+    ): EntryCategory = newCategory(
+        iconId = iconId,
+        sortOrder = sortOrder,
+        at = at,
+    )
+
+    override fun applied(
         to: Icon,
         at: Instant,
     ): Icon {
@@ -80,7 +91,7 @@ data class EntryCategoryDraft(
         )
     }
 
-    fun applied(
+    override fun applied(
         to: EntryCategory,
         at: Instant,
     ): EntryCategory {

@@ -16,11 +16,12 @@ import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.writes.methods.CategoryWriteError
 import com.yossibank.kakeibot.store.writes.methods.CategoryWriteException
 import com.yossibank.kakeibot.store.writes.methods.deleteCategory
-import com.yossibank.kakeibot.store.writes.methods.reorderCategories
+import com.yossibank.kakeibot.store.writes.methods.reorder
 import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.saveCategory
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
-import com.yossibank.kakeibot.store.writes.methods.setCategoryHidden
+import com.yossibank.kakeibot.store.writes.methods.setHidden
+import com.yossibank.kakeibot.store.writes.types.EntryCategoryTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -110,7 +111,8 @@ class EntryCategoryWriteTest {
         val before = setup.expenseCategories()
         val reversed = before.map { it.id }.reversed()
 
-        setup.database.reorderCategories(
+        setup.database.reorder(
+            EntryCategoryTable,
             reversed,
             at = setup.now,
         )
@@ -178,7 +180,8 @@ class EntryCategoryWriteTest {
         val setup = Setup.make()
         val food = setup.category(named = "食費")
 
-        setup.database.setCategoryHidden(
+        setup.database.setHidden(
+            EntryCategoryTable,
             food.id,
             isHidden = true,
             at = setup.now,
@@ -186,7 +189,8 @@ class EntryCategoryWriteTest {
 
         val hiddenOptions = setup.database.entryOptions()
 
-        setup.database.setCategoryHidden(
+        setup.database.setHidden(
+            EntryCategoryTable,
             food.id,
             isHidden = false,
             at = setup.now,

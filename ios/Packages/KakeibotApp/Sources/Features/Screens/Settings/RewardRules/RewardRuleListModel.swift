@@ -54,14 +54,14 @@ extension RewardRuleListModel: SettingsBoardDatabaseModel {
 extension RewardRuleListModel: SettingsBoardModel {
     public func saveOrder(_ ids: [RewardRule.ID]) async throws {
         let ids = ids + hidden.map(\.id)
-        try await database.reorderRewardRules(ids, at: Date())
+        try await database.reorder(ids, at: Date())
     }
 
     public func saveHidden(
         _ id: RewardRule.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setRewardRuleHidden(
+        try await database.setHidden(
             id,
             isHidden: isHidden,
             at: Date()

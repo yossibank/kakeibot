@@ -43,7 +43,7 @@ struct CalendarStampWriteTests {
         let first = try #require(shelf.shelfIcons.first)
         try await setup.database.stamp(first.iconId, on: setup.day, at: setup.now)
 
-        try await setup.database.setShelfIconHidden(first.id, isHidden: true, at: setup.now)
+        try await setup.database.setHidden(first.id, isHidden: true, at: setup.now)
         let calendar = try await setup.database.stampBook()
 
         #expect(calendar.icon(on: setup.day)?.glyph == .star)

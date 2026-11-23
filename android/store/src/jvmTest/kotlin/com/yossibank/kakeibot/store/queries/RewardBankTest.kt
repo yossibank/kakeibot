@@ -7,9 +7,10 @@ import com.yossibank.kakeibot.core.concepts.reward.RewardRuleDraft
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.inMemory
 import com.yossibank.kakeibot.store.queries.methods.rewardBank
-import com.yossibank.kakeibot.store.writes.methods.saveRewardRule
+import com.yossibank.kakeibot.store.writes.methods.save
+import com.yossibank.kakeibot.store.writes.methods.setHidden
 import com.yossibank.kakeibot.store.writes.methods.setReward
-import com.yossibank.kakeibot.store.writes.methods.setRewardRuleHidden
+import com.yossibank.kakeibot.store.writes.types.RewardRuleTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -29,7 +30,8 @@ class RewardBankTest {
             color = "#E07A5F",
         )
 
-        val shown = database.saveRewardRule(
+        val shown = database.save(
+            RewardRuleTable,
             RewardRuleDraft(
                 name = "自炊した日",
                 amount = 500,
@@ -38,7 +40,8 @@ class RewardBankTest {
             at = now,
         )
 
-        val hidden = database.saveRewardRule(
+        val hidden = database.save(
+            RewardRuleTable,
             RewardRuleDraft(
                 name = "歩いて帰った日",
                 amount = 300,
@@ -54,7 +57,8 @@ class RewardBankTest {
             at = now,
         )
 
-        database.setRewardRuleHidden(
+        database.setHidden(
+            RewardRuleTable,
             hidden.id,
             isHidden = true,
             at = now,

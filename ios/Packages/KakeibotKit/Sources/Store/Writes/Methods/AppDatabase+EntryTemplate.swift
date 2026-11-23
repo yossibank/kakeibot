@@ -27,22 +27,6 @@ public extension AppDatabase {
         }
     }
 
-    func setTemplateHidden(
-        _ id: EntryTemplate.ID,
-        isHidden: Bool,
-        at now: Date
-    ) async throws {
-        try await writer.write { db in
-            try EntryTemplate.setHidden(
-                id,
-                isHidden,
-                orThrow: TemplateWriteError.templateNotFound,
-                in: db,
-                at: now
-            )
-        }
-    }
-
     @discardableResult
     func deleteTemplate(_ id: EntryTemplate.ID) async throws -> Deletion {
         try await writer.write { db in
@@ -55,20 +39,6 @@ public extension AppDatabase {
             try templates.deleteAll(db)
 
             return deletion
-        }
-    }
-
-    func reorderTemplates(
-        _ ids: [EntryTemplate.ID],
-        at now: Date
-    ) async throws {
-        try await writer.write { db in
-            try EntryTemplate.reorder(
-                ids,
-                orThrow: TemplateWriteError.templateNotFound,
-                in: db,
-                at: now
-            )
         }
     }
 }

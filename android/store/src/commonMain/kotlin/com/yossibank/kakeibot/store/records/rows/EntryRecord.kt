@@ -5,10 +5,8 @@ import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
@@ -20,6 +18,7 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -116,10 +115,7 @@ data class EntryRecord(
 )
 
 @Dao
-interface EntryRecordDao {
-    @Insert
-    suspend fun insert(record: EntryRecord)
-
+interface EntryRecordDao : UpdatableDao<EntryRecord> {
     @Query("SELECT * FROM entry WHERE id = :id")
     suspend fun find(id: String): EntryRecord?
 
@@ -157,9 +153,6 @@ interface EntryRecordDao {
         """,
     )
     suspend fun recentMemos(limit: Int): List<String>
-
-    @Update
-    suspend fun update(record: EntryRecord)
 
     @Upsert
     suspend fun save(record: EntryRecord)

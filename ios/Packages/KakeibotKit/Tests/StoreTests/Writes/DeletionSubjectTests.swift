@@ -7,7 +7,7 @@ struct DeletionSubjectTests {
     @Test
     func namesDeletedWallet() async throws {
         let setup = try await WalletWriteTests.Setup()
-        let card = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        let card = try await setup.database.save(setup.draft, at: setup.now)
 
         let deletion = try await setup.database.deleteWallet(card.id, at: setup.now)
 
@@ -40,8 +40,8 @@ struct DeletionSubjectTests {
     @Test
     func countsMergedDeletions() async throws {
         let setup = try await WalletWriteTests.Setup()
-        let first = try await setup.database.saveWallet(setup.draft, at: setup.now)
-        let second = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        let first = try await setup.database.save(setup.draft, at: setup.now)
+        let second = try await setup.database.save(setup.draft, at: setup.now)
 
         let deletions = try await [
             setup.database.deleteWallet(first.id, at: setup.now),

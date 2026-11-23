@@ -84,7 +84,7 @@ struct AdjustmentWriteTests {
             initialBalance: 0
         )
 
-        let wallet = try await setup.database.saveWallet(draft, at: setup.now)
+        let wallet = try await setup.database.save(draft, at: setup.now)
         try await setup.database.saveAdjustment(700, of: wallet.id, on: setup.day, at: setup.now)
 
         let deletion = try await setup.database.deleteWallet(wallet.id, at: setup.now)

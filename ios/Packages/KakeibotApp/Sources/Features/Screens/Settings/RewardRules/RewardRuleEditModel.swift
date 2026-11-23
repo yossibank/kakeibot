@@ -84,7 +84,7 @@ public extension RewardRuleEditModel {
 
     func save() async -> Bool {
         do {
-            try await database.saveRewardRule(
+            try await database.save(
                 draft,
                 editing: editingId,
                 at: Date()
@@ -119,7 +119,7 @@ extension RewardRuleEditModel: SettingsEditRemoving {
         _ id: RewardRule.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setRewardRuleHidden(
+        try await database.setHidden(
             id,
             isHidden: isHidden,
             at: Date()

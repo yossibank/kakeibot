@@ -14,10 +14,10 @@ struct RewardBankTests {
         let shownDraft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
         let hiddenDraft = RewardRuleDraft(name: "歩いて帰った日", amount: 300, icon: icon)
 
-        let shown = try await database.saveRewardRule(shownDraft, at: now)
-        let hidden = try await database.saveRewardRule(hiddenDraft, at: now)
+        let shown = try await database.save(shownDraft, at: now)
+        let hidden = try await database.save(hiddenDraft, at: now)
         try await database.setReward(hidden.id, isAchieved: true, on: day, at: now)
-        try await database.setRewardRuleHidden(hidden.id, isHidden: true, at: now)
+        try await database.setHidden(hidden.id, isHidden: true, at: now)
         let bank = try await database.rewardBank()
 
         #expect(bank.rules(on: day).map(\.id) == [shown.id, hidden.id])

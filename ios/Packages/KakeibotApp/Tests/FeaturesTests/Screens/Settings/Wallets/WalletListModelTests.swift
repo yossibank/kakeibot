@@ -30,7 +30,7 @@ struct WalletListModelTests {
         try database.insertDefaultsIfEmpty(at: Date())
         let options = try await database.entryOptions()
         let bank = try #require(options.wallets.last)
-        try await database.setWalletHidden(bank.id, isHidden: true, at: Date())
+        try await database.setHidden(bank.id, isHidden: true, at: Date())
 
         let model = WalletListModel(database: database)
         await model.load()

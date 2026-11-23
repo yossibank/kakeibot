@@ -2,7 +2,7 @@ import Core
 import Foundation
 import WidgetKit
 
-struct QuickRecordWidgetEntry: TimelineEntry {
+struct QuickRecordWidgetEntry: WidgetFallbackEntry {
     let date: Date
     let summary: QuickRecordWidgetSummary?
     let look: ThemeLook

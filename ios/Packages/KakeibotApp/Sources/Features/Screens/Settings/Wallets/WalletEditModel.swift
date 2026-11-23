@@ -215,7 +215,7 @@ public extension WalletEditModel {
 
     func save() async -> Wallet? {
         do {
-            return try await database.saveWallet(draft, editing: editingId, at: Date())
+            return try await database.save(draft, editing: editingId, at: Date())
         } catch {
             errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
@@ -228,7 +228,7 @@ public extension WalletEditModel {
         }
 
         do {
-            try await database.setWalletHidden(editingId, isHidden: isHidden, at: Date())
+            try await database.setHidden(editingId, isHidden: isHidden, at: Date())
             self.isHidden = isHidden
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {

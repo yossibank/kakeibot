@@ -152,7 +152,7 @@ extension RecurringListModel: SettingsBoardModel {
         let others = (snapshot ?? []).map(\.id).filter { !ids.contains($0) }
         let ordered = ids + others
 
-        try await database.reorderRecurrings(ordered, at: Date())
+        try await database.reorder(ordered, at: Date())
     }
 
     public func saveHidden(

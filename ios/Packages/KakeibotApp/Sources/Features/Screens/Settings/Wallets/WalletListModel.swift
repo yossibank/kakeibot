@@ -72,14 +72,14 @@ private extension WalletListModel {
 extension WalletListModel: SettingsBoardModel {
     public func saveOrder(_ ids: [Wallet.ID]) async throws {
         let ids = ids + hidden.map(\.id)
-        try await database.reorderWallets(ids, at: Date())
+        try await database.reorder(ids, at: Date())
     }
 
     public func saveHidden(
         _ id: Wallet.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setWalletHidden(id, isHidden: isHidden, at: Date())
+        try await database.setHidden(id, isHidden: isHidden, at: Date())
     }
 
     public func remove(_ id: Wallet.ID) async throws -> Deletion {

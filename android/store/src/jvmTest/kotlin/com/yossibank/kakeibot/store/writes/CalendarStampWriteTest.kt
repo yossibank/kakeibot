@@ -9,8 +9,9 @@ import com.yossibank.kakeibot.store.database.insertShelfIfEmpty
 import com.yossibank.kakeibot.store.queries.methods.shelfIconList
 import com.yossibank.kakeibot.store.queries.methods.stampBook
 import com.yossibank.kakeibot.store.writes.methods.removeStamp
-import com.yossibank.kakeibot.store.writes.methods.setShelfIconHidden
+import com.yossibank.kakeibot.store.writes.methods.setHidden
 import com.yossibank.kakeibot.store.writes.methods.stamp
+import com.yossibank.kakeibot.store.writes.types.ShelfIconTable
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.Instant
@@ -88,7 +89,8 @@ class CalendarStampWriteTest {
             at = setup.now,
         )
 
-        setup.database.setShelfIconHidden(
+        setup.database.setHidden(
+            ShelfIconTable,
             first.id,
             isHidden = true,
             at = setup.now,

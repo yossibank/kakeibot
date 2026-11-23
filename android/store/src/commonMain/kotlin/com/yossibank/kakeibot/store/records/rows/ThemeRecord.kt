@@ -3,13 +3,12 @@ package com.yossibank.kakeibot.store.records.rows
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
-import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.theme.Theme
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.UpdatableDao
 import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
@@ -35,10 +34,7 @@ data class ThemeRecord(
 )
 
 @Dao
-interface ThemeRecordDao {
-    @Insert
-    suspend fun insert(record: ThemeRecord)
-
+interface ThemeRecordDao : UpdatableDao<ThemeRecord> {
     @Query("SELECT * FROM theme ORDER BY id")
     suspend fun all(): List<ThemeRecord>
 
@@ -50,9 +46,6 @@ interface ThemeRecordDao {
 
     @Query("SELECT * FROM theme WHERE is_builtin = 0 ORDER BY created_at")
     suspend fun custom(): List<ThemeRecord>
-
-    @Update
-    suspend fun update(record: ThemeRecord)
 
     @Query("DELETE FROM theme WHERE id = :id")
     suspend fun delete(id: String)

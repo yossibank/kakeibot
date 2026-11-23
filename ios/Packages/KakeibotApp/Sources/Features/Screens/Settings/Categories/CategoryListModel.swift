@@ -51,14 +51,14 @@ extension CategoryListModel: SettingsBoardListModel {
 extension CategoryListModel: SettingsBoardModel {
     public func saveOrder(_ ids: [EntryCategory.ID]) async throws {
         let ids = ids + hidden.map(\.id)
-        try await database.reorderCategories(ids, at: Date())
+        try await database.reorder(ids, at: Date())
     }
 
     public func saveHidden(
         _ id: EntryCategory.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setCategoryHidden(
+        try await database.setHidden(
             id,
             isHidden: isHidden,
             at: Date()

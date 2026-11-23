@@ -8,7 +8,7 @@ struct WalletWriteTests {
     func addsWalletAtTheEnd() async throws {
         let setup = try await Setup()
 
-        let saved = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        let saved = try await setup.database.save(setup.draft, at: setup.now)
         let list = try await setup.database.entryList()
         let icon = try #require(list.icons[saved.iconId])
 
@@ -30,7 +30,7 @@ struct WalletWriteTests {
         draft.mark = .emoji("📮")
         draft.initialBalance = 120_000
 
-        let updated = try await setup.database.saveWallet(draft, editing: bank.id, at: later)
+        let updated = try await setup.database.save(draft, editing: bank.id, at: later)
         let list = try await setup.database.entryList()
         let icon = try #require(list.icons[updated.iconId])
 
@@ -50,10 +50,10 @@ struct WalletWriteTests {
         draft.kind = .loan
         draft.loanAmount = 300_000
 
-        let saved = try await setup.database.saveWallet(draft, at: setup.now)
+        let saved = try await setup.database.save(draft, at: setup.now)
         let list = try await setup.database.entryList()
         draft.kind = .bank
-        let updated = try await setup.database.saveWallet(draft, editing: saved.id, at: setup.now)
+        let updated = try await setup.database.save(draft, editing: saved.id, at: setup.now)
         let reloaded = try await setup.database.entryList()
 
         #expect(saved.loanAmount == 300_000)
@@ -68,7 +68,7 @@ struct WalletWriteTests {
         let cash = try await setup.wallet(named: "財布")
         let bank = try await setup.wallet(named: "銀行")
 
-        try await setup.database.reorderWallets([bank.id, cash.id], at: setup.now)
+        try await setup.database.reorder([bank.id, cash.id], at: setup.now)
         let options = try await setup.database.entryOptions()
 
         #expect(options.wallets.map(\.name) == ["銀行", "財布"])
@@ -79,9 +79,9 @@ struct WalletWriteTests {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
 
-        try await setup.database.setWalletHidden(bank.id, isHidden: true, at: setup.now)
+        try await setup.database.setHidden(bank.id, isHidden: true, at: setup.now)
         let hidden = try await setup.database.entryOptions()
-        try await setup.database.setWalletHidden(bank.id, isHidden: false, at: setup.now)
+        try await setup.database.setHidden(bank.id, isHidden: false, at: setup.now)
         let shown = try await setup.database.entryOptions()
 
         #expect(hidden.wallets.map(\.name) == ["財布"])
@@ -94,10 +94,10 @@ struct WalletWriteTests {
         let cash = try await setup.wallet(named: "財布")
         let bank = try await setup.wallet(named: "銀行")
 
-        try await setup.database.setWalletHidden(bank.id, isHidden: true, at: setup.now)
+        try await setup.database.setHidden(bank.id, isHidden: true, at: setup.now)
 
         await #expect(throws: AppDatabase.WalletWriteError.lastShownWallet) {
-            try await setup.database.setWalletHidden(cash.id, isHidden: true, at: setup.now)
+            try await setup.database.setHidden(cash.id, isHidden: true, at: setup.now)
         }
     }
 
@@ -105,7 +105,7 @@ struct WalletWriteTests {
     func deletesWalletWithItsRecurringsAndValuations() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
-        let card = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        let card = try await setup.database.save(setup.draft, at: setup.now)
         let day = try #require(LocalDate("2026-11-01"))
 
         let draft = RecurringDraft(
@@ -142,7 +142,7 @@ struct WalletWriteTests {
     @Test
     func deletesWalletIconWithWallet() async throws {
         let setup = try await Setup()
-        let wallet = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        let wallet = try await setup.database.save(setup.draft, at: setup.now)
 
         let deletion = try await setup.database.deleteWallet(wallet.id, at: setup.now)
         let deleted = try setup.database.snapshot().icons.map(\.id)
@@ -156,10 +156,10 @@ struct WalletWriteTests {
     @Test
     func restoresMergedDeletions() async throws {
         let setup = try await Setup()
-        let first = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        let first = try await setup.database.save(setup.draft, at: setup.now)
         var draft = setup.draft
         draft.name = "PayPay"
-        let second = try await setup.database.saveWallet(draft, at: setup.now)
+        let second = try await setup.database.save(draft, at: setup.now)
 
         let deletions = try await [
             setup.database.deleteWallet(first.id, at: setup.now),
@@ -203,7 +203,7 @@ struct WalletWriteTests {
         let setup = try await Setup()
 
         await #expect(throws: AppDatabase.WalletWriteError.walletNotFound) {
-            try await setup.database.saveWallet(setup.draft, editing: Wallet.ID(), at: setup.now)
+            try await setup.database.save(setup.draft, editing: Wallet.ID(), at: setup.now)
         }
     }
 }
@@ -229,7 +229,7 @@ extension WalletWriteTests {
         draft.kind = .card
 
         await #expect(throws: DraftProblem.kindLocked) {
-            try await setup.database.saveWallet(draft, editing: bank.id, at: setup.now)
+            try await setup.database.save(draft, editing: bank.id, at: setup.now)
         }
 
         let stored = try await setup.wallet(named: "銀行")
@@ -269,7 +269,7 @@ extension WalletWriteTests {
         draft.kind = .card
 
         await #expect(throws: DraftProblem.kindLocked) {
-            try await setup.database.saveWallet(draft, editing: cash.id, at: setup.now)
+            try await setup.database.save(draft, editing: cash.id, at: setup.now)
         }
     }
 
@@ -279,24 +279,24 @@ extension WalletWriteTests {
         let day = try #require(LocalDate("2026-10-10"))
         var investment = setup.draft
         investment.kind = .investment
-        let saved = try await setup.database.saveWallet(investment, at: setup.now)
+        let saved = try await setup.database.save(investment, at: setup.now)
         try await setup.database.saveValuation(150_000, of: saved.id, on: day, at: setup.now)
         var draft = investment
         draft.kind = .bank
 
         await #expect(throws: DraftProblem.valuedKindLocked) {
-            try await setup.database.saveWallet(draft, editing: saved.id, at: setup.now)
+            try await setup.database.save(draft, editing: saved.id, at: setup.now)
         }
     }
 
     @Test
     func changesKindFreelyWithoutRecords() async throws {
         let setup = try await Setup()
-        let saved = try await setup.database.saveWallet(setup.draft, at: setup.now)
+        let saved = try await setup.database.save(setup.draft, at: setup.now)
         var draft = setup.draft
         draft.kind = .cash
 
-        let updated = try await setup.database.saveWallet(draft, editing: saved.id, at: setup.now)
+        let updated = try await setup.database.save(draft, editing: saved.id, at: setup.now)
 
         #expect(updated.kind == .cash)
     }

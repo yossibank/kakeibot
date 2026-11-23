@@ -771,7 +771,7 @@ private extension SnapshotTests {
         walletDraft.name = "三井住友カード ゴールド 家族カード"
 
         try await database.saveCategory(categoryDraft, tags: [], editing: category.id, at: now)
-        try await database.saveWallet(walletDraft, editing: wallet.id, at: now)
+        try await database.save(walletDraft, editing: wallet.id, at: now)
     }
 
     static func addItems(to model: EntryModel) {

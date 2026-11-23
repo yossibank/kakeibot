@@ -109,14 +109,15 @@ KakeibotKit/
 | `Concepts/Voice/` | 話した文から金額・日付・カテゴリ・口座・メモを読む決まり |
 | `Concepts/Wallet/` | 財布と残高 |
 | `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、金額の表記、下書きの決まりと問題、文字の前後の空白を除く拡張 |
+| `Core/Shared/` の `NamedIconDraft` | 名前とアイコンを持つ下書き。カテゴリと口座の下書きが適合する |
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
 | `Store/Queries/Methods/` | 返す型の名前で付ける。書き込みと同じ型なら `+<型>Query` |
-| `Store/Records/` | 表の行・設定のキー・列の値の適合 |
+| `Store/Records/` | 表の行・設定のキー・列の値の適合。`Protocols/` に並べ替え・非表示・アイコン付きの行の決まりを置く |
 | `Store/Migrations/` | `MigrationV<3 桁の通し番号>.swift`。欠番は 14。同期のトリガーを作る固定の SQL は `MigrationSyncTriggers.swift` |
 | `Store/Database/` | 最初の財布とカテゴリも作る。止める通知は AppFeature が送る |
 | `Store/Snapshot/` | 書き出し用の全データの読み出し、読み込み用の全置き換え |
 | `Store/Sync/` | 同期で送る行の記録と、受け取った行の書き込み |
-| `Store/Writes/` | ウィジェットからの記録と取り消しも含む |
+| `Store/Writes/` | ウィジェットからの記録と取り消しも含む。並べ替え・非表示・アイコン付きの保存の共通の関数は `Methods/` に、その下書きの決まりは `Types/` に置く |
 
 ### KakeibotApp
 

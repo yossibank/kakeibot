@@ -87,14 +87,14 @@ extension TemplateListModel: SettingsBoardModel {
         let others = (snapshot ?? []).map(\.id).filter { !ids.contains($0) }
         let ordered = ids + others
 
-        try await database.reorderTemplates(ordered, at: Date())
+        try await database.reorder(ordered, at: Date())
     }
 
     public func saveHidden(
         _ id: EntryTemplate.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setTemplateHidden(id, isHidden: isHidden, at: Date())
+        try await database.setHidden(id, isHidden: isHidden, at: Date())
     }
 
     public func remove(_ id: EntryTemplate.ID) async throws -> Deletion {

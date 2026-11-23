@@ -78,7 +78,7 @@ extension RecurringWriteTests {
 
         let added = try await setup.database.saveRecurring(draft, today: start, at: setup.now)
         let before = try await setup.database.recurrings().map(\.id)
-        try await setup.database.reorderRecurrings(before.reversed(), at: setup.now)
+        try await setup.database.reorder(before.reversed(), at: setup.now)
         let after = try await setup.database.recurrings().map(\.id)
 
         #expect(added.sortOrder == 1)
