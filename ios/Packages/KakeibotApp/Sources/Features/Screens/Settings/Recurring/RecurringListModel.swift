@@ -6,18 +6,18 @@ import Store
 
 @MainActor
 @Observable
-public final class RecurringListModel: ScreenModel {
+public final class RecurringListModel {
     public var type: Entry.Kind = .expense
     public var movingOrder: [Recurring.ID]?
     public var errorNotice = ErrorNotice()
 
-    public private(set) var recurrings: [Recurring] = []
+    public internal(set) var snapshot: [Recurring]?
+
     public private(set) var list: EntryList?
     public private(set) var monthStartDay: MonthStartDay = .first
 
     let today: LocalDate
-
-    private let database: AppDatabase
+    let database: AppDatabase
 
     public init(
         database: AppDatabase,
@@ -41,28 +41,12 @@ public extension RecurringListModel {
         public let closing: String?
     }
 
-    var visible: [Recurring] {
-        recurrings(isHidden: false)
-    }
-
-    var hidden: [Recurring] {
-        recurrings(isHidden: true)
-    }
-
     var rows: [Row] {
-        guard let list else {
-            return []
-        }
-
-        return shown.map { row(for: $0, in: list) }
+        shown.compactMap { row(for: $0) }
     }
 
     var hiddenRows: [Row] {
-        guard let list else {
-            return []
-        }
-
-        return hidden.map { row(for: $0, in: list) }
+        hidden.compactMap { row(for: $0) }
     }
 
     var monthTotal: Int {
@@ -81,30 +65,14 @@ public extension RecurringListModel {
         type == .transfer ? "振替" : "固定費"
     }
 
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.recurrings, in: database)
-    }
-
-    func hiddenListFlag() -> SettingsScreenFlag {
-        .openHiddenList(.recurrings, in: database)
-    }
-
-    func editModel(for id: Recurring.ID?) -> RecurringEditModel {
-        RecurringEditModel(
-            database: database,
-            today: today,
-            type: type,
-            editing: id
-        )
+    func row(for recurring: Recurring) -> Row? {
+        list.map { row(for: recurring, in: $0) }
     }
 
     func observe() async {
         await observeAll([
             {
-                await self.observe(
-                    self.database.recurringUpdates(includingHidden: true),
-                    into: \.recurrings
-                )
+                await self.observe(self.updates(), into: \.snapshot)
             },
             {
                 await self.observe(self.database.entryListUpdates(), into: \.list)
@@ -119,17 +87,33 @@ public extension RecurringListModel {
     }
 }
 
-extension RecurringListModel {
+extension RecurringListModel: SettingsBoardListModel {
+    typealias Item = Recurring
+
     static let loadFailedMessage = "固定費を読めませんでした"
+
+    func read() async throws -> [Recurring] {
+        try await database.recurrings(includingHidden: true)
+    }
+
+    func updates() -> some AsyncSequence<[Recurring], any Error> {
+        database.recurringUpdates(includingHidden: true)
+    }
+
+    func items(in snapshot: [Recurring]) -> [Recurring] {
+        guard list != nil else {
+            return []
+        }
+
+        return snapshot.filter { $0.type == type }
+    }
+
+    func isHidden(_ item: Recurring) -> Bool {
+        item.archivedAt != nil
+    }
 }
 
 private extension RecurringListModel {
-    func recurrings(isHidden: Bool) -> [Recurring] {
-        recurrings.filter { recurring in
-            recurring.type == type && (recurring.archivedAt != nil) == isHidden
-        }
-    }
-
     func row(
         for recurring: Recurring,
         in list: EntryList
@@ -164,16 +148,8 @@ private extension RecurringListModel {
 }
 
 extension RecurringListModel: SettingsBoardModel {
-    public func load() async {
-        do {
-            recurrings = try await database.recurrings(includingHidden: true)
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
     public func saveOrder(_ ids: [Recurring.ID]) async throws {
-        let others = recurrings.map(\.id).filter { !ids.contains($0) }
+        let others = (snapshot ?? []).map(\.id).filter { !ids.contains($0) }
         let ordered = ids + others
 
         try await database.reorderRecurrings(ordered, at: Date())

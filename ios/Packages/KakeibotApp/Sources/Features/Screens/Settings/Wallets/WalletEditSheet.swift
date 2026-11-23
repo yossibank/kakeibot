@@ -164,3 +164,18 @@ public struct WalletEditSheet: View {
         WalletEditSheet(model: WalletEditModel(database: database))
     }
 }
+
+extension WalletEditSheet: SettingsEditSheet {
+    init(
+        model: WalletEditModel,
+        onDelete: @escaping (Deletion) -> Void,
+        onHide: @escaping () -> Void
+    ) {
+        self.init(
+            model: model,
+            onSave: { _ in },
+            onDelete: onDelete,
+            onHide: onHide
+        )
+    }
+}

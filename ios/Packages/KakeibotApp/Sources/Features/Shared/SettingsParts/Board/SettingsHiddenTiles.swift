@@ -8,6 +8,7 @@ struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
     let drag: SettingsDrag<Item.ID>
     let grid: SettingsBoardGrid
     let space: String
+    let layout: SettingsBoardLayout
     let face: (Item) -> Face
     let onTap: (Item) -> Void
     let onFollow: (Item.ID, CGPoint) -> Void
@@ -15,7 +16,7 @@ struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
     let onDeleteAll: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: layout == .tiles ? 8 : 12) {
             SettingsHiddenTitle(
                 flag: flag,
                 title: title,
@@ -24,7 +25,13 @@ struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
             )
 
             if flag.isOn {
-                LazyVGrid(columns: columns, spacing: grid.spacing) {
+                if layout == .tiles {
+                    LazyVGrid(columns: columns, spacing: grid.spacing) {
+                        ForEach(items) { item in
+                            tile(item)
+                        }
+                    }
+                } else {
                     ForEach(items) { item in
                         tile(item)
                     }
@@ -46,7 +53,7 @@ private extension SettingsHiddenTiles {
         let lifted = drag.hiddenOffset(of: item.id)
         let isLifted = lifted != nil
         let offset = lifted ?? .zero
-        let opacity: Double = isLifted ? 0 : 1
+        let opacity: Double = isLifted ? 0 : layout == .tiles ? 1 : 0.5
         let layer: Double = isLifted ? 1 : 0
 
         return face(item)
@@ -81,6 +88,7 @@ extension SettingsHiddenTiles {
         grid: SettingsBoardGrid,
         controller: SettingsBoardController<Model>,
         space: String,
+        layout: SettingsBoardLayout,
         @ViewBuilder face: @escaping (Item) -> Face,
         onTap: @escaping (Item) -> Void,
         onDeleteAll: @escaping () -> Void
@@ -92,6 +100,7 @@ extension SettingsHiddenTiles {
             drag: controller.drag,
             grid: grid,
             space: space,
+            layout: layout,
             face: face,
             onTap: onTap,
             onFollow: { id, location in

@@ -11,21 +11,13 @@ extension View {
             .haptic(.success, trigger: drag.showCount)
     }
 
-    func settingsDeleteConfirmation(
-        isPresented: Binding<Bool>,
-        title: String,
-        message: String,
-        onConfirm: @escaping () -> Void
-    ) -> some View {
-        confirmation(
-            isPresented: isPresented,
-            systemImage: "trash",
-            title: title,
-            message: message,
-            keepTitle: "やめる",
-            confirmTitle: "削除する",
-            onConfirm: onConfirm
-        )
+    @ViewBuilder
+    func settingsSharesTextScale(_ id: (some Equatable)?) -> some View {
+        if let id {
+            sharesTextScale(id: id)
+        } else {
+            self
+        }
     }
 
     func settingsDeleteHiddenConfirmation(

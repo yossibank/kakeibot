@@ -119,3 +119,5 @@ extension StampEditModel: SettingsEditing {}
         StampEditSheet(model: StampEditModel(database: database))
     }
 }
+
+extension StampEditSheet: SettingsEditSheet {}

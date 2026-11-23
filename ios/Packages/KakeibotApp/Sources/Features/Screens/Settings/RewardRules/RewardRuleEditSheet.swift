@@ -263,3 +263,5 @@ extension RewardRuleEditModel: SettingsEditing {}
         RewardRuleEditSheet(model: RewardRuleEditModel(database: database))
     }
 }
+
+extension RewardRuleEditSheet: SettingsEditSheet {}

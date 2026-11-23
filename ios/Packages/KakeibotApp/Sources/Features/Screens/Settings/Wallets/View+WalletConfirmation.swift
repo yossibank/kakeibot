@@ -8,15 +8,9 @@ extension View {
         isPresented: Binding<Bool>,
         onConfirm: @escaping () -> Void
     ) -> some View {
-        let amount = Yen.text(balance)
-
-        return confirmation(
+        settingsConfirmation(
+            .hidingWallet(balance: balance),
             isPresented: isPresented,
-            systemImage: "eye.slash",
-            title: "この口座を非表示にしますか",
-            message: "残高 \(amount) は、資産タブの合計から外れます",
-            keepTitle: "やめる",
-            confirmTitle: "非表示にする",
             onConfirm: onConfirm
         )
     }
@@ -27,16 +21,9 @@ extension View {
         onHide: @escaping () -> Void,
         onConfirm: @escaping () -> Void
     ) -> some View {
-        let text = WalletDeleteText(hasEntries: hasEntries)
-
-        return confirmation(
-            isPresented: isPresented,
-            systemImage: text.systemImage,
-            title: text.title,
-            message: text.message,
-            keepTitle: "やめる",
-            confirmTitle: text.confirmTitle,
-            role: text.role
+        settingsConfirmation(
+            .deletingWallet(hasEntries: hasEntries),
+            isPresented: isPresented
         ) {
             if hasEntries {
                 onHide()
@@ -47,30 +34,28 @@ extension View {
     }
 }
 
-private struct WalletDeleteText {
-    let hasEntries: Bool
+extension SettingsConfirmation {
+    static func hidingWallet(balance: Int) -> SettingsConfirmation {
+        SettingsConfirmation(
+            systemImage: "eye.slash",
+            title: "この口座を非表示にしますか",
+            message: "残高 \(Yen.text(balance)) は、資産タブの合計から外れます",
+            confirmTitle: "非表示にする"
+        )
+    }
+
+    static func deletingWallet(hasEntries: Bool) -> SettingsConfirmation {
+        SettingsConfirmation(
+            systemImage: hasEntries ? "eye.slash" : "trash",
+            title: hasEntries ? "この口座は削除できません" : "この口座を削除しますか",
+            message: hasEntries ? hasEntriesMessage : "使っている固定費・テンプレート・評価額も消えます",
+            confirmTitle: hasEntries ? "非表示にする" : "削除する",
+            role: hasEntries ? .suggestion : .destructive,
+            confirmsHide: hasEntries
+        )
+    }
 }
 
-private extension WalletDeleteText {
+private extension SettingsConfirmation {
     static let hasEntriesMessage = "記録があります。非表示にすると、記録を残したまま一覧から外せます"
-
-    var systemImage: String {
-        hasEntries ? "eye.slash" : "trash"
-    }
-
-    var title: String {
-        hasEntries ? "この口座は削除できません" : "この口座を削除しますか"
-    }
-
-    var message: String {
-        hasEntries ? Self.hasEntriesMessage : "使っている固定費・テンプレート・評価額も消えます"
-    }
-
-    var confirmTitle: String {
-        hasEntries ? "非表示にする" : "削除する"
-    }
-
-    var role: ConfirmCard.Role {
-        hasEntries ? .suggestion : .destructive
-    }
 }

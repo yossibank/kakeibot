@@ -300,3 +300,19 @@ extension CategoryEditModel: SettingsEditing {}
         )
     }
 }
+
+extension CategoryEditSheet: SettingsEditSheet {
+    init(
+        model: CategoryEditModel,
+        onDelete: @escaping (Deletion) -> Void,
+        onHide: @escaping () -> Void
+    ) {
+        self.init(
+            model: model,
+            startsAddingTag: false,
+            onSave: { _ in },
+            onDelete: onDelete,
+            onHide: onHide
+        )
+    }
+}

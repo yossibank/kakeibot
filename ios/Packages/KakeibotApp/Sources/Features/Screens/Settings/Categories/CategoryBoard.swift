@@ -15,16 +15,14 @@ extension CategoryBoard: SettingsBoardSpec {
         case edit(EntryCategory.Kind, EntryCategory.ID)
     }
 
+    typealias Editor = CategoryEditSheet
+
     var screen: SettingsScreen {
         .categories
     }
 
     var title: String {
         "カテゴリ"
-    }
-
-    var emptyNote: (systemImage: String, text: String) {
-        ("tag", "カテゴリを足すと、ここに並びます")
     }
 
     var hiddenTitle: String {
@@ -67,16 +65,11 @@ extension CategoryBoard: SettingsBoardSpec {
         )
     }
 
-    func editor(
-        for destination: Destination,
-        onDelete: @escaping (Deletion) -> Void,
-        onHide: @escaping () -> Void
-    ) -> some View {
-        CategoryEditSheet(
-            model: editModel(for: destination),
-            onDelete: onDelete,
-            onHide: onHide
-        )
+    func editModel(for destination: Destination) -> CategoryEditModel {
+        switch destination {
+        case let .new(kind): CategoryEditModel(database: database, kind: kind)
+        case let .edit(kind, id): CategoryEditModel(database: database, kind: kind, editing: id)
+        }
     }
 
     func makeModel() -> CategoryListModel {
@@ -87,7 +80,10 @@ extension CategoryBoard: SettingsBoardSpec {
         return model
     }
 
-    func intro(flag: SettingsScreenFlag) -> SettingsIntroCard {
+    func intro(
+        flag: SettingsScreenFlag,
+        in _: CategoryListModel
+    ) -> SettingsIntroCard {
         SettingsIntroCard(
             systemImage: "tag",
             headline: ("支出と収入を", "分けて振り返れます"),
@@ -98,6 +94,10 @@ extension CategoryBoard: SettingsBoardSpec {
             ],
             flag: flag
         )
+    }
+
+    func emptyNote(in _: CategoryListModel) -> (systemImage: String, text: String) {
+        ("tag", "カテゴリを足すと、ここに並びます")
     }
 
     func addTitle(in model: CategoryListModel) -> String {
@@ -127,12 +127,5 @@ private extension CategoryBoard {
             .init("支出", value: .expense),
             .init("収入", value: .income)
         ]
-    }
-
-    func editModel(for destination: Destination) -> CategoryEditModel {
-        switch destination {
-        case let .new(kind): CategoryEditModel(database: database, kind: kind)
-        case let .edit(kind, id): CategoryEditModel(database: database, kind: kind, editing: id)
-        }
     }
 }
