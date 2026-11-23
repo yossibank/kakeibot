@@ -844,7 +844,32 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "02-theme",
+            file: "02-review",
+            lines: ["締めたら、", "届くレポート"],
+            lead: .note("いまのペースと、次の一手"),
+            phones: [
+                Phone(name: "08-review-pace-black", x: 12, y: 196, width: 250, angle: -4),
+                Phone(name: "08-review-closing-black", x: 112, y: 280, width: 220, angle: 4)
+            ]
+        ),
+        Shot(
+            file: "03-receipt",
+            lines: ["レシートを", "撮れば入る"],
+            lead: .note("品名・合計・日付を読み取り"),
+            phones: [
+                Phone(name: "03-receipt", x: 20, y: 196, width: 280, angle: -2)
+            ]
+        ),
+        Shot(
+            file: "04-entry",
+            lines: ["記録は、", "タップ 1 回"],
+            lead: .note("1 枚のカードと電卓ですばやく"),
+            phones: [
+                Phone(name: "02-entry-black", x: 30, y: 200, width: 270, angle: 3)
+            ]
+        ),
+        Shot(
+            file: "05-theme",
             lines: ["テーマも、", "着せ替え。"],
             lead: .note("ライトとダークの 12 色から選べます"),
             phones: [
@@ -868,15 +893,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "03-entry",
-            lines: ["記録は、", "タップ 1 回"],
-            lead: .note("1 枚のカードと電卓ですばやく"),
-            phones: [
-                Phone(name: "02-entry-black", x: 30, y: 200, width: 270, angle: 3)
-            ]
-        ),
-        Shot(
-            file: "04-voice",
+            file: "06-voice",
             lines: ["話すだけで、", "記録できる"],
             lead: .note("金額・日付・口座を声から読み取り"),
             phones: [
@@ -884,7 +901,7 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "05-font",
+            file: "07-font",
             lines: ["フォントも、", "選べる"],
             lead: .note("手書きやドットなど 6 種類"),
             phones: [
@@ -893,28 +910,11 @@ private extension SnapshotTests {
             ]
         ),
         Shot(
-            file: "06-receipt",
-            lines: ["レシートを", "撮れば入る"],
-            lead: .note("品名・合計・日付を読み取り"),
-            phones: [
-                Phone(name: "03-receipt", x: 20, y: 196, width: 280, angle: -2)
-            ]
-        ),
-        Shot(
-            file: "07-share",
+            file: "08-share",
             lines: ["ふたりで、", "ひとつの家計"],
             lead: .note("共有の財布をいっしょに"),
             phones: [
                 Phone(name: "09-share-rose", x: 20, y: 196, width: 280, angle: 2)
-            ]
-        ),
-        Shot(
-            file: "08-review",
-            lines: ["締めたら、", "届くレポート"],
-            lead: .note("いまのペースと、次の一手"),
-            phones: [
-                Phone(name: "08-review-pace-black", x: 12, y: 196, width: 250, angle: -4),
-                Phone(name: "08-review-closing-black", x: 112, y: 280, width: 220, angle: 4)
             ]
         ),
         Shot(
