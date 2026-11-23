@@ -51,16 +51,14 @@ extension AppDatabase {
             return record
         }
 
-        try setApplying(false, in: db)
-
-        let view = try transferView(
-            of: record,
-            in: walletID,
-            creatingAt: now,
-            db: db
-        )
-
-        try setApplying(true, in: db)
+        let view = try withApplying(false, in: db) {
+            try transferView(
+                of: record,
+                in: walletID,
+                creatingAt: now,
+                db: db
+            )
+        }
 
         return view ?? record
     }

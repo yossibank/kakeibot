@@ -29,6 +29,15 @@ public enum SyncTable: String, CaseIterable, Sendable {
 
     static let localSettingKeys = Setting.Key.deviceOnly
 
+    private static let parentOrders: [SyncTable: Int] = {
+        let pairs = allCases.enumerated().map { ($1, $0) }
+        return Dictionary(uniqueKeysWithValues: pairs)
+    }()
+
+    var parentOrder: Int {
+        Self.parentOrders[self, default: 0]
+    }
+
     var keyColumn: String {
         switch self {
         case .noSpendDay: "date"

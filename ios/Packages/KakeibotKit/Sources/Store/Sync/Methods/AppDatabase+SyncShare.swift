@@ -48,19 +48,9 @@ extension AppDatabase {
         for key: SyncKey,
         in db: Database
     ) throws -> Wallet.ID? {
-        for candidate in try shareCandidates(for: key, in: db) {
-            let isShared = try Bool.fetchOne(
-                db,
-                sql: "SELECT EXISTS (SELECT 1 FROM sync_share WHERE wallet_id = ?)",
-                arguments: [candidate]
-            ) ?? false
-
-            if isShared {
-                return Wallet.ID(candidate)
-            }
-        }
-
-        return nil
+        try shareCandidates(for: key, in: db)
+            .first { try isSharedWallet($0, in: db) }
+            .flatMap { Wallet.ID($0) }
     }
 
     static func notifyShareChanges(in db: Database) throws {

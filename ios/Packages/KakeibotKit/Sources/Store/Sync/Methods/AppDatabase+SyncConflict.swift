@@ -54,16 +54,12 @@ extension AppDatabase {
             return
         }
 
-        try setApplying(false, in: db)
-
-        for id in ids {
-            try db.execute(
-                sql: "DELETE FROM \(table.rawValue) WHERE \(table.keyColumn) = ?",
-                arguments: [id]
-            )
+        try withApplying(false, in: db) {
+            for id in ids {
+                let key = SyncKey(table: table, id: id)
+                try deleteLocalRow(for: key, in: db)
+            }
         }
-
-        try setApplying(true, in: db)
     }
 }
 

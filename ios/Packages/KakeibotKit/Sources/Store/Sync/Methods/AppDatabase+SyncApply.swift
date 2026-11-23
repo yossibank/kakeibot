@@ -117,15 +117,11 @@ private extension AppDatabase {
     }
 
     static func parentsFirst(_ records: [SyncRecord]) -> [SyncRecord] {
-        let pairs = SyncTable.allCases.enumerated().map { ($1, $0) }
-        let order = Dictionary(uniqueKeysWithValues: pairs)
-        return records.sorted { order[$0.key.table, default: 0] < order[$1.key.table, default: 0] }
+        records.sorted { $0.key.table.parentOrder < $1.key.table.parentOrder }
     }
 
     static func parentsLast(_ ids: [SyncRecordID]) -> [SyncRecordID] {
-        let pairs = SyncTable.allCases.enumerated().map { ($1, $0) }
-        let order = Dictionary(uniqueKeysWithValues: pairs)
-        return ids.sorted { order[$0.key.table, default: 0] > order[$1.key.table, default: 0] }
+        ids.sorted { $0.key.table.parentOrder > $1.key.table.parentOrder }
     }
 
     static func canApplyDeletion(
@@ -186,11 +182,7 @@ private extension AppDatabase {
 
         do {
             try db.inSavepoint {
-                try db.execute(
-                    sql: "DELETE FROM \(key.table.rawValue) WHERE \(key.table.keyColumn) = ?",
-                    arguments: [key.id]
-                )
-
+                try deleteLocalRow(for: key, in: db)
                 return .commit
             }
 
