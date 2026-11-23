@@ -117,8 +117,9 @@ public extension ReceiptReading {
     func merging(_ guessed: ReceiptReading) -> ReceiptReading {
         let rules = settlingTax()
         let guessed = guessed.settlingTax()
-        let prefersRules = guessed.items.isEmpty || rules.gap(to: guessed.total) < guessed
-            .gap(to: rules.total)
+        let rulesGap = rules.gap(to: guessed.total)
+        let guessedGap = guessed.gap(to: rules.total)
+        let prefersRules = guessed.items.isEmpty || rulesGap < guessedGap
         let chosen = prefersRules ? rules : guessed
         let other = prefersRules ? guessed : rules
 
