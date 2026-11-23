@@ -18,8 +18,8 @@ struct SnapshotTests {
         let options = try await database.entryOptions()
         let longWallet = options.wallets.max { $0.name.count < $1.name.count }
         let sheet = SettingsMenuSheet(database: database, today: today, appIcon: AppIconListModel())
-        let wallets = WalletListView(database: database)
-        let rules = RewardRuleListView(database: database)
+        let wallets = SettingsBoardPage(WalletBoard(database: database))
+        let rules = SettingsBoardPage(RewardRuleBoard(database: database))
         let categories = SettingsBoardPage(CategoryBoard(database: database, kind: .expense))
         let walletEdit = WalletEditModel(
             database: database,
