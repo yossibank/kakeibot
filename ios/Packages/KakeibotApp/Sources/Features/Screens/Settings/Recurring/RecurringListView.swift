@@ -27,76 +27,38 @@ public struct RecurringListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("固定費", hint: hintFlag)
-
-            SettingsIntroCard(
+        SettingsBoardScreen(
+            title: "固定費",
+            hint: hintFlag,
+            intro: SettingsIntroCard(
                 systemImage: "repeat",
                 headline: ("決まった日の記録を", "ひとりでに入れます"),
                 notes: notes,
                 flag: hintFlag
-            )
-
+            ),
+            emptyNote: .init(systemImage: "repeat", text: emptyText),
+            addTitle: "\(typeName)の固定費を追加",
+            space: Self.space,
+            hideMessage: "止めて非表示にしました",
+            liftScale: 1.03,
+            controller: controller,
+            errorNotice: $model.errorNotice
+        ) {
+            destination = .new
+        } header: {
             CapsulePicker(selection: $model.type, options: Self.typeOptions)
-
-            ScrollView {
-                VStack(spacing: SettingsSpacing.section) {
-                    if !model.rows.isEmpty {
-                        totalCard
-                    }
-
-                    if model.rows.isEmpty {
-                        SettingsEmptyNote(
-                            systemImage: "repeat",
-                            text: emptyText
-                        )
-                    }
-
-                    board
-
-                    if !model.hiddenRows.isEmpty {
-                        hiddenSection
-                    }
-                }
-                .padding(.vertical, 8)
-                .coordinateSpace(.named(Self.space))
-                .onGeometryChange(for: CGPoint.self) { proxy in
-                    proxy.frame(in: .global).origin
-                } action: { origin in
-                    drag.origin = origin
-                }
-            }
-            .scrollIndicators(.hidden)
-            .scrollDisabled(drag.isLifting)
-            .settingsAutoScroll(drag.autoScroll)
-            .settingsDropZones($drag.zones, showing: drag.showZone)
-            .settingsHideNotice($hiddenId, message: "止めて非表示にしました") { id in
-                controller.show(id)
-            }
-            .deletionNotice($deletion) { deletion in
-                controller.restore(deletion)
+        } board: {
+            if !model.rows.isEmpty {
+                totalCard
             }
 
-            if drag.lift != nil {
-                SettingsHideTarget(zones: $drag.zones, isArmed: drag.isOverHide)
-            } else {
-                AddButton("\(typeName)の固定費を追加") {
-                    destination = .new
-                }
-            }
-        }
-        .padding(.horizontal, SettingsSpacing.side)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .settingsLiftLayer(drag, scale: 1.03) { id in
+            board
+        } hiddenSection: {
+            hiddenSection
+        } floatingTile: { id in
             floatingTile(id)
         }
         .sharesTextScale(id: places)
-        .errorBanner($model.errorNotice)
-        .backdrop()
-        .toolbar(.hidden, for: .navigationBar)
-        .settingsBoardHaptics(drag, movingOrder: model.movingOrder)
         .navigationDestination(item: $destination) { destination in
             RecurringEditSheet(model: model.editModel(for: destination.editingId)) { deletion in
                 self.deletion = deletion

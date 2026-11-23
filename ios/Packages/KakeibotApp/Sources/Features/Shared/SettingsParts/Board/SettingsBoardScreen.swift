@@ -16,6 +16,8 @@ struct SettingsBoardScreen<
     let addTitle: String
     let space: String
     let tileHeight: CGFloat?
+    let scrollMargin: CGFloat
+    let hideMessage: String
     let liftScale: CGFloat
     let controller: SettingsBoardController<Model>
     let errorNotice: Binding<ErrorNotice>
@@ -33,6 +35,8 @@ struct SettingsBoardScreen<
         addTitle: String,
         space: String,
         tileHeight: CGFloat? = nil,
+        scrollMargin: CGFloat = 0,
+        hideMessage: String = "非表示にしました",
         liftScale: CGFloat,
         controller: SettingsBoardController<Model>,
         errorNotice: Binding<ErrorNotice>,
@@ -49,6 +53,8 @@ struct SettingsBoardScreen<
         self.addTitle = addTitle
         self.space = space
         self.tileHeight = tileHeight
+        self.scrollMargin = scrollMargin
+        self.hideMessage = hideMessage
         self.liftScale = liftScale
         self.controller = controller
         self.errorNotice = errorNotice
@@ -96,10 +102,12 @@ struct SettingsBoardScreen<
                 }
             }
             .scrollIndicators(.hidden)
+            .contentMargins(.horizontal, scrollMargin, for: .scrollContent)
+            .padding(.horizontal, -scrollMargin)
             .scrollDisabled(drag.isLifting)
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones(Bindable(drag).zones, showing: drag.showZone)
-            .settingsHideNotice(controller.hiddenId) { id in
+            .settingsHideNotice(controller.hiddenId, message: hideMessage) { id in
                 controller.show(id)
             }
             .deletionNotice(controller.deletion, note: bulkNote) { deletion in
@@ -145,6 +153,8 @@ extension SettingsBoardScreen where Header == EmptyView {
         addTitle: String,
         space: String,
         tileHeight: CGFloat? = nil,
+        scrollMargin: CGFloat = 0,
+        hideMessage: String = "非表示にしました",
         liftScale: CGFloat,
         controller: SettingsBoardController<Model>,
         errorNotice: Binding<ErrorNotice>,
@@ -161,6 +171,8 @@ extension SettingsBoardScreen where Header == EmptyView {
             addTitle: addTitle,
             space: space,
             tileHeight: tileHeight,
+            scrollMargin: scrollMargin,
+            hideMessage: hideMessage,
             liftScale: liftScale,
             controller: controller,
             errorNotice: errorNotice,
