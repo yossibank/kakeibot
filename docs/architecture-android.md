@@ -59,6 +59,16 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 
 `:store` も、iOS の Store のファイルと 1 対 1 に対応させる。同期は Android に無いので、`Store/Sync/` は移さない。マイグレーションは iOS の最新の形から始めるので、`Store/Migrations/` も移さない。
 
+iOS で分けたファイルと変えた名前のうち、次のものは Android に移していない。
+
+| iOS | Android の今の形 |
+| --- | --- |
+| `AppDatabase+EntryItemQuery`（品目の読み出し） | `writes/methods/AppDatabaseEntryItem.kt` に書き込みと一緒にある |
+| `AppDatabase+ReviewRequest`（レビューのお願いの記録） | `queries/methods/AppDatabaseEntryHistory.kt` にある |
+| `MonthPlan`・`SettingKey+Scope` | 無い |
+| `Core/Shared/` の `Draft`・`String+Trimmed`、`Icon+Mark` | 無い。各下書きが検証と空白の除去を持つ |
+| 記録の書き込みの失敗 `EntryWriteError` | `WriteError`・`WriteException` |
+
 | iOS | Android |
 | --- | --- |
 | `Store/<フォルダ>/<中のフォルダ>/X.swift` | `store/<フォルダ>/<中のフォルダ>/X.kt`。フォルダの名前は小文字にする |
