@@ -7,17 +7,15 @@ import Store
 @Observable
 public final class SetupModel: ScreenModel {
     public private(set) var progress: SetupProgress?
-    public private(set) var isCardClosed = true
     public private(set) var isEntryOpened = true
     public private(set) var launchScreen: LaunchScreen = .home
     public private(set) var theme: ThemeChoice = .system
     public private(set) var customThemes: [Theme] = []
-    public private(set) var seenNewsVersion: String?
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private var isCardClosedLoaded = false
-    private var isNewsLoaded = false
+    private var cardClosed: Bool?
+    private var seenNews: Loadable<String?> = .loading
 
     private let database: AppDatabase
 
@@ -35,8 +33,16 @@ public extension SetupModel {
         return SetupItem.home.filter { !$0.isDone(in: progress) }
     }
 
+    var isCardClosed: Bool {
+        cardClosed ?? true
+    }
+
+    var seenNewsVersion: String? {
+        seenNews.value ?? nil
+    }
+
     var isLoaded: Bool {
-        progress != nil && isCardClosedLoaded
+        progress != nil && cardClosed != nil
     }
 
     var showsCard: Bool {
@@ -48,7 +54,10 @@ public extension SetupModel {
     }
 
     var hasUnreadNews: Bool {
-        isNewsLoaded && AppVersion.isNewer(WhatsNewRelease.latestVersion, than: seenNewsVersion)
+        seenNews.isLoaded && AppVersion.isNewer(
+            WhatsNewRelease.latestVersion,
+            than: seenNewsVersion
+        )
     }
 
     func isDone(_ item: SetupItem) -> Bool {
@@ -61,7 +70,10 @@ public extension SetupModel {
                 await self.observe(self.database.setupProgressUpdates(), into: \.progress)
             },
             {
-                await self.observeCardClosed()
+                await self.observe(
+                    self.database.settingUpdates(.setupCardClosed),
+                    into: \.cardClosed
+                )
             },
             {
                 await self.observe(
@@ -94,7 +106,7 @@ public extension SetupModel {
             return
         }
 
-        seenNewsVersion = version
+        seenNews = .loaded(version)
 
         do {
             try await database.setSetting(.whatsNewSeenVersion, to: version)
@@ -114,7 +126,7 @@ public extension SetupModel {
     }
 
     func closeCard() async {
-        isCardClosed = true
+        cardClosed = true
         await save(.setupCardClosed, to: true)
     }
 }
@@ -126,23 +138,12 @@ extension SetupModel {
 private extension SetupModel {
     static let saveFailedMessage = "設定を保存できませんでした"
 
-    func observeCardClosed() async {
-        await observe(
-            database.settingUpdates(.setupCardClosed),
-            failure: Self.loadFailedMessage
-        ) { isClosed in
-            isCardClosed = isClosed
-            isCardClosedLoaded = true
-        }
-    }
-
     func observeSeenNews() async {
         await observe(
             database.settingUpdates(.whatsNewSeenVersion),
             failure: Self.loadFailedMessage
         ) { version in
-            seenNewsVersion = version
-            isNewsLoaded = true
+            seenNews = .loaded(version)
         }
     }
 

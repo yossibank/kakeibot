@@ -10,8 +10,6 @@ public final class SyncModel {
     public private(set) var isOn = false
     public private(set) var account = SyncAccount.available
     public private(set) var isWorking = false
-    public private(set) var pendingCount: Int?
-    public private(set) var isPendingFailed = false
     public private(set) var stopReason: SyncStopReason?
     public private(set) var sendProblem: SyncSendProblem?
     public private(set) var isFetching = false
@@ -23,13 +21,14 @@ public final class SyncModel {
     public internal(set) var workingWallet: Wallet.ID?
     public internal(set) var invitation: WalletShare?
     public internal(set) var opened: WalletShare?
-    public internal(set) var participants: [SyncParticipant]?
-    public internal(set) var isParticipantsFailed = false
     public internal(set) var errorNotice = ErrorNotice()
+
+    var members: Loadable<[SyncParticipant]> = .loading
 
     let database: AppDatabase
     let cloud: SyncCloud
 
+    private var pending: Loadable<Int> = .loading
     private var requestedOn: Bool?
 
     public init(
@@ -44,6 +43,22 @@ public final class SyncModel {
 public extension SyncModel {
     var isAvailable: Bool {
         account == .available
+    }
+
+    var pendingCount: Int? {
+        pending.value
+    }
+
+    var isPendingFailed: Bool {
+        pending.isFailed
+    }
+
+    var participants: [SyncParticipant]? {
+        members.value
+    }
+
+    var isParticipantsFailed: Bool {
+        members.isFailed
     }
 
     var isChoosing: Bool {
@@ -217,11 +232,16 @@ private extension SyncModel {
     }
 
     func observePending() async {
-        isPendingFailed = await observe(
+        let isFailed = await observe(
             database.pendingSyncCountUpdates(),
             failure: Self.loadFailedMessage
         ) { count in
-            self.pendingCount = count
+            self.pending = .loaded(count)
+        }
+
+        if isFailed,
+           !pending.isLoaded {
+            pending = .failed
         }
     }
 
