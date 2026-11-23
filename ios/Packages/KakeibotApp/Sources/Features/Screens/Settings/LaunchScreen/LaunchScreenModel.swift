@@ -5,7 +5,7 @@ import Store
 
 @MainActor
 @Observable
-public final class LaunchScreenModel {
+public final class LaunchScreenModel: SettingSaving {
     public private(set) var screen: LaunchScreen = .home
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -26,7 +26,7 @@ public extension LaunchScreenModel {
         do {
             screen = try await database.setting(.launchScreen)
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            errorNotice.show(SettingMessage.loadFailed)
         }
     }
 
@@ -35,16 +35,8 @@ public extension LaunchScreenModel {
 
         self.screen = screen
 
-        do {
-            try await database.setSetting(.launchScreen, to: screen)
-        } catch {
+        await saveSetting(screen, for: .launchScreen, in: database) {
             self.screen = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
-}
-
-private extension LaunchScreenModel {
-    static let loadFailedMessage = "設定を読めませんでした"
-    static let saveFailedMessage = "設定を保存できませんでした"
 }

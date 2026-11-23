@@ -5,7 +5,7 @@ import Store
 
 @MainActor
 @Observable
-public final class ThemeStyleModel {
+public final class ThemeStyleModel: SettingSaving {
     public private(set) var style: ThemeStyle = .standard
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -34,7 +34,7 @@ public extension ThemeStyleModel {
         do {
             style = try await database.style()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            errorNotice.show(SettingMessage.loadFailed)
         }
     }
 
@@ -96,9 +96,6 @@ public extension ThemeStyleModel {
 }
 
 private extension ThemeStyleModel {
-    static let loadFailedMessage = "設定を読めませんでした"
-    static let saveFailedMessage = "設定を保存できませんでした"
-
     func choose<Value>(
         _ value: Value,
         at keyPath: WritableKeyPath<ThemeStyle, Value>,
@@ -110,11 +107,8 @@ private extension ThemeStyleModel {
 
         style[keyPath: keyPath] = value
 
-        do {
-            try await database.setSetting(key, to: value)
-        } catch {
+        await saveSetting(value, for: key, in: database) {
             style = previous
-            errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 

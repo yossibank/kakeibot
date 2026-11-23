@@ -43,7 +43,7 @@ public extension SettingsMenuValueModel {
                 value = savedValue
             }
 
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingMessage.saveFailed, for: error)
         }
     }
 }

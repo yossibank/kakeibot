@@ -26,7 +26,7 @@ public extension HomeSectionListModel {
 
             layout = HomeLayout(order: order, hidden: hidden)
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            errorNotice.show(SettingMessage.loadFailed)
         }
 
         isLoaded = true
@@ -44,12 +44,9 @@ public extension HomeSectionListModel {
             try await database.setSetting(.homeSections, to: layout.order)
             try await database.setSetting(.homeHiddenSections, to: layout.hidden)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            errorNotice.show(SettingMessage.saveFailed, for: error)
         }
     }
 }
 
-private extension HomeSectionListModel {
-    static let loadFailedMessage = "設定を読めませんでした"
-    static let saveFailedMessage = "設定を保存できませんでした"
-}
+private extension HomeSectionListModel {}
