@@ -104,11 +104,7 @@ public extension TemplateEditModel {
     }
 
     var categories: [EntryCategory] {
-        switch type {
-        case .expense: options?.expenseCategories ?? []
-        case .income: options?.incomeCategories ?? []
-        case .transfer: []
-        }
+        options?.categories(of: type) ?? []
     }
 
     var wallets: [Wallet] {
@@ -124,12 +120,7 @@ public extension TemplateEditModel {
     }
 
     var tags: [EntryTag] {
-        let tags = options?.tags ?? []
-
-        return tags.filter { tag in
-            tag.categoryId == categoryId
-                && (tag.archivedAt == nil || tag.id == tagId)
-        }
+        options?.tags(of: categoryId, keeping: tagId) ?? []
     }
 
     var selectedTag: EntryTag? {
@@ -137,11 +128,11 @@ public extension TemplateEditModel {
     }
 
     func icon(for category: EntryCategory) -> Icon? {
-        options?.icons[category.iconId]
+        options?.icon(for: category)
     }
 
     func icon(for wallet: Wallet) -> Icon? {
-        options?.icons[wallet.iconId]
+        options?.icon(for: wallet)
     }
 
     func press(_ key: AmountCalculator.Key) {

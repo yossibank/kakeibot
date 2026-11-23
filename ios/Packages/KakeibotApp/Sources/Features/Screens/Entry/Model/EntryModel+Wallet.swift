@@ -45,11 +45,7 @@ public extension EntryModel {
     }
 
     var walletTitle: String {
-        switch type {
-        case .expense: "支払い元"
-        case .income: "入金先"
-        case .transfer: "振替元"
-        }
+        type.walletTitle
     }
 
     var isUsualWallet: Bool {

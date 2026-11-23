@@ -75,11 +75,7 @@ public extension RecurringEditModel {
     }
 
     var walletTitle: String {
-        switch type {
-        case .expense: "支払い元"
-        case .income: "入金先"
-        case .transfer: "振替元"
-        }
+        type.walletTitle
     }
 
     var draft: RecurringDraft {
@@ -139,11 +135,7 @@ public extension RecurringEditModel {
     }
 
     var categories: [EntryCategory] {
-        switch type {
-        case .expense: options?.expenseCategories ?? []
-        case .income: options?.incomeCategories ?? []
-        case .transfer: []
-        }
+        options?.categories(of: type) ?? []
     }
 
     var wallets: [Wallet] {
@@ -163,11 +155,11 @@ public extension RecurringEditModel {
     }
 
     func icon(for category: EntryCategory) -> Icon? {
-        options?.icons[category.iconId]
+        options?.icon(for: category)
     }
 
     func icon(for wallet: Wallet) -> Icon? {
-        options?.icons[wallet.iconId]
+        options?.icon(for: wallet)
     }
 
     func select(_ type: Entry.Kind) {
