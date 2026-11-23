@@ -247,3 +247,5 @@ private extension RecurringEditSheet {
 }
 
 extension RecurringEditModel: SettingsEditing {}
+
+extension RecurringEditSheet: SettingsEditSheet {}

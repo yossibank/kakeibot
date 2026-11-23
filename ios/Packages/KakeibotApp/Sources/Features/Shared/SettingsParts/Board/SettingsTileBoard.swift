@@ -8,7 +8,7 @@ struct SettingsTileBoard<Item: Identifiable, Face: View>: View {
     let drag: SettingsDrag<Item.ID>
     let space: String
     let face: (Item) -> Face
-    let onTap: (Item) -> Void
+    let onTap: ((Item) -> Void)?
     let onFollow: (Item.ID, CGPoint) -> Void
     let onDrop: () -> Void
 
@@ -42,9 +42,7 @@ private extension SettingsTileBoard {
             .animation(nil, value: isLifted)
             .position(position)
             .zIndex(layer)
-            .onTapGesture {
-                onTap(item)
-            }
+            .modifier(SettingsTapAction(action: onTap.map { tap in { tap(item) } }))
             .gesture(
                 LiftGesture(in: space) { location in
                     onFollow(item.id, location)
@@ -61,7 +59,7 @@ extension SettingsTileBoard {
         controller: SettingsBoardController<Model>,
         space: String,
         @ViewBuilder face: @escaping (Item) -> Face,
-        onTap: @escaping (Item) -> Void
+        onTap: ((Item) -> Void)? = nil
     ) where Model.Item == Item {
         self.init(
             grid: grid,
@@ -77,5 +75,17 @@ extension SettingsTileBoard {
                 controller.drop()
             }
         )
+    }
+}
+
+private struct SettingsTapAction: ViewModifier {
+    let action: (() -> Void)?
+
+    func body(content: Content) -> some View {
+        if let action {
+            content.onTapGesture(perform: action)
+        } else {
+            content
+        }
     }
 }

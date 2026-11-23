@@ -6,12 +6,13 @@ import Store
 
 @MainActor
 @Observable
-public final class TemplateListModel: ScreenModel {
+public final class TemplateListModel {
     public var type: Entry.Kind = .expense
     public var movingOrder: [EntryTemplate.ID]?
     public var errorNotice = ErrorNotice()
 
-    public private(set) var templates: [EntryTemplate] = []
+    public internal(set) var snapshot: [EntryTemplate]?
+
     public private(set) var list: EntryList?
 
     private let database: AppDatabase
@@ -22,14 +23,6 @@ public final class TemplateListModel: ScreenModel {
 }
 
 public extension TemplateListModel {
-    var visible: [EntryTemplate] {
-        templates(isHidden: false)
-    }
-
-    var hidden: [EntryTemplate] {
-        templates(isHidden: true)
-    }
-
     func icon(for template: EntryTemplate) -> Icon? {
         list?.icon(for: template)
     }
@@ -40,7 +33,7 @@ public extension TemplateListModel {
 
     func load() async {
         do {
-            templates = try await database.templates(includingHidden: true)
+            snapshot = try await read()
             list = try await database.entryList()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
@@ -50,10 +43,7 @@ public extension TemplateListModel {
     func observe() async {
         await observeAll([
             {
-                await self.observe(
-                    self.database.templateUpdates(includingHidden: true),
-                    into: \.templates
-                )
+                await self.observe(self.updates(), into: \.snapshot)
             },
             {
                 await self.observe(self.database.entryListUpdates(), into: \.list)
@@ -62,29 +52,39 @@ public extension TemplateListModel {
     }
 }
 
-extension TemplateListModel {
-    static let loadFailedMessage = "テンプレートを読めませんでした"
-}
+extension TemplateListModel: SettingsBoardDatabaseModel {
+    typealias Item = EntryTemplate
 
-private extension TemplateListModel {
-    func templates(isHidden: Bool) -> [EntryTemplate] {
-        templates.filter { template in
-            template.type == type && (template.archivedAt != nil) == isHidden
-        }
+    static let loadFailedMessage = "テンプレートを読めませんでした"
+
+    func read() async throws -> [EntryTemplate] {
+        try await database.templates(includingHidden: true)
+    }
+
+    func updates() -> some AsyncSequence<[EntryTemplate], any Error> {
+        database.templateUpdates(includingHidden: true)
+    }
+
+    func items(in snapshot: [EntryTemplate]) -> [EntryTemplate] {
+        snapshot.filter { $0.type == type }
+    }
+
+    func isHidden(_ item: EntryTemplate) -> Bool {
+        item.archivedAt != nil
     }
 }
 
 extension TemplateListModel: SettingsBoardModel {
     public func reload() async {
         do {
-            templates = try await database.templates(includingHidden: true)
+            snapshot = try await read()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     public func saveOrder(_ ids: [EntryTemplate.ID]) async throws {
-        let others = templates.map(\.id).filter { !ids.contains($0) }
+        let others = (snapshot ?? []).map(\.id).filter { !ids.contains($0) }
         let ordered = ids + others
 
         try await database.reorderTemplates(ordered, at: Date())

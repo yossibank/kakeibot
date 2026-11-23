@@ -144,47 +144,6 @@ extension SettingsBoardScreen {
     }
 }
 
-extension SettingsBoardScreen where Header == EmptyView {
-    init(
-        title: String,
-        hint: SettingsScreenFlag,
-        intro: SettingsIntroCard,
-        emptyNote: EmptyNote,
-        addTitle: String,
-        space: String,
-        tileHeight: CGFloat? = nil,
-        scrollMargin: CGFloat = 0,
-        hideMessage: String = "非表示にしました",
-        liftScale: CGFloat,
-        controller: SettingsBoardController<Model>,
-        errorNotice: Binding<ErrorNotice>,
-        onAdd: @escaping () -> Void,
-        @ViewBuilder board: () -> Board,
-        @ViewBuilder hiddenSection: () -> HiddenSection,
-        @ViewBuilder floatingTile: @escaping (Model.Item.ID) -> Floating
-    ) {
-        self.init(
-            title: title,
-            hint: hint,
-            intro: intro,
-            emptyNote: emptyNote,
-            addTitle: addTitle,
-            space: space,
-            tileHeight: tileHeight,
-            scrollMargin: scrollMargin,
-            hideMessage: hideMessage,
-            liftScale: liftScale,
-            controller: controller,
-            errorNotice: errorNotice,
-            onAdd: onAdd,
-            header: { EmptyView() },
-            board: board,
-            hiddenSection: hiddenSection,
-            floatingTile: floatingTile
-        )
-    }
-}
-
 private extension SettingsBoardScreen {
     var liftSize: CGSize? {
         tileHeight.map { CGSize(width: controller.grid.itemWidth, height: $0) }

@@ -266,3 +266,18 @@ extension TemplateEditModel: SettingsEditing {}
         )
     }
 }
+
+extension TemplateEditSheet: SettingsEditSheet {
+    init(
+        model: TemplateEditModel,
+        onDelete: @escaping (Deletion) -> Void,
+        onHide: @escaping () -> Void
+    ) {
+        self.init(
+            model: model,
+            onSave: { _ in },
+            onDelete: onDelete,
+            onHide: onHide
+        )
+    }
+}

@@ -6,11 +6,11 @@ import Store
 
 @MainActor
 @Observable
-public final class RewardRuleListModel: ScreenModel {
+public final class RewardRuleListModel {
     public var movingOrder: [RewardRule.ID]?
     public var errorNotice = ErrorNotice()
 
-    public private(set) var list: RewardRuleList?
+    public internal(set) var snapshot: RewardRuleList?
 
     private let database: AppDatabase
 
@@ -20,42 +20,34 @@ public final class RewardRuleListModel: ScreenModel {
 }
 
 public extension RewardRuleListModel {
-    var visible: [RewardRule] {
-        rules(isHidden: false)
-    }
-
-    var hidden: [RewardRule] {
-        rules(isHidden: true)
-    }
-
     func icon(for rule: RewardRule) -> Icon? {
-        list?.icons[rule.iconId]
+        snapshot?.icons[rule.iconId]
     }
 
     func total(for rule: RewardRule) -> RewardRuleList.Total? {
-        list?.total(of: rule)
-    }
-
-    func load() async {
-        do {
-            list = try await database.rewardRuleList()
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
-    func observe() async {
-        await observe(database.rewardRuleListUpdates(), into: \.list)
+        snapshot?.total(of: rule)
     }
 }
 
-extension RewardRuleListModel {
+extension RewardRuleListModel: SettingsBoardDatabaseModel {
+    typealias Item = RewardRule
+
     static let loadFailedMessage = "決まりを読めませんでした"
-}
 
-private extension RewardRuleListModel {
-    func rules(isHidden: Bool) -> [RewardRule] {
-        (list?.rules ?? []).filter { $0.isActive != isHidden }
+    func read() async throws -> RewardRuleList {
+        try await database.rewardRuleList()
+    }
+
+    func updates() -> some AsyncSequence<RewardRuleList, any Error> {
+        database.rewardRuleListUpdates()
+    }
+
+    func items(in snapshot: RewardRuleList) -> [RewardRule] {
+        snapshot.rules
+    }
+
+    func isHidden(_ item: RewardRule) -> Bool {
+        !item.isActive
     }
 }
 

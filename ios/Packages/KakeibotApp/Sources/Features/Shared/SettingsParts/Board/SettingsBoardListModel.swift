@@ -7,6 +7,7 @@ protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel {
 
     func read() async throws -> Snapshot
     func updates() -> Updates
+    func observe() async
     func items(in snapshot: Snapshot) -> [Item]
     func isHidden(_ item: Item) -> Bool
 }

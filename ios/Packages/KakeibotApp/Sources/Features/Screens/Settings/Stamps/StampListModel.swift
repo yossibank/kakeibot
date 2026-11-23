@@ -25,7 +25,7 @@ public extension StampListModel {
     }
 }
 
-extension StampListModel: SettingsBoardListModel {
+extension StampListModel: SettingsBoardDatabaseModel {
     typealias Item = ShelfIcon
 
     static let loadFailedMessage = "スタンプを読めませんでした"

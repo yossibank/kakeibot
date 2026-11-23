@@ -9,10 +9,8 @@ struct StampBoard {
 }
 
 extension StampBoard: SettingsBoardSpec {
-    enum Destination: Hashable {
-        case new
-        case edit(ShelfIcon.ID)
-    }
+    typealias Destination = SettingsBoardDestination<ShelfIcon.ID>
+    typealias Editor = StampEditSheet
 
     var screen: SettingsScreen {
         .stamps
@@ -20,10 +18,6 @@ extension StampBoard: SettingsBoardSpec {
 
     var title: String {
         "スタンプ"
-    }
-
-    var emptyNote: (systemImage: String, text: String) {
-        ("seal", "スタンプを足すと、ここに並びます")
     }
 
     var hiddenTitle: String {
@@ -58,19 +52,14 @@ extension StampBoard: SettingsBoardSpec {
         StampTileFace(icon: model.icon(for: item), isHidden: isHidden)
     }
 
-    func editor(
-        for destination: Destination,
-        onDelete: @escaping (Deletion) -> Void,
-        onHide: @escaping () -> Void
-    ) -> some View {
-        StampEditSheet(model: editModel(for: destination), onDelete: onDelete, onHide: onHide)
+    func editModel(for destination: Destination) -> StampEditModel {
+        StampEditModel(database: database, editing: destination.editingID)
     }
 
-    func makeModel() -> StampListModel {
-        StampListModel(database: database)
-    }
-
-    func intro(flag: SettingsScreenFlag) -> SettingsIntroCard {
+    func intro(
+        flag: SettingsScreenFlag,
+        in _: StampListModel
+    ) -> SettingsIntroCard {
         SettingsIntroCard(
             systemImage: "seal",
             headline: ("カレンダーに押して", "その日を残せます"),
@@ -82,35 +71,7 @@ extension StampBoard: SettingsBoardSpec {
         )
     }
 
-    func addTitle(in _: StampListModel) -> String {
-        "スタンプを追加"
-    }
-
-    func newDestination(in _: StampListModel) -> Destination {
-        .new
-    }
-
-    func destination(editing item: ShelfIcon) -> Destination {
-        .edit(item.id)
-    }
-
-    func itemID(of destination: Destination) -> ShelfIcon.ID? {
-        guard case let .edit(id) = destination else {
-            return nil
-        }
-
-        return id
-    }
-}
-
-private extension StampBoard {
-    func editModel(for destination: Destination) -> StampEditModel {
-        switch destination {
-        case .new:
-            StampEditModel(database: database)
-
-        case let .edit(id):
-            StampEditModel(database: database, editing: id)
-        }
+    func emptyNote(in _: StampListModel) -> (systemImage: String, text: String) {
+        ("seal", "スタンプを足すと、ここに並びます")
     }
 }

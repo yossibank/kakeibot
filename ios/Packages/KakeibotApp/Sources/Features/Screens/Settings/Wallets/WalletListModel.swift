@@ -6,11 +6,11 @@ import Store
 
 @MainActor
 @Observable
-public final class WalletListModel: ScreenModel {
+public final class WalletListModel {
     public var movingOrder: [Wallet.ID]?
     public var errorNotice = ErrorNotice()
 
-    public private(set) var list: EntryList?
+    public internal(set) var snapshot: EntryList?
 
     private let database: AppDatabase
 
@@ -20,58 +20,52 @@ public final class WalletListModel: ScreenModel {
 }
 
 public extension WalletListModel {
-    var visible: [Wallet] {
-        wallets(isHidden: false)
-    }
-
-    var hidden: [Wallet] {
-        wallets(isHidden: true)
-    }
-
     func icon(for wallet: Wallet) -> Icon? {
-        list?.icons[wallet.iconId]
+        snapshot?.icons[wallet.iconId]
     }
 
     func needsHideConfirmation(of wallet: Wallet) -> Bool {
-        (list?.balance(of: wallet) ?? wallet.balance(with: [])) != 0
+        (snapshot?.balance(of: wallet) ?? wallet.balance(with: [])) != 0
     }
 
     func hasEntries(_ wallet: Wallet) -> Bool {
-        list.map { WalletEditModel.hasEntries(of: wallet, in: $0) } ?? false
+        snapshot.map { WalletEditModel.hasEntries(of: wallet, in: $0) } ?? false
     }
 
     func balance(of wallet: Wallet) -> Int {
-        list?.balance(of: wallet, through: Self.today) ?? wallet.balance(with: [])
+        snapshot?.balance(of: wallet, through: Self.today) ?? wallet.balance(with: [])
     }
 
-    func load() async {
-        do {
-            list = try await database.entryList()
-        } catch {
-            errorNotice.show(Self.loadFailedMessage)
-        }
-    }
-
-    func observe() async {
-        await observe(database.entryListUpdates(), into: \.list)
+    func isShared(_ wallet: Wallet) -> Bool {
+        snapshot?.isShared(wallet) == true
     }
 }
 
-extension WalletListModel {
+extension WalletListModel: SettingsBoardDatabaseModel {
+    typealias Item = Wallet
+
     static let loadFailedMessage = "口座を読めませんでした"
+
+    func read() async throws -> EntryList {
+        try await database.entryList()
+    }
+
+    func updates() -> some AsyncSequence<EntryList, any Error> {
+        database.entryListUpdates()
+    }
+
+    func items(in snapshot: EntryList) -> [Wallet] {
+        snapshot.wallets.values.sorted { $0.sortOrder < $1.sortOrder }
+    }
+
+    func isHidden(_ item: Wallet) -> Bool {
+        item.archivedAt != nil
+    }
 }
 
 private extension WalletListModel {
     static var today: LocalDate {
         LocalDate(Date(), in: .current)
-    }
-
-    func wallets(isHidden: Bool) -> [Wallet] {
-        let wallets = list.map { Array($0.wallets.values) } ?? []
-
-        return wallets
-            .filter { ($0.archivedAt != nil) == isHidden }
-            .sorted { $0.sortOrder < $1.sortOrder }
     }
 }
 

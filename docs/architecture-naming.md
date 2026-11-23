@@ -83,7 +83,7 @@
 | `Screen` | 同じ種類の画面で使う外枠。中身は画面から受け取る | `SettingsBoardScreen` |
 | `Page` | 同じ種類の画面の全体。状態を持ち、画面ごとの設定を受け取る | `SettingsBoardPage` |
 | `Spec` | 同じ種類の画面で変わる所を書くプロトコル | `SettingsBoardSpec` |
-| `Board` | 設定の一覧の画面ごとの `Spec` の型。`<単数>Board` | `StampBoard` |
+| `Board` | 設定の一覧の画面ごとの `Spec` の型。`<単数>Board`。`SettingsParts` の並びの部品（`SettingsTileBoard`・`SettingsRowBoard`）は除く | `StampBoard` |
 | `Sheet` | シートで開く画面。OS の共有シートを出す型にも使う | `EntrySheet`・`SyncShareSheet` |
 | `EditSheet` | 1 件を編集するシート。モデルは `EditModel` で対にする | `WalletEditSheet` |
 | `Card` | 面を持つ 1 かたまり | `StampTallyCard` |
