@@ -71,7 +71,7 @@ extension MainView {
             TemplateEditSheet(
                 model: TemplateEditModel(
                     database: database,
-                    type: home.templateType
+                    type: home.state.templateType
                 )
             )
 
@@ -116,6 +116,7 @@ extension MainView {
             WalletEditSheet(
                 model: WalletEditModel(
                     database: database,
+                    clock: clock,
                     editing: id
                 )
             ) { _ in } onDelete: { deletion in

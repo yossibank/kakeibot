@@ -5,11 +5,13 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
     func render() throws {
-        let now = Date()
+        let now = snapshotNow
         let names = ["みずほ銀行 普通預金", "楽天カード", "PayPay", "三井住友カード ゴールド", "現金", "ゆうちょ銀行 貯金"]
         let wallets = names.enumerated().map { index, name in
             Wallet(

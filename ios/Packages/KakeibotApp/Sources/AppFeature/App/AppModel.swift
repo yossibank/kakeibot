@@ -26,6 +26,7 @@ final class AppModel {
     private(set) var observationRound = 0
     private(set) var syncActivity = SyncActivity(isSyncEnabled: false, isSharing: false)
 
+    let clock: ScreenClock
     let proStore: ProStore
     let shareInbox: SyncShareInbox
 
@@ -45,6 +46,7 @@ final class AppModel {
         shareInbox: SyncShareInbox = .shared,
         proStore: ProStore = .live,
         retryDelays: [Duration] = ScreenObservation.retryDelays,
+        clock: ScreenClock = .system,
         currentDay: @escaping @Sendable () -> LocalDate = AppModel.deviceDay
     ) {
         self.today = currentDay()
@@ -55,6 +57,7 @@ final class AppModel {
         self.shareInbox = shareInbox
         self.proStore = proStore
         self.retryDelays = retryDelays
+        self.clock = clock
     }
 }
 

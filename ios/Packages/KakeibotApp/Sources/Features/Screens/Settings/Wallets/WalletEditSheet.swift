@@ -50,9 +50,9 @@ public struct WalletEditSheet: View {
                 if isEnteringAmount {
                     amountDrawer(
                         "最初の残高",
-                        calculator: model.calculator,
-                        amount: model.initialBalance,
-                        onPress: model.press,
+                        calculator: model.state.calculator,
+                        amount: model.output.initialBalance,
+                        onPress: model.state.press,
                         onDismiss: closeAmount,
                         onDone: closeAmount
                     )
@@ -61,8 +61,8 @@ public struct WalletEditSheet: View {
                 if isEnteringValuation {
                     amountDrawer(
                         "今の評価額",
-                        calculator: model.valuation,
-                        onPress: model.pressValuation,
+                        calculator: model.state.valuation,
+                        onPress: model.state.pressValuation,
                         onDismiss: closeValuation
                     ) {
                         Task {
@@ -80,8 +80,8 @@ public struct WalletEditSheet: View {
                 if isEnteringLoanAmount {
                     amountDrawer(
                         "最初に借りた額",
-                        calculator: model.loanAmount,
-                        onPress: model.pressLoanAmount,
+                        calculator: model.state.loanAmount,
+                        onPress: model.state.pressLoanAmount,
                         onDismiss: closeLoanAmount,
                         onDone: closeLoanAmount
                     )
@@ -90,7 +90,7 @@ public struct WalletEditSheet: View {
         }
         .iconEditorDrawer(
             isPresented: $isEditingIcon,
-            model: model.icon,
+            model: model.state.icon,
             focus: $focus,
             textField: .text,
             below: iconBottom
@@ -102,7 +102,7 @@ public struct WalletEditSheet: View {
             }
         }
         .confirmsUnsavedHide(
-            isHidden: model.isHidden,
+            isHidden: model.input.isHidden,
             canSave: model.canSave,
             isPresented: $isConfirmingHideChanges
         ) {
@@ -111,14 +111,14 @@ public struct WalletEditSheet: View {
             }
         } onDiscard: {
             Task {
-                await setHidden(!model.isHidden)
+                await setHidden(!model.input.isHidden)
             }
         }
         .confirmsDiscard(when: model.isChanged, isPresented: $isConfirmingDiscard) {
             dismiss()
         }
         .confirmsWalletDelete(
-            hasEntries: model.hasEntries,
+            hasEntries: model.input.hasEntries,
             isPresented: $isConfirmingDelete
         ) {
             toggleHidden()
@@ -127,10 +127,10 @@ public struct WalletEditSheet: View {
                 await delete()
             }
         }
-        .confirmsWalletHide(balance: model.balance, isPresented: $isConfirmingHide) {
+        .confirmsWalletHide(balance: model.input.balance, isPresented: $isConfirmingHide) {
             requestHide()
         }
-        .onChange(of: model.kind) {
+        .onChange(of: model.state.kind) {
             focus = nil
         }
         .sheet(isPresented: $isEditingPayment) {
@@ -141,8 +141,8 @@ public struct WalletEditSheet: View {
         .confirmation(
             isPresented: $isAskingPayment,
             systemImage: "repeat",
-            title: model.paymentQuestion,
-            message: model.paymentQuestionNote,
+            title: model.output.paymentQuestion,
+            message: model.output.paymentQuestionNote,
             keepTitle: "あとで",
             confirmTitle: "決める",
             role: .suggestion,
@@ -161,7 +161,7 @@ public struct WalletEditSheet: View {
     if let database = try? AppDatabase.inMemory() {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
 
-        WalletEditSheet(model: WalletEditModel(database: database))
+        WalletEditSheet(model: WalletEditModel(database: database, clock: .system))
     }
 }
 

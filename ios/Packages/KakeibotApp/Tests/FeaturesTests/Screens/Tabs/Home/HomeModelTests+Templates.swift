@@ -23,18 +23,18 @@ extension HomeModelTests {
         )
 
         try await setup.database.saveTemplate(cafe, at: Date())
-        let home = HomeModel(database: setup.database, today: setup.date)
+        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
 
         let task = Task {
             await home.run()
         }
 
         await ObservationWait.until {
-            home.templates.count >= 3 && home.list != nil
+            home.output.templates.count >= 3 && home.input.list != nil
         }
 
-        let all = home.templateSections(matching: "")
-        let found = home.templateSections(matching: " カフェ ")
+        let all = home.output.templateSections(matching: "")
+        let found = home.output.templateSections(matching: " カフェ ")
         task.cancel()
 
         #expect(all.map(\.title) == ["食費", "日用品"])
@@ -60,33 +60,33 @@ extension HomeModelTests {
         )
 
         try await setup.database.saveTemplate(cafe, at: Date())
-        let home = HomeModel(database: setup.database, today: setup.date)
+        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
 
         let task = Task {
             await home.run()
         }
 
         await ObservationWait.until {
-            home.templates.count >= 3 && home.list != nil
+            home.output.templates.count >= 3 && home.input.list != nil
         }
 
-        let manual = home.templates.map(\.name)
+        let manual = home.output.templates.map(\.name)
         await home.setTemplateOrder(.category)
-        let category = home.templates.map(\.name)
+        let category = home.output.templates.map(\.name)
         await home.setTemplateOrder(.amount)
-        let amount = home.templates.map(\.name)
+        let amount = home.output.templates.map(\.name)
         await home.setTemplateOrder(.name)
-        let name = home.templates.map(\.name)
+        let name = home.output.templates.map(\.name)
         task.cancel()
 
-        let reopened = HomeModel(database: setup.database, today: setup.date)
+        let reopened = HomeModel(database: setup.database, clock: .system, today: setup.date)
         await reopened.loadTemplateOrder()
 
         #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
         #expect(category == ["駅前のカフェでモーニング", "洗剤", "ティッシュ"])
         #expect(amount == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
         #expect(name == ["ティッシュ", "駅前のカフェでモーニング", "洗剤"])
-        #expect(reopened.templateOrder == .name)
+        #expect(reopened.input.templateOrder == .name)
     }
 
     @Test
@@ -98,24 +98,24 @@ extension HomeModelTests {
         let old = try #require(soap.entryDraft(on: oldDate))
         try await setup.database.saveEntry(old, at: Date())
         try await setup.database.saveEntry(old, at: Date())
-        let home = HomeModel(database: setup.database, today: setup.date)
+        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
 
         let task = Task {
             await home.run()
         }
 
         await ObservationWait.until {
-            home.templates.count >= 2 && home.list != nil
+            home.output.templates.count >= 2 && home.input.list != nil
         }
 
         _ = await home.record(tissue)
 
         await ObservationWait.until {
-            home.list?.days.count ?? 0 >= 2
+            home.input.list?.days.count ?? 0 >= 2
         }
 
         await home.setTemplateOrder(.frequent)
-        let names = home.templates.map(\.name)
+        let names = home.output.templates.map(\.name)
         task.cancel()
 
         #expect(names == ["ティッシュ", "洗剤"])
@@ -126,19 +126,19 @@ extension HomeModelTests {
         let setup = try await TemplateSetup()
         try await setup.saveTemplate(name: "ランチ", amount: 980)
         try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
-        let home = HomeModel(database: setup.database, today: setup.date)
+        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
 
         let task = Task {
             await home.run()
         }
 
         await ObservationWait.until {
-            !home.templates.isEmpty
+            !home.output.templates.isEmpty
         }
 
-        let expense = home.templates.map(\.name)
-        home.templateType = .income
-        let income = home.templates.map(\.name)
+        let expense = home.output.templates.map(\.name)
+        home.state.templateType = .income
+        let income = home.output.templates.map(\.name)
         task.cancel()
 
         #expect(expense == ["ランチ"])
@@ -150,7 +150,7 @@ extension HomeModelTests {
         let setup = try await TemplateSetup()
         let tag = try await setup.saveTag("朝ごはん")
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980, tagId: tag.id)
-        let home = HomeModel(database: setup.database, today: setup.date)
+        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
 
         let kept = try #require(await home.record(lunch))
 
@@ -165,7 +165,7 @@ extension HomeModelTests {
     func recordsFromHomeAndUndoes() async throws {
         let setup = try await TemplateSetup()
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)
-        let home = HomeModel(database: setup.database, today: setup.date)
+        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
         let notice = EntryNoticeModel(database: setup.database)
 
         let change = try #require(await home.record(lunch))

@@ -1,28 +1,24 @@
 import Core
 import Store
 
-public extension HomeModel {
+public extension HomeModel.Output {
     func title(of recurring: Recurring) -> String {
-        list?.title(of: recurring) ?? Self.recurringTitle
+        input.list?.title(of: recurring) ?? HomeModel.recurringTitle
     }
 
     func place(of recurring: Recurring) -> String? {
-        list?.place(of: recurring)
+        input.list?.place(of: recurring)
     }
 
     func walletName(of recurring: Recurring) -> String? {
-        list?.wallets[recurring.walletId]?.name
+        input.list?.wallets[recurring.walletId]?.name
     }
 
     func icon(of recurring: Recurring) -> Icon? {
-        list?.icon(of: recurring)
+        input.list?.icon(of: recurring)
     }
 
     func icon(for template: EntryTemplate) -> Icon? {
-        list?.icon(for: template)
+        input.list?.icon(for: template)
     }
-}
-
-extension HomeModel {
-    static let recurringTitle = "固定費"
 }

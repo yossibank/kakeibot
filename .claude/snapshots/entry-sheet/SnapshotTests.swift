@@ -6,6 +6,8 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
@@ -209,7 +211,7 @@ private extension SnapshotTests {
     ]
 
     func renderVoice() async throws {
-        let today = LocalDate(Date(), in: .current)
+        let today = LocalDate(snapshotNow, in: .current)
 
         for (name, title, size, text) in Self.voiceCards {
             let model = try await Self.model(.expense, digits: [])
@@ -430,7 +432,7 @@ private extension SnapshotTests {
             hasTemplates: true
         )
 
-        pastModel.date = LocalDate(Date(), in: .current).adding(days: -3)
+        pastModel.date = LocalDate(snapshotNow, in: .current).adding(days: -3)
 
         for (name, size) in [
             ("entry-past-date", Self.mini),
@@ -650,7 +652,7 @@ private extension SnapshotTests {
         hasLongNames: Bool = false
     ) async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
-        let now = Date()
+        let now = snapshotNow
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)
@@ -688,7 +690,7 @@ private extension SnapshotTests {
 
     static func startModel() async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
-        let now = Date()
+        let now = snapshotNow
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)
@@ -733,7 +735,7 @@ private extension SnapshotTests {
 
     static func editingModel() async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
-        let now = Date()
+        let now = snapshotNow
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)

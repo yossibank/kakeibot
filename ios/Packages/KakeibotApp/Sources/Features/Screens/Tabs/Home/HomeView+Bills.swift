@@ -5,24 +5,31 @@ import SwiftUI
 extension HomeView {
     var billCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CardHeader(Self.billTitle, note: BillText.note(of: model.billPages))
+            CardHeader(Self.billTitle, note: BillText.note(of: model.output.billPages))
 
-            if model.billPages.isEmpty {
+            if model.output.billPages.isEmpty {
                 Text("これからの引き落としはありません")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
                     .padding(.vertical, 16)
             } else {
-                if model.billPages.count > 1 {
-                    BillTabs(pages: model.billPages, current: model.billPage) { index in
-                        model.billPage = index
+                if model.output.billPages.count > 1 {
+                    BillTabs(
+                        pages: model.output.billPages,
+                        current: model.output.billPage
+                    ) { index in
+                        model.state.billPage = index
                     }
                     .padding(.bottom, 4)
                 }
 
                 BillPager(
-                    current: $model.billPage,
-                    pages: model.billPages,
+                    current: Binding {
+                        model.output.billPage
+                    } set: { page in
+                        model.state.billPage = page
+                    },
+                    pages: model.output.billPages,
                     inset: Self.billInset
                 ) { page in
                     billList(page)
@@ -32,8 +39,9 @@ extension HomeView {
         .padding(.horizontal, Self.billInset)
         .padding(.bottom, 8)
         .card()
-        .haptic(.selection, trigger: model.billPage)
-        .sharesTextScale(id: model.billPages.flatMap(\.bills).map { model.title(of: $0.recurring) })
+        .haptic(.selection, trigger: model.output.billPage)
+        .sharesTextScale(id: model.output.billPages.flatMap(\.bills)
+            .map { model.output.title(of: $0.recurring) })
     }
 }
 
@@ -51,9 +59,9 @@ private extension HomeView {
                 } label: {
                     BillRow(
                         bill,
-                        title: model.title(of: bill.recurring),
-                        source: model.walletName(of: bill.recurring),
-                        today: model.today,
+                        title: model.output.title(of: bill.recurring),
+                        source: model.output.walletName(of: bill.recurring),
+                        today: model.state.today,
                         style: .compact
                     )
                 }

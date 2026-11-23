@@ -9,22 +9,22 @@ extension WalletEditModelTests {
     func loadsAndEditsWallet() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
-        let model = WalletEditModel(database: setup.database, editing: bank.id)
+        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
         await model.load()
-        let loaded = model.name
+        let loaded = model.state.name
         let isChanged = model.isChanged
 
-        model.name = "ゆうちょ"
-        model.press(.clear)
-        model.press(.digit(1))
-        model.press(.digit(2))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
+        model.state.name = "ゆうちょ"
+        model.state.press(.clear)
+        model.state.press(.digit(1))
+        model.state.press(.digit(2))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
         let saved = try #require(await model.save())
 
         #expect(loaded == "銀行")
         #expect(!isChanged)
-        #expect(!model.needsHideConfirmation)
+        #expect(!model.output.needsHideConfirmation)
         #expect(saved.id == bank.id)
         #expect(saved.name == "ゆうちょ")
         #expect(saved.initialBalance == 120_000)
@@ -33,53 +33,53 @@ extension WalletEditModelTests {
     @Test
     func savesLoanAmountAndClearsItWhenKindChanges() async throws {
         let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database)
-        adding.name = "奨学金"
-        adding.kind = .loan
-        adding.pressLoanAmount(.digit(3))
-        adding.pressLoanAmount(.doubleZero)
-        adding.pressLoanAmount(.doubleZero)
-        adding.pressLoanAmount(.digit(0))
+        let adding = WalletEditModel(database: setup.database, clock: .system)
+        adding.state.name = "奨学金"
+        adding.state.setKind(.loan)
+        adding.state.pressLoanAmount(.digit(3))
+        adding.state.pressLoanAmount(.doubleZero)
+        adding.state.pressLoanAmount(.doubleZero)
+        adding.state.pressLoanAmount(.digit(0))
         let saved = try #require(await adding.save())
 
-        let model = WalletEditModel(database: setup.database, editing: saved.id)
+        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
         await model.load()
-        let loaded = model.loanAmount.amount
+        let loaded = model.state.loanAmount.amount
         let isChanged = model.isChanged
-        let repaid = model.repaidText
-        model.kind = .bank
+        let repaid = model.output.repaidText
+        model.state.setKind(.bank)
         let changed = try #require(await model.save())
 
-        #expect(adding.showsLoanAmount)
+        #expect(adding.output.showsLoanAmount)
         #expect(saved.loanAmount == 300_000)
         #expect(loaded == 300_000)
         #expect(!isChanged)
         #expect(repaid == "¥300,000 返済済み（100%）")
-        #expect(!model.showsLoanAmount)
+        #expect(!model.output.showsLoanAmount)
         #expect(changed.loanAmount == nil)
     }
 
     @Test
     func showsRepaidOnNewLoanOnlyAfterBalance() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database)
-        model.name = "奨学金"
-        model.kind = .loan
-        model.pressLoanAmount(.digit(3))
-        model.pressLoanAmount(.doubleZero)
-        model.pressLoanAmount(.doubleZero)
-        model.pressLoanAmount(.digit(0))
+        let model = WalletEditModel(database: setup.database, clock: .system)
+        model.state.name = "奨学金"
+        model.state.setKind(.loan)
+        model.state.pressLoanAmount(.digit(3))
+        model.state.pressLoanAmount(.doubleZero)
+        model.state.pressLoanAmount(.doubleZero)
+        model.state.pressLoanAmount(.digit(0))
 
-        let beforeBalance = model.repaidText
-        model.press(.digit(1))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
-        model.press(.digit(0))
+        let beforeBalance = model.output.repaidText
+        model.state.press(.digit(1))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
 
         #expect(beforeBalance == nil)
-        #expect(model.repaidText == "¥200,000 返済済み（66%）")
-        #expect(model.isNegative)
-        #expect(model.balanceText == "−¥100,000")
+        #expect(model.output.repaidText == "¥200,000 返済済み（66%）")
+        #expect(model.state.isNegative)
+        #expect(model.output.balanceText == "−¥100,000")
     }
 
     @Test
@@ -99,11 +99,11 @@ extension WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-        let model = WalletEditModel(database: setup.database, editing: bank.id)
+        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
         await model.load()
 
-        #expect(model.balance == 5000)
-        #expect(model.needsHideConfirmation)
+        #expect(model.input.balance == 5000)
+        #expect(model.output.needsHideConfirmation)
     }
 
     @Test
@@ -114,8 +114,8 @@ extension WalletEditModelTests {
         await entry.load()
 
         let editor = entry.newWalletModel()
-        editor.name = "楽天カード"
-        editor.kind = .card
+        editor.state.name = "楽天カード"
+        editor.state.setKind(.card)
         let saved = try #require(await editor.save())
         await entry.reloadWallets()
         let wallet = try #require(entry.wallet(saved.id))
@@ -130,10 +130,10 @@ extension WalletEditModelTests {
         let cash = try await setup.wallet(named: "財布")
         let bank = try await setup.wallet(named: "銀行")
 
-        let bankModel = WalletEditModel(database: setup.database, editing: bank.id)
+        let bankModel = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
         let hid = await bankModel.setHidden(true)
 
-        let cashModel = WalletEditModel(database: setup.database, editing: cash.id)
+        let cashModel = WalletEditModel(database: setup.database, clock: .system, editing: cash.id)
         let refused = await cashModel.setHidden(true)
 
         #expect(hid)

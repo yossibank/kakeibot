@@ -10,10 +10,10 @@ import UIKit
 struct SnapshotTests {
     @Test
     func render() async throws {
-        let now = Date()
+        let now = Date(timeIntervalSince1970: 1_791_774_000)
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = HomeModel(database: database, today: today)
+        let model = HomeModel(database: database, clock: .fixed(now), today: today)
         let setup = SetupModel(database: database)
         let appIcon = AppIconListModel()
 
@@ -27,7 +27,7 @@ struct SnapshotTests {
         ]
 
         try await Self.wait {
-            model.list != nil && !model.templates.isEmpty
+            model.input.list != nil && !model.output.templates.isEmpty
         }
 
         for variant in Self.variants {
@@ -63,7 +63,7 @@ struct SnapshotTests {
                 to: "home-bills"
             )
 
-            model.billPage = 1
+            model.state.billPage = 1
 
             try Self.write(
                 view.billCard.padding(16),
@@ -72,7 +72,7 @@ struct SnapshotTests {
                 to: "home-bills-next"
             )
 
-            model.billPage = 0
+            model.state.billPage = 0
             try Self.write(sheet, variant: variant, title: "ホーム › 固定費", to: "home-recurring")
         }
 

@@ -80,6 +80,7 @@ public struct AssetsView: View {
             WalletEditSheet(
                 model: WalletEditModel(
                     database: model.database,
+                    clock: .system,
                     kind: addingKind
                 )
             )

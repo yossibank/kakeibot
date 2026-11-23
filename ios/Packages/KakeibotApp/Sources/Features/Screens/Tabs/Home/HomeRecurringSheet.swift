@@ -57,7 +57,7 @@ private extension HomeRecurringSheet {
 
     var summaryCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(model.monthRangeText)
+            Text(model.output.monthRangeText)
                 .textFont(.caption2)
                 .tracking(2)
                 .foregroundStyle(Palette.accent)
@@ -68,7 +68,7 @@ private extension HomeRecurringSheet {
                     .foregroundStyle(Palette.subtext)
 
                 AmountText(
-                    model.upcomingRecurringExpense,
+                    model.output.upcomingRecurringExpense,
                     font: .size(.largeTitle, weight: .bold),
                     color: Palette.accentStrong
                 )
@@ -76,12 +76,12 @@ private extension HomeRecurringSheet {
                 .minimumScaleFactor(0.5)
             }
 
-            RatioBar(model.paidRecurringRatio, tint: Palette.accent, height: 6)
+            RatioBar(model.output.paidRecurringRatio, tint: Palette.accent, height: 6)
 
             HStack(spacing: 0) {
                 stat(
                     "支払った",
-                    amount: model.paidRecurringExpense,
+                    amount: model.output.paidRecurringExpense,
                     type: .expense
                 )
 
@@ -89,7 +89,7 @@ private extension HomeRecurringSheet {
 
                 stat(
                     "支出の合計",
-                    amount: model.recurringExpense,
+                    amount: model.output.recurringExpense,
                     type: .expense
                 )
 
@@ -97,7 +97,7 @@ private extension HomeRecurringSheet {
 
                 stat(
                     "収入の合計",
-                    amount: model.recurringIncome,
+                    amount: model.output.recurringIncome,
                     type: .income
                 )
             }
@@ -148,7 +148,7 @@ private extension HomeRecurringSheet {
                 .fill(Palette.accent.opacity(.muted))
                 .frame(height: 1)
 
-            Text("今日 \(model.today.monthDayText)")
+            Text("今日 \(model.state.today.monthDayText)")
                 .textFont(.caption2)
                 .tracking(1)
                 .foregroundStyle(Palette.accent)
@@ -192,15 +192,15 @@ private extension HomeRecurringSheet {
             }
             .frame(width: 30)
 
-            IconBadge(model.icon(of: item.recurring), size: 36)
+            IconBadge(model.output.icon(of: item.recurring), size: 36)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(model.title(of: item.recurring))
+                Text(model.output.title(of: item.recurring))
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.text)
                     .lineLimit(2)
 
-                if let place = model.place(of: item.recurring) {
+                if let place = model.output.place(of: item.recurring) {
                     Text(place)
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
@@ -259,7 +259,7 @@ private extension HomeRecurringSheet {
                 .foregroundStyle(Palette.subtext)
 
         case .upcoming:
-            Text(BillText.days(until: item.date, today: model.today))
+            Text(BillText.days(until: item.date, today: model.state.today))
                 .textFont(.caption2)
                 .foregroundStyle(Palette.accent)
 
@@ -273,11 +273,11 @@ private extension HomeRecurringSheet {
 
 private extension HomeRecurringSheet {
     var items: [PeriodRecurring] {
-        model.periodRecurrings
+        model.output.periodRecurrings
     }
 
     var todayIndex: Int {
-        items.firstIndex { $0.date > model.today } ?? items.count
+        items.firstIndex { $0.date > model.state.today } ?? items.count
     }
 
     static func opacity(of status: PeriodRecurring.Status) -> Double {

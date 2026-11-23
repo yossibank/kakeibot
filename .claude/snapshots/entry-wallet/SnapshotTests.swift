@@ -6,6 +6,8 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
@@ -51,7 +53,7 @@ private extension SnapshotTests {
 
     static func model(withCard: Bool = false) async throws -> EntryModel {
         let database = try AppDatabase.inMemory()
-        let now = Date()
+        let now = snapshotNow
         let date = LocalDate(now, in: .current)
 
         try database.insertDefaultsIfEmpty(at: now)
@@ -83,7 +85,7 @@ private extension SnapshotTests {
             initialBalance: 0
         )
 
-        let card = try await database.save(wallet, at: Date())
+        let card = try await database.save(wallet, at: snapshotNow)
 
         let recurring = RecurringDraft(
             type: .transfer,
@@ -98,7 +100,7 @@ private extension SnapshotTests {
             startDate: date
         )
 
-        _ = try await database.saveRecurring(recurring, today: date, at: Date())
+        _ = try await database.saveRecurring(recurring, today: date, at: snapshotNow)
 
         return card
     }

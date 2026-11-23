@@ -1,7 +1,7 @@
 import Core
 import Store
 
-public extension HomeModel {
+public extension HomeModel.Output {
     var month: YearMonth {
         overview.month
     }

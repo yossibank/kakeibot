@@ -130,11 +130,11 @@ public extension EntryModel {
     }
 
     func newWalletModel() -> WalletEditModel {
-        WalletEditModel(database: database)
+        WalletEditModel(database: database, clock: .system)
     }
 
     func editWalletModel(_ id: Wallet.ID) -> WalletEditModel {
-        WalletEditModel(database: database, editing: id)
+        WalletEditModel(database: database, clock: .system, editing: id)
     }
 
     func reloadWallets() async {

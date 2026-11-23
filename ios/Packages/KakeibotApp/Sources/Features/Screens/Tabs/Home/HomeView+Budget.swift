@@ -25,12 +25,12 @@ extension HomeView {
                 .padding(.horizontal, 32)
             }
             .frame(maxWidth: 290)
-            .animation(.snappy, value: model.budgetUsage)
+            .animation(.snappy, value: model.output.budgetUsage)
 
             VStack(spacing: 4) {
-                if let usage = model.budgetUsage {
+                if let usage = model.output.budgetUsage {
                     VStack(spacing: 4) {
-                        if !model.isListFailed,
+                        if !model.input.isListFailed,
                            let warning = usage.warningText {
                             Text(warning)
                                 .textFont(.caption, weight: .semibold)
@@ -85,7 +85,7 @@ extension HomeView {
                         .foregroundStyle(Palette.subtext)
                         .padding(.bottom, 12)
                         .overlay(alignment: .bottom) {
-                            RatioBar(model.paidRecurringRatio, tint: Palette.accent)
+                            RatioBar(model.output.paidRecurringRatio, tint: Palette.accent)
                         }
                         .padding(.vertical, 4)
                         .tapArea(Self.recurringLinkTapOutsets)
@@ -97,15 +97,15 @@ extension HomeView {
             HStack(spacing: 0) {
                 stat(
                     "今日の支出",
-                    amount: model.todayExpense,
+                    amount: model.output.todayExpense,
                     type: .expense
                 )
 
                 divider
 
                 stat(
-                    model.middleTitle,
-                    amount: model.middleAmount,
+                    model.output.middleTitle,
+                    amount: model.output.middleAmount,
                     type: .expense
                 )
 
@@ -113,7 +113,7 @@ extension HomeView {
 
                 stat(
                     "今月の収入",
-                    amount: model.monthIncome,
+                    amount: model.output.monthIncome,
                     type: .income
                 )
             }
@@ -158,7 +158,7 @@ private extension HomeView {
                 .foregroundStyle(Palette.subtext)
 
             Group {
-                if model.isListFailed {
+                if model.input.isListFailed {
                     Text(Self.unknownAmount)
                         .foregroundStyle(Palette.subtext)
                 } else {
@@ -185,7 +185,7 @@ private extension HomeView {
     )
 
     var hasRecurringRow: Bool {
-        model.recurringExpense > 0
+        model.output.recurringExpense > 0
     }
 
     var budgetLinkTapOutsets: EdgeInsets {
@@ -207,44 +207,44 @@ private extension HomeView {
     }
 
     var dialTitle: String {
-        model.budgetUsage?.remainingTitle ?? "今月の支出"
+        model.output.budgetUsage?.remainingTitle ?? "今月の支出"
     }
 
     var dialAmount: String {
-        guard !model.isListFailed else {
+        guard !model.input.isListFailed else {
             return Self.unknownAmount
         }
 
-        guard let usage = model.budgetUsage else {
-            return Yen.text(model.monthExpense)
+        guard let usage = model.output.budgetUsage else {
+            return Yen.text(model.output.monthExpense)
         }
 
         return usage.remainingAmountText
     }
 
     var dialProgress: Double? {
-        model.isListFailed ? nil : model.budgetUsage?.progress
+        model.input.isListFailed ? nil : model.output.budgetUsage?.progress
     }
 
     var dialAmountColor: Color {
-        guard !model.isListFailed else {
+        guard !model.input.isListFailed else {
             return Palette.subtext
         }
 
-        return model.budgetUsage?.amountTint ?? Palette.accentStrong
+        return model.output.budgetUsage?.amountTint ?? Palette.accentStrong
     }
 
     var statAmounts: [Int] {
-        [model.todayExpense, model.middleAmount, model.monthIncome]
+        [model.output.todayExpense, model.output.middleAmount, model.output.monthIncome]
     }
 
     var dialTint: Color {
-        model.budgetUsage?.tint ?? Palette.accent
+        model.output.budgetUsage?.tint ?? Palette.accent
     }
 
     func recurringText(title: String) -> String {
-        let total = "\(title) \(Yen.text(model.recurringExpense))"
-        let upcoming = model.upcomingRecurringExpense
+        let total = "\(title) \(Yen.text(model.output.recurringExpense))"
+        let upcoming = model.output.upcomingRecurringExpense
 
         guard upcoming > 0 else {
             return total

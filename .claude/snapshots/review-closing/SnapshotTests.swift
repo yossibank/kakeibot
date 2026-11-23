@@ -5,6 +5,8 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
@@ -13,7 +15,7 @@ struct SnapshotTests {
         let end = try #require(LocalDate("2026-10-31"))
         let range = start...end
         let wallet = Wallet.ID()
-        let now = Date()
+        let now = snapshotNow
         let skipped: Set = [5, 12, 26]
 
         let entries = (1...31).filter { !skipped.contains($0) }.map { day in
@@ -87,8 +89,8 @@ struct SnapshotTests {
                 saving: 3000,
                 result: 6,
                 saved: 4500,
-                createdAt: Date(),
-                checkedAt: Date()
+                createdAt: snapshotNow,
+                checkedAt: snapshotNow
             ),
             name: "外食",
             categoryName: "食費",
@@ -108,7 +110,7 @@ struct SnapshotTests {
                 baseline: 2400,
                 target: 1800,
                 saving: 4800,
-                createdAt: Date()
+                createdAt: snapshotNow
             ),
             name: "日用品",
             categoryName: "日用品",

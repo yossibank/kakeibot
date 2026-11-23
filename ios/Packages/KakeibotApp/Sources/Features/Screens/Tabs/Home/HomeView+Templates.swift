@@ -9,7 +9,7 @@ extension HomeView {
                 SectionTitle("テンプレート")
 
                 CapsulePicker(
-                    selection: $model.templateType,
+                    selection: Bindable(model.state).templateType,
                     options: Self.typeOptions,
                     size: .small
                 )
@@ -21,7 +21,7 @@ extension HomeView {
             }
             .padding(.top, 8)
 
-            if model.templates.isEmpty {
+            if model.output.templates.isEmpty {
                 AddButton("テンプレートを作る", action: onAddTemplate)
             } else {
                 templateTools
@@ -44,7 +44,7 @@ private extension HomeView {
 
             Spacer()
 
-            if model.templates.count > 1 {
+            if model.output.templates.count > 1 {
                 orderButton
                     .layoutPriority(1)
             }
@@ -61,7 +61,7 @@ private extension HomeView {
                 Image(systemName: "arrow.up.arrow.down")
                     .sansFont(.caption, weight: .light)
 
-                Text(model.templateOrder.title)
+                Text(model.input.templateOrder.title)
                     .textFont(.caption2)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -120,9 +120,9 @@ private extension HomeView {
             onUseTemplate(template)
         } label: {
             TemplateRowCard(
-                icon: model.icon(for: template),
+                icon: model.output.icon(for: template),
                 name: template.name,
-                detail: model.detail(for: template),
+                detail: model.output.detail(for: template),
                 amount: template.amount,
                 fit: .hug
             )
@@ -142,7 +142,7 @@ private extension HomeView {
     ]
 
     var shelfRows: [[EntryTemplate]] {
-        let templates = model.templates
+        let templates = model.output.templates
 
         guard templates.count > 2 else {
             return [templates]

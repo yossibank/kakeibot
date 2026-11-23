@@ -8,8 +8,10 @@ public extension HomeModel {
         public let title: String
         public let templates: [EntryTemplate]
     }
+}
 
-    func templateSections(matching query: String) -> [TemplateSection] {
+public extension HomeModel.Output {
+    func templateSections(matching query: String) -> [HomeModel.TemplateSection] {
         let trimmed = query.trimmingCharacters(in: .whitespaces)
 
         let matched = templates.filter { template in
@@ -18,7 +20,7 @@ public extension HomeModel {
                 || detail(for: template).localizedStandardContains(trimmed)
         }
 
-        let categories = (list.map { Array($0.categories.values) } ?? [])
+        let categories = (input.list.map { Array($0.categories.values) } ?? [])
             .sorted { $0.sortOrder < $1.sortOrder }
 
         return categories.compactMap { category in
@@ -28,7 +30,7 @@ public extension HomeModel {
                 return nil
             }
 
-            return TemplateSection(
+            return HomeModel.TemplateSection(
                 id: category.id,
                 title: category.name,
                 templates: templates
@@ -37,6 +39,6 @@ public extension HomeModel {
     }
 
     func detail(for template: EntryTemplate) -> String {
-        list?.detail(for: template) ?? ""
+        input.list?.detail(for: template) ?? ""
     }
 }
