@@ -60,14 +60,13 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            guard var category = try EntryCategory.fetchOne(db, key: id) else {
-                throw CategoryWriteError.categoryNotFound
-            }
-
-            category.archivedAt = isHidden ? now : nil
-            category.updatedAt = now
-
-            try category.update(db)
+            try EntryCategory.setHidden(
+                id,
+                isHidden,
+                orThrow: CategoryWriteError.categoryNotFound,
+                in: db,
+                at: now
+            )
         }
     }
 

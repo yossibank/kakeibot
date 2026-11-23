@@ -33,14 +33,13 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            guard var template = try EntryTemplate.fetchOne(db, key: id) else {
-                throw TemplateWriteError.templateNotFound
-            }
-
-            template.archivedAt = isHidden ? now : nil
-            template.updatedAt = now
-
-            try template.update(db)
+            try EntryTemplate.setHidden(
+                id,
+                isHidden,
+                orThrow: TemplateWriteError.templateNotFound,
+                in: db,
+                at: now
+            )
         }
     }
 

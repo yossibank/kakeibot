@@ -43,14 +43,13 @@ public extension AppDatabase {
         at now: Date
     ) async throws {
         try await writer.write { db in
-            guard var shelfIcon = try ShelfIcon.fetchOne(db, key: id) else {
-                throw ShelfIconWriteError.shelfIconNotFound
-            }
-
-            shelfIcon.archivedAt = isHidden ? now : nil
-            shelfIcon.updatedAt = now
-
-            try shelfIcon.update(db)
+            try ShelfIcon.setHidden(
+                id,
+                isHidden,
+                orThrow: ShelfIconWriteError.shelfIconNotFound,
+                in: db,
+                at: now
+            )
         }
     }
 
