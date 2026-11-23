@@ -23,7 +23,7 @@ extension AppDatabase {
         }
 
         let recurrings = try Recurring
-            .filter(Column("closing_day") != nil)
+            .cardBills()
             .filter(cards.contains(Column("to_wallet_id")))
             .fetchAll(db)
             .filter { !visited.contains($0.id) }
@@ -75,11 +75,8 @@ extension AppDatabase {
         }
 
         let bill = try Recurring
-            .filter(Column("archived_at") == nil)
-            .filter(Column("type") == Entry.Kind.transfer)
-            .filter(Column("closing_day") != nil)
+            .shownCardBills()
             .filter(Column("to_wallet_id") == walletId)
-            .order(Recurring.sortOrder, Column("created_at"))
             .fetchOne(db)
 
         return bill?.billMonth(for: date, shift: shift)
@@ -117,13 +114,9 @@ private extension AppDatabase {
     ) throws -> CardBillChange {
         let used = try billEntries(of: recurring, on: occurrence, in: db)
         let amount = recurring.amount(paidOn: occurrence.date, entries: used)
-        let earliest = occurrence.scheduled.adding(days: -40)
-        let latest = occurrence.scheduled.adding(days: 40)
 
         let bill = try Entry
-            .filter(Column("recurring_id") == recurring.id)
-            .filter(Column("recurring_date") >= earliest)
-            .filter(Column("recurring_date") <= latest)
+            .recorded(of: recurring.id, near: occurrence.scheduled)
             .fetchAll(db)
             .first { recurring.isRecorded(by: $0, scheduled: occurrence.scheduled) }
 

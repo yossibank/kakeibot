@@ -249,8 +249,11 @@ private extension AppDatabase {
     ) throws -> Bool {
         switch change {
         case let .category(id):
-            let category = try EntryCategory.fetchOne(db, key: id)
-            return category?.kind.rawValue == entry.type.rawValue
+            guard let category = try EntryCategory.fetchOne(db, key: id) else {
+                return false
+            }
+
+            return category.kind == entry.type.categoryKind
 
         case let .wallet(id):
             return try entry.transferId == nil && Wallet.exists(db, key: id)

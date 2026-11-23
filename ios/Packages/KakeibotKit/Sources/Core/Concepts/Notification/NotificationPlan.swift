@@ -99,7 +99,7 @@ public enum NotificationPlan {
         let start = today.adding(days: daysBefore)
         let span = recurringDays - 1
         let end = start.adding(days: span)
-        let usesCardBill = recurring.closingDay != nil
+        let usesCardBill = recurring.isCardBill
 
         return recurring.dates(from: start, through: end).map { date in
             let amount = usesCardBill ? nil : recurring.scheduledAmount(paidOn: date)

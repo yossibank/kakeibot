@@ -140,11 +140,8 @@ private extension AppDatabase {
             .map(Column.init)
 
         return try Recurring
+            .shownCardBills()
             .select(columns)
-            .filter(Column("archived_at") == nil)
-            .filter(Column("type") == Entry.Kind.transfer)
-            .filter(Column("closing_day") != nil)
-            .order(Recurring.sortOrder, Column("created_at"))
             .fetchAll(db)
     }
 

@@ -177,13 +177,9 @@ extension AppDatabase {
         at now: Date
     ) throws -> Entry? {
         let date = occurrence.date
-        let earliest = occurrence.scheduled.adding(days: -40)
-        let latest = occurrence.scheduled.adding(days: 40)
 
         let exists = try Entry
-            .filter(Column("recurring_id") == recurring.id)
-            .filter(Column("recurring_date") >= earliest)
-            .filter(Column("recurring_date") <= latest)
+            .recorded(of: recurring.id, near: occurrence.scheduled)
             .fetchAll(db)
             .contains { recurring.isRecorded(by: $0, scheduled: occurrence.scheduled) }
 
