@@ -184,7 +184,7 @@ KakeibotApp/
 | `Features/Screens/Pro/` | Pro の画面と購入のモデル |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
-| `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
+| `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート。`Model/` に版、`View/` にシートとカードとページ送り、`Parts/` に使い方のコマ |
 | `Features/Shared/Bill/` | これからの引き落としの行・月のページとタブ・見込みと確定の印と、その言葉 |
 | `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
 | `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
