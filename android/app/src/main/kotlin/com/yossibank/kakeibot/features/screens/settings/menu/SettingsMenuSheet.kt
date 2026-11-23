@@ -31,19 +31,18 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
-import com.yossibank.kakeibot.features.screens.settings.period.MonthStartView
-import com.yossibank.kakeibot.features.screens.settings.period.WeekStartView
-import com.yossibank.kakeibot.features.screens.settings.period.title
-import com.yossibank.kakeibot.features.screens.settings.recurrings.RecurringListView
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHintButton
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroCard
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroNote
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsRow
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsScreenFlag
+import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
+import com.yossibank.kakeibot.features.screens.settings.monthstartday.title
+import com.yossibank.kakeibot.features.screens.settings.recurring.RecurringListView
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNote
+import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsScreenFlag
+import com.yossibank.kakeibot.features.shared.settingsparts.input.SettingsRow
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -159,7 +158,7 @@ fun SettingsMenuSheet(
                     ),
                 )
 
-                MonthStartView(
+                MonthStartDayView(
                     selection = model.monthStartDay,
                     today = today,
                     onSelect = { day ->
@@ -174,7 +173,7 @@ fun SettingsMenuSheet(
             }
 
             Screen.WeekStart -> {
-                WeekStartView(
+                SettingsMenuWeekStart(
                     selection = model.weekStart,
                     onSelect = { weekday ->
                         scope.launch {

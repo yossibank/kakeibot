@@ -82,6 +82,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | テスト | 置き場所 |
 | --- | --- |
 | `Store/Queries`・`Store/Writes` | `Methods/`・`Types/` に分けない |
+| `Store/Records` | `Protocols/`・`Rows/`・`SettingKeys/`・`Values/` に分けない |
 | `Store/Sync` | `Share/`・`Change/` に分ける |
 | `TestSupport` のテスト | `TestSupport` にテストのターゲットが無いので、`FeaturesTests/Shared/` に置く |
 | `Notifications` のテスト | テストのターゲットが無いので、`AppFeatureTests/Notifications/` に置く |

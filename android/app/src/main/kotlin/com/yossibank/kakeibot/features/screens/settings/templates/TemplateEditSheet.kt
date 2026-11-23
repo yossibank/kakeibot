@@ -65,11 +65,11 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.settingsparts.ChoiceChip
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
-import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
+import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
