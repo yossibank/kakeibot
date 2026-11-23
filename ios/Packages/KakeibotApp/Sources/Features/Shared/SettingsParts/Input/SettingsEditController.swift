@@ -2,21 +2,6 @@ import Store
 import SwiftUI
 
 @MainActor
-protocol SettingsEditing: AnyObject {
-    var isChanged: Bool { get }
-    var isHidden: Bool { get }
-    var canSave: Bool { get }
-
-    func setHidden(_ isHidden: Bool) async -> Bool
-    func delete() async -> Deletion?
-}
-
-struct SettingsEditPrompt {
-    var isConfirmingDiscard = false
-    var isConfirmingHideChanges = false
-}
-
-@MainActor
 struct SettingsEditController<Model: SettingsEditing> {
     let model: Model
     let prompt: Binding<SettingsEditPrompt>

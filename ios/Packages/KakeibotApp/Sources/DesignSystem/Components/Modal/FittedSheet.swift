@@ -57,7 +57,7 @@ extension FittedDetent: UIViewControllerRepresentable {
     }
 }
 
-final class FittedDetentController: UIViewController {
+private final class FittedDetentController: UIViewController {
     var height: CGFloat = 0 {
         didSet {
             if height != oldValue {
