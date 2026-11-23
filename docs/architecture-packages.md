@@ -187,9 +187,9 @@ KakeibotApp/
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート |
 | `Features/Shared/Bill/` | これからの引き落としの行・月のページとタブ・見込みと確定の印と、その言葉 |
 | `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
-| `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値 |
+| `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
-| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）と、文言に出す端末の名前（iPhone か iPad） |
+| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、読み込みの状態、文言に出す端末の名前（iPhone か iPad）。設定を 1 つ保存して、失敗したら戻す形と、その言葉 |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今に戻るボタン |

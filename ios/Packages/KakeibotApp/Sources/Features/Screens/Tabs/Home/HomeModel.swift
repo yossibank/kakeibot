@@ -13,6 +13,13 @@ public final class HomeModel: ScreenModel {
         }
     }
 
+    public var today: LocalDate {
+        didSet {
+            updateOverview()
+            updateTemplates()
+        }
+    }
+
     public var billPage = 0
 
     public private(set) var isListFailed = false
@@ -23,6 +30,13 @@ public final class HomeModel: ScreenModel {
 
     public private(set) var templateOrder: TemplateOrder = .manual {
         didSet {
+            updateTemplates()
+        }
+    }
+
+    public private(set) var list: EntryList? {
+        didSet {
+            updateOverview()
             updateTemplates()
         }
     }
@@ -40,10 +54,9 @@ public final class HomeModel: ScreenModel {
         }
     }
 
-    private var input: Input {
+    private var input = Input() {
         didSet {
             updateOverview()
-            updateTemplates()
         }
     }
 
@@ -54,7 +67,7 @@ public final class HomeModel: ScreenModel {
         today: LocalDate
     ) {
         self.database = database
-        self.input = Input(today: today)
+        self.today = today
 
         self.overview = MonthOverview(
             list: nil,
@@ -68,19 +81,6 @@ public final class HomeModel: ScreenModel {
 
 public extension HomeModel {
     static let recentLimit = 5
-
-    var today: LocalDate {
-        get {
-            input.today
-        }
-        set {
-            input.today = newValue
-        }
-    }
-
-    var list: EntryList? {
-        input.list
-    }
 
     var monthStartDay: MonthStartDay {
         input.monthStartDay
@@ -126,7 +126,7 @@ public extension HomeModel {
             {
                 await self.observe(
                     self.database.entryListUpdates(),
-                    into: \.input.list,
+                    into: \.list,
                     failing: \.isListFailed
                 )
             },
@@ -174,7 +174,7 @@ public extension HomeModel {
 
     func load() async {
         do {
-            input.list = try await database.entryList()
+            list = try await database.entryList()
             input.recurrings = try await database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
@@ -256,12 +256,10 @@ extension HomeModel {
 
 private extension HomeModel {
     struct Input {
-        var list: EntryList?
         var budgets: [Budget] = []
         var recurrings: [Recurring] = []
         var monthStartDay: MonthStartDay = .first
         var carryoverFrom: YearMonth?
-        var today: LocalDate
     }
 
     static let saveFailedMessage = "記録できませんでした"
@@ -288,19 +286,19 @@ private extension HomeModel {
     }
 
     func updateOverview() {
-        let bills = input.list?.upcomingCardBills(
+        let bills = list?.upcomingCardBills(
             recurrings: input.recurrings,
-            after: input.today,
+            after: today,
             count: BillPage.limit
         )
 
         overview = MonthOverview(
-            list: input.list,
+            list: list,
             budgets: input.budgets,
             recurrings: input.recurrings,
             monthStartDay: input.monthStartDay,
             carryoverFrom: input.carryoverFrom,
-            today: input.today
+            today: today
         )
 
         billPages = BillPage.pages(of: bills ?? [])

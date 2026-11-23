@@ -37,13 +37,6 @@ public final class CategoryEditModel {
     }
 }
 
-extension CategoryEditModel {
-    struct Snapshot: Equatable {
-        let draft: EntryCategoryDraft
-        let tags: [EntryTagDraft]
-    }
-}
-
 public extension CategoryEditModel {
     struct EditingTag: Identifiable, Hashable, Sendable {
         public let id: UUID
@@ -167,6 +160,13 @@ public extension CategoryEditModel {
             errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
+    }
+}
+
+extension CategoryEditModel {
+    struct Snapshot: Equatable {
+        let draft: EntryCategoryDraft
+        let tags: [EntryTagDraft]
     }
 }
 
