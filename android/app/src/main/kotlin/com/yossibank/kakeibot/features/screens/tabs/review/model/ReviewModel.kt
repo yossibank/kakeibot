@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.core.concepts.review.ReviewSummary
+import com.yossibank.kakeibot.features.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -62,7 +63,7 @@ class ReviewModel(
 
             return when (scale) {
                 ReviewPeriod.Scale.week -> {
-                    "${range.start.monthDayText}〜${range.endInclusive.monthDayText}"
+                    PeriodText.range(range)
                 }
 
                 ReviewPeriod.Scale.month -> {
@@ -78,10 +79,7 @@ class ReviewModel(
         }
 
     val rangeText: String
-        get() {
-            val range = period.range
-            return "${range.start.monthDayText}〜${range.endInclusive.monthDayText}"
-        }
+        get() = PeriodText.range(period.range)
 
     val summary: ReviewSummary
         get() = ReviewSummary(

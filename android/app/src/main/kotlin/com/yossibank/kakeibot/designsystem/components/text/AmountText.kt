@@ -111,3 +111,6 @@ fun AmountText(
         style = style.copy(fontFeatureSettings = "tnum"),
     )
 }
+
+val Long.clamped: Int
+    get() = coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()

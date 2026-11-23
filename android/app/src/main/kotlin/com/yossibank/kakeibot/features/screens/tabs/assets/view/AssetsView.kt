@@ -22,8 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
@@ -214,6 +216,3 @@ private fun Hairline() {
             .background(Palette.line),
     )
 }
-
-private val Long.clamped: Int
-    get() = coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()

@@ -34,9 +34,11 @@ import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
+import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.features.shared.settingsparts.ChoiceChip
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
 
@@ -61,7 +63,7 @@ fun RecurringQuickCard(
             )
         }
 
-        if (model.type != Entry.Kind.transfer) {
+        if (model.form.type != Entry.Kind.transfer) {
             SettingsDivider()
 
             Section(title = "カテゴリ") {
@@ -69,7 +71,7 @@ fun RecurringQuickCard(
                     model.categories.forEach { category ->
                         ChoiceChip(
                             title = category.name,
-                            isSelected = category.id == model.categoryId,
+                            isSelected = category.id == model.form.categoryId,
                             onSelect = { model.select(category = category.id) },
                         ) {
                             IconTile(
@@ -87,7 +89,7 @@ fun RecurringQuickCard(
         Section(title = model.walletTitle) {
             WalletChips(
                 model = model,
-                selection = model.walletId,
+                selection = model.form.walletId,
                 onSelect = { model.select(wallet = it) },
             )
 
@@ -96,14 +98,14 @@ fun RecurringQuickCard(
             }
         }
 
-        if (model.type == Entry.Kind.transfer) {
+        if (model.form.type == Entry.Kind.transfer) {
             SettingsDivider()
 
-            Section(title = RecurringEditModel.DESTINATION_TITLE) {
+            Section(title = EntryText.destinationTitle) {
                 WalletChips(
                     model = model,
-                    selection = model.toWalletId,
-                    onSelect = { model.toWalletId = it },
+                    selection = model.form.toWalletId,
+                    onSelect = { id -> model.update { copy(toWalletId = id) } },
                 )
             }
         }
@@ -152,7 +154,7 @@ private fun AmountButton(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 52.dp)
+            .heightIn(min = Metrics.rowMinHeight)
             .clickable(onClick = onSelect),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -223,8 +225,8 @@ private fun BillShiftChips(model: RecurringEditModel) {
 
                 ChoiceChip(
                     title = date?.let { "$title・${Recurring.billText(paidOn = it)}" } ?: title,
-                    isSelected = model.billShift == index,
-                    onSelect = { model.billShift = index },
+                    isSelected = model.form.billShift == index,
+                    onSelect = { model.update { copy(billShift = index) } },
                 )
             }
         }
@@ -254,9 +256,9 @@ private fun Schedule(model: RecurringEditModel) {
 
             Text(
                 text = RecurringText.schedule(
-                    frequency = model.frequency,
-                    month = model.month,
-                    day = model.day,
+                    frequency = model.form.frequency,
+                    month = model.form.month,
+                    day = model.form.day,
                 ),
                 color = Palette.accentStrong,
                 style = textFont(style = FontTextStyle.Footnote),
@@ -275,13 +277,13 @@ private fun Schedule(model: RecurringEditModel) {
 
         if (model.isScheduleOpen) {
             SegmentSwitch(
-                selection = model.frequency,
+                selection = model.form.frequency,
                 options = frequencies,
-                onSelect = { model.frequency = it },
+                onSelect = { frequency -> model.update { copy(frequency = frequency) } },
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            if (model.frequency == Recurring.Frequency.yearly) {
+            if (model.form.frequency == Recurring.Frequency.yearly) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -289,8 +291,8 @@ private fun Schedule(model: RecurringEditModel) {
                     (1..12).forEach { month ->
                         ChoiceChip(
                             title = "$month 月",
-                            isSelected = model.month == month,
-                            onSelect = { model.month = month },
+                            isSelected = model.form.month == month,
+                            onSelect = { model.update { copy(month = month) } },
                             modifier = Modifier.widthIn(min = 64.dp),
                         )
                     }
@@ -298,8 +300,8 @@ private fun Schedule(model: RecurringEditModel) {
             }
 
             DayGrid(
-                selection = model.day,
-                onSelect = { model.day = it },
+                selection = model.form.day,
+                onSelect = { day -> model.update { copy(day = day) } },
             )
         }
     }

@@ -47,17 +47,20 @@ import com.yossibank.kakeibot.designsystem.components.budget.carryoverText
 import com.yossibank.kakeibot.designsystem.components.budget.remainingText
 import com.yossibank.kakeibot.designsystem.components.budget.tint
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
+import com.yossibank.kakeibot.designsystem.components.modal.UndoNoticeState
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
+import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsIntroCard
@@ -79,149 +82,150 @@ fun BudgetListView(
         remember(database) { SettingsScreenFlag.closedHint(SettingsScreen.budgets, database) }
     val scope = rememberCoroutineScope()
 
-    var cleared by remember { mutableStateOf<BudgetListModel.Cleared?>(null) }
-    var resetFrom by remember { mutableStateOf<YearMonth?>(null) }
+    val cleared = remember { UndoNoticeState<BudgetListModel.Cleared>() }
+    val resetFrom = remember { UndoNoticeState<YearMonth>() }
 
     LaunchedEffect(model, today) {
         model.observe(today = today)
     }
 
+    cleared.Timer()
+    resetFrom.Timer()
+
     BackHandler(onBack = onBack)
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Palette.background)
-            .pointerInput(Unit) {},
-    ) {
-        Column(
-            modifier = Modifier
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 12.dp,
-                ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SettingsHeader(
-                title = "予算",
-                isRoot = false,
-                onBack = onBack,
-            ) {
-                SettingsHintButton(flag = hint)
-            }
-
-            SettingsIntroCard(
-                icon = R.drawable.ic_glyph_budget,
-                headline = "月に使う額を" to "カテゴリ別に決めます",
-                flag = hint,
-                notes = listOf(
-                    SettingsIntroNote(R.drawable.ic_calendar, "変えた額はこの月から使います"),
-                    SettingsIntroNote(R.drawable.ic_repeat, "前の月の額はそのまま残ります"),
-                ),
+    SettingsFrame(
+        title = "予算",
+        isRoot = false,
+        onBack = onBack,
+        trailing = { SettingsHintButton(flag = hint) },
+        overlay = {
+            BudgetNotices(
+                model = model,
+                cleared = cleared,
+                resetFrom = resetFrom,
+                modifier = Modifier.align(Alignment.BottomCenter),
             )
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(bottom = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                TotalCard(
-                    model = model,
-                    onEdit = { model.startEditing(BudgetListModel.Target.Total) },
-                    onReset = {
-                        scope.launch { resetFrom = model.resetCarryover() }
-                    },
-                )
-
-                SettingsSwitch(
-                    title = "残りを繰り越す",
-                    detail = "使いすぎた分は、次の月の予算から引きます",
-                    icon = R.drawable.ic_repeat,
-                    isOn = model.isCarryoverOn,
-                    onChange = { isOn ->
-                        scope.launch { model.setCarryover(isOn) }
-                    },
-                )
-
-                if (model.budgeted.isNotEmpty()) {
-                    Section(
-                        title = "カテゴリごと",
-                        note = "合計 ${AmountText.text(amount = model.categoriesTotal)}",
-                    ) {
-                        RowsCard(categories = model.budgeted) { category ->
-                            CategoryRow(
-                                model = model,
-                                category = category,
-                            )
-                        }
-                    }
-                }
-
-                if (model.unbudgeted.isNotEmpty()) {
-                    Section(
-                        title = "予算なし",
-                        note = "${model.unbudgeted.size} カテゴリ",
-                    ) {
-                        RowsCard(categories = model.unbudgeted) { category ->
-                            PlainRow(
-                                model = model,
-                                category = category,
-                            )
-                        }
-                    }
-                }
-            }
-        }
+            BudgetKeypadDrawer(
+                model = model,
+                onCleared = cleared::show,
+            )
+        },
+    ) {
+        SettingsIntroCard(
+            icon = R.drawable.ic_glyph_budget,
+            headline = "月に使う額を" to "カテゴリ別に決めます",
+            flag = hint,
+            notes = listOf(
+                SettingsIntroNote(R.drawable.ic_calendar, "変えた額はこの月から使います"),
+                SettingsIntroNote(R.drawable.ic_repeat, "前の月の額はそのまま残ります"),
+            ),
+        )
 
         Column(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp,
-                ),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 96.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            cleared?.let { current ->
-                SettingsUndoNotice(
-                    message = "${current.target.title}をなくしました",
-                    icon = R.drawable.ic_trash,
-                    onUndo = { scope.launch { model.restore(current) } },
-                    onClose = { cleared = null },
-                )
+            TotalCard(
+                model = model,
+                onEdit = { model.startEditing(BudgetListModel.Target.Total) },
+                onReset = {
+                    scope.launch { model.resetCarryover()?.let(resetFrom::show) }
+                },
+            )
+
+            SettingsSwitch(
+                title = "残りを繰り越す",
+                detail = "使いすぎた分は、次の月の予算から引きます",
+                icon = R.drawable.ic_repeat,
+                isOn = model.isCarryoverOn,
+                onChange = { isOn ->
+                    scope.launch { model.setCarryover(isOn) }
+                },
+            )
+
+            if (model.budgeted.isNotEmpty()) {
+                Section(
+                    title = "カテゴリごと",
+                    note = "合計 ${AmountText.text(amount = model.categoriesTotal)}",
+                ) {
+                    RowsCard(categories = model.budgeted) { category ->
+                        CategoryRow(
+                            model = model,
+                            category = category,
+                        )
+                    }
+                }
             }
 
-            resetFrom?.let { start ->
-                SettingsUndoNotice(
-                    message = "繰越を 0 に戻しました",
-                    icon = R.drawable.ic_repeat,
-                    onUndo = { scope.launch { model.restoreCarryover(from = start) } },
-                    onClose = { resetFrom = null },
-                )
-            }
-
-            if (model.message.isNotEmpty() && model.editing == null) {
-                Text(
-                    text = model.message,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .card()
-                        .padding(12.dp),
-                    color = Palette.rose,
-                    style = textFont(style = FontTextStyle.Caption),
-                )
+            if (model.unbudgeted.isNotEmpty()) {
+                Section(
+                    title = "予算なし",
+                    note = "${model.unbudgeted.size} カテゴリ",
+                ) {
+                    RowsCard(categories = model.unbudgeted) { category ->
+                        PlainRow(
+                            model = model,
+                            category = category,
+                        )
+                    }
+                }
             }
         }
+    }
+}
 
-        BudgetKeypadDrawer(
-            model = model,
-            onCleared = { cleared = it },
-        )
+@Composable
+private fun BudgetNotices(
+    model: BudgetListModel,
+    cleared: UndoNoticeState<BudgetListModel.Cleared>,
+    resetFrom: UndoNoticeState<YearMonth>,
+    modifier: Modifier = Modifier,
+) {
+    val scope = rememberCoroutineScope()
+
+    Column(
+        modifier = modifier
+            .navigationBarsPadding()
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp,
+            ),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        cleared.current?.let { current ->
+            SettingsUndoNotice(
+                message = "${current.target.title}をなくしました",
+                icon = R.drawable.ic_trash,
+                onUndo = { scope.launch { model.restore(current) } },
+                onClose = cleared::dismiss,
+            )
+        }
+
+        resetFrom.current?.let { start ->
+            SettingsUndoNotice(
+                message = "繰越を 0 に戻しました",
+                icon = R.drawable.ic_repeat,
+                onUndo = { scope.launch { model.restoreCarryover(from = start) } },
+                onClose = resetFrom::dismiss,
+            )
+        }
+
+        if (model.message.isNotEmpty() && model.editing == null) {
+            Text(
+                text = model.message,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .card()
+                    .padding(12.dp),
+                color = Palette.rose,
+                style = textFont(style = FontTextStyle.Caption),
+            )
+        }
     }
 }
 
@@ -406,7 +410,7 @@ private fun CategoryRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 52.dp)
+            .heightIn(min = Metrics.rowMinHeight)
             .clickable { model.startEditing(BudgetListModel.Target.Category(category)) }
             .padding(vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),

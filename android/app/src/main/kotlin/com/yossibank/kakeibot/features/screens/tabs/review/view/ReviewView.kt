@@ -38,11 +38,15 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.title
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
+import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -52,6 +56,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.review.model.ReviewModel
+import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.roundToInt
 
@@ -103,7 +108,12 @@ fun ReviewView(
         }
 
         item(key = "period") {
-            PeriodHeader(model = model)
+            PeriodStepper(
+                title = model.title,
+                onPrevious = { model.move(count = -1) },
+                onNext = { model.move(count = 1) },
+                caption = model.rangeText.takeIf { model.scale != ReviewPeriod.Scale.week },
+            )
         }
 
         item(key = "totals") {
@@ -113,66 +123,6 @@ fun ReviewView(
         item(key = "breakdown") {
             BreakdownCard(model = model)
         }
-    }
-}
-
-@Composable
-private fun PeriodHeader(model: ReviewModel) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        PeriodButton(
-            rotation = 180f,
-            onSelect = { model.move(count = -1) },
-        )
-
-        Column(
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = model.title,
-                color = Palette.accentStrong,
-                style = displayFont(size = FontSize.Headline),
-            )
-
-            if (model.scale != ReviewPeriod.Scale.week) {
-                Text(
-                    text = model.rangeText,
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption),
-                )
-            }
-        }
-
-        PeriodButton(
-            rotation = 0f,
-            onSelect = { model.move(count = 1) },
-        )
-    }
-}
-
-@Composable
-private fun PeriodButton(
-    rotation: Float,
-    onSelect: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .clickable(onClick = onSelect),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_chevron_right),
-            contentDescription = null,
-            modifier = Modifier
-                .size(24.dp)
-                .rotate(rotation),
-            tint = Palette.accent,
-        )
     }
 }
 
@@ -197,7 +147,7 @@ private fun TotalsCard(model: ReviewModel) {
             modifier = Modifier.weight(1f),
         )
 
-        Separator()
+        VerticalRule()
 
         Total(
             title = "収入",
@@ -206,7 +156,7 @@ private fun TotalsCard(model: ReviewModel) {
             modifier = Modifier.weight(1f),
         )
 
-        Separator()
+        VerticalRule()
 
         Column(
             modifier = Modifier.weight(1f),
@@ -294,7 +244,7 @@ private fun BreakdownCard(model: ReviewModel) {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = if (model.kind == Entry.Kind.income) "収入" else "支出",
+                    text = model.kind.title,
                     color = Palette.subtext,
                     style = textFont(style = FontTextStyle.Caption),
                 )
@@ -330,12 +280,7 @@ private fun BreakdownCard(model: ReviewModel) {
 
         Column(modifier = Modifier.fillMaxWidth()) {
             rows.forEach { row ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Palette.line),
-                )
+                Hairline()
 
                 CategoryRow(row = row)
             }
@@ -436,16 +381,6 @@ private fun Donut(rows: List<ReviewModel.Row>) {
     }
 }
 
-@Composable
-private fun Separator() {
-    Box(
-        modifier = Modifier
-            .width(1.dp)
-            .height(28.dp)
-            .background(Palette.line),
-    )
-}
-
 private const val DONUT_SLICES = 5
 private const val GAP_DEGREES = 1.5f
 
@@ -455,10 +390,4 @@ private val scales = listOf(
     ReviewPeriod.Scale.year to "年",
 )
 
-private val kinds = listOf(
-    Entry.Kind.expense to "支出",
-    Entry.Kind.income to "収入",
-)
-
-private val Long.clamped: Int
-    get() = coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
+private val kinds = listOf(Entry.Kind.expense, Entry.Kind.income).map { it to it.title }

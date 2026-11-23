@@ -8,6 +8,7 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.features.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.features.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.monthOverviewUpdates
 import com.yossibank.kakeibot.store.queries.types.MonthOverview
@@ -24,7 +25,7 @@ class HomeModel(
     val periodText: String
         get() {
             val period = overview?.period ?: return ""
-            return "${period.start.monthDayText}〜${period.endInclusive.monthDayText}"
+            return PeriodText.range(period)
         }
 
     val usage: BudgetUsage?

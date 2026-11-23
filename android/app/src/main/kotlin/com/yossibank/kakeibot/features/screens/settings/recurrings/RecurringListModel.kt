@@ -10,6 +10,8 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.nextDate
 import com.yossibank.kakeibot.core.concepts.recurring.total
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.designsystem.components.text.clamped
+import com.yossibank.kakeibot.features.shared.model.ModelTask
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
@@ -34,19 +36,23 @@ import java.time.Instant
 
 class RecurringListModel(
     private val database: AppDatabase,
-    val today: LocalDate,
+    today: LocalDate,
 ) {
+    var today: LocalDate by mutableStateOf(today)
+
     var type: Entry.Kind by mutableStateOf(Entry.Kind.expense)
 
     var movingOrder: List<Identifier<Recurring>>? by mutableStateOf(null)
         private set
 
-    var message: String by mutableStateOf("")
-        private set
-
     private var recurrings: List<Recurring> by mutableStateOf(emptyList())
     private var list: EntryList? by mutableStateOf(null)
     private var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
+
+    private val task = ModelTask()
+
+    val message: String
+        get() = task.message
 
     val visible: List<Recurring>
         get() = recurrings(isHidden = false)
@@ -143,7 +149,7 @@ class RecurringListModel(
         val order = movingOrder ?: return
         val others = recurrings.map { it.id }.filter { it !in order }
 
-        run {
+        task.attempt(failure = ModelTask.saveFailed) {
             database.reorderRecurrings(
                 ids = order + others,
                 at = Instant.now(),
@@ -163,18 +169,13 @@ class RecurringListModel(
         isHidden = false,
     )
 
-    suspend fun delete(id: Identifier<Recurring>): Deletion? {
-        var deletion: Deletion? = null
-
-        run {
-            deletion = database.deleteRecurring(
+    suspend fun delete(id: Identifier<Recurring>): Deletion? =
+        task.attempt(failure = ModelTask.saveFailed) {
+            database.deleteRecurring(
                 id = id,
                 at = Instant.now(),
             )
         }
-
-        return deletion
-    }
 
     suspend fun deleteHidden(): Deletion? {
         val ids = hidden.map { it.id }
@@ -183,51 +184,38 @@ class RecurringListModel(
             return null
         }
 
-        var deletion: Deletion? = null
-
-        run {
-            deletion = database.deleteRecurrings(
+        return task.attempt(failure = ModelTask.saveFailed) {
+            database.deleteRecurrings(
                 ids = ids,
                 at = Instant.now(),
             )
         }
-
-        return deletion
     }
 
     suspend fun restore(deletion: Deletion) {
-        run(failure = RESTORE_FAILED) {
+        task.attempt(failure = ModelTask.restoreFailed) {
             database.restore(deletion)
         }
     }
 
     fun clearMessage() {
-        message = ""
+        task.clear()
     }
 
     private suspend fun setHidden(
         id: Identifier<Recurring>,
         isHidden: Boolean,
-    ): Boolean = run {
-        database.setRecurringHidden(
-            id = id,
-            isHidden = isHidden,
-            today = today,
-            at = Instant.now(),
-        )
-    }
+    ): Boolean {
+        val done = task.attempt(failure = ModelTask.saveFailed) {
+            database.setRecurringHidden(
+                id = id,
+                isHidden = isHidden,
+                today = today,
+                at = Instant.now(),
+            )
+        }
 
-    private suspend fun run(
-        failure: String = SAVE_FAILED,
-        action: suspend () -> Unit,
-    ): Boolean = try {
-        action()
-        true
-    } catch (error: CancellationException) {
-        throw error
-    } catch (_: Exception) {
-        message = failure
-        false
+        return done != null
     }
 
     private fun recurrings(isHidden: Boolean): List<Recurring> = recurrings.filter { recurring ->
@@ -258,8 +246,7 @@ class RecurringListModel(
                 .amount(
                     of = of,
                     on = next ?: today,
-                ).coerceAtMost(Int.MAX_VALUE.toLong())
-                .toInt(),
+                ).clamped,
             type = of.type,
             icon = list.icon(of = of),
             next = next,
@@ -268,9 +255,6 @@ class RecurringListModel(
     }
 
     companion object {
-        private const val SAVE_FAILED = "保存できませんでした"
-        private const val RESTORE_FAILED = "元に戻せませんでした"
-
         fun title(type: Entry.Kind): String = if (type == Entry.Kind.transfer) "振替" else "固定費"
     }
 }

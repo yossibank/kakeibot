@@ -14,6 +14,7 @@ import com.yossibank.kakeibot.core.concepts.entry.incomeTotal
 import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
 import com.yossibank.kakeibot.features.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.features.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -74,8 +75,11 @@ class RecordsModel(
     val period: ClosedRange<LocalDate>
         get() = shownMonth.period(startingOn = monthStartDay)
 
+    val monthTitle: String
+        get() = "${shownMonth.year}年 ${shownMonth.month}月"
+
     val periodText: String
-        get() = "${period.start.monthDayText}〜${period.endInclusive.monthDayText}"
+        get() = PeriodText.range(period)
 
     val days: List<EntryDay>
         get() = list?.days?.within(period) ?: emptyList()

@@ -1,0 +1,126 @@
+package com.yossibank.kakeibot.designsystem.components.modal
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
+import com.yossibank.kakeibot.R
+import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
+import com.yossibank.kakeibot.designsystem.theme.Emphasis
+import com.yossibank.kakeibot.designsystem.theme.FontSize
+import com.yossibank.kakeibot.designsystem.theme.Metrics
+import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.designsystem.theme.displayFont
+import com.yossibank.kakeibot.designsystem.theme.opacity
+
+@Composable
+fun <Item : Any> BottomDrawer(
+    item: Item?,
+    title: (Item) -> String,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+    padding: PaddingValues = PaddingValues(16.dp),
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    content: @Composable ColumnScope.(Item) -> Unit,
+) {
+    var last by remember { mutableStateOf(item) }
+
+    if (item != null) {
+        last = item
+    }
+
+    AnimatedVisibility(
+        visible = item != null,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Palette.scrim.opacity(Emphasis.Muted))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onClose,
+                ),
+        )
+    }
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        AnimatedVisibility(
+            visible = item != null,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it },
+        ) {
+            val current = last ?: return@AnimatedVisibility
+
+            val shape = RoundedCornerShape(
+                topStart = Metrics.drawerCorner,
+                topEnd = Metrics.drawerCorner,
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape)
+                    .background(Palette.backgroundTop)
+                    .border(
+                        width = 1.dp,
+                        color = Palette.accent.opacity(Emphasis.Soft),
+                        shape = shape,
+                    ).pointerInput(Unit) {}
+                    .navigationBarsPadding()
+                    .padding(padding),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = horizontalAlignment,
+            ) {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = title(current),
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Palette.accentStrong,
+                        maxLines = 1,
+                        style = displayFont(size = FontSize.Body),
+                    )
+
+                    CircleIconButton(
+                        icon = R.drawable.ic_close,
+                        onClick = onClose,
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                    )
+                }
+
+                content(current)
+            }
+        }
+    }
+}

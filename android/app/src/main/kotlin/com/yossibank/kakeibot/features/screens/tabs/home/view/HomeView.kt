@@ -32,14 +32,18 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.budget.budgetText
 import com.yossibank.kakeibot.designsystem.components.dial.HalfDial
 import com.yossibank.kakeibot.designsystem.components.entry.EntryRow
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
+import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.home.model.HomeModel
+import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
 import com.yossibank.kakeibot.features.shared.settingsparts.RoundIconButton
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.abs
@@ -164,7 +168,7 @@ private fun BudgetCard(
                 modifier = Modifier.weight(1f),
             )
 
-            Separator()
+            VerticalRule()
 
             Stat(
                 title = "今月の支出",
@@ -173,7 +177,7 @@ private fun BudgetCard(
                 modifier = Modifier.weight(1f),
             )
 
-            Separator()
+            VerticalRule()
 
             Stat(
                 title = "今月の収入",
@@ -310,39 +314,10 @@ private fun RecentCard(
         rows.forEach { row ->
             Hairline()
 
-            EntryRow(
-                icon = row.icon,
-                title = row.title,
-                detail = row.detail,
-                amount = row.amount,
-                type = row.type,
-                modifier = Modifier.clickable { onOpenEntry(row.id) },
-                memo = row.memo,
-                isRecurring = row.isRecurring,
+            EntryItemRow(
+                item = row,
+                onOpen = { onOpenEntry(row.id) },
             )
         }
     }
 }
-
-@Composable
-private fun Hairline() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Palette.line),
-    )
-}
-
-@Composable
-private fun Separator() {
-    Box(
-        modifier = Modifier
-            .width(1.dp)
-            .height(28.dp)
-            .background(Palette.line),
-    )
-}
-
-private val Long.clamped: Int
-    get() = coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()

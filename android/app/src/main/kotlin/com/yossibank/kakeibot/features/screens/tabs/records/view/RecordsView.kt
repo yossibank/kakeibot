@@ -46,14 +46,19 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.date.shortName
 import com.yossibank.kakeibot.designsystem.components.entry.EntryRow
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
+import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.records.model.RecordsModel
+import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
+import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
@@ -99,7 +104,12 @@ fun RecordsView(
         }
 
         item(key = "month") {
-            MonthHeader(model = model)
+            PeriodStepper(
+                title = model.monthTitle,
+                onPrevious = { model.move(months = -1) },
+                onNext = { model.move(months = 1) },
+                caption = model.periodText,
+            )
         }
 
         item(key = "summary") {
@@ -155,69 +165,9 @@ fun RecordsView(
 }
 
 @Composable
-private fun MonthHeader(model: RecordsModel) {
-    val month = model.shownMonth
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MonthButton(
-            rotation = 180f,
-            onSelect = { model.move(months = -1) },
-        )
-
-        Column(
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "${month.year}年 ${month.month}月",
-                color = Palette.accentStrong,
-                style = displayFont(size = FontSize.Headline),
-            )
-
-            Text(
-                text = model.periodText,
-                color = Palette.subtext,
-                style = textFont(style = FontTextStyle.Caption),
-            )
-        }
-
-        MonthButton(
-            rotation = 0f,
-            onSelect = { model.move(months = 1) },
-        )
-    }
-}
-
-@Composable
-private fun MonthButton(
-    rotation: Float,
-    onSelect: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .clickable(onClick = onSelect),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_chevron_right),
-            contentDescription = null,
-            modifier = Modifier
-                .size(24.dp)
-                .rotate(rotation),
-            tint = Palette.accent,
-        )
-    }
-}
-
-@Composable
 private fun SummaryCard(model: RecordsModel) {
-    val expense = model.expenseTotal.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
-    val income = model.incomeTotal.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+    val expense = model.expenseTotal.clamped
+    val income = model.incomeTotal.clamped
     val balance = income - expense
 
     Column(
@@ -238,12 +188,7 @@ private fun SummaryCard(model: RecordsModel) {
                 modifier = Modifier.weight(1f),
             )
 
-            Box(
-                modifier = Modifier
-                    .width(1.dp)
-                    .height(20.dp)
-                    .background(Palette.line),
-            )
+            VerticalRule(height = 20.dp)
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -255,12 +200,7 @@ private fun SummaryCard(model: RecordsModel) {
             )
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Palette.line),
-        )
+        Hairline()
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -340,22 +280,11 @@ private fun DayCard(
         }
 
         model.rows(of = day).forEach { row ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(Palette.line),
-            )
+            Hairline()
 
-            EntryRow(
-                icon = row.icon,
-                title = row.title,
-                detail = row.detail,
-                amount = row.amount,
-                type = row.type,
-                modifier = Modifier.clickable { onOpenEntry(row.id) },
-                memo = row.memo,
-                isRecurring = row.isRecurring,
+            EntryItemRow(
+                item = row,
+                onOpen = { onOpenEntry(row.id) },
             )
         }
     }

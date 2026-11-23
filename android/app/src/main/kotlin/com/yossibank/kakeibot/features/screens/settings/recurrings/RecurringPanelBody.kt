@@ -50,10 +50,10 @@ fun RecurringPanelBody(
 
         RecurringPanel.Start -> {
             MonthCalendar(
-                selection = model.startDate,
+                selection = model.form.startDate,
                 today = model.today,
-                onSelect = {
-                    model.startDate = it
+                onSelect = { date ->
+                    model.update { copy(startDate = date) }
                     onClose()
                 },
             )
@@ -82,7 +82,7 @@ fun RecurringPanelBody(
                 }
 
                 MonthCalendar(
-                    selection = model.scheduledEndDate ?: model.startDate,
+                    selection = model.scheduledEndDate ?: model.form.startDate,
                     today = model.today,
                     onSelect = {
                         model.setEnd(it)
@@ -103,7 +103,7 @@ fun RecurringPanelBody(
                     HolidayShift.entries.forEach { shift ->
                         ChoiceChip(
                             title = shift.title,
-                            isSelected = model.holidayShift == shift,
+                            isSelected = model.form.holidayShift == shift,
                             onSelect = {
                                 model.choose(shift)
                                 onClose()
@@ -123,17 +123,17 @@ fun RecurringPanelBody(
 
                 ChoiceChip(
                     title = RecurringText.closingDay(null),
-                    isSelected = model.closingDay == null,
+                    isSelected = model.form.closingDay == null,
                     onSelect = {
-                        model.closingDay = null
+                        model.update { copy(closingDay = null) }
                         onClose()
                     },
                 )
 
                 DayGrid(
-                    selection = model.closingDay,
-                    onSelect = {
-                        model.closingDay = it
+                    selection = model.form.closingDay,
+                    onSelect = { day ->
+                        model.update { copy(closingDay = day) }
                         onClose()
                     },
                 )
@@ -256,9 +256,9 @@ private fun RemindChoices(
         RecurringEditModel.remindChoices.forEach { days ->
             ChoiceChip(
                 title = RecurringText.remind(days),
-                isSelected = model.remindDaysBefore == days,
+                isSelected = model.form.remindDaysBefore == days,
                 onSelect = {
-                    model.remindDaysBefore = days
+                    model.update { copy(remindDaysBefore = days) }
                     onClose()
                 },
                 modifier = Modifier.widthIn(min = 96.dp),
