@@ -1,3 +1,5 @@
+import Core
+
 public enum SyncTable: String, CaseIterable, Sendable {
     case icon
     case wallet
@@ -25,16 +27,7 @@ public enum SyncTable: String, CaseIterable, Sendable {
         let matchesNull: Bool
     }
 
-    static let localSettingKeys: Set = [
-        "onboarding_completed",
-        "setup_card_closed",
-        "entry_opened",
-        "settings_opened",
-        "closed_hints",
-        "closed_hidden_lists",
-        "recent_searches",
-        "widget_entry"
-    ]
+    static let localSettingKeys = Setting.Key.deviceOnly
 
     var keyColumn: String {
         switch self {

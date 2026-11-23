@@ -120,7 +120,7 @@ extension YearMonth: Comparable {
     }
 }
 
-extension YearMonth: CustomStringConvertible {
+extension YearMonth: LosslessStringConvertible {
     public var description: String {
         let yearText = DateText.padded(year, digits: 4)
         let monthText = DateText.padded(month, digits: 2)
