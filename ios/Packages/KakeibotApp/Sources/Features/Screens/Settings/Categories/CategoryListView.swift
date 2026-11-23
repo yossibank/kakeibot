@@ -85,10 +85,10 @@ public struct CategoryListView: View {
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId) { id in
-                show(id)
+                controller.show(id)
             }
             .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
-                restore(deletion)
+                controller.restore(deletion)
             }
 
             if drag.lift != nil {
@@ -102,7 +102,7 @@ public struct CategoryListView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -113,13 +113,8 @@ public struct CategoryListView: View {
         ) { id in
             floatingTile(id)
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.impact(weight: .medium), trigger: drag.liftCount)
         .haptic(.selection, trigger: model.movingOrder)
@@ -143,7 +138,7 @@ public struct CategoryListView: View {
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
         ) {
-            deleteHidden()
+            controller.deleteHidden()
         }
         .task {
             await model.observe()
@@ -153,69 +148,41 @@ public struct CategoryListView: View {
 
 private extension CategoryListView {
     var board: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(model.shown) { category in
-                movableTile(category)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .frame(height: boardHeight)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            grid.width = width
+        SettingsTileBoard(
+            grid: $grid,
+            items: model.shown,
+            drag: drag,
+            space: Self.space
+        ) { category in
+            tileFace(category, isHidden: false)
+        } onTap: { category in
+            destination = .edit(category.kind, category.id)
+        } onFollow: { id, location in
+            controller.follow(id, to: location)
+        } onDrop: {
+            controller.drop()
         }
     }
 
     var hiddenSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SettingsHiddenTitle(
-                flag: hiddenList,
-                title: "非表示のカテゴリ",
-                count: model.hidden.count
-            ) {
-                isConfirmingDeleteHidden = true
-            }
-
-            if hiddenList.isOn {
-                LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
-                    ForEach(model.hidden) { category in
-                        hiddenTile(category)
-                    }
-                }
-            }
+        SettingsHiddenTiles(
+            flag: hiddenList,
+            title: "非表示のカテゴリ",
+            items: model.hidden,
+            drag: drag,
+            grid: grid,
+            space: Self.space
+        ) { category in
+            tileFace(category, isHidden: true)
+        } onTap: { category in
+            destination = .edit(category.kind, category.id)
+        } onFollow: { id, location in
+            controller.followHidden(id, to: location)
+        } onDrop: {
+            controller.dropHidden()
+        } onDeleteAll: {
+            isConfirmingDeleteHidden = true
         }
-    }
-
-    func hiddenTile(_ category: EntryCategory) -> some View {
-        let lifted = drag.hiddenOffset(of: category.id)
-        let isLifted = lifted != nil
-        let offset = lifted ?? .zero
-        let opacity: Double = isLifted ? 0 : 1
-        let layer: Double = isLifted ? 1 : 0
-
-        return tileFace(category, isHidden: true)
-            .frame(height: Self.tileHeight)
-            .opacity(opacity)
-            .animation(nil, value: isLifted)
-            .offset(offset)
-            .settingsLiftFrame(
-                drag,
-                \.hiddenFrames,
-                id: category.id,
-                in: Self.space
-            )
-            .zIndex(layer)
-            .onTapGesture {
-                destination = .edit(category.kind, category.id)
-            }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    followHidden(category.id, to: location)
-                } onEnd: {
-                    dropHidden()
-                }
-            )
     }
 
     @ViewBuilder
@@ -223,31 +190,6 @@ private extension CategoryListView {
         if let category = (model.shown + model.hidden).first(where: { $0.id == id }) {
             tileFace(category, isHidden: false)
         }
-    }
-
-    func movableTile(_ category: EntryCategory) -> some View {
-        let isLifted = drag.isLifted(category.id)
-        let index = model.shown.firstIndex(of: category) ?? 0
-        let position = isLifted ? drag.liftedCenter : grid.center(at: index)
-        let opacity: Double = isLifted ? 0 : 1
-        let layer: Double = isLifted ? 1 : 0
-
-        return tileFace(category, isHidden: false)
-            .frame(width: grid.itemWidth, height: Self.tileHeight)
-            .opacity(opacity)
-            .animation(nil, value: isLifted)
-            .position(position)
-            .zIndex(layer)
-            .onTapGesture {
-                destination = .edit(category.kind, category.id)
-            }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    follow(category, to: location)
-                } onEnd: {
-                    drop()
-                }
-            )
     }
 
     func tileFace(
@@ -280,17 +222,19 @@ private extension CategoryListView {
         .init("収入", value: .income)
     ]
 
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: spacing),
-        count: columnCount
-    )
-
     var addTitle: String {
         model.kind == .income ? "収入のカテゴリを追加" : "支出のカテゴリを追加"
     }
 
-    var boardHeight: CGFloat {
-        grid.height(slots: model.shown.count)
+    var controller: SettingsBoardController<CategoryListModel> {
+        SettingsBoardController(
+            model: model,
+            drag: drag,
+            grid: grid,
+            hiddenId: $hiddenId,
+            deletion: $deletion,
+            bulkDelete: $bulkDelete
+        )
     }
 
     func editModel(for destination: Destination) -> CategoryEditModel {

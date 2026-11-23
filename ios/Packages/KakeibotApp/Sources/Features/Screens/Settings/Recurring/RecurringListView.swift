@@ -71,10 +71,10 @@ public struct RecurringListView: View {
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId, message: "止めて非表示にしました") { id in
-                show(id)
+                controller.show(id)
             }
             .deletionNotice($deletion) { deletion in
-                restore(deletion)
+                controller.restore(deletion)
             }
 
             if drag.lift != nil {
@@ -85,7 +85,7 @@ public struct RecurringListView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -93,13 +93,8 @@ public struct RecurringListView: View {
             floatingTile(id)
         }
         .sharesTextScale(id: places)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.impact(weight: .medium), trigger: drag.liftCount)
         .haptic(.selection, trigger: model.movingOrder)
@@ -122,7 +117,7 @@ public struct RecurringListView: View {
             confirmTitle: "削除する"
         ) {
             if let deleting {
-                delete(deleting)
+                controller.delete(deleting)
             }
         }
         .confirmation(
@@ -133,7 +128,7 @@ public struct RecurringListView: View {
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
         ) {
-            deleteHidden()
+            controller.deleteHidden()
         }
         .task {
             await model.observe()
@@ -211,9 +206,9 @@ private extension RecurringListView {
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
-                    followHidden(row.id, to: location)
+                    controller.followHidden(row.id, to: location)
                 } onEnd: {
-                    dropHidden()
+                    controller.dropHidden()
                 }
             )
     }
@@ -240,7 +235,7 @@ private extension RecurringListView {
         return SwipeRow(id: row.id, openId: $openId, role: .hide) {
             destination = .edit(row.id)
         } onAction: {
-            hide(row.id)
+            controller.hide(row.id)
         } onDelete: {
             requestDelete(row.id)
         } content: {
@@ -256,7 +251,7 @@ private extension RecurringListView {
             LiftGesture(in: Self.space) { location in
                 follow(row, at: index, to: location)
             } onEnd: {
-                drop()
+                controller.drop()
             }
         )
     }

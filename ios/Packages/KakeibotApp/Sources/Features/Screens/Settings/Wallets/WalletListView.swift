@@ -78,10 +78,10 @@ public struct WalletListView: View {
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId) { id in
-                show(id)
+                controller.show(id)
             }
             .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
-                restore(deletion)
+                controller.restore(deletion)
             }
 
             if drag.lift != nil {
@@ -92,7 +92,7 @@ public struct WalletListView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -100,13 +100,8 @@ public struct WalletListView: View {
             floatingTile(id)
         }
         .sharesTextScale(id: model.shown + model.hidden)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.impact(weight: .medium), trigger: drag.liftCount)
         .haptic(.selection, trigger: model.movingOrder)
@@ -124,7 +119,7 @@ public struct WalletListView: View {
         }
         .confirmsWalletHide(balance: hidingBalance, isPresented: $isConfirmingHide) {
             if let hiding {
-                hide(hiding.id)
+                controller.hide(hiding.id)
             }
         }
         .confirmsWalletDelete(
@@ -136,7 +131,7 @@ public struct WalletListView: View {
             }
         } onConfirm: {
             if let deleting {
-                delete(deleting.id)
+                controller.delete(deleting.id)
             }
         }
         .confirmation(
@@ -147,7 +142,7 @@ public struct WalletListView: View {
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
         ) {
-            deleteHidden()
+            controller.deleteHidden()
         }
         .task {
             await model.observe()
@@ -199,9 +194,9 @@ private extension WalletListView {
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
-                    followHidden(wallet.id, to: location)
+                    controller.followHidden(wallet.id, to: location)
                 } onEnd: {
-                    dropHidden()
+                    controller.dropHidden()
                 }
             )
     }
@@ -239,7 +234,7 @@ private extension WalletListView {
         .zIndex(layer)
         .gesture(
             LiftGesture(in: Self.space) { location in
-                follow(wallet, to: location)
+                controller.follow(wallet.id, to: location)
             } onEnd: {
                 drop()
             }

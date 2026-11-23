@@ -80,10 +80,10 @@ public struct TemplateListView: View {
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId) { id in
-                show(id)
+                controller.show(id)
             }
             .deletionNotice($deletion) { deletion in
-                restore(deletion)
+                controller.restore(deletion)
             }
 
             if drag.lift != nil {
@@ -94,20 +94,15 @@ public struct TemplateListView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .settingsLiftLayer(drag, size: liftSize, scale: 1.03) { id in
             floatingTile(id)
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.impact(weight: .medium), trigger: drag.liftCount)
         .haptic(.selection, trigger: model.movingOrder)
@@ -136,7 +131,7 @@ public struct TemplateListView: View {
             confirmTitle: "削除する"
         ) {
             if let deleting {
-                delete(deleting)
+                controller.delete(deleting)
             }
         }
         .confirmation(
@@ -147,7 +142,7 @@ public struct TemplateListView: View {
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
         ) {
-            deleteHidden()
+            controller.deleteHidden()
         }
         .task {
             await model.observe()
@@ -216,9 +211,9 @@ private extension TemplateListView {
             }
             .gesture(
                 LiftGesture(in: Self.space) { location in
-                    followHidden(template.id, to: location)
+                    controller.followHidden(template.id, to: location)
                 } onEnd: {
-                    dropHidden()
+                    controller.dropHidden()
                 }
             )
     }
@@ -242,7 +237,7 @@ private extension TemplateListView {
         return SwipeRow(id: template.id, openId: $openId, role: .hide) {
             destination = .edit(template.id)
         } onAction: {
-            hide(template.id)
+            controller.hide(template.id)
         } onDelete: {
             requestDelete(template.id)
         } content: {
@@ -255,9 +250,9 @@ private extension TemplateListView {
         .zIndex(layer)
         .gesture(
             LiftGesture(in: Self.space) { location in
-                follow(template, to: location)
+                controller.follow(template.id, to: location)
             } onEnd: {
-                drop()
+                controller.drop()
             }
         )
     }
@@ -307,6 +302,21 @@ private extension TemplateListView {
 
     var liftSize: CGSize {
         CGSize(width: grid.itemWidth, height: grid.itemHeight)
+    }
+
+    var controller: SettingsBoardController<TemplateListModel> {
+        SettingsBoardController(
+            model: model,
+            drag: drag,
+            grid: grid,
+            hiddenId: $hiddenId,
+            deletion: $deletion
+        )
+    }
+
+    func requestDelete(_ id: EntryTemplate.ID) {
+        deleting = id
+        isConfirmingDelete = true
     }
 
     func editModel(for destination: Destination) -> TemplateEditModel {

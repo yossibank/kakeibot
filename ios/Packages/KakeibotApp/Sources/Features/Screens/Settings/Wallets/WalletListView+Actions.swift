@@ -22,31 +22,19 @@ extension WalletListView {
         hiding.map { model.balance(of: $0) } ?? 0
     }
 
-    func follow(
-        _ wallet: Wallet,
-        to location: CGPoint
-    ) {
-        let index = model.shown.firstIndex(of: wallet) ?? 0
-        let start = Self.grid.center(at: index)
-
-        let center = drag.follow(wallet.id, from: start, to: location) { next in
-            follow(wallet, to: next)
-        }
-
-        guard let center else {
-            return
-        }
-
-        let target = Self.grid.index(at: center, count: model.shown.count)
-
-        withAnimation(.snappy) {
-            model.move(wallet.id, to: target)
-        }
+    var controller: SettingsBoardController<WalletListModel> {
+        SettingsBoardController(
+            model: model,
+            drag: drag,
+            grid: Self.grid,
+            hiddenId: $hiddenId,
+            deletion: $deletion,
+            bulkDelete: $bulkDelete
+        )
     }
 
     func drop() {
-        switch drag.drop() {
-        case let .hide(id):
+        controller.drop { id in
             let wallet = model.shown.first { $0.id == id }
 
             withAnimation(.snappy) {
@@ -56,26 +44,12 @@ extension WalletListView {
             if let wallet {
                 requestHide(wallet)
             }
-
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-
-        case nil:
-            break
         }
     }
 
     func requestDelete(_ wallet: Wallet) {
         deleting = wallet
         isConfirmingDelete = true
-    }
-
-    func delete(_ id: Wallet.ID) {
-        Task {
-            deletion = await model.delete(id)
-        }
     }
 
     func requestHide(_ wallet: Wallet) {
@@ -85,51 +59,7 @@ extension WalletListView {
             return
         }
 
-        hide(wallet.id)
-    }
-
-    func followHidden(
-        _ id: Wallet.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
-    }
-
-    func hide(_ id: Wallet.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            let result = await model.deleteHidden()
-
-            bulkDelete = result
-            deletion = result.deletion
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: Wallet.ID) {
-        Task {
-            await model.show(id)
-        }
+        controller.hide(wallet.id)
     }
 
     func editModel(for destination: Destination) -> WalletEditModel {

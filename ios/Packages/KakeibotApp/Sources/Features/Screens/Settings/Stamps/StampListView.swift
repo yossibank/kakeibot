@@ -74,10 +74,10 @@ public struct StampListView: View {
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId) { id in
-                show(id)
+                controller.show(id)
             }
             .deletionNotice($deletion) { deletion in
-                restore(deletion)
+                controller.restore(deletion)
             }
 
             if drag.lift != nil {
@@ -91,7 +91,7 @@ public struct StampListView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -102,13 +102,8 @@ public struct StampListView: View {
         ) { id in
             floatingTile(id)
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.impact(weight: .medium), trigger: drag.liftCount)
         .haptic(.selection, trigger: model.movingOrder)
@@ -132,7 +127,7 @@ public struct StampListView: View {
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
         ) {
-            deleteHidden()
+            controller.deleteHidden()
         }
         .task {
             await model.observe()
@@ -142,69 +137,41 @@ public struct StampListView: View {
 
 private extension StampListView {
     var board: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(model.shown) { shelfIcon in
-                movableTile(shelfIcon)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .frame(height: boardHeight)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            grid.width = width
+        SettingsTileBoard(
+            grid: $grid,
+            items: model.shown,
+            drag: drag,
+            space: Self.space
+        ) { shelfIcon in
+            tileFace(shelfIcon, isHidden: false)
+        } onTap: { shelfIcon in
+            destination = .edit(shelfIcon.id)
+        } onFollow: { id, location in
+            controller.follow(id, to: location)
+        } onDrop: {
+            controller.drop()
         }
     }
 
     var hiddenSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SettingsHiddenTitle(
-                flag: hiddenList,
-                title: "非表示のスタンプ",
-                count: model.hidden.count
-            ) {
-                isConfirmingDeleteHidden = true
-            }
-
-            if hiddenList.isOn {
-                LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
-                    ForEach(model.hidden) { shelfIcon in
-                        hiddenTile(shelfIcon)
-                    }
-                }
-            }
+        SettingsHiddenTiles(
+            flag: hiddenList,
+            title: "非表示のスタンプ",
+            items: model.hidden,
+            drag: drag,
+            grid: grid,
+            space: Self.space
+        ) { shelfIcon in
+            tileFace(shelfIcon, isHidden: true)
+        } onTap: { shelfIcon in
+            destination = .edit(shelfIcon.id)
+        } onFollow: { id, location in
+            controller.followHidden(id, to: location)
+        } onDrop: {
+            controller.dropHidden()
+        } onDeleteAll: {
+            isConfirmingDeleteHidden = true
         }
-    }
-
-    func hiddenTile(_ shelfIcon: ShelfIcon) -> some View {
-        let lifted = drag.hiddenOffset(of: shelfIcon.id)
-        let isLifted = lifted != nil
-        let offset = lifted ?? .zero
-        let opacity: Double = isLifted ? 0 : 1
-        let layer: Double = isLifted ? 1 : 0
-
-        return tileFace(shelfIcon, isHidden: true)
-            .frame(height: Self.tileHeight)
-            .opacity(opacity)
-            .animation(nil, value: isLifted)
-            .offset(offset)
-            .settingsLiftFrame(
-                drag,
-                \.hiddenFrames,
-                id: shelfIcon.id,
-                in: Self.space
-            )
-            .zIndex(layer)
-            .onTapGesture {
-                destination = .edit(shelfIcon.id)
-            }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    followHidden(shelfIcon.id, to: location)
-                } onEnd: {
-                    dropHidden()
-                }
-            )
     }
 
     @ViewBuilder
@@ -212,31 +179,6 @@ private extension StampListView {
         if let shelfIcon = (model.shown + model.hidden).first(where: { $0.id == id }) {
             tileFace(shelfIcon, isHidden: false)
         }
-    }
-
-    func movableTile(_ shelfIcon: ShelfIcon) -> some View {
-        let isLifted = drag.isLifted(shelfIcon.id)
-        let index = model.shown.firstIndex(of: shelfIcon) ?? 0
-        let position = isLifted ? drag.liftedCenter : grid.center(at: index)
-        let opacity: Double = isLifted ? 0 : 1
-        let layer: Double = isLifted ? 1 : 0
-
-        return tileFace(shelfIcon, isHidden: false)
-            .frame(width: grid.itemWidth, height: Self.tileHeight)
-            .opacity(opacity)
-            .animation(nil, value: isLifted)
-            .position(position)
-            .zIndex(layer)
-            .onTapGesture {
-                destination = .edit(shelfIcon.id)
-            }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    follow(shelfIcon, to: location)
-                } onEnd: {
-                    drop()
-                }
-            )
     }
 
     func tileFace(
@@ -260,91 +202,14 @@ private extension StampListView {
     static let spacing: CGFloat = 8
     static let tileHeight: CGFloat = 78
 
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: spacing),
-        count: columnCount
-    )
-
-    var boardHeight: CGFloat {
-        grid.height(slots: model.shown.count)
-    }
-
-    func follow(
-        _ shelfIcon: ShelfIcon,
-        to location: CGPoint
-    ) {
-        let index = model.shown.firstIndex(of: shelfIcon) ?? 0
-        let start = grid.center(at: index)
-
-        let center = drag.follow(shelfIcon.id, from: start, to: location) { next in
-            follow(shelfIcon, to: next)
-        }
-
-        guard let center else {
-            return
-        }
-
-        let target = grid.index(at: center, count: model.shown.count)
-
-        withAnimation(.snappy) {
-            model.move(shelfIcon.id, to: target)
-        }
-    }
-
-    func drop() {
-        switch drag.drop() {
-        case let .hide(id):
-            hide(id)
-
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-
-        case nil:
-            break
-        }
-    }
-
-    func followHidden(
-        _ id: ShelfIcon.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
-    }
-
-    func hide(_ id: ShelfIcon.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            deletion = await model.deleteHidden().deletion
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: ShelfIcon.ID) {
-        Task {
-            await model.show(id)
-        }
+    var controller: SettingsBoardController<StampListModel> {
+        SettingsBoardController(
+            model: model,
+            drag: drag,
+            grid: grid,
+            hiddenId: $hiddenId,
+            deletion: $deletion
+        )
     }
 
     func editModel(for destination: Destination) -> StampEditModel {

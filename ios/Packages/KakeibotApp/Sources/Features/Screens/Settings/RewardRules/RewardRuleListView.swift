@@ -76,10 +76,10 @@ public struct RewardRuleListView: View {
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones($drag.zones, showing: drag.showZone)
             .settingsHideNotice($hiddenId) { id in
-                show(id)
+                controller.show(id)
             }
             .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
-                restore(deletion)
+                controller.restore(deletion)
             }
 
             if drag.lift != nil {
@@ -93,7 +93,7 @@ public struct RewardRuleListView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -104,13 +104,8 @@ public struct RewardRuleListView: View {
         ) { id in
             floatingTile(id)
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.impact(weight: .medium), trigger: drag.liftCount)
         .haptic(.selection, trigger: model.movingOrder)
@@ -134,7 +129,7 @@ public struct RewardRuleListView: View {
             keepTitle: "やめる",
             confirmTitle: "まとめて削除する"
         ) {
-            deleteHidden()
+            controller.deleteHidden()
         }
         .task {
             await model.observe()
@@ -144,69 +139,41 @@ public struct RewardRuleListView: View {
 
 private extension RewardRuleListView {
     var board: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(model.shown) { rule in
-                movableTile(rule)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .frame(height: boardHeight)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { width in
-            grid.width = width
+        SettingsTileBoard(
+            grid: $grid,
+            items: model.shown,
+            drag: drag,
+            space: Self.space
+        ) { rule in
+            tileFace(rule, isHidden: false)
+        } onTap: { rule in
+            destination = .edit(rule.id)
+        } onFollow: { id, location in
+            controller.follow(id, to: location)
+        } onDrop: {
+            controller.drop()
         }
     }
 
     var hiddenSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            SettingsHiddenTitle(
-                flag: hiddenList,
-                title: "非表示の決まり",
-                count: model.hidden.count
-            ) {
-                isConfirmingDeleteHidden = true
-            }
-
-            if hiddenList.isOn {
-                LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
-                    ForEach(model.hidden) { rule in
-                        hiddenTile(rule)
-                    }
-                }
-            }
+        SettingsHiddenTiles(
+            flag: hiddenList,
+            title: "非表示の決まり",
+            items: model.hidden,
+            drag: drag,
+            grid: grid,
+            space: Self.space
+        ) { rule in
+            tileFace(rule, isHidden: true)
+        } onTap: { rule in
+            destination = .edit(rule.id)
+        } onFollow: { id, location in
+            controller.followHidden(id, to: location)
+        } onDrop: {
+            controller.dropHidden()
+        } onDeleteAll: {
+            isConfirmingDeleteHidden = true
         }
-    }
-
-    func hiddenTile(_ rule: RewardRule) -> some View {
-        let lifted = drag.hiddenOffset(of: rule.id)
-        let isLifted = lifted != nil
-        let offset = lifted ?? .zero
-        let opacity: Double = isLifted ? 0 : 1
-        let layer: Double = isLifted ? 1 : 0
-
-        return tileFace(rule, isHidden: true)
-            .frame(height: Self.tileHeight)
-            .opacity(opacity)
-            .animation(nil, value: isLifted)
-            .offset(offset)
-            .settingsLiftFrame(
-                drag,
-                \.hiddenFrames,
-                id: rule.id,
-                in: Self.space
-            )
-            .zIndex(layer)
-            .onTapGesture {
-                destination = .edit(rule.id)
-            }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    followHidden(rule.id, to: location)
-                } onEnd: {
-                    dropHidden()
-                }
-            )
     }
 
     func tileFace(
@@ -229,31 +196,6 @@ private extension RewardRuleListView {
             tileFace(rule, isHidden: false)
         }
     }
-
-    func movableTile(_ rule: RewardRule) -> some View {
-        let isLifted = drag.isLifted(rule.id)
-        let index = model.shown.firstIndex(of: rule) ?? 0
-        let position = isLifted ? drag.liftedCenter : grid.center(at: index)
-        let opacity: Double = isLifted ? 0 : 1
-        let layer: Double = isLifted ? 1 : 0
-
-        return tileFace(rule, isHidden: false)
-            .frame(width: grid.itemWidth, height: Self.tileHeight)
-            .opacity(opacity)
-            .animation(nil, value: isLifted)
-            .position(position)
-            .zIndex(layer)
-            .onTapGesture {
-                destination = .edit(rule.id)
-            }
-            .gesture(
-                LiftGesture(in: Self.space) { location in
-                    follow(rule, to: location)
-                } onEnd: {
-                    drop()
-                }
-            )
-    }
 }
 
 private extension RewardRuleListView {
@@ -268,94 +210,15 @@ private extension RewardRuleListView {
     static let spacing: CGFloat = 12
     static let tileHeight: CGFloat = 156
 
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: spacing),
-        count: columnCount
-    )
-
-    var boardHeight: CGFloat {
-        grid.height(slots: model.shown.count)
-    }
-
-    func follow(
-        _ rule: RewardRule,
-        to location: CGPoint
-    ) {
-        let index = model.shown.firstIndex(of: rule) ?? 0
-        let start = grid.center(at: index)
-
-        let center = drag.follow(rule.id, from: start, to: location) { next in
-            follow(rule, to: next)
-        }
-
-        guard let center else {
-            return
-        }
-
-        let target = grid.index(at: center, count: model.shown.count)
-
-        withAnimation(.snappy) {
-            model.move(rule.id, to: target)
-        }
-    }
-
-    func drop() {
-        switch drag.drop() {
-        case let .hide(id):
-            hide(id)
-
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-
-        case nil:
-            break
-        }
-    }
-
-    func followHidden(
-        _ id: RewardRule.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
-    }
-
-    func hide(_ id: RewardRule.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            let result = await model.deleteHidden()
-
-            bulkDelete = result
-            deletion = result.deletion
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: RewardRule.ID) {
-        Task {
-            await model.show(id)
-        }
+    var controller: SettingsBoardController<RewardRuleListModel> {
+        SettingsBoardController(
+            model: model,
+            drag: drag,
+            grid: grid,
+            hiddenId: $hiddenId,
+            deletion: $deletion,
+            bulkDelete: $bulkDelete
+        )
     }
 
     func editModel(for destination: Destination) -> RewardRuleEditModel {
