@@ -1,9 +1,9 @@
-struct Memo<Key: Equatable, Value> {
+struct Memoized<Key: Equatable, Value> {
     private var key: Key?
     private var value: Value?
 }
 
-extension Memo {
+extension Memoized {
     mutating func value(
         for key: Key,
         make: () -> Value

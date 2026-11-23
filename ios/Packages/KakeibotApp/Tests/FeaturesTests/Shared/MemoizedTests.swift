@@ -1,10 +1,10 @@
 @testable import Features
 import Testing
 
-struct MemoTests {
+struct MemoizedTests {
     @Test
     func reusesValueForSameKey() {
-        var memo = Memo<Int, String>()
+        var memo = Memoized<Int, String>()
         var made = 0
 
         _ = memo.value(for: 1) {
@@ -23,7 +23,7 @@ struct MemoTests {
 
     @Test
     func remakesValueWhenKeyChanges() {
-        var memo = Memo<Int, String>()
+        var memo = Memoized<Int, String>()
 
         _ = memo.value(for: 1) {
             "a"

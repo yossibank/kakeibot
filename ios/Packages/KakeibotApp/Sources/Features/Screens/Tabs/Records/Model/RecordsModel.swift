@@ -53,7 +53,7 @@ public final class RecordsModel: ScreenModel {
 
     private var listGeneration = 0
 
-    @ObservationIgnored private var monthDaysMemo = Memo<MonthDays.Key, MonthDays>()
+    @ObservationIgnored private var monthDaysMemo = Memoized<MonthDays.Key, MonthDays>()
     @ObservationIgnored private var searchIndex: EntrySearchIndex?
 
     public init(

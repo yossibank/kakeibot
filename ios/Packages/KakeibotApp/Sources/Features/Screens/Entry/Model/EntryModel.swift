@@ -75,9 +75,9 @@ public final class EntryModel {
     private(set) var editingId: Entry.ID?
     private(set) var historyGeneration = 0
 
-    @ObservationIgnored var monthMemo = Memo<MonthSummary.Key, MonthSummary>()
-    @ObservationIgnored var feeChoicesMemo = Memo<Int, [Int]>()
-    @ObservationIgnored var recentWalletsMemo = Memo<Int, [Entry.Kind: Wallet.ID]>()
+    @ObservationIgnored var monthMemo = Memoized<MonthSummary.Key, MonthSummary>()
+    @ObservationIgnored var feeChoicesMemo = Memoized<Int, [Int]>()
+    @ObservationIgnored var recentWalletsMemo = Memoized<Int, [Entry.Kind: Wallet.ID]>()
 
     let database: AppDatabase
 
