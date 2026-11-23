@@ -203,7 +203,7 @@ private extension ThemeStyleLookView {
 }
 
 private extension ThemeStyleLookView {
-    static let intro = ThemeStyleIntro(
+    static let intro = ThemeStyleIntroContent(
         systemImage: "square.on.circle",
         headline: ("角の丸みや背景などを", "好みに変えられます"),
         notes: [

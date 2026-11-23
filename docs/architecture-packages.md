@@ -172,7 +172,7 @@ KakeibotApp/
 | フォルダ | 中身 |
 | --- | --- |
 | `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備、レビューのお願い。Pro が無くなったら同期を止める |
-| `AppFeature/Bridge/` | Pro の購入を StoreKit で確かめる。同期の口座と参加者を CloudKit で読む |
+| `AppFeature/Bridge/` | Pro の購入を StoreKit で確かめる。iCloud のアカウントと共有の参加者を CloudKit で読む |
 | `AppFeature/Main/` | 4 つのタブと入力シートなどのシートを組む |
 | `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `AppWidget/Shared/` | ウィジェットをまたいで使う読み出し・書体・テーマ・タイムライン |
@@ -189,13 +189,13 @@ KakeibotApp/
 | `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
 | `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
-| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、読み込みの状態、文言に出す端末の名前（iPhone か iPad）。設定を 1 つ保存して、失敗したら戻す形と、その言葉 |
+| `Features/Shared/Model/` | 画面のモデルの見張りの形（失敗したら見張り直す）、読み込みの状態、文言に出す端末の名前（iPhone か iPad）。設定を 1 つ保存して失敗したら戻す形とその言葉、鍵が同じ間は値を作り直さない `Memoized` も置く |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今に戻るボタン |
 | `Features/Shared/Placeholder/` | タブで記録が無いときと読み込めないときの表示。設定の一覧が空なら `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |
 | `Features/Shared/Pro/` | Pro を買ったかと、止めた所の下に出すカード。StoreKit の中身は AppFeature が渡す |
-| `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Header・Hint・Icon・Input・Layout・Tile） |
+| `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Hint・Icon・Input・Layout・Tile）。画面の上のヘッダーは `Layout/` に置く |
 | `Features/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `Features/Shared/Stamp/` | 押したスタンプの数のカードと、押した日の一覧のシート |
 | `Features/Shared/Wallet/` | 口座の役割ごとの、残高に添える言葉と額の色。資産のタブと設定の口座で使う |

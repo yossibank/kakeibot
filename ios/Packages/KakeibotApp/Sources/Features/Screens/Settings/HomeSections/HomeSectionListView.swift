@@ -133,7 +133,7 @@ private extension HomeSectionListView {
         let scale = isDragging ? Self.liftScale : 1
 
         return HStack(spacing: 12) {
-            HomeSectionThumbnail(section: section)
+            HomeSectionPreview(section: section)
                 .opacity(opacity)
 
             Text(section.title)

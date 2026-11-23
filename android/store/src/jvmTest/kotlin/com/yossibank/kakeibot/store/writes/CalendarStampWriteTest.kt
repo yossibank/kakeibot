@@ -6,8 +6,8 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.inMemory
 import com.yossibank.kakeibot.store.database.insertShelfIfEmpty
-import com.yossibank.kakeibot.store.queries.methods.iconShelf
-import com.yossibank.kakeibot.store.queries.methods.stampCalendar
+import com.yossibank.kakeibot.store.queries.methods.shelfIconList
+import com.yossibank.kakeibot.store.queries.methods.stampBook
 import com.yossibank.kakeibot.store.writes.methods.removeStamp
 import com.yossibank.kakeibot.store.writes.methods.setShelfIconHidden
 import com.yossibank.kakeibot.store.writes.methods.stamp
@@ -31,7 +31,7 @@ class CalendarStampWriteTest {
             at = setup.now,
         )
 
-        val first = setup.database.stampCalendar()
+        val first = setup.database.stampBook()
 
         setup.database.stamp(
             party,
@@ -39,7 +39,7 @@ class CalendarStampWriteTest {
             at = setup.now,
         )
 
-        val replaced = setup.database.stampCalendar()
+        val replaced = setup.database.stampBook()
 
         assertEquals(1, first.stamps.size)
         assertEquals(Icon.Glyph.star, first.icon(on = setup.day)?.glyph)
@@ -68,7 +68,7 @@ class CalendarStampWriteTest {
         )
 
         setup.database.removeStamp(on = setup.day)
-        val calendar = setup.database.stampCalendar()
+        val calendar = setup.database.stampBook()
 
         assertNull(calendar.stamps[setup.day])
         assertEquals(Icon.Glyph.star, calendar.icon(on = nextDay)?.glyph)
@@ -79,7 +79,7 @@ class CalendarStampWriteTest {
     @Test
     fun keepsStampWhenItsStampIsHidden() = runTest {
         val setup = Setup.make()
-        val shelf = setup.database.iconShelf()
+        val shelf = setup.database.shelfIconList()
         val first = assertNotNull(shelf.shelfIcons.firstOrNull())
 
         setup.database.stamp(
@@ -94,7 +94,7 @@ class CalendarStampWriteTest {
             at = setup.now,
         )
 
-        val calendar = setup.database.stampCalendar()
+        val calendar = setup.database.stampBook()
 
         assertEquals(Icon.Glyph.star, calendar.icon(on = setup.day)?.glyph)
 
@@ -126,7 +126,7 @@ class CalendarStampWriteTest {
             )
         }
 
-        val calendar = setup.database.stampCalendar()
+        val calendar = setup.database.stampBook()
         val tallies = calendar.tallies(start..end)
 
         assertEquals(
@@ -161,7 +161,7 @@ class CalendarStampWriteTest {
                     database = database,
                     now = now,
                     day = day,
-                    shelf = database.iconShelf().shelfIcons.map { it.iconId },
+                    shelf = database.shelfIconList().shelfIcons.map { it.iconId },
                 )
             }
         }

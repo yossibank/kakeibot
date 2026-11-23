@@ -2,11 +2,6 @@ import Core
 import Foundation
 import GRDB
 
-struct CardBillChange {
-    var before: [Entry] = []
-    var after: [Entry] = []
-}
-
 extension AppDatabase {
     static func recalculateCardBills(
         _ change: CardBillChange,

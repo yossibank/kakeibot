@@ -22,6 +22,7 @@ import com.yossibank.kakeibot.store.records.rows.noSpendDay
 import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import com.yossibank.kakeibot.store.records.values.fromDatabaseValue
+import com.yossibank.kakeibot.store.writes.types.CardBillChange
 import com.yossibank.kakeibot.store.writes.types.SavedEntry
 import java.time.Instant
 

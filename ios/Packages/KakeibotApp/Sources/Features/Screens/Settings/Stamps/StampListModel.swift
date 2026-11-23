@@ -10,7 +10,7 @@ public final class StampListModel: ScreenModel {
     public var movingOrder: [ShelfIcon.ID]?
     public var errorNotice = ErrorNotice()
 
-    public private(set) var shelf: IconShelf?
+    public private(set) var shelf: ShelfIconList?
 
     private let database: AppDatabase
 
@@ -34,14 +34,14 @@ public extension StampListModel {
 
     func load() async {
         do {
-            shelf = try await database.iconShelf()
+            shelf = try await database.shelfIconList()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func observe() async {
-        await observe(database.iconShelfUpdates(), into: \.shelf)
+        await observe(database.shelfIconListUpdates(), into: \.shelf)
     }
 }
 

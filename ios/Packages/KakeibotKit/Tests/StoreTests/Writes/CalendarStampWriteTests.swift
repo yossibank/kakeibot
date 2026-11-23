@@ -11,9 +11,9 @@ struct CalendarStampWriteTests {
         let party = try #require(setup.shelf.dropFirst().first)
 
         try await setup.database.stamp(star, on: setup.day, at: setup.now)
-        let first = try await setup.database.stampCalendar()
+        let first = try await setup.database.stampBook()
         try await setup.database.stamp(party, on: setup.day, at: setup.now)
-        let replaced = try await setup.database.stampCalendar()
+        let replaced = try await setup.database.stampBook()
 
         #expect(first.stamps.count == 1)
         #expect(first.icon(on: setup.day)?.glyph == .star)
@@ -30,7 +30,7 @@ struct CalendarStampWriteTests {
         try await setup.database.stamp(star, on: nextDay, at: setup.now)
 
         try await setup.database.removeStamp(on: setup.day)
-        let calendar = try await setup.database.stampCalendar()
+        let calendar = try await setup.database.stampBook()
 
         #expect(calendar.stamps[setup.day] == nil)
         #expect(calendar.icon(on: nextDay)?.glyph == .star)
@@ -39,12 +39,12 @@ struct CalendarStampWriteTests {
     @Test
     func keepsStampWhenItsStampIsHidden() async throws {
         let setup = try await Setup()
-        let shelf = try await setup.database.iconShelf()
+        let shelf = try await setup.database.shelfIconList()
         let first = try #require(shelf.shelfIcons.first)
         try await setup.database.stamp(first.iconId, on: setup.day, at: setup.now)
 
         try await setup.database.setShelfIconHidden(first.id, isHidden: true, at: setup.now)
-        let calendar = try await setup.database.stampCalendar()
+        let calendar = try await setup.database.stampBook()
 
         #expect(calendar.icon(on: setup.day)?.glyph == .star)
     }
@@ -70,7 +70,7 @@ struct CalendarStampWriteTests {
             try await setup.database.stamp(icon, on: date, at: setup.now)
         }
 
-        let calendar = try await setup.database.stampCalendar()
+        let calendar = try await setup.database.stampBook()
         let tallies = calendar.tallies(in: start...end)
 
         #expect(tallies.map(\.icon.glyph) == [.star, .cake, .party])
@@ -95,7 +95,7 @@ extension CalendarStampWriteTests.Setup {
 
         try database.insertShelfIfEmpty(at: now)
 
-        let shelf = try await database.iconShelf().shelfIcons.map(\.iconId)
+        let shelf = try await database.shelfIconList().shelfIcons.map(\.iconId)
 
         self.init(database: database, now: now, day: day, shelf: shelf)
     }

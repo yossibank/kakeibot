@@ -43,7 +43,7 @@ public final class HomeModel: ScreenModel {
 
     public internal(set) var errorNotice = ErrorNotice()
 
-    private(set) var stampCalendar: StampCalendar?
+    private(set) var stampBook: StampBook?
 
     private var homeSections = HomeSection.standard
     private var homeHiddenSections: Set<HomeSection> = []
@@ -164,7 +164,7 @@ public extension HomeModel {
                 )
             },
             {
-                await self.observe(self.database.stampCalendarUpdates(), into: \.stampCalendar)
+                await self.observe(self.database.stampBookUpdates(), into: \.stampBook)
             },
             {
                 await self.observeSyncStatus()

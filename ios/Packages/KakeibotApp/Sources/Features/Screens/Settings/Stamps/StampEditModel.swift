@@ -36,7 +36,7 @@ public extension StampEditModel {
         }
 
         do {
-            let shelf = try await database.iconShelf()
+            let shelf = try await database.shelfIconList()
             let shelfIcon = shelf.shelfIcons.first { $0.id == editingId }
 
             guard

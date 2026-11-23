@@ -9,7 +9,7 @@ struct ShelfIconWriteTests {
         let setup = try await Setup()
 
         let saved = try await setup.database.saveShelfIcon(setup.draft, at: setup.now)
-        let shelf = try await setup.database.iconShelf()
+        let shelf = try await setup.database.shelfIconList()
         let icon = try #require(shelf.icons[saved.iconId])
 
         #expect(saved.sortOrder == 8)
@@ -26,7 +26,7 @@ struct ShelfIconWriteTests {
         let draft = IconDraft(mark: .text("推し"), color: "#9C6ADE")
 
         let updated = try await setup.database.saveShelfIcon(draft, editing: first.id, at: later)
-        let shelf = try await setup.database.iconShelf()
+        let shelf = try await setup.database.shelfIconList()
         let icon = try #require(shelf.icons[updated.iconId])
 
         #expect(updated.id == first.id)
@@ -40,12 +40,12 @@ struct ShelfIconWriteTests {
     @Test
     func reordersShelfIcons() async throws {
         let setup = try await Setup()
-        let shelf = try await setup.database.iconShelf()
+        let shelf = try await setup.database.shelfIconList()
         let ids = shelf.shelfIcons.map(\.id)
         let reversed = Array(ids.reversed())
 
         try await setup.database.reorderShelfIcons(reversed, at: setup.now)
-        let reordered = try await setup.database.iconShelf()
+        let reordered = try await setup.database.shelfIconList()
 
         #expect(reordered.shelfIcons.map(\.id) == reversed)
     }
@@ -56,10 +56,10 @@ struct ShelfIconWriteTests {
         let first = try await setup.firstShelfIcon()
 
         try await setup.database.setShelfIconHidden(first.id, isHidden: true, at: setup.now)
-        let hidden = try await setup.database.iconShelf()
+        let hidden = try await setup.database.shelfIconList()
         let list = try await setup.database.entryList()
         try await setup.database.setShelfIconHidden(first.id, isHidden: false, at: setup.now)
-        let shown = try await setup.database.iconShelf()
+        let shown = try await setup.database.shelfIconList()
 
         #expect(hidden.shelfIcons.first?.archivedAt == setup.now)
         #expect(hidden.shelfIcons.count == 8)
@@ -73,7 +73,7 @@ struct ShelfIconWriteTests {
         let first = try await setup.firstShelfIcon()
 
         try await setup.database.deleteShelfIcon(first.id)
-        let shelf = try await setup.database.iconShelf()
+        let shelf = try await setup.database.shelfIconList()
 
         #expect(shelf.shelfIcons.count == 7)
         #expect(!shelf.shelfIcons.contains { $0.id == first.id })
@@ -110,7 +110,7 @@ struct ShelfIconWriteTests {
             try await setup.database.saveShelfIcon(draft, at: setup.now)
         }
 
-        let shelf = try await setup.database.iconShelf()
+        let shelf = try await setup.database.shelfIconList()
 
         #expect(shelf.shelfIcons.count == 8)
     }
@@ -136,7 +136,7 @@ extension ShelfIconWriteTests.Setup {
     }
 
     func firstShelfIcon() async throws -> ShelfIcon {
-        let shelf = try await database.iconShelf()
+        let shelf = try await database.shelfIconList()
         return try #require(shelf.shelfIcons.first)
     }
 }

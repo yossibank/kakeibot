@@ -12,12 +12,12 @@ struct SettingsMenuRewardStartRow: View {
             NavigationLink {
                 RewardRuleListView(database: database)
             } label: {
-                SettingsRow(
+                SettingsMenuRow(
                     "ごほうび貯金を始める",
                     systemImage: "gift",
                     tint: nil,
                     trailingImage: "chevron.right",
-                    accessory: SettingsRowValue?.none
+                    accessory: SettingsMenuRowValue?.none
                 )
             }
         }

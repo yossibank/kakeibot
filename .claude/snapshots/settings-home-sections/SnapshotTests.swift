@@ -23,7 +23,7 @@ struct SnapshotTests {
             ForEach(rows.indices, id: \.self) { index in
                 HStack(spacing: 12) {
                     ForEach(rows[index]) { section in
-                        HomeSectionThumbnail(section: section)
+                        HomeSectionPreview(section: section)
                     }
                 }
             }

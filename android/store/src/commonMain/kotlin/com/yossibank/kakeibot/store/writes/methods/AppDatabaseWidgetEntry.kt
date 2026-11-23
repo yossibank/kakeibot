@@ -18,6 +18,7 @@ import com.yossibank.kakeibot.store.records.rows.entryTemplate
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.widgetEntry
 import com.yossibank.kakeibot.store.records.values.databaseValue
+import com.yossibank.kakeibot.store.writes.types.CardBillChange
 import com.yossibank.kakeibot.store.writes.types.WidgetRecord
 import java.time.Instant
 

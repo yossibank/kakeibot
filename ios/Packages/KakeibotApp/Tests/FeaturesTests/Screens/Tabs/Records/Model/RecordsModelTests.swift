@@ -366,7 +366,7 @@ struct RecordsModelTests {
     func stampsAndRemovesWithShownChoices() async throws {
         let setup = try await Setup()
         try setup.database.insertShelfIfEmpty(at: Date())
-        let shelf = try await setup.database.iconShelf()
+        let shelf = try await setup.database.shelfIconList()
         let hidden = try #require(shelf.shelfIcons.last)
         try await setup.database.setShelfIconHidden(hidden.id, isHidden: true, at: Date())
         let today = setup.today
@@ -393,7 +393,7 @@ struct RecordsModelTests {
 
         let stamped = model.stampIcon(on: today)
         await model.removeStamp(on: today)
-        let calendar = try await setup.database.stampCalendar()
+        let calendar = try await setup.database.stampBook()
         task.cancel()
 
         #expect(choices.count == 7)

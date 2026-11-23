@@ -234,7 +234,7 @@ private extension ThemeStyleTextView {
 }
 
 private extension ThemeStyleTextView {
-    static let intro = ThemeStyleIntro(
+    static let intro = ThemeStyleIntroContent(
         systemImage: "textformat",
         headline: ("文字の大きさと字体を", "好みに変えられます"),
         notes: [

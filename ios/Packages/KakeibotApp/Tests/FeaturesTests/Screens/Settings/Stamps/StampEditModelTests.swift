@@ -14,7 +14,7 @@ struct StampEditModelTests {
         model.icon.inputEmoji("🎉")
 
         let isSaved = await model.save()
-        let shelf = try await database.iconShelf()
+        let shelf = try await database.shelfIconList()
         let last = try #require(shelf.shelfIcons.last)
 
         #expect(isSaved)
@@ -46,7 +46,7 @@ struct StampEditModelTests {
         model.icon.color = "#4A6FA5"
         let changedAfterEdit = model.isChanged
         let isSaved = await model.save()
-        let shelf = try await database.iconShelf()
+        let shelf = try await database.shelfIconList()
 
         #expect(loadedGlyph == .star)
         #expect(!changedBeforeEdit)
@@ -64,7 +64,7 @@ struct StampEditModelTests {
         await model.load()
 
         let isHidden = await model.setHidden(true)
-        let shelf = try await database.iconShelf()
+        let shelf = try await database.shelfIconList()
 
         #expect(isHidden)
         #expect(model.isHidden)
@@ -80,7 +80,7 @@ private extension StampEditModelTests {
     }
 
     static func firstShelfIcon(in database: AppDatabase) async throws -> ShelfIcon {
-        let shelf = try await database.iconShelf()
+        let shelf = try await database.shelfIconList()
         return try #require(shelf.shelfIcons.first)
     }
 }

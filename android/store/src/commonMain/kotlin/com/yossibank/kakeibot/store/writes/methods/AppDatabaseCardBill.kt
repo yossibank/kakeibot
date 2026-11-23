@@ -19,15 +19,8 @@ import com.yossibank.kakeibot.store.records.rows.entry
 import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.records.rows.recurring
 import com.yossibank.kakeibot.store.records.values.databaseValue
+import com.yossibank.kakeibot.store.writes.types.CardBillChange
 import java.time.Instant
-
-internal class CardBillChange(
-    before: List<Entry> = emptyList(),
-    after: List<Entry> = emptyList(),
-) {
-    val before: MutableList<Entry> = before.toMutableList()
-    val after: MutableList<Entry> = after.toMutableList()
-}
 
 internal suspend fun AppDatabase.recalculateCardBills(
     change: CardBillChange,

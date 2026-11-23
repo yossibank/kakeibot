@@ -30,8 +30,8 @@ public final class RecordsModel: ScreenModel {
     public private(set) var layout: RecordsLayout = .calendar
     public private(set) var isListFailed = false
     public private(set) var noSpendDays: Set<LocalDate> = []
-    public private(set) var stampCalendar: StampCalendar?
-    public private(set) var stampShelf: IconShelf?
+    public private(set) var stampBook: StampBook?
+    public private(set) var stampShelf: ShelfIconList?
     public private(set) var rewardBank: RewardBank?
     public private(set) var recurrings: [Recurring] = []
     public private(set) var recentSearches: [String] = []
@@ -53,7 +53,7 @@ public final class RecordsModel: ScreenModel {
 
     private var listGeneration = 0
 
-    @ObservationIgnored private var monthDaysMemo = Memo<MonthDays.Key, MonthDays>()
+    @ObservationIgnored private var monthDaysMemo = Memoized<MonthDays.Key, MonthDays>()
     @ObservationIgnored private var searchIndex: EntrySearchIndex?
 
     public init(
@@ -248,10 +248,10 @@ public extension RecordsModel {
                 await self.observe(self.database.noSpendDayUpdates(), into: \.noSpendDays)
             },
             {
-                await self.observe(self.database.stampCalendarUpdates(), into: \.stampCalendar)
+                await self.observe(self.database.stampBookUpdates(), into: \.stampBook)
             },
             {
-                await self.observe(self.database.iconShelfUpdates(), into: \.stampShelf)
+                await self.observe(self.database.shelfIconListUpdates(), into: \.stampShelf)
             },
             {
                 await self.observe(self.database.rewardBankUpdates(), into: \.rewardBank)
