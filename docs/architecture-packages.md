@@ -112,7 +112,7 @@ KakeibotKit/
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
 | `Store/Queries/Methods/` | 返す型の名前で付ける。書き込みと同じ型なら `+<型>Query` |
 | `Store/Records/` | 表の行・設定のキー・列の値の適合 |
-| `Store/Migrations/` | `MigrationV<3 桁の通し番号>.swift`。欠番は 14 |
+| `Store/Migrations/` | `MigrationV<3 桁の通し番号>.swift`。欠番は 14。同期のトリガーを作る固定の SQL は `MigrationSyncTriggers.swift` |
 | `Store/Database/` | 最初の財布とカテゴリも作る。止める通知は AppFeature が送る |
 | `Store/Snapshot/` | 書き出し用の全データの読み出し、読み込み用の全置き換え |
 | `Store/Sync/` | 同期で送る行の記録と、受け取った行の書き込み |

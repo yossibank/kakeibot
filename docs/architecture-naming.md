@@ -10,7 +10,7 @@
 
 | 対象 | 決まり |
 | --- | --- |
-| Migrations | ファイルと型は、3 桁の通し番号で付ける |
+| Migrations | ファイルと型は、3 桁の通し番号で付ける。複数の番号から呼ぶ固定の SQL は `Migration<役割>` に置く |
 | fixtures | `Core/Concepts/` のフォルダ名を小文字にして置く |
 | `Features/Screens/Settings/` | 子フォルダが 20 を超えたら、下の表の領域の子フォルダでまとめる |
 | 設定の一覧の画面 | 型は `<単数>ListModel`・`<単数>ListView` にする |

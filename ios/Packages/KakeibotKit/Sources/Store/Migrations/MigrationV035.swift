@@ -31,12 +31,7 @@ enum MigrationV035 {
         }
 
         for (table, key) in tables {
-            try MigrationV026.createTriggers(
-                on: table,
-                key: key,
-                recording: MigrationV028.recording,
-                in: db
-            )
+            try MigrationSyncTriggers.create(on: table, key: key, in: db)
         }
     }
 }

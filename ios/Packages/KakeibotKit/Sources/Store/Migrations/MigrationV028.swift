@@ -1,10 +1,6 @@
 import GRDB
 
 enum MigrationV028 {
-    static let recording = """
-    (SELECT (enabled OR EXISTS (SELECT 1 FROM sync_share)) AND NOT applying FROM sync_state)
-    """
-
     static func migrate(_ db: Database) throws {
         try db.alter(table: "category") { table in
             table.add(column: "wallet_id", .text).references("wallet")
@@ -18,11 +14,8 @@ enum MigrationV028 {
         }
 
         for (table, key) in MigrationV026.tables {
-            for (name, _, _) in MigrationV026.events {
-                try db.execute(sql: "DROP TRIGGER sync_\(table)_\(name)")
-            }
-
-            try MigrationV026.createTriggers(on: table, key: key, recording: recording, in: db)
+            try MigrationSyncTriggers.drop(on: table, in: db)
+            try MigrationSyncTriggers.create(on: table, key: key, in: db)
         }
     }
 }
