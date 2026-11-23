@@ -162,7 +162,7 @@ private extension ReviewClosingView {
                 HStack(spacing: 8) {
                     ReviewReportLabel(title: "\(goals.nextName)の一手")
 
-                    Text("\(start.yearMonth.month)/\(start.day) から")
+                    Text("\(start.monthDayText) から")
                         .textFont(.caption2, weight: .bold)
                         .foregroundStyle(Palette.backgroundBottom)
                         .padding(.horizontal, 8)
@@ -215,33 +215,15 @@ private extension ReviewClosingView {
             .padding(20)
 
             VStack(spacing: 12) {
-                Text("途中経過で進み具合を見て、\(check.yearMonth.month)/\(check.day) に答え合わせします")
+                Text("途中経過で進み具合を見て、\(check.monthDayText) に答え合わせします")
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
 
-                Button {
+                BandLinkButton("\(item.name)をくわしく見る") {
                     onOpenGoal(item)
-                } label: {
-                    HStack {
-                        Text("\(item.name)をくわしく見る")
-                            .textFont(.footnote, weight: .bold)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-
-                        Spacer(minLength: 8)
-
-                        Image(systemName: "chevron.right")
-                            .sansFont(.small, weight: .bold)
-                    }
-                    .foregroundStyle(Palette.accent)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
-                    .contentShape(.rect)
                 }
-                .buttonStyle(.plain)
             }
             .padding([.horizontal, .bottom], 20)
         }

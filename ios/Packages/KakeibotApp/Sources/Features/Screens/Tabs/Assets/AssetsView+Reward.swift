@@ -68,9 +68,7 @@ private extension AssetsView {
                         .background(Palette.accent, in: .capsule)
                 }
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.hint)
+                DisclosureMark()
             }
 
             rewardContent

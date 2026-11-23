@@ -105,9 +105,7 @@ private extension AssetsView {
                     .frame(minHeight: 32)
                 }
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.hint)
+                DisclosureMark()
             }
 
             if row.needsAdjustment {
@@ -204,9 +202,7 @@ private extension AssetsView {
 
                 Spacer(minLength: 8)
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.hint)
+                DisclosureMark()
             }
             .padding(.vertical, 12)
             .contentShape(.rect)
@@ -301,8 +297,7 @@ private extension AssetsView {
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
 
-                    Image(systemName: "chevron.right")
-                        .sansFont(.micro, weight: .bold)
+                    DisclosureMark(.strongLink)
                 }
                 .textFont(.caption2)
                 .foregroundStyle(Palette.accent)

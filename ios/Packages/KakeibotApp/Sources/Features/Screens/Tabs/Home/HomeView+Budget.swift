@@ -45,8 +45,7 @@ extension HomeView {
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.8)
 
-                                Image(systemName: "chevron.right")
-                                    .sansFont(.micro, weight: .semibold)
+                                DisclosureMark(.link)
                             }
                             .textFont(.caption)
                             .monospacedDigit()
@@ -63,8 +62,7 @@ extension HomeView {
                         HStack(spacing: 4) {
                             Text("予算を決めると、あといくら使えるかが出ます")
 
-                            Image(systemName: "chevron.right")
-                                .sansFont(.micro, weight: .semibold)
+                            DisclosureMark(.link)
                         }
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
@@ -145,8 +143,7 @@ private extension HomeView {
             Label(text, systemImage: "repeat")
                 .lineLimit(1)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.micro, weight: .semibold)
+            DisclosureMark(.link)
         }
     }
 

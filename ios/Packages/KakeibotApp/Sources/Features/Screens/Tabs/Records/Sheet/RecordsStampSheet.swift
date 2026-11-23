@@ -61,20 +61,11 @@ struct RecordsStampSheet: View {
 
 private extension RecordsStampSheet {
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-
-            Spacer()
-
-            SheetTitle("\(date.monthDayText) のスタンプ")
-
-            Spacer()
-
+        SheetHeader("\(date.monthDayText) のスタンプ") {
+            dismiss()
+        } trailing: {
             if choices.isEmpty {
-                Color.clear
-                    .frame(width: 44, height: 44)
+                SheetHeaderSlot()
             } else {
                 RingButton(systemImage: "plus") {
                     isAddingStamp = true

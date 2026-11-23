@@ -14,8 +14,7 @@ extension ReviewView {
                 HStack(spacing: 4) {
                     upcomingLabel(upcoming)
 
-                    Image(systemName: "chevron.right")
-                        .sansFont(.micro, weight: .semibold)
+                    DisclosureMark(.link)
                 }
                 .upcomingRowStyle(minHeight: minHeight)
                 .tapArea(tapOutsets)

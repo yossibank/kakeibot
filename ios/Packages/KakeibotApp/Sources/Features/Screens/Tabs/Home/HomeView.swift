@@ -101,9 +101,7 @@ public struct HomeView: View {
             .animation(.snappy, value: setup.showsCard)
             .animation(.snappy, value: model.homeLayout)
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
             StampDaysSheet(
                 tally: tally,
@@ -115,10 +113,7 @@ public struct HomeView: View {
                 openStamp = nil
             }
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 }
 
@@ -261,7 +256,7 @@ private extension HomeView {
     }
 
     var periodTitle: String {
-        "\(String(model.month.year))年 \(model.month.month)月"
+        model.month.title
     }
 
     static func column(of section: HomeSection) -> TwoColumnLayout.Column {

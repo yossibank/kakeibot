@@ -16,9 +16,7 @@ struct AssetsAdjustSheet: View {
         FittedSheet {
             content
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .confirmation(
             isPresented: $isConfirmingDiscard,
             systemImage: "pencil.slash",

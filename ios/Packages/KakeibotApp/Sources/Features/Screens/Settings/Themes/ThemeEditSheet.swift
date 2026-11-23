@@ -63,20 +63,15 @@ public struct ThemeEditSheet: View {
             }
         }
         .animation(.snappy, value: focus == nil)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .contentShape(.rect)
         .onTapGesture {
             focus = nil
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .backdrop()
+        .errorBanner($model.errorNotice)
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard

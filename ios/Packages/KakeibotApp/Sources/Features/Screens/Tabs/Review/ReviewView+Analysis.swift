@@ -55,8 +55,7 @@ extension ReviewView {
                         .transition(.scale.combined(with: .opacity))
                 }
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small, weight: .bold)
+                DisclosureMark(.band)
                     .foregroundStyle(Palette.accent)
             }
             .padding(.vertical, 8)
@@ -76,21 +75,12 @@ extension ReviewView {
 
     var analysisSheet: some View {
         VStack(spacing: 12) {
-            HStack {
-                RingButton(systemImage: "xmark") {
-                    showsAnalysis = false
-                }
-
-                Spacer()
-
+            SheetHeader {
+                showsAnalysis = false
+            } title: {
                 Text("ふりかえり")
                     .displayFont(.body)
                     .foregroundStyle(Palette.accent)
-
-                Spacer()
-
-                Color.clear
-                    .frame(width: 44, height: 44)
             }
             .padding(.horizontal, 20)
 
@@ -133,10 +123,7 @@ extension ReviewView {
         .sheet(item: $analysisShare) { share in
             shareSheet(share)
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .presentationSizing(.tallForm)
     }
 }
@@ -249,6 +236,6 @@ private extension ReviewView {
     ) -> String {
         let start = range.lowerBound
         let end = range.upperBound
-        return "\(start.yearMonth.month)/\(start.day)\(separator)\(end.yearMonth.month)/\(end.day)"
+        return "\(start.monthDayText)\(separator)\(end.monthDayText)"
     }
 }

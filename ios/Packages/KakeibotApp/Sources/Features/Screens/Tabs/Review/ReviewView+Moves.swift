@@ -111,9 +111,7 @@ private extension ReviewView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
         .padding(.vertical, 8)
         .contentShape(.rect)

@@ -75,9 +75,7 @@ private extension AssetsView {
             .lineLimit(1)
             .minimumScaleFactor(0.5)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
     }
 

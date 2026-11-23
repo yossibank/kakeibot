@@ -14,21 +14,12 @@ struct StampDaysSheet: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            HStack {
-                RingButton(systemImage: "xmark") {
-                    dismiss()
-                }
-
-                Spacer()
-
+            SheetHeader {
+                dismiss()
+            } title: {
                 Text(periodTitle)
                     .displayFont(.body)
                     .foregroundStyle(Palette.accent)
-
-                Spacer()
-
-                Color.clear
-                    .frame(width: 44, height: 44)
             }
 
             HStack(spacing: 12) {
@@ -69,10 +60,7 @@ struct StampDaysSheet: View {
         .padding(.horizontal, 20)
         .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .presentationSizing(.tallForm)
     }
 }
@@ -106,9 +94,7 @@ private extension StampDaysSheet {
                     .minimumScaleFactor(0.8)
             }
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
         .frame(minHeight: 48)
         .contentShape(.rect)

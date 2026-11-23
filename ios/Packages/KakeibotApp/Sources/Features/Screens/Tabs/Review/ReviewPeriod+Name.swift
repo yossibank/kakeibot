@@ -6,7 +6,7 @@ extension ReviewPeriod {
         let month = range.upperBound.yearMonth
 
         return switch scale {
-        case .week: "\(start.yearMonth.month)/\(start.day) の週"
+        case .week: "\(start.monthDayText) の週"
         case .month: "\(month.month)月"
         case .year: "\(String(month.year))年"
         }

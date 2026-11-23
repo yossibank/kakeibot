@@ -98,9 +98,7 @@ public struct RecordsView: View {
         }
         .monthSwipe(following: swipeSlide, perform: moveMonth)
         .scrollDismissesKeyboard(.interactively)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .safeAreaInset(edge: .bottom) {
             if let selection {
                 selectionBar(selection)
@@ -188,10 +186,7 @@ public struct RecordsView: View {
             }
         }
         .haptic(.success, trigger: stampCount)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 }
 
@@ -202,7 +197,7 @@ private extension RecordsView {
 
     var monthStepper: some View {
         PeriodStepper(
-            title: "\(String(model.month.year))年 \(model.month.month)月",
+            title: model.month.title,
             subtitle: model.periodText,
             currentTitle: model.isCurrentMonth ? nil : "今月",
             transition: monthTextTransition,

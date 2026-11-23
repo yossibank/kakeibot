@@ -178,8 +178,7 @@ private extension ReviewClosingView {
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .bold)
+                        DisclosureMark(.strongLink)
                             .foregroundStyle(Palette.accent)
                     }
                     .padding(.horizontal, 12)
@@ -238,7 +237,7 @@ private extension ReviewClosingView {
     }
 
     func specialCard(_ special: Special) -> some View {
-        let date = "\(special.date.yearMonth.month)/\(special.date.day)"
+        let date = special.date.monthDayText
         let amount = ReviewYen.number(special.amount)
 
         return VStack(alignment: .leading, spacing: 12) {

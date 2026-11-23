@@ -96,9 +96,7 @@ extension RecordsView {
                 .layoutPriority(1)
                 .opacity(0.6)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
         .padding(.vertical, 8)
         .contentShape(.rect)

@@ -37,7 +37,7 @@ struct ReviewProgressView: View {
 
 private extension ReviewProgressView {
     var closingCard: some View {
-        let day = "\(closingDate.yearMonth.month)/\(closingDate.day)"
+        let day = closingDate.monthDayText
 
         return VStack(alignment: .leading, spacing: 16) {
             ReviewReportLabel(title: closingTitle)
@@ -92,25 +92,7 @@ private extension ReviewProgressView {
                     .padding(.vertical, 24)
             }
 
-            Button(action: onOpenPrevious) {
-                HStack {
-                    Text(previousTitle)
-                        .textFont(.footnote, weight: .bold)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                    Spacer(minLength: 8)
-
-                    Image(systemName: "chevron.right")
-                        .sansFont(.small, weight: .bold)
-                }
-                .foregroundStyle(Palette.accent)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
-                .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
+            BandLinkButton(previousTitle, action: onOpenPrevious)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)

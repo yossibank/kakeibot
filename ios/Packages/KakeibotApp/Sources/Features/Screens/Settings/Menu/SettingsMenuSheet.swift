@@ -95,18 +95,11 @@ public struct SettingsMenuSheet: View {
             .padding(.horizontal, 20)
             .padding(.top, 16)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background {
-                Backdrop()
-                    .ignoresSafeArea()
-            }
+            .backdrop()
             .toolbar(.hidden, for: .navigationBar)
         }
-        .errorBanner(weekStart.errorNotice) {
-            weekStart.errorNotice.clear()
-        }
-        .errorBanner(recordReset.errorNotice) {
-            recordReset.errorNotice.clear()
-        }
+        .errorBanner($weekStart.errorNotice)
+        .errorBanner($recordReset.errorNotice)
         .confirmation(
             isPresented: $isConfirmingReset,
             systemImage: "trash",

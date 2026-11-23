@@ -34,9 +34,7 @@ struct ProOfferCard: View {
         }
         .padding(16)
         .floatingCard()
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .task {
             await model.load()
         }

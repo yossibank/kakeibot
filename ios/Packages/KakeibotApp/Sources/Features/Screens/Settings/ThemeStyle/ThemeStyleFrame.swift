@@ -43,16 +43,13 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
         }
         .environment(\.themeStyle, shownStyle)
         .font(shownStyle.bodyFont)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.selection, trigger: model.style, condition: Self.isSwitchKept)
         .environment(\.themeStyle.haptics, model.style.haptics)

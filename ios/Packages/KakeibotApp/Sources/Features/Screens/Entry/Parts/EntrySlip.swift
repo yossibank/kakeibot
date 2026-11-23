@@ -290,8 +290,7 @@ private extension EntrySlip {
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.micro, weight: .bold)
+                DisclosureMark(.strongLink)
                     .foregroundStyle(arrowColor)
             }
             .padding(.leading, 16)

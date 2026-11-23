@@ -69,9 +69,7 @@ public struct AssetsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .sheet(isPresented: $isShowingReward) {
             AssetsRewardSheet(model: model)
         }
@@ -105,10 +103,7 @@ public struct AssetsView: View {
                 pendingEntry = id
             }
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 }
 

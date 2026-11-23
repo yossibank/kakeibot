@@ -184,7 +184,7 @@ private extension MonthCalendar {
     }
 
     var monthTitle: String {
-        "\(month.year)年 \(month.month)月"
+        month.title
     }
 
     static func headerColor(for weekday: Weekday) -> Color {

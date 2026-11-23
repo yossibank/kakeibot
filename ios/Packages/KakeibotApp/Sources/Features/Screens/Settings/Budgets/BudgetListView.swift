@@ -18,9 +18,7 @@ public struct BudgetListView: View {
 
     public var body: some View {
         content
-            .errorBanner(model.errorNotice) {
-                model.errorNotice.clear()
-            }
+            .errorBanner($model.errorNotice)
             .budgetKeypad(model, cleared: $cleared)
             .toolbar(.hidden, for: .navigationBar)
             .haptic(.selection, trigger: model.budgets)
@@ -116,13 +114,10 @@ private extension BudgetListView {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 
     var totalCard: some View {

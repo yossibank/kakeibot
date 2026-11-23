@@ -83,13 +83,8 @@ private extension OnboardingView {
         .padding(.bottom, 8)
         .frame(maxWidth: Self.contentWidth, maxHeight: .infinity, alignment: .top)
         .frame(maxWidth: .infinity)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .budgetKeypad(model.budget)
         .haptic(.selection, trigger: model.page)
     }
@@ -235,9 +230,7 @@ private extension OnboardingView {
                         .foregroundStyle(Palette.hint)
                 }
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.hint)
+                DisclosureMark()
             }
             .frame(minHeight: 56)
             .padding(.horizontal, 16)

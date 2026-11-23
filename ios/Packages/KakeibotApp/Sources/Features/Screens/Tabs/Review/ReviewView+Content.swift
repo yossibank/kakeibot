@@ -118,8 +118,7 @@ private extension ReviewView {
                             HStack(spacing: 4) {
                                 Label(recurringText(recurring), systemImage: "repeat")
 
-                                Image(systemName: "chevron.right")
-                                    .sansFont(.micro, weight: .semibold)
+                                DisclosureMark(.link)
                             }
                             .textFont(.caption)
                             .monospacedDigit()
@@ -154,8 +153,7 @@ private extension ReviewView {
                             HStack(spacing: 4) {
                                 Label(moveText, systemImage: "arrow.right")
 
-                                Image(systemName: "chevron.right")
-                                    .sansFont(.micro, weight: .semibold)
+                                DisclosureMark(.link)
                             }
                             .textFont(.caption)
                             .monospacedDigit()

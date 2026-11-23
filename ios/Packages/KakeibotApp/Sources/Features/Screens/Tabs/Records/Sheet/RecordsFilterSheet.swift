@@ -52,10 +52,7 @@ struct RecordsFilterSheet: View {
         .padding(.top, 20)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .haptic(.selection, trigger: filter)
         .presentationDetents([.medium, .large])
         .presentationSizing(.tallForm)
