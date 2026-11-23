@@ -54,3 +54,28 @@ private extension SettingsTileBoard {
             )
     }
 }
+
+extension SettingsTileBoard {
+    init<Model: SettingsBoardModel>(
+        grid: Binding<SettingsBoardGrid>,
+        controller: SettingsBoardController<Model>,
+        space: String,
+        @ViewBuilder face: @escaping (Item) -> Face,
+        onTap: @escaping (Item) -> Void
+    ) where Model.Item == Item {
+        self.init(
+            grid: grid,
+            items: controller.model.shown,
+            drag: controller.drag,
+            space: space,
+            face: face,
+            onTap: onTap,
+            onFollow: { id, location in
+                controller.follow(id, to: location)
+            },
+            onDrop: {
+                controller.drop()
+            }
+        )
+    }
+}

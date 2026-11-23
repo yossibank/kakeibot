@@ -80,6 +80,7 @@
 | 語尾 | 役割 | 例 |
 | --- | --- | --- |
 | `View` | 押し込んで開く画面の本体 | `BudgetListView` |
+| `Screen` | 同じ種類の画面で使う外枠。中身は画面から受け取る | `SettingsBoardScreen` |
 | `Sheet` | シートで開く画面。OS の共有シートを出す型にも使う | `EntrySheet`・`SyncShareSheet` |
 | `EditSheet` | 1 件を編集するシート。モデルは `EditModel` で対にする | `WalletEditSheet` |
 | `Card` | 面を持つ 1 かたまり | `StampTallyCard` |

@@ -10,11 +10,7 @@ public struct CategoryListView: View {
     @State var deletion: Deletion?
     @State var bulkDelete: SettingsBulkDelete?
 
-    @State var grid = SettingsBoardGrid(
-        columns: Self.columnCount,
-        itemHeight: Self.tileHeight,
-        spacing: Self.spacing
-    )
+    @State var grid = Self.tiles
 
     @State private var hintFlag: SettingsScreenFlag
     @State private var destination: Destination?
@@ -41,10 +37,10 @@ public struct CategoryListView: View {
     }
 
     public var body: some View {
-        VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("カテゴリ", hint: hintFlag)
-
-            SettingsIntroCard(
+        SettingsBoardScreen(
+            title: "カテゴリ",
+            hint: hintFlag,
+            intro: SettingsIntroCard(
                 systemImage: "tag",
                 headline: ("支出と収入を", "分けて振り返れます"),
                 notes: [
@@ -53,72 +49,25 @@ public struct CategoryListView: View {
                     .arrange
                 ],
                 flag: hintFlag
-            )
-
+            ),
+            emptyNote: .init(systemImage: "tag", text: "カテゴリを足すと、ここに並びます"),
+            addTitle: addTitle,
+            space: Self.space,
+            tileHeight: Self.tiles.itemHeight,
+            liftScale: 1.1,
+            controller: controller,
+            errorNotice: $model.errorNotice
+        ) {
+            destination = .new(model.kind)
+        } header: {
             CapsulePicker(selection: $model.kind, options: Self.kindOptions)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    if model.shown.isEmpty {
-                        SettingsEmptyNote(
-                            systemImage: "tag",
-                            text: "カテゴリを足すと、ここに並びます"
-                        )
-                    }
-
-                    board
-
-                    if !model.hidden.isEmpty {
-                        hiddenSection
-                    }
-                }
-                .padding(.vertical, 8)
-                .coordinateSpace(.named(Self.space))
-                .onGeometryChange(for: CGPoint.self) { proxy in
-                    proxy.frame(in: .global).origin
-                } action: { origin in
-                    drag.origin = origin
-                }
-            }
-            .scrollIndicators(.hidden)
-            .scrollDisabled(drag.isLifting)
-            .settingsAutoScroll(drag.autoScroll)
-            .settingsDropZones($drag.zones, showing: drag.showZone)
-            .settingsHideNotice($hiddenId) { id in
-                controller.show(id)
-            }
-            .deletionNotice($deletion, note: bulkDelete?.note(for: deletion)) { deletion in
-                controller.restore(deletion)
-            }
-
-            if drag.lift != nil {
-                SettingsHideTarget(
-                    zones: $drag.zones,
-                    isArmed: drag.isOverHide
-                )
-            } else {
-                AddButton(addTitle) {
-                    destination = .new(model.kind)
-                }
-            }
-        }
-        .padding(.horizontal, SettingsSpacing.side)
-        .padding(.top, SettingsSpacing.top)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .settingsLiftLayer(
-            drag,
-            size: CGSize(width: grid.itemWidth, height: Self.tileHeight),
-            scale: 1.1
-        ) { id in
+        } board: {
+            board
+        } hiddenSection: {
+            hiddenSection
+        } floatingTile: { id in
             floatingTile(id)
         }
-        .errorBanner($model.errorNotice)
-        .backdrop()
-        .toolbar(.hidden, for: .navigationBar)
-        .haptic(.impact(weight: .medium), trigger: drag.liftCount)
-        .haptic(.selection, trigger: model.movingOrder)
-        .haptic(.success, trigger: drag.showCount)
         .navigationDestination(item: $destination) { destination in
             CategoryEditSheet(model: editModel(for: destination)) { _ in } onDelete: { deletion in
                 self.deletion = deletion
@@ -130,13 +79,10 @@ public struct CategoryListView: View {
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)
         }
-        .confirmation(
+        .settingsDeleteHiddenConfirmation(
             isPresented: $isConfirmingDeleteHidden,
-            systemImage: "trash",
             title: "非表示のカテゴリをまとめて削除しますか",
-            message: "記録があるカテゴリは残ります。使っている固定費・テンプレート・予算・タグも消えます",
-            keepTitle: "やめる",
-            confirmTitle: "まとめて削除する"
+            message: "記録があるカテゴリは残ります。使っている固定費・テンプレート・予算・タグも消えます"
         ) {
             controller.deleteHidden()
         }
@@ -150,17 +96,12 @@ private extension CategoryListView {
     var board: some View {
         SettingsTileBoard(
             grid: $grid,
-            items: model.shown,
-            drag: drag,
+            controller: controller,
             space: Self.space
         ) { category in
             tileFace(category, isHidden: false)
         } onTap: { category in
             destination = .edit(category.kind, category.id)
-        } onFollow: { id, location in
-            controller.follow(id, to: location)
-        } onDrop: {
-            controller.drop()
         }
     }
 
@@ -168,18 +109,13 @@ private extension CategoryListView {
         SettingsHiddenTiles(
             flag: hiddenList,
             title: "非表示のカテゴリ",
-            items: model.hidden,
-            drag: drag,
             grid: grid,
+            controller: controller,
             space: Self.space
         ) { category in
             tileFace(category, isHidden: true)
         } onTap: { category in
             destination = .edit(category.kind, category.id)
-        } onFollow: { id, location in
-            controller.followHidden(id, to: location)
-        } onDrop: {
-            controller.dropHidden()
         } onDeleteAll: {
             isConfirmingDeleteHidden = true
         }
@@ -213,9 +149,7 @@ private extension CategoryListView {
 
     nonisolated static let space = "CategoryBoard"
 
-    static let columnCount = 4
-    static let spacing: CGFloat = 8
-    static let tileHeight: CGFloat = 78
+    static let tiles = SettingsBoardGrid(columns: 4, itemHeight: 78, spacing: 8)
 
     static let kindOptions: [CapsulePicker<EntryCategory.Kind>.Option] = [
         .init("支出", value: .expense),
