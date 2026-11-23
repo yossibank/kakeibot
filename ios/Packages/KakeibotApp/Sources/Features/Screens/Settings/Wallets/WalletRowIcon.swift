@@ -6,6 +6,7 @@ struct WalletRowIcon: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let icon: Icon?
+
     var strokeWidth: CGFloat = IconBadge.lineWidth
 
     var body: some View {

@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SettingsEditForm<Content: View, Save: View>: View {
     let showsSave: Bool
+
     @ViewBuilder let content: () -> Content
     @ViewBuilder let save: () -> Save
 

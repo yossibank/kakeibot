@@ -180,6 +180,7 @@ extension SnapshotTests {
         let y: CGFloat
         let width: CGFloat
         let angle: Double
+
         var anchor: UnitPoint = .center
     }
 }
@@ -254,6 +255,7 @@ private struct StoreWave: View {
     let opacity: Double
     let width: CGFloat
     let dash: [CGFloat]
+
     var shift: CGFloat = 0
 
     var body: some View {
@@ -298,6 +300,7 @@ private enum StoreInk {
 
 private struct StoreRings: View {
     let rings: [Ring]
+
     var shift: CGFloat = 0
 
     var body: some View {
@@ -821,6 +824,7 @@ private extension StoreBanner {
 private struct PhoneFrame: View {
     let shot: UIImage
     let width: CGFloat
+
     var corner: CGFloat = 44
 
     var body: some View {

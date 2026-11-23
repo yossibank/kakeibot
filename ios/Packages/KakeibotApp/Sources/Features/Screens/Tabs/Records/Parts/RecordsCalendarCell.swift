@@ -15,7 +15,9 @@ struct RecordsCalendarCell: View {
     let income: Int
     let isNoSpend: Bool
     let hasUpcoming: Bool
+
     var heat: Double = 0
+
     let onSelect: () -> Void
 
     var body: some View {

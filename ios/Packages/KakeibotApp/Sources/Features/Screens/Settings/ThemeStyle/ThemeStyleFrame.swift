@@ -11,6 +11,7 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
     let intro: ThemeStyleIntroContent
     let hint: SettingsScreenFlag
     let model: ThemeStyleModel
+
     @ViewBuilder let preview: Preview
     @ViewBuilder let content: Content
 

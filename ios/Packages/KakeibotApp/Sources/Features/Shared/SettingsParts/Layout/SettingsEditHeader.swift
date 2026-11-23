@@ -9,9 +9,11 @@ struct SettingsEditHeader: View {
     let title: String
     let isEditing: Bool
     let isHidden: Bool
+
     var canHide = true
     var canDelete = true
     var subtitle: String?
+
     let onClose: () -> Void
     let onHide: () -> Void
     let onDelete: () -> Void

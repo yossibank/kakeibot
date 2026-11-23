@@ -32,6 +32,7 @@ public final class TemplateEditModel {
     public private(set) var calculator: AmountCalculator
     public private(set) var options: EntryOptions?
     public private(set) var cardBills: [Recurring] = []
+
     public internal(set) var isHidden = false
 
     public internal(set) var errorNotice = ErrorNotice()

@@ -43,7 +43,9 @@ extension ReceiptLine {
 
     struct Amount: Equatable {
         var name: String
+
         let value: Int
+
         var count = 1
         var isReduced = false
         var isIncluded = false

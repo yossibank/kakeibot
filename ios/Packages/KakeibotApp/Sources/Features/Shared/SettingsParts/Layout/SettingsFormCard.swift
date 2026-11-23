@@ -6,6 +6,7 @@ struct SettingsFormCard<Content: View>: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let spacing: CGFloat
+
     @ViewBuilder let content: () -> Content
 
     init(

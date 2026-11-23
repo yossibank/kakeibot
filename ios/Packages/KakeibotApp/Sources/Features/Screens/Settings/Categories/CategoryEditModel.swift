@@ -10,7 +10,9 @@ public final class CategoryEditModel {
     public var name = ""
 
     public private(set) var tags: [EditingTag] = []
+
     public internal(set) var isHidden = false
+
     public private(set) var hasEntries = false
     public private(set) var tagProblem: String?
 

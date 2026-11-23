@@ -6,6 +6,7 @@ struct SettingsFormSection<Content: View>: View {
     let title: String
     let value: String?
     let valueIcon: Icon?
+
     @ViewBuilder let content: () -> Content
 
     init(
