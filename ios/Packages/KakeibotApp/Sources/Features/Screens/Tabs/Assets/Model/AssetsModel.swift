@@ -123,8 +123,8 @@ public extension AssetsModel {
         upcomingBills.filter { $0.bill.month == month }
     }
 
-    func adjustModel(for row: WalletRow) -> AssetsAdjustModel {
-        AssetsAdjustModel(
+    func adjustModel(for row: WalletRow) -> AssetsAdjustmentModel {
+        AssetsAdjustmentModel(
             database: database,
             wallet: row.wallet,
             balance: row.balance,

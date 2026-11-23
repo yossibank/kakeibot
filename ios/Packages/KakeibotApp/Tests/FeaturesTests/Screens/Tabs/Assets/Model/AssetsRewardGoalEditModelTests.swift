@@ -5,11 +5,11 @@ import Store
 import Testing
 
 @MainActor
-struct AssetsGoalEditModelTests {
+struct AssetsRewardGoalEditModelTests {
     @Test
     func newGoalIsChangedAfterInput() throws {
         let database = try AppDatabase.inMemory()
-        let model = AssetsGoalEditModel(database: database)
+        let model = AssetsRewardGoalEditModel(database: database)
 
         let changedBeforeInput = model.isChanged
 
@@ -30,7 +30,7 @@ struct AssetsGoalEditModelTests {
             updatedAt: Date()
         )
 
-        let model = AssetsGoalEditModel(database: database, editing: goal)
+        let model = AssetsRewardGoalEditModel(database: database, editing: goal)
 
         let changedBeforeEdit = model.isChanged
 
@@ -44,7 +44,7 @@ struct AssetsGoalEditModelTests {
     @Test
     func savesNewGoal() async throws {
         let database = try AppDatabase.inMemory()
-        let model = AssetsGoalEditModel(database: database)
+        let model = AssetsRewardGoalEditModel(database: database)
         model.name = "新しい靴"
         model.press(.digit(5))
         model.press(.doubleZero)
@@ -60,7 +60,7 @@ struct AssetsGoalEditModelTests {
     @Test
     func tellsWhenGoalCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
-        let model = AssetsGoalEditModel(database: database)
+        let model = AssetsRewardGoalEditModel(database: database)
         model.name = "新しい靴"
         model.press(.digit(5))
         try await database.failWrites(to: "reward_goal")
@@ -76,7 +76,7 @@ struct AssetsGoalEditModelTests {
         let database = try AppDatabase.inMemory()
         let draft = RewardGoalDraft(name: "新しい靴", targetAmount: 12000)
         let goal = try await database.saveRewardGoal(draft, at: Date())
-        let model = AssetsGoalEditModel(database: database, editing: goal)
+        let model = AssetsRewardGoalEditModel(database: database, editing: goal)
 
         let isDeleted = await model.delete()
         let goals = try await database.rewardBank().waitingGoals
@@ -90,8 +90,8 @@ struct AssetsGoalEditModelTests {
         let database = try AppDatabase.inMemory()
         let draft = RewardGoalDraft(name: "新しい靴", targetAmount: 12000)
         let goal = try await database.saveRewardGoal(draft, at: Date())
-        let model = AssetsGoalEditModel(database: database, editing: goal)
-        let adding = AssetsGoalEditModel(database: database)
+        let model = AssetsRewardGoalEditModel(database: database, editing: goal)
+        let adding = AssetsRewardGoalEditModel(database: database)
         try await database.failWrites(to: "reward_goal")
 
         let isDeleted = await model.delete()

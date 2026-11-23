@@ -2,8 +2,8 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct AssetsGoalSheet: View {
-    @State private var model: AssetsGoalEditModel
+struct AssetsRewardGoalEditSheet: View {
+    @State private var model: AssetsRewardGoalEditModel
     @State private var panel: Panel?
     @State private var isConfirmingDiscard = false
     @State private var isConfirmingDelete = false
@@ -12,7 +12,7 @@ struct AssetsGoalSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    init(model: AssetsGoalEditModel) {
+    init(model: AssetsRewardGoalEditModel) {
         _model = State(initialValue: model)
         _panel = State(initialValue: model.isEditing ? nil : .amount)
     }
@@ -73,7 +73,7 @@ struct AssetsGoalSheet: View {
     }
 }
 
-private extension AssetsGoalSheet {
+private extension AssetsRewardGoalEditSheet {
     var content: some View {
         VStack(spacing: 16) {
             Color.clear
@@ -81,7 +81,7 @@ private extension AssetsGoalSheet {
 
             ScrollView {
                 VStack(spacing: SettingsSpacing.form) {
-                    AssetsGoalCard(
+                    AssetsRewardGoalCard(
                         name: model.name.isEmpty ? "欲しい物" : model.name,
                         targetAmount: model.calculator.amount,
                         remaining: model.remaining,
@@ -141,7 +141,7 @@ private extension AssetsGoalSheet {
     }
 }
 
-private extension AssetsGoalSheet {
+private extension AssetsRewardGoalEditSheet {
     enum Field: Hashable {
         case name
     }

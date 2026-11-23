@@ -74,7 +74,7 @@ public struct AssetsView: View {
             AssetsRewardSheet(model: model)
         }
         .sheet(isPresented: $isAddingGoal) {
-            AssetsGoalSheet(model: model.goalEditModel(editing: nil))
+            AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: nil))
         }
         .sheet(isPresented: $isAddingWallet) {
             WalletEditSheet(
@@ -85,7 +85,7 @@ public struct AssetsView: View {
             )
         }
         .sheet(item: $adjusting) { row in
-            AssetsAdjustSheet(model: model.adjustModel(for: row))
+            AssetsAdjustmentSheet(model: model.adjustModel(for: row))
         }
         .sheet(isPresented: $isShowingOutlook, onDismiss: openPendingEntry) {
             AssetsOutlookSheet(

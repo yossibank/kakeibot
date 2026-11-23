@@ -39,14 +39,14 @@ struct SnapshotTests {
 
             try Self.write(reward, variant: variant, to: "assets-reward")
 
-            let adding = AssetsGoalSheet(model: model.goalEditModel(editing: nil))
+            let adding = AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: nil))
                 .frame(height: 852)
 
             try Self.write(adding, variant: variant, to: "assets-goal-new")
 
             let goal = try #require(model.waitingGoals.first)
 
-            let editing = AssetsGoalSheet(model: model.goalEditModel(editing: goal))
+            let editing = AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: goal))
                 .frame(height: 852)
 
             try Self.write(editing, variant: variant, to: "assets-goal-edit")
@@ -91,7 +91,7 @@ struct SnapshotTests {
                     adjust.press(key)
                 }
 
-                let sheet = AssetsAdjustSheet(model: adjust).content
+                let sheet = AssetsAdjustmentSheet(model: adjust).content
                     .padding(.horizontal, 20)
                     .padding(.top, 28)
                     .background(Palette.panel)

@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct AssetsGoalCard: View {
+struct AssetsRewardGoalCard: View {
     let name: String
     let targetAmount: Int
     let remaining: Int

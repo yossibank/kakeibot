@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class AssetsAdjustModel {
+public final class AssetsAdjustmentModel {
     public private(set) var calculator: AmountCalculator
 
     public internal(set) var errorNotice = ErrorNotice()
@@ -35,7 +35,7 @@ public final class AssetsAdjustModel {
     }
 }
 
-public extension AssetsAdjustModel {
+public extension AssetsAdjustmentModel {
     var difference: Int {
         calculator.amount - balance
     }
@@ -85,6 +85,6 @@ public extension AssetsAdjustModel {
     }
 }
 
-private extension AssetsAdjustModel {
+private extension AssetsAdjustmentModel {
     static let saveFailedMessage = "残高を合わせられませんでした"
 }

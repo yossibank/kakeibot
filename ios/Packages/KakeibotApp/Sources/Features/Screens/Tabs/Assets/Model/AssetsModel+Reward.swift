@@ -68,8 +68,8 @@ public extension AssetsModel {
         rewardBank?.percent(to: goal) ?? 0
     }
 
-    func goalEditModel(editing goal: RewardGoal?) -> AssetsGoalEditModel {
-        AssetsGoalEditModel(
+    func goalEditModel(editing goal: RewardGoal?) -> AssetsRewardGoalEditModel {
+        AssetsRewardGoalEditModel(
             database: database,
             editing: goal,
             balance: rewardBank?.balance ?? 0

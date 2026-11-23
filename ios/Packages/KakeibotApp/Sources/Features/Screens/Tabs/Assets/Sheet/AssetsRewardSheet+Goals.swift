@@ -44,7 +44,7 @@ extension AssetsRewardSheet {
 
 private extension AssetsRewardSheet {
     func goalRow(_ goal: RewardGoal) -> some View {
-        AssetsGoalCard(
+        AssetsRewardGoalCard(
             name: goal.name,
             targetAmount: goal.targetAmount,
             remaining: model.remaining(to: goal),

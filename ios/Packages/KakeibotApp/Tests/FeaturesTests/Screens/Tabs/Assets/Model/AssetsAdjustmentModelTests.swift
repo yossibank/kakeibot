@@ -5,7 +5,7 @@ import Store
 import Testing
 
 @MainActor
-struct AssetsAdjustModelTests {
+struct AssetsAdjustmentModelTests {
     @Test
     func asksToAdjustOnlyNegativeOnHandWallets() async throws {
         let setup = try await AssetsModelTests.Setup()

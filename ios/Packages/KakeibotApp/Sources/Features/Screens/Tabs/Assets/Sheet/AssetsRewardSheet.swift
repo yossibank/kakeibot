@@ -47,7 +47,7 @@ struct AssetsRewardSheet: View {
             }
         }
         .sheet(item: $goalTarget) { target in
-            AssetsGoalSheet(model: model.goalEditModel(editing: target.goal))
+            AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: target.goal))
         }
         .settingsHideNotice(
             $boughtId,

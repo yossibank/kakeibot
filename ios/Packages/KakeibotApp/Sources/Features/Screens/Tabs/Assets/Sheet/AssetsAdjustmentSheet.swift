@@ -2,13 +2,13 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct AssetsAdjustSheet: View {
-    @State private var model: AssetsAdjustModel
+struct AssetsAdjustmentSheet: View {
+    @State private var model: AssetsAdjustmentModel
     @State private var isConfirmingDiscard = false
 
     @Environment(\.dismiss) private var dismiss
 
-    init(model: AssetsAdjustModel) {
+    init(model: AssetsAdjustmentModel) {
         _model = State(initialValue: model)
     }
 
@@ -30,18 +30,18 @@ struct AssetsAdjustSheet: View {
     }
 }
 
-private extension AssetsAdjustSheet {
+private extension AssetsAdjustmentSheet {
     static let slotSize: CGFloat = 44
     static let shape = EntryReceiptShape(tooth: 12, hasTopEdge: true)
 }
 
-private extension AssetsAdjustSheet {
+private extension AssetsAdjustmentSheet {
     var differenceColor: Color {
         model.difference < 0 ? Palette.rose : Palette.accent
     }
 }
 
-private extension AssetsAdjustSheet {
+private extension AssetsAdjustmentSheet {
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -161,7 +161,7 @@ private extension AssetsAdjustSheet {
     }
 }
 
-private extension AssetsAdjustSheet {
+private extension AssetsAdjustmentSheet {
     func close() {
         if model.isChanged {
             isConfirmingDiscard = true
@@ -177,7 +177,7 @@ private extension AssetsAdjustSheet {
     }
 }
 
-extension AssetsAdjustSheet {
+extension AssetsAdjustmentSheet {
     var content: some View {
         VStack(spacing: 20) {
             header

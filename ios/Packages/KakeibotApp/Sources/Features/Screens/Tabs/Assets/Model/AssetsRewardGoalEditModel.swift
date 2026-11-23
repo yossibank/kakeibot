@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class AssetsGoalEditModel {
+public final class AssetsRewardGoalEditModel {
     public var name: String
 
     public private(set) var calculator: AmountCalculator
@@ -35,7 +35,7 @@ public final class AssetsGoalEditModel {
     }
 }
 
-public extension AssetsGoalEditModel {
+public extension AssetsRewardGoalEditModel {
     var isEditing: Bool {
         editing != nil
     }
@@ -105,7 +105,7 @@ public extension AssetsGoalEditModel {
     }
 }
 
-private extension AssetsGoalEditModel {
+private extension AssetsRewardGoalEditModel {
     static let saveFailedMessage = "目標を保存できませんでした"
     static let deleteFailedMessage = "目標を削除できませんでした"
 }
