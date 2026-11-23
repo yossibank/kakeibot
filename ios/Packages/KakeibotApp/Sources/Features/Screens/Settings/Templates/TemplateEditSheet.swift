@@ -12,8 +12,7 @@ public struct TemplateEditSheet: View {
     @Environment(\.themeStyle) var themeStyle
 
     @State private var panel: Panel?
-    @State private var isConfirmingDiscard = false
-    @State private var isConfirmingHideChanges = false
+    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @Environment(\.dismiss) private var dismiss
@@ -37,105 +36,75 @@ public struct TemplateEditSheet: View {
 
     public var body: some View {
         FloatingInputReader { _ in
-            ZStack(alignment: .bottom) {
-                content
-                    .ignoresSafeArea(keyboardRegions)
-                    .floatingInput(isPresented: panel == .memo) {
-                        closePanel()
-                    } card: {
-                        memoCard
-                    }
-
-                if let panel,
-                   panel != .memo {
-                    Palette.scrim
-                        .opacity(0.35)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            closePanel()
-                        }
-                        .transition(.opacity)
-                        .zIndex(1)
-
+            content
+                .ignoresSafeArea(keyboardRegions)
+                .floatingInput(isPresented: panel == .memo) {
+                    closePanel()
+                } card: {
+                    memoCard
+                }
+                .settingsDrawerLayer(item: drawerPanel) {
+                    closePanel()
+                } drawer: { panel in
                     SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
                         closePanel()
                     } content: {
                         drawerBody(panel)
                     }
-                    .transition(.settingsDrawer)
-                    .zIndex(1)
                 }
-            }
-            .overlay(alignment: .top) {
-                SettingsEditHeader(
-                    title: title,
-                    isEditing: model.isEditing,
-                    isHidden: model.isHidden,
-                    subtitle: model.typeName
-                ) {
-                    close()
-                } onHide: {
-                    toggleHidden()
-                } onDelete: {
-                    isConfirmingDelete = true
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, SettingsSpacing.top)
-            }
-            .errorBanner(model.errorNotice) {
-                model.errorNotice.clear()
-            }
-            .background {
-                Backdrop()
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        focus = nil
+                .overlay(alignment: .top) {
+                    SettingsEditHeader(
+                        title: title,
+                        isEditing: model.isEditing,
+                        isHidden: model.isHidden,
+                        subtitle: model.typeName
+                    ) {
+                        edit.close()
+                    } onHide: {
+                        edit.toggleHidden()
+                    } onDelete: {
+                        isConfirmingDelete = true
                     }
-            }
-            .haptic(.selection, trigger: model.categoryId)
-            .haptic(.selection, trigger: model.walletId)
-            .confirmsUnsavedHide(
-                isHidden: model.isHidden,
-                canSave: model.canSave,
-                isPresented: $isConfirmingHideChanges
-            ) {
-                Task {
-                    await save(hiding: true)
+                    .padding(.horizontal, SettingsSpacing.side)
+                    .padding(.top, SettingsSpacing.top)
                 }
-            } onDiscard: {
-                Task {
-                    await setHidden(!model.isHidden)
+                .errorBanner($model.errorNotice)
+                .background {
+                    Backdrop()
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            focus = nil
+                        }
                 }
-            }
-            .confirmsDiscard(when: model.isChanged, isPresented: $isConfirmingDiscard) {
-                dismiss()
-            }
-            .confirmation(
-                isPresented: $isConfirmingDelete,
-                systemImage: "trash",
-                title: "このテンプレートを削除しますか",
-                message: "このテンプレートで記録したものは残ります",
-                keepTitle: "やめる",
-                confirmTitle: "削除する"
-            ) {
-                Task {
-                    await delete()
+                .haptic(.selection, trigger: model.categoryId)
+                .haptic(.selection, trigger: model.walletId)
+                .settingsEditConfirmations(edit)
+                .confirmation(
+                    isPresented: $isConfirmingDelete,
+                    systemImage: "trash",
+                    title: "このテンプレートを削除しますか",
+                    message: "このテンプレートで記録したものは残ります",
+                    keepTitle: "やめる",
+                    confirmTitle: "削除する"
+                ) {
+                    Task {
+                        await edit.delete()
+                    }
                 }
-            }
-            .onChange(of: focus) {
-                if focus == .name {
-                    hidePanel()
+                .onChange(of: focus) {
+                    if focus == .name {
+                        hidePanel()
+                    }
                 }
-            }
-            .sheet(item: $tagCategory, onDismiss: reloadTags) { category in
-                CategoryEditSheet(
-                    model: model.editCategoryModel(category),
-                    startsAddingTag: true
-                )
-            }
-            .task {
-                await model.load()
-            }
+                .sheet(item: $tagCategory, onDismiss: reloadTags) { category in
+                    CategoryEditSheet(
+                        model: model.editCategoryModel(category),
+                        startsAddingTag: true
+                    )
+                }
+                .task {
+                    await model.load()
+                }
         }
     }
 }
@@ -144,7 +113,7 @@ extension TemplateEditSheet {
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
             Task {
-                await save()
+                await edit.save()
             }
         }
         .disabled(!model.canSave)
@@ -161,6 +130,31 @@ extension TemplateEditSheet {
         case amount
         case tag
         case memo
+    }
+
+    var drawerPanel: Panel? {
+        panel == .memo ? nil : panel
+    }
+
+    var edit: SettingsEditController<TemplateEditModel> {
+        SettingsEditController(
+            model: model,
+            prompt: $prompt,
+            dismiss: dismiss,
+            onRest: {
+                closePanel()
+            },
+            onHide: onHide,
+            onDelete: onDelete,
+            onSave: {
+                guard let template = await model.save() else {
+                    return false
+                }
+
+                onSave(template)
+                return true
+            }
+        )
     }
 
     func open(_ panel: Panel) {
@@ -256,68 +250,9 @@ private extension TemplateEditSheet {
             panel = nil
         }
     }
-
-    func close() {
-        closePanel()
-
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
-    }
-
-    func save(hiding: Bool = false) async {
-        closePanel()
-
-        guard let template = await model.save() else {
-            return
-        }
-
-        onSave(template)
-
-        if hiding {
-            guard await model.setHidden(!model.isHidden) else {
-                return
-            }
-
-            if model.isHidden {
-                onHide()
-            }
-        }
-
-        dismiss()
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
-            dismiss()
-        }
-    }
-
-    func toggleHidden() {
-        guard model.isChanged else {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-
-            return
-        }
-
-        isConfirmingHideChanges = true
-    }
-
-    func setHidden(_ isHidden: Bool) async {
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
-        }
-    }
 }
+
+extension TemplateEditModel: SettingsEditing {}
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {

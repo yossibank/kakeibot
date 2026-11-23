@@ -69,9 +69,7 @@ public struct AssetsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .sheet(isPresented: $isShowingReward) {
             AssetsRewardSheet(model: model)
         }
@@ -105,10 +103,17 @@ public struct AssetsView: View {
                 pendingEntry = id
             }
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
+    }
+}
+
+extension AssetsView {
+    var ownedSections: [AssetsModel.WalletSection] {
+        model.sections.filter { !Self.isOwed($0.role) }
+    }
+
+    var owedSections: [AssetsModel.WalletSection] {
+        model.sections.filter { Self.isOwed($0.role) }
     }
 }
 
@@ -194,179 +199,19 @@ private extension AssetsView {
             }
         }
     }
-
-    var trendContent: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if model.showsNetWorth {
-                netWorthRow
-            }
-
-            AssetsBalanceTrend(
-                totals: model.monthTotals.map(\.total),
-                netWorths: netWorths
-            )
-            .frame(height: 70)
-
-            if model.showsNetWorth {
-                trendLegend
-            }
-
-            HStack(spacing: 0) {
-                ForEach(model.monthTotals) { total in
-                    Text("\(total.month.month)月")
-                        .textFont(size: .micro)
-                        .foregroundStyle(monthColor(total.month))
-                        .frame(maxWidth: .infinity)
-                }
-            }
-        }
-    }
-
-    var trendLegend: some View {
-        HStack(spacing: 16) {
-            legend("手元のお金", color: Palette.accent)
-            legend("純資産", color: AssetsBalanceTrend.netWorthColor)
-        }
-        .frame(maxWidth: .infinity, alignment: .trailing)
-    }
-
-    var netWorthTitle: some View {
-        Text("純資産")
-            .textFont(.caption)
-            .foregroundStyle(Palette.text)
-            .fixedSize()
-    }
-
-    var netWorthNote: some View {
-        Text("投資と借入を含む")
-            .textFont(.caption2)
-            .foregroundStyle(Palette.hint)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-    }
-
-    var netWorthAmount: some View {
-        AmountText(
-            model.holdings.netWorth,
-            font: .size(.headline),
-            color: Palette.accentStrong
-        )
-        .lineLimit(1)
-        .minimumScaleFactor(0.5)
-    }
-
-    var netWorthRow: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        netWorthTitle
-
-                        netWorthNote
-                    }
-
-                    Spacer(minLength: 8)
-
-                    netWorthAmount
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        netWorthTitle
-
-                        netWorthNote
-                    }
-
-                    netWorthAmount
-                }
-            }
-
-            if !owedSections.isEmpty {
-                VStack(spacing: 4) {
-                    SplitBar(
-                        ownedShare,
-                        leading: Palette.accent,
-                        trailing: Palette.accent.opacity(.muted)
-                    )
-
-                    HStack {
-                        Text("資産 \(AmountText.text(ownedTotal))")
-
-                        Spacer(minLength: 8)
-
-                        Text("負債 \(AmountText.text(-owedTotal))")
-                    }
-                    .textFont(size: .micro)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                }
-            }
-        }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 12)
-        .background(
-            Palette.accent.opacity(.faint),
-            in: .rect(cornerRadius: corner.radius(16))
-        )
-    }
-
-    func legend(
-        _ title: String,
-        color: Color
-    ) -> some View {
-        HStack(spacing: 8) {
-            Path { path in
-                path.move(to: CGPoint(x: 0, y: 1))
-                path.addLine(to: CGPoint(x: 16, y: 1))
-            }
-            .stroke(color, lineWidth: 1.6)
-            .frame(width: 16, height: 2)
-
-            Text(title)
-                .textFont(size: .micro)
-                .foregroundStyle(Palette.subtext)
-        }
-    }
 }
 
 private extension AssetsView {
-    var ownedSections: [AssetsModel.WalletSection] {
-        model.sections.filter { !Self.isOwed($0.role) }
-    }
-
-    var owedSections: [AssetsModel.WalletSection] {
-        model.sections.filter { Self.isOwed($0.role) }
-    }
-
-    var ownedTotal: Int {
-        ownedSections.flatMap(\.rows).reduce(0) { $0 + $1.balance }
-    }
-
-    var owedTotal: Int {
-        owedSections.flatMap(\.rows).reduce(0) { $0 + $1.balance }
-    }
-
-    var ownedShare: Double {
-        let owned = max(ownedTotal, 0)
-        let owed = max(-owedTotal, 0)
-        let total = owned + owed
-        return total == 0 ? 1 : Double(owned) / Double(total)
-    }
-
-    var netWorths: [Int]? {
-        model.showsNetWorth ? model.monthTotals.map(\.netWorth) : nil
-    }
-
     var breakdownText: String {
         let holdings = model.holdings
-        let onHand = "手持ち \(AmountText.text(holdings.onHand))"
+        let onHand = "手持ち \(Yen.text(holdings.onHand))"
 
         if holdings.unpaid > 0 {
-            return "\(onHand)・未払い \(AmountText.text(holdings.unpaid))"
+            return "\(onHand)・未払い \(Yen.text(holdings.unpaid))"
         }
 
         if holdings.refund > 0 {
-            return "\(onHand)・返ってくる額 \(AmountText.text(holdings.refund))"
+            return "\(onHand)・返ってくる額 \(Yen.text(holdings.refund))"
         }
 
         return onHand
@@ -375,7 +220,7 @@ private extension AssetsView {
     var changeText: String {
         let change = model.changeFromLastMonth
         let sign = change > 0 ? "+" : ""
-        return "先月末より \(sign)\(AmountText.text(change))"
+        return "先月末より \(sign)\(Yen.text(change))"
     }
 
     static func isOwed(_ role: Wallet.Kind.Role) -> Bool {
@@ -383,10 +228,6 @@ private extension AssetsView {
         case .card, .loan: true
         case .onHand, .investment: false
         }
-    }
-
-    func monthColor(_ month: YearMonth) -> Color {
-        month == model.currentMonth ? Palette.accent : Palette.hint
     }
 
     func addWallet(_ kind: Wallet.Kind) {

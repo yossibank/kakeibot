@@ -20,6 +20,15 @@ public struct Backdrop: View {
     }
 }
 
+public extension View {
+    func backdrop() -> some View {
+        background {
+            Backdrop()
+                .ignoresSafeArea()
+        }
+    }
+}
+
 private extension Backdrop {
     @ViewBuilder
     var pattern: some View {

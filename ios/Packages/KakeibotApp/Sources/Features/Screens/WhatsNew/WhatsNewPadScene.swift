@@ -2,23 +2,31 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewPadScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .padReview:
+        switch step {
+        case .review:
             tablet {
                 review
             }
 
-        case .padKeyboard:
+        case .keyboard:
             keyboard
 
-        default:
+        case .home:
             tablet {
                 home
             }
         }
+    }
+}
+
+extension WhatsNewPadScene {
+    enum Step: Hashable, Sendable {
+        case home
+        case review
+        case keyboard
     }
 }
 

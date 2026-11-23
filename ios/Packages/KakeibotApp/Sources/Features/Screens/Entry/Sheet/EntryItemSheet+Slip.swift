@@ -221,7 +221,7 @@ private extension EntryItemSheet {
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 4) {
-                token(AmountText.text(unit.amount), label: "単価", for: .unit)
+                token(Yen.text(unit.amount), label: "単価", for: .unit)
 
                 Text("×")
                     .textFont(.body)

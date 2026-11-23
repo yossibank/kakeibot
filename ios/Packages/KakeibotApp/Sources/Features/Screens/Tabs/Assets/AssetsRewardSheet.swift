@@ -40,10 +40,7 @@ struct AssetsRewardSheet: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
-            .background {
-                Backdrop()
-                    .ignoresSafeArea()
-            }
+            .backdrop()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $isEditingRules) {
                 RewardRuleListView(database: model.database)
@@ -77,19 +74,8 @@ private extension AssetsRewardSheet {
     }
 
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-
-            Spacer()
-
-            SheetTitle("ごほうび貯金箱")
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
+        SheetHeader("ごほうび貯金箱") {
+            dismiss()
         }
     }
 
@@ -219,7 +205,7 @@ private extension AssetsRewardSheet {
         let remaining = model.remaining(to: goal)
         let progress = model.progress(to: goal)
         let percent = model.percent(to: goal)
-        let note = remaining > 0 ? "あと \(AmountText.text(remaining))" : "届きました"
+        let note = remaining > 0 ? "あと \(Yen.text(remaining))" : "届きました"
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {

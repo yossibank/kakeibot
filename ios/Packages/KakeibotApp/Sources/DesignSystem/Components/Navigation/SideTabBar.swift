@@ -48,10 +48,7 @@ public struct SideTabBar<Value: Hashable>: View {
         .padding(.vertical, 24)
         .frame(width: Self.width)
         .frame(maxHeight: .infinity)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .overlay(alignment: .trailing) {
             Rectangle()
                 .fill(Palette.hairline)

@@ -15,9 +15,9 @@ extension WhatsNewRelease {
                 ],
                 note: "iOS 26 以降で、Apple Intelligence をオンにした端末で使えます",
                 steps: [
-                    Step(scene: .analysisSwitch, caption: "分析に切り替える"),
-                    Step(scene: .analysisReason, caption: "増えた理由を見る"),
-                    Step(scene: .analysisSummary, caption: "AI のまとめを読む")
+                    Step(scene: .analysis(.toggle), caption: "分析に切り替える"),
+                    Step(scene: .analysis(.reason), caption: "増えた理由を見る"),
+                    Step(scene: .analysis(.summary), caption: "AI のまとめを読む")
                 ],
                 action: .review,
                 actionTitle: "振り返りを見る"

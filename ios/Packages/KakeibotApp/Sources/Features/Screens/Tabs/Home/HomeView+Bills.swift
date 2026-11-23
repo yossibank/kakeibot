@@ -58,9 +58,7 @@ private extension HomeView {
                     )
                 }
                 .buttonStyle(.plain)
-                .overlay(alignment: .top) {
-                    Hairline(thickness: 1)
-                }
+                .topHairline()
             }
         }
     }

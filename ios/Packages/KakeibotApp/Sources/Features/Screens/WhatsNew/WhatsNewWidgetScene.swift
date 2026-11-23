@@ -3,16 +3,23 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewWidgetScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .widgetReceipt:
+        switch step {
+        case .receipt:
             receipt
 
-        default:
+        case .tiles:
             widget
         }
+    }
+}
+
+extension WhatsNewWidgetScene {
+    enum Step: Hashable, Sendable {
+        case tiles
+        case receipt
     }
 }
 

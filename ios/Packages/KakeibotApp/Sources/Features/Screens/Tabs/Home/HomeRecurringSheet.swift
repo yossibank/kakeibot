@@ -36,10 +36,7 @@ public struct HomeRecurringSheet: View {
         .padding(.horizontal, 20)
         .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 }
 
@@ -222,9 +219,7 @@ private extension HomeRecurringSheet {
                 statusLabel(item)
             }
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

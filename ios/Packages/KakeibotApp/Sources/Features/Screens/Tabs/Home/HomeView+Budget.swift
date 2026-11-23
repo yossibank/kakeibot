@@ -45,8 +45,7 @@ extension HomeView {
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.8)
 
-                                Image(systemName: "chevron.right")
-                                    .sansFont(.micro, weight: .semibold)
+                                DisclosureMark(.link)
                             }
                             .textFont(.caption)
                             .monospacedDigit()
@@ -63,8 +62,7 @@ extension HomeView {
                         HStack(spacing: 4) {
                             Text("予算を決めると、あといくら使えるかが出ます")
 
-                            Image(systemName: "chevron.right")
-                                .sansFont(.micro, weight: .semibold)
+                            DisclosureMark(.link)
                         }
                         .textFont(.caption)
                         .foregroundStyle(Palette.subtext)
@@ -145,8 +143,7 @@ private extension HomeView {
             Label(text, systemImage: "repeat")
                 .lineLimit(1)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.micro, weight: .semibold)
+            DisclosureMark(.link)
         }
     }
 
@@ -219,7 +216,7 @@ private extension HomeView {
         }
 
         guard let usage = model.budgetUsage else {
-            return AmountText.text(model.monthExpense)
+            return Yen.text(model.monthExpense)
         }
 
         return usage.remainingAmountText
@@ -246,13 +243,13 @@ private extension HomeView {
     }
 
     func recurringText(title: String) -> String {
-        let total = "\(title) \(AmountText.text(model.recurringExpense))"
+        let total = "\(title) \(Yen.text(model.recurringExpense))"
         let upcoming = model.upcomingRecurringExpense
 
         guard upcoming > 0 else {
             return total
         }
 
-        return "\(total)・これから \(AmountText.text(upcoming))"
+        return "\(total)・これから \(Yen.text(upcoming))"
     }
 }

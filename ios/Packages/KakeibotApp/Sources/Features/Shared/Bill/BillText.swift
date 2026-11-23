@@ -17,7 +17,7 @@ enum BillText {
     }
 
     static func shortage(_ amount: Int) -> String {
-        "残高が \(AmountText.text(amount)) 足りません"
+        "残高が \(Yen.text(amount)) 足りません"
     }
 
     static func source(_ name: String?) -> String {
@@ -36,7 +36,7 @@ enum BillText {
             return nil
         }
 
-        return "\(Self.page(page.month)) \(AmountText.text(page.total))"
+        return "\(Self.page(page.month)) \(Yen.text(page.total))"
     }
 
     static func count(of page: BillPage) -> String {
@@ -62,8 +62,8 @@ enum BillText {
             return shortage(bill.shortage)
         }
 
-        let before = AmountText.text(bill.balanceBefore)
-        let after = AmountText.text(bill.balanceAfter)
+        let before = Yen.text(bill.balanceBefore)
+        let after = Yen.text(bill.balanceAfter)
 
         return "\(before) → \(after)"
     }

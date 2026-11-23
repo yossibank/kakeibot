@@ -110,7 +110,7 @@ private extension AssetsOutlookSheet {
     }
 
     var before: some View {
-        Text("\(AmountText.text(model.total)) →")
+        Text("\(Yen.text(model.total)) →")
             .textFont(.caption)
             .monospacedDigit()
             .foregroundStyle(Palette.subtext)
@@ -210,7 +210,7 @@ private extension AssetsOutlookSheet {
                 .minimumScaleFactor(0.5)
 
                 if let balance {
-                    Text("残り \(AmountText.text(balance))")
+                    Text("残り \(Yen.text(balance))")
                         .textFont(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(balance < 0 ? Palette.rose : Palette.subtext)

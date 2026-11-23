@@ -103,7 +103,7 @@ extension EntrySlip {
     }
 
     var feeValue: String {
-        model.fee > 0 ? AmountText.text(model.fee) : "なし"
+        model.fee > 0 ? Yen.text(model.fee) : "なし"
     }
 
     var dateValue: String {

@@ -14,8 +14,7 @@ struct EntryGuideCard: View {
         let scale: CGFloat = isShown ? 1 : 0.94
 
         ZStack {
-            Palette.scrim
-                .opacity(0.55)
+            Scrim(.modal)
                 .ignoresSafeArea()
                 .onTapGesture(perform: onClose)
 

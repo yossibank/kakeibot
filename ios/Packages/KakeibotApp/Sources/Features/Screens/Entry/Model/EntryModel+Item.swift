@@ -143,7 +143,7 @@ extension EntryModel {
         let price = unitPrice(of: item)
 
         return price.quantity > 1
-            ? "\(price.quantity) × \(AmountText.text(price.unit))"
+            ? "\(price.quantity) × \(Yen.text(price.unit))"
             : "×\(item.quantity)"
     }
 

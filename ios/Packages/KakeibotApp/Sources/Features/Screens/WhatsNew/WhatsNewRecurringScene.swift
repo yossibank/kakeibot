@@ -3,21 +3,29 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewRecurringScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .recurringTabs:
+        switch step {
+        case .tabs:
             tabs
                 .whatsNewTapped()
 
-        case .recurringList:
+        case .list:
             list
 
-        default:
+        case .row:
             row
                 .whatsNewTapped()
         }
+    }
+}
+
+extension WhatsNewRecurringScene {
+    enum Step: Hashable, Sendable {
+        case row
+        case tabs
+        case list
     }
 }
 

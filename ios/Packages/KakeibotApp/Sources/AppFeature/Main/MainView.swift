@@ -19,12 +19,12 @@ struct MainView: View {
     @State var notice: EntryNoticeModel
     @State var undo: DeletionUndo
     @State var launchScreen: LaunchScreen?
+    @State var orderMenuAnchor: CGRect?
+    @State var observationRound = 0
 
     @Environment(\.requestReview) var requestReview
 
     @State private var isWarmingEntry = true
-    @State private var orderMenuAnchor: CGRect?
-    @State private var observationRound = 0
     @State private var foreground = AppForegroundReturn()
     @State private var noticeRound = 0
 
@@ -98,162 +98,23 @@ struct MainView: View {
 
     var body: some View {
         ZStack {
-            MainTabLayer(selection: selection, value: .home) {
-                HomeView(
-                    model: home,
-                    setup: setup,
-                    appIcon: appIcon,
-                    isSheetOpen: sheet != nil,
-                    onOpenEntry: { id in
-                        sheet = .edit(id)
-                    },
-                    onShowRecords: {
-                        records.openCurrentMonth()
+            homeTab
 
-                        tab = .records
-                    },
-                    onAddEntry: addEntry(on:),
-                    onRetry: {
-                        observationRound += 1
-                    },
-                    onOpenSettings: {
-                        sheet = .settings
-                    },
-                    onOpenNews: openNews,
-                    onUseTemplate: useTemplate,
-                    onShowAllTemplates: {
-                        sheet = .templates
-                    },
-                    onOpenOrderMenu: { frame in
-                        withAnimation(.snappy(duration: 0.25)) {
-                            orderMenuAnchor = frame
-                        }
-                    },
-                    onAddTemplate: {
-                        sheet = .newTemplate
-                    },
-                    onDeleteEntry: { id in
-                        Task {
-                            await notice.delete(id, in: home.list)
-                        }
-                    },
-                    onOpenRecurrings: {
-                        sheet = .periodRecurrings
-                    },
-                    onOpenRecurring: { id in
-                        sheet = .recurring(id)
-                    },
-                    onOpenSetup: { item in
-                        sheet = .setup(item)
-                    },
-                    onOpenDay: { date in
-                        records.open(date)
+            recordsTab
 
-                        tab = .records
-                    }
-                )
-                .tabContent()
-            }
+            reviewTab
 
-            MainTabLayer(selection: selection, value: .records) {
-                RecordsView(
-                    model: records,
-                    onOpenEntry: { id in
-                        sheet = .edit(id)
-                    },
-                    onAddEntry: addEntry(on:),
-                    onOpenRecurring: { id in
-                        sheet = .recurring(id)
-                    },
-                    onChangeEntries: { ids, change in
-                        Task {
-                            await notice.changeEntries(ids, to: change)
-                        }
-                    },
-                    onDeleteEntries: { ids in
-                        Task {
-                            await notice.deleteEntries(ids)
-                        }
-                    },
-                    onDeleteAdjustment: { deletion in
-                        undo.deletion = deletion
-                    }
-                )
-                .loadFailed(records.isListFailed) {
-                    observationRound += 1
-                }
-                .tabContent()
-            }
-
-            MainTabLayer(selection: selection, value: .review) {
-                ReviewView(
-                    model: review,
-                    onOpenEntry: { id in
-                        sheet = .edit(id)
-                    },
-                    onOpenRecurring: { id in
-                        sheet = .recurring(id)
-                    },
-                    onOpenDay: { date in
-                        records.open(date)
-
-                        tab = .records
-                    },
-                    onAddEntry: addEntry(on:),
-                    onOpenRecurrings: {
-                        sheet = .periodRecurrings
-                    }
-                )
-                .loadFailed(review.isListFailed) {
-                    observationRound += 1
-                }
-                .tabContent()
-            }
-
-            MainTabLayer(selection: selection, value: .assets) {
-                AssetsView(
-                    model: assets,
-                    onTransfer: addTransfer,
-                    onOpenWallet: { id in
-                        sheet = .wallet(id)
-                    },
-                    onOpenRecurring: { id in
-                        sheet = .recurring(id)
-                    },
-                    onOpenEntry: { id in
-                        sheet = .edit(id)
-                    },
-                    onMarkReward: {
-                        sheet = .reward
-                    }
-                )
-                .loadFailed(assets.isListFailed) {
-                    observationRound += 1
-                }
-                .tabContent()
-            }
+            assetsTab
         }
         .environment(\.noticeRound, noticeRound)
         .overlay(alignment: .leading) {
             if hasSidebar {
-                MainTabBar(
-                    selection: selection,
-                    hasSidebar: true,
-                    isAddHinted: !setup.isEntryOpened
-                ) {
-                    sheet = .new
-                }
+                tabBar
             }
         }
         .overlay(alignment: .bottom) {
             if !hasSidebar {
-                MainTabBar(
-                    selection: selection,
-                    hasSidebar: false,
-                    isAddHinted: !setup.isEntryOpened
-                ) {
-                    sheet = .new
-                }
+                tabBar
             }
         }
         .overlay {
@@ -367,6 +228,16 @@ private extension MainView {
 }
 
 private extension MainView {
+    var tabBar: some View {
+        MainTabBar(
+            selection: selection,
+            hasSidebar: hasSidebar,
+            isAddHinted: !setup.isEntryOpened
+        ) {
+            sheet = .new
+        }
+    }
+
     var notices: some View {
         let noticeAbove = Self.noticeAbove(hasSidebar: hasSidebar)
         let noticeBottom = Self.noticeBottom(hasSidebar: hasSidebar)

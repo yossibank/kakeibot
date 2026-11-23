@@ -8,8 +8,7 @@ public struct RewardRuleEditSheet: View {
     @State private var panel: Panel?
     @State private var isEditingIcon = false
     @State private var iconBottom: CGFloat = 0
-    @State private var isConfirmingDiscard = false
-    @State private var isConfirmingHideChanges = false
+    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -32,102 +31,70 @@ public struct RewardRuleEditSheet: View {
     }
 
     public var body: some View {
-        ZStack(alignment: .bottom) {
-            content
-
-            if let panel {
-                Palette.scrim
-                    .opacity(0.35)
+        content
+            .settingsDrawerLayer(item: panel) {
+                closePanel()
+            } drawer: { panel in
+                drawerView(panel)
+            }
+            .iconEditorDrawer(
+                isPresented: $isEditingIcon,
+                model: model.icon,
+                focus: $focus,
+                textField: .text,
+                below: iconBottom
+            )
+            .overlay(alignment: .top) {
+                SettingsEditHeader(
+                    title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
+                    isEditing: model.isEditing,
+                    isHidden: model.isHidden,
+                    canDelete: !(model.isHidden && model.hasLogs)
+                ) {
+                    edit.close()
+                } onHide: {
+                    edit.toggleHidden()
+                } onDelete: {
+                    isConfirmingDelete = true
+                }
+                .padding(.horizontal, SettingsSpacing.side)
+                .padding(.top, SettingsSpacing.top)
+            }
+            .background {
+                Backdrop()
                     .ignoresSafeArea()
                     .onTapGesture {
-                        closePanel()
+                        focus = nil
                     }
-                    .transition(.opacity)
-                    .zIndex(1)
-
-                drawerView(panel)
-                    .transition(.settingsDrawer)
-                    .zIndex(1)
             }
-        }
-        .iconEditorDrawer(
-            isPresented: $isEditingIcon,
-            model: model.icon,
-            focus: $focus,
-            textField: .text,
-            below: iconBottom
-        )
-        .overlay(alignment: .top) {
-            SettingsEditHeader(
-                title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
-                isEditing: model.isEditing,
-                isHidden: model.isHidden,
-                canDelete: !(model.isHidden && model.hasLogs)
+            .errorBanner($model.errorNotice)
+            .settingsEditConfirmations(edit)
+            .confirmation(
+                isPresented: $isConfirmingDelete,
+                systemImage: deleteImage,
+                title: deleteTitle,
+                message: deleteMessage,
+                keepTitle: "やめる",
+                confirmTitle: deleteConfirmTitle,
+                role: deleteRole
             ) {
-                close()
-            } onHide: {
-                toggleHidden()
-            } onDelete: {
-                isConfirmingDelete = true
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, SettingsSpacing.top)
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-                .onTapGesture {
-                    focus = nil
-                }
-        }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .confirmsUnsavedHide(
-            isHidden: model.isHidden,
-            canSave: model.canSave,
-            isPresented: $isConfirmingHideChanges
-        ) {
-            Task {
-                await save(hiding: true)
-            }
-        } onDiscard: {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-        }
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            dismiss()
-        }
-        .confirmation(
-            isPresented: $isConfirmingDelete,
-            systemImage: deleteImage,
-            title: deleteTitle,
-            message: deleteMessage,
-            keepTitle: "やめる",
-            confirmTitle: deleteConfirmTitle,
-            role: deleteRole
-        ) {
-            if model.hasLogs {
-                toggleHidden()
-            } else {
-                Task {
-                    await delete()
+                if model.hasLogs {
+                    edit.toggleHidden()
+                } else {
+                    Task {
+                        await edit.delete()
+                    }
                 }
             }
-        }
-        .onChange(of: focus) {
-            if focus != nil {
-                hidePanel()
+            .onChange(of: focus) {
+                if focus != nil {
+                    hidePanel()
+                }
             }
-        }
-        .task {
-            await model.load()
-        }
-        .presentationSizing(.tallForm)
+            .task {
+                await model.load()
+            }
+            .presentationSizing(.tallForm)
     }
 }
 
@@ -197,7 +164,7 @@ private extension RewardRuleEditSheet {
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
             Task {
-                await save()
+                await edit.save()
             }
         }
         .disabled(!model.canSave)
@@ -252,6 +219,23 @@ private extension RewardRuleEditSheet {
         model.hasLogs ? .suggestion : .destructive
     }
 
+    var edit: SettingsEditController<RewardRuleEditModel> {
+        SettingsEditController(
+            model: model,
+            prompt: $prompt,
+            dismiss: dismiss,
+            restsOnHide: true,
+            onRest: {
+                closePanel()
+            },
+            onHide: onHide,
+            onDelete: onDelete,
+            onSave: {
+                await model.save()
+            }
+        )
+    }
+
     func open(_ panel: Panel) {
         focus = nil
 
@@ -270,66 +254,9 @@ private extension RewardRuleEditSheet {
         focus = nil
         hidePanel()
     }
-
-    func close() {
-        closePanel()
-
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
-    }
-
-    func save(hiding: Bool = false) async {
-        closePanel()
-
-        if await model.save() {
-            if hiding {
-                guard await model.setHidden(!model.isHidden) else {
-                    return
-                }
-
-                if model.isHidden {
-                    onHide()
-                }
-            }
-
-            dismiss()
-        }
-    }
-
-    func toggleHidden() {
-        guard model.isChanged else {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-
-            return
-        }
-
-        isConfirmingHideChanges = true
-    }
-
-    func setHidden(_ isHidden: Bool) async {
-        closePanel()
-
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
-            dismiss()
-        }
-    }
 }
+
+extension RewardRuleEditModel: SettingsEditing {}
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {

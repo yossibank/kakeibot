@@ -163,9 +163,7 @@ private extension ThemeStyleLookView {
                 amount: 900,
                 type: .expense
             )
-            .overlay(alignment: .top) {
-                Hairline(thickness: 1)
-            }
+            .topHairline()
 
             EntryRow(
                 icon: .styleSample(.transit),
@@ -174,9 +172,7 @@ private extension ThemeStyleLookView {
                 amount: 440,
                 type: .expense
             )
-            .overlay(alignment: .top) {
-                Hairline(thickness: 1)
-            }
+            .topHairline()
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)

@@ -80,9 +80,7 @@ extension RecordsView {
                     }
                 }
             }
-            .overlay(alignment: .top) {
-                Hairline(thickness: 1)
-            }
+            .topHairline()
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)

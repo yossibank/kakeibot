@@ -2,20 +2,28 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewAnalysisScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .analysisReason:
+        switch step {
+        case .reason:
             reason
 
-        case .analysisSummary:
+        case .summary:
             summary
 
-        default:
+        case .toggle:
             displaySwitch
                 .whatsNewTapped()
         }
+    }
+}
+
+extension WhatsNewAnalysisScene {
+    enum Step: Hashable, Sendable {
+        case toggle
+        case reason
+        case summary
     }
 }
 

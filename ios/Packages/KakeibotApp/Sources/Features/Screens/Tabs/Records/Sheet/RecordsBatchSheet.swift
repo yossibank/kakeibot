@@ -56,21 +56,12 @@ extension RecordsBatchSheet {
 
 private extension RecordsBatchSheet {
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-
-            Spacer()
-
+        SheetHeader {
+            dismiss()
+        } title: {
             SheetTitle(title)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
-
-            Spacer()
-
-            Color.clear
-                .frame(width: 44, height: 44)
         }
     }
 

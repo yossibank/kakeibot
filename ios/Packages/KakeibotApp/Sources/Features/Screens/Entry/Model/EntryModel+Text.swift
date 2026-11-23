@@ -96,10 +96,10 @@ public extension EntryModel {
         let title = "今月の\(selectedCategory?.name ?? typeName)"
 
         guard totals.after != totals.current else {
-            return "\(title) \(AmountText.text(totals.current))"
+            return "\(title) \(Yen.text(totals.current))"
         }
 
-        return "\(title) \(AmountText.text(totals.current)) → \(AmountText.text(totals.after))"
+        return "\(title) \(Yen.text(totals.current)) → \(Yen.text(totals.after))"
     }
 
     var monthOverview: MonthOverview {

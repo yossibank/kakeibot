@@ -15,9 +15,9 @@ extension WhatsNewRelease {
                 ],
                 note: "iOS 26 以降で Apple Intelligence をオンにすると、品目をより正しく読めます",
                 steps: [
-                    Step(scene: .receiptButton, caption: "「レシート」を押す"),
-                    Step(scene: .receiptCamera, caption: "レシートを撮る"),
-                    Step(scene: .receiptItems, caption: "品目が入る")
+                    Step(scene: .receipt(.button), caption: "「レシート」を押す"),
+                    Step(scene: .receipt(.camera), caption: "レシートを撮る"),
+                    Step(scene: .receipt(.items), caption: "品目が入る")
                 ],
                 action: .entry,
                 actionTitle: "入力シートを開く"
@@ -33,9 +33,9 @@ extension WhatsNewRelease {
                     "記録の一覧で品名を探せます"
                 ],
                 steps: [
-                    Step(scene: .itemsAdd, caption: "「＋ 品目」を押す"),
-                    Step(scene: .itemsSlip, caption: "品名と金額を入れる"),
-                    Step(scene: .itemsList, caption: "税率ごとに並ぶ")
+                    Step(scene: .items(.add), caption: "「＋ 品目」を押す"),
+                    Step(scene: .items(.slip), caption: "品名と金額を入れる"),
+                    Step(scene: .items(.list), caption: "税率ごとに並ぶ")
                 ],
                 action: .entry,
                 actionTitle: "入力シートを開く"
@@ -50,9 +50,9 @@ extension WhatsNewRelease {
                     "使いすぎた分は次の予算から引きます"
                 ],
                 steps: [
-                    Step(scene: .carryoverSwitch, caption: "繰り越すにする"),
-                    Step(scene: .carryoverLeft, caption: "残りが出る"),
-                    Step(scene: .carryoverNext, caption: "次の予算に足す")
+                    Step(scene: .carryover(.toggle), caption: "繰り越すにする"),
+                    Step(scene: .carryover(.left), caption: "残りが出る"),
+                    Step(scene: .carryover(.next), caption: "次の予算に足す")
                 ],
                 action: .setup(.budget),
                 actionTitle: "予算を開く"
@@ -67,9 +67,9 @@ extension WhatsNewRelease {
                     "期間と予算も、ずらした日から数えます"
                 ],
                 steps: [
-                    Step(scene: .monthStartDay, caption: "始まりの日を選ぶ"),
-                    Step(scene: .monthStartShift, caption: "「前の平日」を押す"),
-                    Step(scene: .monthStartPeriod, caption: "期間がずれる")
+                    Step(scene: .monthStart(.day), caption: "始まりの日を選ぶ"),
+                    Step(scene: .monthStart(.shift), caption: "「前の平日」を押す"),
+                    Step(scene: .monthStart(.period), caption: "期間がずれる")
                 ],
                 action: .setup(.monthStart),
                 actionTitle: "月の始まりを開く"

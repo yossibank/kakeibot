@@ -15,8 +15,7 @@ struct RecordsMarkMenu: View {
             let local = anchor.offsetBy(dx: -origin.x, dy: -origin.y)
 
             ZStack(alignment: .topLeading) {
-                Palette.scrim
-                    .opacity(0.45)
+                Scrim(.menu)
                     .ignoresSafeArea()
                     .onTapGesture(perform: onClose)
 
@@ -71,10 +70,12 @@ private extension RecordsMarkMenu {
         for anchor: CGRect,
         in width: CGFloat
     ) -> CGFloat {
-        let preferred = anchor.maxX - Self.width
-        let limit = width - Self.width - Self.inset
-        let lower = max(preferred, Self.inset)
-        return min(lower, limit)
+        MenuPlacement.trailingX(
+            of: anchor,
+            panelWidth: Self.width,
+            in: width,
+            inset: Self.inset
+        )
     }
 
     func panelY(

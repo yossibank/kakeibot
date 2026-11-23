@@ -14,6 +14,15 @@ public extension View {
             )
         )
     }
+
+    func errorBanner(
+        _ notice: Binding<ErrorNotice>,
+        bottom: CGFloat = NoticeBanner.bottomMargin
+    ) -> some View {
+        errorBanner(notice.wrappedValue, bottom: bottom) {
+            notice.wrappedValue.clear()
+        }
+    }
 }
 
 public extension NoticeBanner {

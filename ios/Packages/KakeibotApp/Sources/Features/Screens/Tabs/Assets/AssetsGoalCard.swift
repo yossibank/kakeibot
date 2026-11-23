@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -27,7 +28,7 @@ struct AssetsGoalCard: View {
 
             HStack {
                 if remaining > 0 || targetAmount == 0 {
-                    Text("あと \(AmountText.text(remaining))")
+                    Text("あと \(Yen.text(remaining))")
                         .textFont(.caption)
                         .monospacedDigit()
                         .foregroundStyle(Palette.accent)

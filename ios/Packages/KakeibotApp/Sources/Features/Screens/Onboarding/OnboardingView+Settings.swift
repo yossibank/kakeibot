@@ -137,7 +137,7 @@ private extension OnboardingView {
 
 private extension OnboardingView {
     var budgetText: String {
-        model.budget.totalAmount.map { AmountText.text($0) } ?? "なし"
+        model.budget.totalAmount.map { Yen.text($0) } ?? "なし"
     }
 
     var budgetColor: Color {

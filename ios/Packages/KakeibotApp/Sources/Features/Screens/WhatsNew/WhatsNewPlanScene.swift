@@ -3,21 +3,29 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewPlanScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .planButton:
+        switch step {
+        case .button:
             planButton
                 .whatsNewTapped()
 
-        case .planList:
+        case .list:
             planList
 
-        default:
+        case .tab:
             tabBar
                 .whatsNewTapped()
         }
+    }
+}
+
+extension WhatsNewPlanScene {
+    enum Step: Hashable, Sendable {
+        case tab
+        case button
+        case list
     }
 }
 

@@ -98,17 +98,12 @@ public struct BackupView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .task {
             await model.observeSync()
@@ -194,9 +189,7 @@ private extension BackupView {
                     ProgressView()
                         .controlSize(.small)
                 } else {
-                    Image(systemName: "chevron.right")
-                        .sansFont(.small)
-                        .foregroundStyle(Palette.hint)
+                    DisclosureMark()
                 }
             }
             .frame(minHeight: 58)

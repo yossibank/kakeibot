@@ -1,3 +1,4 @@
+import Core
 import SwiftUI
 
 public struct FeeChoiceRow: View {
@@ -34,7 +35,7 @@ public extension FeeChoiceRow {
 
 private extension FeeChoiceRow {
     func button(_ amount: Int) -> some View {
-        let title = amount == 0 ? "なし" : AmountText.text(amount)
+        let title = amount == 0 ? "なし" : Yen.text(amount)
 
         return ChipButton(
             isSelected: selection == amount,

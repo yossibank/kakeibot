@@ -53,17 +53,14 @@ extension WalletEditSheet {
                 focus = nil
                 isConfirmingDelete = true
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, SettingsSpacing.side)
             .padding(.top, SettingsSpacing.top)
         }
         .contentShape(.rect)
         .onTapGesture {
             focus = nil
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 
     var saveButton: some View {
@@ -205,8 +202,7 @@ extension WalletEditSheet {
         @ViewBuilder button: () -> some View
     ) -> some View {
         Group {
-            Palette.scrim
-                .opacity(0.35)
+            Scrim(.drawer)
                 .ignoresSafeArea()
                 .onTapGesture {
                     onDismiss()

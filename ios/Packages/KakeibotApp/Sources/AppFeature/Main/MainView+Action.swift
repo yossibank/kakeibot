@@ -53,6 +53,28 @@ extension MainView {
         }
     }
 
+    func openEntry(_ id: Entry.ID) {
+        sheet = .edit(id)
+    }
+
+    func openRecurring(_ id: Recurring.ID) {
+        sheet = .recurring(id)
+    }
+
+    func openRecurrings() {
+        sheet = .periodRecurrings
+    }
+
+    func showDay(_ date: LocalDate) {
+        records.open(date)
+
+        tab = .records
+    }
+
+    func retry() {
+        observationRound += 1
+    }
+
     func addEntry(on date: LocalDate) {
         draft.date = date
         sheet = .new

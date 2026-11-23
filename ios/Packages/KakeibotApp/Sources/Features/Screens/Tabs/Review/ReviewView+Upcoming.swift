@@ -14,8 +14,7 @@ extension ReviewView {
                 HStack(spacing: 4) {
                     upcomingLabel(upcoming)
 
-                    Image(systemName: "chevron.right")
-                        .sansFont(.micro, weight: .semibold)
+                    DisclosureMark(.link)
                 }
                 .upcomingRowStyle(minHeight: minHeight)
                 .tapArea(tapOutsets)
@@ -30,7 +29,7 @@ extension ReviewView {
 
 private extension ReviewView {
     func upcomingLabel(_ upcoming: Int) -> some View {
-        let rest = "固定費あと \(AmountText.text(upcoming))"
+        let rest = "固定費あと \(Yen.text(upcoming))"
         let outlook = outlookText(upcoming)
 
         return Label {
@@ -58,7 +57,7 @@ private extension ReviewView {
 
     func outlookText(_ upcoming: Int) -> String {
         let total = model.total(of: model.kind) + upcoming
-        return "\(Self.outlookName(of: model.scale)) \(AmountText.text(total))"
+        return "\(Self.outlookName(of: model.scale)) \(Yen.text(total))"
     }
 }
 

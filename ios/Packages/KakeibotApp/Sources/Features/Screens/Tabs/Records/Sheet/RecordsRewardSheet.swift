@@ -54,20 +54,11 @@ public struct RecordsRewardSheet: View {
 
 private extension RecordsRewardSheet {
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-
-            Spacer()
-
-            SheetTitle("\(date.monthDayText) のごほうび")
-
-            Spacer()
-
+        SheetHeader("\(date.monthDayText) のごほうび") {
+            dismiss()
+        } trailing: {
             if rules.isEmpty {
-                Color.clear
-                    .frame(width: 44, height: 44)
+                SheetHeaderSlot()
             } else {
                 RingButton(systemImage: "plus") {
                     isAddingRule = true

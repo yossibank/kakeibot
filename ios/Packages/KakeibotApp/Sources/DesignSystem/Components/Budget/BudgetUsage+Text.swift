@@ -6,26 +6,26 @@ public extension BudgetUsage {
     }
 
     var remainingAmountText: String {
-        AmountText.text(abs(remaining))
+        Yen.text(abs(remaining))
     }
 
     var remainingText: String {
         if isOver {
-            return "オーバー \(AmountText.text(-remaining))"
+            return "オーバー \(Yen.text(-remaining))"
         }
 
-        return "残り \(AmountText.text(remaining))"
+        return "残り \(Yen.text(remaining))"
     }
 
     var budgetText: String {
-        let base = "予算 \(AmountText.text(baseBudget))"
+        let base = "予算 \(Yen.text(baseBudget))"
 
         if carryover > 0 {
-            return "\(base) ＋ 繰越 \(AmountText.text(carryover))"
+            return "\(base) ＋ 繰越 \(Yen.text(carryover))"
         }
 
         if carryover < 0 {
-            return "\(base) − 繰越 \(AmountText.text(-carryover))"
+            return "\(base) − 繰越 \(Yen.text(-carryover))"
         }
 
         return base
@@ -33,7 +33,7 @@ public extension BudgetUsage {
 
     var carryoverText: String {
         let sign = carryover < 0 ? "−" : "＋"
-        return "繰越 \(sign)\(AmountText.text(abs(carryover)))"
+        return "繰越 \(sign)\(Yen.text(abs(carryover)))"
     }
 
     var warningText: String? {

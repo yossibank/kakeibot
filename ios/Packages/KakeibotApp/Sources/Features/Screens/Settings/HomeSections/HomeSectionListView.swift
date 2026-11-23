@@ -45,17 +45,7 @@ public struct HomeSectionListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(dragging != nil)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
-        .toolbar(.hidden, for: .navigationBar)
+        .settingsScreen(errorNotice: $model.errorNotice)
         .animation(.snappy, value: model.layout)
         .transaction(value: model.isLoaded) { transaction in
             transaction.disablesAnimations = true

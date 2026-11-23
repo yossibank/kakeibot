@@ -95,9 +95,7 @@ public struct WalletEditSheet: View {
             textField: .text,
             below: iconBottom
         )
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .deletionNotice($valuationDeletion) { deletion in
             Task {
                 await model.restore(deletion)

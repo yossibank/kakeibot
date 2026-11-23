@@ -44,7 +44,7 @@ private extension RecurringLoanPlan {
     var noteText: String? {
         if model.usesAutoCount,
            let owed = model.loanOwed {
-            return "残高 \(AmountText.text(owed)) から回数と最後の回を出しています"
+            return "残高 \(Yen.text(owed)) から回数と最後の回を出しています"
         }
 
         guard let plan = model.autoPlan else {
@@ -52,7 +52,7 @@ private extension RecurringLoanPlan {
         }
 
         if let gap = model.balanceGap {
-            return "残高と \(AmountText.text(abs(gap))) ずれています"
+            return "残高と \(Yen.text(abs(gap))) ずれています"
         }
 
         return model.plannedTotal == nil ? "残高から出すと、あと \(plan.count) 回で終わります" : nil

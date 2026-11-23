@@ -22,401 +22,91 @@ struct WhatsNewScene: View {
 
 extension WhatsNewScene {
     enum Kind: Hashable, Sendable {
-        case receiptButton
-        case receiptCamera
-        case receiptItems
-        case itemsAdd
-        case itemsSlip
-        case itemsList
-        case carryoverSwitch
-        case carryoverLeft
-        case carryoverNext
-        case monthStartDay
-        case monthStartShift
-        case monthStartPeriod
-        case unpaidRow
-        case unpaidButton
-        case unpaidList
-        case shiftWallet
-        case shiftChoice
-        case shiftBill
-        case recurringRow
-        case recurringTabs
-        case recurringList
-        case loanCount
-        case loanFinal
-        case loanTotal
-        case iconRow
-        case iconButton
-        case iconGrid
-        case planTab
-        case planButton
-        case planList
-        case pagerCard
-        case pagerSwipe
-        case pagerNext
-        case walletAdd
-        case walletKinds
-        case walletMade
-        case outlookTab
-        case outlookBlock
-        case outlookList
-        case voiceButton
-        case voiceListen
-        case voiceFilled
-        case entrySlip
-        case entryDeck
-        case entryShortcuts
-        case padHome
-        case padReview
-        case padKeyboard
-        case upcomingCaptions
-        case upcomingDay
-        case upcomingOpen
-        case widgetTiles
-        case widgetReceipt
-        case analysisSwitch
-        case analysisReason
-        case analysisSummary
-        case reviewPace
-        case reviewClosing
-        case reviewGoal
+        case receipt(WhatsNewReceiptScene.Step)
+        case items(WhatsNewItemsScene.Step)
+        case carryover(WhatsNewCarryoverScene.Step)
+        case monthStart(WhatsNewMonthStartScene.Step)
+        case bill(WhatsNewBillScene.Step)
+        case recurring(WhatsNewRecurringScene.Step)
+        case loan(WhatsNewLoanScene.Step)
+        case icon(WhatsNewIconScene.Step)
+        case plan(WhatsNewPlanScene.Step)
+        case pager(WhatsNewPagerScene.Step)
+        case wallet(WhatsNewWalletScene.Step)
+        case outlook(WhatsNewOutlookScene.Step)
+        case voice(WhatsNewVoiceScene.Step)
+        case entry(WhatsNewEntryScene.Step)
+        case pad(WhatsNewPadScene.Step)
+        case upcoming(WhatsNewUpcomingScene.Step)
+        case widget(WhatsNewWidgetScene.Step)
+        case analysis(WhatsNewAnalysisScene.Step)
+        case review(WhatsNewReviewScene.Step)
     }
 }
 
 private extension WhatsNewScene {
     static let size: CGFloat = 140
-}
 
-private extension WhatsNewScene {
     @ViewBuilder
     var content: some View {
         switch kind {
-        case .receiptButton:
-            tapped {
-                EntryReceiptButton(freeLeft: nil) {}
-            }
+        case let .receipt(step):
+            WhatsNewReceiptScene(step: step)
 
-        case .receiptCamera:
-            FeatureArtReceipt(showsViewfinder: true)
-                .scaleEffect(0.95)
+        case let .items(step):
+            WhatsNewItemsScene(step: step)
 
-        case .receiptItems:
-            VStack(spacing: 8) {
-                FeatureArtSlip(showsRates: false)
+        case let .carryover(step):
+            WhatsNewCarryoverScene(step: step)
 
-                countBadge
-            }
-            .padding(.horizontal, 4)
+        case let .monthStart(step):
+            WhatsNewMonthStartScene(step: step)
 
-        case .itemsAdd:
-            tapped {
-                Label("品目", systemImage: "plus")
-                    .textFont(size: .caption, weight: .semibold)
-                    .foregroundStyle(Palette.accent)
-                    .padding(.horizontal, 12)
-                    .frame(height: 30)
-                    .overlay {
-                        Capsule()
-                            .stroke(Palette.accent, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
-                    }
-            }
+        case let .bill(step):
+            WhatsNewBillScene(step: step)
 
-        case .itemsSlip:
-            itemForm
+        case let .recurring(step):
+            WhatsNewRecurringScene(step: step)
 
-        case .itemsList:
-            FeatureArtSlip(showsRates: true, count: 2)
-                .padding(.horizontal, 2)
+        case let .loan(step):
+            WhatsNewLoanScene(step: step)
 
-        case .carryoverSwitch:
-            carryoverSwitch
+        case let .icon(step):
+            WhatsNewIconScene(step: step)
 
-        case .carryoverLeft:
-            carryoverLeft
+        case let .plan(step):
+            WhatsNewPlanScene(step: step)
 
-        case .carryoverNext:
-            carryoverNext
+        case let .pager(step):
+            WhatsNewPagerScene(step: step)
 
-        case .monthStartDay:
-            monthStartDay
+        case let .wallet(step):
+            WhatsNewWalletScene(step: step)
 
-        case .monthStartShift:
-            tapped {
-                monthStartShift
-            }
+        case let .outlook(step):
+            WhatsNewOutlookScene(step: step)
 
-        case .monthStartPeriod:
-            monthStartPeriod
+        case let .voice(step):
+            WhatsNewVoiceScene(step: step)
 
-        case .unpaidRow, .unpaidButton, .unpaidList, .shiftWallet, .shiftChoice, .shiftBill:
-            WhatsNewBillScene(kind: kind)
+        case let .entry(step):
+            WhatsNewEntryScene(step: step)
 
-        case .recurringRow, .recurringTabs, .recurringList:
-            WhatsNewRecurringScene(kind: kind)
+        case let .pad(step):
+            WhatsNewPadScene(step: step)
 
-        case .loanCount, .loanFinal, .loanTotal:
-            WhatsNewLoanScene(kind: kind)
+        case let .upcoming(step):
+            WhatsNewUpcomingScene(step: step)
 
-        case .iconRow, .iconButton, .iconGrid:
-            WhatsNewIconScene(kind: kind)
+        case let .widget(step):
+            WhatsNewWidgetScene(step: step)
 
-        case .planTab, .planButton, .planList:
-            WhatsNewPlanScene(kind: kind)
+        case let .analysis(step):
+            WhatsNewAnalysisScene(step: step)
 
-        case .pagerCard, .pagerSwipe, .pagerNext:
-            WhatsNewPagerScene(kind: kind)
-
-        case .walletAdd, .walletKinds, .walletMade:
-            WhatsNewWalletScene(kind: kind)
-
-        case .outlookTab, .outlookBlock, .outlookList:
-            WhatsNewOutlookScene(kind: kind)
-
-        case .voiceButton, .voiceListen, .voiceFilled:
-            WhatsNewVoiceScene(kind: kind)
-
-        case .entrySlip, .entryDeck, .entryShortcuts:
-            WhatsNewEntryScene(kind: kind)
-
-        case .padHome, .padReview, .padKeyboard:
-            WhatsNewPadScene(kind: kind)
-
-        case .upcomingCaptions, .upcomingDay, .upcomingOpen:
-            WhatsNewUpcomingScene(kind: kind)
-
-        case .widgetTiles, .widgetReceipt:
-            WhatsNewWidgetScene(kind: kind)
-
-        case .analysisSwitch, .analysisReason, .analysisSummary:
-            WhatsNewAnalysisScene(kind: kind)
-
-        case .reviewPace, .reviewClosing, .reviewGoal:
-            WhatsNewReviewScene(kind: kind)
+        case let .review(step):
+            WhatsNewReviewScene(step: step)
         }
-    }
-
-    var countBadge: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "receipt")
-
-            Text("品目 \(FeatureArtSample.items.count)件")
-
-            AmountText(FeatureArtSample.total, font: .size(.caption, weight: .semibold))
-        }
-        .textFont(size: .caption, weight: .semibold)
-        .foregroundStyle(Palette.accentStrong)
-        .padding(.horizontal, 8)
-        .frame(height: 24)
-        .background(Palette.accent.opacity(.subtle), in: .capsule)
-    }
-
-    var itemForm: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("品名")
-                .textFont(size: .micro)
-                .foregroundStyle(Palette.subtext)
-
-            Text("牛乳")
-                .textFont(size: .small, weight: .semibold)
-                .foregroundStyle(Palette.text)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 8)
-                .frame(height: 26)
-                .background(Palette.card, in: .rect(cornerRadius: 4))
-
-            HStack(spacing: 4) {
-                AmountText(198, font: .size(.caption, weight: .medium))
-
-                Text("×")
-                    .foregroundStyle(Palette.hint)
-
-                Text("2")
-
-                Text("=")
-                    .foregroundStyle(Palette.hint)
-
-                AmountText(396, font: .size(.caption, weight: .medium), color: Palette.accentStrong)
-                    .bold()
-            }
-            .textFont(size: .caption, weight: .medium)
-            .monospacedDigit()
-            .foregroundStyle(Palette.text)
-        }
-        .padding(8)
-        .background {
-            EntryReceiptShape(tooth: 6, hasTopEdge: true, hasBottomEdge: false)
-                .fill(Palette.paper)
-        }
-        .overlay {
-            EntryReceiptShape(tooth: 6, hasTopEdge: true, hasBottomEdge: false)
-                .stroke(Palette.paperEdge, lineWidth: 1)
-        }
-        .padding(.horizontal, 4)
-    }
-
-    var carryoverSwitch: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("予算")
-                .textFont(size: .micro, weight: .semibold)
-                .tracking(1)
-                .foregroundStyle(Palette.accent)
-
-            HStack {
-                Text("残りを\n繰り越す")
-                    .textFont(size: .caption)
-                    .foregroundStyle(Palette.text)
-
-                Spacer(minLength: 4)
-
-                Capsule()
-                    .fill(Palette.accent)
-                    .frame(width: 40, height: 24)
-                    .overlay(alignment: .trailing) {
-                        Circle()
-                            .fill(.white)
-                            .shadow(color: Palette.shadow, radius: 1, y: 1)
-                            .padding(2)
-                    }
-            }
-        }
-        .padding(12)
-        .card(cornerRadius: 12)
-        .padding(.horizontal, 4)
-    }
-
-    var carryoverLeft: some View {
-        VStack(spacing: 4) {
-            Text("11月の残り")
-                .textFont(size: .caption)
-                .foregroundStyle(Palette.subtext)
-
-            ZStack(alignment: .bottom) {
-                HalfDial(progress: 0.84)
-
-                AmountText(
-                    FeatureArtSample.carryover,
-                    font: .size(.body, weight: .bold),
-                    color: Palette.accentStrong
-                )
-            }
-            .frame(width: 120, height: 60)
-        }
-    }
-
-    var carryoverNext: some View {
-        let total = FeatureArtSample.budget + FeatureArtSample.carryover
-
-        return VStack(alignment: .leading, spacing: 4) {
-            Text("12月")
-                .textFont(size: .caption, weight: .semibold)
-                .foregroundStyle(Palette.accent)
-
-            Text("予算 \(AmountText.text(FeatureArtSample.budget))")
-                .textFont(size: .caption)
-                .foregroundStyle(Palette.text)
-
-            Text("＋ 繰越 \(AmountText.text(FeatureArtSample.carryover))")
-                .textFont(size: .caption, weight: .semibold)
-                .foregroundStyle(Palette.accentStrong)
-                .padding(.horizontal, 4)
-                .padding(.vertical, 2)
-                .background(Palette.accent.opacity(.subtle), in: .capsule)
-
-            AmountText(total, font: .size(.headline, weight: .bold), color: Palette.accentStrong)
-        }
-        .monospacedDigit()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12)
-    }
-
-    var monthStartDay: some View {
-        VStack(spacing: 8) {
-            Text("月の始まり")
-                .textFont(size: .micro, weight: .semibold)
-                .tracking(1)
-                .foregroundStyle(Palette.accent)
-
-            HStack(spacing: 4) {
-                ForEach(23...27, id: \.self) { day in
-                    let isSelected = day == 25
-
-                    Text("\(day)")
-                        .textFont(size: .caption, weight: isSelected ? .bold : .regular)
-                        .monospacedDigit()
-                        .foregroundStyle(isSelected ? Palette.backgroundTop : Palette.text)
-                        .frame(width: 22, height: 22)
-                        .background(isSelected ? Palette.accent : .clear, in: Circle())
-                }
-            }
-
-            Text("毎月 25 日")
-                .textFont(size: .caption)
-                .foregroundStyle(Palette.subtext)
-        }
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity)
-        .card(cornerRadius: 12)
-        .padding(.horizontal, 4)
-    }
-
-    var monthStartShift: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("土日・祝日のとき")
-                .textFont(size: .micro, weight: .semibold)
-                .foregroundStyle(Palette.accent)
-
-            ForEach(HolidayShift.allCases, id: \.self) { shift in
-                let isSelected = shift == .previous
-
-                Text(shift.title)
-                    .textFont(size: .caption, weight: isSelected ? .semibold : .regular)
-                    .foregroundStyle(isSelected ? Palette.accentStrong : Palette.subtext)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 24)
-                    .background(SettingsTile.fill(isSelected: isSelected), in: .capsule)
-                    .overlay {
-                        Capsule()
-                            .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
-                    }
-            }
-        }
-        .padding(.horizontal, 12)
-    }
-
-    var monthStartPeriod: some View {
-        VStack(spacing: 4) {
-            Text("11月の始まり")
-                .textFont(size: .caption)
-                .foregroundStyle(Palette.subtext)
-
-            HStack(spacing: 4) {
-                Text("25日(日)")
-                    .strikethrough()
-                    .foregroundStyle(Palette.hint)
-
-                Image(systemName: "arrow.right")
-                    .foregroundStyle(Palette.hint)
-
-                Text("23日(金)")
-                    .bold()
-                    .foregroundStyle(Palette.accentStrong)
-            }
-            .textFont(size: .caption)
-
-            Text("10/23〜11/24")
-                .displayFont(.body, weight: .bold)
-                .foregroundStyle(Palette.accentStrong)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 2)
-                .background(Palette.accent.opacity(.subtle), in: .capsule)
-        }
-        .monospacedDigit()
-    }
-
-    func tapped(@ViewBuilder _ content: () -> some View) -> some View {
-        content()
-            .whatsNewTapped()
     }
 }
 

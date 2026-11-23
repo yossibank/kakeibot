@@ -20,7 +20,7 @@ extension RecordsModelTests {
         #expect(model.days.map(\.date.description) == ["2026-10-14", "2026-10-12"])
         #expect(model.expenseTotal == 980)
         #expect(model.day(on: date)?.entries.isEmpty == true)
-        #expect(rows.map { AmountText.text($0.adjustment.amount, sign: .plus) } == ["−¥500"])
+        #expect(rows.map { Yen.text($0.adjustment.amount, sign: .plus) } == ["−¥500"])
         #expect(rows.map(\.walletName) == ["財布"])
     }
 
@@ -53,7 +53,7 @@ extension RecordsModelTests {
         try await setup.database.restore(deletion)
         let restored = try await setup.database.entryList().adjustments
 
-        #expect(AmountText.text(row.adjustment.amount, sign: .plus) == "+¥700")
+        #expect(Yen.text(row.adjustment.amount, sign: .plus) == "+¥700")
         #expect(deleted.isEmpty)
         #expect(restored.map(\.id) == [row.id])
     }

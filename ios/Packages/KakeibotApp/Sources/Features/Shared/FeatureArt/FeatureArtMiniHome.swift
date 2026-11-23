@@ -73,7 +73,7 @@ private extension FeatureArtMiniHome {
             }
             .frame(width: 236)
 
-            Text("予算 \(AmountText.text(200_000))")
+            Text("予算 \(Yen.text(200_000))")
                 .textFont(.caption)
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)

@@ -178,13 +178,15 @@ private extension ReviewClosingView {
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .bold)
+                        DisclosureMark(.strongLink)
                             .foregroundStyle(Palette.accent)
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
+                    .background(
+                        Palette.accent.opacity(.faint),
+                        in: .rect(cornerRadius: ReviewReportRadius.block)
+                    )
                     .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
@@ -238,7 +240,7 @@ private extension ReviewClosingView {
     }
 
     func specialCard(_ special: Special) -> some View {
-        let date = "\(special.date.yearMonth.month)/\(special.date.day)"
+        let date = special.date.monthDayText
         let amount = ReviewYen.number(special.amount)
 
         return VStack(alignment: .leading, spacing: 12) {
@@ -247,7 +249,7 @@ private extension ReviewClosingView {
                     .sansFont(.small, weight: .bold)
                     .foregroundStyle(Palette.cardBottom)
                     .frame(width: 32, height: 32)
-                    .background(Self.specialFill, in: .rect(cornerRadius: 12))
+                    .background(Self.specialFill, in: .rect(cornerRadius: ReviewReportRadius.block))
 
                 VStack(alignment: .leading, spacing: 0) {
                     Text("特別な支出")
@@ -306,10 +308,10 @@ private extension ReviewClosingView {
         }
         .padding(16)
         .background {
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: ReviewReportRadius.panel)
                 .fill(Self.specialGlow)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: ReviewReportRadius.panel)
                         .strokeBorder(Palette.amber.opacity(.muted))
                 }
         }
@@ -324,7 +326,10 @@ private extension ReviewClosingView {
                 .sansFont(.small, weight: .bold)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 36, height: 36)
-                .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 12))
+                .background(
+                    Palette.accent.opacity(.subtle),
+                    in: .rect(cornerRadius: ReviewReportRadius.block)
+                )
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title)

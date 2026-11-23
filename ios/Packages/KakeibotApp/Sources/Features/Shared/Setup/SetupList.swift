@@ -57,9 +57,7 @@ private extension SetupList {
                     .transition(.scale.combined(with: .opacity))
             }
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
         .frame(minHeight: 48)
         .contentShape(.rect)

@@ -4,6 +4,16 @@ import Store
 import SwiftUI
 
 extension RecurringListView {
+    var controller: SettingsBoardController<RecurringListModel> {
+        SettingsBoardController(
+            model: model,
+            drag: drag,
+            grid: Self.grid,
+            hiddenId: $hiddenId,
+            deletion: $deletion
+        )
+    }
+
     func follow(
         _ row: RecurringListModel.Row,
         at index: Int,
@@ -26,70 +36,8 @@ extension RecurringListView {
         }
     }
 
-    func drop() {
-        switch drag.drop() {
-        case let .hide(id):
-            hide(id)
-
-        case .move:
-            Task {
-                await model.finishMoving()
-            }
-
-        case nil:
-            break
-        }
-    }
-
-    func hide(_ id: Recurring.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId = id
-            }
-        }
-    }
-
     func requestDelete(_ id: Recurring.ID) {
         deleting = id
         isConfirmingDelete = true
-    }
-
-    func delete(_ id: Recurring.ID) {
-        Task {
-            deletion = await model.delete(id)
-        }
-    }
-
-    func deleteHidden() {
-        Task {
-            deletion = await model.deleteHidden().deletion
-        }
-    }
-
-    func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
-        }
-    }
-
-    func show(_ id: Recurring.ID) {
-        Task {
-            await model.show(id)
-        }
-    }
-
-    func followHidden(
-        _ id: Recurring.ID,
-        to location: CGPoint
-    ) {
-        drag.followHidden(id, to: location)
-    }
-
-    func dropHidden() {
-        guard let id = drag.dropHidden() else {
-            return
-        }
-
-        show(id)
     }
 }

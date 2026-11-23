@@ -24,8 +24,7 @@ public struct ModalCard<Content: View>: View {
         let scale: CGFloat = isShown ? 1 : 0.94
 
         return ZStack {
-            Palette.scrim
-                .opacity(0.55)
+            Scrim(.modal)
                 .ignoresSafeArea()
                 .onTapGesture(perform: onDismiss)
 

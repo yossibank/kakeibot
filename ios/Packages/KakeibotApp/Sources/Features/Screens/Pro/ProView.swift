@@ -38,17 +38,12 @@ public struct ProView: View {
 
             purchaseBar
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .errorBanner($model.errorNotice)
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .interactiveDismissDisabled(model.isWorking)
         .task {

@@ -60,14 +60,11 @@ public struct WidgetGuideView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
     }
 }

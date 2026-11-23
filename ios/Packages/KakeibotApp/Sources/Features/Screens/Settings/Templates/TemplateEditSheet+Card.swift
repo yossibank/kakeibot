@@ -88,7 +88,7 @@ extension TemplateEditSheet {
 
 extension TemplateEditSheet {
     var amountValue: String {
-        model.amount.map { AmountText.text($0) } ?? "毎回入れる"
+        model.amount.map { Yen.text($0) } ?? "毎回入れる"
     }
 }
 

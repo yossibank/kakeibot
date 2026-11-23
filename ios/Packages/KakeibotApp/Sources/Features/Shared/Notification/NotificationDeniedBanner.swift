@@ -22,8 +22,7 @@ struct NotificationDeniedBanner: View {
                     Text("許可する")
                         .textFont(.caption, weight: .semibold)
 
-                    Image(systemName: "chevron.right")
-                        .sansFont(.micro, weight: .semibold)
+                    DisclosureMark(.link)
                 }
                 .padding(.horizontal, 12)
                 .frame(minHeight: 30)

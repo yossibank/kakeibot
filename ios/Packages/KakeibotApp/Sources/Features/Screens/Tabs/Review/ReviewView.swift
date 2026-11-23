@@ -89,10 +89,7 @@ public struct ReviewView: View {
         .errorBanner(model.errorNotice) {
             model.errorNotice.clear()
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 }
 
@@ -107,7 +104,7 @@ extension ReviewView {
 
         switch model.scale {
         case .week: return PeriodText.range(range, today: model.today)
-        case .month: return "\(String(month.year))年 \(month.month)月"
+        case .month: return month.title
         case .year: return "\(String(month.year))年"
         }
     }

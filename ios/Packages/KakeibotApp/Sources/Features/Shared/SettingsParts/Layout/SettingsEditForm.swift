@@ -43,6 +43,6 @@ private extension SettingsEditForm {
     }
 
     static var inset: CGFloat {
-        20
+        SettingsSpacing.side
     }
 }

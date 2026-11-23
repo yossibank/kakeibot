@@ -71,7 +71,7 @@ public struct ThemeListView: View {
                     create(base: nil)
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, SettingsSpacing.side)
             .padding(.top, SettingsSpacing.top)
             .padding(.bottom, 8)
 
@@ -86,9 +86,7 @@ public struct ThemeListView: View {
         } action: { size in
             self.size = size
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .errorBanner(appIcon.errorNotice) {
             appIcon.errorNotice.clear()
         }
@@ -105,10 +103,7 @@ public struct ThemeListView: View {
                 await model.use(icon)
             }
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .proOffer(proOffer?.feature) {
             proOffer = nil

@@ -16,9 +16,7 @@ struct AssetsAdjustSheet: View {
         FittedSheet {
             content
         }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
+        .errorBanner($model.errorNotice)
         .confirmation(
             isPresented: $isConfirmingDiscard,
             systemImage: "pencil.slash",
@@ -80,7 +78,7 @@ private extension AssetsAdjustSheet {
 
             line(
                 "記録の残高",
-                value: AmountText.text(model.balance),
+                value: Yen.text(model.balance),
                 titleColor: Palette.subtext,
                 valueColor: Palette.subtext
             )

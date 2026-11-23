@@ -19,7 +19,7 @@ private extension RecurringEditSheet {
             panel: .fee,
             systemImage: "yensign.circle",
             title: "手数料",
-            value: model.fee > 0 ? AmountText.text(model.fee) : "なし",
+            value: model.fee > 0 ? Yen.text(model.fee) : "なし",
             isEmpty: model.fee == 0,
             isAmount: true
         )

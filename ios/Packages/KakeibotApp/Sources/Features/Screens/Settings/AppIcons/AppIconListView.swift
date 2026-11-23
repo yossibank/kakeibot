@@ -39,17 +39,7 @@ public struct AppIconListView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, SettingsSpacing.top)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
-        .toolbar(.hidden, for: .navigationBar)
+        .settingsScreen(errorNotice: $model.errorNotice)
         .haptic(.selection, trigger: model.current)
     }
 }

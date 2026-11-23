@@ -68,9 +68,7 @@ private extension AssetsView {
                         .background(Palette.accent, in: .capsule)
                 }
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small)
-                    .foregroundStyle(Palette.hint)
+                DisclosureMark()
             }
 
             rewardContent
@@ -111,7 +109,7 @@ private extension AssetsView {
     func goalLine(_ goal: RewardGoal) -> some View {
         let remaining = model.remaining(to: goal)
         let progress = model.progress(to: goal)
-        let note = remaining > 0 ? "あと \(AmountText.text(remaining))" : "届きました"
+        let note = remaining > 0 ? "あと \(Yen.text(remaining))" : "届きました"
 
         return VStack(alignment: .leading, spacing: 8) {
             Text("\(goal.name) まで")
@@ -123,7 +121,7 @@ private extension AssetsView {
             RatioBar(progress, tint: Palette.accent, height: 6)
 
             HStack(alignment: .firstTextBaseline) {
-                Text("目標 \(AmountText.text(goal.targetAmount))")
+                Text("目標 \(Yen.text(goal.targetAmount))")
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
 

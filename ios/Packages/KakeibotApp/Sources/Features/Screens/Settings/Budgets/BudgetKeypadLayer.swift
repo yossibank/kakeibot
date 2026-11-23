@@ -24,31 +24,19 @@ private struct BudgetKeypadLayer: ViewModifier {
     let model: BudgetListModel
 
     func body(content: Content) -> some View {
-        ZStack(alignment: .bottom) {
-            content
-
-            if model.editing != nil {
-                Palette.scrim
-                    .opacity(0.35)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        close()
-                    }
-                    .transition(.opacity)
-                    .zIndex(1)
-
+        content
+            .settingsDrawerLayer(item: model.editing) {
+                close()
+            } drawer: { _ in
                 drawer
-                    .transition(.settingsDrawer)
-                    .zIndex(1)
             }
-        }
-        .animation(.snappy, value: model.editing)
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            model.cancelEditing()
-        }
+            .animation(.snappy, value: model.editing)
+            .confirmsDiscard(
+                when: model.isChanged,
+                isPresented: $isConfirmingDiscard
+            ) {
+                model.cancelEditing()
+            }
     }
 }
 

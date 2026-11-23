@@ -13,9 +13,9 @@ extension WhatsNewRelease {
                     "押すと予定の記録を日付順に見られます"
                 ],
                 steps: [
-                    Step(scene: .planTab, caption: "「資産」を開く"),
-                    Step(scene: .planButton, caption: "「予定を含めると」を押す"),
-                    Step(scene: .planList, caption: "予定の記録が並ぶ")
+                    Step(scene: .plan(.tab), caption: "「資産」を開く"),
+                    Step(scene: .plan(.button), caption: "「予定を含めると」を押す"),
+                    Step(scene: .plan(.list), caption: "予定の記録が並ぶ")
                 ],
                 action: .assets,
                 actionTitle: "資産を開く"
@@ -30,9 +30,9 @@ extension WhatsNewRelease {
                     "締め日までの見込みと確定が分かります"
                 ],
                 steps: [
-                    Step(scene: .pagerCard, caption: "引き落としのカードを見る"),
-                    Step(scene: .pagerSwipe, caption: "指で横に送る"),
-                    Step(scene: .pagerNext, caption: "次の月の引き落とし")
+                    Step(scene: .pager(.card), caption: "引き落としのカードを見る"),
+                    Step(scene: .pager(.swipe), caption: "指で横に送る"),
+                    Step(scene: .pager(.next), caption: "次の月の引き落とし")
                 ],
                 action: .assets,
                 actionTitle: "資産を開く"
@@ -47,9 +47,9 @@ extension WhatsNewRelease {
                     "資産タブからカードの口座を作れます"
                 ],
                 steps: [
-                    Step(scene: .walletAdd, caption: "負債の「＋」を押す"),
-                    Step(scene: .walletKinds, caption: "組から種類を選ぶ"),
-                    Step(scene: .walletMade, caption: "カードの口座ができる")
+                    Step(scene: .wallet(.add), caption: "負債の「＋」を押す"),
+                    Step(scene: .wallet(.kinds), caption: "組から種類を選ぶ"),
+                    Step(scene: .wallet(.made), caption: "カードの口座ができる")
                 ],
                 action: .assets,
                 actionTitle: "資産を開く"

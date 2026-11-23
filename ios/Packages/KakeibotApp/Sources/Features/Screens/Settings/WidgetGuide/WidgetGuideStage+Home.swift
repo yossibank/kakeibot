@@ -28,7 +28,7 @@ extension WidgetGuideStage {
 
                 Spacer(minLength: 4)
 
-                Text("予算 \(AmountText.text(200_000))")
+                Text("予算 \(Yen.text(200_000))")
                     .textFont(size: .caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)
@@ -211,7 +211,7 @@ extension WidgetGuideStage {
 
             Spacer(minLength: 4)
 
-            Text("今日の支出 \(AmountText.text(FeatureArtSample.todayExpense))")
+            Text("今日の支出 \(Yen.text(FeatureArtSample.todayExpense))")
                 .textFont(size: .caption)
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)

@@ -13,9 +13,9 @@ extension WhatsNewRelease {
                     "返す総額と終わりの月が分かります"
                 ],
                 steps: [
-                    Step(scene: .loanCount, caption: "「回数」を押す"),
-                    Step(scene: .loanFinal, caption: "回数を入れる"),
-                    Step(scene: .loanTotal, caption: "総額と終わりが出る")
+                    Step(scene: .loan(.count), caption: "「回数」を押す"),
+                    Step(scene: .loan(.last), caption: "回数を入れる"),
+                    Step(scene: .loan(.total), caption: "総額と終わりが出る")
                 ],
                 action: .setup(.recurrings),
                 actionTitle: "固定費を開く"
@@ -30,9 +30,9 @@ extension WhatsNewRelease {
                     "食べ物などの絵文字も選べます"
                 ],
                 steps: [
-                    Step(scene: .iconRow, caption: "「カテゴリ」を開く"),
-                    Step(scene: .iconButton, caption: "アイコンを押す"),
-                    Step(scene: .iconGrid, caption: "増えた絵柄から選ぶ")
+                    Step(scene: .icon(.row), caption: "「カテゴリ」を開く"),
+                    Step(scene: .icon(.button), caption: "アイコンを押す"),
+                    Step(scene: .icon(.grid), caption: "増えた絵柄から選ぶ")
                 ],
                 action: .setup(.categories),
                 actionTitle: "カテゴリを開く"

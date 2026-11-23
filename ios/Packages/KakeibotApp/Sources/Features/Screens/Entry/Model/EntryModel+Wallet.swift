@@ -123,9 +123,9 @@ public extension EntryModel {
         }
 
         switch wallet.kind.role {
-        case .loan: return "残り \(AmountText.text(max(-balance, 0)))"
-        case .investment: return "評価額 \(AmountText.text(balance))"
-        case .onHand, .card: return "残高 \(AmountText.text(balance))"
+        case .loan: return "残り \(Yen.text(max(-balance, 0)))"
+        case .investment: return "評価額 \(Yen.text(balance))"
+        case .onHand, .card: return "残高 \(Yen.text(balance))"
         }
     }
 

@@ -44,7 +44,7 @@ struct ReviewTextTests {
         (0, "¥0", "収支")
     ])
     func signsBalance(amount: Int, expected: String, title: String) {
-        #expect(AmountText.text(amount, sign: .plus) == expected)
+        #expect(Yen.text(amount, sign: .plus) == expected)
         #expect(ReviewText.balanceTitle(amount) == title)
     }
 }

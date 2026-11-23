@@ -79,8 +79,7 @@ private extension AssetsView {
                         )
                         .lineLimit(2)
 
-                        Image(systemName: "chevron.right")
-                            .sansFont(.micro, weight: .bold)
+                        DisclosureMark(.strongLink)
                     }
                     .textFont(.caption2)
                     .foregroundStyle(Palette.accent)

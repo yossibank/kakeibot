@@ -68,8 +68,7 @@ extension EnvironmentValues {
 
 private extension SettingsEditHeader {
     var scrim: some View {
-        Palette.scrim
-            .opacity(0.45)
+        Scrim(.menu)
             .frame(width: Self.scrimSize, height: Self.scrimSize)
             .ignoresSafeArea()
             .onTapGesture {

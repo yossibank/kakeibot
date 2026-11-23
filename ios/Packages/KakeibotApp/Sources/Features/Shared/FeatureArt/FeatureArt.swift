@@ -171,7 +171,7 @@ private extension FeatureArt {
                         .foregroundStyle(Palette.subtext)
                         .frame(width: 64, alignment: .leading)
 
-                    Text("今月あと \(AmountText.text(FeatureArtSample.remaining))")
+                    Text("今月あと \(Yen.text(FeatureArtSample.remaining))")
                         .font(.display(size: 21, weight: .bold, in: sample.font))
                         .monospacedDigit()
                         .foregroundStyle(Palette.accentStrong)

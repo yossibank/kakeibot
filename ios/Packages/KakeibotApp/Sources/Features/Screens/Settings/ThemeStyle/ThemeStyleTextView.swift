@@ -54,7 +54,7 @@ public struct ThemeStyleTextView: View {
                 isLocked: isLocked
             ) { font in
                 fontSample(
-                    AmountText.text(Self.sampleAmount),
+                    Yen.text(Self.sampleAmount),
                     font: .display(.headline, in: font, scale: 1),
                     scale: 0.5
                 )

@@ -114,7 +114,7 @@ private extension BudgetLockWidgetView {
     }
 
     func inline(_ summary: BudgetWidgetSummary) -> some View {
-        let amount = AmountText.text(mainAmount(of: summary))
+        let amount = Yen.text(mainAmount(of: summary))
 
         return Text("\(inlineTitle(of: summary)) \(amount)")
             .monospacedDigit()
@@ -150,7 +150,7 @@ private extension BudgetLockWidgetView {
     }
 
     func detail(of summary: BudgetWidgetSummary) -> String {
-        "今日の支出 \(AmountText.text(summary.todayExpense))"
+        "今日の支出 \(Yen.text(summary.todayExpense))"
     }
 
     func shortAmount(_ amount: Int) -> String {

@@ -3,23 +3,31 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewUpcomingScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .upcomingDay:
+        switch step {
+        case .day:
             day
 
-        case .upcomingOpen:
+        case .open:
             row(Self.recurrings[0])
                 .padding(.horizontal, 8)
                 .card(cornerRadius: 12)
                 .padding(.horizontal, 4)
                 .whatsNewTapped()
 
-        default:
+        case .captions:
             captions
         }
+    }
+}
+
+extension WhatsNewUpcomingScene {
+    enum Step: Hashable, Sendable {
+        case captions
+        case day
+        case open
     }
 }
 

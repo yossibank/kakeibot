@@ -3,10 +3,10 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewBillScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
+        switch step {
         case .unpaidButton:
             unpaidButton
                 .whatsNewTapped()
@@ -24,9 +24,20 @@ struct WhatsNewBillScene: View {
         case .shiftBill:
             shiftBill
 
-        default:
+        case .unpaidRow:
             unpaidRow
         }
+    }
+}
+
+extension WhatsNewBillScene {
+    enum Step: Hashable, Sendable {
+        case unpaidRow
+        case unpaidButton
+        case unpaidList
+        case shiftWallet
+        case shiftChoice
+        case shiftBill
     }
 }
 

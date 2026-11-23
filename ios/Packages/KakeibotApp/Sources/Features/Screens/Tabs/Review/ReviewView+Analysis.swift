@@ -25,7 +25,10 @@ extension ReviewView {
                     .sansFont(.body, weight: .semibold)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 40, height: 40)
-                    .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 12))
+                    .background(
+                        Palette.accent.opacity(.subtle),
+                        in: .rect(cornerRadius: ReviewReportRadius.block)
+                    )
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(bannerLabel)
@@ -55,16 +58,15 @@ extension ReviewView {
                         .transition(.scale.combined(with: .opacity))
                 }
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.small, weight: .bold)
+                DisclosureMark(.band)
                     .foregroundStyle(Palette.accent)
             }
             .padding(.vertical, 8)
             .padding(.leading, 8)
             .padding(.trailing, 16)
-            .background(Palette.card, in: .rect(cornerRadius: 20))
+            .background(Palette.card, in: .rect(cornerRadius: ReviewReportRadius.card))
             .overlay {
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: ReviewReportRadius.card)
                     .strokeBorder(Palette.accent.opacity(.muted))
             }
             .shadow(color: Palette.accent.opacity(.subtle), radius: 12, y: 6)
@@ -76,21 +78,12 @@ extension ReviewView {
 
     var analysisSheet: some View {
         VStack(spacing: 12) {
-            HStack {
-                RingButton(systemImage: "xmark") {
-                    showsAnalysis = false
-                }
-
-                Spacer()
-
+            SheetHeader {
+                showsAnalysis = false
+            } title: {
                 Text("ふりかえり")
                     .displayFont(.body)
                     .foregroundStyle(Palette.accent)
-
-                Spacer()
-
-                Color.clear
-                    .frame(width: 44, height: 44)
             }
             .padding(.horizontal, 20)
 
@@ -133,10 +126,7 @@ extension ReviewView {
         .sheet(item: $analysisShare) { share in
             shareSheet(share)
         }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
         .presentationSizing(.tallForm)
     }
 }
@@ -249,6 +239,6 @@ private extension ReviewView {
     ) -> String {
         let start = range.lowerBound
         let end = range.upperBound
-        return "\(start.yearMonth.month)/\(start.day)\(separator)\(end.yearMonth.month)/\(end.day)"
+        return "\(start.monthDayText)\(separator)\(end.monthDayText)"
     }
 }

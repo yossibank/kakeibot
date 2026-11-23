@@ -161,9 +161,7 @@ private extension ReviewSharesCard {
             }
             .layoutPriority(1)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
         .contentShape(.rect)
     }

@@ -18,72 +18,58 @@ struct AssetsGoalSheet: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            content
-
-            if let panel {
-                Palette.scrim
-                    .opacity(0.35)
+        content
+            .settingsDrawerLayer(item: panel) {
+                closePanel()
+            } drawer: { panel in
+                drawerView(panel)
+            }
+            .overlay(alignment: .top) {
+                SettingsEditHeader(
+                    title: model.isEditing ? "目標を編集" : "目標を決める",
+                    isEditing: model.isEditing,
+                    isHidden: false,
+                    canHide: false
+                ) {
+                    close()
+                } onHide: {} onDelete: {
+                    isConfirmingDelete = true
+                }
+                .padding(.horizontal, SettingsSpacing.side)
+                .padding(.top, SettingsSpacing.top)
+            }
+            .background {
+                Backdrop()
                     .ignoresSafeArea()
                     .onTapGesture {
-                        closePanel()
+                        focus = nil
                     }
-                    .transition(.opacity)
-                    .zIndex(1)
-
-                drawerView(panel)
-                    .transition(.settingsDrawer)
-                    .zIndex(1)
             }
-        }
-        .overlay(alignment: .top) {
-            SettingsEditHeader(
-                title: model.isEditing ? "目標を編集" : "目標を決める",
-                isEditing: model.isEditing,
-                isHidden: false,
-                canHide: false
+            .errorBanner($model.errorNotice)
+            .confirmsDiscard(
+                when: model.isChanged,
+                isPresented: $isConfirmingDiscard
             ) {
-                close()
-            } onHide: {} onDelete: {
-                isConfirmingDelete = true
+                dismiss()
             }
-            .padding(.horizontal, 20)
-            .padding(.top, SettingsSpacing.top)
-        }
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-                .onTapGesture {
-                    focus = nil
+            .confirmation(
+                isPresented: $isConfirmingDelete,
+                systemImage: "trash",
+                title: "この目標を削除しますか",
+                message: "貯金箱の額はそのまま残ります",
+                keepTitle: "やめる",
+                confirmTitle: "削除する"
+            ) {
+                Task {
+                    await delete()
                 }
-        }
-        .errorBanner(model.errorNotice) {
-            model.errorNotice.clear()
-        }
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: $isConfirmingDiscard
-        ) {
-            dismiss()
-        }
-        .confirmation(
-            isPresented: $isConfirmingDelete,
-            systemImage: "trash",
-            title: "この目標を削除しますか",
-            message: "貯金箱の額はそのまま残ります",
-            keepTitle: "やめる",
-            confirmTitle: "削除する"
-        ) {
-            Task {
-                await delete()
             }
-        }
-        .onChange(of: focus) {
-            if focus != nil {
-                hidePanel()
+            .onChange(of: focus) {
+                if focus != nil {
+                    hidePanel()
+                }
             }
-        }
-        .presentationSizing(.tallForm)
+            .presentationSizing(.tallForm)
     }
 }
 
@@ -124,7 +110,7 @@ private extension AssetsGoalSheet {
 
             saveButton
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
     }
@@ -172,7 +158,7 @@ private extension AssetsGoalSheet {
                 panel: .amount,
                 systemImage: "yensign",
                 title: "目標の額",
-                value: AmountText.text(model.calculator.amount),
+                value: Yen.text(model.calculator.amount),
                 isEmpty: model.calculator.amount == 0,
                 isAmount: true
             )

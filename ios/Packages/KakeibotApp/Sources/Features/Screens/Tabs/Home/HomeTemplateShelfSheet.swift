@@ -66,10 +66,7 @@ public struct HomeTemplateShelfSheet: View {
             .padding(.horizontal, 20)
             .padding(.top, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background {
-                Backdrop()
-                    .ignoresSafeArea()
-            }
+            .backdrop()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $isEditing) {
                 TemplateListView(database: database)
@@ -80,17 +77,9 @@ public struct HomeTemplateShelfSheet: View {
 
 private extension HomeTemplateShelfSheet {
     var header: some View {
-        HStack {
-            RingButton(systemImage: "xmark") {
-                dismiss()
-            }
-
-            Spacer()
-
-            SheetTitle("テンプレート")
-
-            Spacer()
-
+        SheetHeader("テンプレート") {
+            dismiss()
+        } trailing: {
             RingButton(systemImage: "slider.horizontal.3", label: "編集") {
                 isSearching = false
                 isEditing = true

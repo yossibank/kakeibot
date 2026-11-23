@@ -1,6 +1,7 @@
 import CoreGraphics
 
 enum SettingsSpacing {
+    static let side: CGFloat = 20
     static let top: CGFloat = 16
     static let header: CGFloat = 16
     static let form: CGFloat = 16

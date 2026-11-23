@@ -49,7 +49,7 @@ public extension AssetsAdjustModel {
     }
 
     var differenceText: String {
-        canSave ? AmountText.text(difference, type: .income) : "なし"
+        canSave ? Yen.text(difference, type: .income) : "なし"
     }
 
     var differenceNote: String {

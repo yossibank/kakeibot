@@ -56,7 +56,7 @@ public extension EntryChange {
     }
 
     var amountText: String {
-        AmountText.text(entry.amount)
+        Yen.text(entry.amount)
     }
 
     var predicate: String {

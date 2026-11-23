@@ -132,10 +132,7 @@ public struct EntrySheet: View {
             .fullScreenCover(isPresented: isScanningReceipt) {
                 receiptCamera
             }
-            .background {
-                Backdrop()
-                    .ignoresSafeArea()
-            }
+            .backdrop()
             .modifier(
                 EntryDiscardGuard(
                     isPresented: $isConfirmingDiscard,

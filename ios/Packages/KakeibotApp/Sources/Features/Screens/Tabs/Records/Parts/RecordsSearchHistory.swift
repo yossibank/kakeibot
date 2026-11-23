@@ -91,9 +91,7 @@ private extension RecordsSearchHistory {
                     .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
-                .overlay(alignment: .top) {
-                    Hairline(thickness: 1)
-                }
+                .topHairline()
             }
         }
         .padding(.horizontal, 16)

@@ -14,9 +14,9 @@ extension WhatsNewRelease {
                     "声は端末の中で聞き取り、保存しません"
                 ],
                 steps: [
-                    Step(scene: .voiceButton, caption: "金額の右のマイクを押す"),
-                    Step(scene: .voiceListen, caption: "使ったものと金額を話す"),
-                    Step(scene: .voiceFilled, caption: "読み取った内容が入る")
+                    Step(scene: .voice(.button), caption: "金額の右のマイクを押す"),
+                    Step(scene: .voice(.listen), caption: "使ったものと金額を話す"),
+                    Step(scene: .voice(.filled), caption: "読み取った内容が入る")
                 ],
                 action: .entry,
                 actionTitle: "記録する"
@@ -32,9 +32,9 @@ extension WhatsNewRelease {
                     "テンプレートと最近の記録から、すぐに入れられます"
                 ],
                 steps: [
-                    Step(scene: .entrySlip, caption: "1 枚のカードで見渡す"),
-                    Step(scene: .entryDeck, caption: "テンキーで金額を入れる"),
-                    Step(scene: .entryShortcuts, caption: "テンプレートから入れる")
+                    Step(scene: .entry(.slip), caption: "1 枚のカードで見渡す"),
+                    Step(scene: .entry(.deck), caption: "テンキーで金額を入れる"),
+                    Step(scene: .entry(.shortcuts), caption: "テンプレートから入れる")
                 ],
                 action: .entry,
                 actionTitle: "記録する"

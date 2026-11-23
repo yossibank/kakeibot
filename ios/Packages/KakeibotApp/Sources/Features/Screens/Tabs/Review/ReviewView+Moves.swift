@@ -53,9 +53,7 @@ extension ReviewView {
                         moveRow(move)
                     }
                     .buttonStyle(.plain)
-                    .overlay(alignment: .top) {
-                        Hairline(thickness: 1)
-                    }
+                    .topHairline()
                 }
             }
         }
@@ -111,9 +109,7 @@ private extension ReviewView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 
-            Image(systemName: "chevron.right")
-                .sansFont(.small)
-                .foregroundStyle(Palette.hint)
+            DisclosureMark()
         }
         .padding(.vertical, 8)
         .contentShape(.rect)
@@ -126,7 +122,7 @@ private extension ReviewView {
             return nil
         }
 
-        let balance = AmountText.text(abs(move.balance))
+        let balance = Yen.text(abs(move.balance))
 
         guard move.wallet.kind == .loan else {
             return "評価額 \(balance)"

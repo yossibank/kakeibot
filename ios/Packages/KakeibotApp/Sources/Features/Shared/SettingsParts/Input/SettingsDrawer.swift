@@ -63,6 +63,30 @@ private extension SettingsDrawer {
     }
 }
 
+extension View {
+    func settingsDrawerLayer<Item>(
+        item: Item?,
+        onDismiss: @escaping () -> Void,
+        @ViewBuilder drawer: (Item) -> some View
+    ) -> some View {
+        ZStack(alignment: .bottom) {
+            self
+
+            if let item {
+                Scrim(.drawer)
+                    .ignoresSafeArea()
+                    .onTapGesture(perform: onDismiss)
+                    .transition(.opacity)
+                    .zIndex(1)
+
+                drawer(item)
+                    .transition(.settingsDrawer)
+                    .zIndex(1)
+            }
+        }
+    }
+}
+
 extension AnyTransition {
     static var settingsDrawer: AnyTransition {
         .move(edge: .bottom).combined(with: .opacity)

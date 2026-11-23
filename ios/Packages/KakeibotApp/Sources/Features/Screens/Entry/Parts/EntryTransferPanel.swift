@@ -155,8 +155,7 @@ private extension EntryTransferPanel {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                Image(systemName: "chevron.right")
-                    .sansFont(.micro, weight: .bold)
+                DisclosureMark(.strongLink)
                     .foregroundStyle(Palette.hint)
             }
             .padding(.leading, 16)

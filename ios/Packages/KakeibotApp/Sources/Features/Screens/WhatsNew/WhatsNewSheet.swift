@@ -52,10 +52,7 @@ public struct WhatsNewSheet: View {
         .padding(.horizontal, 20)
         .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
+        .backdrop()
     }
 }
 
