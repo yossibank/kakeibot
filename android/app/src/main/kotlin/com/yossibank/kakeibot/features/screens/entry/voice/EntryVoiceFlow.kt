@@ -12,12 +12,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.voice.VoiceReading
+import com.yossibank.kakeibot.designsystem.components.modal.UndoNoticeState
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.VoiceUndo
 import com.yossibank.kakeibot.features.screens.entry.model.apply
 import com.yossibank.kakeibot.features.screens.entry.model.undo
 import com.yossibank.kakeibot.features.screens.entry.model.voiceHints
 import com.yossibank.kakeibot.features.screens.entry.model.voiceReading
+import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceResult.Outcome
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,70 +30,30 @@ class EntryVoiceFlow(
     private val context: Context,
     private val scope: CoroutineScope,
 ) {
-    enum class Step {
-        Listening,
-        Reading,
-        Denied,
-    }
+    sealed interface Phase {
+        data object Idle : Phase
 
-    enum class Outcome {
-        Applied,
-        MissingAmount,
-        Unheard,
-        Failed,
-        Downloading,
-        Unsupported,
-    }
+        data object Denied : Phase
 
-    data class Notice(
-        val outcome: Outcome,
-        val count: Int,
-        val text: String,
-        val id: UUID = UUID.randomUUID(),
-    ) {
-        val title: String
-            get() = when (outcome) {
-                Outcome.Applied -> "声から $count つ入れました"
-                Outcome.MissingAmount -> "金額が聞き取れませんでした"
-                Outcome.Unheard -> if (text.isEmpty()) "聞き取れませんでした" else "入れられる項目がありませんでした"
-                Outcome.Failed -> "声を聞き取れませんでした。もう一度押してください"
-                Outcome.Downloading -> "日本語の音声認識を準備しています"
-                Outcome.Unsupported -> "この端末では日本語の音声認識が使えません"
-            }
+        data class Listening(
+            val transcript: String = "",
+            val preview: VoiceReading? = null,
+            val levels: List<Float> = quietLevels,
+            val silenceStart: Long? = null,
+            val hasVoice: Boolean = false,
+        ) : Phase
 
-        val message: String?
-            get() = if (text.isEmpty()) null else "「$text」"
-
-        val hint: String?
-            get() = when (outcome) {
-                Outcome.Applied -> null
-                Outcome.Downloading -> "日本語のデータを入れ終えてから、もう一度押してください"
-                Outcome.Unsupported -> "テンキーで入れてください"
-                else -> "もう一度「声」を押して話すか、テンキーで入れてください"
-            }
-
-        val canUndo: Boolean
-            get() = outcome == Outcome.Applied
+        data class Reading(
+            val transcript: String,
+        ) : Phase
     }
 
     val isAvailable: Boolean = isOnDeviceAvailable(context)
 
-    var step: Step? by mutableStateOf(null)
+    var phase: Phase by mutableStateOf(Phase.Idle)
         private set
 
-    var transcript: String by mutableStateOf("")
-        private set
-
-    var preview: VoiceReading? by mutableStateOf(null)
-        private set
-
-    var levels: List<Float> by mutableStateOf(quietLevels)
-        private set
-
-    var notice: Notice? by mutableStateOf(null)
-        private set
-
-    var silenceStart: Long? by mutableStateOf(null)
+    var notice: EntryVoiceResult? by mutableStateOf(null)
         private set
 
     var startCount: Int by mutableStateOf(0)
@@ -101,7 +63,10 @@ class EntryVoiceFlow(
         private set
 
     val isActive: Boolean
-        get() = step != null
+        get() = phase != Phase.Idle
+
+    val listening: Phase.Listening?
+        get() = phase as? Phase.Listening
 
     val silenceMillis: Long
         get() = SILENCE_MILLIS
@@ -111,13 +76,12 @@ class EntryVoiceFlow(
     private var undo: VoiceUndo? = null
     private var noticeJob: Job? = null
     private var silenceJob: Job? = null
-    private var hasVoice = false
 
     fun start(
         model: EntryModel,
         today: LocalDate,
     ) {
-        if (step != null || !isAvailable || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+        if (isActive || !isAvailable || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             return
         }
 
@@ -131,9 +95,7 @@ class EntryVoiceFlow(
             model = model,
             today = today,
         )
-        transcript = ""
-        preview = null
-        step = Step.Listening
+        phase = Phase.Listening()
         startCount += 1
 
         recognizer.setRecognitionListener(Listener())
@@ -141,29 +103,25 @@ class EntryVoiceFlow(
     }
 
     fun deny() {
-        step = Step.Denied
+        phase = Phase.Denied
     }
 
     fun finish() {
-        if (step != Step.Listening) {
-            return
-        }
+        val listening = listening ?: return
 
         silenceJob?.cancel()
-        silenceStart = null
-        step = Step.Reading
-        levels = quietLevels
+        phase = Phase.Reading(transcript = listening.transcript)
         endCount += 1
         recognizer?.stopListening()
     }
 
     fun cancel() {
-        if (step == Step.Denied) {
-            step = null
+        if (phase == Phase.Denied) {
+            phase = Phase.Idle
             return
         }
 
-        if (step == Step.Listening) {
+        if (phase is Phase.Listening) {
             endCount += 1
         }
 
@@ -199,12 +157,10 @@ class EntryVoiceFlow(
         override fun onBeginningOfSpeech() = Unit
 
         override fun onRmsChanged(rmsdB: Float) {
-            if (step != Step.Listening) {
-                return
-            }
-
+            val listening = listening ?: return
             val level = ((rmsdB - MIN_RMS) / (MAX_RMS - MIN_RMS)).coerceIn(0f, 1f)
-            levels = listOf(level) + levels.dropLast(1)
+
+            phase = listening.copy(levels = listOf(level) + listening.levels.dropLast(1))
             follow(level)
         }
 
@@ -234,7 +190,7 @@ class EntryVoiceFlow(
             if (outcome == null) {
                 deny()
             } else {
-                show(Notice(outcome = outcome, count = 0, text = ""))
+                show(EntryVoiceResult(outcome = outcome, count = 0, text = ""))
             }
         }
 
@@ -257,11 +213,25 @@ class EntryVoiceFlow(
                 ?.firstOrNull()
                 ?: return
 
-            transcript = text
-            preview = session?.let { it.model.voiceReading(text = text, today = it.today) }
+            when (val current = phase) {
+                is Phase.Listening -> {
+                    phase = current.copy(
+                        transcript = text,
+                        preview = session?.let {
+                            it.model.voiceReading(text = text, today = it.today)
+                        },
+                    )
 
-            if (step == Step.Listening && text.isNotBlank() && !hasVoice) {
-                waitForSilence()
+                    if (text.isNotBlank() && !current.hasVoice) {
+                        waitForSilence()
+                    }
+                }
+
+                is Phase.Reading -> {
+                    phase = Phase.Reading(transcript = text)
+                }
+
+                Phase.Idle, Phase.Denied -> {}
             }
         }
 
@@ -284,25 +254,43 @@ class EntryVoiceFlow(
             ?: primary
 
         if (text.isEmpty()) {
-            show(Notice(outcome = Outcome.Unheard, count = 0, text = ""))
+            show(EntryVoiceResult(outcome = Outcome.Unheard, count = 0, text = ""))
             return
         }
 
         val reading = model.voiceReading(text = text, today = session.today)
 
         if (reading.isEmpty) {
-            show(Notice(outcome = Outcome.Unheard, count = 0, text = text))
+            show(
+                EntryVoiceResult(
+                    outcome = Outcome.Unheard,
+                    count = 0,
+                    text = text,
+                ),
+            )
             return
         }
 
         val undo = model.apply(reading)
 
         if (reading.amount == null) {
-            show(Notice(outcome = Outcome.MissingAmount, count = reading.count, text = text))
+            show(
+                EntryVoiceResult(
+                    outcome = Outcome.MissingAmount,
+                    count = reading.count,
+                    text = text,
+                ),
+            )
             return
         }
 
-        show(Notice(outcome = Outcome.Applied, count = reading.count, text = text))
+        show(
+            EntryVoiceResult(
+                outcome = Outcome.Applied,
+                count = reading.count,
+                text = text,
+            ),
+        )
         this.undo = undo
     }
 
@@ -318,12 +306,12 @@ class EntryVoiceFlow(
         return Outcome.Downloading
     }
 
-    private fun show(notice: Notice) {
+    private fun show(notice: EntryVoiceResult) {
         noticeJob?.cancel()
         this.notice = notice
 
         noticeJob = scope.launch {
-            delay(NOTICE_MILLIS)
+            delay(UndoNoticeState.MILLIS)
 
             if (this@EntryVoiceFlow.notice?.id == notice.id) {
                 this@EntryVoiceFlow.notice = null
@@ -333,25 +321,33 @@ class EntryVoiceFlow(
     }
 
     private fun follow(level: Float) {
+        val listening = listening ?: return
+
         if (level >= VOICE_LEVEL) {
-            hasVoice = true
             silenceJob?.cancel()
             silenceJob = null
-            silenceStart = null
+
+            phase = listening.copy(
+                silenceStart = null,
+                hasVoice = true,
+            )
+
             return
         }
 
-        if (hasVoice) {
+        if (listening.hasVoice) {
             waitForSilence()
         }
     }
 
     private fun waitForSilence() {
-        if (silenceJob != null) {
+        val listening = listening
+
+        if (silenceJob != null || listening == null) {
             return
         }
 
-        silenceStart = System.currentTimeMillis()
+        phase = listening.copy(silenceStart = System.currentTimeMillis())
 
         silenceJob = scope.launch {
             delay(SILENCE_MILLIS)
@@ -363,15 +359,10 @@ class EntryVoiceFlow(
     private fun reset() {
         silenceJob?.cancel()
         silenceJob = null
-        silenceStart = null
-        hasVoice = false
         recognizer?.destroy()
         recognizer = null
         session = null
-        step = null
-        preview = null
-        transcript = ""
-        levels = quietLevels
+        phase = Phase.Idle
     }
 
     private fun intent(hints: List<String>): Intent =
@@ -393,7 +384,6 @@ class EntryVoiceFlow(
     private companion object {
         const val LANGUAGE = "ja-JP"
         const val MAX_RESULTS = 5
-        const val NOTICE_MILLIS = 4_000L
         const val SILENCE_MILLIS = 1_000L
         const val VOICE_LEVEL = 0.2f
         const val MIN_RMS = -2f

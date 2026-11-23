@@ -2,6 +2,7 @@ package com.yossibank.kakeibot.features.screens.settings.recurrings
 
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
+import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 
 object RecurringText {
@@ -44,4 +45,10 @@ object RecurringText {
         schedule: String,
         holiday: String?,
     ): String = listOfNotNull(schedule, holiday).joinToString("・")
+
+    fun namePrompt(type: Entry.Kind): String = when (type) {
+        Entry.Kind.expense -> "家賃・サブスクなど"
+        Entry.Kind.income -> "給料・年金など"
+        Entry.Kind.transfer -> "カードの引き落とし・積立など"
+    }
 }

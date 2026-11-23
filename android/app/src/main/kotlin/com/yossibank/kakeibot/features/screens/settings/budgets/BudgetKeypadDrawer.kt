@@ -13,6 +13,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,12 +40,16 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
+import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
+import com.yossibank.kakeibot.designsystem.components.modal.BottomDrawer
 import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
+import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
@@ -70,38 +76,17 @@ fun BudgetKeypadDrawer(
         BackHandler(onBack = ::close)
     }
 
-    AnimatedVisibility(
-        visible = model.editing != null,
-        enter = fadeIn(),
-        exit = fadeOut(),
+    BottomDrawer(
+        item = model.editing,
+        title = { it.title },
+        onClose = ::close,
+        padding = drawerPadding,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Palette.scrim.opacity(Emphasis.Muted))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = ::close,
-                ),
+        Drawer(
+            model = model,
+            onCleared = onCleared,
         )
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        AnimatedVisibility(
-            visible = model.editing != null,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
-            Drawer(
-                model = model,
-                onClose = ::close,
-                onCleared = onCleared,
-            )
-        }
     }
 
     if (isConfirmingDiscard) {
@@ -116,134 +101,73 @@ fun BudgetKeypadDrawer(
 }
 
 @Composable
-private fun Drawer(
+private fun ColumnScope.Drawer(
     model: BudgetListModel,
-    onClose: () -> Unit,
     onCleared: (BudgetListModel.Cleared) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val shape = RoundedCornerShape(
-        topStart = 28.dp,
-        topEnd = 28.dp,
+
+    AmountText(
+        amount = model.calculator.amount,
+        style = displayFont(
+            size = FontSize.LargeTitle,
+            weight = FontWeight.Bold,
+        ),
+        color = Palette.accentStrong,
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(Palette.backgroundTop)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Soft),
-                shape = shape,
-            ).pointerInput(Unit) {}
-            .navigationBarsPadding()
-            .padding(
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp,
-                bottom = 12.dp,
-            ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = (model.editing ?: BudgetListModel.Target.Total).title,
-                modifier = Modifier.align(Alignment.Center),
-                color = Palette.accentStrong,
-                maxLines = 1,
-                style = displayFont(size = FontSize.Body),
-            )
-
-            RoundIconButton(
-                icon = R.drawable.ic_close,
-                onSelect = onClose,
-                modifier = Modifier.align(Alignment.CenterEnd),
-            )
-        }
-
-        AmountText(
-            amount = model.calculator.amount,
-            style = displayFont(
-                size = FontSize.LargeTitle,
-                weight = FontWeight.Bold,
-            ),
-            color = Palette.accentStrong,
-        )
-
-        if (model.suggestions.isNotEmpty()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                model.suggestions.forEach { suggestion ->
-                    SuggestionChip(
-                        suggestion = suggestion,
-                        isSelected = model.calculator.amount == suggestion.amount,
-                        onSelect = { model.choose(suggestion) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+    if (model.suggestions.isNotEmpty()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            model.suggestions.forEach { suggestion ->
+                SuggestionChip(
+                    suggestion = suggestion,
+                    isSelected = model.calculator.amount == suggestion.amount,
+                    onSelect = { model.choose(suggestion) },
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
+    }
 
-        Keypad(
-            calculator = model.calculator,
-            onKey = model::press,
-            keyHeight = 52.dp,
+    Keypad(
+        calculator = model.calculator,
+        onKey = model::press,
+        keyHeight = Metrics.keyHeight,
+    )
+
+    if (model.message.isNotEmpty()) {
+        Text(
+            text = model.message,
+            color = Palette.rose,
+            style = textFont(style = FontTextStyle.Caption),
         )
+    }
 
-        if (model.message.isNotEmpty()) {
-            Text(
-                text = model.message,
-                color = Palette.rose,
-                style = textFont(style = FontTextStyle.Caption),
-            )
-        }
+    PrimaryButton(
+        title = model.saveTitle,
+        onClick = { scope.launch { model.save() } },
+        modifier = Modifier.fillMaxWidth(),
+        isEnabled = model.canSave,
+    )
 
-        Box(
+    if (model.editingAmount != null) {
+        Text(
+            text = "予算をなくす",
             modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
+                .heightIn(min = 44.dp)
                 .clip(CircleShape)
-                .background(
-                    if (model.canSave) {
-                        Brush.verticalGradient(listOf(Palette.accentDeep, Palette.accent))
-                    } else {
-                        Brush.verticalGradient(listOf(Palette.hint, Palette.hint))
-                    },
-                ).clickable(enabled = model.canSave) {
-                    scope.launch { model.save() }
-                },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = model.saveTitle,
-                color = Palette.backgroundTop,
-                style = textFont(
-                    size = FontSize.Body,
-                    weight = FontWeight.SemiBold,
+                .clickable {
+                    scope.launch { model.clear()?.let(onCleared) }
+                }.padding(
+                    horizontal = 16.dp,
+                    vertical = 12.dp,
                 ),
-            )
-        }
-
-        if (model.editingAmount != null) {
-            Text(
-                text = "予算をなくす",
-                modifier = Modifier
-                    .heightIn(min = 44.dp)
-                    .clip(CircleShape)
-                    .clickable {
-                        scope.launch { model.clear()?.let(onCleared) }
-                    }.padding(
-                        horizontal = 16.dp,
-                        vertical = 12.dp,
-                    ),
-                color = Palette.rose,
-                style = textFont(style = FontTextStyle.Footnote),
-            )
-        }
+            color = Palette.rose,
+            style = textFont(style = FontTextStyle.Footnote),
+        )
     }
 }
 
@@ -269,10 +193,9 @@ private fun SuggestionChip(
             .padding(vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
+        FittedText(
             text = suggestion.title,
             color = Palette.subtext,
-            maxLines = 1,
             style = textFont(style = FontTextStyle.Caption2),
         )
 
@@ -282,3 +205,10 @@ private fun SuggestionChip(
         )
     }
 }
+
+private val drawerPadding = PaddingValues(
+    start = 16.dp,
+    top = 16.dp,
+    end = 16.dp,
+    bottom = 12.dp,
+)

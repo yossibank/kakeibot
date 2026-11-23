@@ -35,21 +35,33 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
+import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
 import com.yossibank.kakeibot.features.screens.entry.model.isDateFromVoice
 import com.yossibank.kakeibot.features.screens.entry.model.isMemoFromVoice
 import com.yossibank.kakeibot.features.screens.entry.model.isWalletFromVoice
 import com.yossibank.kakeibot.features.screens.entry.model.itemAdjustment
 import com.yossibank.kakeibot.features.screens.entry.model.itemTotal
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
 import com.yossibank.kakeibot.features.screens.entry.model.showsItems
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceWave
 
@@ -58,13 +70,13 @@ fun EntrySlip(
     model: EntryModel,
     onOpenItems: () -> Unit,
     onVoice: (() -> Unit)?,
-    listening: EntryVoiceFlow?,
+    listening: EntryVoiceFlow.Phase.Listening?,
     modifier: Modifier = Modifier,
 ) {
     val preview = listening?.preview
 
     Column(modifier = modifier.card()) {
-        if (model.type != Entry.Kind.transfer) {
+        if (model.form.type != Entry.Kind.transfer) {
             SlipRow(
                 title = "カテゴリ",
                 value = preview?.categoryId
@@ -79,7 +91,7 @@ fun EntrySlip(
                 )
             }
 
-            Divider()
+            Hairline()
 
             SlipRow(
                 title = model.walletTitle,
@@ -95,7 +107,7 @@ fun EntrySlip(
             }
         }
 
-        if (model.type == Entry.Kind.transfer) {
+        if (model.form.type == Entry.Kind.transfer) {
             SlipRow(
                 title = "振替",
                 value = model.routeText,
@@ -105,7 +117,7 @@ fun EntrySlip(
                 SymbolTile(icon = R.drawable.ic_swap)
             }
 
-            Divider()
+            Hairline()
 
             SlipRow(
                 title = "手数料",
@@ -117,7 +129,7 @@ fun EntrySlip(
             }
         }
 
-        Divider()
+        Hairline()
 
         SlipRow(
             title = "日付",
@@ -126,19 +138,19 @@ fun EntrySlip(
             isActive = model.field == EntryModel.Field.Date,
             onSelect = { model.focus(EntryModel.Field.Date) },
         ) {
-            DayTile(day = model.date.day)
+            DayTile(day = model.form.date.day)
         }
 
-        Divider()
+        Hairline()
 
         AmountRow(
             model = model,
             listening = listening,
         )
 
-        Divider()
+        Hairline()
 
-        MemoRow(
+        EntrySlipMemoRow(
             model = model,
             onOpenItems = onOpenItems,
             onVoice = onVoice,
@@ -155,10 +167,10 @@ private fun SlipRow(
     isFromVoice: Boolean = false,
     icon: @Composable () -> Unit,
 ) {
-    ActiveRow(
+    EntrySlipActiveRow(
         isActive = isActive,
         modifier = Modifier
-            .height(52.dp)
+            .height(Metrics.rowMinHeight)
             .clickable(onClick = onSelect),
     ) {
         icon()
@@ -174,11 +186,10 @@ private fun SlipRow(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Text(
+        FittedText(
             text = value,
             modifier = Modifier.voiceUnderline(isFromVoice),
             color = Palette.text,
-            maxLines = 1,
             style = textFont(
                 size = FontSize.Body,
                 weight = FontWeight.Medium,
@@ -197,11 +208,11 @@ private fun SlipRow(
 @Composable
 private fun AmountRow(
     model: EntryModel,
-    listening: EntryVoiceFlow?,
+    listening: EntryVoiceFlow.Phase.Listening?,
 ) {
     val isActive = model.field == EntryModel.Field.Amount
 
-    ActiveRow(
+    EntrySlipActiveRow(
         isActive = isActive,
         modifier = Modifier
             .height(80.dp)
@@ -245,12 +256,10 @@ private fun AmountRow(
                 modifier = Modifier.weight(1f),
             )
         } else {
-            Text(
+            FittedText(
                 text = expression ?: "",
                 modifier = Modifier.weight(1f),
                 color = Palette.hint,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 style = textFont(size = FontSize.Caption),
             )
         }
@@ -268,270 +277,8 @@ private fun AmountRow(
     }
 }
 
-@Composable
-private fun MemoRow(
-    model: EntryModel,
-    onOpenItems: () -> Unit,
-    onVoice: (() -> Unit)?,
-) {
-    val style = textFont(size = FontSize.Body)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_edit),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Palette.subtext,
-        )
-
-        BasicTextField(
-            value = model.memo,
-            onValueChange = { model.memo = it },
-            modifier = Modifier
-                .weight(1f)
-                .voiceUnderline(model.isMemoFromVoice),
-            textStyle = style.copy(color = Palette.text),
-            singleLine = true,
-            cursorBrush = SolidColor(Palette.accent),
-            decorationBox = { field ->
-                if (model.memo.isEmpty()) {
-                    Text(
-                        text = "店名や買ったものをメモ",
-                        color = Palette.hint,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = style,
-                    )
-                }
-
-                field()
-            },
-        )
-
-        if (model.showsItems && model.items.isNotEmpty()) {
-            ItemButton(
-                model = model,
-                onOpen = onOpenItems,
-            )
-        }
-
-        if (onVoice != null) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = Palette.accent.opacity(Emphasis.Medium),
-                        shape = CircleShape,
-                    ).clickable(onClick = onVoice),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_mic),
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    tint = Palette.accent,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ItemButton(
-    model: EntryModel,
-    onOpen: () -> Unit,
-) {
-    val adjustment = model.itemAdjustment
-    val fill = if (adjustment ==
-        0L
-    ) {
-        Palette.accent.opacity(Emphasis.Subtle)
-    } else {
-        Palette.amber.opacity(Emphasis.Subtle)
-    }
-    val style = textFont(
-        size = FontSize.Caption,
-        weight = FontWeight.SemiBold,
-    )
-
-    Row(
-        modifier = Modifier
-            .height(28.dp)
-            .clip(CircleShape)
-            .background(fill)
-            .clickable(onClick = onOpen)
-            .padding(horizontal = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = "品目 ${model.items.size}件",
-            color = Palette.accentStrong,
-            style = style,
-        )
-
-        Text(
-            text = AmountText.text(model.itemTotal.toInt()),
-            color = Palette.text,
-            style = style,
-        )
-
-        if (adjustment != 0L) {
-            Text(
-                text = "差額 ${AmountText.text(adjustment.toInt())}",
-                color = Palette.amber,
-                style = style,
-            )
-        }
-    }
-}
-
-@Composable
-private fun ActiveRow(
-    isActive: Boolean,
-    modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit,
-) {
-    val fill = if (isActive) Palette.accent.opacity(Emphasis.Subtle) else Color.Transparent
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(fill),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .width(3.dp)
-                .fillMaxHeight()
-                .background(if (isActive) Palette.accent else Color.Transparent),
-        )
-
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .padding(
-                    start = 13.dp,
-                    end = 12.dp,
-                ),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            content()
-        }
-    }
-}
-
 private val transferFields = setOf(
     EntryModel.Field.Transfer,
     EntryModel.Field.Wallet,
     EntryModel.Field.ToWallet,
 )
-
-private val EntryModel.routeText: String
-    get() {
-        val source = wallet?.name
-        val destination = toWallet?.name
-
-        if (source == null || destination == null) {
-            return "口座を選ぶ"
-        }
-
-        return "$source → $destination"
-    }
-
-private val EntryModel.categoryText: String
-    get() {
-        val name = category?.name ?: return "選ぶ"
-        val tag = tags.firstOrNull { it.id == tagId }?.name ?: return name
-        return "$name・$tag"
-    }
-
-@Composable
-private fun SymbolTile(icon: Int) {
-    val shape = RoundedCornerShape(8.dp)
-
-    Box(
-        modifier = Modifier
-            .size(30.dp)
-            .background(
-                color = Palette.accent.opacity(Emphasis.Subtle),
-                shape = shape,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            modifier = Modifier.size(18.dp),
-            tint = Palette.accent,
-        )
-    }
-}
-
-@Composable
-private fun DayTile(day: Int) {
-    val shape = RoundedCornerShape(8.dp)
-
-    Box(
-        modifier = Modifier
-            .size(30.dp)
-            .background(
-                color = Palette.accent.opacity(Emphasis.Subtle),
-                shape = shape,
-            ).border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Medium),
-                shape = shape,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = day.toString(),
-            color = Palette.accentStrong,
-            style = displayFont(
-                size = FontSize.Small,
-                weight = FontWeight.Bold,
-            ),
-        )
-    }
-}
-
-@Composable
-private fun Divider() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Palette.line),
-    )
-}
-
-@Composable
-private fun Modifier.voiceUnderline(isOn: Boolean): Modifier {
-    if (!isOn) {
-        return this
-    }
-
-    val color = Palette.accent.opacity(Emphasis.Medium)
-
-    return drawBehind {
-        val y = size.height - 1.dp.toPx()
-
-        drawLine(
-            color = color,
-            start = Offset(0f, y),
-            end = Offset(size.width, y),
-            strokeWidth = 1.dp.toPx(),
-        )
-    }
-}

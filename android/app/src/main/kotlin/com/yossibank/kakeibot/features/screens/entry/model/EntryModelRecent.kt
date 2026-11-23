@@ -10,7 +10,7 @@ const val RECENT_TRANSFER_LIMIT = 3
 
 val EntryModel.recentEntries: List<Entry>
     get() {
-        if (type == Entry.Kind.transfer) {
+        if (form.type == Entry.Kind.transfer) {
             return emptyList()
         }
 
@@ -22,7 +22,7 @@ val EntryModel.recentEntries: List<Entry>
 
         return (history?.entries ?: emptyList())
             .filter { entry ->
-                entry.type == type &&
+                entry.type == form.type &&
                     entry.recurringId == null &&
                     entry.transferId == null &&
                     entry.categoryId in shown
@@ -40,7 +40,7 @@ val EntryModel.recentEntries: List<Entry>
 
 val EntryModel.recentTransfers: List<Entry>
     get() {
-        if (type != Entry.Kind.transfer) {
+        if (form.type != Entry.Kind.transfer) {
             return emptyList()
         }
 

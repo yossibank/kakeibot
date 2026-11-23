@@ -14,58 +14,43 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.cardBill
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.features.shared.model.ModelTask
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.recurrings
 import com.yossibank.kakeibot.store.queries.types.EntryOptions
 import com.yossibank.kakeibot.store.writes.methods.saveTemplate
-import kotlinx.coroutines.CancellationException
 import java.time.Instant
 
 class TemplateEditModel(
     private val database: AppDatabase,
     draft: EntryTemplateDraft,
 ) {
-    var name: String by mutableStateOf(draft.name)
-
-    var memo: String by mutableStateOf(draft.memo)
-
-    val type: Entry.Kind = draft.type
+    var form: EntryTemplateDraft by mutableStateOf(draft)
+        private set
 
     var calculator: AmountCalculator by mutableStateOf(AmountCalculator(amount = draft.amount ?: 0))
-        private set
-
-    var categoryId: Identifier<EntryCategory>? by mutableStateOf(draft.categoryId)
-        private set
-
-    var tagId: Identifier<EntryTag>? by mutableStateOf(draft.tagId)
-        private set
-
-    var walletId: Identifier<Wallet>? by mutableStateOf(draft.walletId)
-        private set
-
-    var billShift: Int by mutableStateOf(draft.billShift)
-
-    var message: String by mutableStateOf("")
-        private set
-
-    var isSaving: Boolean by mutableStateOf(false)
         private set
 
     private var options: EntryOptions? by mutableStateOf(null)
     private var cardBills: List<Recurring> by mutableStateOf(emptyList())
 
+    private val task = ModelTask()
+
+    val message: String
+        get() = task.message
+
     val billRecurring: Recurring?
-        get() = cardBills.cardBill(paidBy = walletId)
+        get() = cardBills.cardBill(paidBy = form.walletId)
 
     val category: EntryCategory?
-        get() = categories.firstOrNull { it.id == categoryId }
+        get() = categories.firstOrNull { it.id == form.categoryId }
 
     val wallet: Wallet?
-        get() = wallets.firstOrNull { it.id == walletId }
+        get() = wallets.firstOrNull { it.id == form.walletId }
 
     val tag: EntryTag?
-        get() = tags.firstOrNull { it.id == tagId }
+        get() = tags.firstOrNull { it.id == form.tagId }
 
     val detail: String
         get() = listOfNotNull(category?.name, tag?.name, wallet?.name).joinToString("・")
@@ -74,10 +59,10 @@ class TemplateEditModel(
         get() = calculator.amount.takeIf { it > 0 }
 
     val walletTitle: String
-        get() = if (type == Entry.Kind.income) "入金先" else "支払い元"
+        get() = if (form.type == Entry.Kind.income) "入金先" else "支払い元"
 
     val categories: List<EntryCategory>
-        get() = when (type) {
+        get() = when (form.type) {
             Entry.Kind.income -> options?.incomeCategories ?: emptyList()
             else -> options?.expenseCategories ?: emptyList()
         }
@@ -87,72 +72,60 @@ class TemplateEditModel(
 
     val tags: List<EntryTag>
         get() = (options?.tags ?: emptyList()).filter { tag ->
-            tag.categoryId == categoryId && (tag.archivedAt == null || tag.id == tagId)
+            tag.categoryId == form.categoryId && (tag.archivedAt == null || tag.id == form.tagId)
         }
 
     private val draft: EntryTemplateDraft
-        get() = EntryTemplateDraft(
-            name = name,
-            type = type,
+        get() = form.copy(
             amount = amount,
-            categoryId = categoryId,
-            tagId = tagId,
-            walletId = walletId,
-            memo = memo,
-            billShift = if (billRecurring == null) 0 else billShift,
+            billShift = if (billRecurring == null) 0 else form.billShift,
         )
 
     fun icon(of: Identifier<Icon>): Icon? = options?.icons?.get(of)
 
+    fun update(change: EntryTemplateDraft.() -> EntryTemplateDraft) {
+        form = form.change()
+    }
+
     suspend fun load() {
-        try {
+        task.attempt(failure = "テンプレートを読めませんでした") {
             options = database.entryOptions()
             cardBills = database.recurrings()
 
-            if (categories.none { it.id == categoryId }) {
-                select(category = categories.firstOrNull())
+            if (categories.none { it.id == form.categoryId }) {
+                form = form.withCategory(categories.firstOrNull()?.id)
             }
 
-            if (wallets.none { it.id == walletId }) {
-                walletId = wallets.firstOrNull()?.id
-                billShift = 0
+            if (wallets.none { it.id == form.walletId }) {
+                form = form.copy(
+                    walletId = wallets.firstOrNull()?.id,
+                    billShift = 0,
+                )
             }
-        } catch (error: CancellationException) {
-            throw error
-        } catch (_: Exception) {
-            message = "テンプレートを読めませんでした"
         }
     }
 
     fun select(category: EntryCategory?) {
-        if (category?.id != categoryId) {
-            tagId = null
-        }
-
-        categoryId = category?.id
-        message = ""
+        form = form.withCategory(category?.id)
+        task.clear()
     }
 
     fun select(wallet: Wallet) {
-        if (wallet.id != walletId) {
-            billShift = 0
-        }
-
-        walletId = wallet.id
-        message = ""
+        form = form.withWallet(wallet.id)
+        task.clear()
     }
 
     fun toggleTag(id: Identifier<EntryTag>) {
-        tagId = if (tagId == id) null else id
+        form = form.copy(tagId = if (form.tagId == id) null else id)
     }
 
     fun press(key: AmountCalculator.Key) {
         calculator = calculator.press(key)
-        message = ""
+        task.clear()
     }
 
     suspend fun save(): EntryTemplate? {
-        if (isSaving) {
+        if (task.isRunning) {
             return null
         }
 
@@ -160,24 +133,15 @@ class TemplateEditModel(
         val problem = draft.problems.firstOrNull()
 
         if (problem != null) {
-            message = message(of = problem)
+            task.show(message(of = problem))
             return null
         }
 
-        isSaving = true
-
-        try {
-            return database.saveTemplate(
+        return task.attempt(failure = ModelTask.saveFailed) {
+            database.saveTemplate(
                 draft = draft,
                 at = Instant.now(),
             )
-        } catch (error: CancellationException) {
-            throw error
-        } catch (_: Exception) {
-            message = "保存できませんでした"
-            return null
-        } finally {
-            isSaving = false
         }
     }
 
@@ -185,6 +149,28 @@ class TemplateEditModel(
         EntryTemplateDraft.Problem.emptyName -> "名前を入れてください"
         EntryTemplateDraft.Problem.missingCategory -> "カテゴリを選んでください"
         EntryTemplateDraft.Problem.missingWallet -> "${walletTitle}を選んでください"
-        else -> "保存できませんでした"
+        else -> ModelTask.saveFailed
     }
+}
+
+private fun EntryTemplateDraft.withCategory(id: Identifier<EntryCategory>?): EntryTemplateDraft {
+    if (id == categoryId) {
+        return this
+    }
+
+    return copy(
+        categoryId = id,
+        tagId = null,
+    )
+}
+
+private fun EntryTemplateDraft.withWallet(id: Identifier<Wallet>?): EntryTemplateDraft {
+    if (id == walletId) {
+        return this
+    }
+
+    return copy(
+        walletId = id,
+        billShift = 0,
+    )
 }

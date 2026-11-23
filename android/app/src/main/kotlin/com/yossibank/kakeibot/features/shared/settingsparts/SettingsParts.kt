@@ -25,9 +25,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
+import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
+import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
@@ -53,13 +57,12 @@ fun SettingsHeader(
             modifier = Modifier.align(Alignment.CenterStart),
         )
 
-        Text(
+        FittedText(
             text = title,
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(horizontal = 56.dp),
             color = Palette.accentStrong,
-            maxLines = 1,
             textAlign = TextAlign.Center,
             style = displayFont(size = FontSize.Headline),
         )
@@ -77,27 +80,12 @@ fun RoundIconButton(
     modifier: Modifier = Modifier,
     rotation: Float = 0f,
 ) {
-    Box(
-        modifier = modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .background(Palette.card)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Muted),
-                shape = CircleShape,
-            ).clickable(onClick = onSelect),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            modifier = Modifier
-                .size(22.dp)
-                .rotate(rotation),
-            tint = Palette.accent,
-        )
-    }
+    CircleIconButton(
+        icon = icon,
+        onClick = onSelect,
+        modifier = modifier,
+        rotation = rotation,
+    )
 }
 
 @Composable
@@ -126,7 +114,7 @@ fun SettingsRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 52.dp)
+            .heightIn(min = Metrics.rowMinHeight)
             .clickable(onClick = onSelect)
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -139,10 +127,9 @@ fun SettingsRow(
             style = textFont(style = FontTextStyle.Body),
         )
 
-        Text(
+        FittedText(
             text = value,
             color = Palette.subtext,
-            maxLines = 1,
             style = textFont(style = FontTextStyle.Subheadline),
         )
 
@@ -157,12 +144,7 @@ fun SettingsRow(
 
 @Composable
 fun SettingsDivider(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Palette.line),
-    )
+    Hairline(modifier = modifier)
 }
 
 @Composable
@@ -195,10 +177,9 @@ fun ChoiceChip(
     ) {
         leading()
 
-        Text(
+        FittedText(
             text = title,
             color = if (isSelected) Palette.accentStrong else Palette.text,
-            maxLines = 1,
             style = textFont(
                 size = FontSize.Small,
                 weight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,

@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.icon.ShelfIcon
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.ArchivableRecord
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -91,3 +93,9 @@ fun ShelfIconRecord.shelfIcon(): ShelfIcon? {
         updatedAt = updatedAt,
     )
 }
+
+internal val shelfIconTable = TableBinding<ShelfIcon>(
+    all = { shelfIconDao().all().map { it.decoded(ShelfIconRecord::shelfIcon) } },
+    insert = { shelfIconDao().insert(it.record()) },
+    deleteAll = { shelfIconDao().deleteAll() },
+)

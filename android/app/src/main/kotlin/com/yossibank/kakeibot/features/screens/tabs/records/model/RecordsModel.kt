@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.features.screens.tabs.records.model
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,6 +15,8 @@ import com.yossibank.kakeibot.core.concepts.entry.incomeTotal
 import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
 import com.yossibank.kakeibot.features.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.features.shared.model.ModelTask
+import com.yossibank.kakeibot.features.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -25,10 +28,12 @@ import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class RecordsModel(
     private val database: AppDatabase,
+    private val entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
     var today: LocalDate by mutableStateOf(today)
@@ -74,17 +79,31 @@ class RecordsModel(
     val period: ClosedRange<LocalDate>
         get() = shownMonth.period(startingOn = monthStartDay)
 
-    val periodText: String
-        get() = "${period.start.monthDayText}〜${period.endInclusive.monthDayText}"
+    val monthTitle: String
+        get() = "${shownMonth.year}年 ${shownMonth.month}月"
 
-    val days: List<EntryDay>
-        get() = list?.days?.within(period) ?: emptyList()
+    val periodText: String
+        get() = PeriodText.range(period)
+
+    val days: List<EntryDay> by derivedStateOf {
+        list?.days?.within(period) ?: emptyList()
+    }
+
+    private val daysByDate: Map<LocalDate, EntryDay> by derivedStateOf {
+        days.associateBy { it.date }
+    }
 
     val expenseTotal: Long
         get() = days.expenseTotal
 
     val incomeTotal: Long
         get() = days.incomeTotal
+
+    val balance: Long
+        get() = incomeTotal - expenseTotal
+
+    val balanceTitle: String
+        get() = if (balance < 0) "収支 · 赤字" else "収支 · 黒字"
 
     suspend fun observe() {
         coroutineScope {
@@ -101,7 +120,7 @@ class RecordsModel(
             }
 
             launch {
-                database.entryListUpdates().collect {
+                entryList.collect {
                     list = it
                     isLoaded = true
                 }
@@ -118,20 +137,16 @@ class RecordsModel(
         selected = date
     }
 
-    fun day(on: LocalDate): EntryDay? = days.firstOrNull { it.date == on }
+    fun day(on: LocalDate): EntryDay? = daysByDate[on]
 
     suspend fun select(layout: RecordsLayout) {
         this.layout = layout
 
-        try {
+        ModelTask.quiet {
             database.setSetting(
                 key = SettingKey.recordsLayout,
                 to = layout,
             )
-        } catch (error: CancellationException) {
-            throw error
-        } catch (_: Exception) {
-            return
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
+import com.yossibank.kakeibot.features.shared.model.ModelTask
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.setting
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
@@ -43,25 +44,15 @@ class SettingsScreenFlag(
             screens.remove(screen)
         }
 
-        try {
+        ModelTask.quiet {
             database.setSetting(
                 key = key,
                 to = screens,
             )
-        } catch (error: CancellationException) {
-            throw error
-        } catch (_: Exception) {
-            return
         }
     }
 
-    private suspend fun read(): Set<SettingsScreen>? = try {
-        database.setting(key)
-    } catch (error: CancellationException) {
-        throw error
-    } catch (_: Exception) {
-        null
-    }
+    private suspend fun read(): Set<SettingsScreen>? = ModelTask.quiet { database.setting(key) }
 
     companion object {
         fun closedHint(

@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
@@ -68,12 +69,10 @@ fun RecurringRowCard(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
+                FittedText(
                     text = row.title,
                     modifier = Modifier.weight(1f),
                     color = Palette.text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(style = FontTextStyle.Subheadline),
                 )
 
@@ -92,21 +91,17 @@ fun RecurringRowCard(
                 }
             }
 
-            Text(
+            FittedText(
                 text = row.schedule,
                 color = Palette.subtext,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 style = textFont(style = FontTextStyle.Caption),
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
+                FittedText(
                     text = row.place ?: "",
                     modifier = Modifier.weight(1f),
                     color = Palette.subtext,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(style = FontTextStyle.Caption),
                 )
 
@@ -129,10 +124,9 @@ fun RecurringRowCard(
                         )
                     }
                 } else {
-                    Text(
+                    FittedText(
                         text = nextText(row),
                         color = Palette.subtext,
-                        maxLines = 1,
                         style = textFont(style = FontTextStyle.Caption2),
                     )
                 }

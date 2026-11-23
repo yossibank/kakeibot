@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
@@ -53,10 +54,9 @@ fun FeeChoiceRow(
                     ).clickable { onSelect(amount) },
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
+                FittedText(
                     text = if (amount == 0) "なし" else AmountText.text(amount),
                     color = if (isSelected) Palette.accentStrong else Palette.text,
-                    maxLines = 1,
                     style = textFont(
                         size = FontSize.Caption,
                         weight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,

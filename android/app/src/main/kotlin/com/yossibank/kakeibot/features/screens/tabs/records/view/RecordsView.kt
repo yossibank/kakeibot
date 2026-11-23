@@ -46,14 +46,20 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.date.shortName
 import com.yossibank.kakeibot.designsystem.components.entry.EntryRow
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
+import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.records.model.RecordsModel
+import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
+import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
@@ -63,9 +69,12 @@ fun RecordsView(
     today: LocalDate,
     onOpenEntry: (Identifier<Entry>) -> Unit,
 ) {
-    val model = remember(database) {
+    val entryList = rememberEntryList(database)
+
+    val model = remember(database, entryList) {
         RecordsModel(
             database = database,
+            entryList = entryList,
             today = today,
         )
     }
@@ -99,7 +108,12 @@ fun RecordsView(
         }
 
         item(key = "month") {
-            MonthHeader(model = model)
+            PeriodStepper(
+                title = model.monthTitle,
+                onPrevious = { model.move(months = -1) },
+                onNext = { model.move(months = 1) },
+                caption = model.periodText,
+            )
         }
 
         item(key = "summary") {
@@ -118,7 +132,7 @@ fun RecordsView(
 
         if (model.layout == RecordsLayout.calendar) {
             item(key = "calendar") {
-                CalendarCard(model = model)
+                RecordsCalendarCard(model = model)
             }
 
             item(key = "selected") {
@@ -155,70 +169,10 @@ fun RecordsView(
 }
 
 @Composable
-private fun MonthHeader(model: RecordsModel) {
-    val month = model.shownMonth
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MonthButton(
-            rotation = 180f,
-            onSelect = { model.move(months = -1) },
-        )
-
-        Column(
-            modifier = Modifier.weight(1f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "${month.year}年 ${month.month}月",
-                color = Palette.accentStrong,
-                style = displayFont(size = FontSize.Headline),
-            )
-
-            Text(
-                text = model.periodText,
-                color = Palette.subtext,
-                style = textFont(style = FontTextStyle.Caption),
-            )
-        }
-
-        MonthButton(
-            rotation = 0f,
-            onSelect = { model.move(months = 1) },
-        )
-    }
-}
-
-@Composable
-private fun MonthButton(
-    rotation: Float,
-    onSelect: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .clickable(onClick = onSelect),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_chevron_right),
-            contentDescription = null,
-            modifier = Modifier
-                .size(24.dp)
-                .rotate(rotation),
-            tint = Palette.accent,
-        )
-    }
-}
-
-@Composable
 private fun SummaryCard(model: RecordsModel) {
-    val expense = model.expenseTotal.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
-    val income = model.incomeTotal.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
-    val balance = income - expense
+    val expense = model.expenseTotal.clamped
+    val income = model.incomeTotal.clamped
+    val balance = model.balance.clamped
 
     Column(
         modifier = Modifier
@@ -238,12 +192,7 @@ private fun SummaryCard(model: RecordsModel) {
                 modifier = Modifier.weight(1f),
             )
 
-            Box(
-                modifier = Modifier
-                    .width(1.dp)
-                    .height(20.dp)
-                    .background(Palette.line),
-            )
+            VerticalRule(height = 20.dp)
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -255,16 +204,11 @@ private fun SummaryCard(model: RecordsModel) {
             )
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Palette.line),
-        )
+        Hairline()
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = if (balance < 0) "収支 · 赤字" else "収支 · 黒字",
+                text = model.balanceTitle,
                 modifier = Modifier.weight(1f),
                 color = Palette.subtext,
                 style = textFont(style = FontTextStyle.Caption),
@@ -340,22 +284,11 @@ private fun DayCard(
         }
 
         model.rows(of = day).forEach { row ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(Palette.line),
-            )
+            Hairline()
 
-            EntryRow(
-                icon = row.icon,
-                title = row.title,
-                detail = row.detail,
-                amount = row.amount,
-                type = row.type,
-                modifier = Modifier.clickable { onOpenEntry(row.id) },
-                memo = row.memo,
-                isRecurring = row.isRecurring,
+            EntryItemRow(
+                item = row,
+                onOpen = { onOpenEntry(row.id) },
             )
         }
     }
@@ -426,126 +359,6 @@ private fun DayHeader(
             )
         }
     }
-}
-
-@Composable
-private fun CalendarCard(model: RecordsModel) {
-    val selected = model.selectedDate
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .card()
-            .padding(
-                horizontal = 8.dp,
-                vertical = 12.dp,
-            ),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            model.weekdays.forEach { weekday ->
-                Text(
-                    text = weekday.shortName,
-                    modifier = Modifier.weight(1f),
-                    color = weekdayColor(weekday = weekday),
-                    textAlign = TextAlign.Center,
-                    style = textFont(style = FontTextStyle.Caption2),
-                )
-            }
-        }
-
-        model.weeks.forEach { week ->
-            Row(modifier = Modifier.fillMaxWidth()) {
-                week.forEach { date ->
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (date != null) {
-                            CalendarCell(
-                                date = date,
-                                day = model.day(on = date),
-                                isSelected = date == selected,
-                                isToday = date == model.today,
-                                onSelect = { model.select(date) },
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CalendarCell(
-    date: LocalDate,
-    day: EntryDay?,
-    isSelected: Boolean,
-    isToday: Boolean,
-    onSelect: () -> Unit,
-) {
-    val fill = if (isSelected) Palette.accent else Color.Transparent
-    val rim = if (isToday && !isSelected) Palette.accent else Color.Transparent
-
-    val numberColor = when {
-        isSelected -> Palette.backgroundTop
-
-        Holiday.contains(date) -> Palette.holiday
-
-        else -> weekdayColor(weekday = date.weekday).takeIf { it != Palette.subtext }
-            ?: Palette.text
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 62.dp)
-            .clickable(onClick = onSelect)
-            .padding(vertical = 2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(30.dp)
-                .clip(CircleShape)
-                .background(fill)
-                .border(
-                    width = 1.dp,
-                    color = rim,
-                    shape = CircleShape,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = date.day.toString(),
-                color = numberColor,
-                style = displayFont(size = FontSize.Body),
-            )
-        }
-
-        if (day != null && day.expenseTotal > 0) {
-            AmountText(
-                amount = day.expenseTotal.toInt(),
-                style = displayFont(size = FontSize.Micro),
-                type = Entry.Kind.expense,
-                isCompact = true,
-            )
-        }
-
-        if (day != null && day.incomeTotal > 0) {
-            AmountText(
-                amount = day.incomeTotal.toInt(),
-                style = displayFont(size = FontSize.Micro),
-                type = Entry.Kind.income,
-                isCompact = true,
-            )
-        }
-    }
-}
-
-@Composable
-private fun weekdayColor(weekday: Weekday): Color = when (weekday) {
-    Weekday.sunday -> Palette.holiday
-    Weekday.saturday -> Palette.saturday
-    else -> Palette.subtext
 }
 
 private val layouts = listOf(

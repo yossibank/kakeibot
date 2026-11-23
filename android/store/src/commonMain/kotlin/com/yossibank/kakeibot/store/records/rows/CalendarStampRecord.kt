@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.icon.CalendarStamp
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -79,3 +81,9 @@ fun CalendarStampRecord.calendarStamp(): CalendarStamp? {
         createdAt = createdAt,
     )
 }
+
+internal val calendarStampTable = TableBinding<CalendarStamp>(
+    all = { calendarStampDao().all().map { it.decoded(CalendarStampRecord::calendarStamp) } },
+    insert = { calendarStampDao().insert(it.record()) },
+    deleteAll = { calendarStampDao().deleteAll() },
+)

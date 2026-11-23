@@ -25,13 +25,13 @@ import com.yossibank.kakeibot.store.records.values.fromDatabaseValue
 import com.yossibank.kakeibot.store.writes.types.SavedEntry
 import java.time.Instant
 
-enum class WriteError {
+enum class EntryWriteError {
     entryNotFound,
     tagMismatch,
 }
 
-class WriteException(
-    val error: WriteError,
+class EntryWriteException(
+    val error: EntryWriteError,
 ) : Exception(error.name)
 
 suspend fun AppDatabase.saveEntry(
@@ -86,7 +86,7 @@ suspend fun AppDatabase.fee(of: Identifier<Entry>): Entry? = read {
 suspend fun AppDatabase.deleteEntry(
     id: Identifier<Entry>,
     restoringNoSpend: List<NoSpendDay> = emptyList(),
-    at: Instant = Instant.now(),
+    at: Instant,
 ): List<Entry> = deleteEntries(
     ids = listOf(id),
     restoringNoSpend = restoringNoSpend,
@@ -96,7 +96,7 @@ suspend fun AppDatabase.deleteEntry(
 suspend fun AppDatabase.deleteEntries(
     ids: List<Identifier<Entry>>,
     restoringNoSpend: List<NoSpendDay> = emptyList(),
-    at: Instant = Instant.now(),
+    at: Instant,
 ): List<Entry> = write {
     val keys = ids.map { it.databaseValue }
     val entries = entryDao().withIds(keys).map { it.decoded(EntryRecord::entry) }
@@ -220,7 +220,7 @@ internal suspend fun AppDatabase.saveEntry(
     )
 
     if (!belongs) {
-        throw WriteException(WriteError.tagMismatch)
+        throw EntryWriteException(EntryWriteError.tagMismatch)
     }
 
     entryDao().save(entry.record())
@@ -358,7 +358,7 @@ private suspend fun AppDatabase.entry(
 ): Entry {
     editing ?: return from.newEntry(at)
 
-    val existing = findEntry(editing) ?: throw WriteException(WriteError.entryNotFound)
+    val existing = findEntry(editing) ?: throw EntryWriteException(EntryWriteError.entryNotFound)
 
     return from.applied(
         to = existing,

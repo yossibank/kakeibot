@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.surface.card
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -106,11 +107,9 @@ fun SettingsIntroCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     listOf(headline.first, headline.second).forEach { line ->
-                        Text(
+                        FittedText(
                             text = line,
                             color = Palette.accentStrong,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
                             style = displayFont(
                                 size = FontSize.Body,
                                 weight = FontWeight.Medium,
@@ -143,11 +142,9 @@ fun SettingsIntroCard(
                                 tint = Palette.accent,
                             )
 
-                            Text(
+                            FittedText(
                                 text = note.text,
                                 color = Palette.text,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
                                 style = textFont(style = FontTextStyle.Footnote),
                             )
                         }

@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.wallet.Valuation
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -103,3 +105,9 @@ fun ValuationRecord.valuation(): Valuation? {
         updatedAt = updatedAt,
     )
 }
+
+internal val valuationTable = TableBinding<Valuation>(
+    all = { valuationDao().all().map { it.decoded(ValuationRecord::valuation) } },
+    insert = { valuationDao().insert(it.record()) },
+    deleteAll = { valuationDao().deleteAll() },
+)

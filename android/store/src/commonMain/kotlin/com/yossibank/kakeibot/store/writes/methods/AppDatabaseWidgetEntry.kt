@@ -74,7 +74,7 @@ suspend fun AppDatabase.entryDraft(
 
 suspend fun AppDatabase.undoWidgetEntry(
     id: Identifier<Entry>,
-    at: Instant = Instant.now(),
+    at: Instant,
 ) {
     write {
         val entry = findEntry(id)

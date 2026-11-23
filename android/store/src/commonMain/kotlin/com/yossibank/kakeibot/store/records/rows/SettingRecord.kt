@@ -7,6 +7,8 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.setting.Setting
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 
 @Entity(tableName = "setting")
 data class SettingRecord(
@@ -51,3 +53,9 @@ fun SettingRecord.setting(): Setting? {
         value = value,
     )
 }
+
+internal val settingTable = TableBinding<Setting>(
+    all = { settingDao().all().map { it.decoded(SettingRecord::setting) } },
+    insert = { settingDao().insert(it.record()) },
+    deleteAll = { settingDao().deleteAll() },
+)

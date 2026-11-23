@@ -174,7 +174,7 @@ class TransferFeeWriteTest {
         val setup = Setup.make()
 
         val transfer = setup.database.saveEntry(setup.draft, at = setup.now)
-        setup.database.deleteEntry(transfer.id)
+        setup.database.deleteEntry(transfer.id, at = Instant.now())
         val snapshot = setup.database.snapshot()
 
         assertTrue(snapshot.entries.isEmpty())
@@ -188,11 +188,12 @@ class TransferFeeWriteTest {
 
         val transfer = setup.database.saveEntry(setup.draft, at = setup.now)
         val fee = setup.database.fee(of = transfer.id)
-        setup.database.deleteEntry(transfer.id)
+        setup.database.deleteEntry(transfer.id, at = Instant.now())
 
         setup.database.restoreEntry(
             transfer,
             fee = fee,
+            at = Instant.now(),
         )
 
         val snapshot = setup.database.snapshot()
@@ -219,6 +220,7 @@ class TransferFeeWriteTest {
         setup.database.restoreEntry(
             transfer,
             fee = null,
+            at = Instant.now(),
         )
 
         val snapshot = setup.database.snapshot()
@@ -234,8 +236,8 @@ class TransferFeeWriteTest {
 
         val transfer = setup.database.saveEntry(setup.draft, at = setup.now)
         val fee = setup.database.fee(of = transfer.id)
-        val deleted = setup.database.deleteEntries(listOf(transfer.id))
-        setup.database.restoreEntries(deleted.reversed())
+        val deleted = setup.database.deleteEntries(listOf(transfer.id), at = Instant.now())
+        setup.database.restoreEntries(deleted.reversed(), at = Instant.now())
         val snapshot = setup.database.snapshot()
         val expected = listOfNotNull(transfer, fee).toSet()
 

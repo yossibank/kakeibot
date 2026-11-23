@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.title
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -28,11 +29,21 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 
 private val types = listOf(
-    Triple(Entry.Kind.expense, "支出", R.drawable.ic_arrow_upward),
-    Triple(Entry.Kind.income, "収入", R.drawable.ic_arrow_downward),
-    Triple(Entry.Kind.transfer, "振替", R.drawable.ic_swap),
+    Triple(Entry.Kind.expense, Entry.Kind.expense.title, R.drawable.ic_arrow_upward),
+    Triple(Entry.Kind.income, Entry.Kind.income.title, R.drawable.ic_arrow_downward),
+    Triple(Entry.Kind.transfer, Entry.Kind.transfer.title, R.drawable.ic_swap),
 )
 
 @Composable

@@ -22,8 +22,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
+import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
@@ -31,11 +34,13 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.settings.wallets.title
 import com.yossibank.kakeibot.features.screens.tabs.assets.model.AssetsModel
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
 fun AssetsView(database: AppDatabase) {
-    val model = remember(database) { AssetsModel(database = database) }
+    val entryList = rememberEntryList(database)
+    val model = remember(entryList) { AssetsModel(entryList = entryList) }
 
     LaunchedEffect(model) {
         model.observe()
@@ -164,11 +169,9 @@ private fun WalletCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Text(
+                    FittedText(
                         text = row.name,
                         color = Palette.text,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                         style = textFont(style = FontTextStyle.Subheadline),
                     )
 
@@ -204,16 +207,3 @@ private fun Caption(
         ),
     )
 }
-
-@Composable
-private fun Hairline() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp)
-            .background(Palette.line),
-    )
-}
-
-private val Long.clamped: Int
-    get() = coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()

@@ -14,7 +14,9 @@ object PeriodText {
         return if (startDay.shift == HolidayShift.none) day else "$day・${startDay.shift.title}"
     }
 
-    fun weekdayDate(date: LocalDate): String = "${date.monthDayText}（${date.weekday.shortName}）"
+    fun weekday(date: LocalDate): String = date.weekday.shortName
+
+    fun weekdayDate(date: LocalDate): String = "${date.monthDayText}（${weekday(date)}）"
 }
 
 val HolidayShift.title: String

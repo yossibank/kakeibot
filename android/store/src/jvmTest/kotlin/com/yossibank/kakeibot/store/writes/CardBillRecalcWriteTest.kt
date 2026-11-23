@@ -49,7 +49,7 @@ class CardBillRecalcWriteTest {
         val added = setup.spend(3000, on = "2026-10-05")
         assertEquals(13000, setup.bill()?.amount)
 
-        setup.database.deleteEntry(added.id)
+        setup.database.deleteEntry(added.id, at = Instant.now())
         assertEquals(10000, setup.bill()?.amount)
 
         setup.database.close()
@@ -65,7 +65,7 @@ class CardBillRecalcWriteTest {
             },
         )
 
-        setup.database.deleteEntry(entry.id)
+        setup.database.deleteEntry(entry.id, at = Instant.now())
 
         assertNull(setup.bill())
         assertTrue(setup.database.snapshot().entries.isEmpty())
@@ -152,10 +152,10 @@ class CardBillRecalcWriteTest {
         val setup = Setup.make(usage = listOf(10000))
         val entry = setup.spend(3000, on = "2026-10-05")
 
-        setup.database.deleteEntry(entry.id)
+        setup.database.deleteEntry(entry.id, at = Instant.now())
         assertEquals(10000, setup.bill()?.amount)
 
-        setup.database.restoreEntry(entry)
+        setup.database.restoreEntry(entry, at = Instant.now())
         assertEquals(13000, setup.bill()?.amount)
 
         setup.database.close()
@@ -184,7 +184,7 @@ class CardBillRecalcWriteTest {
 
         assertEquals(12000, setup.bill()?.amount)
 
-        setup.database.undoWidgetEntry(entry.id)
+        setup.database.undoWidgetEntry(entry.id, at = Instant.now())
         assertEquals(10000, setup.bill()?.amount)
 
         setup.database.close()
@@ -196,10 +196,10 @@ class CardBillRecalcWriteTest {
         val added = setup.spend(3000, on = "2026-10-05")
         val bill = assertNotNull(setup.bill())
 
-        val deleted = setup.database.deleteEntries(listOf(added.id, bill.id))
+        val deleted = setup.database.deleteEntries(listOf(added.id, bill.id), at = Instant.now())
         assertTrue(setup.bills().isEmpty())
 
-        setup.database.restoreEntries(deleted)
+        setup.database.restoreEntries(deleted, at = Instant.now())
         val bills = setup.bills()
 
         assertEquals(1, bills.size)
@@ -215,7 +215,7 @@ class CardBillRecalcWriteTest {
         val added = setup.spend(3000, on = "2026-10-05")
         val later = setup.now.plusSeconds(1)
 
-        setup.database.deleteEntry(bill.id)
+        setup.database.deleteEntry(bill.id, at = Instant.now())
 
         setup.database.saveEntry(
             EntryDraft(added).copy(amount = 5000),
@@ -238,10 +238,10 @@ class CardBillRecalcWriteTest {
             },
         )
 
-        val deleted = setup.database.deleteEntries(listOf(usage.id))
+        val deleted = setup.database.deleteEntries(listOf(usage.id), at = Instant.now())
         assertTrue(setup.bills().isEmpty())
 
-        setup.database.restoreEntries(deleted)
+        setup.database.restoreEntries(deleted, at = Instant.now())
         val bills = setup.bills()
 
         assertEquals(1, bills.size)
@@ -294,7 +294,7 @@ class CardBillRecalcWriteTest {
         assertNull(setup.bill())
         assertEquals(10000, setup.bill(of = other.id)?.amount)
 
-        setup.database.restoreEntries(previous)
+        setup.database.restoreEntries(previous, at = Instant.now())
 
         assertEquals(10000, setup.bill()?.amount)
         assertNull(setup.bill(of = other.id))
@@ -381,7 +381,7 @@ class CardBillRecalcWriteTest {
         val bill = assertNotNull(setup.bill())
         val movedDate = assertNotNull(LocalDate.parse("2026-11-12"))
 
-        setup.database.deleteEntry(bill.id)
+        setup.database.deleteEntry(bill.id, at = Instant.now())
 
         val moved = Entry(
             type = Entry.Kind.transfer,
@@ -396,8 +396,8 @@ class CardBillRecalcWriteTest {
             updatedAt = setup.now,
         )
 
-        setup.database.restoreEntries(listOf(moved))
-        setup.database.restoreEntries(listOf(bill))
+        setup.database.restoreEntries(listOf(moved), at = Instant.now())
+        setup.database.restoreEntries(listOf(bill), at = Instant.now())
         val bills = setup.bills()
 
         assertEquals(1, bills.size)

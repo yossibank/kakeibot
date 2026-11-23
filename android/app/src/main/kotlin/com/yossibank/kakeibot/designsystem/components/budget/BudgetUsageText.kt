@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import kotlin.math.abs
 
@@ -38,6 +39,3 @@ val BudgetUsage.tint: Color
         isNearLimit -> Palette.amber
         else -> Palette.accent
     }
-
-private val Long.clamped: Int
-    get() = coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()

@@ -10,12 +10,12 @@ const val RECENT_ITEM_NAME_LIMIT = 50
 const val ITEM_SUGGESTION_LIMIT = 8
 
 val EntryModel.showsItems: Boolean
-    get() = type != Entry.Kind.transfer
+    get() = form.type != Entry.Kind.transfer
 
 val EntryModel.itemTotals: EntryItemTotal
     get() = EntryItemTotal(
-        items = items,
-        taxIncluded = taxIncluded,
+        items = form.items,
+        taxIncluded = form.taxIncluded,
     )
 
 val EntryModel.itemTotal: Long
@@ -25,20 +25,18 @@ val EntryModel.itemAdjustment: Long
     get() = amount - itemTotal
 
 val EntryModel.itemCount: Int
-    get() = items.sumOf { it.quantity }
+    get() = form.items.sumOf { it.quantity }
 
 val EntryModel.hasItemAdjustment: Boolean
-    get() = items.isNotEmpty() && itemAdjustment != 0L
+    get() = form.items.isNotEmpty() && itemAdjustment != 0L
 
 val EntryModel.canAdjustToItems: Boolean
     get() = itemTotal in 0..AmountCalculator.maxValue.toLong()
 
 var EntryModel.store: String
-    get() = memo.split("\n").first()
+    get() = form.store
     set(value) {
-        val lines = memo.split("\n").toMutableList()
-        lines[0] = value.replace("\n", " ")
-        memo = lines.joinToString("\n")
+        update { withStore(value) }
     }
 
 fun EntryModel.itemNameSuggestions(text: String): List<String> {
@@ -55,7 +53,7 @@ fun EntryModel.itemNameSuggestions(text: String): List<String> {
 
 fun EntryModel.addItem(item: EntryItem.Draft) {
     changeItems {
-        items = items + item
+        update { copy(items = items + item) }
     }
 }
 
@@ -63,12 +61,12 @@ fun EntryModel.updateItem(
     index: Int,
     item: EntryItem.Draft,
 ) {
-    if (index !in items.indices) {
+    if (index !in form.items.indices) {
         return
     }
 
     changeItems {
-        items = items.toMutableList().also { it[index] = item }
+        update { copy(items = items.toMutableList().also { it[index] = item }) }
     }
 }
 
@@ -78,10 +76,10 @@ data class RemovedItem(
 )
 
 fun EntryModel.removeItem(index: Int): RemovedItem? {
-    val item = items.getOrNull(index) ?: return null
+    val item = form.items.getOrNull(index) ?: return null
 
     changeItems {
-        items = items.toMutableList().also { it.removeAt(index) }
+        update { copy(items = items.toMutableList().also { it.removeAt(index) }) }
     }
 
     return RemovedItem(
@@ -92,13 +90,17 @@ fun EntryModel.removeItem(index: Int): RemovedItem? {
 
 fun EntryModel.restoreItem(removed: RemovedItem) {
     changeItems {
-        items = items.toMutableList().also { it.add(minOf(removed.index, it.size), removed.item) }
+        update {
+            val restored = items.toMutableList()
+            restored.add(minOf(removed.index, restored.size), removed.item)
+            copy(items = restored)
+        }
     }
 }
 
 fun EntryModel.setTaxIncluded(isIncluded: Boolean) {
     changeItems {
-        taxIncluded = isIncluded
+        update { copy(taxIncluded = isIncluded) }
     }
 }
 
@@ -107,7 +109,7 @@ fun EntryModel.adjustToItems() {
         return
     }
 
-    calculator = AmountCalculator(amount = itemTotal.toInt())
+    setAmount(itemTotal.toInt())
 }
 
 fun EntryItem.Draft.quantityText(): String? {

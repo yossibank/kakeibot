@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
@@ -45,7 +46,7 @@ fun RecurringLoanPlan(
                     Caption(text = if (model.isEditing) "これから返す額" else "返す総額")
 
                     AmountText(
-                        amount = total.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+                        amount = total.clamped,
                         style = displayFont(
                             size = FontSize.Title,
                             weight = FontWeight.Bold,
@@ -141,9 +142,7 @@ private fun noteText(model: RecurringEditModel): String? {
     val plan = model.autoPlan ?: return null
 
     model.balanceGap?.let { gap ->
-        return "残高と ${AmountText.text(
-            amount = abs(gap).coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
-        )} ずれています"
+        return "残高と ${AmountText.text(amount = abs(gap).clamped)} ずれています"
     }
 
     return if (model.plannedTotal == null) "残高から出すと、あと ${plan.count} 回で終わります" else null

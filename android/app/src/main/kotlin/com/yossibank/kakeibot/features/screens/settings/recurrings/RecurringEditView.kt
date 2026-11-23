@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,9 +64,13 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.title
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
+import com.yossibank.kakeibot.designsystem.components.input.PlaceholderTextField
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
+import com.yossibank.kakeibot.designsystem.components.modal.BottomDrawer
 import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
 import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.surface.card
@@ -77,10 +82,12 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
 import com.yossibank.kakeibot.features.shared.period.title
 import com.yossibank.kakeibot.features.shared.settingsparts.RoundIconButton
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
+import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.writes.types.Deletion
@@ -118,33 +125,19 @@ fun RecurringEditView(
         )
     }
 
-    val context = LocalContext.current
+    SideEffect {
+        model.today = today
+    }
+
     val focus = LocalFocusManager.current
     val scope = rememberCoroutineScope()
+    val permission = rememberNotificationPermission()
 
     var panel by remember { mutableStateOf<RecurringPanel?>(null) }
-    var isConfirmingDiscard by remember { mutableStateOf(false) }
-    var isConfirmingHide by remember { mutableStateOf(false) }
-    var isConfirmingDelete by remember { mutableStateOf(false) }
-
-    val permission = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        model.isNotificationAllowed = isGranted
-    }
-
-    fun refreshAuthorization() {
-        model.isNotificationAllowed =
-            NotificationManagerCompat.from(context).areNotificationsEnabled()
-    }
+    var prompt by remember { mutableStateOf<RecurringEditPrompt?>(null) }
 
     LaunchedEffect(model) {
         model.load()
-        refreshAuthorization()
-    }
-
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        refreshAuthorization()
     }
 
     fun open(next: RecurringPanel) {
@@ -161,7 +154,7 @@ fun RecurringEditView(
         panel = null
 
         if (model.isChanged) {
-            isConfirmingDiscard = true
+            prompt = RecurringEditPrompt.Discard
         } else {
             onClose()
         }
@@ -187,12 +180,8 @@ fun RecurringEditView(
                 return@launch
             }
 
-            val needsPermission = model.remindDaysBefore != null &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                !NotificationManagerCompat.from(context).areNotificationsEnabled()
-
-            if (needsPermission) {
-                permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            if (model.form.remindDaysBefore != null) {
+                permission.requestIfNeeded()
             }
 
             if (hiding) {
@@ -211,585 +200,138 @@ fun RecurringEditView(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Palette.background)
-            .pointerInput(Unit) {},
-    ) {
-        Column(
-            modifier = Modifier
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .imePadding()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 12.dp,
-                ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            SettingsHeader(
-                title = if (model.isEditing) "固定費を編集" else "固定費を追加",
-                isRoot = false,
-                onBack = ::close,
-            ) {
-                if (model.isEditing) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        HideButton(
-                            isHidden = model.isHidden,
-                            onSelect = {
-                                if (model.isChanged) {
-                                    isConfirmingHide = true
-                                } else {
-                                    setHidden(!model.isHidden)
-                                }
-                            },
-                        )
-
-                        RoundIconButton(
-                            icon = R.drawable.ic_trash,
-                            onSelect = { isConfirmingDelete = true },
-                        )
-                    }
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                if (!model.isEditing) {
-                    SegmentSwitch(
-                        selection = model.type,
-                        options = typeOptions,
-                        onSelect = model::select,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    RecurringRowCard(row = model.previewRow)
-
-                    SettingsCaption(text = "一覧では、このカードで並びます")
-                }
-
-                NameField(model = model)
-
-                RecurringQuickCard(
-                    model = model,
-                    onOpen = ::open,
-                )
-
-                DetailRows(
-                    model = model,
-                    onOpen = ::open,
-                )
-
-                if (model.isLoanRepayment &&
-                    (model.plannedTotal != null || model.autoPlan != null)
-                ) {
-                    RecurringLoanPlan(
-                        model = model,
-                        onMatch = model::useAutoCount,
-                    )
-                }
-
-                if (model.isNotificationDenied) {
-                    DeniedBanner(
-                        onOpen = {
-                            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                                .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-
-                            context.startActivity(intent)
+    SettingsFrame(
+        title = if (model.isEditing) "固定費を編集" else "固定費を追加",
+        isRoot = false,
+        onBack = ::close,
+        followsKeyboard = true,
+        trailing = {
+            if (model.isEditing) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    HideButton(
+                        isHidden = model.isHidden,
+                        onSelect = {
+                            if (model.isChanged) {
+                                prompt = RecurringEditPrompt.Hide
+                            } else {
+                                setHidden(!model.isHidden)
+                            }
                         },
-                    )
-                }
-            }
-
-            if (model.message.isNotEmpty()) {
-                Text(
-                    text = model.message,
-                    modifier = Modifier.clickable(onClick = model::clearMessage),
-                    color = Palette.rose,
-                    style = textFont(style = FontTextStyle.Caption),
-                )
-            }
-
-            SaveButton(
-                title = model.saveTitle,
-                isEnabled = model.canSave,
-                onSave = { save() },
-            )
-        }
-
-        PanelDrawer(
-            panel = panel,
-            model = model,
-            onClose = { panel = null },
-        )
-    }
-
-    if (isConfirmingDiscard) {
-        DiscardDialog(
-            onDiscard = {
-                isConfirmingDiscard = false
-                onClose()
-            },
-            onKeep = { isConfirmingDiscard = false },
-        )
-    }
-
-    if (isConfirmingDelete) {
-        DeleteDialog(
-            title = "この固定費を削除しますか",
-            message = "これまでに作った記録は残ります",
-            onConfirm = {
-                isConfirmingDelete = false
-
-                scope.launch {
-                    model.delete()?.let {
-                        onDelete(it)
-                        onClose()
-                    }
-                }
-            },
-            onDismiss = { isConfirmingDelete = false },
-        )
-    }
-
-    if (isConfirmingHide) {
-        UnsavedHideDialog(
-            isHidden = model.isHidden,
-            canSave = model.canSave,
-            onSave = {
-                isConfirmingHide = false
-                save(hiding = true)
-            },
-            onDiscard = {
-                isConfirmingHide = false
-                setHidden(!model.isHidden)
-            },
-            onKeep = { isConfirmingHide = false },
-        )
-    }
-}
-
-@Composable
-private fun PanelDrawer(
-    panel: RecurringPanel?,
-    model: RecurringEditModel,
-    onClose: () -> Unit,
-) {
-    AnimatedVisibility(
-        visible = panel != null,
-        enter = fadeIn(),
-        exit = fadeOut(),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Palette.scrim.opacity(Emphasis.Muted))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onClose,
-                ),
-        )
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        AnimatedVisibility(
-            visible = panel != null,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
-            val current = remember(panel) { panel } ?: return@AnimatedVisibility
-            val shape = RoundedCornerShape(
-                topStart = 28.dp,
-                topEnd = 28.dp,
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape)
-                    .background(Palette.backgroundTop)
-                    .border(
-                        width = 1.dp,
-                        color = Palette.accent.opacity(Emphasis.Soft),
-                        shape = shape,
-                    ).pointerInput(Unit) {}
-                    .navigationBarsPadding()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = current.title,
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Palette.accentStrong,
-                        style = displayFont(size = FontSize.Body),
                     )
 
                     RoundIconButton(
-                        icon = R.drawable.ic_close,
-                        onSelect = onClose,
-                        modifier = Modifier.align(Alignment.CenterEnd),
+                        icon = R.drawable.ic_trash,
+                        onSelect = { prompt = RecurringEditPrompt.Delete },
                     )
                 }
-
+            }
+        },
+        overlay = {
+            BottomDrawer(
+                item = panel,
+                title = { it.title },
+                onClose = { panel = null },
+            ) { current ->
                 RecurringPanelBody(
                     panel = current,
                     model = model,
-                    onClose = onClose,
+                    onClose = { panel = null },
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun NameField(model: RecurringEditModel) {
-    val style = textFont(style = FontTextStyle.Body)
-
-    val prompt = when (model.type) {
-        Entry.Kind.expense -> "家賃・サブスクなど"
-        Entry.Kind.income -> "給料・年金など"
-        Entry.Kind.transfer -> "カードの引き落とし・積立など"
-    }
-
-    BasicTextField(
-        value = model.memo,
-        onValueChange = { model.memo = it },
-        modifier = Modifier
-            .fillMaxWidth()
-            .card()
-            .padding(16.dp),
-        textStyle = style.copy(color = Palette.text),
-        singleLine = true,
-        cursorBrush = SolidColor(Palette.accent),
-        decorationBox = { field ->
-            if (model.memo.isEmpty()) {
-                Text(
-                    text = prompt,
-                    color = Palette.hint,
-                    style = style,
-                )
-            }
-
-            field()
         },
-    )
-}
-
-@Composable
-private fun DetailRows(
-    model: RecurringEditModel,
-    onOpen: (RecurringPanel) -> Unit,
-) {
-    val rows = buildList {
-        if (model.type == Entry.Kind.transfer) {
-            if (model.isLoanRepayment) {
-                val count = model.repaymentCount
-
-                add(
-                    DetailRow(
-                        panel = RecurringPanel.Count,
-                        icon = R.drawable.ic_repeat,
-                        value = when {
-                            count == null -> "決めない"
-                            model.usesAutoCount -> "自動 · $count 回"
-                            else -> "$count 回"
-                        },
-                        isEmpty = count == null,
-                    ),
-                )
-            } else if (model.canUseClosingDay) {
-                add(
-                    DetailRow(
-                        panel = RecurringPanel.Closing,
-                        icon = R.drawable.ic_card,
-                        value = RecurringText.closingDay(model.closingDay),
-                        isEmpty = model.closingDay == null,
-                    ),
-                )
-            }
-
-            add(
-                DetailRow(
-                    panel = RecurringPanel.Fee,
-                    icon = R.drawable.ic_bank,
-                    value = if (model.fee > 0) AmountText.text(amount = model.fee) else "なし",
-                    isEmpty = model.fee == 0,
-                ),
-            )
-        }
-
-        add(
-            DetailRow(
-                panel = RecurringPanel.Start,
-                icon = R.drawable.ic_calendar,
-                value = RecurringText.date(model.startDate),
-                isEmpty = false,
-            ),
-        )
-
-        add(
-            DetailRow(
-                panel = RecurringPanel.End,
-                icon = R.drawable.ic_calendar,
-                value = model.scheduledEndDate?.let(RecurringText::date) ?: "なし",
-                isEmpty = model.scheduledEndDate == null,
-            ),
-        )
-
-        add(
-            DetailRow(
-                panel = RecurringPanel.Holiday,
-                icon = R.drawable.ic_calendar,
-                value = model.holidayShift.title,
-                isEmpty = model.holidayShift == HolidayShift.none,
-            ),
-        )
-
-        add(
-            DetailRow(
-                panel = RecurringPanel.Remind,
-                icon = R.drawable.ic_bell,
-                value = RecurringText.remind(model.remindDaysBefore),
-                isEmpty = model.remindDaysBefore == null,
-            ),
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .card(),
     ) {
-        rows.forEachIndexed { index, row ->
-            if (index > 0) {
-                SettingsDivider()
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            if (!model.isEditing) {
+                SegmentSwitch(
+                    selection = model.form.type,
+                    options = typeOptions,
+                    onSelect = model::select,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
 
-            Row(
+            Column(verticalArrangement = Arrangement.spacedBy(previewSpacing)) {
+                RecurringRowCard(row = model.previewRow)
+
+                SettingsCaption(text = "一覧では、このカードで並びます")
+            }
+
+            PlaceholderTextField(
+                value = model.form.memo,
+                onChange = { memo -> model.update { copy(memo = memo) } },
+                placeholder = RecurringText.namePrompt(model.form.type),
+                style = textFont(style = FontTextStyle.Body),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 52.dp)
-                    .clickable { onOpen(row.panel) }
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    .card()
+                    .padding(16.dp),
+            )
+
+            RecurringQuickCard(
+                model = model,
+                onOpen = ::open,
+            )
+
+            RecurringDetailRows(
+                rows = model.detailRows,
+                onOpen = ::open,
+            )
+
+            if (model.isLoanRepayment &&
+                (model.plannedTotal != null || model.autoPlan != null)
             ) {
-                Icon(
-                    painter = painterResource(row.icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = Palette.accent,
+                RecurringLoanPlan(
+                    model = model,
+                    onMatch = model::useAutoCount,
                 )
+            }
 
-                Text(
-                    text = row.panel.title,
-                    modifier = Modifier.weight(1f),
-                    color = Palette.text,
-                    style = textFont(style = FontTextStyle.Subheadline),
-                )
-
-                Text(
-                    text = row.value,
-                    color = if (row.isEmpty) Palette.hint else Palette.accentStrong,
-                    maxLines = 1,
-                    style = textFont(style = FontTextStyle.Subheadline),
-                )
-
-                Icon(
-                    painter = painterResource(R.drawable.ic_chevron_right),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = Palette.subtext,
-                )
+            if (model.form.remindDaysBefore != null && !permission.isAllowed) {
+                DeniedBanner(onOpen = permission::openSettings)
             }
         }
-    }
-}
 
-private data class DetailRow(
-    val panel: RecurringPanel,
-    val icon: Int,
-    val value: String,
-    val isEmpty: Boolean,
-)
+        if (model.message.isNotEmpty()) {
+            Text(
+                text = model.message,
+                modifier = Modifier.clickable(onClick = model::clearMessage),
+                color = Palette.rose,
+                style = textFont(style = FontTextStyle.Caption),
+            )
+        }
 
-@Composable
-private fun HideButton(
-    isHidden: Boolean,
-    onSelect: () -> Unit,
-) {
-    Text(
-        text = if (isHidden) "表示する" else "非表示",
-        modifier = Modifier
-            .height(40.dp)
-            .clip(CircleShape)
-            .background(Palette.card)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Muted),
-                shape = CircleShape,
-            ).clickable(onClick = onSelect)
-            .padding(
-                horizontal = 14.dp,
-                vertical = 10.dp,
-            ),
-        color = Palette.accent,
-        style = textFont(
-            size = FontSize.Small,
-            weight = FontWeight.SemiBold,
-        ),
-    )
-}
-
-@Composable
-private fun DeniedBanner(onOpen: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .card()
-            .clickable(onClick = onOpen)
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_bell),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = Palette.amber,
-        )
-
-        Text(
-            text = "通知が届かない状態です",
-            modifier = Modifier.weight(1f),
-            color = Palette.text,
-            style = textFont(style = FontTextStyle.Subheadline),
-        )
-
-        Text(
-            text = "許可する",
-            color = Palette.accent,
-            style = textFont(
-                style = FontTextStyle.Subheadline,
-                weight = FontWeight.SemiBold,
-            ),
-        )
-
-        Icon(
-            painter = painterResource(R.drawable.ic_chevron_right),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Palette.accent,
+        PrimaryButton(
+            title = model.saveTitle,
+            onClick = { save() },
+            modifier = Modifier.fillMaxWidth(),
+            isEnabled = model.canSave,
         )
     }
-}
 
-@Composable
-private fun SaveButton(
-    title: String,
-    isEnabled: Boolean,
-    onSave: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp)
-            .clip(CircleShape)
-            .background(
-                if (isEnabled) {
-                    Brush.verticalGradient(listOf(Palette.accentDeep, Palette.accent))
-                } else {
-                    SolidColor(Palette.hint)
-                },
-            ).clickable(
-                enabled = isEnabled,
-                onClick = onSave,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = title,
-            color = Palette.backgroundTop,
-            style = textFont(
-                size = FontSize.Body,
-                weight = FontWeight.SemiBold,
-            ),
-        )
-    }
-}
-
-@Composable
-private fun UnsavedHideDialog(
-    isHidden: Boolean,
-    canSave: Boolean,
-    onSave: () -> Unit,
-    onDiscard: () -> Unit,
-    onKeep: () -> Unit,
-) {
-    val verb = if (isHidden) "表示" else "非表示"
-
-    AlertDialog(
-        onDismissRequest = onKeep,
-        confirmButton = {
-            Column(horizontalAlignment = Alignment.End) {
-                if (canSave) {
-                    TextButton(onClick = onSave) {
-                        Text(
-                            text = "保存して$verb",
-                            color = Palette.accent,
-                        )
-                    }
-                }
-
-                TextButton(onClick = onDiscard) {
-                    Text(
-                        text = "捨てて$verb",
-                        color = Palette.rose,
-                    )
-                }
-
-                TextButton(onClick = onKeep) {
-                    Text(
-                        text = "入力に戻る",
-                        color = Palette.subtext,
-                    )
+    RecurringEditDialogs(
+        prompt = prompt,
+        isHidden = model.isHidden,
+        canSave = model.canSave,
+        onDismiss = { prompt = null },
+        onDiscard = onClose,
+        onDelete = {
+            scope.launch {
+                model.delete()?.let {
+                    onDelete(it)
+                    onClose()
                 }
             }
         },
-        title = {
-            Text(
-                text = "保存していない変更があります",
-                color = Palette.text,
-                style = textFont(
-                    size = FontSize.Body,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-        },
-        text = {
-            Text(
-                text = "入力した内容は、保存しないと残りません",
-                color = Palette.subtext,
-            )
-        },
-        containerColor = Palette.backgroundTop,
+        onSaveHiding = { save(hiding = true) },
+        onDiscardHiding = { setHidden(!model.isHidden) },
     )
 }
 
-private val typeOptions = listOf(
-    Entry.Kind.expense to "支出",
-    Entry.Kind.income to "収入",
-    Entry.Kind.transfer to "振替",
-)
+private val previewSpacing = 6.dp
+
+private val typeOptions = Entry.Kind.entries.map { it to it.title }

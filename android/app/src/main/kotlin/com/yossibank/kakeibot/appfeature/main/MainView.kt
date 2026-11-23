@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -33,6 +34,8 @@ import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
 import com.yossibank.kakeibot.features.screens.tabs.home.view.HomeView
 import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
 import com.yossibank.kakeibot.features.screens.tabs.review.view.ReviewView
+import com.yossibank.kakeibot.features.shared.entrylist.LocalEntryList
+import com.yossibank.kakeibot.features.shared.entrylist.rememberSharedEntryList
 import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
@@ -43,37 +46,31 @@ fun MainView(
     onOpenLink: () -> Unit,
 ) {
     val selection = rememberSaveable(saver = MainTabSelection.Saver) { MainTabSelection() }
-    var isEntryShown by rememberSaveable { mutableStateOf(false) }
-    var editing by rememberSaveable(
-        stateSaver = Saver<Identifier<Entry>?, String>(
-            save = { it?.toString() },
-            restore = { Identifier.parse(it) },
-        ),
-    ) { mutableStateOf(null) }
-    var isBudgetShown by rememberSaveable { mutableStateOf(false) }
-    var isSettingsShown by rememberSaveable { mutableStateOf(false) }
-    var settingsRecurring by remember { mutableStateOf<Identifier<Recurring>?>(null) }
-    var settingsRound by remember { mutableIntStateOf(0) }
+    var sheet by rememberSaveable(stateSaver = MainSheet.Saver) { mutableStateOf(null) }
+    var round by remember { mutableIntStateOf(0) }
+
+    val entryList = rememberSharedEntryList(database)
+    val openEntry: (Identifier<Entry>?) -> Unit = { sheet = MainSheet.Entry(editing = it) }
 
     LaunchedEffect(link) {
         val route = link?.let { PlannedNotification.Route.of(link = it) } ?: return@LaunchedEffect
 
         onOpenLink()
 
-        isEntryShown = false
-        isBudgetShown = false
-        isSettingsShown = false
+        sheet = null
 
         when (route) {
             is PlannedNotification.Route.Recurring -> {
-                settingsRecurring = route.id
-                settingsRound += 1
-                isSettingsShown = true
+                round += 1
+
+                sheet = MainSheet.Settings(
+                    recurring = route.id,
+                    round = round,
+                )
             }
 
             is PlannedNotification.Route.Entry -> {
-                editing = null
-                isEntryShown = true
+                openEntry(null)
             }
 
             else -> {
@@ -81,6 +78,27 @@ fun MainView(
             }
         }
     }
+
+    CompositionLocalProvider(LocalEntryList provides entryList) {
+        MainLayers(
+            database = database,
+            today = today,
+            selection = selection,
+            sheet = sheet,
+            onOpen = { sheet = it },
+        )
+    }
+}
+
+@Composable
+private fun MainLayers(
+    database: AppDatabase,
+    today: LocalDate,
+    selection: MainTabSelection,
+    sheet: MainSheet?,
+    onOpen: (MainSheet?) -> Unit,
+) {
+    val openEntry: (Identifier<Entry>?) -> Unit = { onOpen(MainSheet.Entry(editing = it)) }
 
     Box(
         modifier = Modifier
@@ -98,12 +116,9 @@ fun MainView(
                             HomeView(
                                 database = database,
                                 today = today,
-                                onOpenBudget = { isBudgetShown = true },
-                                onOpenEntry = { id ->
-                                    editing = id
-                                    isEntryShown = true
-                                },
-                                onOpenSettings = { isSettingsShown = true },
+                                onOpenBudget = { onOpen(MainSheet.Budget) },
+                                onOpenEntry = openEntry,
+                                onOpenSettings = { onOpen(MainSheet.Settings()) },
                             )
                         }
 
@@ -111,10 +126,7 @@ fun MainView(
                             RecordsView(
                                 database = database,
                                 today = today,
-                                onOpenEntry = { id ->
-                                    editing = id
-                                    isEntryShown = true
-                                },
+                                onOpenEntry = openEntry,
                             )
                         }
 
@@ -135,59 +147,62 @@ fun MainView(
 
         MainTabBar(
             selection = selection,
-            onAdd = {
-                editing = null
-                isEntryShown = true
-            },
+            onAdd = { openEntry(null) },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding(),
         )
 
-        AnimatedVisibility(
-            visible = isEntryShown,
-            modifier = Modifier.zIndex(3f),
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
+        SheetLayer<MainSheet.Entry>(sheet = sheet) { entry ->
             EntrySheet(
                 database = database,
                 today = today,
-                editing = editing,
-                onClose = { isEntryShown = false },
+                editing = entry.editing,
+                onClose = { onOpen(null) },
             )
         }
 
-        AnimatedVisibility(
-            visible = isSettingsShown,
-            modifier = Modifier.zIndex(3f),
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
-            key(settingsRound) {
+        SheetLayer<MainSheet.Settings>(sheet = sheet) { settings ->
+            key(settings.round) {
                 SettingsMenuSheet(
                     database = database,
                     today = today,
-                    onClose = {
-                        isSettingsShown = false
-                        settingsRecurring = null
-                    },
-                    openRecurring = settingsRecurring,
+                    onClose = { onOpen(null) },
+                    openRecurring = settings.recurring,
                 )
             }
         }
 
-        AnimatedVisibility(
-            visible = isBudgetShown,
-            modifier = Modifier.zIndex(3f),
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
+        SheetLayer<MainSheet.Budget>(sheet = sheet) {
             BudgetListView(
                 database = database,
                 today = today,
-                onBack = { isBudgetShown = false },
+                onBack = { onOpen(null) },
             )
         }
     }
 }
+
+@Composable
+private inline fun <reified Sheet : MainSheet> SheetLayer(
+    sheet: MainSheet?,
+    crossinline content: @Composable (Sheet) -> Unit,
+) {
+    val current = sheet as? Sheet
+    var last by remember { mutableStateOf(current) }
+
+    if (current != null) {
+        last = current
+    }
+
+    AnimatedVisibility(
+        visible = current != null,
+        modifier = Modifier.zIndex(SHEET_LAYER),
+        enter = slideInVertically { it },
+        exit = slideOutVertically { it },
+    ) {
+        last?.let { content(it) }
+    }
+}
+
+private const val SHEET_LAYER = 3f

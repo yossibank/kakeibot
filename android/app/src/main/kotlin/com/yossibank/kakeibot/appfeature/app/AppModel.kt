@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.theme.ThemeLook
 import com.yossibank.kakeibot.core.concepts.theme.ThemeStyle
+import com.yossibank.kakeibot.features.shared.model.ModelTask
 import com.yossibank.kakeibot.notifications.NotificationScheduler
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.notificationInputUpdates
@@ -130,30 +131,22 @@ class AppModel(
         notifications?.cancel()
 
         notifications = viewModelScope.launch {
-            try {
+            ModelTask.quiet {
                 database.notificationInputUpdates(from = day).collect { input ->
                     withContext(Dispatchers.IO) {
                         scheduler.apply(input.plan(today = day))
                     }
                 }
-            } catch (error: CancellationException) {
-                throw error
-            } catch (_: Exception) {
-                return@launch
             }
         }
     }
 
     private suspend fun generateRecurring(database: AppDatabase) {
-        try {
+        ModelTask.quiet {
             database.generateRecurringEntries(
                 through = today,
                 at = Instant.now(),
             )
-        } catch (error: CancellationException) {
-            throw error
-        } catch (_: Exception) {
-            return
         }
     }
 

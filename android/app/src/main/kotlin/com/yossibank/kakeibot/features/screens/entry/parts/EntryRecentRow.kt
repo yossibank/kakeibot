@@ -29,6 +29,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -38,12 +39,22 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.recentEntries
 import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
 val EntryModel.hasRecent: Boolean
-    get() = if (type == Entry.Kind.transfer) {
+    get() = if (form.type == Entry.Kind.transfer) {
         recentTransfers.isNotEmpty()
     } else {
         templates.isNotEmpty() || recentEntries.isNotEmpty()
@@ -59,7 +70,7 @@ fun EntryRecentRow(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = if (model.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
+            text = if (model.form.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
             modifier = Modifier.padding(horizontal = 4.dp),
             color = Palette.subtext,
             style = textFont(
@@ -72,7 +83,7 @@ fun EntryRecentRow(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (model.type == Entry.Kind.transfer) {
+            if (model.form.type == Entry.Kind.transfer) {
                 model.recentTransfers.forEach { transfer ->
                     TransferCard(
                         model = model,
@@ -204,11 +215,9 @@ private fun RecentCard(
                     )
                 }
 
-                Text(
+                FittedText(
                     text = title,
                     color = Palette.text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(
                         size = FontSize.Caption,
                         weight = FontWeight.Bold,
@@ -217,11 +226,9 @@ private fun RecentCard(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
+                FittedText(
                     text = detail,
                     color = Palette.subtext,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
                     style = textFont(size = FontSize.Micro),
                 )
@@ -229,20 +236,18 @@ private fun RecentCard(
                 Spacer(modifier = Modifier.size(8.dp))
 
                 if (amount != null) {
-                    Text(
+                    FittedText(
                         text = AmountText.text(amount),
                         color = Palette.accentStrong,
-                        maxLines = 1,
                         style = displayFont(
                             size = FontSize.Small,
                             weight = FontWeight.SemiBold,
                         ),
                     )
                 } else {
-                    Text(
+                    FittedText(
                         text = "毎回入れる",
                         color = Palette.hint,
-                        maxLines = 1,
                         style = textFont(
                             size = FontSize.Micro,
                             weight = FontWeight.SemiBold,

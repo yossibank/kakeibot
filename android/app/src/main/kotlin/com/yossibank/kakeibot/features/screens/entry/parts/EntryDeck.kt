@@ -55,6 +55,7 @@ import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.row.FeeChoiceRow
 import com.yossibank.kakeibot.designsystem.components.tag.TagLine
 import com.yossibank.kakeibot.designsystem.components.tag.TagLineItem
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -64,8 +65,18 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.screens.entry.model.apply
+import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categoryText
+import com.yossibank.kakeibot.features.screens.entry.model.dateText
+import com.yossibank.kakeibot.features.screens.entry.model.expressionText
 import com.yossibank.kakeibot.features.screens.entry.model.feeChoices
+import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
+import com.yossibank.kakeibot.features.screens.entry.model.routeText
 import com.yossibank.kakeibot.features.screens.entry.model.showsItems
+import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
+import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
 @Composable
@@ -113,13 +124,13 @@ fun EntryDeck(
 
                 EntryModel.Field.Wallet -> WalletList(
                     model = model,
-                    selection = model.walletId,
+                    selection = model.form.walletId,
                     onSelect = model::select,
                 )
 
                 EntryModel.Field.ToWallet -> WalletList(
                     model = model,
-                    selection = model.toWalletId,
+                    selection = model.form.toWalletId,
                     onSelect = model::selectDestination,
                 )
 
@@ -232,7 +243,7 @@ private fun CategoryArea(
         if (tags.isNotEmpty()) {
             TagLine(
                 tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                selection = model.tagId,
+                selection = model.form.tagId,
                 onSelect = model::toggleTag,
             )
         }
@@ -286,144 +297,9 @@ private fun SaveTemplateChip(onSelect: () -> Unit) {
 }
 
 @Composable
-private fun CategoryGrid(
-    model: EntryModel,
-    modifier: Modifier = Modifier,
-) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(4),
-        modifier = modifier.fillMaxSize(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items(
-            items = model.categories,
-            key = { it.id.toString() },
-        ) { category ->
-            ChoiceCell(
-                icon = model.icon(of = category.iconId),
-                name = category.name,
-                isSelected = category.id == model.categoryId,
-                onSelect = { model.select(category) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun WalletList(
-    model: EntryModel,
-    selection: Identifier<Wallet>?,
-    onSelect: (Wallet) -> Unit,
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items(
-            items = model.wallets,
-            key = { it.id.toString() },
-        ) { wallet ->
-            val isSelected = wallet.id == selection
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .choice(isSelected = isSelected)
-                    .clickable { onSelect(wallet) }
-                    .padding(
-                        horizontal = 12.dp,
-                        vertical = 8.dp,
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconTile(
-                    icon = model.icon(of = wallet.iconId),
-                    size = 36.dp,
-                )
-
-                Text(
-                    text = wallet.name,
-                    modifier = Modifier.weight(1f),
-                    color = Palette.text,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = textFont(
-                        size = FontSize.Body,
-                        weight = FontWeight.Medium,
-                    ),
-                )
-
-                if (isSelected) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_check),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Palette.accent,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ChoiceCell(
-    icon: EntryIcon?,
-    name: String,
-    isSelected: Boolean,
-    onSelect: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .choice(isSelected = isSelected)
-            .clickable(onClick = onSelect)
-            .padding(
-                horizontal = 4.dp,
-                vertical = 8.dp,
-            ),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        IconTile(
-            icon = icon,
-            size = 40.dp,
-        )
-
-        Text(
-            text = name,
-            color = if (isSelected) Palette.accentStrong else Palette.text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = textFont(
-                size = FontSize.Caption,
-                weight = FontWeight.Medium,
-            ),
-        )
-    }
-}
-
-@Composable
-private fun Modifier.choice(isSelected: Boolean): Modifier {
-    val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(16.dp))
-    val fill = if (isSelected) Palette.accent.opacity(Emphasis.Subtle) else Color.Transparent
-    val rim = if (isSelected) Palette.accent else Palette.accent.opacity(Emphasis.Soft)
-
-    return clip(shape)
-        .background(fill)
-        .border(
-            width = 1.dp,
-            color = rim,
-            shape = shape,
-        )
-}
-
-@Composable
 private fun DateCalendar(model: EntryModel) {
     MonthCalendar(
-        selection = model.date,
+        selection = model.form.date,
         today = model.today,
         onSelect = model::select,
     )
@@ -432,4 +308,5 @@ private fun DateCalendar(model: EntryModel) {
 private const val KEY_ROWS = 5
 
 private val minKeyHeight: Dp = 36.dp
+
 private val maxKeyHeight: Dp = 72.dp

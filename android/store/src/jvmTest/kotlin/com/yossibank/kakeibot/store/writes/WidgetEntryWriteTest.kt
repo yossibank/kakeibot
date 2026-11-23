@@ -70,7 +70,7 @@ class WidgetEntryWriteTest {
             at = setup.now,
         )
 
-        setup.database.undoWidgetEntry(entry.id)
+        setup.database.undoWidgetEntry(entry.id, at = Instant.now())
         val deleted = setup.database.entry(entry.id)
         val remembered = setup.database.setting(SettingKey.widgetEntry)
 
@@ -224,7 +224,7 @@ class WidgetEntryWriteTest {
         )
 
         val cleared = setup.database.snapshot().noSpendDays
-        setup.database.undoWidgetEntry(entry.id)
+        setup.database.undoWidgetEntry(entry.id, at = Instant.now())
         val restored = setup.database.snapshot().noSpendDays
         val remembered = setup.database.setting(SettingKey.widgetEntry)
 

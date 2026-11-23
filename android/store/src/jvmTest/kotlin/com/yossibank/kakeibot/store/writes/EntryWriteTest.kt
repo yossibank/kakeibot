@@ -16,8 +16,8 @@ import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import com.yossibank.kakeibot.store.snapshot.snapshot
 import com.yossibank.kakeibot.store.support.execute
-import com.yossibank.kakeibot.store.writes.methods.WriteError
-import com.yossibank.kakeibot.store.writes.methods.WriteException
+import com.yossibank.kakeibot.store.writes.methods.EntryWriteError
+import com.yossibank.kakeibot.store.writes.methods.EntryWriteException
 import com.yossibank.kakeibot.store.writes.methods.changeEntries
 import com.yossibank.kakeibot.store.writes.methods.deleteEntries
 import com.yossibank.kakeibot.store.writes.methods.deleteEntry
@@ -52,6 +52,7 @@ class EntryWriteTest {
         setup.database.deleteEntry(
             result.entry.id,
             restoringNoSpend = result.clearedNoSpendDays,
+            at = Instant.now(),
         )
 
         val restored = setup.database.snapshot().noSpendDays
@@ -72,6 +73,7 @@ class EntryWriteTest {
         setup.database.deleteEntry(
             result.entry.id,
             restoringNoSpend = result.clearedNoSpendDays,
+            at = Instant.now(),
         )
 
         val snapshot = setup.database.snapshot()
@@ -122,7 +124,7 @@ class EntryWriteTest {
     fun rejectsUnknownEntry() = runTest {
         val setup = Setup.make()
 
-        val error = assertFailsWith<WriteException> {
+        val error = assertFailsWith<EntryWriteException> {
             setup.database.saveEntry(
                 setup.draft,
                 editing = Identifier(),
@@ -130,7 +132,7 @@ class EntryWriteTest {
             )
         }
 
-        assertEquals(WriteError.entryNotFound, error.error)
+        assertEquals(EntryWriteError.entryNotFound, error.error)
 
         setup.database.close()
     }
@@ -216,7 +218,7 @@ class EntryWriteTest {
 
         val saved = setup.database.saveEntry(setup.draft, at = setup.now)
 
-        setup.database.deleteEntry(saved.id)
+        setup.database.deleteEntry(saved.id, at = Instant.now())
         val snapshot = setup.database.snapshot()
 
         assertTrue(snapshot.entries.isEmpty())
@@ -242,7 +244,7 @@ class EntryWriteTest {
             goal.id.databaseValue,
         )
 
-        setup.database.deleteEntry(saved.id)
+        setup.database.deleteEntry(saved.id, at = Instant.now())
         val snapshot = setup.database.snapshot()
 
         assertTrue(snapshot.entries.isEmpty())
@@ -259,8 +261,8 @@ class EntryWriteTest {
 
         val saved = setup.database.saveEntry(setup.draft, at = setup.now)
 
-        setup.database.deleteEntry(saved.id)
-        setup.database.restoreEntry(saved)
+        setup.database.deleteEntry(saved.id, at = Instant.now())
+        setup.database.restoreEntry(saved, at = Instant.now())
         val restored = setup.database.snapshot().entries
 
         setup.database.saveEntry(
@@ -269,7 +271,7 @@ class EntryWriteTest {
             at = later,
         )
 
-        setup.database.restoreEntry(saved)
+        setup.database.restoreEntry(saved, at = Instant.now())
         val reverted = setup.database.snapshot().entries
 
         assertEquals(listOf(saved), restored)
@@ -339,9 +341,9 @@ class EntryWriteTest {
         val first = setup.database.saveEntry(setup.draft, at = setup.now)
         val second = setup.database.saveEntry(setup.draft, at = setup.now)
 
-        val deleted = setup.database.deleteEntries(listOf(first.id, second.id))
+        val deleted = setup.database.deleteEntries(listOf(first.id, second.id), at = Instant.now())
         val emptied = setup.database.snapshot().entries
-        setup.database.restoreEntries(deleted)
+        setup.database.restoreEntries(deleted, at = Instant.now())
         val restored = setup.database.snapshot().entries
 
         assertEquals(setOf(first, second), deleted.toSet())

@@ -20,9 +20,11 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
+import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
@@ -43,7 +45,7 @@ fun EntryRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 52.dp),
+            .heightIn(min = Metrics.rowMinHeight),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -96,11 +98,9 @@ fun EntryRow(
             val note = listOfNotNull(detail, memo).joinToString("｜")
 
             if (note.isNotEmpty()) {
-                Text(
+                FittedText(
                     text = note,
                     color = Palette.subtext,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                     style = textFont(style = FontTextStyle.Caption),
                 )
             }

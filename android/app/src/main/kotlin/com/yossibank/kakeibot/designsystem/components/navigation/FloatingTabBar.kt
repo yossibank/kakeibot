@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.dial.DialTicks
+import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Haptic
@@ -287,11 +288,10 @@ private fun <Value> TabItem(
         )
 
         if (showsTitles) {
-            Text(
+            FittedText(
                 text = item.title,
                 color = titleColor,
                 style = textFont(size = FontSize.Caption).copy(letterSpacing = 0.05.em),
-                maxLines = 1,
             )
         }
     }

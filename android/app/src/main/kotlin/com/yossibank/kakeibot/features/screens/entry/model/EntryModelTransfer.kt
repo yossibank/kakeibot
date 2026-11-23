@@ -9,7 +9,6 @@ import com.yossibank.kakeibot.core.concepts.wallet.role
 import com.yossibank.kakeibot.core.shared.Identifier
 
 const val FREQUENT_ROUTE_LIMIT = 6
-const val DESTINATION_TITLE = "振替先"
 
 data class TransferRoute(
     val walletId: Identifier<Wallet>,
@@ -67,7 +66,7 @@ fun EntryModel.balance(of: Wallet): Long? {
 
 val EntryModel.isOverSourceBalance: Boolean
     get() {
-        if (type != Entry.Kind.transfer || amount <= 0) {
+        if (form.type != Entry.Kind.transfer || amount <= 0) {
             return false
         }
 
@@ -81,7 +80,7 @@ val EntryModel.loanRemaining: Long?
         val wallet = toWallet ?: return null
         val balance = balance(of = wallet) ?: return null
 
-        if (type != Entry.Kind.transfer || wallet.kind != Wallet.Kind.loan || balance >= 0) {
+        if (form.type != Entry.Kind.transfer || wallet.kind != Wallet.Kind.loan || balance >= 0) {
             return null
         }
 
@@ -102,7 +101,7 @@ fun EntryModel.afterLine(
     of: Wallet,
     isSource: Boolean,
 ): BalanceLine? {
-    if (type != Entry.Kind.transfer || amount <= 0) {
+    if (form.type != Entry.Kind.transfer || amount <= 0) {
         return null
     }
 
@@ -124,17 +123,12 @@ fun EntryModel.payOffLoan() {
     val remaining = loanRemaining ?: return
 
     if (remaining <= AmountCalculator.maxValue) {
-        calculator = AmountCalculator(amount = remaining.toInt())
+        setAmount(remaining.toInt())
     }
 }
 
 fun EntryModel.applyRoute(route: TransferRoute) {
-    if (route.walletId != walletId) {
-        billMonth = null
-    }
-
-    walletId = route.walletId
-    toWalletId = route.toWalletId
+    update { withWallet(route.walletId).copy(toWalletId = route.toWalletId) }
 }
 
 private fun EntryModel.afterTitle(
