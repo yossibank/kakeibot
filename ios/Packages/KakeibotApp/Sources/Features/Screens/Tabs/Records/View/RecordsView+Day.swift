@@ -185,21 +185,13 @@ extension RecordsView {
         Group {
             if let selection,
                let day {
-                ViewThatFits(in: .horizontal) {
-                    dayHeaderRow(date, day: day) {
-                        daySelectButton(day, in: selection, showsTitle: true)
-                    }
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    daySelectButton(day, in: selection)
 
-                    dayHeaderRow(date, day: day) {
-                        daySelectButton(day, in: selection, showsTitle: false)
-                    }
+                    ViewThatFits(in: .horizontal) {
+                        dayHeaderRow(date, day: day) {}
 
-                    dayHeaderStack(date, day: day) {
-                        daySelectButton(day, in: selection, showsTitle: true)
-                    }
-
-                    dayHeaderStack(date, day: day) {
-                        daySelectButton(day, in: selection, showsTitle: false)
+                        dayHeaderStack(date, day: day) {}
                     }
                 }
             } else {
@@ -379,8 +371,7 @@ private extension RecordsView {
 
     func daySelectButton(
         _ day: EntryDay,
-        in selection: Set<Entry.ID>,
-        showsTitle: Bool
+        in selection: Set<Entry.ID>
     ) -> some View {
         let isSelected = model.isSelected(day, in: selection)
         let mark = isSelected ? "checkmark.circle.fill" : "circle"
@@ -388,22 +379,12 @@ private extension RecordsView {
         return Button {
             self.selection = model.toggling(day, in: selection)
         } label: {
-            HStack(spacing: 4) {
-                if showsTitle {
-                    Text("この日を選ぶ")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.accent)
-                        .lineLimit(1)
-                        .fixedSize()
-                }
-
-                Image(systemName: mark)
-                    .sansFont(.headline)
-                    .foregroundStyle(Palette.accent)
-                    .contentTransition(.symbolEffect(.replace))
-            }
-            .frame(minHeight: 26)
-            .tapArea(Self.dayButtonTapOutsets)
+            Image(systemName: mark)
+                .sansFont(.headline)
+                .foregroundStyle(Palette.accent)
+                .contentTransition(.symbolEffect(.replace))
+                .frame(minHeight: 26)
+                .tapArea(Self.dayButtonTapOutsets)
         }
         .buttonStyle(.plain)
     }
