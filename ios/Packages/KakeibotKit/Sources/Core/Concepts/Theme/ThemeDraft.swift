@@ -97,11 +97,7 @@ public extension ThemeDraft {
             textPrimary: text,
             textSecondary: subtext,
             accent: accent,
-            expense: Self.expenseColor,
             income: accent,
-            cornerRadius: Self.cornerRadius,
-            fontId: Self.fontId,
-            isBuiltin: false,
             createdAt: now,
             updatedAt: now
         )
@@ -129,10 +125,6 @@ public extension ThemeDraft {
 }
 
 private extension ThemeDraft {
-    static let expenseColor = "#E3A3A3"
-    static let cornerRadius = 16
-    static let fontId = "system"
-
     var trimmedName: String {
         name.trimmed
     }
