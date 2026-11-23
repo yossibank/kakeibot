@@ -13,8 +13,7 @@ extension ThemeListView {
 
     @ViewBuilder
     func menuLayer(_ menu: Menu) -> some View {
-        Palette.scrim
-            .opacity(0.45)
+        Scrim(.menu)
             .ignoresSafeArea()
             .onTapGesture {
                 closeMenu()

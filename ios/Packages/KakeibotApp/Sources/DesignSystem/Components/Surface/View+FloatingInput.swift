@@ -31,8 +31,7 @@ struct FloatingInputLayer<Card: View>: ViewModifier {
             content
 
             if isPresented {
-                Palette.scrim
-                    .opacity(0.35)
+                Scrim(.drawer)
                     .ignoresSafeArea()
                     .onTapGesture(perform: onDismiss)
                     .transition(.opacity)

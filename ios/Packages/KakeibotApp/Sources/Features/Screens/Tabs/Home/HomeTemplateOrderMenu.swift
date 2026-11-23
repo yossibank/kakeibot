@@ -22,8 +22,7 @@ public struct HomeTemplateOrderMenu: View {
     public var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .topLeading) {
-                Palette.scrim
-                    .opacity(0.45)
+                Scrim(.menu)
                     .onTapGesture(perform: onClose)
 
                 MenuPanel(width: Self.width) {
@@ -60,10 +59,12 @@ private extension HomeTemplateOrderMenu {
     static let inset: CGFloat = 16
 
     func panelX(in width: CGFloat) -> CGFloat {
-        let preferred = anchor.maxX - Self.width
-        let limit = width - Self.width - Self.inset
-        let lower = max(preferred, Self.inset)
-        return min(lower, limit)
+        MenuPlacement.trailingX(
+            of: anchor,
+            panelWidth: Self.width,
+            in: width,
+            inset: Self.inset
+        )
     }
 
     func choose(_ order: TemplateOrder) {

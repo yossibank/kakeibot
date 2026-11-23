@@ -4,8 +4,7 @@ import SwiftUI
 struct EntryReceiptReadingCard: View {
     var body: some View {
         ZStack {
-            Palette.scrim
-                .opacity(0.55)
+            Scrim(.modal)
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {

@@ -202,8 +202,7 @@ extension WalletEditSheet {
         @ViewBuilder button: () -> some View
     ) -> some View {
         Group {
-            Palette.scrim
-                .opacity(0.35)
+            Scrim(.drawer)
                 .ignoresSafeArea()
                 .onTapGesture {
                     onDismiss()

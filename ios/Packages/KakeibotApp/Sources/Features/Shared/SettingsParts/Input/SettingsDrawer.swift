@@ -73,8 +73,7 @@ extension View {
             self
 
             if let item {
-                Palette.scrim
-                    .opacity(0.35)
+                Scrim(.drawer)
                     .ignoresSafeArea()
                     .onTapGesture(perform: onDismiss)
                     .transition(.opacity)

@@ -39,8 +39,7 @@ extension EntrySheet {
 
     @ViewBuilder
     func categoryMenuLayer(_ menu: CategoryMenu) -> some View {
-        Palette.scrim
-            .opacity(0.45)
+        Scrim(.menu)
             .ignoresSafeArea()
             .onTapGesture {
                 closeCategoryMenu()
