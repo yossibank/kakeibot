@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.features.screens.tabs.review.model
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,10 +20,12 @@ import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ReviewModel(
     private val database: AppDatabase,
+    private val entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
     data class Row(
@@ -81,11 +84,12 @@ class ReviewModel(
     val rangeText: String
         get() = PeriodText.range(period.range)
 
-    val summary: ReviewSummary
-        get() = ReviewSummary(
+    val summary: ReviewSummary by derivedStateOf {
+        ReviewSummary(
             entries = list?.entries ?: emptyList(),
             range = period.range,
         )
+    }
 
     val previousTotal: Long
         get() {
@@ -138,7 +142,7 @@ class ReviewModel(
             }
 
             launch {
-                database.entryListUpdates().collect { list = it }
+                entryList.collect { list = it }
             }
         }
     }

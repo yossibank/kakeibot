@@ -20,7 +20,10 @@ import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import kotlinx.coroutines.flow.Flow
 
-fun AppDatabase.monthOverviewUpdates(on: LocalDate): Flow<MonthOverview> = entryListJoin(
+fun AppDatabase.monthOverviewUpdates(
+    on: LocalDate,
+    list: Flow<EntryList> = entryListUpdates(),
+): Flow<MonthOverview> = entryListJoin(
     part = observation(
         "budget",
         "recurring",
@@ -28,8 +31,9 @@ fun AppDatabase.monthOverviewUpdates(on: LocalDate): Flow<MonthOverview> = entry
     ) {
         fetchMonthPlan(on)
     },
-) { list, plan ->
-    plan.with(list)
+    list = list,
+) { entries, plan ->
+    plan.with(entries)
 }
 
 suspend fun AppDatabase.monthOverview(on: LocalDate): MonthOverview = read {

@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
@@ -77,7 +79,20 @@ fun BudgetListView(
     today: LocalDate,
     onBack: () -> Unit,
 ) {
-    val model = remember(database) { BudgetListModel(database = database) }
+    val entryList = rememberEntryList(database)
+
+    val model = remember(database, entryList) {
+        BudgetListModel(
+            database = database,
+            entryList = entryList,
+            today = today,
+        )
+    }
+
+    SideEffect {
+        model.today = today
+    }
+
     val hint =
         remember(database) { SettingsScreenFlag.closedHint(SettingsScreen.budgets, database) }
     val scope = rememberCoroutineScope()
@@ -85,8 +100,8 @@ fun BudgetListView(
     val cleared = remember { UndoNoticeState<BudgetListModel.Cleared>() }
     val resetFrom = remember { UndoNoticeState<YearMonth>() }
 
-    LaunchedEffect(model, today) {
-        model.observe(today = today)
+    LaunchedEffect(model) {
+        model.observe()
     }
 
     cleared.Timer()

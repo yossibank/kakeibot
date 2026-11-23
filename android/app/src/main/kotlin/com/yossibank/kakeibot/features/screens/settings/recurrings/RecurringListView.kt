@@ -79,6 +79,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHeader
 import com.yossibank.kakeibot.features.shared.settingsparts.SettingsHintButton
@@ -114,9 +115,12 @@ fun RecurringListView(
     onBack: () -> Unit,
     opening: Identifier<Recurring>? = null,
 ) {
-    val model = remember(database) {
+    val entryList = rememberEntryList(database)
+
+    val model = remember(database, entryList) {
         RecurringListModel(
             database = database,
+            entryList = entryList,
             today = today,
         )
     }

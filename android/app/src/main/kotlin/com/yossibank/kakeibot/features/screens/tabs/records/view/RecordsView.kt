@@ -58,6 +58,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.records.model.RecordsModel
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
@@ -68,9 +69,12 @@ fun RecordsView(
     today: LocalDate,
     onOpenEntry: (Identifier<Entry>) -> Unit,
 ) {
-    val model = remember(database) {
+    val entryList = rememberEntryList(database)
+
+    val model = remember(database, entryList) {
         RecordsModel(
             database = database,
+            entryList = entryList,
             today = today,
         )
     }

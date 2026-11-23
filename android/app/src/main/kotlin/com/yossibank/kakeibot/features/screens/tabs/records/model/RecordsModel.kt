@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.features.screens.tabs.records.model
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,10 +28,12 @@ import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class RecordsModel(
     private val database: AppDatabase,
+    private val entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
     var today: LocalDate by mutableStateOf(today)
@@ -82,8 +85,13 @@ class RecordsModel(
     val periodText: String
         get() = PeriodText.range(period)
 
-    val days: List<EntryDay>
-        get() = list?.days?.within(period) ?: emptyList()
+    val days: List<EntryDay> by derivedStateOf {
+        list?.days?.within(period) ?: emptyList()
+    }
+
+    private val daysByDate: Map<LocalDate, EntryDay> by derivedStateOf {
+        days.associateBy { it.date }
+    }
 
     val expenseTotal: Long
         get() = days.expenseTotal
@@ -106,7 +114,7 @@ class RecordsModel(
             }
 
             launch {
-                database.entryListUpdates().collect {
+                entryList.collect {
                     list = it
                     isLoaded = true
                 }
@@ -123,7 +131,7 @@ class RecordsModel(
         selected = date
     }
 
-    fun day(on: LocalDate): EntryDay? = days.firstOrNull { it.date == on }
+    fun day(on: LocalDate): EntryDay? = daysByDate[on]
 
     suspend fun select(layout: RecordsLayout) {
         this.layout = layout

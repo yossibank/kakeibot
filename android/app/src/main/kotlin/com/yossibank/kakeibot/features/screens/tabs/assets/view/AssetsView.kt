@@ -33,11 +33,13 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.settings.wallets.title
 import com.yossibank.kakeibot.features.screens.tabs.assets.model.AssetsModel
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
 fun AssetsView(database: AppDatabase) {
-    val model = remember(database) { AssetsModel(database = database) }
+    val entryList = rememberEntryList(database)
+    val model = remember(entryList) { AssetsModel(entryList = entryList) }
 
     LaunchedEffect(model) {
         model.observe()

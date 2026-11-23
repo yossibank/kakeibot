@@ -4,6 +4,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.core.concepts.budget.amount
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
@@ -21,17 +22,23 @@ import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.categoryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.monthOverviewUpdates
 import com.yossibank.kakeibot.store.queries.types.CategoryList
+import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.queries.types.MonthOverview
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.budgetCarryoverFrom
 import com.yossibank.kakeibot.store.writes.methods.setBudget
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class BudgetListModel(
     private val database: AppDatabase,
+    private val entryList: Flow<EntryList>,
+    today: LocalDate,
 ) {
     sealed interface Target {
         val categoryId: Identifier<EntryCategory>?
@@ -60,6 +67,8 @@ class BudgetListModel(
         val title: String,
         val amount: Int,
     )
+
+    var today: LocalDate by mutableStateOf(today)
 
     var overview: MonthOverview? by mutableStateOf(null)
         private set
@@ -190,13 +199,20 @@ class BudgetListModel(
 
     fun icon(category: EntryCategory) = categoryList?.icons?.get(category.iconId)
 
-    suspend fun observe(today: LocalDate) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun observe() {
         coroutineScope {
             launch {
                 database.categoryListUpdates().collect { categoryList = it }
             }
 
-            database.monthOverviewUpdates(on = today).collect { overview = it }
+            snapshotFlow { today }
+                .flatMapLatest { day ->
+                    database.monthOverviewUpdates(
+                        on = day,
+                        list = entryList,
+                    )
+                }.collect { overview = it }
         }
     }
 

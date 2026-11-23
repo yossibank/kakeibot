@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.RoundIconButton
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.abs
@@ -56,10 +58,22 @@ fun HomeView(
     onOpenEntry: (Identifier<Entry>) -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    val model = remember(database) { HomeModel(database = database) }
+    val entryList = rememberEntryList(database)
 
-    LaunchedEffect(model, today) {
-        model.observe(today = today)
+    val model = remember(database, entryList) {
+        HomeModel(
+            database = database,
+            entryList = entryList,
+            today = today,
+        )
+    }
+
+    SideEffect {
+        model.today = today
+    }
+
+    LaunchedEffect(model) {
+        model.observe()
     }
 
     LazyColumn(

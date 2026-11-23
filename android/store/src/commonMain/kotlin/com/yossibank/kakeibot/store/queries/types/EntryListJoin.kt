@@ -8,9 +8,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 
 internal fun <Part, Value> AppDatabase.entryListJoin(
     part: Flow<Part>,
+    list: Flow<EntryList> = entryListUpdates(),
     join: (EntryList, Part) -> Value,
 ): Flow<Value> = combine(
-    entryListUpdates(),
+    list,
     part.distinctUntilChanged(),
     join,
 ).distinctUntilChanged()

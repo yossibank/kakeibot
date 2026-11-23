@@ -56,6 +56,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.tabs.review.model.ReviewModel
+import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.roundToInt
@@ -65,9 +66,12 @@ fun ReviewView(
     database: AppDatabase,
     today: LocalDate,
 ) {
-    val model = remember(database) {
+    val entryList = rememberEntryList(database)
+
+    val model = remember(database, entryList) {
         ReviewModel(
             database = database,
+            entryList = entryList,
             today = today,
         )
     }

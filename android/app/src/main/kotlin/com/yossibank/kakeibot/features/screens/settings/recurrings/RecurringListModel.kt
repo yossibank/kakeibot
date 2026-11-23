@@ -31,11 +31,13 @@ import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
 import com.yossibank.kakeibot.store.writes.types.Deletion
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.Instant
 
 class RecurringListModel(
     private val database: AppDatabase,
+    private val entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
     var today: LocalDate by mutableStateOf(today)
@@ -111,7 +113,7 @@ class RecurringListModel(
             }
 
             launch {
-                database.entryListUpdates().collect { list = it }
+                entryList.collect { list = it }
             }
 
             database.settingUpdates(SettingKey.monthStartDay).collect { monthStartDay = it }
