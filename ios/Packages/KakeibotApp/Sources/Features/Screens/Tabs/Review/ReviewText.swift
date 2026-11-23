@@ -18,7 +18,7 @@ enum ReviewText {
 
     static func budget(_ usage: BudgetUsage) -> String {
         if usage.isOver {
-            return "\(AmountText.text(-usage.remaining)) オーバー"
+            return "\(Yen.text(-usage.remaining)) オーバー"
         }
 
         let percent = Percent.floor(usage.spent, of: usage.budget)

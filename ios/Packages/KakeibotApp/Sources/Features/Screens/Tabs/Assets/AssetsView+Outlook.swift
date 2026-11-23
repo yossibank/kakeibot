@@ -155,7 +155,7 @@ private extension AssetsView {
             return nil
         }
 
-        let change = AmountText.text(outlook.laterChange, sign: .plus)
+        let change = Yen.text(outlook.laterChange, sign: .plus)
 
         return OutlookNote(
             text: "月末より先の予定 \(outlook.later.count) 件 \(change)",
@@ -178,13 +178,13 @@ private extension AssetsView {
 
         guard lowest.balance < 0 else {
             return OutlookNote(
-                text: "いちばん少ない日 \(day) \(AmountText.text(lowest.balance))",
+                text: "いちばん少ない日 \(day) \(Yen.text(lowest.balance))",
                 color: Palette.subtext
             )
         }
 
         return OutlookNote(
-            text: "\(day) に \(AmountText.text(abs(lowest.balance))) 足りなくなります",
+            text: "\(day) に \(Yen.text(abs(lowest.balance))) 足りなくなります",
             color: Palette.rose
         )
     }

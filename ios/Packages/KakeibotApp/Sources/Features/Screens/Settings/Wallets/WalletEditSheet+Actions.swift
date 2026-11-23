@@ -61,7 +61,7 @@ extension WalletEditSheet {
                 panel: .valuation,
                 systemImage: "chart.line.uptrend.xyaxis",
                 title: "今の評価額",
-                value: AmountText.text(amount),
+                value: Yen.text(amount),
                 isEmpty: false,
                 isAmount: true
             )

@@ -124,7 +124,7 @@ private extension ReviewView {
             return nil
         }
 
-        let balance = AmountText.text(abs(move.balance))
+        let balance = Yen.text(abs(move.balance))
 
         guard move.wallet.kind == .loan else {
             return "評価額 \(balance)"

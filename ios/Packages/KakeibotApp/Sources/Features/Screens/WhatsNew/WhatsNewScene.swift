@@ -312,11 +312,11 @@ private extension WhatsNewScene {
                 .textFont(size: .caption, weight: .semibold)
                 .foregroundStyle(Palette.accent)
 
-            Text("予算 \(AmountText.text(FeatureArtSample.budget))")
+            Text("予算 \(Yen.text(FeatureArtSample.budget))")
                 .textFont(size: .caption)
                 .foregroundStyle(Palette.text)
 
-            Text("＋ 繰越 \(AmountText.text(FeatureArtSample.carryover))")
+            Text("＋ 繰越 \(Yen.text(FeatureArtSample.carryover))")
                 .textFont(size: .caption, weight: .semibold)
                 .foregroundStyle(Palette.accentStrong)
                 .padding(.horizontal, 4)

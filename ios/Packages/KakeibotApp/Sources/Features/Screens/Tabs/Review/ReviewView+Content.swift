@@ -345,7 +345,7 @@ private extension ReviewView {
 
     var moveText: String {
         let total = ReviewModel.total(of: model.moves)
-        return "ほかに返済と積立 \(AmountText.text(total))"
+        return "ほかに返済と積立 \(Yen.text(total))"
     }
 
     var comparisonText: String {
@@ -358,7 +358,7 @@ private extension ReviewView {
             : Self.previousName(of: model.scale)
 
         let change = model.change
-        let amount = AmountText.text(abs(change))
+        let amount = Yen.text(abs(change))
 
         if change > 0 {
             return "\(previous)より \(amount) 多い"
@@ -438,8 +438,8 @@ private extension ReviewView {
 
     func recurringText(_ recurring: Int) -> String {
         let other = model.total(of: model.kind) - recurring
-        let fixed = "固定費 \(AmountText.text(recurring))"
-        return "\(fixed)・それ以外 \(AmountText.text(other))"
+        let fixed = "固定費 \(Yen.text(recurring))"
+        return "\(fixed)・それ以外 \(Yen.text(other))"
     }
 
     func isFirstRow(_ row: DetailRow) -> Bool {

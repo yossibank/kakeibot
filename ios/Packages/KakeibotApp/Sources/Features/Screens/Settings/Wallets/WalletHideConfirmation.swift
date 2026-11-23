@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -7,7 +8,7 @@ extension View {
         isPresented: Binding<Bool>,
         onConfirm: @escaping () -> Void
     ) -> some View {
-        let amount = AmountText.text(balance)
+        let amount = Yen.text(balance)
 
         return confirmation(
             isPresented: isPresented,

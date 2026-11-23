@@ -41,7 +41,7 @@ extension EntrySheet {
 private extension EntrySheet {
     func payOffButton(_ remaining: Int) -> some View {
         ChipButton(
-            "残り \(AmountText.text(remaining)) をまとめて返す",
+            "残り \(Yen.text(remaining)) をまとめて返す",
             systemImage: "checkmark.seal",
             size: .large
         ) {

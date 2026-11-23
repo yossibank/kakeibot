@@ -211,7 +211,7 @@ private extension BudgetWidgetView {
 
     func amount(of summary: BudgetWidgetSummary) -> String {
         guard let usage = summary.usage else {
-            return AmountText.text(summary.monthExpense)
+            return Yen.text(summary.monthExpense)
         }
 
         return usage.remainingAmountText

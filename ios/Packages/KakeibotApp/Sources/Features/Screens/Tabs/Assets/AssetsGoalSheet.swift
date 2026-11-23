@@ -158,7 +158,7 @@ private extension AssetsGoalSheet {
                 panel: .amount,
                 systemImage: "yensign",
                 title: "目標の額",
-                value: AmountText.text(model.calculator.amount),
+                value: Yen.text(model.calculator.amount),
                 isEmpty: model.calculator.amount == 0,
                 isAmount: true
             )

@@ -71,7 +71,7 @@ private extension QuickRecordWidgetView {
             HStack(spacing: 8) {
                 NoticeMark(systemImage: "checkmark", size: Self.badgeSize)
 
-                Text("\(recorded.name) \(AmountText.text(recorded.amount)) を記録しました")
+                Text("\(recorded.name) \(Yen.text(recorded.amount)) を記録しました")
                     .textFont(size: .caption)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
@@ -104,7 +104,7 @@ private extension QuickRecordWidgetView {
 
                 Spacer(minLength: 4)
 
-                Text("今日の支出 \(AmountText.text(summary.todayExpense))")
+                Text("今日の支出 \(Yen.text(summary.todayExpense))")
                     .textFont(size: .caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)

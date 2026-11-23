@@ -24,7 +24,7 @@ struct EntryItemButton: View {
                 )
 
                 if adjustment != 0 {
-                    Text("差額 \(AmountText.text(adjustment))")
+                    Text("差額 \(Yen.text(adjustment))")
                         .monospacedDigit()
                         .foregroundStyle(Palette.amber)
                 }

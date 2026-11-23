@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -5,7 +6,7 @@ extension WidgetGuideStage {
     var lockScreen: some View {
         VStack(spacing: 4) {
             Label(
-                "今月あと \(AmountText.text(FeatureArtSample.remaining))",
+                "今月あと \(Yen.text(FeatureArtSample.remaining))",
                 systemImage: "yensign.circle"
             )
             .font(.system(size: 13, weight: .semibold))
@@ -63,11 +64,11 @@ extension WidgetGuideStage {
                     .opacity(0.7)
             }
 
-            Text(AmountText.text(FeatureArtSample.remaining))
+            Text(Yen.text(FeatureArtSample.remaining))
                 .font(.system(size: 22, weight: .bold))
                 .monospacedDigit()
 
-            Text("今日の支出 \(AmountText.text(FeatureArtSample.todayExpense))")
+            Text("今日の支出 \(Yen.text(FeatureArtSample.todayExpense))")
                 .font(.system(size: 11))
                 .monospacedDigit()
                 .opacity(0.7)

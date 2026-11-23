@@ -34,11 +34,11 @@ public extension WalletEditModel {
     }
 
     var balanceText: String {
-        AmountText.text(initialBalance)
+        Yen.text(initialBalance)
     }
 
     var loanAmountText: String {
-        loanAmount.amount > 0 ? AmountText.text(loanAmount.amount) : "未入力"
+        loanAmount.amount > 0 ? Yen.text(loanAmount.amount) : "未入力"
     }
 
     var repaidText: String? {
@@ -58,7 +58,7 @@ public extension WalletEditModel {
         )
         let percent = Percent.floor(repaid, of: borrowed)
 
-        return "\(AmountText.text(repaid)) 返済済み（\(percent)%）"
+        return "\(Yen.text(repaid)) 返済済み（\(percent)%）"
     }
 
     var paymentTitle: String {
@@ -89,7 +89,7 @@ public extension WalletEditModel {
         )
 
         let closing = payment.closingDay.map(RecurringText.closingNote)
-        let amount = payment.amount > 0 ? AmountText.text(payment.amount) : nil
+        let amount = payment.amount > 0 ? Yen.text(payment.amount) : nil
         let detail = closing ?? amount
 
         return [schedule, detail].compactMap(\.self).joined(separator: "・")

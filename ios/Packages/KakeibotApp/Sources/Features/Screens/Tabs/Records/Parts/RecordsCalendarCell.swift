@@ -123,10 +123,10 @@ private extension RecordsCalendarCell {
     }
 
     var bothAmounts: AttributedString {
-        var expenseText = AttributedString(AmountText.compactText(expense, type: .expense))
+        var expenseText = AttributedString(Yen.compactText(expense, type: .expense))
         expenseText.foregroundColor = Palette.accentStrong
 
-        var incomeText = AttributedString(AmountText.compactText(income, type: .income))
+        var incomeText = AttributedString(Yen.compactText(income, type: .income))
         incomeText.foregroundColor = Palette.accent
 
         return expenseText + AttributedString("\n") + incomeText

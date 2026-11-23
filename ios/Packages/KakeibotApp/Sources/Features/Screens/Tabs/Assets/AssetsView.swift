@@ -285,11 +285,11 @@ private extension AssetsView {
                     )
 
                     HStack {
-                        Text("資産 \(AmountText.text(ownedTotal))")
+                        Text("資産 \(Yen.text(ownedTotal))")
 
                         Spacer(minLength: 8)
 
-                        Text("負債 \(AmountText.text(-owedTotal))")
+                        Text("負債 \(Yen.text(-owedTotal))")
                     }
                     .textFont(size: .micro)
                     .monospacedDigit()
@@ -354,14 +354,14 @@ private extension AssetsView {
 
     var breakdownText: String {
         let holdings = model.holdings
-        let onHand = "手持ち \(AmountText.text(holdings.onHand))"
+        let onHand = "手持ち \(Yen.text(holdings.onHand))"
 
         if holdings.unpaid > 0 {
-            return "\(onHand)・未払い \(AmountText.text(holdings.unpaid))"
+            return "\(onHand)・未払い \(Yen.text(holdings.unpaid))"
         }
 
         if holdings.refund > 0 {
-            return "\(onHand)・返ってくる額 \(AmountText.text(holdings.refund))"
+            return "\(onHand)・返ってくる額 \(Yen.text(holdings.refund))"
         }
 
         return onHand
@@ -370,7 +370,7 @@ private extension AssetsView {
     var changeText: String {
         let change = model.changeFromLastMonth
         let sign = change > 0 ? "+" : ""
-        return "先月末より \(sign)\(AmountText.text(change))"
+        return "先月末より \(sign)\(Yen.text(change))"
     }
 
     static func isOwed(_ role: Wallet.Kind.Role) -> Bool {

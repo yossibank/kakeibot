@@ -84,7 +84,7 @@ private extension RewardRuleTile {
                 .padding(.vertical, 4)
                 .background(Palette.accent.opacity(.subtle), in: .capsule)
 
-            Text("計 \(AmountText.text(total.amount))")
+            Text("計 \(Yen.text(total.amount))")
                 .textFont(.caption2)
                 .monospacedDigit()
                 .foregroundStyle(Palette.subtext)

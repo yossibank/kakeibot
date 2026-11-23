@@ -108,7 +108,7 @@ KakeibotKit/
 | `Concepts/Theme/` | テーマの色・書体・形 |
 | `Concepts/Voice/` | 話した文から金額・日付・カテゴリ・口座・メモを読む決まり |
 | `Concepts/Wallet/` | 財布と残高 |
-| `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、下書きの決まりと問題、文字の前後の空白を除く拡張 |
+| `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、金額の表記、下書きの決まりと問題、文字の前後の空白を除く拡張 |
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
 | `Store/Queries/Methods/` | 返す型の名前で付ける。書き込みと同じ型なら `+<型>Query` |
 | `Store/Records/` | 表の行・設定のキー・列の値の適合 |

@@ -216,7 +216,7 @@ private extension HomeView {
         }
 
         guard let usage = model.budgetUsage else {
-            return AmountText.text(model.monthExpense)
+            return Yen.text(model.monthExpense)
         }
 
         return usage.remainingAmountText
@@ -243,13 +243,13 @@ private extension HomeView {
     }
 
     func recurringText(title: String) -> String {
-        let total = "\(title) \(AmountText.text(model.recurringExpense))"
+        let total = "\(title) \(Yen.text(model.recurringExpense))"
         let upcoming = model.upcomingRecurringExpense
 
         guard upcoming > 0 else {
             return total
         }
 
-        return "\(total)・これから \(AmountText.text(upcoming))"
+        return "\(total)・これから \(Yen.text(upcoming))"
     }
 }

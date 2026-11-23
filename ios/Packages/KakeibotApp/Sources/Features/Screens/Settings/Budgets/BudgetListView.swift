@@ -63,7 +63,7 @@ private extension BudgetListView {
 
                                 Spacer()
 
-                                Text("合計 \(AmountText.text(model.categoriesTotal))")
+                                Text("合計 \(Yen.text(model.categoriesTotal))")
                                     .textFont(.caption2)
                                     .monospacedDigit()
                                     .foregroundStyle(Palette.subtext)
@@ -222,7 +222,7 @@ private extension BudgetListView {
                     usageLine(usage)
                         .padding(.leading, 40)
                 } else if spent > 0 {
-                    Text("使った額 \(AmountText.text(spent))")
+                    Text("使った額 \(Yen.text(spent))")
                         .textFont(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
@@ -254,7 +254,7 @@ private extension BudgetListView {
                 Spacer(minLength: 8)
 
                 if spent > 0 {
-                    Text("使った額 \(AmountText.text(spent))")
+                    Text("使った額 \(Yen.text(spent))")
                         .textFont(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
@@ -295,7 +295,7 @@ private extension BudgetListView {
             BudgetUsageBar(usage)
 
             HStack {
-                Text("使った額 \(AmountText.text(usage.spent))")
+                Text("使った額 \(Yen.text(usage.spent))")
 
                 Spacer()
 
@@ -345,7 +345,7 @@ private extension BudgetListView {
     }
 
     var recurringText: String {
-        "この月の固定費は \(AmountText.text(model.recurringExpense))。予算の目安にできます"
+        "この月の固定費は \(Yen.text(model.recurringExpense))。予算の目安にできます"
     }
 
     var clearedMessage: String {

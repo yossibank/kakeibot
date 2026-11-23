@@ -99,7 +99,7 @@ private extension RecurringEditSheet {
                 }
 
                 Text(
-                    "残高 \(AmountText.text(owed)) ÷ \(AmountText.text(model.amount)) で \(plan.count) 回。端数は最後の回に足します"
+                    "残高 \(Yen.text(owed)) ÷ \(Yen.text(model.amount)) で \(plan.count) 回。端数は最後の回に足します"
                 )
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)

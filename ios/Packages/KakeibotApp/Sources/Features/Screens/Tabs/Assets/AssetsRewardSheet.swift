@@ -205,7 +205,7 @@ private extension AssetsRewardSheet {
         let remaining = model.remaining(to: goal)
         let progress = model.progress(to: goal)
         let percent = model.percent(to: goal)
-        let note = remaining > 0 ? "あと \(AmountText.text(remaining))" : "届きました"
+        let note = remaining > 0 ? "あと \(Yen.text(remaining))" : "届きました"
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {

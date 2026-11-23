@@ -27,8 +27,8 @@ public struct AmountText: View {
 
     public var body: some View {
         let text = isCompact
-            ? Self.compactText(amount, type: type, sign: sign)
-            : Self.text(amount, type: type, sign: sign)
+            ? Yen.compactText(amount, type: type, sign: sign)
+            : Yen.text(amount, type: type, sign: sign)
 
         Text(text)
             .modifier(AmountFont(spec: font))
@@ -44,58 +44,16 @@ public extension AmountText {
         case fixed(Font)
     }
 
-    enum Sign {
-        case auto
-        case plus
-    }
-
-    nonisolated static func text(
-        _ amount: Int,
-        type: Entry.Kind? = nil,
-        sign: Sign = .auto
-    ) -> String {
-        let number = abs(amount).formatted(.number.locale(locale))
-        return "\(mark(of: amount, type: type, sign: sign))¥\(number)"
-    }
-
-    nonisolated static func compactText(
-        _ amount: Int,
-        type: Entry.Kind? = nil,
-        sign: Sign = .auto
-    ) -> String {
-        guard abs(amount) >= compactFloor else {
-            return text(amount, type: type, sign: sign)
-        }
-
-        let number = (abs(amount) / 10000).formatted(.number.locale(locale))
-        return "\(mark(of: amount, type: type, sign: sign))\(number)万円"
-    }
+    typealias Sign = Yen.Sign
 }
 
 private extension AmountText {
-    nonisolated static let locale = Locale(identifier: "ja_JP")
-    nonisolated static let compactFloor = 1_000_000
-
     var typeColor: Color? {
         switch type {
         case .income: Palette.accent
         case .transfer: Palette.subtext
         case .expense: Palette.accentStrong
         case nil: nil
-        }
-    }
-
-    nonisolated static func mark(
-        of amount: Int,
-        type: Entry.Kind?,
-        sign: Sign
-    ) -> String {
-        if amount < 0 {
-            "−"
-        } else if type == .income || (sign == .plus && amount > 0) {
-            "+"
-        } else {
-            ""
         }
     }
 }
