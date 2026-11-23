@@ -29,6 +29,34 @@
 
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 
+## 🧩 拡張のファイルの名前
+
+拡張のファイル（`<型>+<役割>.swift`）は、`<型>` と `<役割>` を次の決まりで付ける。
+
+`<型>` は、次のとおりに書く。
+
+| 拡張する型 | 書き方 | 例 |
+| --- | --- | --- |
+| 入れ子の型 | 親から `.` を抜いてつなげる。親は省かない | `Wallet.Kind.Role` は `WalletKindRole+Balance` |
+| `AppDatabase` の中のエラー | `AppDatabase` だけを省く | `AppDatabase.WalletWriteError` は `WalletWriteError+Message` |
+| 標準の型 | 標準の型の名前のまま書く | `Array+RowDetail` |
+| 型引数を絞った標準の型 | 絞った意味の名前で書いてよい | `ClosedRange<LocalDate>` は `DateRange+Weeks` |
+
+`<役割>` の語は、足すものでそろえる。
+
+| 役割の語 | 足すもの |
+| --- | --- |
+| `+Title` | 選ぶ画面に並べる題（`title`） |
+| `+Name` | 文や見出しに入れる呼び名（`name`・`shortName`・`displayName`） |
+| `+Message` | 知らせとエラーの文（`message`・`troubleMessage`） |
+| `+Text` | 値を文字にしたもの（金額・割合・日付の入った文） |
+| `+Actions` | 画面の操作の関数。複数形で書く |
+| `+Sheets` | 画面から開くシートの種類と、その振り分け。複数形で書く |
+
+型をまたぐ文言は、拡張にせず、名前空間の `enum` の `<頭>Text` に置く。例は `BillText`・`PeriodText`・`RecurringText`・`ReviewText` である。
+
+モデルと画面の拡張は、同じ話題に同じ語を使う。資産のタブは、`AssetsModel`・`AssetsSummary`・`AssetsView` の拡張を `Bills`・`Outlook`・`Reward`・`Wallets` で分ける。
+
 ## 🗺️ 概念ごとの置き場所
 
 1 つの概念のファイルは、層ごとに次の場所に置く。新しい概念を足すときも、同じ形にする。

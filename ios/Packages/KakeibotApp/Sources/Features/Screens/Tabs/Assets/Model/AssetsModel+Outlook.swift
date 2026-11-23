@@ -85,3 +85,17 @@ public extension AssetsModel.Outlook {
         return lowest
     }
 }
+
+public extension AssetsModel {
+    struct MonthTotal: Equatable, Sendable {
+        public let month: YearMonth
+        public let total: Int
+        public let netWorth: Int
+    }
+}
+
+extension AssetsModel.MonthTotal: Identifiable {
+    public var id: YearMonth {
+        month
+    }
+}

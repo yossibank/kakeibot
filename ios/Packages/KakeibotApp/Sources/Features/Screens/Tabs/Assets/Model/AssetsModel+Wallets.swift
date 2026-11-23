@@ -34,21 +34,6 @@ public extension AssetsModel {
         public let role: Wallet.Kind.Role
         public let rows: [WalletRow]
     }
-
-    struct MonthTotal: Equatable, Sendable {
-        public let month: YearMonth
-        public let total: Int
-        public let netWorth: Int
-    }
-
-    struct UpcomingBill: Equatable, Sendable {
-        public let bill: CardBill
-        public let title: String
-        public let icon: Icon?
-        public let source: String?
-        public let movedIn: [EntryRowItem]
-        public let movedOut: [EntryRowItem]
-    }
 }
 
 public extension AssetsModel.WalletRow {
@@ -100,17 +85,5 @@ extension AssetsModel.WalletRow: Identifiable {
 extension AssetsModel.WalletSection: Identifiable {
     public var id: Wallet.Kind.Role {
         role
-    }
-}
-
-extension AssetsModel.MonthTotal: Identifiable {
-    public var id: YearMonth {
-        month
-    }
-}
-
-extension AssetsModel.UpcomingBill: Identifiable {
-    public var id: Recurring.ID {
-        bill.recurring.id
     }
 }

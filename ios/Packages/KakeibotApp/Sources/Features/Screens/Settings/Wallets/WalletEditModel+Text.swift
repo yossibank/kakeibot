@@ -2,25 +2,6 @@ import Core
 import DesignSystem
 
 public extension WalletEditModel {
-    var initialBalance: Int {
-        isNegative ? -calculator.amount : calculator.amount
-    }
-
-    var draft: WalletDraft {
-        let loan = loanAmount.amount > 0 ? loanAmount.amount : nil
-
-        return WalletDraft(
-            kind: kind,
-            name: name,
-            mark: icon.mark,
-            color: icon.color,
-            initialBalance: initialBalance,
-            loanAmount: loan,
-            recordedKind: recordedKind,
-            hasValuations: hasValuations
-        )
-    }
-
     var showsPayment: Bool {
         isEditing && (kind == .card || kind == .loan)
     }
@@ -93,9 +74,5 @@ public extension WalletEditModel {
         let detail = closing ?? amount
 
         return [schedule, detail].compactMap(\.self).joined(separator: "・")
-    }
-
-    var needsHideConfirmation: Bool {
-        !isHidden && totalBalance != 0
     }
 }
