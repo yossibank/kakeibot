@@ -17,7 +17,7 @@ struct SnapshotTests {
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, .light)
 
-        try Self.write(view, title: "記録 › 口座の選択", to: "wallet-edit.png")
+        try Self.write(view, title: "記録の入力 › 口座の選択", to: "wallet-edit.png")
 
         let database = try AppDatabase.inMemory()
 

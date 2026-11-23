@@ -17,14 +17,14 @@ struct SnapshotTests {
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, .light)
 
-        try Self.write(view, title: "記録 › 口座の選択", to: "wallet.png")
+        try Self.write(view, title: "記録の入力 › 口座の選択", to: "wallet.png")
     }
 
     @Test
     func renderCard() async throws {
         let model = try await Self.model(withCard: true)
 
-        try Self.write(Self.sheet(model), title: "記録 › 口座の選択 › カードの引き落とし", to: "wallet-card.png")
+        try Self.write(Self.sheet(model), title: "記録の入力 › 口座の選択 › カードの引き落とし", to: "wallet-card.png")
 
         let later = try #require(model.billChoices.dropFirst().first?.date)
 
@@ -32,7 +32,7 @@ struct SnapshotTests {
 
         try Self.write(
             Self.sheet(model),
-            title: "記録 › 口座の選択 › 引き落とし日を変えた時",
+            title: "記録の入力 › 口座の選択 › 引き落とし日を変えた時",
             to: "wallet-card-shifted.png"
         )
     }

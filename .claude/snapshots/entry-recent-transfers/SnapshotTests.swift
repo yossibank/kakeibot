@@ -26,7 +26,7 @@ struct SnapshotTests {
 
             try Self.write(
                 view,
-                title: "記録 › 最近の振替",
+                title: "記録の入力 › 最近の振替",
                 variant: label,
                 to: "recent-\(suffix).png"
             )

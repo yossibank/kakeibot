@@ -91,7 +91,7 @@ struct SnapshotTests {
                 try Self.write(
                     view,
                     variant: variant,
-                    title: "記録 › 消した後 › \(name)",
+                    title: "記録 › 消した後 › \(Self.deletionTitle(name))",
                     to: "records-deleted-\(name)"
                 )
             }
@@ -173,7 +173,8 @@ struct SnapshotTests {
                 try Self.write(
                     receipt,
                     variant: variant,
-                    title: "記録 › レシートの行 › \(theme.rawValue)",
+                    title: "記録 › レシートの行",
+                    note: "テーマ \(Self.themeTitle(theme))",
                     to: "records-item-receipt-\(theme.rawValue)"
                 )
 
@@ -185,7 +186,8 @@ struct SnapshotTests {
                 try Self.write(
                     adjusted,
                     variant: variant,
-                    title: "記録 › 残高合わせの行 › \(theme.rawValue)",
+                    title: "記録 › 残高合わせの行",
+                    note: "テーマ \(Self.themeTitle(theme))",
                     to: "records-item-adjusted-\(theme.rawValue)"
                 )
 
@@ -201,7 +203,8 @@ struct SnapshotTests {
                 try Self.write(
                     included,
                     variant: variant,
-                    title: "記録 › 含めた行 › \(theme.rawValue)",
+                    title: "記録 › 含めた行",
+                    note: "テーマ \(Self.themeTitle(theme))",
                     to: "records-item-included-\(theme.rawValue)"
                 )
             }
@@ -468,10 +471,28 @@ private extension SnapshotTests {
         return database
     }
 
+    static func deletionTitle(_ name: String) -> String {
+        switch name {
+        case "long": "長いメモ"
+        case "short": "短いメモ"
+        default: "メモなし"
+        }
+    }
+
+    static func themeTitle(_ theme: ThemePreset) -> String {
+        switch theme {
+        case .white: "ホワイト"
+        case .black: "ブラック"
+        case .rose: "ローズ"
+        default: theme.rawValue
+        }
+    }
+
     static func write(
         _ view: some View,
         variant: Variant,
         title: String,
+        note: String = "",
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -503,7 +524,7 @@ private extension SnapshotTests {
             directory: directory,
             file: "\(name)-\(variant.name).png",
             title: title,
-            variant: variant.label
+            variant: note.isEmpty ? variant.label : "\(variant.label)・\(note)"
         )
     }
 }
