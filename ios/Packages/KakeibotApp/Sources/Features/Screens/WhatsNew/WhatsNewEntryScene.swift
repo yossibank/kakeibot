@@ -2,19 +2,27 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewEntryScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .entryDeck:
+        switch step {
+        case .deck:
             deck
 
-        case .entryShortcuts:
+        case .shortcuts:
             shortcuts
 
-        default:
+        case .slip:
             slip
         }
+    }
+}
+
+extension WhatsNewEntryScene {
+    enum Step: Hashable, Sendable {
+        case slip
+        case deck
+        case shortcuts
     }
 }
 

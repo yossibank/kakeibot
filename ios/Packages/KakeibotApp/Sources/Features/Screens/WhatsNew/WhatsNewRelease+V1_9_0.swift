@@ -15,9 +15,9 @@ extension WhatsNewRelease {
                 ],
                 note: "一手の理由は、iOS 26 以降で Apple Intelligence をオンにした端末で AI が書きます",
                 steps: [
-                    Step(scene: .reviewPace, caption: "いまのペースを見る"),
-                    Step(scene: .reviewClosing, caption: "締めのレポートを読む"),
-                    Step(scene: .reviewGoal, caption: "次の一手を確かめる")
+                    Step(scene: .review(.pace), caption: "いまのペースを見る"),
+                    Step(scene: .review(.closing), caption: "締めのレポートを読む"),
+                    Step(scene: .review(.goal), caption: "次の一手を確かめる")
                 ],
                 action: .review,
                 actionTitle: "ふりかえりを見る"

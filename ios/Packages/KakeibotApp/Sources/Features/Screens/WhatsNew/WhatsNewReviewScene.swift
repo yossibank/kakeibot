@@ -3,19 +3,27 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewReviewScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .reviewClosing:
+        switch step {
+        case .closing:
             closing
 
-        case .reviewGoal:
+        case .goal:
             goal
 
-        default:
+        case .pace:
             pace
         }
+    }
+}
+
+extension WhatsNewReviewScene {
+    enum Step: Hashable, Sendable {
+        case pace
+        case closing
+        case goal
     }
 }
 

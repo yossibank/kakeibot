@@ -2,21 +2,29 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewIconScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .iconButton:
+        switch step {
+        case .button:
             iconButton
                 .whatsNewTapped()
 
-        case .iconGrid:
+        case .grid:
             grid
 
-        default:
+        case .row:
             row
                 .whatsNewTapped()
         }
+    }
+}
+
+extension WhatsNewIconScene {
+    enum Step: Hashable, Sendable {
+        case row
+        case button
+        case grid
     }
 }
 

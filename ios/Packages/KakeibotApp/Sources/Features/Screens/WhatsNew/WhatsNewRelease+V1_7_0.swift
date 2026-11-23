@@ -14,9 +14,9 @@ extension WhatsNewRelease {
                     "Pro の同期で、iPhone と同じ記録を使えます"
                 ],
                 steps: [
-                    Step(scene: .padHome, caption: "ホームを 2 列で見渡す"),
-                    Step(scene: .padReview, caption: "振り返りを並べて見る"),
-                    Step(scene: .padKeyboard, caption: "キーボードで金額を打つ")
+                    Step(scene: .pad(.home), caption: "ホームを 2 列で見渡す"),
+                    Step(scene: .pad(.review), caption: "振り返りを並べて見る"),
+                    Step(scene: .pad(.keyboard), caption: "キーボードで金額を打つ")
                 ],
                 action: nil,
                 actionTitle: ""
@@ -32,9 +32,9 @@ extension WhatsNewRelease {
                     "押すと、その固定費を開けます"
                 ],
                 steps: [
-                    Step(scene: .upcomingCaptions, caption: "これからの日が上に並ぶ"),
-                    Step(scene: .upcomingDay, caption: "日付ごとに固定費を見る"),
-                    Step(scene: .upcomingOpen, caption: "押して固定費を開く")
+                    Step(scene: .upcoming(.captions), caption: "これからの日が上に並ぶ"),
+                    Step(scene: .upcoming(.day), caption: "日付ごとに固定費を見る"),
+                    Step(scene: .upcoming(.open), caption: "押して固定費を開く")
                 ],
                 action: .records,
                 actionTitle: "記録を見る"
@@ -50,9 +50,9 @@ extension WhatsNewRelease {
                     "「レシート」から、読み取りをすぐ始められます"
                 ],
                 steps: [
-                    Step(scene: .widgetTiles, caption: "カテゴリの色で選ぶ"),
-                    Step(scene: .widgetReceipt, caption: "「レシート」を押す"),
-                    Step(scene: .receiptCamera, caption: "そのまま読み取りが始まる")
+                    Step(scene: .widget(.tiles), caption: "カテゴリの色で選ぶ"),
+                    Step(scene: .widget(.receipt), caption: "「レシート」を押す"),
+                    Step(scene: .receipt(.camera), caption: "そのまま読み取りが始まる")
                 ],
                 action: nil,
                 actionTitle: ""

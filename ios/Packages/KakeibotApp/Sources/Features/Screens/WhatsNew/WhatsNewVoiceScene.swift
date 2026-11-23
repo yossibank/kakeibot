@@ -2,20 +2,28 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewVoiceScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .voiceListen:
+        switch step {
+        case .listen:
             listen
 
-        case .voiceFilled:
+        case .filled:
             filled
 
-        default:
+        case .button:
             amountRow
                 .whatsNewTapped()
         }
+    }
+}
+
+extension WhatsNewVoiceScene {
+    enum Step: Hashable, Sendable {
+        case button
+        case listen
+        case filled
     }
 }
 

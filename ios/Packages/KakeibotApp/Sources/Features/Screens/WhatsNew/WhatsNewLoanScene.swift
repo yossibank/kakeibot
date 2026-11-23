@@ -3,20 +3,28 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewLoanScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .loanFinal:
+        switch step {
+        case .last:
             finalAmount
 
-        case .loanTotal:
+        case .total:
             total
 
-        default:
+        case .count:
             countRow
                 .whatsNewTapped()
         }
+    }
+}
+
+extension WhatsNewLoanScene {
+    enum Step: Hashable, Sendable {
+        case count
+        case last
+        case total
     }
 }
 

@@ -3,20 +3,28 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewOutlookScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .outlookBlock:
+        switch step {
+        case .block:
             block
                 .whatsNewTapped()
 
-        case .outlookList:
+        case .list:
             list
 
-        default:
-            WhatsNewPlanScene(kind: .planTab)
+        case .tab:
+            WhatsNewPlanScene(step: .tab)
         }
+    }
+}
+
+extension WhatsNewOutlookScene {
+    enum Step: Hashable, Sendable {
+        case tab
+        case block
+        case list
     }
 }
 

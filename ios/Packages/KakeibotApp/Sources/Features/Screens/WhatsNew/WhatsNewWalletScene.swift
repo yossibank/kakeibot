@@ -3,20 +3,28 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewWalletScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .walletKinds:
+        switch step {
+        case .kinds:
             kinds
 
-        case .walletMade:
+        case .made:
             debtCard(isMade: true)
 
-        default:
+        case .add:
             debtCard(isMade: false)
                 .whatsNewTapped()
         }
+    }
+}
+
+extension WhatsNewWalletScene {
+    enum Step: Hashable, Sendable {
+        case add
+        case kinds
+        case made
     }
 }
 

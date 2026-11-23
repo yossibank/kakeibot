@@ -13,9 +13,9 @@ extension WhatsNewRelease {
                     "引き落としの回ごとに記録を並べます"
                 ],
                 steps: [
-                    Step(scene: .unpaidRow, caption: "カードの行"),
-                    Step(scene: .unpaidButton, caption: "「未払いの記録を見る」を押す"),
-                    Step(scene: .unpaidList, caption: "合計と記録が並ぶ")
+                    Step(scene: .bill(.unpaidRow), caption: "カードの行"),
+                    Step(scene: .bill(.unpaidButton), caption: "「未払いの記録を見る」を押す"),
+                    Step(scene: .bill(.unpaidList), caption: "合計と記録が並ぶ")
                 ],
                 action: .assets,
                 actionTitle: "資産を開く"
@@ -30,9 +30,9 @@ extension WhatsNewRelease {
                     "記録を作るたびに、選んだ回に入ります"
                 ],
                 steps: [
-                    Step(scene: .shiftWallet, caption: "カードを選ぶ"),
-                    Step(scene: .shiftChoice, caption: "「次に回す」を押す"),
-                    Step(scene: .shiftBill, caption: "次の引き落としに入る")
+                    Step(scene: .bill(.shiftWallet), caption: "カードを選ぶ"),
+                    Step(scene: .bill(.shiftChoice), caption: "「次に回す」を押す"),
+                    Step(scene: .bill(.shiftBill), caption: "次の引き落としに入る")
                 ],
                 action: .setup(.recurrings),
                 actionTitle: "固定費を開く"
@@ -47,9 +47,9 @@ extension WhatsNewRelease {
                     "作る画面が 1 画面に収まりました"
                 ],
                 steps: [
-                    Step(scene: .recurringRow, caption: "「固定費」を開く"),
-                    Step(scene: .recurringTabs, caption: "「収入」を押す"),
-                    Step(scene: .recurringList, caption: "収入だけが並ぶ")
+                    Step(scene: .recurring(.row), caption: "「固定費」を開く"),
+                    Step(scene: .recurring(.tabs), caption: "「収入」を押す"),
+                    Step(scene: .recurring(.list), caption: "収入だけが並ぶ")
                 ],
                 action: .setup(.recurrings),
                 actionTitle: "固定費を開く"

@@ -3,19 +3,27 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewPagerScene: View {
-    let kind: WhatsNewScene.Kind
+    let step: Step
 
     var body: some View {
-        switch kind {
-        case .pagerSwipe:
+        switch step {
+        case .swipe:
             swipe
 
-        case .pagerNext:
+        case .next:
             page(isNext: true)
 
-        default:
+        case .card:
             page(isNext: false)
         }
+    }
+}
+
+extension WhatsNewPagerScene {
+    enum Step: Hashable, Sendable {
+        case card
+        case swipe
+        case next
     }
 }
 
