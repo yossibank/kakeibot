@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.ArchivableRecord
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -132,3 +134,9 @@ fun EntryTagRecord.entryTag(): EntryTag? {
         updatedAt = updatedAt,
     )
 }
+
+internal val entryTagTable = TableBinding<EntryTag>(
+    all = { tagDao().all().map { it.decoded(EntryTagRecord::entryTag) } },
+    insert = { tagDao().insert(it.record()) },
+    deleteAll = { tagDao().deleteAll() },
+)

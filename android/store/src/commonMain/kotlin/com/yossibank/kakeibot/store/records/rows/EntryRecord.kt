@@ -19,6 +19,8 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -320,3 +322,9 @@ fun EntryRecord.entry(): Entry? {
         updatedAt = updatedAt,
     )
 }
+
+internal val entryTable = TableBinding<Entry>(
+    all = { entryDao().all().map { it.decoded(EntryRecord::entry) } },
+    insert = { entryDao().insert(it.record()) },
+    deleteAll = { entryDao().deleteAll() },
+)

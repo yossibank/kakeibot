@@ -13,6 +13,8 @@ import com.yossibank.kakeibot.core.concepts.budget.Budget
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.values.databaseValue
 import com.yossibank.kakeibot.store.records.values.fromDatabaseValue
 
@@ -88,3 +90,9 @@ fun BudgetRecord.budget(): Budget? {
         amount = amount,
     )
 }
+
+internal val budgetTable = TableBinding<Budget>(
+    all = { budgetDao().all().map { it.decoded(BudgetRecord::budget) } },
+    insert = { budgetDao().insert(it.record()) },
+    deleteAll = { budgetDao().deleteAll() },
+)

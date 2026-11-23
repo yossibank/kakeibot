@@ -13,6 +13,8 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -125,3 +127,9 @@ fun EntryItemRecord.entryItem(): EntryItem? {
         updatedAt = updatedAt,
     )
 }
+
+internal val entryItemTable = TableBinding<EntryItem>(
+    all = { entryItemDao().all().map { it.decoded(EntryItemRecord::entryItem) } },
+    insert = { entryItemDao().insert(it.record()) },
+    deleteAll = { entryItemDao().deleteAll() },
+)

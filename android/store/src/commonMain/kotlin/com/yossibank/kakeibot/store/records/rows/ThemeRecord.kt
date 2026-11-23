@@ -9,6 +9,8 @@ import androidx.room.Query
 import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.theme.Theme
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -95,3 +97,9 @@ fun ThemeRecord.theme(): Theme? {
         updatedAt = updatedAt,
     )
 }
+
+internal val themeTable = TableBinding<Theme>(
+    all = { themeDao().all().map { it.decoded(ThemeRecord::theme) } },
+    insert = { themeDao().insert(it.record()) },
+    deleteAll = { themeDao().deleteAll() },
+)

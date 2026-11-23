@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.reward.RewardRule
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.store.records.protocols.SortableRecord
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -93,3 +95,9 @@ fun RewardRuleRecord.rewardRule(): RewardRule? {
         updatedAt = updatedAt,
     )
 }
+
+internal val rewardRuleTable = TableBinding<RewardRule>(
+    all = { rewardRuleDao().all().map { it.decoded(RewardRuleRecord::rewardRule) } },
+    insert = { rewardRuleDao().insert(it.record()) },
+    deleteAll = { rewardRuleDao().deleteAll() },
+)

@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.reward.RewardLog
 import com.yossibank.kakeibot.core.concepts.reward.RewardRule
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -111,3 +113,9 @@ fun RewardLogRecord.rewardLog(): RewardLog? {
         createdAt = createdAt,
     )
 }
+
+internal val rewardLogTable = TableBinding<RewardLog>(
+    all = { rewardLogDao().all().map { it.decoded(RewardLogRecord::rewardLog) } },
+    insert = { rewardLogDao().insert(it.record()) },
+    deleteAll = { rewardLogDao().deleteAll() },
+)

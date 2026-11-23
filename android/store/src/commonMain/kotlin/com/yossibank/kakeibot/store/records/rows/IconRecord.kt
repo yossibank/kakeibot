@@ -9,6 +9,8 @@ import androidx.room.Query
 import androidx.room.Update
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -74,3 +76,9 @@ fun IconRecord.icon(): Icon? {
         updatedAt = updatedAt,
     )
 }
+
+internal val iconTable = TableBinding<Icon>(
+    all = { iconDao().all().map { it.decoded(IconRecord::icon) } },
+    insert = { iconDao().insert(it.record()) },
+    deleteAll = { iconDao().deleteAll() },
+)

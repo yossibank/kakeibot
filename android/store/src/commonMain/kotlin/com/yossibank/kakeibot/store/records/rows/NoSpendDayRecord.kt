@@ -9,6 +9,8 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.NoSpendDay
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -61,3 +63,9 @@ fun NoSpendDayRecord.noSpendDay(): NoSpendDay? {
         createdAt = createdAt,
     )
 }
+
+internal val noSpendDayTable = TableBinding<NoSpendDay>(
+    all = { noSpendDayDao().all().map { it.decoded(NoSpendDayRecord::noSpendDay) } },
+    insert = { noSpendDayDao().insert(it.record()) },
+    deleteAll = { noSpendDayDao().deleteAll() },
+)

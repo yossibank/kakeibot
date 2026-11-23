@@ -10,6 +10,8 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.yossibank.kakeibot.core.concepts.receipt.ItemName
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -86,3 +88,9 @@ fun ItemNameRecord.itemName(): ItemName? {
         updatedAt = updatedAt,
     )
 }
+
+internal val itemNameTable = TableBinding<ItemName>(
+    all = { itemNameDao().all().map { it.decoded(ItemNameRecord::itemName) } },
+    insert = { itemNameDao().insert(it.record()) },
+    deleteAll = { itemNameDao().deleteAll() },
+)

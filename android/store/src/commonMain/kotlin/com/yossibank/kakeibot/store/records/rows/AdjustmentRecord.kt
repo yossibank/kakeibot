@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.wallet.Adjustment
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.store.records.protocols.TableBinding
+import com.yossibank.kakeibot.store.records.protocols.decoded
 import com.yossibank.kakeibot.store.records.protocols.storedInstant
 import com.yossibank.kakeibot.store.records.protocols.storedValue
 import com.yossibank.kakeibot.store.records.values.databaseValue
@@ -100,3 +102,9 @@ fun AdjustmentRecord.adjustment(): Adjustment? {
         updatedAt = updatedAt,
     )
 }
+
+internal val adjustmentTable = TableBinding<Adjustment>(
+    all = { adjustmentDao().all().map { it.decoded(AdjustmentRecord::adjustment) } },
+    insert = { adjustmentDao().insert(it.record()) },
+    deleteAll = { adjustmentDao().deleteAll() },
+)
