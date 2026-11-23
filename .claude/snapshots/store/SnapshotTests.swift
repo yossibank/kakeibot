@@ -9,7 +9,7 @@ struct SnapshotTests {
     @Test
     func render() throws {
         for (canvas, pages) in Self.pageSets {
-            for (index, page) in pages.enumerated() {
+            for (index, page) in pages.enumerated() where canvas.shows(page) {
                 let art = try Self.load(page.art)
                 let view = StorePage(page: page, index: index, art: art, canvas: canvas)
 
@@ -64,8 +64,7 @@ extension SnapshotTests {
         var folder: String {
             switch self {
             case .phone: "6.9"
-            case .duoOuter: "duo-outer"
-            case .duoInner: "duo-inner"
+            case .duoOuter, .duoInner: "duo"
             case .pad: "13"
             case .header: "header"
             case .search: "search"
@@ -102,6 +101,16 @@ extension SnapshotTests {
             switch self {
             case .pad: 2.2
             default: 1.15
+            }
+        }
+
+        func shows(_ page: Page) -> Bool {
+            let isOuter = ["03-receipt", "04-entry", "07-font", "09-outlook"].contains(page.file)
+
+            switch self {
+            case .duoOuter: return isOuter
+            case .duoInner: return !isOuter
+            case .phone, .pad, .header, .search: return true
             }
         }
     }
@@ -440,8 +449,8 @@ private extension StorePage {
 
     var waves: [StoreWave] {
         let zoom = canvas.size.width / 320
-        let swing = min(zoom, 1.5)
-        let y = canvas.headerHeight - 20
+        let swing = min(zoom, 1)
+        let y = canvas.headerHeight - 12
         let shift = canvas.size.width * 1.05 * CGFloat(index)
 
         return [
@@ -455,7 +464,7 @@ private extension StorePage {
                 dash: []
             ),
             StoreWave(
-                y: y + 8 * swing,
+                y: y + 6 * swing,
                 amplitude: 9 * swing,
                 period: 1008 * zoom,
                 phase: 60 * zoom,
@@ -609,7 +618,7 @@ private extension StorePage {
                         .background(StoreInk.accent.opacity(0.2), in: .capsule)
                 }
             }
-            .offset(y: -12)
+            .offset(y: 8)
         }
     }
 
