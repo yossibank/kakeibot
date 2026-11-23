@@ -4,9 +4,9 @@ import Store
 import SwiftUI
 
 struct StampTallyCard: View {
-    let tallies: [StampCalendar.Tally]
+    let tallies: [StampBook.Tally]
     let emptyText: String
-    let onOpen: (StampCalendar.Tally) -> Void
+    let onOpen: (StampBook.Tally) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {

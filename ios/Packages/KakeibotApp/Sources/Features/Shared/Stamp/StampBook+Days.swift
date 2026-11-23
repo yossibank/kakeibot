@@ -1,7 +1,7 @@
 import Core
 import Store
 
-extension StampCalendar {
+extension StampBook {
     func days(
         of tally: Tally,
         in range: ClosedRange<LocalDate>

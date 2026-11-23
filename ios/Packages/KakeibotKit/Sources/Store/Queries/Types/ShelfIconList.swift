@@ -1,6 +1,6 @@
 import Core
 
-public struct IconShelf: Equatable, Sendable {
+public struct ShelfIconList: Equatable, Sendable {
     public let shelfIcons: [ShelfIcon]
     public let icons: [Icon.ID: Icon]
 

@@ -27,7 +27,7 @@ public final class ReviewModel: ScreenModel {
     public private(set) var weekStart: Weekday = .sunday
     public private(set) var budgets: [Budget] = []
     public private(set) var carryoverFrom: YearMonth?
-    public private(set) var stampCalendar: StampCalendar?
+    public private(set) var stampBook: StampBook?
 
     public private(set) var list: EntryList? {
         didSet {
@@ -130,8 +130,8 @@ public extension ReviewModel {
         change(of: kind)
     }
 
-    var stampTallies: [StampCalendar.Tally] {
-        stampCalendar?.tallies(in: period.range) ?? []
+    var stampTallies: [StampBook.Tally] {
+        stampBook?.tallies(in: period.range) ?? []
     }
 
     func total(of kind: ReviewKind) -> Int {
@@ -188,8 +188,8 @@ public extension ReviewModel {
             }
     }
 
-    func stampDays(of tally: StampCalendar.Tally) -> [LocalDate] {
-        stampCalendar?.days(of: tally, in: period.range) ?? []
+    func stampDays(of tally: StampBook.Tally) -> [LocalDate] {
+        stampBook?.days(of: tally, in: period.range) ?? []
     }
 
     func day(on date: LocalDate) -> EntryDay? {
@@ -211,7 +211,7 @@ public extension ReviewModel {
                 await self.observe(self.database.budgetUpdates(), into: \.budgets)
             },
             {
-                await self.observe(self.database.stampCalendarUpdates(), into: \.stampCalendar)
+                await self.observe(self.database.stampBookUpdates(), into: \.stampBook)
             },
             {
                 await self.observe(self.database.noSpendDayUpdates(), into: \.noSpendDays)

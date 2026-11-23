@@ -360,7 +360,7 @@ struct ReviewModelTests {
     func listsDaysOfStamp() async throws {
         let setup = try await RecordsModelTests.Setup()
         try setup.database.insertShelfIfEmpty(at: Date())
-        let shelf = try await setup.database.iconShelf().shelfIcons
+        let shelf = try await setup.database.shelfIconList().shelfIcons
         let star = try #require(shelf.first?.iconId)
         let party = try #require(shelf.dropFirst().first?.iconId)
 

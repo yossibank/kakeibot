@@ -5,7 +5,7 @@ import com.yossibank.kakeibot.core.concepts.icon.CalendarStamp
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.shared.Identifier
 
-data class StampCalendar(
+data class StampBook(
     val stamps: Map<LocalDate, CalendarStamp>,
     val icons: Map<Identifier<Icon>, Icon>,
 ) {

@@ -158,7 +158,7 @@ public struct SettingsMenuSheet: View {
 private extension SettingsMenuSheet {
     func loadUsesFun() async {
         do {
-            let calendar = try await database.stampCalendar()
+            let calendar = try await database.stampBook()
             let rules = try await database.rewardRuleList()
             usesFun = !calendar.stamps.isEmpty || !rules.rules.isEmpty
         } catch {

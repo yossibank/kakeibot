@@ -6,7 +6,7 @@ import SwiftUI
 struct StampDaysSheet: View {
     @Environment(\.dismiss) private var dismiss
 
-    let tally: StampCalendar.Tally
+    let tally: StampBook.Tally
     let periodTitle: String
     let days: [LocalDate]
     let entryDay: (LocalDate) -> EntryDay?

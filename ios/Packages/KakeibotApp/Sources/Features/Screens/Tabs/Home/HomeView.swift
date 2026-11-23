@@ -10,7 +10,7 @@ public struct HomeView: View {
     @State var shelfWidth: CGFloat = 0
 
     @State private var openId: Entry.ID?
-    @State private var openStamp: StampCalendar.Tally?
+    @State private var openStamp: StampBook.Tally?
     @State private var pendingDay: LocalDate?
 
     let onUseTemplate: (EntryTemplate) -> Void

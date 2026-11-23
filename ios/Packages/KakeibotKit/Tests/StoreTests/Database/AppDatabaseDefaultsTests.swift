@@ -107,7 +107,7 @@ struct AppDatabaseDefaultsTests {
 
         try database.insertShelfIfEmpty(at: now)
         try database.insertShelfIfEmpty(at: now)
-        let shelf = try await database.iconShelf()
+        let shelf = try await database.shelfIconList()
         let glyphs = shelf.shelfIcons.map { shelf.icons[$0.iconId]?.glyph }
 
         #expect(shelf.shelfIcons.map(\.sortOrder) == Array(0..<8))
@@ -120,14 +120,14 @@ struct AppDatabaseDefaultsTests {
         let database = try AppDatabase.inMemory()
         let now = Date(timeIntervalSince1970: 1_791_000_000)
         try database.insertShelfIfEmpty(at: now)
-        let inserted = try await database.iconShelf()
+        let inserted = try await database.shelfIconList()
 
         for shelfIcon in inserted.shelfIcons {
             try await database.setShelfIconHidden(shelfIcon.id, isHidden: true, at: now)
         }
 
         try database.insertShelfIfEmpty(at: now)
-        let shelf = try await database.iconShelf()
+        let shelf = try await database.shelfIconList()
 
         #expect(shelf.shelfIcons.count == 8)
         #expect(shelf.shelfIcons.allSatisfy { $0.archivedAt != nil })

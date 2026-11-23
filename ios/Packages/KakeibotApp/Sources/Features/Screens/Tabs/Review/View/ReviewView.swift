@@ -10,7 +10,7 @@ public struct ReviewView: View {
     @Bindable private(set) var model: ReviewModel
 
     @State var openShare: ReviewModel.Share?
-    @State var openStamp: StampCalendar.Tally?
+    @State var openStamp: StampBook.Tally?
     @State var showsAnalysis = false
     @State var analysisShare: ReviewModel.Share?
     @State var slide = PageSlide()

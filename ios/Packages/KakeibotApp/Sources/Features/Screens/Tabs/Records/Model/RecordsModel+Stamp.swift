@@ -14,7 +14,7 @@ public extension RecordsModel {
     }
 
     func stampIcon(on date: LocalDate) -> Icon? {
-        stampCalendar?.icon(on: date)
+        stampBook?.icon(on: date)
     }
 
     func stamp(

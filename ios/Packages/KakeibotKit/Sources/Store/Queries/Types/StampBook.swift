@@ -1,6 +1,6 @@
 import Core
 
-public struct StampCalendar: Equatable, Sendable {
+public struct StampBook: Equatable, Sendable {
     public let stamps: [LocalDate: CalendarStamp]
     public let icons: [Icon.ID: Icon]
 
@@ -13,7 +13,7 @@ public struct StampCalendar: Equatable, Sendable {
     }
 }
 
-public extension StampCalendar {
+public extension StampBook {
     struct Tally: Equatable, Sendable {
         public let icon: Icon
         public let count: Int
@@ -49,7 +49,7 @@ public extension StampCalendar {
     }
 }
 
-extension StampCalendar.Tally: Identifiable {
+extension StampBook.Tally: Identifiable {
     public var id: Icon.ID {
         icon.id
     }

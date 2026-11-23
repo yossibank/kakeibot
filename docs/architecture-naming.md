@@ -61,6 +61,20 @@
 
 モデルと画面の拡張は、同じ話題に同じ語を使う。資産のタブの拡張は、`Bills`・`Outlook`・`Reward`・`Wallets` で分ける。モデルも、まとめも、画面も同じ語にする。
 
+### 層をまたぐ語
+
+同じ語が層で違うものを指す所は、次のとおりに読み分ける。
+
+| 語 | 指すもの |
+| --- | --- |
+| `<型>+Record`・`StoreRecord` | 表の行。`Store/Records/` に置く |
+| `Records`・`QuickRecord`・`WidgetRecord` | 記録（`Entry`）。画面とウィジェットの名前に使う |
+| `SyncRecord` | 同期で送り受けする行 |
+| `EntryCategory` | Core の型と、`Store/Writes/Methods/` の拡張の名前 |
+| `Category` | 画面（`CategoryListModel`）と、読み出しの型（`CategoryList`）の名前。`Entry` を略す |
+
+読み出しの型は、行の型と語順を入れ替えただけの名前にしない。`CalendarStamp` の読み出しは `StampBook` である。`ShelfIcon` の読み出しは `ShelfIconList` である。
+
 ### 部品の語尾
 
 部品と値の型は、役割に合う語尾で終える。新しい型は、次の表から選ぶ。
@@ -108,8 +122,8 @@
 | --- | --- |
 | 送る行の記録と、受け取った行の書き込み | `Store/Sync/` |
 | CKSyncEngine で送り受けする | `Sync/` |
-| 画面と、口座と参加者の型 | `Features/Screens/Settings/Sync/` |
-| CloudKit から口座と参加者を読む | `AppFeature/Bridge/` |
+| 画面と、iCloud のアカウント（`SyncAccount`）と参加者の型 | `Features/Screens/Settings/Sync/` |
+| CloudKit から iCloud のアカウントと参加者を読む | `AppFeature/Bridge/` |
 
 ## 🧪 テストの名前
 
