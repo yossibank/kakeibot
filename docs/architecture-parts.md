@@ -6,7 +6,7 @@
 
 ## 🪝 プロトコル
 
-`Features/Shared/` に置くプロトコルは、すべてここに載せる。
+`Features/Shared/` と `Core/Shared/` に置くプロトコルは、すべてここに載せる。
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
@@ -20,6 +20,7 @@
 | `SettingsEditModel` | 1 件を編集するモデル。下書きと、保存できるかを持つ | `Features/Shared/SettingsParts/Input/` |
 | `SettingsEditing` | 編集の画面がモデルに頼む操作（非表示・削除）と状態 | `Features/Shared/SettingsParts/Input/` |
 | `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足す | `Features/Shared/SettingsParts/Input/` |
+| `Draft` | 保存前の下書き。`problems` を返し、`validate()` が最初の問題を投げる | `Core/Shared/` |
 
 ## 🗺️ 画面の部品
 
