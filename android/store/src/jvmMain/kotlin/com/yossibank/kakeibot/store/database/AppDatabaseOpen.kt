@@ -9,7 +9,7 @@ fun AppDatabase.Companion.inMemory(): AppDatabase = Room
 
 suspend fun AppDatabase.Companion.file(
     path: String,
-    now: Instant = Instant.now(),
+    now: Instant,
 ): AppDatabase = open(
     builder = Room.databaseBuilder<AppDatabase>(name = path),
     now = now,

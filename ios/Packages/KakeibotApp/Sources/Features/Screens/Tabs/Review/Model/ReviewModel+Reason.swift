@@ -24,7 +24,7 @@ extension ReviewModel {
         }
     }
 
-    func refreshReason(now: Date = Date()) async {
+    func refreshReason(now: Date) async {
         let key = period.commentKey
         let next = period.adding(1)
 

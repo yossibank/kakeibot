@@ -47,7 +47,7 @@ public extension EntryNoticeModel {
 
             case let .batch(batch):
                 let items = batch.kind == .deleted ? batch.items : nil
-                try await database.restoreEntries(batch.previous, items: items)
+                try await database.restoreEntries(batch.previous, items: items, at: Date())
 
             case .undone, .failed, nil:
                 return
@@ -86,7 +86,7 @@ public extension EntryNoticeModel {
     func deleteEntries(_ ids: [Entry.ID]) async {
         do {
             let items = try await database.entryItems(of: ids)
-            let previous = try await database.deleteEntries(ids)
+            let previous = try await database.deleteEntries(ids, at: Date())
             let batch = EntryBatch(kind: .deleted, previous: previous, items: items)
             notice = .batch(batch)
         } catch {
@@ -109,7 +109,7 @@ public extension EntryNoticeModel {
 
         do {
             let items = try await database.entryItems(of: id)
-            let deleted = try await database.deleteEntry(id)
+            let deleted = try await database.deleteEntry(id, at: Date())
 
             let label = EntryChange.label(for: entry) { id in
                 list.categories[id]
@@ -192,18 +192,25 @@ private extension EntryNoticeModel {
         case .recorded:
             try await database.deleteEntry(
                 change.entry.id,
-                restoringNoSpend: change.clearedNoSpendDays
+                restoringNoSpend: change.clearedNoSpendDays,
+                at: Date()
             )
 
         case let .edited(previous, previousFee):
             try await database.restoreEntry(
                 previous,
                 fee: previousFee,
-                restoringNoSpend: change.clearedNoSpendDays
+                restoringNoSpend: change.clearedNoSpendDays,
+                at: Date()
             )
 
         case .deleted:
-            try await database.restoreEntry(change.entry, fee: change.fee, items: change.items)
+            try await database.restoreEntry(
+                change.entry,
+                fee: change.fee,
+                items: change.items,
+                at: Date()
+            )
         }
     }
 }

@@ -105,7 +105,11 @@ struct SyncTests {
         let walletRecord = try #require(try await source.database.syncRecord(for: key))
         let iconRecord = try await source.iconRecord(of: key)
 
-        try await target.database.applySyncChanges(saved: [walletRecord, iconRecord], deleted: [])
+        try await target.database.applySyncChanges(
+            saved: [walletRecord, iconRecord],
+            deleted: [],
+            at: StoreFixture.now
+        )
 
         #expect(try await target.database.syncRecord(for: key) == walletRecord)
         #expect(try await target.pendingKeys() == [])
@@ -122,7 +126,11 @@ struct SyncTests {
         values["updated_at"] = .text("2000-01-01T00:00:00Z")
         let remote = SyncRecord(key: key, values: values)
 
-        try await setup.database.applySyncChanges(saved: [remote], deleted: [])
+        try await setup.database.applySyncChanges(
+            saved: [remote],
+            deleted: [],
+            at: StoreFixture.now
+        )
 
         #expect(try await setup.database.syncRecord(for: key) == local)
     }
@@ -136,9 +144,17 @@ struct SyncTests {
         let walletRecord = try #require(try await source.database.syncRecord(for: key))
         let iconRecord = try await source.iconRecord(of: key)
 
-        try await target.database.applySyncChanges(saved: [walletRecord], deleted: [])
+        try await target.database.applySyncChanges(
+            saved: [walletRecord],
+            deleted: [],
+            at: StoreFixture.now
+        )
         let waiting = try await target.database.syncRecord(for: key)
-        try await target.database.applySyncChanges(saved: [iconRecord], deleted: [])
+        try await target.database.applySyncChanges(
+            saved: [iconRecord],
+            deleted: [],
+            at: StoreFixture.now
+        )
         let arrived = try await target.database.syncRecord(for: key)
 
         #expect(waiting == nil)
@@ -169,7 +185,11 @@ struct SyncTests {
             ]
         )
 
-        try await setup.database.applySyncChanges(saved: [remote], deleted: [])
+        try await setup.database.applySyncChanges(
+            saved: [remote],
+            deleted: [],
+            at: StoreFixture.now
+        )
 
         #expect(try await setup.database.syncRecord(for: local) == nil)
         #expect(try await setup.database.syncRecord(for: remote.key) != nil)
@@ -191,7 +211,11 @@ struct SyncTests {
         try await setup.database.removeSyncChanges(changes)
         let key = SyncKey(table: .wallet, id: walletID)
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
+        try await setup.database.applySyncChanges(
+            saved: [],
+            deleted: [key.own],
+            at: StoreFixture.now
+        )
 
         #expect(try await setup.database.syncRecord(for: key) != nil)
         #expect(try await setup.pendingKeys() == [key])
@@ -206,7 +230,11 @@ struct SyncTests {
         let changes = try await setup.database.pendingSyncChanges()
         try await setup.database.removeSyncChanges(changes)
 
-        try await setup.database.applySyncChanges(saved: [], deleted: [key.own])
+        try await setup.database.applySyncChanges(
+            saved: [],
+            deleted: [key.own],
+            at: StoreFixture.now
+        )
 
         #expect(try await setup.database.syncRecord(for: key) == nil)
         #expect(try await setup.pendingKeys() == [])
@@ -223,7 +251,11 @@ struct SyncTests {
         try await setup.database.removeSyncChanges(changes)
 
         try await setup.execute("DELETE FROM no_spend_day")
-        try await setup.database.applySyncChanges(saved: [remote], deleted: [])
+        try await setup.database.applySyncChanges(
+            saved: [remote],
+            deleted: [],
+            at: StoreFixture.now
+        )
 
         #expect(try await setup.database.syncRecord(for: key) == nil)
         #expect(try await setup.pendingKeys() == [key])
@@ -272,7 +304,8 @@ struct SyncTests {
         try await setup.database.applySyncChanges(
             saved: [remote],
             deleted: [deleted.own],
-            systemFields: [saved.own: fields]
+            systemFields: [saved.own: fields],
+            at: StoreFixture.now
         )
 
         #expect(try await setup.database.syncSystemFields(for: saved.own) == fields)
@@ -348,7 +381,8 @@ extension SyncTests.Setup {
             saved: [],
             deleted: [],
             systemFields: [zoned: Data([1])],
-            owners: [zone: "owner"]
+            owners: [zone: "owner"],
+            at: StoreFixture.now
         )
     }
 

@@ -131,7 +131,7 @@ extension RecurringWriteTests {
         let kept = try #require(ids.last)
         let deletion = try await setup.database.deleteRecurring(id, at: setup.now)
 
-        try await setup.database.deleteEntry(gone)
+        try await setup.database.deleteEntry(gone, at: StoreFixture.now)
         try await setup.database.restore(deletion)
         let restored = try setup.database.snapshot()
 

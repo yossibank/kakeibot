@@ -120,7 +120,7 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         suspend fun open(
             builder: Builder<AppDatabase>,
-            now: Instant = Instant.now(),
+            now: Instant,
         ): AppDatabase {
             val database = builder.configured()
 

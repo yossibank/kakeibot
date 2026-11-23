@@ -89,7 +89,7 @@ struct SyncShareCategoryTests {
     func keepsOneSharedCategoryPerNameWhenSharingAgain() async throws {
         let setup = try await Setup()
 
-        try await setup.database.endSharing(setup.shared)
+        try await setup.database.endSharing(setup.shared, at: StoreFixture.now)
         try await setup.database.startSharing(setup.shared)
 
         #expect(try await setup.duplicatedSharedCategories() == "0")
@@ -103,7 +103,7 @@ struct SyncShareCategoryTests {
             at: Date()
         )
 
-        try await setup.database.endSharing(setup.shared)
+        try await setup.database.endSharing(setup.shared, at: StoreFixture.now)
         let category = try await setup.category(of: entry.id)
 
         #expect(category == Category(name: "食費", walletID: nil))

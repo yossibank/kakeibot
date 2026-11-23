@@ -8,7 +8,7 @@ public extension AppDatabase {
         deleted: [SyncRecordID],
         systemFields: [SyncRecordID: Data] = [:],
         owners: [String: String] = [:],
-        at now: Date = Date()
+        at now: Date
     ) async throws {
         try await writer.write { db in
             let joinedIDs = Array(systemFields.keys)

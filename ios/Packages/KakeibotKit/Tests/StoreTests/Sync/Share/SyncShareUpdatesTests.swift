@@ -29,7 +29,7 @@ struct SyncShareUpdatesTests {
         var updates = setup.database.walletShareUpdates().makeAsyncIterator()
 
         let before = try await updates.next()
-        try await setup.database.endSharing(id)
+        try await setup.database.endSharing(id, at: StoreFixture.now)
         let after = try await updates.next()
 
         #expect(before?.first { $0.wallet.id == id }?.isShared == true)

@@ -18,7 +18,7 @@ public extension AppDatabase {
         }
     }
 
-    func deleteAllRecords(at now: Date = Date()) async throws {
+    func deleteAllRecords(at now: Date) async throws {
         try await writer.write { db in
             let entries = try Self.deletableEntries.fetchAll(db)
             let change = CardBillChange(before: entries)

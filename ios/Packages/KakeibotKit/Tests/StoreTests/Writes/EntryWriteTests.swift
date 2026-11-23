@@ -15,7 +15,8 @@ struct EntryWriteTests {
 
         try await setup.database.deleteEntry(
             result.entry.id,
-            restoringNoSpend: result.clearedNoSpendDays
+            restoringNoSpend: result.clearedNoSpendDays,
+            at: StoreFixture.now
         )
 
         let restored = try setup.database.snapshot().noSpendDays
@@ -52,7 +53,8 @@ struct EntryWriteTests {
 
         try await setup.database.deleteEntry(
             result.entry.id,
-            restoringNoSpend: result.clearedNoSpendDays
+            restoringNoSpend: result.clearedNoSpendDays,
+            at: StoreFixture.now
         )
 
         let snapshot = try setup.database.snapshot()
@@ -151,7 +153,7 @@ struct EntryWriteTests {
 
         let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
 
-        try await setup.database.deleteEntry(saved.id)
+        try await setup.database.deleteEntry(saved.id, at: StoreFixture.now)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries.isEmpty)
@@ -172,7 +174,7 @@ struct EntryWriteTests {
             )
         }
 
-        try await setup.database.deleteEntry(saved.id)
+        try await setup.database.deleteEntry(saved.id, at: StoreFixture.now)
         let snapshot = try setup.database.snapshot()
 
         #expect(snapshot.entries.isEmpty)
@@ -188,11 +190,11 @@ struct EntryWriteTests {
 
         let saved = try await setup.database.saveEntry(setup.draft, at: setup.now)
 
-        try await setup.database.deleteEntry(saved.id)
-        try await setup.database.restoreEntry(saved)
+        try await setup.database.deleteEntry(saved.id, at: StoreFixture.now)
+        try await setup.database.restoreEntry(saved, at: StoreFixture.now)
         let restored = try setup.database.snapshot().entries
         try await setup.database.saveEntry(edited, editing: saved.id, at: later)
-        try await setup.database.restoreEntry(saved)
+        try await setup.database.restoreEntry(saved, at: StoreFixture.now)
         let reverted = try setup.database.snapshot().entries
 
         #expect(restored == [saved])
@@ -254,9 +256,12 @@ struct EntryWriteTests {
         let first = try await setup.database.saveEntry(setup.draft, at: setup.now)
         let second = try await setup.database.saveEntry(setup.draft, at: setup.now)
 
-        let deleted = try await setup.database.deleteEntries([first.id, second.id])
+        let deleted = try await setup.database.deleteEntries(
+            [first.id, second.id],
+            at: StoreFixture.now
+        )
         let emptied = try setup.database.snapshot().entries
-        try await setup.database.restoreEntries(deleted)
+        try await setup.database.restoreEntries(deleted, at: StoreFixture.now)
         let restored = try setup.database.snapshot().entries
 
         #expect(Set(deleted) == [first, second])

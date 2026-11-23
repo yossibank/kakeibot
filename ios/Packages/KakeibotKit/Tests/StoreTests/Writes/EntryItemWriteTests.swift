@@ -93,7 +93,7 @@ struct EntryItemWriteTests {
         draft.items = Self.items
         let entry = try await setup.database.saveEntry(draft, at: setup.now)
 
-        try await setup.database.deleteEntry(entry.id)
+        try await setup.database.deleteEntry(entry.id, at: StoreFixture.now)
 
         #expect(try setup.database.snapshot().entryItems.isEmpty)
     }
@@ -106,8 +106,8 @@ struct EntryItemWriteTests {
         let entry = try await setup.database.saveEntry(draft, at: setup.now)
         let items = try await setup.database.entryItems(of: [entry.id])
 
-        let deleted = try await setup.database.deleteEntries([entry.id])
-        try await setup.database.restoreEntries(deleted, items: items)
+        let deleted = try await setup.database.deleteEntries([entry.id], at: StoreFixture.now)
+        try await setup.database.restoreEntries(deleted, items: items, at: StoreFixture.now)
 
         #expect(try await setup.database.entryItems(of: entry.id) == items)
     }

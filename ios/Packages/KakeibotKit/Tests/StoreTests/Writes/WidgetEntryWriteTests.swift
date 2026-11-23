@@ -37,7 +37,7 @@ struct WidgetEntryWriteTests {
             at: setup.now
         )
 
-        try await setup.database.undoWidgetEntry(entry.id)
+        try await setup.database.undoWidgetEntry(entry.id, at: StoreFixture.now)
         let deleted = try await setup.database.entry(entry.id)
         let remembered = try await setup.database.setting(.widgetEntry)
 
@@ -136,7 +136,7 @@ struct WidgetEntryWriteTests {
         )
 
         let cleared = try setup.database.snapshot().noSpendDays
-        try await setup.database.undoWidgetEntry(entry.id)
+        try await setup.database.undoWidgetEntry(entry.id, at: StoreFixture.now)
         let restored = try setup.database.snapshot().noSpendDays
         let remembered = try await setup.database.setting(.widgetEntry)
 

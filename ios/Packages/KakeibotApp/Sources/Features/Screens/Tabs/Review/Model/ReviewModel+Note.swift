@@ -8,11 +8,6 @@ extension ReviewModel {
         let basis: String?
     }
 
-    var noteTrigger: NoteTrigger {
-        let basis = list == nil ? nil : closingFacts.basis
-        return NoteTrigger(period: period.commentKey, basis: basis)
-    }
-
     var closingNotes: ReviewClosingView.Notes {
         let range = period.range
         let history = (1...Self.averagePeriods).map { period.adding(-$0).range }
@@ -35,9 +30,14 @@ extension ReviewModel {
         )
     }
 
-    func refreshNotes(now: Date = Date()) async {
+    func noteTrigger(now: Date) -> NoteTrigger {
+        let basis = list == nil ? nil : closingFacts(now: now).basis
+        return NoteTrigger(period: period.commentKey, basis: basis)
+    }
+
+    func refreshNotes(now: Date) async {
         let key = Self.summaryKey(period.commentKey)
-        let facts = closingFacts
+        let facts = closingFacts(now: now)
         let basis = facts.basis
         let request = "\(key)\n\(basis)"
 
@@ -84,21 +84,6 @@ extension ReviewModel {
 private extension ReviewModel {
     static let dailyRatio = 0.8
 
-    var closingFacts: ReviewClosingFacts {
-        let content = closingContent
-        let range = content.range
-        let totalDays = range.lowerBound.days(until: range.upperBound) + 1
-        let recorded = Double(content.streak.days.count) / Double(totalDays)
-
-        return ReviewClosingFacts(
-            verdict: Self.verdict(of: content.pace),
-            more: content.rows.filter { $0.row.tone == .more }.map(\.name),
-            less: content.rows.filter { $0.row.tone == .less }.map(\.name),
-            isGoalAchieved: closingGoals().answer?.goal.isAchieved,
-            recordsDaily: recorded >= Self.dailyRatio
-        )
-    }
-
     static func summaryKey(_ key: String) -> String {
         "summary:\(key)"
     }
@@ -131,5 +116,20 @@ private extension ReviewModel {
         }
 
         return await ReviewNoteWriter.summary(facts: facts, scale: scale, categories: categories)
+    }
+
+    func closingFacts(now: Date) -> ReviewClosingFacts {
+        let content = closingContent
+        let range = content.range
+        let totalDays = range.lowerBound.days(until: range.upperBound) + 1
+        let recorded = Double(content.streak.days.count) / Double(totalDays)
+
+        return ReviewClosingFacts(
+            verdict: Self.verdict(of: content.pace),
+            more: content.rows.filter { $0.row.tone == .more }.map(\.name),
+            less: content.rows.filter { $0.row.tone == .less }.map(\.name),
+            isGoalAchieved: closingGoals(now: now).answer?.goal.isAchieved,
+            recordsDaily: recorded >= Self.dailyRatio
+        )
     }
 }

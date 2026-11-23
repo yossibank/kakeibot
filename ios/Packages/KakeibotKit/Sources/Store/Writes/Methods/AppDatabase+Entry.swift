@@ -46,7 +46,7 @@ public extension AppDatabase {
     func deleteEntry(
         _ id: Entry.ID,
         restoringNoSpend days: [NoSpendDay] = [],
-        at now: Date = Date()
+        at now: Date
     ) async throws -> [Entry] {
         try await deleteEntries([id], restoringNoSpend: days, at: now)
     }
@@ -54,7 +54,7 @@ public extension AppDatabase {
     func deleteEntries(
         _ ids: [Entry.ID],
         restoringNoSpend days: [NoSpendDay] = [],
-        at now: Date = Date()
+        at now: Date
     ) async throws -> [Entry] {
         try await writer.write { db in
             let entries = try Entry.fetchAll(db, keys: ids)

@@ -29,7 +29,8 @@ struct SyncShareTransferTests {
         try await partner.database.applySyncChanges(
             saved: [record],
             deleted: [],
-            systemFields: [key.recordID(in: zone): Data([1])]
+            systemFields: [key.recordID(in: zone): Data([1])],
+            at: StoreFixture.now
         )
 
         let entry = try await partner.database.syncRecord(for: key)
@@ -114,7 +115,8 @@ struct SyncShareTransferTests {
         try await inviter.database.applySyncChanges(
             saved: [SyncRecord(key: key, values: values)],
             deleted: [],
-            systemFields: [key.recordID(in: zone): Data([1])]
+            systemFields: [key.recordID(in: zone): Data([1])],
+            at: StoreFixture.now
         )
 
         let local = try await inviter.database.syncRecord(for: key)

@@ -70,7 +70,7 @@ public extension SyncModel {
 
         await workOnWallet(id, failure: Self.leaveFailedMessage) {
             try await cloud.leaveShare(id, item.ownerName)
-            try await database.endSharing(id)
+            try await database.endSharing(id, at: Date())
         }
     }
 }
@@ -110,7 +110,7 @@ private extension SyncModel {
     func endShare(_ id: Wallet.ID) async {
         await workOnWallet(id, failure: Self.stopFailedMessage) {
             try await cloud.deleteShare(id)
-            try await database.endSharing(id)
+            try await database.endSharing(id, at: Date())
         }
     }
 

@@ -7,7 +7,7 @@ import java.time.Instant
 suspend fun AppDatabase.Companion.file(
     context: Context,
     name: String = "kakeibot.sqlite",
-    now: Instant = Instant.now(),
+    now: Instant,
 ): AppDatabase {
     val appContext = context.applicationContext
     val path = appContext.getDatabasePath(name).absolutePath

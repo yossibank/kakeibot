@@ -47,7 +47,8 @@ private extension SyncModelTests {
             saved: [],
             deleted: [],
             systemFields: [id: Data([1])],
-            owners: [zone: "_owner"]
+            owners: [zone: "_owner"],
+            at: Date(timeIntervalSince1970: 1_791_000_000)
         )
 
         return try #require(try await joinedShares(in: database).first)
