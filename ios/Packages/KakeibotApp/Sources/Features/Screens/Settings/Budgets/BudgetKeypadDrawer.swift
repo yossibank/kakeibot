@@ -8,7 +8,7 @@ extension View {
         cleared: Binding<BudgetListModel.Cleared?> = .constant(nil)
     ) -> some View {
         modifier(
-            BudgetKeypadLayer(
+            BudgetKeypadDrawer(
                 cleared: cleared,
                 model: model
             )
@@ -16,7 +16,7 @@ extension View {
     }
 }
 
-private struct BudgetKeypadLayer: ViewModifier {
+private struct BudgetKeypadDrawer: ViewModifier {
     @Binding var cleared: BudgetListModel.Cleared?
 
     @State private var isConfirmingDiscard = false
@@ -40,7 +40,7 @@ private struct BudgetKeypadLayer: ViewModifier {
     }
 }
 
-private extension BudgetKeypadLayer {
+private extension BudgetKeypadDrawer {
     var drawer: some View {
         SettingsDrawer(model.editingTitle, showsDone: false) {
             Task {
@@ -127,7 +127,7 @@ private extension BudgetKeypadLayer {
     }
 }
 
-private extension BudgetKeypadLayer {
+private extension BudgetKeypadDrawer {
     func close() {
         if model.isChanged {
             isConfirmingDiscard = true

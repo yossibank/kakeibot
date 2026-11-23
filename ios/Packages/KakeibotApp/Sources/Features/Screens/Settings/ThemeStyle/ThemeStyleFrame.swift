@@ -8,7 +8,7 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
     @Environment(\.themeStyle) private var appStyle
 
     let title: String
-    let intro: ThemeStyleIntro
+    let intro: ThemeStyleIntroContent
     let hint: SettingsScreenFlag
     let model: ThemeStyleModel
     @ViewBuilder let preview: Preview

@@ -61,6 +61,32 @@
 
 モデルと画面の拡張は、同じ話題に同じ語を使う。資産のタブの拡張は、`Bills`・`Outlook`・`Reward`・`Wallets` で分ける。モデルも、まとめも、画面も同じ語にする。
 
+### 部品の語尾
+
+部品と値の型は、役割に合う語尾で終える。新しい型は、次の表から選ぶ。
+
+| 語尾 | 役割 | 例 |
+| --- | --- | --- |
+| `View` | 押し込んで開く画面の本体 | `BudgetListView` |
+| `Sheet` | シートで開く画面。OS の共有シートを出す型にも使う | `EntrySheet`・`SyncShareSheet` |
+| `EditSheet` | 1 件を編集するシート。モデルは `EditModel` で対にする | `WalletEditSheet` |
+| `Card` | 面を持つ 1 かたまり | `StampTallyCard` |
+| `RowCard` | 面を持つ横長の 1 件 | `WalletRowCard` |
+| `IntroCard` | 画面の上の説明カード。中身の値は `IntroContent` | `SyncIntroCard` |
+| `Tile` | 格子に並べる 1 枚 | `SettingsTile` |
+| `Row` | 一覧の 1 行 | `SettingsMenuRow` |
+| `Drawer` | 画面の下から出す引き出しと、それを重ねるモディファイア | `SettingsDrawer`・`BudgetKeypadDrawer` |
+| `Layer` | 画面に層を重ねるモディファイア | `SettingsLiftLayer` |
+| `Preview` | 設定の値を当てた見本 | `ThemePreview`・`HomeSectionPreview` |
+| `Choice` | 選ぶ値 | `AppIconChoice`・`SyncChoice` |
+| `Option` | 画面ごとの選択肢 1 件の部品 | `LaunchScreenOption` |
+| `Banner` | 画面の端に重ねて出す帯と、それを出すモディファイア | `NoticeBanner` |
+| `Notice` | 知らせの値とモデル | `ErrorNotice` |
+| `Note` | 部品に添える短い注記 | `SettingsEmptyNote` |
+| `Scene` | お知らせの使い方のコマ | `WhatsNewScene` |
+
+表から外れたまま残している型もある。`SettingsChoice` は値でなく、選ぶ 1 件の部品である。`EntryVoiceNotice` も値でなく、取り消しの付いた知らせの部品である。
+
 ## 🗺️ 概念ごとの置き場所
 
 1 つの概念のファイルは、層ごとに次の場所に置く。新しい概念を足すときも、同じ形にする。

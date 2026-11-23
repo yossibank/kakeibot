@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct HomeSectionThumbnail: View {
+struct HomeSectionPreview: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let section: HomeSection
@@ -20,7 +20,7 @@ struct HomeSectionThumbnail: View {
     }
 }
 
-private extension HomeSectionThumbnail {
+private extension HomeSectionPreview {
     @ViewBuilder
     var content: some View {
         switch section {
@@ -188,7 +188,7 @@ private extension HomeSectionThumbnail {
     }
 }
 
-private extension HomeSectionThumbnail {
+private extension HomeSectionPreview {
     static let size = CGSize(width: 56, height: 40)
     static let dialStroke = StrokeStyle(lineWidth: 3, lineCap: .round)
     static let recentWidths: [CGFloat] = [18, 12, 16]
