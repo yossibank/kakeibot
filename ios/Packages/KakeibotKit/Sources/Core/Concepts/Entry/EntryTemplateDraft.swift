@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EntryTemplateDraft: Hashable, Sendable {
+public struct EntryTemplateDraft: Draft, Hashable, Sendable {
     public var name: String
     public var type: Entry.Kind
     public var amount: Int?
@@ -125,21 +125,18 @@ public extension EntryTemplateDraft {
 
 private extension EntryTemplateDraft {
     var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
+        name.trimmed
     }
 
     var trimmedMemo: String? {
-        let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+        memo.trimmedOrNil
     }
 
     func validated() throws -> (
         categoryId: EntryCategory.ID,
         walletId: Wallet.ID
     ) {
-        if let problem = problems.first {
-            throw problem
-        }
+        try validate()
 
         guard
             let categoryId,

@@ -167,7 +167,7 @@ private extension AppDatabase {
     ) throws -> [EntryTag] {
         let existing = try EntryTag.filter(Column("category_id") == categoryId).fetchAll(db)
 
-        let names = drafts.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
+        let names = drafts.map(\.name.trimmed)
 
         guard Set(names).count == names.count else {
             throw EntryTagDraft.Problem.duplicateName

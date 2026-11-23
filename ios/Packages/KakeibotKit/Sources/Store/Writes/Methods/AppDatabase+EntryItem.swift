@@ -35,7 +35,7 @@ public extension AppDatabase {
         at store: String,
         on now: Date
     ) async throws {
-        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let name = name.trimmed
 
         guard !name.isEmpty else {
             return

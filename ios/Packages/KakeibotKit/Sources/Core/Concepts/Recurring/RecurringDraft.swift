@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RecurringDraft: Hashable, Sendable {
+public struct RecurringDraft: Draft, Hashable, Sendable {
     public var type: Entry.Kind
     public var amount: Int
     public var categoryId: EntryCategory.ID?
@@ -261,17 +261,14 @@ private extension RecurringDraft {
     }
 
     var trimmedMemo: String? {
-        let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+        memo.trimmedOrNil
     }
 
     func validated() throws -> (
         categoryId: EntryCategory.ID?,
         walletId: Wallet.ID
     ) {
-        if let problem = problems.first {
-            throw problem
-        }
+        try validate()
 
         guard let walletId else {
             throw Problem.missingWallet

@@ -69,7 +69,7 @@ private extension ReceiptFragment {
     static let maxSkew = 0.3
 
     var trimmedText: String {
-        text.trimmingCharacters(in: .whitespacesAndNewlines)
+        text.trimmed
     }
 
     var midX: Double {

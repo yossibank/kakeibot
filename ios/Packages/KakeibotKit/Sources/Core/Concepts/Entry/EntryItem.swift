@@ -73,7 +73,7 @@ public extension EntryItem {
 
 public extension EntryItem.Draft {
     var trimmedName: String {
-        name.trimmingCharacters(in: .whitespacesAndNewlines)
+        name.trimmed
     }
 }
 
