@@ -7,6 +7,7 @@ extension SyncModelTests {
         private(set) var shareCalls: [String] = []
 
         private var account: SyncAccount
+
         private let hasData: Bool
         private let cloudSummary: SyncSummary
         private let participants: [SyncParticipant]

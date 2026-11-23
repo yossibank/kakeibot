@@ -6,6 +6,7 @@ struct ReviewReportStat: View {
     let systemImage: String
     let value: String
     let unit: String
+
     var note: String?
     var badge: String?
     var progress: Double?

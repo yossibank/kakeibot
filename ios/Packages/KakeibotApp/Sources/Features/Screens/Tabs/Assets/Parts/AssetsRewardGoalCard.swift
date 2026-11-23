@@ -7,6 +7,7 @@ struct AssetsRewardGoalCard: View {
     let targetAmount: Int
     let remaining: Int
     let progress: Double
+
     var onBuy: (() -> Void)?
 
     var body: some View {

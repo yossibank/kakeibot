@@ -10,8 +10,11 @@ struct ThemeStyleChoices<Option: Hashable & Sendable, Sample: View>: View {
     let selection: Option
     let columns: Int
     let label: (Option) -> String
+
     var isLocked: (Option) -> Bool = { _ in false }
+
     @ViewBuilder let sample: (Option) -> Sample
+
     let choose: (Option) async -> Void
 
     var body: some View {

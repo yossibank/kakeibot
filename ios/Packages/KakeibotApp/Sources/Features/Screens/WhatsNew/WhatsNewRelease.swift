@@ -29,7 +29,9 @@ extension WhatsNewRelease {
         let shortTitle: String
         let lead: String
         let points: [String]
+
         var note: String?
+
         let steps: [Step]
         let action: Action?
         let actionTitle: String

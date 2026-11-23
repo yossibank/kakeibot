@@ -10,6 +10,7 @@ struct SettingsPagedGrid<Item: Identifiable, Tile: View>: View {
     let columns: Int
     let rows: Int
     let spacing: CGFloat
+
     @ViewBuilder let tile: (Item) -> Tile
 
     var body: some View {

@@ -8,8 +8,11 @@ import Store
 @Observable
 public final class RewardRuleEditModel {
     public var name = ""
+
     public private(set) var calculator = AmountCalculator()
+
     public internal(set) var isHidden = false
+
     public private(set) var hasLogs = false
 
     public internal(set) var errorNotice = ErrorNotice()

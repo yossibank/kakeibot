@@ -5,6 +5,7 @@ struct SettingsTileGrid<Item: Identifiable, Tile: View>: View {
     let items: [Item]
     let columns: Int
     let spacing: CGFloat
+
     @ViewBuilder let tile: (Item) -> Tile
 
     var body: some View {

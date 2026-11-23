@@ -4,6 +4,7 @@ import SwiftUI
 
 public struct AppIconListView: View {
     @Bindable private var model: AppIconListModel
+
     @State private var hintFlag: SettingsScreenFlag
 
     public init(

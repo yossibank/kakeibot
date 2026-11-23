@@ -4,6 +4,7 @@ struct SettingsPreviewSection<Preview: View>: View {
     let note: String
     let colorNote: String?
     let dot: Color?
+
     @ViewBuilder let preview: () -> Preview
 
     init(
