@@ -10,7 +10,7 @@ import UIKit
 struct SnapshotTests {
     @Test
     func render() async throws {
-        for (name, type, digits, deck) in Self.cases {
+        for (name, title, type, digits, deck) in Self.cases {
             let model = try await Self.model(type, digits: digits)
 
             let view = EntrySheet(model: model, deck: deck)
@@ -18,7 +18,12 @@ struct SnapshotTests {
                 .background(Color(uiColor: .systemBackground))
                 .environment(\.colorScheme, .light)
 
-            try Self.write(view, to: "\(name).png")
+            try Self.write(
+                view,
+                title: "記録の入力 › \(title)",
+                variant: Self.label(Self.phone),
+                to: "\(name).png"
+            )
 
             let dark = EntrySheet(model: model, deck: deck)
                 .frame(width: Self.phone.width, height: Self.phone.height)
@@ -26,7 +31,12 @@ struct SnapshotTests {
                 .environment(\.canScanReceipt, true)
                 .environment(\.palette, ThemePreset.black.palette)
 
-            try Self.write(dark, to: "\(name)-dark.png")
+            try Self.write(
+                dark,
+                title: "記録の入力 › \(title)",
+                variant: Self.label(Self.phone, isDark: true),
+                to: "\(name)-dark.png"
+            )
         }
 
         let startModel = try await Self.startModel()
@@ -36,7 +46,12 @@ struct SnapshotTests {
             .background(Palette.background)
             .environment(\.canScanReceipt, true)
 
-        try Self.write(start, to: "entry-start.png")
+        try Self.write(
+            start,
+            title: "記録の入力 › 開いた直後",
+            variant: Self.label(Self.phone),
+            to: "entry-start.png"
+        )
 
         let startDark = EntrySheet(model: startModel, deck: .category)
             .frame(width: Self.phone.width, height: Self.phone.height)
@@ -44,7 +59,12 @@ struct SnapshotTests {
             .environment(\.canScanReceipt, true)
             .environment(\.palette, ThemePreset.black.palette)
 
-        try Self.write(startDark, to: "entry-start-dark.png")
+        try Self.write(
+            startDark,
+            title: "記録の入力 › 開いた直後",
+            variant: Self.label(Self.phone, isDark: true),
+            to: "entry-start-dark.png"
+        )
 
         let model = try await Self.model(.expense, digits: Self.smallDigits)
         let style = ThemeStyle(
@@ -59,23 +79,28 @@ struct SnapshotTests {
             .environment(\.themeStyle, style)
             .environment(\.colorScheme, .dark)
 
-        try Self.write(mini, to: "entry-mini-large.png")
+        try Self.write(
+            mini,
+            title: "記録の入力 › 支出の金額",
+            variant: Self.label(Self.mini, isDark: true, isLarge: true),
+            to: "entry-mini-large.png"
+        )
 
-        let tallCases: [(String, CGSize, EntryDeck)] = [
-            ("entry-tall-expense", Self.tall, .amount),
-            ("entry-tall-date", Self.tall, .date),
-            ("entry-mini-date", Self.mini, .date),
-            ("entry-max-expense", Self.max, .amount),
-            ("entry-pad-form-expense", Self.padForm, .amount),
-            ("entry-pad-form-date", Self.padForm, .date),
-            ("entry-pad-page-expense", Self.padPage, .amount),
-            ("entry-pad-page-date", Self.padPage, .date),
-            ("entry-pad-tall-expense", Self.padTall, .amount),
-            ("entry-short-expense", Self.short, .amount),
-            ("entry-short-date", Self.short, .date)
+        let tallCases: [(String, String, CGSize, EntryDeck)] = [
+            ("entry-tall-expense", "支出の金額", Self.tall, .amount),
+            ("entry-tall-date", "日付の選択", Self.tall, .date),
+            ("entry-mini-date", "日付の選択", Self.mini, .date),
+            ("entry-max-expense", "支出の金額", Self.max, .amount),
+            ("entry-pad-form-expense", "支出の金額", Self.padForm, .amount),
+            ("entry-pad-form-date", "日付の選択", Self.padForm, .date),
+            ("entry-pad-page-expense", "支出の金額", Self.padPage, .amount),
+            ("entry-pad-page-date", "日付の選択", Self.padPage, .date),
+            ("entry-pad-tall-expense", "支出の金額", Self.padTall, .amount),
+            ("entry-short-expense", "支出の金額", Self.short, .amount),
+            ("entry-short-date", "日付の選択", Self.short, .date)
         ]
 
-        for (name, size, deck) in tallCases {
+        for (name, title, size, deck) in tallCases {
             let tallModel = try await Self.model(.expense, digits: Self.smallDigits)
 
             let tallView = EntrySheet(model: tallModel, deck: deck)
@@ -83,7 +108,12 @@ struct SnapshotTests {
                 .background(Color(uiColor: .systemBackground))
                 .environment(\.colorScheme, .light)
 
-            try Self.write(tallView, to: "\(name).png")
+            try Self.write(
+                tallView,
+                title: "記録の入力 › \(title)",
+                variant: Self.label(size),
+                to: "\(name).png"
+            )
         }
 
         let closedModel = try await Self.model(
@@ -99,7 +129,12 @@ struct SnapshotTests {
                 .background(Color(uiColor: .systemBackground))
                 .environment(\.colorScheme, .light)
 
-            try Self.write(edit, to: "\(name).png")
+            try Self.write(
+                edit,
+                title: "記録の入力 › 記録の編集",
+                variant: Self.label(size),
+                to: "\(name).png"
+            )
         }
 
         let itemModel = try await Self.model(
@@ -114,19 +149,19 @@ struct SnapshotTests {
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, .light)
 
-        try Self.write(itemSlip, to: "entry-item-slip.png")
+        try Self.write(itemSlip, title: "記録の入力 › 品目の入った紙のカード", to: "entry-item-slip.png")
 
         let itemSheet = EntryItemSheet(model: itemModel)
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .light)
 
-        try Self.write(itemSheet, to: "entry-item-sheet.png")
+        try Self.write(itemSheet, title: "記録の入力 › 品目のシート", to: "entry-item-sheet.png")
 
         let itemInput = EntryItemSheet(model: itemModel, isSlipOpen: true)
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .light)
 
-        try Self.write(itemInput, to: "entry-item-input.png")
+        try Self.write(itemInput, title: "記録の入力 › 品目のシート › 紙のカードを開いた時", to: "entry-item-input.png")
 
         let includedModel = try await Self.model(
             .expense,
@@ -139,20 +174,20 @@ struct SnapshotTests {
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .light)
 
-        try Self.write(included, to: "entry-item-included.png")
+        try Self.write(included, title: "記録の入力 › 品目のシート › 内税の品目", to: "entry-item-included.png")
 
         let emptySheet = EntryItemSheet(model: closedModel)
             .frame(width: Self.phone.width, height: Self.phone.height)
             .environment(\.colorScheme, .dark)
 
-        try Self.write(emptySheet, to: "entry-item-empty.png")
+        try Self.write(emptySheet, title: "記録の入力 › 品目のシート › 品目なし", to: "entry-item-empty.png")
 
         let help = EntryGuideCard(guide: .items) {}
             .frame(width: Self.phone.width, height: Self.phone.height)
             .background(Palette.background)
             .environment(\.colorScheme, .light)
 
-        try Self.write(help, to: "entry-item-help.png")
+        try Self.write(help, title: "記録の入力 › 品目の使い方", to: "entry-item-help.png")
 
         try await renderReceipt()
         try await renderSaveLabels()
@@ -161,17 +196,22 @@ struct SnapshotTests {
 }
 
 private extension SnapshotTests {
-    static let voiceCards: [(String, CGSize, (String, String))] = [
-        ("empty", phone, ("", "")),
-        ("listening", phone, ("昨日、駅前でランチ980円、", "カードで")),
-        ("long", narrow, ("昨日の夜、駅前の居酒屋で会社の同期と送別会をして、二次会のカラオケも含めて一人", "5,800円を楽天カードで払った")),
-        ("very-long", narrow, (String(repeating: "今日は朝からスーパーで買い物をして、", count: 5), "合計3,240円"))
+    static let voiceCards: [(String, String, CGSize, (String, String))] = [
+        ("empty", "聞き取りの待ち受け", phone, ("", "")),
+        ("listening", "聞き取り中", phone, ("昨日、駅前でランチ980円、", "カードで")),
+        ("long", "長い文", narrow, ("昨日の夜、駅前の居酒屋で会社の同期と送別会をして、二次会のカラオケも含めて一人", "5,800円を楽天カードで払った")),
+        (
+            "very-long",
+            "とても長い文",
+            narrow,
+            (String(repeating: "今日は朝からスーパーで買い物をして、", count: 5), "合計3,240円")
+        )
     ]
 
     func renderVoice() async throws {
         let today = LocalDate(Date(), in: .current)
 
-        for (name, size, text) in Self.voiceCards {
+        for (name, title, size, text) in Self.voiceCards {
             let model = try await Self.model(.expense, digits: [])
             let source = VoiceSnapshotSource()
             let flow = EntryVoiceFlow(dependencies: .snapshot(source))
@@ -196,7 +236,12 @@ private extension SnapshotTests {
             .background(Palette.panel)
             .environment(\.colorScheme, .dark)
 
-            try Self.write(card, to: "voice-card-\(name).png")
+            try Self.write(
+                card,
+                title: "声の入力 › \(title)",
+                variant: Self.label(size),
+                to: "voice-card-\(name).png"
+            )
         }
 
         let deniedModel = try await Self.model(.expense, digits: [])
@@ -219,24 +264,34 @@ private extension SnapshotTests {
         .frame(width: Self.phone.width)
         .background(Palette.panel)
 
-        try Self.write(deniedCard, to: "voice-card-denied.png")
+        try Self.write(
+            deniedCard,
+            title: "声の入力 › マイクが使えない時",
+            variant: Self.label(Self.phone),
+            to: "voice-card-denied.png"
+        )
 
-        let notices: [(String, EntryVoiceFlow.Notice)] = [
+        let notices: [(String, String, EntryVoiceFlow.Notice)] = [
             (
                 "applied",
+                "入れた",
                 .init(outcome: .applied, count: 4, text: "昨日、駅前の喫茶店でモーニングセットとコーヒーのおかわりで980円、カードで")
             ),
-            ("missing", .init(outcome: .missingAmount, count: 1, text: "昨日のコンビニ")),
-            ("unheard", .init(outcome: .unheard, count: 0, text: ""))
+            ("missing", "金額が読めない", .init(outcome: .missingAmount, count: 1, text: "昨日のコンビニ")),
+            ("unheard", "聞こえない", .init(outcome: .unheard, count: 0, text: ""))
         ]
 
-        for (name, notice) in notices {
+        for (name, title, notice) in notices {
             let view = EntryVoiceNotice(notice: notice, onUndo: {}, onClose: {})
                 .padding(20)
                 .frame(width: Self.narrow.width)
                 .background(Palette.background)
 
-            try Self.write(view, to: "voice-notice-\(name).png")
+            try Self.write(
+                view,
+                title: "声の入力 › 結果の知らせ › \(title)",
+                to: "voice-notice-\(name).png"
+            )
         }
 
         let listeningModel = try await Self.model(.expense, digits: [])
@@ -268,7 +323,7 @@ private extension SnapshotTests {
         .background(Palette.background)
         .environment(\.colorScheme, .dark)
 
-        try Self.write(listening, to: "voice-slip-listening.png")
+        try Self.write(listening, title: "記録の入力 › 声を聞いている紙のカード", to: "voice-slip-listening.png")
 
         let appliedModel = try await Self.model(.expense, digits: [])
         let wallet = try #require(appliedModel.wallets.last)
@@ -299,7 +354,7 @@ private extension SnapshotTests {
         .frame(width: Self.phone.width)
         .background(Palette.background)
 
-        try Self.write(applied, to: "voice-slip-applied.png")
+        try Self.write(applied, title: "記録の入力 › 声で入った紙のカード", to: "voice-slip-applied.png")
     }
 }
 
@@ -361,7 +416,12 @@ private extension SnapshotTests {
                 .environment(\.canScanReceipt, true)
                 .environment(\.colorScheme, .light)
 
-            try Self.write(view, to: "\(name).png")
+            try Self.write(
+                view,
+                title: "記録の入力 › 長い名前のテンプレートと口座",
+                variant: Self.label(size),
+                to: "\(name).png"
+            )
         }
 
         let pastModel = try await Self.model(
@@ -382,7 +442,12 @@ private extension SnapshotTests {
                 .environment(\.canScanReceipt, true)
                 .environment(\.colorScheme, .dark)
 
-            try Self.write(view, to: "\(name).png")
+            try Self.write(
+                view,
+                title: "記録の入力 › 過去の日付",
+                variant: Self.label(size),
+                to: "\(name).png"
+            )
         }
 
         let transferModel = try await Self.model(
@@ -398,12 +463,21 @@ private extension SnapshotTests {
             .background(Palette.background)
             .environment(\.colorScheme, .light)
 
-        try Self.write(transfer, to: "entry-transfer-narrow.png")
+        try Self.write(
+            transfer,
+            title: "記録の入力 › 振替の手数料と長い口座名",
+            variant: Self.label(Self.narrow),
+            to: "entry-transfer-narrow.png"
+        )
     }
 }
 
 private extension SnapshotTests {
-    static let receiptThemes: [ThemePreset] = [.white, .black, .rose]
+    static let receiptThemes: [(ThemePreset, String)] = [
+        (.white, "ホワイト"),
+        (.black, "ブラック"),
+        (.rose, "ローズ")
+    ]
 
     func renderReceipt() async throws {
         let suspectModel = try await Self.model(
@@ -419,7 +493,7 @@ private extension SnapshotTests {
             hasTemplates: true
         )
 
-        for theme in Self.receiptThemes {
+        for (theme, label) in Self.receiptThemes {
             let palette = theme.palette
             let name = theme.rawValue
 
@@ -467,26 +541,38 @@ private extension SnapshotTests {
 
             try Self.write(
                 drawer.environment(\.palette, palette),
+                title: "記録の入力 › レシートの読み取り › 入力シート",
+                variant: "テーマ \(label)",
                 to: "entry-receipt-drawer-\(name).png"
             )
             try Self.write(
                 guide.environment(\.palette, palette),
+                title: "レシートの読み取り › 案内のカード",
+                variant: "テーマ \(label)",
                 to: "entry-receipt-guide-\(name).png"
             )
             try Self.write(
                 reading.environment(\.palette, palette),
+                title: "レシートの読み取り › 読み取り中のカード",
+                variant: "テーマ \(label)",
                 to: "entry-receipt-reading-\(name).png"
             )
             try Self.write(
                 suspect.environment(\.palette, palette),
+                title: "記録の入力 › 品目のシート › 読み違えの候補",
+                variant: "テーマ \(label)",
                 to: "entry-item-suspect-\(name).png"
             )
             try Self.write(
                 buttons.environment(\.palette, palette),
+                title: "レシートの読み取り › ボタン（残り回数別）",
+                variant: "テーマ \(label)",
                 to: "entry-receipt-buttons-\(name).png"
             )
             try Self.write(
                 arts.environment(\.palette, palette),
+                title: "レシートの読み取り › 案内の絵",
+                variant: "テーマ \(label)",
                 to: "entry-receipt-arts-\(name).png"
             )
         }
@@ -509,15 +595,15 @@ private extension SnapshotTests {
     static let largeDigits = (2...9).reversed().map(AmountCalculator.Key.digit)
     static let itemDigits: [AmountCalculator.Key] = [.digit(6), .digit(6), .digit(6)]
 
-    static let cases: [(String, Entry.Kind, [AmountCalculator.Key], EntryDeck)] = [
-        ("entry-expense", .expense, smallDigits, .amount),
-        ("entry-category", .expense, [], .category),
-        ("entry-wallet", .expense, smallDigits, .wallet(.source)),
-        ("entry-date", .expense, smallDigits, .date),
-        ("entry-transfer", .transfer, smallDigits, .amount),
-        ("entry-transfer-empty", .transfer, [], .transfer),
-        ("entry-fee", .transfer, smallDigits, .fee),
-        ("entry-expense-large", .expense, largeDigits, .amount)
+    static let cases: [(String, String, Entry.Kind, [AmountCalculator.Key], EntryDeck)] = [
+        ("entry-expense", "支出の金額", .expense, smallDigits, .amount),
+        ("entry-category", "カテゴリの選択", .expense, [], .category),
+        ("entry-wallet", "口座の選択", .expense, smallDigits, .wallet(.source)),
+        ("entry-date", "日付の選択", .expense, smallDigits, .date),
+        ("entry-transfer", "振替の金額", .transfer, smallDigits, .amount),
+        ("entry-transfer-empty", "振替の口座の選択", .transfer, [], .transfer),
+        ("entry-fee", "振替の手数料", .transfer, smallDigits, .fee),
+        ("entry-expense-large", "支出の大きな金額", .expense, largeDigits, .amount)
     ]
 
     static let includedReading = ReceiptReading(
@@ -542,6 +628,20 @@ private extension SnapshotTests {
             EntryItem.Draft(name: "ヨーグルト", amount: 414)
         ]
     )
+
+    static func label(
+        _ size: CGSize,
+        isDark: Bool = false,
+        isLarge: Bool = false
+    ) -> String {
+        var parts = ["幅 \(Int(size.width))", "高さ \(Int(size.height))", isDark ? "ダーク" : "ライト"]
+
+        if isLarge {
+            parts.append("文字大")
+        }
+
+        return parts.joined(separator: "・")
+    }
 
     static func model(
         _ type: Entry.Kind,
@@ -685,6 +785,8 @@ private extension SnapshotTests {
 
     static func write(
         _ view: some View,
+        title: String,
+        variant: String = "",
         to name: String
     ) throws {
         let renderer = ImageRenderer(content: view)
@@ -695,5 +797,7 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: name)
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(directory: directory, file: name, title: title, variant: variant)
     }
 }

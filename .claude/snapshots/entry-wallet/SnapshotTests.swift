@@ -17,20 +17,24 @@ struct SnapshotTests {
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, .light)
 
-        try Self.write(view, to: "wallet.png")
+        try Self.write(view, title: "記録の入力 › 口座の選択", to: "wallet.png")
     }
 
     @Test
     func renderCard() async throws {
         let model = try await Self.model(withCard: true)
 
-        try Self.write(Self.sheet(model), to: "wallet-card.png")
+        try Self.write(Self.sheet(model), title: "記録の入力 › 口座の選択 › カードの引き落とし", to: "wallet-card.png")
 
         let later = try #require(model.billChoices.dropFirst().first?.date)
 
         model.selectBill(later)
 
-        try Self.write(Self.sheet(model), to: "wallet-card-shifted.png")
+        try Self.write(
+            Self.sheet(model),
+            title: "記録の入力 › 口座の選択 › 引き落とし日を変えた時",
+            to: "wallet-card-shifted.png"
+        )
     }
 }
 
@@ -101,6 +105,7 @@ private extension SnapshotTests {
 
     static func write(
         _ view: some View,
+        title: String,
         to name: String
     ) throws {
         let renderer = ImageRenderer(content: view)
@@ -111,5 +116,7 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: name)
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(directory: directory, file: name, title: title, variant: "")
     }
 }

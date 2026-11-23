@@ -55,15 +55,23 @@ struct SnapshotTests {
         await stampEdit.load()
         await ruleEdit.load()
 
-        let editSheets: [(String, AnyView)] = [
-            ("settings-category-edit", AnyView(CategoryEditSheet(model: categoryEdit))),
-            ("settings-stamp-edit", AnyView(StampEditSheet(model: stampEdit))),
-            ("settings-reward-edit", AnyView(RewardRuleEditSheet(model: ruleEdit)))
+        let editSheets: [(String, String, AnyView)] = [
+            (
+                "settings-category-edit",
+                "設定 › カテゴリの編集",
+                AnyView(CategoryEditSheet(model: categoryEdit))
+            ),
+            ("settings-stamp-edit", "設定 › スタンプの編集", AnyView(StampEditSheet(model: stampEdit))),
+            (
+                "settings-reward-edit",
+                "設定 › ごほうびの決まりの編集",
+                AnyView(RewardRuleEditSheet(model: ruleEdit))
+            )
         ]
 
-        for (name, view) in editSheets {
+        for (name, title, view) in editSheets {
             for variant in Self.variants {
-                try Self.write(view.frame(height: 1000), variant: variant, to: name)
+                try Self.write(view.frame(height: 1000), variant: variant, title: title, to: name)
             }
         }
         let reminderView = ReminderView(model: reminder)
@@ -97,6 +105,7 @@ struct SnapshotTests {
                 try Self.write(
                     RecurringListView(model: recurring),
                     variant: variant,
+                    title: "設定 › 固定費 › \(Self.kindTitle(type))",
                     to: "settings-recurring-\(type.rawValue)"
                 )
             }
@@ -114,11 +123,13 @@ struct SnapshotTests {
             try Self.write(
                 TemplateEditSheet(model: templateEdit).frame(height: 1000),
                 variant: variant,
+                title: "設定 › テンプレートの編集",
                 to: "settings-template-edit"
             )
             try Self.write(
                 RecurringEditSheet(model: recurringEdit).frame(height: 1000),
                 variant: variant,
+                title: "設定 › 固定費の編集",
                 to: "settings-recurring-edit"
             )
         }
@@ -137,11 +148,13 @@ struct SnapshotTests {
             try Self.write(
                 RecurringQuickCard(model: expenseEdit) { _ in }.padding(20),
                 variant: variant,
+                title: "設定 › 固定費 › すぐ足す › 支出",
                 to: "settings-recurring-quick-expense"
             )
             try Self.write(
                 RecurringQuickCard(model: transferEdit) { _ in }.padding(20),
                 variant: variant,
+                title: "設定 › 固定費 › すぐ足す › 振替",
                 to: "settings-recurring-quick-transfer"
             )
         }
@@ -152,6 +165,7 @@ struct SnapshotTests {
             try Self.write(
                 RecurringQuickCard(model: transferEdit) { _ in }.padding(20),
                 variant: variant,
+                title: "設定 › 固定費 › すぐ足す › カードの引き落とし",
                 to: "settings-recurring-quick-card-bill"
             )
         }
@@ -177,6 +191,7 @@ struct SnapshotTests {
             try Self.write(
                 RecurringEditSheet(model: loanEdit).frame(height: 1900),
                 variant: variant,
+                title: "設定 › 固定費の編集 › 返済",
                 to: "settings-recurring-loan"
             )
         }
@@ -205,16 +220,19 @@ struct SnapshotTests {
             try Self.write(
                 TemplateEditSheet(model: templateEditing).frame(height: 1000),
                 variant: variant,
+                title: "設定 › テンプレートの編集 › 保存済み",
                 to: "settings-template-edit-editing"
             )
             try Self.write(
                 BudgetListView(model: budgetDrawer).frame(height: 852),
                 variant: variant,
+                title: "設定 › 予算 › 提案",
                 to: "settings-budgets-suggestions"
             )
             try Self.write(
                 WalletEditSheet(model: minusWallet).frame(height: 1000),
                 variant: variant,
+                title: "設定 › 口座の編集 › マイナスの残高",
                 to: "settings-wallet-edit-minus"
             )
         }
@@ -226,27 +244,50 @@ struct SnapshotTests {
             try Self.write(
                 TemplateQuickCard(model: templateEdit) { _ in }.padding(20),
                 variant: variant,
+                title: "設定 › テンプレート › 引き落とし",
                 to: "settings-template-bill"
             )
             try Self.write(
                 RecurringQuickCard(model: recurringEdit) { _ in }.padding(20),
                 variant: variant,
+                title: "設定 › 固定費 › 引き落とし",
                 to: "settings-recurring-bill"
             )
         }
 
         for variant in Self.variants {
-            try Self.write(sheet, variant: variant, to: "settings")
-            try Self.write(wallets, variant: variant, to: "settings-wallets")
-            try Self.write(rules, variant: variant, to: "settings-rewards")
-            try Self.write(categories, variant: variant, to: "settings-categories")
-            try Self.write(walletSheet, variant: variant, to: "settings-wallet-edit")
-            try Self.write(reminderView, variant: variant, to: "settings-reminder")
-            try Self.write(monthStartView, variant: variant, to: "settings-month-start")
-            try Self.write(budgetView, variant: variant, to: "settings-budgets")
+            try Self.write(sheet, variant: variant, title: "設定 › メニュー", to: "settings")
+            try Self.write(wallets, variant: variant, title: "設定 › 口座", to: "settings-wallets")
+            try Self.write(rules, variant: variant, title: "設定 › ごほうびの決まり", to: "settings-rewards")
+            try Self.write(
+                categories,
+                variant: variant,
+                title: "設定 › カテゴリ",
+                to: "settings-categories"
+            )
+            try Self.write(
+                walletSheet,
+                variant: variant,
+                title: "設定 › 口座の編集",
+                to: "settings-wallet-edit"
+            )
+            try Self.write(
+                reminderView,
+                variant: variant,
+                title: "設定 › 通知",
+                to: "settings-reminder"
+            )
+            try Self.write(
+                monthStartView,
+                variant: variant,
+                title: "設定 › 月の始まり",
+                to: "settings-month-start"
+            )
+            try Self.write(budgetView, variant: variant, title: "設定 › 予算", to: "settings-budgets")
             try Self.write(
                 WidgetGuideView(database: database),
                 variant: variant,
+                title: "設定 › ウィジェットの案内",
                 to: "settings-widget-guide"
             )
             try Self.write(
@@ -257,6 +298,7 @@ struct SnapshotTests {
                     size: .small
                 ),
                 variant: variant,
+                title: "設定 › ウィジェットの案内 › 小",
                 to: "settings-widget-guide-small"
             )
             try Self.write(
@@ -267,6 +309,7 @@ struct SnapshotTests {
                     size: .large
                 ),
                 variant: variant,
+                title: "設定 › ウィジェットの案内 › 大",
                 to: "settings-widget-guide-large"
             )
             try Self.write(
@@ -276,6 +319,7 @@ struct SnapshotTests {
                 }
                 .padding(16),
                 variant: variant,
+                title: "設定 › ウィジェットの案内 › すばやく記録",
                 to: "settings-widget-guide-quick"
             )
             try Self.write(
@@ -284,6 +328,7 @@ struct SnapshotTests {
                     place: .lockScreen
                 ),
                 variant: variant,
+                title: "設定 › ウィジェットの案内 › ロック画面",
                 to: "settings-widget-guide-lock"
             )
             try Self.write(
@@ -292,24 +337,33 @@ struct SnapshotTests {
                     place: .control
                 ),
                 variant: variant,
+                title: "設定 › ウィジェットの案内 › コントロール",
                 to: "settings-widget-guide-control"
             )
             try Self.write(
                 ProView(model: ProPurchaseModel(store: .unavailable)),
                 variant: variant,
+                title: "設定 › Pro",
                 to: "settings-pro"
             )
             try Self.write(
                 WhatsNewSheet(seenVersion: nil, revealsSteps: false) { _ in },
                 variant: variant,
+                title: "お知らせ",
                 to: "settings-whats-new"
             )
             try Self.write(
                 WhatsNewSheet(seenVersion: "1.1.0", version: "1.1.0", revealsSteps: false) { _ in },
                 variant: variant,
+                title: "お知らせ › 前の版",
                 to: "settings-whats-new-older"
             )
-            try Self.write(intros, variant: variant, to: "settings-intros")
+            try Self.write(
+                intros,
+                variant: variant,
+                title: "設定 › 同期とバックアップの案内",
+                to: "settings-intros"
+            )
         }
 
         let choice = SyncChoiceCard(
@@ -339,17 +393,30 @@ struct SnapshotTests {
             onClose: {}
         )
 
-        let squares: [(String, AnyView)] = [
-            ("settings-pro-square", AnyView(ProView(model: ProPurchaseModel(store: .unavailable)))),
-            ("settings-sync-choice-square", AnyView(choice.frame(height: 852))),
-            ("settings-sync-shared-square", AnyView(shared.frame(height: 852)))
+        let squares: [(String, String, AnyView)] = [
+            (
+                "settings-pro-square",
+                "設定 › Pro › 四角い角",
+                AnyView(ProView(model: ProPurchaseModel(store: .unavailable)))
+            ),
+            (
+                "settings-sync-choice-square",
+                "設定 › 同期 › 選ぶ › 四角い角",
+                AnyView(choice.frame(height: 852))
+            ),
+            (
+                "settings-sync-shared-square",
+                "設定 › 同期 › 共有中 › 四角い角",
+                AnyView(shared.frame(height: 852))
+            )
         ]
 
-        for (name, view) in squares {
+        for (name, title, view) in squares {
             for variant in Self.variants {
                 try Self.write(
                     view.environment(\.themeStyle.corner, .square),
                     variant: variant,
+                    title: title,
                     to: name
                 )
             }
@@ -363,6 +430,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -375,6 +454,14 @@ private extension SnapshotTests {
         Variant(name: "narrow", width: 320, scheme: .dark, textSize: .large),
         Variant(name: "pad", width: 704, scheme: .light, textSize: .standard)
     ]
+
+    static func kindTitle(_ kind: Entry.Kind) -> String {
+        switch kind {
+        case .expense: "支出"
+        case .income: "収入"
+        case .transfer: "振替"
+        }
+    }
 
     static func wait(until isReady: () -> Bool) async throws {
         for _ in 0..<300 where !isReady() {
@@ -474,6 +561,7 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -500,5 +588,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }

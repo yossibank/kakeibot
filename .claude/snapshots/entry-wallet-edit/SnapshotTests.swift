@@ -17,12 +17,14 @@ struct SnapshotTests {
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, .light)
 
-        try Self.write(view, to: "wallet-edit.png")
+        try Self.write(view, title: "記録の入力 › 口座の選択", to: "wallet-edit.png")
 
         let database = try AppDatabase.inMemory()
 
         for kind in [Wallet.Kind.cash, .card] {
             for (variant, width, textSize) in Self.variants {
+                let label = "幅 \(Int(width))" + (textSize == .standard ? "" : "・文字大")
+
                 let sheet = WalletEditSheet(
                     model: WalletEditModel(
                         database: database,
@@ -48,7 +50,12 @@ struct SnapshotTests {
                 .environment(\.themeStyle, style)
                 .environment(\.colorScheme, .light)
 
-                try Self.write(form, to: "wallet-kind-\(kind.rawValue)-\(variant).png")
+                try Self.write(
+                    form,
+                    title: "設定 › 口座の編集 › \(kind == .cash ? "現金" : "カード")の種類と残高",
+                    variant: "\(label)・ライト",
+                    to: "wallet-kind-\(kind.rawValue)-\(variant).png"
+                )
             }
         }
     }
@@ -79,6 +86,8 @@ private extension SnapshotTests {
 
     static func write(
         _ view: some View,
+        title: String,
+        variant: String = "",
         to name: String
     ) throws {
         let renderer = ImageRenderer(content: view)
@@ -89,5 +98,7 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: name)
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(directory: directory, file: name, title: title, variant: variant)
     }
 }

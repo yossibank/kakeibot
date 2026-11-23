@@ -36,7 +36,12 @@ struct SnapshotTests {
                     onDeleteEntries: { _ in }
                 )
 
-                try Self.write(view, variant: variant, to: "records-\(layout.rawValue)")
+                try Self.write(
+                    view,
+                    variant: variant,
+                    title: "記録 › \(layout == .calendar ? "カレンダー" : "一覧")",
+                    to: "records-\(layout.rawValue)"
+                )
             }
         }
 
@@ -44,7 +49,12 @@ struct SnapshotTests {
 
         let wide = Variant(name: "wide", width: 820, scheme: .light, textSize: .standard)
 
-        try Self.write(Self.recordsView(model), variant: wide, to: "records-calendar")
+        try Self.write(
+            Self.recordsView(model),
+            variant: wide,
+            title: "記録 › カレンダー",
+            to: "records-calendar"
+        )
 
         model.setLayout(.list)
 
@@ -64,7 +74,7 @@ struct SnapshotTests {
                 onDeleteEntries: { _ in }
             )
 
-            try Self.write(view, variant: variant, to: "records-selecting")
+            try Self.write(view, variant: variant, title: "記録 › 選んでいる時", to: "records-selecting")
         }
 
         let deletions = Self.deletions(in: model)
@@ -78,7 +88,12 @@ struct SnapshotTests {
                     .frame(height: 140)
                     .entryNotice(notice, above: 0)
 
-                try Self.write(view, variant: variant, to: "records-deleted-\(name)")
+                try Self.write(
+                    view,
+                    variant: variant,
+                    title: "記録 › 消した後 › \(Self.deletionTitle(name))",
+                    to: "records-deleted-\(name)"
+                )
             }
         }
 
@@ -98,7 +113,7 @@ struct SnapshotTests {
                 onDeleteEntries: { _ in }
             )
 
-            try Self.write(view, variant: variant, to: "records-previous-month")
+            try Self.write(view, variant: variant, title: "記録 › 前の月", to: "records-previous-month")
         }
 
         try await Self.writeSearchAndFilter(model, database: database)
@@ -114,7 +129,12 @@ struct SnapshotTests {
                 .frame(height: 560)
                 .background(Palette.background)
 
-                try Self.write(menu, variant: variant, to: "records-mark-menu-\(name)")
+                try Self.write(
+                    menu,
+                    variant: variant,
+                    title: "記録 › 印のメニュー › \(name == "below" ? "下に開く" : "上に開く")",
+                    to: "records-mark-menu-\(name)"
+                )
             }
         }
 
@@ -153,6 +173,8 @@ struct SnapshotTests {
                 try Self.write(
                     receipt,
                     variant: variant,
+                    title: "記録 › レシートの行",
+                    note: "テーマ \(Self.themeTitle(theme))",
                     to: "records-item-receipt-\(theme.rawValue)"
                 )
 
@@ -164,6 +186,8 @@ struct SnapshotTests {
                 try Self.write(
                     adjusted,
                     variant: variant,
+                    title: "記録 › 残高合わせの行",
+                    note: "テーマ \(Self.themeTitle(theme))",
                     to: "records-item-adjusted-\(theme.rawValue)"
                 )
 
@@ -179,6 +203,8 @@ struct SnapshotTests {
                 try Self.write(
                     included,
                     variant: variant,
+                    title: "記録 › 含めた行",
+                    note: "テーマ \(Self.themeTitle(theme))",
                     to: "records-item-included-\(theme.rawValue)"
                 )
             }
@@ -192,6 +218,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -237,7 +275,12 @@ private extension SnapshotTests {
         model.searchText = "サブスクの解約金"
 
         for variant in variants {
-            try write(recordsView(model), variant: variant, to: "records-search-empty")
+            try write(
+                recordsView(model),
+                variant: variant,
+                title: "記録 › 検索 › 見つからない",
+                to: "records-search-empty"
+            )
         }
 
         model.searchText = "発表会"
@@ -247,7 +290,12 @@ private extension SnapshotTests {
         model.filter = EntryFilter(categoryIds: [income.id])
 
         for variant in variants {
-            try write(recordsView(model), variant: variant, to: "records-search-filtered")
+            try write(
+                recordsView(model),
+                variant: variant,
+                title: "記録 › 検索 › 絞り込み",
+                to: "records-search-filtered"
+            )
         }
 
         model.filter = EntryFilter(categoryIds: [category])
@@ -257,7 +305,7 @@ private extension SnapshotTests {
             let sheet = RecordsFilterSheet(model: model)
                 .frame(height: 720)
 
-            try write(sheet, variant: variant, to: "records-filter-sheet")
+            try write(sheet, variant: variant, title: "記録 › 絞り込み", to: "records-filter-sheet")
         }
 
         model.filter = EntryFilter(categoryIds: [income.id])
@@ -266,7 +314,12 @@ private extension SnapshotTests {
             let sheet = RecordsFilterSheet(model: model)
                 .frame(height: 720)
 
-            try write(sheet, variant: variant, to: "records-filter-sheet-none")
+            try write(
+                sheet,
+                variant: variant,
+                title: "記録 › 絞り込み › なし",
+                to: "records-filter-sheet-none"
+            )
         }
 
         model.clearFilter()
@@ -418,9 +471,28 @@ private extension SnapshotTests {
         return database
     }
 
+    static func deletionTitle(_ name: String) -> String {
+        switch name {
+        case "long": "長いメモ"
+        case "short": "短いメモ"
+        default: "メモなし"
+        }
+    }
+
+    static func themeTitle(_ theme: ThemePreset) -> String {
+        switch theme {
+        case .white: "ホワイト"
+        case .black: "ブラック"
+        case .rose: "ローズ"
+        default: theme.rawValue
+        }
+    }
+
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
+        note: String = "",
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -447,5 +519,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: note.isEmpty ? variant.label : "\(variant.label)・\(note)"
+        )
     }
 }

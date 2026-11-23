@@ -97,16 +97,16 @@ struct SnapshotTests {
 
         let year = ReviewYearProgress(months: months, spent: 1_787_700, previousSpent: 1_842_000)
 
-        let cases: [(String, ReviewPace?, ReviewYearProgress?, [ReviewGoalItem])] = [
-            ("budget", budget, nil, [item]),
-            ("average", over, nil, []),
-            ("exceeded", exceeded, nil, []),
-            ("first", nil, nil, []),
-            ("year", nil, year, [])
+        let cases: [(String, String, ReviewPace?, ReviewYearProgress?, [ReviewGoalItem])] = [
+            ("budget", "予算と比べる", budget, nil, [item]),
+            ("average", "直近の平均と比べる", over, nil, []),
+            ("exceeded", "予算を超えた", exceeded, nil, []),
+            ("first", "初めての期間", nil, nil, []),
+            ("year", "今年の 12 か月", nil, year, [])
         ]
 
         for variant in Self.variants {
-            for (name, pace, year, goals) in cases {
+            for (name, title, pace, year, goals) in cases {
                 let view = ReviewProgressView(
                     pace: pace,
                     year: year,
@@ -123,7 +123,12 @@ struct SnapshotTests {
                 )
                 .padding(16)
 
-                try Self.write(view, variant: variant, to: "review-progress-\(name)")
+                try Self.write(
+                    view,
+                    variant: variant,
+                    title: "途中経過 › \(title)",
+                    to: "review-progress-\(name)"
+                )
             }
         }
     }
@@ -135,6 +140,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -151,6 +168,7 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -180,5 +198,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }

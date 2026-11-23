@@ -24,7 +24,7 @@ struct SnapshotTests {
 
         await model.refreshStoreReviewCard()
 
-        for kind in [ReviewKind.expense, .balance] {
+        for (kind, label) in [(ReviewKind.expense, "支出"), (.balance, "収支")] {
             model.setKind(kind)
 
             for variant in Self.variants {
@@ -37,7 +37,12 @@ struct SnapshotTests {
                     onOpenRecurrings: {}
                 )
 
-                try Self.write(view, variant: variant, to: "review-\(kind.rawValue)")
+                try Self.write(
+                    view,
+                    variant: variant,
+                    title: "振り返り › \(label)",
+                    to: "review-\(kind.rawValue)"
+                )
             }
         }
 
@@ -51,6 +56,18 @@ extension SnapshotTests {
         let width: CGFloat
         let scheme: ColorScheme
         let textSize: ThemeTextSize
+
+        var label: String {
+            var parts = ["幅 \(Int(width))", scheme == .dark ? "ダーク" : "ライト"]
+
+            switch textSize {
+            case .standard: break
+            case .small: parts.append("文字小")
+            case .large: parts.append("文字大")
+            }
+
+            return parts.joined(separator: "・")
+        }
     }
 }
 
@@ -164,6 +181,7 @@ private extension SnapshotTests {
     static func write(
         _ view: some View,
         variant: Variant,
+        title: String,
         to name: String
     ) throws {
         let style = ThemeStyle(
@@ -190,5 +208,12 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: "\(name)-\(variant.name).png")
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(
+            directory: directory,
+            file: "\(name)-\(variant.name).png",
+            title: title,
+            variant: variant.label
+        )
     }
 }

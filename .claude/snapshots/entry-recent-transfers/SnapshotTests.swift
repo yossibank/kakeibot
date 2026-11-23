@@ -13,7 +13,10 @@ struct SnapshotTests {
         let model = try await Self.model()
         let transfers = model.recentTransfers
 
-        for (suffix, preset) in [("light", ThemePreset.white), ("dark", .black)] {
+        for (suffix, label, preset) in [
+            ("light", "ライト", ThemePreset.white),
+            ("dark", "ダーク", .black)
+        ] {
             let view = EntryRecentTransfers(model: model, transfers: transfers) { _ in }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
@@ -21,7 +24,12 @@ struct SnapshotTests {
                 .background(Palette.background)
                 .environment(\.palette, preset.palette)
 
-            try Self.write(view, to: "recent-\(suffix).png")
+            try Self.write(
+                view,
+                title: "記録の入力 › 最近の振替",
+                variant: label,
+                to: "recent-\(suffix).png"
+            )
         }
     }
 }
@@ -90,6 +98,8 @@ private extension SnapshotTests {
 
     static func write(
         _ view: some View,
+        title: String,
+        variant: String = "",
         to name: String
     ) throws {
         let renderer = ImageRenderer(content: view)
@@ -100,5 +110,7 @@ private extension SnapshotTests {
         let url = URL(fileURLWithPath: directory).appending(path: name)
 
         try data.write(to: url)
+
+        try SnapshotIndex.record(directory: directory, file: name, title: title, variant: variant)
     }
 }
