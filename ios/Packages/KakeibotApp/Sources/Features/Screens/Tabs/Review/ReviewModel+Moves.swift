@@ -25,13 +25,13 @@ public extension ReviewModel {
 
         _ = recurrings
 
-        if let cached = moveCache[range] {
+        if let cached = cache.moves[range] {
             return cached
         }
 
         let made = moves(in: list)
 
-        moveCache[range] = made
+        cache.moves[range] = made
 
         return made
     }

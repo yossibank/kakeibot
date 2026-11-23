@@ -9,16 +9,14 @@ import Store
 public final class ReviewModel: ScreenModel {
     public var today: LocalDate {
         didSet {
-            moveCache = [:]
-            upcomingCache = [:]
-            closingCache = [:]
+            cache.invalidate(.today)
         }
     }
 
     public private(set) var scale: ReviewPeriod.Scale = .month
     public private(set) var kind: ReviewKind = .expense {
         didSet {
-            upcomingCache = [:]
+            cache.invalidate(.kind)
         }
     }
 
@@ -34,10 +32,7 @@ public final class ReviewModel: ScreenModel {
     public private(set) var list: EntryList? {
         didSet {
             entries = list?.entries ?? []
-            summaries = [:]
-            moveCache = [:]
-            upcomingCache = [:]
-            closingCache = [:]
+            cache.invalidate(.list)
         }
     }
 
@@ -54,28 +49,21 @@ public final class ReviewModel: ScreenModel {
 
     private(set) var noSpendDays: Set<LocalDate> = [] {
         didSet {
-            closingCache = [:]
+            cache.invalidate(.noSpendDays)
         }
     }
 
     private(set) var recurrings: [Recurring] = [] {
         didSet {
-            moveCache = [:]
-            upcomingCache = [:]
+            cache.invalidate(.recurrings)
         }
     }
 
-    @ObservationIgnored var moveCache: [ClosedRange<LocalDate>: [Move]] = [:]
-    @ObservationIgnored var upcomingCache: [ClosedRange<LocalDate>: Int] = [:]
-    @ObservationIgnored var closingCache: [ClosingKey: ReviewClosingView.Content] = [:]
+    @ObservationIgnored var cache = Cache()
     @ObservationIgnored var reasonRequests: Set<String> = []
     @ObservationIgnored var noteRequests: Set<String> = []
 
     let database: AppDatabase
-
-    @ObservationIgnored private var summaries: [
-        ClosedRange<LocalDate>: ReviewSummary
-    ] = [:]
 
     public init(
         database: AppDatabase,
@@ -318,13 +306,13 @@ private extension ReviewModel {
     static let saveFailedMessage = "保存できませんでした"
 
     func summary(in range: ClosedRange<LocalDate>) -> ReviewSummary {
-        if let summary = summaries[range] {
+        if let summary = cache.summaries[range] {
             return summary
         }
 
         let summary = ReviewSummary(entries: entries, in: range)
 
-        summaries[range] = summary
+        cache.summaries[range] = summary
 
         return summary
     }

@@ -18,13 +18,13 @@ extension ReviewModel {
             carryoverFrom: carryoverFrom
         )
 
-        if let cached = closingCache[key] {
+        if let cached = cache.closing[key] {
             return cached
         }
 
         let content = makeClosingContent()
 
-        closingCache[key] = content
+        cache.closing[key] = content
 
         return content
     }
