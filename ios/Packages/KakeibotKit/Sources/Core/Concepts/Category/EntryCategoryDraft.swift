@@ -22,9 +22,7 @@ public struct EntryCategoryDraft: Draft, Hashable, Sendable {
         _ category: EntryCategory,
         icon: Icon
     ) {
-        let mark = Mark(icon)
-
-        self.init(kind: category.kind, name: category.name, mark: mark, color: icon.color)
+        self.init(kind: category.kind, name: category.name, mark: icon.mark, color: icon.color)
     }
 }
 

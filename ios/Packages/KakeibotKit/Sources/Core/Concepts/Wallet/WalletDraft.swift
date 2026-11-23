@@ -34,12 +34,10 @@ public struct WalletDraft: Draft, Hashable, Sendable {
         _ wallet: Wallet,
         icon: Icon
     ) {
-        let mark = IconDraft.Mark(icon)
-
         self.init(
             kind: wallet.kind,
             name: wallet.name,
-            mark: mark,
+            mark: icon.mark,
             color: icon.color,
             initialBalance: wallet.initialBalance,
             loanAmount: wallet.loanAmount

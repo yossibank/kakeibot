@@ -13,30 +13,12 @@ public struct IconDraft: Draft, Hashable, Sendable {
     }
 
     public init(_ icon: Icon) {
-        let mark = Mark(icon)
-
-        self.init(mark: mark, color: icon.color)
+        self.init(mark: icon.mark, color: icon.color)
     }
 }
 
 public extension IconDraft {
-    enum Mark: Hashable, Sendable {
-        case glyph(Icon.Glyph)
-        case emoji(String)
-        case text(String)
-
-        public init(_ icon: Icon) {
-            let emoji = icon.emoji ?? ""
-
-            if let glyph = icon.glyph {
-                self = .glyph(glyph)
-            } else if !emoji.isEmpty {
-                self = .emoji(emoji)
-            } else {
-                self = .text(icon.text ?? "")
-            }
-        }
-    }
+    typealias Mark = Icon.Mark
 
     static let maxTextLength = 3
 
@@ -97,11 +79,7 @@ private extension IconDraft {
     }
 
     var isValidColor: Bool {
-        let digits = color.dropFirst()
-
-        return color.hasPrefix("#")
-            && digits.count == 6
-            && digits.allSatisfy(\.isHexDigit)
+        ThemeHex.rgb(color) != nil
     }
 
     var glyph: Icon.Glyph? {
