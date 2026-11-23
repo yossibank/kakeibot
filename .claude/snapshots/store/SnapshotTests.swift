@@ -449,8 +449,8 @@ private extension StorePage {
 
     var waves: [StoreWave] {
         let zoom = canvas.size.width / 320
-        let swing = min(zoom, 1)
-        let y = canvas.headerHeight - 12
+        let swing = canvas.size.width / 440
+        let y = canvas.headerHeight - 4
         let shift = canvas.size.width * 1.05 * CGFloat(index)
 
         return [
@@ -460,17 +460,17 @@ private extension StorePage {
                 period: 1008 * zoom,
                 phase: 0,
                 opacity: 0.75,
-                width: 2,
+                width: 2 * swing,
                 dash: []
             ),
             StoreWave(
-                y: y + 6 * swing,
+                y: y + 8 * swing,
                 amplitude: 9 * swing,
                 period: 1008 * zoom,
                 phase: 60 * zoom,
                 opacity: 0.35,
-                width: 1,
-                dash: [2, 12]
+                width: swing,
+                dash: [2 * swing, 12 * swing]
             )
         ].map { $0.shifted(by: shift) }
     }
