@@ -29,7 +29,11 @@
 
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 
-## 🧩 拡張のファイルの名前
+## 🏷️ 名前の付け方
+
+上の表で決まらない名前は、次の決まりで付ける。
+
+### 拡張のファイル
 
 拡張のファイル（`<型>+<役割>.swift`）は、`<型>` と `<役割>` を次の決まりで付ける。
 
@@ -55,7 +59,7 @@
 
 型をまたぐ文言は、拡張にせず、名前空間の `enum` の `<頭>Text` に置く。例は `BillText`・`PeriodText`・`RecurringText`・`ReviewText` である。
 
-モデルと画面の拡張は、同じ話題に同じ語を使う。資産のタブは、`AssetsModel`・`AssetsSummary`・`AssetsView` の拡張を `Bills`・`Outlook`・`Reward`・`Wallets` で分ける。
+モデルと画面の拡張は、同じ話題に同じ語を使う。資産のタブの拡張は、`Bills`・`Outlook`・`Reward`・`Wallets` で分ける。モデルも、まとめも、画面も同じ語にする。
 
 ## 🗺️ 概念ごとの置き場所
 
