@@ -181,8 +181,10 @@ extension RecurringEditModel {
             return
         }
 
-        repayment.isCountAuto = autoEndDate(of: plan) == end && plan.finalAmount == repayment
-            .manualFinal
+        let endsAsPlanned = autoEndDate(of: plan) == end
+        let finalsAsPlanned = plan.finalAmount == repayment.manualFinal
+
+        repayment.isCountAuto = endsAsPlanned && finalsAsPlanned
     }
 
     func loadLoanBalances() async throws {
