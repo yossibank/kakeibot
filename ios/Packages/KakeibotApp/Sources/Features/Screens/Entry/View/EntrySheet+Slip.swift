@@ -33,7 +33,7 @@ extension EntrySheet {
 
 private extension EntrySheet {
     var isBlankEntry: Bool {
-        !model.isEditing && model.amount <= 0
+        !model.output.isEditing && model.output.amount <= 0
     }
 
     var quickReceipt: (() -> Void)? {

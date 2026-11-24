@@ -7,7 +7,7 @@ struct EntryRouteRow: View {
     let onUse: (EntryModel.TransferRoute) -> Void
 
     var body: some View {
-        let routes = model.frequentRoutes
+        let routes = model.output.frequentRoutes
 
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
@@ -25,9 +25,10 @@ struct EntryRouteRow: View {
 
 private extension EntryRouteRow {
     func button(_ route: EntryModel.TransferRoute) -> some View {
-        let isApplied = model.walletId == route.walletId && model.toWalletId == route.toWalletId
-        let source = model.wallet(route.walletId)?.name ?? ""
-        let destination = model.wallet(route.toWalletId)?.name ?? ""
+        let isApplied = model.state.payment.walletId == route.walletId && model.state.payment
+            .toWalletId == route.toWalletId
+        let source = model.output.wallet(route.walletId)?.name ?? ""
+        let destination = model.output.wallet(route.toWalletId)?.name ?? ""
 
         return ChipButton(isSelected: isApplied) {
             onUse(route)

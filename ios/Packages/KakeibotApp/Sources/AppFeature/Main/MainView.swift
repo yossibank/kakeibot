@@ -85,6 +85,7 @@ struct MainView: View {
         _draft = State(
             initialValue: EntryModel(
                 database: database,
+                clock: clock,
                 date: today
             )
         )

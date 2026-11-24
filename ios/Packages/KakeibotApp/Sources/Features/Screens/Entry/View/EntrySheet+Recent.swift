@@ -5,8 +5,8 @@ import SwiftUI
 extension EntrySheet {
     @ViewBuilder
     var recentRow: some View {
-        if model.type == .transfer {
-            let transfers = model.recentTransfers
+        if model.state.type == .transfer {
+            let transfers = model.output.recentTransfers
 
             if !transfers.isEmpty {
                 EntryRecentTransfers(model: model, transfers: transfers) { transfer in
@@ -14,8 +14,8 @@ extension EntrySheet {
                 }
             }
         } else {
-            let templates = model.templates
-            let entries = model.recentEntries
+            let templates = model.output.templates
+            let entries = model.output.recentEntries
 
             if !templates.isEmpty || !entries.isEmpty {
                 EntryRecentRow(title: "よく使う") {
@@ -36,7 +36,7 @@ extension EntrySheet {
 
 private extension EntrySheet {
     func templateCard(_ template: EntryTemplate) -> some View {
-        let category = model.category(of: template)
+        let category = model.output.category(of: template)
 
         return EntryRecentCard(
             title: template.name,
@@ -47,13 +47,13 @@ private extension EntrySheet {
                 useTemplate(template)
             },
             mark: {
-                IconTile(model.icon(for: template), size: 32)
+                IconTile(model.output.icon(for: template), size: 32)
             }
         )
     }
 
     func recentCard(_ entry: Entry) -> some View {
-        let category = model.category(of: entry)
+        let category = model.output.category(of: entry)
         let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
         let named = memo == nil ? nil : category?.name
 
@@ -66,7 +66,7 @@ private extension EntrySheet {
                 useRecent(entry)
             },
             mark: {
-                IconTile(category.flatMap(model.icon(for:)), size: 32)
+                IconTile(category.flatMap(model.output.icon(for:)), size: 32)
             }
         )
     }
@@ -75,7 +75,7 @@ private extension EntrySheet {
         category: String?,
         walletId: Wallet.ID?
     ) -> String {
-        let wallet = model.wallet(walletId)?.name
+        let wallet = model.output.wallet(walletId)?.name
 
         return [category, wallet]
             .compactMap(\.self)

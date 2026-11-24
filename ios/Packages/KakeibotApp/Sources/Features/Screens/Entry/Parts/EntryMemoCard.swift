@@ -3,7 +3,7 @@ import DesignSystem
 import SwiftUI
 
 struct EntryMemoCard: View {
-    @Bindable var model: EntryModel
+    let model: EntryModel
 
     let isFocused: FocusState<Bool>.Binding
     let onDone: () -> Void
@@ -26,8 +26,8 @@ struct EntryMemoCard: View {
 
             TextField(
                 "メモ",
-                text: $model.memo,
-                prompt: Text(model.memoPrompt).foregroundStyle(Palette.hint),
+                text: Bindable(model.state).memo,
+                prompt: Text(model.output.memoPrompt).foregroundStyle(Palette.hint),
                 axis: .vertical
             )
             .lineLimit(1...4)
@@ -36,14 +36,14 @@ struct EntryMemoCard: View {
             .tint(Palette.accent)
             .focused(isFocused)
 
-            if !model.recentMemos.isEmpty {
+            if !model.input.recentMemos.isEmpty {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
-                        ForEach(model.recentMemos, id: \.self) { memo in
+                        ForEach(model.input.recentMemos, id: \.self) { memo in
                             suggestionButton(memo)
                         }
                     }
-                    .sharesTextScale(id: model.recentMemos)
+                    .sharesTextScale(id: model.input.recentMemos)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -59,7 +59,7 @@ struct EntryMemoCard: View {
 private extension EntryMemoCard {
     func suggestionButton(_ memo: String) -> some View {
         ChipButton {
-            model.memo = memo
+            model.state.memo = memo
         } content: {
             Text(memo)
                 .sharedTextScale()

@@ -14,7 +14,7 @@ extension EntryItemSheet {
 
                 TextField(
                     "店名",
-                    text: $model.store,
+                    text: Bindable(model.state).store,
                     prompt: Text("店名を入れる").foregroundStyle(Palette.hint)
                 )
                 .textFont(.subheadline, weight: .semibold)
@@ -27,7 +27,7 @@ extension EntryItemSheet {
 
             EntryReceiptRule(style: .dashed)
 
-            if model.items.isEmpty {
+            if model.state.items.list.isEmpty {
                 VStack(spacing: 4) {
                     Text("品目はまだありません")
                         .textFont(.subheadline)
@@ -40,7 +40,10 @@ extension EntryItemSheet {
                 .frame(maxWidth: .infinity, minHeight: 72)
             } else {
                 VStack(spacing: 0) {
-                    ForEach(Array(model.items.enumerated()), id: \.offset) { index, item in
+                    ForEach(
+                        Array(model.state.items.list.enumerated()),
+                        id: \.offset
+                    ) { index, item in
                         itemRow(item, at: index)
                             .id(index)
                             .transition(.move(edge: .top).combined(with: .opacity))
@@ -50,23 +53,23 @@ extension EntryItemSheet {
 
             EntryReceiptRule(style: .dashed)
 
-            summaryLine("小計", amount: model.itemTotals.subtotal)
+            summaryLine("小計", amount: model.output.itemTotals.subtotal)
 
-            if !model.itemTotals.taxes.isEmpty {
+            if !model.output.itemTotals.taxes.isEmpty {
                 taxModeLine
             }
 
-            if !model.itemTotals.taxes.isEmpty {
+            if !model.output.itemTotals.taxes.isEmpty {
                 EntryReceiptTaxBreakdown(
-                    taxes: model.itemTotals.taxes,
-                    taxIncluded: model.taxIncluded
+                    taxes: model.output.itemTotals.taxes,
+                    taxIncluded: model.state.items.taxIncluded
                 )
             }
 
-            if model.hasItemAdjustment {
+            if model.output.hasItemAdjustment {
                 adjustmentLine
 
-                if !model.suspectItemIndices.isEmpty {
+                if !model.output.suspectItemIndices.isEmpty {
                     suspectHint
                 }
             }
@@ -81,7 +84,7 @@ extension EntryItemSheet {
                 Spacer()
 
                 AmountText(
-                    model.amount,
+                    model.output.amount,
                     font: .size(.title, weight: .bold),
                     color: Palette.accentStrong
                 )
@@ -89,7 +92,7 @@ extension EntryItemSheet {
                 .minimumScaleFactor(0.5)
             }
 
-            if !model.items.isEmpty {
+            if !model.state.items.list.isEmpty {
                 HStack {
                     Text("お買上点数")
                         .textFont(.caption)
@@ -97,7 +100,7 @@ extension EntryItemSheet {
 
                     Spacer()
 
-                    Text("\(model.itemCount)点")
+                    Text("\(model.output.itemCount)点")
                         .textFont(.caption)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
@@ -124,7 +127,7 @@ extension EntryItemSheet {
                 .foregroundStyle(Palette.amber)
 
             Button {
-                model.adjustToItems()
+                model.state.adjustToItems()
             } label: {
                 Text("調整")
                     .textFont(.caption, weight: .semibold)
@@ -139,12 +142,12 @@ extension EntryItemSheet {
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
-            .disabled(!model.canAdjustToItems)
+            .disabled(!model.output.canAdjustToItems)
 
             Spacer()
 
             AmountText(
-                model.itemAdjustment,
+                model.output.itemAdjustment,
                 font: .style(.subheadline),
                 color: Palette.amber
             )
@@ -161,8 +164,8 @@ extension EntryItemSheet {
 
             CapsulePicker(
                 selection: Binding(
-                    get: { model.taxIncluded },
-                    set: { model.setTaxIncluded($0) }
+                    get: { model.state.items.taxIncluded },
+                    set: { model.state.setTaxIncluded($0) }
                 ),
                 options: Self.taxModeOptions,
                 size: .small
@@ -189,7 +192,7 @@ extension EntryItemSheet {
         at index: Int
     ) -> some View {
         let isEditing = isSlipOpen && editingIndex == index
-        let isSuspect = model.suspectItemIndices.contains(index)
+        let isSuspect = model.output.suspectItemIndices.contains(index)
         let isNegative = item.amount < 0
         let amountColor = isSuspect ? Palette.amber : isNegative ? Palette.rose : Palette.text
 

@@ -28,7 +28,7 @@ struct SnapshotTests {
 
         try Self.write(Self.sheet(model), title: "記録の入力 › 口座の選択 › カードの引き落とし", to: "wallet-card.png")
 
-        let later = try #require(model.billChoices.dropFirst().first?.date)
+        let later = try #require(model.output.billChoices.dropFirst().first?.date)
 
         model.selectBill(later)
 
@@ -59,12 +59,17 @@ private extension SnapshotTests {
         try database.insertDefaultsIfEmpty(at: now)
 
         let card = withCard ? try await addCard(to: database, from: date) : nil
-        let model = EntryModel(database: database, date: date, type: .expense)
+        let model = EntryModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            date: date,
+            type: .expense
+        )
 
         await model.load()
 
         if let card {
-            model.walletId = card.id
+            model.setWallet(card.id)
         }
 
         return model

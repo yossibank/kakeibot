@@ -4,14 +4,14 @@ import Store
 import SwiftUI
 
 struct EntryWalletDeck: View {
-    @Bindable var model: EntryModel
-
     @Environment(\.themeStyle.corner) private var corner
 
     @State private var isEditing = false
     @State private var isBillOpen = false
     @State private var isBillShown = false
     @State private var scrollPosition = ScrollPosition()
+
+    let model: EntryModel
 
     let role: Role
     let onChoose: (Wallet) -> Void
@@ -60,9 +60,9 @@ struct EntryWalletDeck: View {
             .scrollIndicators(.hidden)
             .scrollPosition($scrollPosition)
         }
-        .haptic(.selection, trigger: model.billMonth)
-        .onChange(of: model.walletId, initial: true) {
-            isBillOpen = model.billMonth != nil
+        .haptic(.selection, trigger: model.state.payment.billMonth)
+        .onChange(of: model.state.payment.walletId, initial: true) {
+            isBillOpen = model.state.payment.billMonth != nil
         }
         .onChange(of: billTrigger, initial: true) { old, new in
             showBills(from: old, to: new)
@@ -88,7 +88,7 @@ private extension EntryWalletDeck {
             if isBillOpen {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
-                        ForEach(model.billChoices) { choice in
+                        ForEach(model.output.billChoices) { choice in
                             billButton(choice)
                         }
                     }
@@ -123,7 +123,7 @@ private extension EntryWalletDeck {
                     .textFont(.subheadline)
                     .foregroundStyle(Palette.accent)
 
-                if let date = model.selectedBillDate {
+                if let date = model.output.selectedBillDate {
                     Text("\(date.monthDayText) に引き落とし")
                         .textFont(.subheadline, weight: .medium)
                         .foregroundStyle(Palette.text)
@@ -186,7 +186,7 @@ private extension EntryWalletDeck {
             }
         } label: {
             HStack(spacing: 8) {
-                IconImage(model.icon(for: wallet), size: 16)
+                IconImage(model.output.icon(for: wallet), size: 16)
                     .foregroundStyle(isSelected ? Palette.accent : Palette.subtext)
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -197,12 +197,12 @@ private extension EntryWalletDeck {
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
 
-                        if model.isShared(wallet) {
+                        if model.output.isShared(wallet) {
                             SharedMark()
                         }
                     }
 
-                    if let balance = model.balanceText(of: wallet) {
+                    if let balance = model.output.balanceText(of: wallet) {
                         Text(balance)
                             .textFont(.caption2)
                             .monospacedDigit()
@@ -235,7 +235,7 @@ private extension EntryWalletDeck {
     }
 
     func billButton(_ choice: EntryModel.BillChoice) -> some View {
-        let isSelected = model.selectedBillDate == choice.date
+        let isSelected = model.output.selectedBillDate == choice.date
         let titleColor = isSelected ? Palette.accentStrong : Palette.subtext
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let ring = isSelected ? Palette.accent : Palette.line
@@ -280,15 +280,15 @@ private extension EntryWalletDeck {
     ]
 
     var wallets: [Wallet] {
-        model.walletSections.flatMap(\.wallets)
+        model.output.walletSections.flatMap(\.wallets)
     }
 
     var showsBills: Bool {
-        role == .source && !model.billChoices.isEmpty && !isEditing
+        role == .source && !model.output.billChoices.isEmpty && !isEditing
     }
 
     var billTrigger: BillTrigger {
-        BillTrigger(walletId: model.walletId, showsBills: showsBills)
+        BillTrigger(walletId: model.state.payment.walletId, showsBills: showsBills)
     }
 
     var editTitle: String {
@@ -300,10 +300,10 @@ private extension EntryWalletDeck {
     }
 
     var shiftTitle: String? {
-        let choices = model.billChoices
+        let choices = model.output.billChoices
 
         guard
-            let chosen = choices.first(where: { $0.date == model.selectedBillDate }),
+            let chosen = choices.first(where: { $0.date == model.output.selectedBillDate }),
             chosen.date != choices.first?.date
         else {
             return nil
@@ -313,8 +313,8 @@ private extension EntryWalletDeck {
     }
 
     var billNote: String? {
-        let choices = model.billChoices
-        let chosen = choices.first { $0.date == model.selectedBillDate }
+        let choices = model.output.billChoices
+        let chosen = choices.first { $0.date == model.output.selectedBillDate }
 
         guard let chosen else {
             return nil
@@ -333,26 +333,26 @@ private extension EntryWalletDeck {
 
     var title: String {
         switch role {
-        case .source: model.walletTitle
+        case .source: model.output.walletTitle
         case .destination: EntryModel.destinationTitle
         }
     }
 
     var selectedId: Wallet.ID? {
         switch role {
-        case .source: model.walletId
-        case .destination: model.toWalletId
+        case .source: model.state.payment.walletId
+        case .destination: model.state.payment.toWalletId
         }
     }
 
     var takenId: Wallet.ID? {
-        guard model.type == .transfer else {
+        guard model.state.type == .transfer else {
             return nil
         }
 
         switch role {
-        case .source: return model.toWalletId
-        case .destination: return model.walletId
+        case .source: return model.state.payment.toWalletId
+        case .destination: return model.state.payment.walletId
         }
     }
 

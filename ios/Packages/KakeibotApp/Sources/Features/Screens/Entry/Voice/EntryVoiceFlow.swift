@@ -143,7 +143,7 @@ extension EntryVoiceFlow {
         startCount += 1
 
         do {
-            try await source.start(hints: model.voiceHints) { [weak self] event in
+            try await source.start(hints: model.output.voiceHints) { [weak self] event in
                 self?.receive(event)
             }
         } catch {
@@ -155,7 +155,7 @@ extension EntryVoiceFlow {
 
             reset()
             endCount += 1
-            model.errorNotice.show(Self.failedMessage)
+            model.state.errorNotice.show(Self.failedMessage)
             return
         }
 
@@ -235,7 +235,7 @@ private extension EntryVoiceFlow {
         let candidates = [primary] + transcript.alternatives
 
         let withAmount = candidates.first { candidate in
-            session.model.voiceReading(from: candidate, today: session.today, choice: nil)
+            session.model.output.voiceReading(from: candidate, today: session.today, choice: nil)
                 .amount != nil
         }
 
@@ -257,7 +257,7 @@ private extension EntryVoiceFlow {
             self.transcript = transcript
 
             if let session {
-                preview = session.model.voiceReading(
+                preview = session.model.output.voiceReading(
                     from: transcript.text,
                     today: session.today,
                     choice: nil
@@ -321,13 +321,13 @@ private extension EntryVoiceFlow {
 
         let question = EntryVoiceQuestion(
             text: text,
-            categories: model.categories.map(\.name),
-            wallets: model.wallets.map(\.name),
-            examples: model.voiceExamples(for: text)
+            categories: model.output.categories.map(\.name),
+            wallets: model.output.wallets.map(\.name),
+            examples: model.output.voiceExamples(for: text)
         )
 
         let choice = await dependencies.choose(question)
-        let reading = model.voiceReading(from: text, today: session.today, choice: choice)
+        let reading = model.output.voiceReading(from: text, today: session.today, choice: choice)
 
         guard !reading.isEmpty else {
             show(Notice(outcome: .unheard, count: 0, text: text))

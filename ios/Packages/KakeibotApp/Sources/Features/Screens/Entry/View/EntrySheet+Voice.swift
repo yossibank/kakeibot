@@ -5,7 +5,7 @@ import UIKit
 
 extension EntrySheet {
     var showsVoiceButton: Bool {
-        voice.isAvailable && model.showsVoice
+        voice.isAvailable && model.output.showsVoice
     }
 
     var voiceCard: some View {

@@ -46,7 +46,7 @@ extension EntryReceiptFlow {
         for model: EntryModel,
         isPro: Bool
     ) {
-        guard model.canReadReceipt(isPro: isPro) else {
+        guard model.output.canReadReceipt(isPro: isPro) else {
             offer = Self.offerFeature
             return
         }
@@ -54,7 +54,7 @@ extension EntryReceiptFlow {
         offer = nil
         hidesGuide = false
         prepare()
-        step = model.showsReceiptGuide ? .guide : .camera
+        step = model.output.showsReceiptGuide ? .guide : .camera
     }
 
     func confirmGuide() {
@@ -89,14 +89,14 @@ extension EntryReceiptFlow {
         step = nil
 
         guard !reading.isEmpty else {
-            model.errorNotice.show(Self.unreadMessage)
+            model.state.errorNotice.show(Self.unreadMessage)
             return .unread
         }
 
         let hasAmount = await model.apply(reading)
 
         if reading.items.isEmpty, hasAmount {
-            model.errorNotice.inform(Self.totalMessage)
+            model.state.errorNotice.inform(Self.totalMessage)
         }
 
         return .read(itemCount: reading.items.count, hasAmount: hasAmount)

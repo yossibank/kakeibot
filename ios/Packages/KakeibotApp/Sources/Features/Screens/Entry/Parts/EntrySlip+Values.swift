@@ -93,8 +93,8 @@ extension EntrySlip {
 
     var routeValue: String {
         guard
-            let source = model.wallet(model.walletId)?.name,
-            let destination = model.wallet(model.toWalletId)?.name
+            let source = model.output.wallet(model.state.payment.walletId)?.name,
+            let destination = model.output.wallet(model.state.payment.toWalletId)?.name
         else {
             return "口座を選ぶ"
         }
@@ -103,16 +103,16 @@ extension EntrySlip {
     }
 
     var feeValue: String {
-        model.fee > 0 ? Yen.text(model.fee) : "なし"
+        model.output.fee > 0 ? Yen.text(model.output.fee) : "なし"
     }
 
     var dateValue: String {
-        let day = EntryModel.shortDateText(for: model.date, today: today)
-        return "\(day)（\(model.date.weekday.shortName)）"
+        let day = EntryModel.shortDateText(for: model.state.payment.date, today: today)
+        return "\(day)（\(model.state.payment.date.weekday.shortName)）"
     }
 
     var memoText: String {
-        model.memo.isEmpty ? "\(model.memoPrompt)をメモ" : model.memo
+        model.state.memo.isEmpty ? "\(model.output.memoPrompt)をメモ" : model.state.memo
     }
 
     var memoColor: Color {
@@ -120,20 +120,20 @@ extension EntrySlip {
             return Palette.accent
         }
 
-        return model.memo.isEmpty ? Palette.hint : Palette.subtext
+        return model.state.memo.isEmpty ? Palette.hint : Palette.subtext
     }
 
     var showsItems: Bool {
-        model.showsItems && !model.items.isEmpty
+        model.output.showsItems && !model.state.items.list.isEmpty
     }
 
     var shownCategory: EntryCategory? {
         guard
             isListening,
             let id = preview?.categoryId,
-            let category = model.categories.first(where: { $0.id == id })
+            let category = model.output.categories.first(where: { $0.id == id })
         else {
-            return model.selectedCategory
+            return model.output.selectedCategory
         }
 
         return category
@@ -144,7 +144,7 @@ extension EntrySlip {
             return amount
         }
 
-        return model.amount
+        return model.output.amount
     }
 
     var isListening: Bool {
@@ -152,6 +152,6 @@ extension EntrySlip {
     }
 
     func isSelected(_ target: EntryDeck) -> Bool {
-        deck.field(for: model.type) == target
+        deck.field(for: model.state.type) == target
     }
 }

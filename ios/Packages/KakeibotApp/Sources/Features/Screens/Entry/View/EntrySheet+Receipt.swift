@@ -4,7 +4,7 @@ import SwiftUI
 
 extension EntrySheet {
     var showsReceiptButton: Bool {
-        model.showsReceipt && canScanReceipt
+        model.output.showsReceipt && canScanReceipt
     }
 
     var isScanningReceipt: Binding<Bool> {
@@ -73,11 +73,7 @@ private extension EntrySheet {
     func scanReceipt(_ pages: [CGImage]) async {
         let outcome = await receipt.scan(pages, into: model)
 
-        guard case let .read(itemCount, _) = outcome else {
-            return
-        }
-
-        guard itemCount > 0 else {
+        guard case let .read(itemCount, _) = outcome, itemCount > 0 else {
             return
         }
 

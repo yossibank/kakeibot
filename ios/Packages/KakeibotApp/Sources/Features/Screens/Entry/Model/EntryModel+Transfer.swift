@@ -18,182 +18,42 @@ public extension EntryModel {
     static let frequentRouteLimit = 6
     static let destinationTitle = "振替先"
 
-    var recentTransfers: [Entry] {
-        let fees = feesByTransfer
-
-        var seen: Set<String> = []
-
-        let unique = manualTransfers.filter { entry in
-            let route = "\(entry.walletId)>\(String(describing: entry.toWalletId))"
-            let key = "\(route)>\(entry.amount)>\(fees[entry.id] ?? 0)"
-            return seen.insert(key).inserted
-        }
-
-        return Array(unique.prefix(Self.recentTransferLimit))
-    }
-
-    var frequentRoutes: [TransferRoute] {
-        let routes = manualTransfers.compactMap(Self.route(of:))
-        let counts = Dictionary(routes.map { ($0, 1) }, uniquingKeysWith: +)
-
-        var seen: Set<TransferRoute> = []
-
-        let ordered = routes.filter { seen.insert($0).inserted }
-
-        let sorted = ordered.enumerated().sorted { lhs, rhs in
-            let left = counts[lhs.element, default: 0]
-            let right = counts[rhs.element, default: 0]
-            return left == right ? lhs.offset < rhs.offset : left > right
-        }
-
-        return sorted.prefix(Self.frequentRouteLimit).map(\.element)
-    }
-
-    var isOverSourceBalance: Bool {
-        guard
-            type == .transfer,
-            amount > 0
-        else {
-            return false
-        }
-
-        guard let balance = wallet(walletId).flatMap(balance(of:)) else {
-            return false
-        }
-
-        return amount + fee > balance
-    }
-
-    var loanRemaining: Int? {
-        guard
-            type == .transfer,
-            let wallet = wallet(toWalletId),
-            wallet.kind == .loan,
-            let balance = balance(of: wallet),
-            balance < 0
-        else {
-            return nil
-        }
-
-        return -balance
-    }
-
-    func currentLine(of wallet: Wallet) -> BalanceLine? {
-        guard let balance = balance(of: wallet) else {
-            return nil
-        }
-
-        switch wallet.kind.role {
-        case .loan: return BalanceLine(title: "今の残り", amount: max(-balance, 0))
-        case .investment: return BalanceLine(title: "今の評価額", amount: balance)
-        case .onHand, .card: return BalanceLine(title: "残高", amount: balance)
-        }
-    }
-
-    func afterLine(
-        of wallet: Wallet,
-        isSource: Bool
-    ) -> BalanceLine? {
-        guard
-            type == .transfer,
-            amount > 0,
-            let balance = balance(of: wallet)
-        else {
-            return nil
-        }
-
-        let after = isSource ? balance - amount - fee : balance + amount
-        let shown = wallet.kind.role == .loan ? max(-after, 0) : after
-
-        return BalanceLine(title: afterTitle(of: wallet, isSource: isSource), amount: shown)
-    }
-
-    func idleAfterLine(
-        of wallet: Wallet,
-        isSource: Bool
-    ) -> BalanceLine? {
-        currentLine(of: wallet).map { current in
-            BalanceLine(title: afterTitle(of: wallet, isSource: isSource), amount: current.amount)
-        }
-    }
-
-    func afterTitle(
-        of wallet: Wallet,
-        isSource: Bool
-    ) -> String {
-        switch (wallet.kind.role, isSource) {
-        case (.loan, false): "返済後"
-        case (.investment, false): "積立後"
-        default: "振替後"
-        }
-    }
-
-    func fee(of transfer: Entry) -> Int {
-        let entries = history?.entries ?? []
-        return entries.first { $0.transferId == transfer.id }?.amount ?? 0
-    }
-
     func payOffLoan() {
-        guard let loanRemaining else {
+        guard let loanRemaining = output.loanRemaining else {
             return
         }
 
-        calculator = AmountCalculator(amount: loanRemaining)
+        state.keypad.setAmount(loanRemaining)
     }
 
     func applyRoute(_ route: TransferRoute) {
-        walletId = route.walletId
-        toWalletId = route.toWalletId
+        setWallet(route.walletId)
+        state.setDestination(route.toWalletId)
     }
 
     func applyTransfer(_ entry: Entry) {
-        walletId = entry.walletId
-        toWalletId = entry.toWalletId
-        calculator = AmountCalculator(amount: entry.amount)
-        feeCalculator = AmountCalculator(amount: fee(of: entry))
+        setWallet(entry.walletId)
+        state.setDestination(entry.toWalletId)
+        state.keypad.setAmount(entry.amount)
+        state.keypad.setFee(output.fee(of: entry))
     }
 
     func swapWallets() {
-        let source = walletId
-        walletId = toWalletId
-        toWalletId = source
+        let source = state.payment.walletId
+        setWallet(state.payment.toWalletId)
+        state.setDestination(source)
     }
 }
 
 extension EntryModel {
     func chooseDestination() {
+        let walletId = state.payment.walletId
+        let toWalletId = state.payment.toWalletId
+
         guard toWalletId == nil || toWalletId == walletId else {
             return
         }
 
-        toWalletId = wallets.first { $0.id != walletId }?.id
-    }
-}
-
-private extension EntryModel {
-    var manualTransfers: [Entry] {
-        let shown = Set(wallets.map(\.id))
-
-        return (history?.entries ?? [])
-            .filter { entry in
-                entry.type == .transfer
-                    && entry.recurringId == nil
-                    && entry.id != editingId
-                    && shown.contains(entry.walletId)
-                    && entry.toWalletId.map(shown.contains) == true
-            }
-            .sorted { $0.createdAt > $1.createdAt }
-    }
-
-    var feesByTransfer: [Entry.ID: Int] {
-        let fees = (history?.entries ?? []).compactMap { entry in
-            entry.transferId.map { ($0, entry.amount) }
-        }
-
-        return Dictionary(fees) { first, _ in first }
-    }
-
-    static func route(of entry: Entry) -> TransferRoute? {
-        entry.toWalletId.map { TransferRoute(walletId: entry.walletId, toWalletId: $0) }
+        state.setDestination(output.wallets.first { $0.id != walletId }?.id)
     }
 }

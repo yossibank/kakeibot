@@ -11,7 +11,7 @@ struct EntryVoiceFlowTests {
     func appliesSpokenFieldsAndUndoesThem() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
-        let wallet = try #require(model.wallets.last)
+        let wallet = try #require(model.output.wallets.last)
         let source = FakeVoiceSource()
         let flow = EntryVoiceFlow(dependencies: .fake(source))
         var applied = 0
@@ -25,13 +25,13 @@ struct EntryVoiceFlowTests {
         await flow.finish()
 
         #expect(previewAmount == 980)
-        #expect(model.amount == 980)
-        #expect(model.date == setup.date.adding(days: -1))
-        #expect(model.walletId == wallet.id)
-        #expect(model.store == "コンビニ")
-        #expect(model.isDateFromVoice)
-        #expect(model.isWalletFromVoice)
-        #expect(model.isMemoFromVoice)
+        #expect(model.output.amount == 980)
+        #expect(model.state.payment.date == setup.date.adding(days: -1))
+        #expect(model.state.payment.walletId == wallet.id)
+        #expect(model.state.store == "コンビニ")
+        #expect(model.output.isDateFromVoice)
+        #expect(model.output.isWalletFromVoice)
+        #expect(model.output.isMemoFromVoice)
         #expect(flow.notice?.outcome == .applied)
         #expect(flow.notice?.count == 4)
         #expect(flow.notice?.title == "声から 4 つ入れました")
@@ -41,10 +41,10 @@ struct EntryVoiceFlowTests {
 
         flow.undoLast(in: model)
 
-        #expect(model.amount == 0)
-        #expect(model.date == setup.date)
-        #expect(model.memo.isEmpty)
-        #expect(!model.isDateFromVoice)
+        #expect(model.output.amount == 0)
+        #expect(model.state.payment.date == setup.date)
+        #expect(model.state.memo.isEmpty)
+        #expect(!model.output.isDateFromVoice)
         #expect(flow.notice == nil)
     }
 
@@ -63,8 +63,8 @@ struct EntryVoiceFlowTests {
         source.say("昨日のコンビニ")
         await flow.finish()
 
-        #expect(model.amount == 0)
-        #expect(model.date == setup.date.adding(days: -1))
+        #expect(model.output.amount == 0)
+        #expect(model.state.payment.date == setup.date.adding(days: -1))
         #expect(flow.notice?.outcome == .missingAmount)
         #expect(flow.notice?.message == "「昨日のコンビニ」")
         #expect(flow.notice?.canUndo == false)
@@ -97,7 +97,7 @@ struct EntryVoiceFlowTests {
         await ObservationWait.until { flow.step == nil }
 
         #expect(flow.step == nil)
-        #expect(model.amount == 500)
+        #expect(model.output.amount == 500)
         #expect(source.isFinished)
     }
 
@@ -221,7 +221,7 @@ struct EntryVoiceFlowTests {
         await flow.cancel()
         counts.append(flow.endCount)
 
-        #expect(model.amount == 0)
+        #expect(model.output.amount == 0)
         #expect(flow.step == nil)
         #expect(flow.notice == nil)
         #expect(source.isCancelled)
@@ -272,13 +272,13 @@ extension EntryVoiceFlowTests {
     }
 
     func waitForHistory(_ model: EntryModel) async throws {
-        for _ in 0..<50 where model.voiceExamples(for: "").isEmpty {
+        for _ in 0..<50 where model.output.voiceExamples(for: "").isEmpty {
             try await Task.sleep(for: .milliseconds(20))
         }
     }
 
     func loadedModel(_ setup: EntryModelTests.Setup) async throws -> EntryModel {
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
         return model
     }

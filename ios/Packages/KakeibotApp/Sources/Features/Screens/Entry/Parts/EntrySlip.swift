@@ -71,7 +71,7 @@ private extension EntrySlip {
 
                 if let listening {
                     EntryVoiceWave(flow: listening, reach: 2, height: Self.waveHeight)
-                } else if let status = model.expressionText {
+                } else if let status = model.output.expressionText {
                     Text(status)
                         .textFont(.caption2)
                         .monospacedDigit()
@@ -113,7 +113,7 @@ private extension EntrySlip {
 
     @ViewBuilder
     var fields: some View {
-        if model.type == .transfer {
+        if model.state.type == .transfer {
             row(
                 "振替",
                 value: routeValue,
@@ -126,7 +126,7 @@ private extension EntrySlip {
                 "手数料",
                 value: feeValue,
                 target: .fee,
-                isChanged: model.fee > 0
+                isChanged: model.output.fee > 0
             ) {
                 symbolMark("building.columns")
             }
@@ -142,11 +142,11 @@ private extension EntrySlip {
             }
 
             row(
-                model.walletTitle,
-                value: model.billText ?? model.walletName,
+                model.output.walletTitle,
+                value: model.output.billText ?? model.output.walletName,
                 target: .wallet(.source),
-                isChanged: !model.isUsualWallet || model.billText != nil,
-                isFromVoice: model.isWalletFromVoice
+                isChanged: !model.output.isUsualWallet || model.output.billText != nil,
+                isFromVoice: model.output.isWalletFromVoice
             ) {
                 walletMark
             }
@@ -160,8 +160,8 @@ private extension EntrySlip {
             "日付",
             value: dateValue,
             target: .date,
-            isChanged: model.date != today,
-            isFromVoice: model.isDateFromVoice
+            isChanged: model.state.payment.date != today,
+            isFromVoice: model.output.isDateFromVoice
         ) {
             dateMark
         }
@@ -170,7 +170,7 @@ private extension EntrySlip {
     @ViewBuilder
     var categoryMark: some View {
         if let category = shownCategory {
-            iconMark(model.icon(for: category))
+            iconMark(model.output.icon(for: category))
         } else {
             symbolMark("square.grid.2x2")
         }
@@ -178,8 +178,8 @@ private extension EntrySlip {
 
     @ViewBuilder
     var walletMark: some View {
-        if let wallet = model.wallet(model.walletId) {
-            iconMark(model.icon(for: wallet))
+        if let wallet = model.output.wallet(model.state.payment.walletId) {
+            iconMark(model.output.icon(for: wallet))
         } else {
             symbolMark("creditcard")
         }
@@ -192,7 +192,7 @@ private extension EntrySlip {
             Self.gold
                 .frame(height: 5)
 
-            Text("\(model.date.day)")
+            Text("\(model.state.payment.date.day)")
                 .displayFont(.caption, weight: .bold)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
@@ -218,7 +218,10 @@ private extension EntrySlip {
 
                     Text(memoText)
                         .textFont(.footnote)
-                        .underline(model.isMemoFromVoice, color: Palette.accent.opacity(.medium))
+                        .underline(
+                            model.output.isMemoFromVoice,
+                            color: Palette.accent.opacity(.medium)
+                        )
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -230,9 +233,9 @@ private extension EntrySlip {
 
             if showsItems {
                 EntryItemButton(
-                    count: model.items.count,
-                    total: model.itemTotal,
-                    adjustment: model.itemAdjustment,
+                    count: model.state.items.list.count,
+                    total: model.output.itemTotal,
+                    adjustment: model.output.itemAdjustment,
                     onOpen: onOpenItems
                 )
                 .fixedSize()
@@ -390,6 +393,6 @@ private extension EntrySlip {
     }
 
     var receiptsLeft: Int? {
-        isPro ? nil : model.freeReceiptsLeft
+        isPro ? nil : model.output.freeReceiptsLeft
     }
 }

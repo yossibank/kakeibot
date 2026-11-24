@@ -141,7 +141,7 @@ private extension EntryVoiceCard {
                 systemImage: "square.grid.2x2",
                 label: "カテゴリ",
                 value: reading?.categoryId.flatMap { id in
-                    model.categories.first { $0.id == id }?.name
+                    model.output.categories.first { $0.id == id }?.name
                 }
             )
 
@@ -155,7 +155,7 @@ private extension EntryVoiceCard {
                 systemImage: "creditcard",
                 label: "口座",
                 value: reading?.walletId.flatMap { id in
-                    model.wallets.first { $0.id == id }?.name
+                    model.output.wallets.first { $0.id == id }?.name
                 }
             )
 

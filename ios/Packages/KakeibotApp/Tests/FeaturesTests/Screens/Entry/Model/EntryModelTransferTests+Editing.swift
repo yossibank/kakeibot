@@ -23,15 +23,20 @@ extension EntryModelTransferTests {
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
         try await setup.database.setHidden(setup.cash, isHidden: true, at: Date())
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
 
         await model.load()
         await model.reloadWallets()
 
-        #expect(model.walletId == setup.cash)
-        #expect(model.billMonth == entry.billMonth)
-        #expect(model.wallet(setup.cash) != nil)
-        #expect(model.wallet(setup.bank) != nil)
+        #expect(model.state.payment.walletId == setup.cash)
+        #expect(model.state.payment.billMonth == entry.billMonth)
+        #expect(model.output.wallet(setup.cash) != nil)
+        #expect(model.output.wallet(setup.bank) != nil)
     }
 
     @Test
@@ -40,14 +45,19 @@ extension EntryModelTransferTests {
         try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
         let transfer = try #require(setup.database.snapshot().entries.first)
         try await setup.database.setHidden(setup.bank, isHidden: true, at: Date())
-        let model = EntryModel(database: setup.database, editing: transfer.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: transfer.id,
+            date: setup.date
+        )
 
         await model.load()
         await model.reloadWallets()
 
-        #expect(model.walletId == setup.cash)
-        #expect(model.toWalletId == setup.bank)
-        #expect(model.wallet(setup.bank) != nil)
+        #expect(model.state.payment.walletId == setup.cash)
+        #expect(model.state.payment.toWalletId == setup.bank)
+        #expect(model.output.wallet(setup.bank) != nil)
     }
 
     @Test
@@ -64,13 +74,18 @@ extension EntryModelTransferTests {
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
         try await setup.database.setHidden(setup.salary, isHidden: true, at: Date())
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
 
         await model.load()
         await model.reloadCategories()
 
-        #expect(model.categoryId == setup.salary)
-        #expect(model.selectedCategory?.id == setup.salary)
+        #expect(model.state.category.id == setup.salary)
+        #expect(model.output.selectedCategory?.id == setup.salary)
     }
 
     @Test
@@ -88,15 +103,20 @@ extension EntryModelTransferTests {
         )
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
 
         await model.load()
-        model.walletId = setup.bank
+        model.setWallet(setup.bank)
         _ = try await setup.database.deleteWallet(setup.bank, at: Date())
         await model.reloadWallets()
 
-        #expect(model.walletId != setup.bank)
-        #expect(model.walletId != nil)
+        #expect(model.state.payment.walletId != setup.bank)
+        #expect(model.state.payment.walletId != nil)
     }
 
     @Test
@@ -114,15 +134,20 @@ extension EntryModelTransferTests {
         )
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
 
         await model.load()
-        model.categoryId = other
+        model.state.setCategory(other)
         _ = try await setup.database.deleteCategory(other, at: Date())
         await model.reloadCategories()
 
-        #expect(model.categoryId != other)
-        #expect(model.categoryId != nil)
+        #expect(model.state.category.id != other)
+        #expect(model.state.category.id != nil)
     }
 
     @Test
@@ -139,12 +164,17 @@ extension EntryModelTransferTests {
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
         try await setup.database.setHidden(setup.salary, isHidden: true, at: Date())
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
 
         await model.load()
         model.select(.expense)
         model.select(.income)
 
-        #expect(model.categoryId == setup.salary)
+        #expect(model.state.category.id == setup.salary)
     }
 }

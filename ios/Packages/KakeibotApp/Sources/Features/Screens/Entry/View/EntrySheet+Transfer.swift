@@ -22,15 +22,15 @@ extension EntrySheet {
                 }
             }
 
-            if model.recentTransfers.isEmpty {
+            if model.output.recentTransfers.isEmpty {
                 Text("チャージ・カードの支払い・口座のあいだの移動")
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
             }
 
             EntryLiveSlot {
-                if let remaining = model.loanRemaining,
-                   remaining != model.amount {
+                if let remaining = model.output.loanRemaining,
+                   remaining != model.output.amount {
                     payOffButton(remaining)
                 }
             }

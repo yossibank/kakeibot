@@ -15,9 +15,9 @@ extension EntrySheet {
         VStack(alignment: .leading, spacing: 12) {
             TagLine(
                 tagItems,
-                selection: model.tagId,
+                selection: model.state.category.tagId,
                 onSelect: { id in
-                    model.toggleTag(id)
+                    model.state.toggleTag(id)
                 },
                 onAdd: {
                     editTags()
@@ -25,7 +25,7 @@ extension EntrySheet {
                 onEdit: tagEditAction
             )
 
-            if model.amount > 0 {
+            if model.output.amount > 0 {
                 ChipButton(
                     "今の入力を保存",
                     systemImage: "plus",
@@ -48,7 +48,7 @@ extension EntrySheet {
 
         EntryCategoryFace(
             category: menu.category,
-            icon: model.icon(for: menu.category),
+            icon: model.output.icon(for: menu.category),
             isLit: true,
             isLifted: true
         )
@@ -64,7 +64,7 @@ extension EntrySheet {
             .frame(maxWidth: .infinity)
             .overlay(alignment: .bottomLeading) {
                 EntryCategoryMenu(
-                    icon: model.icon(for: menu.category),
+                    icon: model.output.icon(for: menu.category),
                     name: menu.category.name,
                     onEdit: {
                         closeCategoryMenu()
@@ -91,8 +91,8 @@ extension EntrySheet {
     }
 
     func showSelectedCategory() {
-        let page = model.categoryPages.firstIndex { page in
-            page.contains { $0.categoryId == model.categoryId }
+        let page = model.output.categoryPages.firstIndex { page in
+            page.contains { $0.categoryId == model.state.category.id }
         }
 
         categoryPage = page ?? 0
@@ -124,7 +124,7 @@ private extension EntrySheet {
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 0) {
                     ForEach(
-                        Array(model.categoryPages.enumerated()),
+                        Array(model.output.categoryPages.enumerated()),
                         id: \.offset
                     ) { index, page in
                         categoryGrid(page)
@@ -140,11 +140,11 @@ private extension EntrySheet {
             .scrollIndicators(.hidden)
             .frame(height: Self.pagerHeight + Self.liftInset * 2)
             .padding(-Self.liftInset)
-            .id(model.type)
+            .id(model.state.type)
 
-            if model.categoryPages.count > 1 {
+            if model.output.categoryPages.count > 1 {
                 PageDots(
-                    count: model.categoryPages.count,
+                    count: model.output.categoryPages.count,
                     current: categoryPage ?? 0
                 )
             }
@@ -203,8 +203,8 @@ private extension EntrySheet {
         case let .category(category):
             EntryCategoryCell(
                 category: category,
-                icon: model.icon(for: category),
-                isSelected: model.categoryId == category.id
+                icon: model.output.icon(for: category),
+                isSelected: model.state.category.id == category.id
             ) {
                 select(category)
             } onMenu: { frame in
@@ -239,8 +239,8 @@ private extension EntrySheet {
 
     var tagEditAction: (() -> Void)? {
         guard
-            let category = model.selectedCategory,
-            !model.tags.isEmpty
+            let category = model.output.selectedCategory,
+            !model.output.tags.isEmpty
         else {
             return nil
         }
@@ -251,11 +251,11 @@ private extension EntrySheet {
     }
 
     var tagItems: [TagLine<EntryTag.ID>.Item] {
-        model.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
+        model.output.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
     }
 
     func editTags() {
-        guard let category = model.selectedCategory else {
+        guard let category = model.output.selectedCategory else {
             return
         }
 
@@ -270,7 +270,7 @@ private extension EntrySheet {
     }
 
     func select(_ category: EntryCategory) {
-        model.categoryId = category.id
+        model.state.setCategory(category.id)
         show(.amount)
     }
 
