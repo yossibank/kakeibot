@@ -70,7 +70,7 @@ public extension ThemeListModel {
             return
         }
 
-        suggestedIcon = icon == appIcon.current ? nil : icon
+        suggestedIcon = icon == appIcon.input.current ? nil : icon
     }
 
     func use(_ icon: AppIconChoice?) async {

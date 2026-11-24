@@ -156,7 +156,7 @@ extension SettingsMenuSheet {
                 row(
                     "アプリアイコン",
                     systemImage: "app.badge",
-                    value: appIcon.current.title
+                    value: appIcon.input.current.title
                 )
             }
 
@@ -290,7 +290,7 @@ private extension SettingsMenuSheet {
 
     var weekStartBinding: Binding<Weekday> {
         Binding {
-            weekStart.value
+            weekStart.output.value
         } set: { day in
             Task {
                 await weekStart.choose(day)

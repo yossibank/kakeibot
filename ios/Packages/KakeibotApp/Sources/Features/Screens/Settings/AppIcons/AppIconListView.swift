@@ -40,8 +40,8 @@ public struct AppIconListView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .settingsScreen(errorNotice: $model.errorNotice)
-        .haptic(.selection, trigger: model.current)
+        .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
+        .haptic(.selection, trigger: model.input.current)
     }
 }
 
@@ -57,7 +57,7 @@ private extension AppIconListView {
                 ForEach(choices(isLight: isLight), id: \.self) { choice in
                     AppIconTile(
                         choice: choice,
-                        isCurrent: choice == model.current,
+                        isCurrent: choice == model.input.current,
                         onSelect: {
                             Task {
                                 await model.select(choice)

@@ -4,34 +4,51 @@ import Observation
 @MainActor
 @Observable
 public final class AppIconListModel {
-    public private(set) var current: AppIconChoice
+    public let state = NoticeState()
+    public let input: Input
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let switcher: AppIconSwitcher
+    let dependencies: Dependencies
 
     public init(switcher: AppIconSwitcher = .live) {
-        self.switcher = switcher
-        self.current = AppIconChoice(alternateName: switcher.currentName())
+        let name = switcher.currentName()
+
+        self.input = Input(current: AppIconChoice(alternateName: name))
+        self.dependencies = Dependencies(switcher: switcher)
     }
 }
 
 public extension AppIconListModel {
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var current: AppIconChoice
+
+        init(current: AppIconChoice) {
+            self.current = current
+        }
+    }
+
     func select(_ choice: AppIconChoice) async {
-        guard choice != current else {
+        guard choice != input.current else {
             return
         }
 
-        let previous = current
+        let previous = input.current
 
-        current = choice
+        input.current = choice
 
         do {
-            try await switcher.setName(choice.alternateName)
+            try await dependencies.switcher.setName(choice.alternateName)
         } catch {
-            current = previous
-            errorNotice.show(Self.changeFailedMessage)
+            input.current = previous
+            state.errorNotice.show(Self.changeFailedMessage)
         }
+    }
+}
+
+extension AppIconListModel {
+    struct Dependencies {
+        let switcher: AppIconSwitcher
     }
 }
 

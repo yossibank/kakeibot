@@ -10,13 +10,13 @@ struct SettingsMenuValueModelTests {
         let setup = try await HomeModelTests.Setup()
         let model = SettingsMenuValueModel(database: setup.database, key: .entryStartsWithAmount)
         await model.load()
-        let before = model.value
+        let before = model.output.value
 
         await model.choose(false)
         let saved = try await setup.database.setting(.entryStartsWithAmount)
 
         #expect(before)
-        #expect(!model.value)
+        #expect(!model.output.value)
         #expect(!saved)
     }
 
@@ -29,9 +29,9 @@ struct SettingsMenuValueModelTests {
         await model.choose(.monday)
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.value == .monday)
+        #expect(model.output.value == .monday)
         #expect(saved == .monday)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 
     @Test
@@ -44,9 +44,9 @@ struct SettingsMenuValueModelTests {
         await model.choose(.monday)
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.value == .sunday)
+        #expect(model.output.value == .sunday)
         #expect(saved == .sunday)
-        #expect(model.errorNotice.message == "設定を保存できませんでした")
+        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
     }
 
     @Test
@@ -79,7 +79,7 @@ struct SettingsMenuValueModelTests {
         await second.value
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.value == .tuesday)
+        #expect(model.output.value == .tuesday)
         #expect(saved == .tuesday)
     }
 
@@ -102,7 +102,7 @@ struct SettingsMenuValueModelTests {
         await second.value
         let saved = try await setup.database.setting(.weekStart)
 
-        #expect(model.value == .sunday)
+        #expect(model.output.value == .sunday)
         #expect(saved == .sunday)
     }
 }

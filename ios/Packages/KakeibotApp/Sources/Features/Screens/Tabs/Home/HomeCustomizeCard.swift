@@ -121,7 +121,7 @@ private extension HomeCustomizeCard {
         switch item {
         case .launchScreen: model.launchScreen.title
         case .theme: model.themeTitle
-        case .appIcon: appIcon.current.title
+        case .appIcon: appIcon.input.current.title
         case .themeStyle: themeStyle.shortTextTitle
         case .themeLook: themeStyle.lookTitle
         default: ""

@@ -87,8 +87,8 @@ public struct ThemeListView: View {
             self.size = size
         }
         .errorBanner($model.errorNotice)
-        .errorBanner(appIcon.errorNotice) {
-            appIcon.errorNotice.clear()
+        .errorBanner(appIcon.state.errorNotice) {
+            appIcon.state.errorNotice.clear()
         }
         .confirmation(
             isPresented: isSuggestingIcon,
