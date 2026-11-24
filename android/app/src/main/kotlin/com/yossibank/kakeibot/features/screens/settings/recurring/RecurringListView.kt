@@ -80,6 +80,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
+import com.yossibank.kakeibot.features.shared.model.ScreenClock
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
@@ -120,13 +121,14 @@ fun RecurringListView(
     val model = remember(database, entryList) {
         RecurringListModel(
             database = database,
+            clock = ScreenClock.system,
             entryList = entryList,
             today = today,
         )
     }
 
     SideEffect {
-        model.today = today
+        model.state.today = today
     }
 
     val scope = rememberCoroutineScope()
@@ -208,13 +210,13 @@ fun RecurringListView(
                     )
                 }
 
-                if (model.message.isNotEmpty()) {
+                if (model.state.task.message.isNotEmpty()) {
                     Text(
-                        text = model.message,
+                        text = model.state.task.message,
                         modifier = Modifier
                             .fillMaxWidth()
                             .card()
-                            .clickable(onClick = model::clearMessage)
+                            .clickable(onClick = model.state.task::clear)
                             .padding(12.dp),
                         color = Palette.rose,
                         style = textFont(style = FontTextStyle.Caption),
@@ -233,7 +235,7 @@ fun RecurringListView(
                     RecurringEditSheet(
                         database = database,
                         today = today,
-                        type = model.type,
+                        type = model.state.type,
                         editingId = (current as? Editing.Existing)?.id,
                         onClose = { editing = null },
                         onDelete = deletedNotice::show,
@@ -251,7 +253,7 @@ fun RecurringListView(
                 add(SettingsIntroNote(R.drawable.ic_calendar, "休日なら、前後の平日にずらせます"))
                 add(SettingsIntroNote(R.drawable.ic_bell, "前もって通知で知らせられます"))
 
-                if (model.rows.isNotEmpty()) {
+                if (model.output.rows.isNotEmpty()) {
                     add(SettingsIntroNote.arrange)
                     add(SettingsIntroNote.swipeDelete)
                 }
@@ -259,11 +261,11 @@ fun RecurringListView(
         )
 
         SegmentSwitch(
-            selection = model.type,
+            selection = model.state.type,
             options = typeOptions,
             onSelect = {
                 openId = null
-                model.type = it
+                model.state.type = it
             },
             modifier = Modifier.fillMaxWidth(),
         )
@@ -277,12 +279,12 @@ fun RecurringListView(
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            if (model.rows.isEmpty()) {
-                EmptyNote(text = model.emptyText)
+            if (model.output.rows.isEmpty()) {
+                EmptyNote(text = model.output.emptyText)
             } else {
                 TotalCard(
-                    type = model.type,
-                    total = model.monthTotal,
+                    type = model.state.type,
+                    total = model.output.monthTotal,
                 )
             }
 
@@ -293,9 +295,9 @@ fun RecurringListView(
                 actions = actions,
             )
 
-            if (model.hiddenRows.isNotEmpty()) {
+            if (model.output.hiddenRows.isNotEmpty()) {
                 RecurringHiddenSection(
-                    rows = model.hiddenRows,
+                    rows = model.output.hiddenRows,
                     isOpen = hiddenList.isOn,
                     onToggle = { scope.launch { hiddenList.set(!hiddenList.isOn) } },
                     onDeleteAll = { deleting = DeleteTarget.AllHidden },
@@ -309,7 +311,7 @@ fun RecurringListView(
             RecurringHideTarget(lift = lift)
         } else {
             PrimaryButton(
-                title = "${model.type.title}の固定費を追加",
+                title = "${model.state.type.title}の固定費を追加",
                 onClick = { editing = Editing.New },
                 modifier = Modifier.fillMaxWidth(),
                 icon = R.drawable.ic_add,

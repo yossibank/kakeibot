@@ -79,8 +79,8 @@ internal fun BudgetCategoryRow(
     model: BudgetListModel,
     category: EntryCategory,
 ) {
-    val usage = model.usage(categoryId = category.id)
-    val spent = model.spent(categoryId = category.id)
+    val usage = model.output.usage(categoryId = category.id)
+    val spent = model.output.spent(categoryId = category.id)
 
     Column(
         modifier = Modifier
@@ -95,7 +95,7 @@ internal fun BudgetCategoryRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconTile(
-                icon = model.icon(category),
+                icon = model.output.icon(category),
                 size = 28.dp,
             )
 
@@ -107,7 +107,7 @@ internal fun BudgetCategoryRow(
             )
 
             AmountValue(
-                amount = model.amount(categoryId = category.id),
+                amount = model.output.amount(categoryId = category.id),
                 size = FontSize.Body,
             )
 
@@ -133,7 +133,7 @@ internal fun BudgetPlainRow(
     model: BudgetListModel,
     category: EntryCategory,
 ) {
-    val spent = model.spent(categoryId = category.id)
+    val spent = model.output.spent(categoryId = category.id)
 
     Row(
         modifier = Modifier
@@ -145,7 +145,7 @@ internal fun BudgetPlainRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconTile(
-            icon = model.icon(category),
+            icon = model.output.icon(category),
             size = 28.dp,
         )
 

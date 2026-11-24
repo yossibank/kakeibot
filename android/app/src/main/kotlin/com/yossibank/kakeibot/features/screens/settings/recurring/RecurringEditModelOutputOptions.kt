@@ -31,19 +31,19 @@ import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
 import com.yossibank.kakeibot.store.writes.types.Deletion
 import java.time.Instant
 
-val RecurringEditModel.walletTitle: String
-    get() = EntryText.walletTitle(form.type)
+val RecurringEditModel.Output.walletTitle: String
+    get() = EntryText.walletTitle(state.form.type)
 
-val RecurringEditModel.billRecurring: Recurring?
+val RecurringEditModel.Output.billRecurring: Recurring?
     get() {
-        if (form.type == Entry.Kind.transfer) {
+        if (state.form.type == Entry.Kind.transfer) {
             return null
         }
 
-        return cardBills.cardBill(paidBy = form.walletId)
+        return input.cardBills.cardBill(paidBy = state.form.walletId)
     }
 
-val RecurringEditModel.billDates: List<LocalDate>
+val RecurringEditModel.Output.billDates: List<LocalDate>
     get() {
         val bill = billRecurring ?: return emptyList()
         val next = previewRow.next ?: return emptyList()
@@ -54,40 +54,41 @@ val RecurringEditModel.billDates: List<LocalDate>
         )
     }
 
-val RecurringEditModel.canUseClosingDay: Boolean
-    get() = form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.card
+val RecurringEditModel.Output.canUseClosingDay: Boolean
+    get() = state.form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.card
 
-val RecurringEditModel.isCardBill: Boolean
-    get() = canUseClosingDay && form.closingDay != null
+val RecurringEditModel.Output.isCardBill: Boolean
+    get() = canUseClosingDay && state.form.closingDay != null
 
-val RecurringEditModel.isLoanRepayment: Boolean
-    get() = form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.loan
+val RecurringEditModel.Output.isLoanRepayment: Boolean
+    get() = state.form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.loan
 
-val RecurringEditModel.categories: List<EntryCategory>
-    get() = when (form.type) {
-        Entry.Kind.expense -> options?.expenseCategories.orEmpty()
-        Entry.Kind.income -> options?.incomeCategories.orEmpty()
+val RecurringEditModel.Output.categories: List<EntryCategory>
+    get() = when (state.form.type) {
+        Entry.Kind.expense -> input.options?.expenseCategories.orEmpty()
+        Entry.Kind.income -> input.options?.incomeCategories.orEmpty()
         Entry.Kind.transfer -> emptyList()
     }
 
-val RecurringEditModel.wallets: List<Wallet>
-    get() = options?.wallets.orEmpty()
+val RecurringEditModel.Output.wallets: List<Wallet>
+    get() = input.options?.wallets.orEmpty()
 
-val RecurringEditModel.selectedCategory: EntryCategory?
-    get() = categories.firstOrNull { it.id == form.categoryId }
+val RecurringEditModel.Output.selectedCategory: EntryCategory?
+    get() = categories.firstOrNull { it.id == state.form.categoryId }
 
-val RecurringEditModel.selectedWallet: Wallet?
-    get() = wallets.firstOrNull { it.id == form.walletId }
+val RecurringEditModel.Output.selectedWallet: Wallet?
+    get() = wallets.firstOrNull { it.id == state.form.walletId }
 
-val RecurringEditModel.selectedDestination: Wallet?
-    get() = wallets.firstOrNull { it.id == form.toWalletId }
+val RecurringEditModel.Output.selectedDestination: Wallet?
+    get() = wallets.firstOrNull { it.id == state.form.toWalletId }
 
-internal fun RecurringEditModel.message(problem: RecurringDraft.Problem): String = when (problem) {
-    RecurringDraft.Problem.amountNotPositive -> "金額を入れてください"
-    RecurringDraft.Problem.missingCategory -> "カテゴリを選んでください"
-    RecurringDraft.Problem.missingWallet -> "${walletTitle}を選んでください"
-    RecurringDraft.Problem.missingDestination -> "${EntryText.destinationTitle}を選んでください"
-    RecurringDraft.Problem.sameWallet -> "振替元と振替先を別にしてください"
-    RecurringDraft.Problem.endBeforeStart -> "終わりを始まりより後にしてください"
-    else -> ModelTask.saveFailed
-}
+internal fun RecurringEditModel.Output.message(problem: RecurringDraft.Problem): String =
+    when (problem) {
+        RecurringDraft.Problem.amountNotPositive -> "金額を入れてください"
+        RecurringDraft.Problem.missingCategory -> "カテゴリを選んでください"
+        RecurringDraft.Problem.missingWallet -> "${walletTitle}を選んでください"
+        RecurringDraft.Problem.missingDestination -> "${EntryText.destinationTitle}を選んでください"
+        RecurringDraft.Problem.sameWallet -> "振替元と振替先を別にしてください"
+        RecurringDraft.Problem.endBeforeStart -> "終わりを始まりより後にしてください"
+        else -> ModelTask.saveFailed
+    }

@@ -65,19 +65,19 @@ fun BudgetKeypadDrawer(
     var isConfirmingDiscard by remember { mutableStateOf(false) }
 
     fun close() {
-        if (model.isChanged) {
+        if (model.output.isChanged) {
             isConfirmingDiscard = true
         } else {
-            model.cancelEditing()
+            model.state.cancelEditing()
         }
     }
 
-    if (model.editing != null) {
+    if (model.state.editing != null) {
         BackHandler(onBack = ::close)
     }
 
     BottomDrawer(
-        item = model.editing,
+        item = model.state.editing,
         title = { it.title },
         onClose = ::close,
         padding = drawerPadding,
@@ -93,7 +93,7 @@ fun BudgetKeypadDrawer(
         DiscardDialog(
             onDiscard = {
                 isConfirmingDiscard = false
-                model.cancelEditing()
+                model.state.cancelEditing()
             },
             onKeep = { isConfirmingDiscard = false },
         )
@@ -108,7 +108,7 @@ private fun ColumnScope.Drawer(
     val scope = rememberCoroutineScope()
 
     AmountText(
-        amount = model.calculator.amount,
+        amount = model.state.calculator.amount,
         style = displayFont(
             size = FontSize.LargeTitle,
             weight = FontWeight.Bold,
@@ -116,16 +116,16 @@ private fun ColumnScope.Drawer(
         color = Palette.accentStrong,
     )
 
-    if (model.suggestions.isNotEmpty()) {
+    if (model.output.suggestions.isNotEmpty()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            model.suggestions.forEach { suggestion ->
+            model.output.suggestions.forEach { suggestion ->
                 SuggestionChip(
                     suggestion = suggestion,
-                    isSelected = model.calculator.amount == suggestion.amount,
-                    onSelect = { model.choose(suggestion) },
+                    isSelected = model.state.calculator.amount == suggestion.amount,
+                    onSelect = { model.state.choose(suggestion) },
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -133,27 +133,27 @@ private fun ColumnScope.Drawer(
     }
 
     Keypad(
-        calculator = model.calculator,
-        onKey = model::press,
+        calculator = model.state.calculator,
+        onKey = model.state::press,
         keyHeight = Metrics.keyHeight,
     )
 
-    if (model.message.isNotEmpty()) {
+    if (model.state.task.message.isNotEmpty()) {
         Text(
-            text = model.message,
+            text = model.state.task.message,
             color = Palette.rose,
             style = textFont(style = FontTextStyle.Caption),
         )
     }
 
     PrimaryButton(
-        title = model.saveTitle,
+        title = model.output.saveTitle,
         onClick = { scope.launch { model.save() } },
         modifier = Modifier.fillMaxWidth(),
-        isEnabled = model.canSave,
+        isEnabled = model.output.canSave,
     )
 
-    if (model.editingAmount != null) {
+    if (model.output.editingAmount != null) {
         Text(
             text = "予算をなくす",
             modifier = Modifier

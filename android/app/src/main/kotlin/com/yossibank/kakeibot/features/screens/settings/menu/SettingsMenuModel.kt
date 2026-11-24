@@ -18,28 +18,42 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class SettingsMenuModel(
-    private val database: AppDatabase,
+    database: AppDatabase,
 ) {
-    var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
-        private set
+    val input = Input()
 
-    var weekStart: Weekday by mutableStateOf(Weekday.monday)
-        private set
+    private val dependencies = Dependencies(database)
 
-    var recurringCount: Int by mutableIntStateOf(0)
-        private set
+    class Input {
+        var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
+            internal set
+
+        var weekStart: Weekday by mutableStateOf(Weekday.monday)
+            internal set
+
+        var recurringCount: Int by mutableIntStateOf(0)
+            internal set
+    }
+
+    private class Dependencies(
+        val database: AppDatabase,
+    )
 
     suspend fun observe() {
+        val database = dependencies.database
+
         coroutineScope {
             launch {
-                database.settingUpdates(SettingKey.monthStartDay).collect { monthStartDay = it }
+                database.settingUpdates(SettingKey.monthStartDay).collect {
+                    input.monthStartDay = it
+                }
             }
 
             launch {
-                database.settingUpdates(SettingKey.weekStart).collect { weekStart = it }
+                database.settingUpdates(SettingKey.weekStart).collect { input.weekStart = it }
             }
 
-            database.recurringUpdates().collect { recurringCount = it.size }
+            database.recurringUpdates().collect { input.recurringCount = it.size }
         }
     }
 
@@ -48,7 +62,7 @@ class SettingsMenuModel(
         value: Value,
     ) {
         ModelTask.quiet {
-            database.setSetting(
+            dependencies.database.setSetting(
                 key = key,
                 to = value,
             )

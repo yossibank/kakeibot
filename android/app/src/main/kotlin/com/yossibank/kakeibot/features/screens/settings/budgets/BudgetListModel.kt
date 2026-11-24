@@ -11,8 +11,6 @@ import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
-import com.yossibank.kakeibot.core.concepts.entry.Entry
-import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.clamped
@@ -28,7 +26,6 @@ import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.budgetCarryoverFrom
 import com.yossibank.kakeibot.store.writes.methods.setBudget
 import com.yossibank.kakeibot.store.writes.methods.setSetting
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -36,10 +33,16 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class BudgetListModel(
-    private val database: AppDatabase,
-    private val entryList: Flow<EntryList>,
+    database: AppDatabase,
+    entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
+    val state = State(today)
+    val input = Input()
+    val output = Output(input, state)
+
+    private val dependencies = Dependencies(database, entryList)
+
     sealed interface Target {
         val categoryId: Identifier<EntryCategory>?
         val title: String
@@ -68,203 +71,204 @@ class BudgetListModel(
         val amount: Int,
     )
 
-    var today: LocalDate by mutableStateOf(today)
+    class State(
+        today: LocalDate,
+    ) {
+        val task = ModelTask()
 
-    var overview: MonthOverview? by mutableStateOf(null)
-        private set
+        var today: LocalDate by mutableStateOf(today)
 
-    var categoryList: CategoryList? by mutableStateOf(null)
-        private set
+        var editing: Target? by mutableStateOf(null)
+            private set
 
-    var editing: Target? by mutableStateOf(null)
-        private set
+        var calculator by mutableStateOf(AmountCalculator())
+            private set
 
-    var calculator by mutableStateOf(AmountCalculator())
-        private set
+        fun startEditing(
+            target: Target,
+            amount: Int,
+        ) {
+            calculator = AmountCalculator(amount = amount)
+            editing = target
 
-    private val task = ModelTask()
-
-    val message: String
-        get() = task.message
-
-    val month: YearMonth?
-        get() = overview?.month
-
-    val periodText: String
-        get() = overview?.period?.let(PeriodText::range) ?: ""
-
-    val startText: String
-        get() = "${month?.month ?: ""}月（$periodText）から使う額"
-
-    val categoriesNote: String
-        get() = "合計 ${AmountText.text(amount = categoriesTotal)}"
-
-    val unbudgetedNote: String
-        get() = "${unbudgeted.size} カテゴリ"
-
-    val recurringExpense: Long
-        get() = overview?.recurringExpense ?: 0L
-
-    val recurringText: String
-        get() {
-            val amount = AmountText.text(amount = recurringExpense.clamped)
-            return "この月の固定費は $amount。予算の目安にできます"
+            task.clear()
         }
 
-    val categories: List<EntryCategory> by derivedStateOf {
-        categoryList?.categories.orEmpty().filter { category ->
-            category.kind == EntryCategory.Kind.expense && category.archivedAt == null
+        fun cancelEditing() {
+            editing = null
+        }
+
+        fun choose(suggestion: Suggestion) {
+            calculator = AmountCalculator(amount = suggestion.amount)
+        }
+
+        fun press(key: AmountCalculator.Key) {
+            calculator = calculator.press(key)
         }
     }
 
-    val budgeted: List<EntryCategory> by derivedStateOf {
-        categories.filter { amount(it.id) != null }
+    class Input {
+        var overview: MonthOverview? by mutableStateOf(null)
+            internal set
+
+        var categoryList: CategoryList? by mutableStateOf(null)
+            internal set
     }
 
-    val unbudgeted: List<EntryCategory> by derivedStateOf {
-        categories
-            .filter { amount(it.id) == null }
-            .withIndex()
-            .sortedWith(
-                compareByDescending<IndexedValue<EntryCategory>> { spent(it.value.id) }
-                    .thenBy { it.index },
-            ).map { it.value }
-    }
+    class Output(
+        internal val input: Input,
+        internal val state: State,
+    ) {
+        val month: YearMonth?
+            get() = input.overview?.month
 
-    private val monthSpent: Map<Identifier<EntryCategory>?, Long> by derivedStateOf {
-        month?.let(::spentByCategory).orEmpty()
-    }
+        val periodText: String
+            get() = input.overview?.period?.let(PeriodText::range) ?: ""
 
-    val totalAmount: Int?
-        get() = amount(null)
+        val startText: String
+            get() = "${month?.month ?: ""}月（$periodText）から使う額"
 
-    val isCarryoverOn: Boolean
-        get() = overview?.carryoverFrom != null
+        val categoriesNote: String
+            get() = "合計 ${AmountText.text(amount = categoriesTotal)}"
 
-    val carryover: Long
-        get() = overview?.budgetCarryover ?: 0L
+        val unbudgetedNote: String
+            get() = "${unbudgeted.size} カテゴリ"
 
-    val categoriesTotal: Int
-        get() = categories.sumOf { amount(it.id) ?: 0 }
+        val recurringExpense: Long
+            get() = input.overview?.recurringExpense ?: 0L
 
-    val editingAmount: Int?
-        get() = editing?.let { amount(it.categoryId) }
+        val recurringText: String
+            get() {
+                val amount = AmountText.text(amount = recurringExpense.clamped)
+                return "この月の固定費は $amount。予算の目安にできます"
+            }
 
-    val suggestions: List<Suggestion>
-        get() {
-            val target = editing ?: return emptyList()
-            val month = month ?: return emptyList()
-            val categoryId = target.categoryId
-            val recurring = if (categoryId == null) recurringExpense else 0L
-            val seen = mutableSetOf<Int>()
-
-            return listOf(
-                Suggestion(
-                    title = "先月",
-                    amount = spent(categoryId, month.adding(months = -1)).clamped,
-                ),
-                Suggestion(
-                    title = "3 か月の平均",
-                    amount = averageSpent(categoryId).clamped,
-                ),
-                Suggestion(
-                    title = "固定費",
-                    amount = recurring.clamped,
-                ),
-            ).filter { it.amount > 0 && seen.add(it.amount) }
+        val categories: List<EntryCategory> by derivedStateOf {
+            input.categoryList?.categories.orEmpty().filter { category ->
+                category.kind == EntryCategory.Kind.expense && category.archivedAt == null
+            }
         }
 
-    val canSave: Boolean
-        get() = calculator.amount > 0
+        val budgeted: List<EntryCategory> by derivedStateOf {
+            categories.filter { amount(it.id) != null }
+        }
 
-    val isChanged: Boolean
-        get() = editing != null && calculator.amount != (editingAmount ?: 0)
+        val unbudgeted: List<EntryCategory> by derivedStateOf {
+            categories
+                .filter { amount(it.id) == null }
+                .withIndex()
+                .sortedWith(
+                    compareByDescending<IndexedValue<EntryCategory>> { spent(it.value.id) }
+                        .thenBy { it.index },
+                ).map { it.value }
+        }
 
-    val saveTitle: String
-        get() = if (canSave) "${month?.month ?: ""}月からこの額にする" else "金額を入れてください"
+        private val monthSpent: Map<Identifier<EntryCategory>?, Long> by derivedStateOf {
+            month?.let { spentByCategory(it) }.orEmpty()
+        }
 
-    fun amount(categoryId: Identifier<EntryCategory>?): Int? {
-        val month = month ?: return null
-        return overview?.budgets?.amount(
-            categoryId = categoryId,
-            month = month,
-        )
+        val totalAmount: Int?
+            get() = amount(null)
+
+        val isCarryoverOn: Boolean
+            get() = input.overview?.carryoverFrom != null
+
+        val carryover: Long
+            get() = input.overview?.budgetCarryover ?: 0L
+
+        val categoriesTotal: Int
+            get() = categories.sumOf { amount(it.id) ?: 0 }
+
+        val editingAmount: Int?
+            get() = state.editing?.let { amount(it.categoryId) }
+
+        val canSave: Boolean
+            get() = state.calculator.amount > 0
+
+        val isChanged: Boolean
+            get() = state.editing != null && state.calculator.amount != (editingAmount ?: 0)
+
+        val saveTitle: String
+            get() = if (canSave) "${month?.month ?: ""}月からこの額にする" else "金額を入れてください"
+
+        fun amount(categoryId: Identifier<EntryCategory>?): Int? {
+            val month = month ?: return null
+            return input.overview?.budgets?.amount(
+                categoryId = categoryId,
+                month = month,
+            )
+        }
+
+        fun spent(categoryId: Identifier<EntryCategory>?): Long = monthSpent[categoryId] ?: 0L
+
+        fun usage(categoryId: Identifier<EntryCategory>?): BudgetUsage? {
+            val overview = input.overview ?: return null
+            val budget = amount(categoryId) ?: return null
+
+            return BudgetUsage(
+                budget = budget,
+                carryover = if (categoryId == null) carryover else 0L,
+                spent = spent(categoryId),
+                today = overview.today,
+                periodEnd = overview.period.endInclusive,
+            )
+        }
+
+        fun icon(category: EntryCategory) = input.categoryList?.icons?.get(category.iconId)
     }
 
-    fun spent(categoryId: Identifier<EntryCategory>?): Long = monthSpent[categoryId] ?: 0L
-
-    fun usage(categoryId: Identifier<EntryCategory>?): BudgetUsage? {
-        val overview = overview ?: return null
-        val budget = amount(categoryId) ?: return null
-
-        return BudgetUsage(
-            budget = budget,
-            carryover = if (categoryId == null) carryover else 0L,
-            spent = spent(categoryId),
-            today = overview.today,
-            periodEnd = overview.period.endInclusive,
-        )
-    }
-
-    fun icon(category: EntryCategory) = categoryList?.icons?.get(category.iconId)
+    private class Dependencies(
+        val database: AppDatabase,
+        val entryList: Flow<EntryList>,
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun observe() {
+        val database = dependencies.database
+
         coroutineScope {
             launch {
-                database.categoryListUpdates().collect { categoryList = it }
+                database.categoryListUpdates().collect { input.categoryList = it }
             }
 
-            snapshotFlow { today }
+            snapshotFlow { state.today }
                 .flatMapLatest { day ->
                     database.monthOverviewUpdates(
                         on = day,
-                        list = entryList,
+                        list = dependencies.entryList,
                     )
-                }.collect { overview = it }
+                }.collect { input.overview = it }
         }
     }
 
     fun startEditing(target: Target) {
-        calculator = AmountCalculator(amount = amount(target.categoryId) ?: 0)
-        editing = target
-
-        task.clear()
-    }
-
-    fun cancelEditing() {
-        editing = null
-    }
-
-    fun choose(suggestion: Suggestion) {
-        calculator = AmountCalculator(amount = suggestion.amount)
-    }
-
-    fun press(key: AmountCalculator.Key) {
-        calculator = calculator.press(key)
+        state.startEditing(
+            target = target,
+            amount = output.amount(target.categoryId) ?: 0,
+        )
     }
 
     suspend fun save() {
-        if (!canSave) {
+        if (!output.canSave) {
             return
         }
 
-        setBudget(calculator.amount)
+        setBudget(state.calculator.amount)
     }
 
     suspend fun finishEditing() {
-        if (!canSave || calculator.amount == editingAmount) {
-            cancelEditing()
+        if (!output.canSave || state.calculator.amount == output.editingAmount) {
+            state.cancelEditing()
             return
         }
 
-        setBudget(calculator.amount)
+        setBudget(state.calculator.amount)
     }
 
     suspend fun clear(): Cleared? {
-        val target = editing ?: return null
-        val amount = editingAmount ?: return null
-        val month = month ?: return null
+        val target = state.editing ?: return null
+        val amount = output.editingAmount ?: return null
+        val month = output.month ?: return null
 
         if (!setBudget(null)) {
             return null
@@ -278,8 +282,8 @@ class BudgetListModel(
     }
 
     suspend fun restore(cleared: Cleared) {
-        task.attempt(failure = ModelTask.restoreFailed) {
-            database.setBudget(
+        state.task.attempt(failure = ModelTask.restoreFailed) {
+            dependencies.database.setBudget(
                 amount = cleared.amount,
                 categoryId = cleared.target.categoryId,
                 from = cleared.month,
@@ -288,13 +292,13 @@ class BudgetListModel(
     }
 
     suspend fun setCarryover(isOn: Boolean) {
-        saveCarryoverFrom(if (isOn) month else null)
+        saveCarryoverFrom(if (isOn) output.month else null)
     }
 
     suspend fun resetCarryover(): YearMonth? {
-        val previous = overview?.carryoverFrom ?: return null
+        val previous = input.overview?.carryoverFrom ?: return null
 
-        if (carryover == 0L || !saveCarryoverFrom(month)) {
+        if (output.carryover == 0L || !saveCarryoverFrom(output.month)) {
             return null
         }
 
@@ -308,63 +312,12 @@ class BudgetListModel(
         )
     }
 
-    fun clearMessage() {
-        task.clear()
-    }
-
-    private fun spent(
-        categoryId: Identifier<EntryCategory>?,
-        month: YearMonth,
-    ): Long = spentByCategory(month)[categoryId] ?: 0L
-
-    private fun spentByCategory(month: YearMonth): Map<Identifier<EntryCategory>?, Long> {
-        val overview = overview ?: return emptyMap()
-        val period = month.period(startingOn = overview.monthStartDay)
-
-        val expenses = overview.list?.days
-            ?.within(period)
-            .orEmpty()
-            .flatMap { it.entries }
-            .filter { it.type == Entry.Kind.expense }
-
-        val byCategory = expenses
-            .filter { it.categoryId != null }
-            .groupBy { it.categoryId }
-            .mapValues { (_, entries) -> entries.sumOf { it.amount.toLong() } }
-
-        return byCategory + (null to expenses.sumOf { it.amount.toLong() })
-    }
-
-    private fun averageSpent(categoryId: Identifier<EntryCategory>?): Long {
-        val overview = overview ?: return 0L
-        val month = month ?: return 0L
-        val firstDate = overview.list?.days?.minOfOrNull { it.date } ?: return 0L
-
-        val months = (1..AVERAGE_MONTHS)
-            .map { month.adding(months = -it) }
-            .filter { it.period(startingOn = overview.monthStartDay).endInclusive >= firstDate }
-
-        if (months.size < 2) {
-            return 0L
-        }
-
-        val total = months.sumOf { month ->
-            spent(
-                categoryId = categoryId,
-                month = month,
-            )
-        }
-        val unit = months.size.toLong() * AVERAGE_UNIT
-
-        return (total + unit - 1) / unit * AVERAGE_UNIT
-    }
-
     private suspend fun setBudget(amount: Int?): Boolean {
-        val target = editing ?: return false
-        val month = month ?: return false
+        val target = state.editing ?: return false
+        val month = output.month ?: return false
 
-        val saved = task.attempt(failure = SAVE_FAILED) {
-            database.setBudget(
+        val saved = state.task.attempt(failure = SAVE_FAILED) {
+            dependencies.database.setBudget(
                 amount = amount,
                 categoryId = target.categoryId,
                 from = month,
@@ -372,7 +325,7 @@ class BudgetListModel(
         }
 
         if (saved != null) {
-            editing = null
+            state.cancelEditing()
         }
 
         return saved != null
@@ -382,8 +335,8 @@ class BudgetListModel(
         start: YearMonth?,
         failure: String = SAVE_FAILED,
     ): Boolean {
-        val saved = task.attempt(failure = failure) {
-            database.setSetting(
+        val saved = state.task.attempt(failure = failure) {
+            dependencies.database.setSetting(
                 key = SettingKey.budgetCarryoverFrom,
                 to = start,
             )
@@ -394,7 +347,5 @@ class BudgetListModel(
 
     private companion object {
         const val SAVE_FAILED = "予算を保存できませんでした"
-        const val AVERAGE_MONTHS = 3
-        const val AVERAGE_UNIT = 100
     }
 }

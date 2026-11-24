@@ -4,17 +4,17 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.recurring.nextDate
 import com.yossibank.kakeibot.core.shared.Identifier
 
-val RecurringEditModel.previewRow: RecurringRow
+val RecurringEditModel.Output.previewRow: RecurringRow
     get() {
-        val isTransfer = form.type == Entry.Kind.transfer
+        val isTransfer = state.form.type == Entry.Kind.transfer
 
         val schedule = RecurringText.schedule(
-            frequency = form.frequency,
-            month = form.month,
-            day = form.day,
+            frequency = state.form.frequency,
+            month = state.form.month,
+            day = state.form.day,
         )
 
-        val name = form.memo.trim()
+        val name = state.form.memo.trim()
         val destination = if (isTransfer) selectedDestination?.name else null
         val place = listOfNotNull(selectedWallet?.name, destination).joinToString(" → ")
 
@@ -27,24 +27,27 @@ val RecurringEditModel.previewRow: RecurringRow
         val next = recurring(
             endDate = scheduledEndDate,
             finalAmount = null,
-        ).nextDate(onOrAfter = today)
+        ).nextDate(onOrAfter = state.today)
 
         val closing = if (canUseClosingDay) {
-            form.closingDay?.let(RecurringText::closingNote)
+            state.form.closingDay?.let(RecurringText::closingNote)
         } else {
             null
         }
 
         return RecurringRow(
-            id = editingId ?: Identifier(),
-            title = name.ifEmpty { selectedCategory?.name ?: RecurringListModel.title(form.type) },
+            id = input.editingId ?: Identifier(),
+            title = name.ifEmpty {
+                selectedCategory?.name
+                    ?: RecurringListModel.title(state.form.type)
+            },
             schedule = RecurringText.detail(
                 schedule = schedule,
-                holiday = RecurringText.holidayNote(form.holidayShift),
+                holiday = RecurringText.holidayNote(state.form.holidayShift),
             ),
             place = place.ifEmpty { null },
             amount = if (isCardBill) null else amount,
-            type = form.type,
+            type = state.form.type,
             icon = icon,
             next = next,
             closing = closing,

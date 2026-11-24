@@ -39,21 +39,21 @@ fun RecurringPanelBody(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                KeypadValue(amount = model.amount)
+                KeypadValue(amount = model.output.amount)
 
                 Keypad(
-                    calculator = model.calculator,
-                    onKey = model::press,
+                    calculator = model.state.calculator,
+                    onKey = model.state::press,
                 )
             }
         }
 
         RecurringPanel.Start -> {
             MonthCalendar(
-                selection = model.form.startDate,
-                today = model.today,
+                selection = model.state.form.startDate,
+                today = model.state.today,
                 onSelect = { date ->
-                    model.update { copy(startDate = date) }
+                    model.state.update { copy(startDate = date) }
                     onClose()
                 },
             )
@@ -64,7 +64,7 @@ fun RecurringPanelBody(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ChoiceChip(
                         title = "終わりなし",
-                        isSelected = model.scheduledEndDate == null,
+                        isSelected = model.output.scheduledEndDate == null,
                         onSelect = {
                             model.setEnd(null)
                             onClose()
@@ -73,17 +73,17 @@ fun RecurringPanelBody(
 
                     ChoiceChip(
                         title = "今日で終える",
-                        isSelected = model.scheduledEndDate == model.today,
+                        isSelected = model.output.scheduledEndDate == model.state.today,
                         onSelect = {
-                            model.setEnd(model.today)
+                            model.setEnd(model.state.today)
                             onClose()
                         },
                     )
                 }
 
                 MonthCalendar(
-                    selection = model.scheduledEndDate ?: model.form.startDate,
-                    today = model.today,
+                    selection = model.output.scheduledEndDate ?: model.state.form.startDate,
+                    today = model.state.today,
                     onSelect = {
                         model.setEnd(it)
                         onClose()
@@ -103,9 +103,9 @@ fun RecurringPanelBody(
                     HolidayShift.entries.forEach { shift ->
                         ChoiceChip(
                             title = shift.title,
-                            isSelected = model.form.holidayShift == shift,
+                            isSelected = model.state.form.holidayShift == shift,
                             onSelect = {
-                                model.choose(shift)
+                                model.state.choose(shift)
                                 onClose()
                             },
                         )
@@ -123,17 +123,17 @@ fun RecurringPanelBody(
 
                 ChoiceChip(
                     title = RecurringText.closingDay(null),
-                    isSelected = model.form.closingDay == null,
+                    isSelected = model.state.form.closingDay == null,
                     onSelect = {
-                        model.update { copy(closingDay = null) }
+                        model.state.update { copy(closingDay = null) }
                         onClose()
                     },
                 )
 
                 DayGrid(
-                    selection = model.form.closingDay,
+                    selection = model.state.form.closingDay,
                     onSelect = { day ->
-                        model.update { copy(closingDay = day) }
+                        model.state.update { copy(closingDay = day) }
                         onClose()
                     },
                 )
@@ -145,17 +145,17 @@ fun RecurringPanelBody(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                KeypadValue(amount = model.fee)
+                KeypadValue(amount = model.output.fee)
 
                 FeeChoiceRow(
                     choices = FeeChoiceRow.defaultChoices,
-                    selection = model.fee,
-                    onSelect = model::setFee,
+                    selection = model.output.fee,
+                    onSelect = model.state::setFee,
                 )
 
                 Keypad(
-                    calculator = model.feeCalculator,
-                    onKey = model::pressFee,
+                    calculator = model.state.feeCalculator,
+                    onKey = model.state::pressFee,
                 )
             }
         }
@@ -171,7 +171,7 @@ fun RecurringPanelBody(
                 )
 
                 Text(
-                    text = "${model.countCalculator.amount} 回",
+                    text = "${model.output.countCalculator.amount} 回",
                     color = Palette.accentStrong,
                     style = displayFont(
                         size = FontSize.LargeTitle,
@@ -180,12 +180,12 @@ fun RecurringPanelBody(
                 )
 
                 Note(
-                    text = model.scheduledEndDate?.let { "終わり ${RecurringText.date(it)}" }
+                    text = model.output.scheduledEndDate?.let { "終わり ${RecurringText.date(it)}" }
                         ?: "回数を入れると、終わりの日が決まります",
                 )
 
                 Keypad(
-                    calculator = model.countCalculator,
+                    calculator = model.output.countCalculator,
                     onKey = model::pressCount,
                 )
             }
@@ -205,8 +205,8 @@ private fun CountChoices(
     model: RecurringEditModel,
     onClose: () -> Unit,
 ) {
-    val plan = model.autoPlan ?: return
-    val owed = model.loanOwed ?: return
+    val plan = model.output.autoPlan ?: return
+    val owed = model.output.loanOwed ?: return
 
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -215,16 +215,16 @@ private fun CountChoices(
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ChoiceChip(
                 title = "残高から自動",
-                isSelected = model.usesAutoCount,
+                isSelected = model.output.usesAutoCount,
                 onSelect = {
-                    model.useAutoCount()
+                    model.state.useAutoCount()
                     model.prepareCount()
                 },
             )
 
             ChoiceChip(
                 title = "決めない",
-                isSelected = model.scheduledEndDate == null,
+                isSelected = model.output.scheduledEndDate == null,
                 onSelect = {
                     model.setEnd(null)
                     onClose()
@@ -236,7 +236,7 @@ private fun CountChoices(
             text =
                 "残高 ${AmountText.text(
                     amount = owed,
-                )} ÷ ${AmountText.text(amount = model.amount)} で " +
+                )} ÷ ${AmountText.text(amount = model.output.amount)} で " +
                     "${plan.count} 回。端数は最後の回に足します",
         )
     }
@@ -256,9 +256,9 @@ private fun RemindChoices(
         RecurringEditModel.remindChoices.forEach { days ->
             ChoiceChip(
                 title = RecurringText.remind(days),
-                isSelected = model.form.remindDaysBefore == days,
+                isSelected = model.state.form.remindDaysBefore == days,
                 onSelect = {
-                    model.update { copy(remindDaysBefore = days) }
+                    model.state.update { copy(remindDaysBefore = days) }
                     onClose()
                 },
                 modifier = Modifier.widthIn(min = 96.dp),

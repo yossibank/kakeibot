@@ -13,12 +13,12 @@ data class RecurringDetailRow(
     val isEmpty: Boolean,
 )
 
-val RecurringEditModel.detailRows: List<RecurringDetailRow>
+val RecurringEditModel.Output.detailRows: List<RecurringDetailRow>
     get() = transferRows + scheduleRows
 
-private val RecurringEditModel.transferRows: List<RecurringDetailRow>
+private val RecurringEditModel.Output.transferRows: List<RecurringDetailRow>
     get() {
-        if (form.type != Entry.Kind.transfer) {
+        if (state.form.type != Entry.Kind.transfer) {
             return emptyList()
         }
 
@@ -32,7 +32,7 @@ private val RecurringEditModel.transferRows: List<RecurringDetailRow>
         return listOfNotNull(countRow ?: closingRow, feeRow)
     }
 
-private val RecurringEditModel.countRow: RecurringDetailRow?
+private val RecurringEditModel.Output.countRow: RecurringDetailRow?
     get() {
         if (!isLoanRepayment) {
             return null
@@ -54,7 +54,7 @@ private val RecurringEditModel.countRow: RecurringDetailRow?
         )
     }
 
-private val RecurringEditModel.closingRow: RecurringDetailRow?
+private val RecurringEditModel.Output.closingRow: RecurringDetailRow?
     get() {
         if (!canUseClosingDay) {
             return null
@@ -63,12 +63,12 @@ private val RecurringEditModel.closingRow: RecurringDetailRow?
         return RecurringDetailRow(
             panel = RecurringPanel.Closing,
             icon = R.drawable.ic_card,
-            value = RecurringText.closingDay(form.closingDay),
-            isEmpty = form.closingDay == null,
+            value = RecurringText.closingDay(state.form.closingDay),
+            isEmpty = state.form.closingDay == null,
         )
     }
 
-private val RecurringEditModel.scheduleRows: List<RecurringDetailRow>
+private val RecurringEditModel.Output.scheduleRows: List<RecurringDetailRow>
     get() {
         val end = scheduledEndDate
 
@@ -76,7 +76,7 @@ private val RecurringEditModel.scheduleRows: List<RecurringDetailRow>
             RecurringDetailRow(
                 panel = RecurringPanel.Start,
                 icon = R.drawable.ic_calendar,
-                value = RecurringText.date(form.startDate),
+                value = RecurringText.date(state.form.startDate),
                 isEmpty = false,
             ),
             RecurringDetailRow(
@@ -88,14 +88,14 @@ private val RecurringEditModel.scheduleRows: List<RecurringDetailRow>
             RecurringDetailRow(
                 panel = RecurringPanel.Holiday,
                 icon = R.drawable.ic_calendar,
-                value = form.holidayShift.title,
-                isEmpty = form.holidayShift == HolidayShift.none,
+                value = state.form.holidayShift.title,
+                isEmpty = state.form.holidayShift == HolidayShift.none,
             ),
             RecurringDetailRow(
                 panel = RecurringPanel.Remind,
                 icon = R.drawable.ic_bell,
-                value = RecurringText.remind(form.remindDaysBefore),
-                isEmpty = form.remindDaysBefore == null,
+                value = RecurringText.remind(state.form.remindDaysBefore),
+                isEmpty = state.form.remindDaysBefore == null,
             ),
         )
     }

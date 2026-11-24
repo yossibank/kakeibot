@@ -11,15 +11,12 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.RecurringDraft
-import com.yossibank.kakeibot.core.concepts.recurring.billChoiceCount
-import com.yossibank.kakeibot.core.concepts.recurring.billDates
-import com.yossibank.kakeibot.core.concepts.recurring.cardBill
 import com.yossibank.kakeibot.core.concepts.recurring.endDate
 import com.yossibank.kakeibot.core.concepts.recurring.maxCount
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.features.shared.model.ModelTask
+import com.yossibank.kakeibot.features.shared.model.ScreenClock
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.latestEntryList
@@ -29,244 +26,233 @@ import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
 import com.yossibank.kakeibot.store.writes.methods.saveRecurring
 import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
 import com.yossibank.kakeibot.store.writes.types.Deletion
-import java.time.Instant
 
 class RecurringEditModel(
-    private val database: AppDatabase,
+    database: AppDatabase,
+    clock: ScreenClock,
     today: LocalDate,
     type: Entry.Kind = Entry.Kind.expense,
-    internal val editingId: Identifier<Recurring>? = null,
+    editingId: Identifier<Recurring>? = null,
 ) {
-    var today: LocalDate by mutableStateOf(today)
-    var isScheduleOpen: Boolean by mutableStateOf(editingId == null)
+    val state = State(today, type, isScheduleOpen = editingId == null)
+    val input = Input(editingId)
+    val output = Output(input, state)
 
-    var form: RecurringEditForm by mutableStateOf(
-        RecurringEditForm.starting(
-            today = today,
-            type = type,
-        ),
-    )
-        private set
+    private val dependencies = Dependencies(database, clock)
 
-    var calculator by mutableStateOf(AmountCalculator())
-        private set
+    class State(
+        today: LocalDate,
+        type: Entry.Kind,
+        isScheduleOpen: Boolean,
+    ) {
+        val task = ModelTask()
 
-    var feeCalculator by mutableStateOf(AmountCalculator())
-        private set
+        var today: LocalDate by mutableStateOf(today)
+        var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
 
-    var loan by mutableStateOf(RecurringLoanInput())
-        private set
-
-    var isHidden: Boolean by mutableStateOf(false)
-        private set
-
-    internal var loanBalances: Map<Identifier<Wallet>, Long> by mutableStateOf(emptyMap())
-        private set
-
-    internal var generatedUntil: LocalDate? = null
-        private set
-
-    internal var options: EntryOptions? by mutableStateOf(null)
-        private set
-
-    internal var cardBills: List<Recurring> by mutableStateOf(emptyList())
-        private set
-
-    private var baseline: RecurringDraft? by mutableStateOf(null)
-    private var isHolidayShiftChosen = false
-
-    private val task = ModelTask()
-
-    val isEditing: Boolean
-        get() = editingId != null
-
-    val message: String
-        get() = task.message
-
-    val amount: Int
-        get() = calculator.amount
-
-    val fee: Int
-        get() = feeCalculator.amount
-
-    val draft: RecurringDraft
-        get() = RecurringDraft(
-            type = form.type,
-            amount = amount,
-            categoryId = form.categoryId,
-            walletId = form.walletId,
-            toWalletId = form.toWalletId,
-            memo = form.memo,
-            frequency = form.frequency,
-            month = form.month,
-            day = form.day,
-            holidayShift = form.holidayShift,
-            closingDay = if (canUseClosingDay) form.closingDay else null,
-            fee = if (form.type == Entry.Kind.transfer) fee else 0,
-            finalAmount = finalAmount ?: 0,
-            billShift = if (billRecurring == null) 0 else form.billShift,
-            startDate = form.startDate,
-            endDate = scheduledEndDate,
-            remindDaysBefore = form.remindDaysBefore,
+        var form: RecurringEditForm by mutableStateOf(
+            RecurringEditForm.starting(
+                today = today,
+                type = type,
+            ),
         )
+            private set
 
-    val canSave: Boolean
-        get() = draft.problems.isEmpty()
+        var calculator by mutableStateOf(AmountCalculator())
+            private set
 
-    val saveTitle: String
-        get() {
-            val problem = draft.problems.firstOrNull() ?: return if (isEditing) "変更を保存" else "追加する"
-            return message(problem)
+        var feeCalculator by mutableStateOf(AmountCalculator())
+            private set
+
+        var loan by mutableStateOf(RecurringLoanInput())
+            private set
+
+        var isHolidayShiftChosen = false
+            private set
+
+        fun update(change: RecurringEditForm.() -> RecurringEditForm) {
+            form = form.change()
         }
 
-    val isChanged: Boolean
-        get() = baseline?.let { it != draft } ?: false
-
-    private val suggestedHolidayShift: HolidayShift
-        get() {
-            if (form.type == Entry.Kind.transfer) {
-                return HolidayShift.next
-            }
-
-            val glyph = selectedCategory?.let { icon(it.iconId) }?.glyph
-
-            return when (glyph) {
-                Icon.Glyph.salary, Icon.Glyph.bonus -> HolidayShift.previous
-                Icon.Glyph.home, Icon.Glyph.utility, Icon.Glyph.phone -> HolidayShift.next
-                else -> HolidayShift.none
-            }
+        fun updateLoan(change: RecurringLoanInput.() -> RecurringLoanInput) {
+            loan = loan.change()
         }
 
-    fun icon(of: Identifier<Icon>): Icon? = options?.icons?.get(of)
+        fun select(wallet: Identifier<Wallet>) {
+            form = form.withWallet(wallet)
+        }
 
-    fun update(change: RecurringEditForm.() -> RecurringEditForm) {
-        form = form.change()
+        fun choose(shift: HolidayShift) {
+            form = form.copy(holidayShift = shift)
+            isHolidayShiftChosen = true
+        }
+
+        fun press(key: AmountCalculator.Key) {
+            calculator = calculator.press(key)
+        }
+
+        fun pressFee(key: AmountCalculator.Key) {
+            feeCalculator = feeCalculator.press(key)
+        }
+
+        fun setFee(amount: Int) {
+            feeCalculator = AmountCalculator(amount = amount)
+        }
+
+        fun useAutoCount() {
+            loan = loan.copy(
+                isCountAuto = true,
+                manualFinal = null,
+            )
+        }
+
+        fun load(recurring: Recurring) {
+            val draft = RecurringDraft(recurring = recurring)
+
+            form = RecurringEditForm.of(draft)
+            calculator = AmountCalculator(amount = draft.amount)
+            feeCalculator = AmountCalculator(amount = draft.fee)
+            loan = loan.copy(manualFinal = recurring.finalAmount)
+        }
     }
 
+    class Input(
+        val editingId: Identifier<Recurring>?,
+    ) {
+        var isHidden: Boolean by mutableStateOf(false)
+            internal set
+
+        var loanBalances: Map<Identifier<Wallet>, Long> by mutableStateOf(emptyMap())
+            internal set
+
+        var generatedUntil: LocalDate? = null
+            internal set
+
+        var options: EntryOptions? by mutableStateOf(null)
+            internal set
+
+        var cardBills: List<Recurring> by mutableStateOf(emptyList())
+            internal set
+
+        var baseline: RecurringDraft? by mutableStateOf(null)
+            internal set
+    }
+
+    class Output(
+        internal val input: Input,
+        internal val state: State,
+    ) {
+        val isEditing: Boolean
+            get() = input.editingId != null
+
+        val amount: Int
+            get() = state.calculator.amount
+
+        val fee: Int
+            get() = state.feeCalculator.amount
+
+        fun icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
+    }
+
+    private class Dependencies(
+        val database: AppDatabase,
+        val clock: ScreenClock,
+    )
+
     fun select(type: Entry.Kind) {
-        if (type == form.type) {
+        if (type == state.form.type) {
             return
         }
 
-        form = form.copy(type = type)
-        form = form.copy(categoryId = categories.firstOrNull()?.id)
+        state.update { copy(type = type) }
+        state.update { copy(categoryId = output.categories.firstOrNull()?.id) }
 
         presetDestination()
         suggestHolidayShift()
     }
 
-    @JvmName("selectCategory")
     fun select(category: Identifier<EntryCategory>) {
-        form = form.copy(categoryId = category)
+        state.update { copy(categoryId = category) }
         suggestHolidayShift()
     }
 
-    @JvmName("selectWallet")
-    fun select(wallet: Identifier<Wallet>) {
-        form = form.withWallet(wallet)
-    }
-
-    fun choose(shift: HolidayShift) {
-        form = form.copy(holidayShift = shift)
-        isHolidayShiftChosen = true
-    }
-
-    fun press(key: AmountCalculator.Key) {
-        calculator = calculator.press(key)
-    }
-
-    fun pressFee(key: AmountCalculator.Key) {
-        feeCalculator = feeCalculator.press(key)
-    }
-
-    fun setFee(amount: Int) {
-        feeCalculator = AmountCalculator(amount = amount)
-    }
-
     fun prepareCount() {
-        loan = loan.copy(count = AmountCalculator(amount = repaymentCount ?: 0))
+        state.updateLoan { copy(count = AmountCalculator(amount = output.repaymentCount ?: 0)) }
     }
 
     fun pressCount(key: AmountCalculator.Key) {
-        val pressed = loan.count.press(key)
+        val pressed = state.loan.count.press(key)
         val isOver = pressed.amount > Recurring.maxCount
         val count = if (isOver) AmountCalculator(amount = Recurring.maxCount) else pressed
 
-        loan = loan.copy(count = count)
+        state.updateLoan { copy(count = count) }
 
-        val end = recurring(
+        val end = output.recurring(
             endDate = null,
             finalAmount = null,
         ).endDate(
             afterCount = count.amount,
-            from = repaymentStart,
+            from = output.repaymentStart,
         )
 
         setEnd(end)
     }
 
     fun setEnd(date: LocalDate?) {
-        form = form.copy(endDate = date)
+        state.update { copy(endDate = date) }
 
-        loan = loan.copy(
-            isCountAuto = false,
-            manualFinal = manualFinalAmount(through = date),
-        )
-    }
+        val manualFinal = output.manualFinalAmount(through = date)
 
-    fun useAutoCount() {
-        loan = loan.copy(
-            isCountAuto = true,
-            manualFinal = null,
-        )
-    }
-
-    fun clearMessage() {
-        task.clear()
+        state.updateLoan {
+            copy(
+                isCountAuto = false,
+                manualFinal = manualFinal,
+            )
+        }
     }
 
     suspend fun load() {
-        task.attempt(failure = LOAD_FAILED) {
-            options = database.entryOptions()
-            cardBills = database.recurrings()
+        state.task.attempt(failure = LOAD_FAILED) {
+            input.options = dependencies.database.entryOptions()
+            input.cardBills = dependencies.database.recurrings()
 
             loadLoanBalances()
             loadRecurring()
 
-            if (form.categoryId == null) {
-                form = form.copy(categoryId = categories.firstOrNull()?.id)
+            if (state.form.categoryId == null) {
+                state.update { copy(categoryId = output.categories.firstOrNull()?.id) }
             }
 
             suggestHolidayShift()
 
-            if (form.walletId == null) {
-                form = form.copy(walletId = wallets.firstOrNull()?.id)
+            if (state.form.walletId == null) {
+                state.update { copy(walletId = output.wallets.firstOrNull()?.id) }
             }
 
             presetDestination()
             chooseCountMode()
-            baseline = draft
+            input.baseline = output.draft
         }
     }
 
     suspend fun save(): Boolean {
-        val problem = draft.problems.firstOrNull()
+        val problem = output.draft.problems.firstOrNull()
 
         if (problem != null) {
-            task.show(message(problem))
+            state.task.show(output.message(problem))
             return false
         }
 
-        if (task.isRunning) {
+        if (state.task.isRunning) {
             return false
         }
 
-        val saved = task.attempt(failure = ModelTask.saveFailed) {
-            database.saveRecurring(
-                draft = draft,
-                editing = editingId,
-                today = today,
-                at = Instant.now(),
+        val saved = state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.saveRecurring(
+                draft = output.draft,
+                editing = input.editingId,
+                today = state.today,
+                at = dependencies.clock.now,
             )
         }
 
@@ -274,117 +260,97 @@ class RecurringEditModel(
     }
 
     suspend fun delete(): Deletion? {
-        val id = editingId ?: return null
+        val id = input.editingId ?: return null
 
-        return task.attempt(failure = ModelTask.saveFailed) {
-            database.deleteRecurring(
+        return state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.deleteRecurring(
                 id = id,
-                at = Instant.now(),
+                at = dependencies.clock.now,
             )
         }
     }
 
     suspend fun setHidden(isHidden: Boolean): Boolean {
-        val id = editingId ?: return false
+        val id = input.editingId ?: return false
 
-        val done = task.attempt(failure = ModelTask.saveFailed) {
-            database.setRecurringHidden(
+        val done = state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.setRecurringHidden(
                 id = id,
                 isHidden = isHidden,
-                today = today,
-                at = Instant.now(),
+                today = state.today,
+                at = dependencies.clock.now,
             )
         }
 
         if (done != null) {
-            this.isHidden = isHidden
+            input.isHidden = isHidden
         }
 
         return done != null
     }
 
-    internal fun recurring(
-        endDate: LocalDate?,
-        finalAmount: Int?,
-    ): Recurring = Recurring(
-        type = form.type,
-        amount = amount,
-        categoryId = null,
-        walletId = form.walletId ?: Identifier(),
-        toWalletId = form.toWalletId,
-        frequency = form.frequency,
-        month = if (form.frequency == Recurring.Frequency.yearly) form.month else null,
-        day = form.day,
-        holidayShift = form.holidayShift,
-        finalAmount = finalAmount,
-        startDate = form.startDate,
-        endDate = endDate,
-        createdAt = Instant.EPOCH,
-        updatedAt = Instant.EPOCH,
-    )
-
     private fun chooseCountMode() {
-        if (!isEditing) {
-            loan = loan.copy(isCountAuto = true)
+        if (!output.isEditing) {
+            state.updateLoan { copy(isCountAuto = true) }
             return
         }
 
-        val plan = autoPlan
-        val end = form.endDate
+        val plan = output.autoPlan
+        val end = state.form.endDate
 
         if (plan == null || end == null) {
-            loan = loan.copy(isCountAuto = false)
+            state.updateLoan { copy(isCountAuto = false) }
             return
         }
 
-        val isAuto = autoEndDate(plan) == end && plan.finalAmount == loan.manualFinal
+        val isAuto = output.autoEndDate(plan) == end && plan.finalAmount == state.loan.manualFinal
 
-        loan = loan.copy(isCountAuto = isAuto)
+        state.updateLoan { copy(isCountAuto = isAuto) }
     }
 
     private suspend fun loadLoanBalances() {
-        val list = database.latestEntryList()
+        val list = dependencies.database.latestEntryList()
 
-        loanBalances = wallets
+        input.loanBalances = output.wallets
             .filter { it.kind == Wallet.Kind.loan }
             .associate { wallet ->
                 wallet.id to list.balance(
                     of = wallet,
-                    through = today,
+                    through = state.today,
                 )
             }
     }
 
     private fun presetDestination() {
+        val form = state.form
+
         if (form.type != Entry.Kind.transfer || form.toWalletId != null) {
             return
         }
 
-        form = form.copy(toWalletId = wallets.firstOrNull { it.id != form.walletId }?.id)
+        state.update {
+            copy(toWalletId = output.wallets.firstOrNull { it.id != form.walletId }?.id)
+        }
     }
 
     private fun suggestHolidayShift() {
-        if (isEditing || isHolidayShiftChosen) {
+        if (output.isEditing || state.isHolidayShiftChosen) {
             return
         }
 
-        form = form.copy(holidayShift = suggestedHolidayShift)
+        state.update { copy(holidayShift = output.suggestedHolidayShift) }
     }
 
     private suspend fun loadRecurring() {
-        val id = editingId ?: return
+        val id = input.editingId ?: return
 
-        val recurring = database.recurrings(includingHidden = true).firstOrNull { it.id == id }
-            ?: throw IllegalStateException("recurringNotFound")
+        val recurring =
+            dependencies.database.recurrings(includingHidden = true).firstOrNull { it.id == id }
+                ?: throw IllegalStateException("recurringNotFound")
 
-        val draft = RecurringDraft(recurring = recurring)
-
-        isHidden = recurring.archivedAt != null
-        form = RecurringEditForm.of(draft)
-        calculator = AmountCalculator(amount = draft.amount)
-        feeCalculator = AmountCalculator(amount = draft.fee)
-        loan = loan.copy(manualFinal = recurring.finalAmount)
-        generatedUntil = recurring.generatedUntil
+        input.isHidden = recurring.archivedAt != null
+        state.load(recurring)
+        input.generatedUntil = recurring.generatedUntil
     }
 
     companion object {
