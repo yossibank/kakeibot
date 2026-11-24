@@ -51,9 +51,6 @@ class RecordsModel(
         var selected: LocalDate? by mutableStateOf(null)
             private set
 
-        var layout: RecordsLayout by mutableStateOf(RecordsLayout.calendar)
-            private set
-
         fun move(to: YearMonth) {
             month = to
             selected = null
@@ -61,10 +58,6 @@ class RecordsModel(
 
         fun select(date: LocalDate) {
             selected = date
-        }
-
-        fun show(layout: RecordsLayout) {
-            this.layout = layout
         }
     }
 
@@ -79,6 +72,9 @@ class RecordsModel(
             internal set
 
         var weekStart: Weekday by mutableStateOf(Weekday.monday)
+            internal set
+
+        var layout: RecordsLayout by mutableStateOf(RecordsLayout.calendar)
             internal set
     }
 
@@ -170,7 +166,7 @@ class RecordsModel(
             }
 
             launch {
-                database.settingUpdates(SettingKey.recordsLayout).collect { state.show(it) }
+                database.settingUpdates(SettingKey.recordsLayout).collect { input.layout = it }
             }
 
             launch {
@@ -187,7 +183,7 @@ class RecordsModel(
     }
 
     suspend fun select(layout: RecordsLayout) {
-        state.show(layout)
+        input.layout = layout
 
         ModelTask.quiet {
             dependencies.database.setSetting(

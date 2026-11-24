@@ -122,7 +122,7 @@ fun RecordsView(
 
         item(key = "layout") {
             SegmentSwitch(
-                selection = model.state.layout,
+                selection = model.input.layout,
                 options = layouts,
                 onSelect = { layout ->
                     scope.launch { model.select(layout) }
@@ -130,7 +130,7 @@ fun RecordsView(
             )
         }
 
-        if (model.state.layout == RecordsLayout.calendar) {
+        if (model.input.layout == RecordsLayout.calendar) {
             item(key = "calendar") {
                 RecordsCalendarCard(model = model)
             }
