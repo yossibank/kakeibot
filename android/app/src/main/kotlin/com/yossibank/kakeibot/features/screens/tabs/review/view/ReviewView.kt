@@ -79,7 +79,7 @@ fun ReviewView(
     }
 
     SideEffect {
-        model.today = today
+        model.state.today = today
     }
 
     LaunchedEffect(model) {
@@ -106,19 +106,22 @@ fun ReviewView(
                 )
 
                 SegmentSwitch(
-                    selection = model.scale,
+                    selection = model.state.scale,
                     options = scales,
-                    onSelect = model::select,
+                    onSelect = model.state::select,
                 )
             }
         }
 
         item(key = "period") {
             PeriodStepper(
-                title = model.title,
-                onPrevious = { model.move(count = -1) },
-                onNext = { model.move(count = 1) },
-                caption = model.rangeText.takeIf { model.scale != ReviewPeriod.Scale.week },
+                title = model.output.title,
+                onPrevious = { model.state.move(count = -1) },
+                onNext = { model.state.move(count = 1) },
+                caption = model.output.rangeText.takeIf {
+                    model.state.scale !=
+                        ReviewPeriod.Scale.week
+                },
             )
         }
 
@@ -134,7 +137,7 @@ fun ReviewView(
 
 @Composable
 private fun TotalsCard(model: ReviewModel) {
-    val summary = model.summary
+    val summary = model.output.summary
 
     Row(
         modifier = Modifier
@@ -213,8 +216,8 @@ private fun Total(
 
 @Composable
 private fun BreakdownCard(model: ReviewModel) {
-    val rows = model.rows
-    val difference = model.total - model.previousTotal
+    val rows = model.output.rows
+    val difference = model.output.total - model.output.previousTotal
 
     Column(
         modifier = Modifier
@@ -239,9 +242,9 @@ private fun BreakdownCard(model: ReviewModel) {
             )
 
             SegmentSwitch(
-                selection = model.kind,
+                selection = model.state.kind,
                 options = kinds,
-                onSelect = { model.kind = it },
+                onSelect = { model.state.kind = it },
             )
         }
 
@@ -250,13 +253,13 @@ private fun BreakdownCard(model: ReviewModel) {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = model.kind.title,
+                    text = model.state.kind.title,
                     color = Palette.subtext,
                     style = textFont(style = FontTextStyle.Caption),
                 )
 
                 AmountText(
-                    amount = model.total.clamped,
+                    amount = model.output.total.clamped,
                     style = displayFont(
                         size = FontSize.Headline,
                         weight = FontWeight.Bold,

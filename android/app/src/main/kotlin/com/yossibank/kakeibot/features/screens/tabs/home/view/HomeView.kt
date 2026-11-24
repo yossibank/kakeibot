@@ -69,7 +69,7 @@ fun HomeView(
     }
 
     SideEffect {
-        model.today = today
+        model.state.today = today
     }
 
     LaunchedEffect(model) {
@@ -92,14 +92,14 @@ fun HomeView(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    text = model.month?.let { "${it.month}月" } ?: "",
+                    text = model.output.month?.let { "${it.month}月" } ?: "",
                     modifier = Modifier.alignByBaseline(),
                     color = Palette.accentStrong,
                     style = displayFont(size = FontSize.Headline),
                 )
 
                 Text(
-                    text = model.periodText,
+                    text = model.output.periodText,
                     modifier = Modifier
                         .alignByBaseline()
                         .weight(1f),
@@ -135,8 +135,8 @@ private fun BudgetCard(
     model: HomeModel,
     onOpenBudget: () -> Unit,
 ) {
-    val overview = model.overview
-    val usage = model.usage
+    val overview = model.input.overview
+    val usage = model.output.usage
 
     Column(
         modifier = Modifier
@@ -291,7 +291,7 @@ private fun RecentCard(
     model: HomeModel,
     onOpenEntry: (Identifier<Entry>) -> Unit,
 ) {
-    val rows = model.recentRows
+    val rows = model.output.recentRows
 
     Column(
         modifier = Modifier

@@ -68,20 +68,20 @@ fun AssetsView(database: AppDatabase) {
             TotalCard(model = model)
         }
 
-        if (model.assets.isNotEmpty()) {
+        if (model.output.assets.isNotEmpty()) {
             item(key = "assets") {
                 WalletCard(
                     title = "資産",
-                    rows = model.assets,
+                    rows = model.output.assets,
                 )
             }
         }
 
-        if (model.debts.isNotEmpty()) {
+        if (model.output.debts.isNotEmpty()) {
             item(key = "debts") {
                 WalletCard(
                     title = "負債",
-                    rows = model.debts,
+                    rows = model.output.debts,
                 )
             }
         }
@@ -100,12 +100,12 @@ private fun TotalCard(model: AssetsModel) {
         Caption(text = "手元のお金")
 
         AmountText(
-            amount = model.onHand.clamped,
+            amount = model.output.onHand.clamped,
             style = displayFont(
                 size = FontSize.LargeTitle,
                 weight = FontWeight.Bold,
             ),
-            color = if (model.onHand < 0) Palette.rose else Palette.accentStrong,
+            color = if (model.output.onHand < 0) Palette.rose else Palette.accentStrong,
         )
 
         Hairline()
@@ -119,12 +119,12 @@ private fun TotalCard(model: AssetsModel) {
             )
 
             AmountText(
-                amount = model.netWorth.clamped,
+                amount = model.output.netWorth.clamped,
                 style = displayFont(
                     size = FontSize.Body,
                     weight = FontWeight.SemiBold,
                 ),
-                color = if (model.netWorth < 0) Palette.rose else Palette.text,
+                color = if (model.output.netWorth < 0) Palette.rose else Palette.text,
             )
         }
     }

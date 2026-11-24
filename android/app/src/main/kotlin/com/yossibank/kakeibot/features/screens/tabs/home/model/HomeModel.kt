@@ -20,59 +20,80 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 
 class HomeModel(
-    private val database: AppDatabase,
-    private val entryList: Flow<EntryList>,
+    database: AppDatabase,
+    entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
-    var today: LocalDate by mutableStateOf(today)
+    val state = State(today)
+    val input = Input()
+    val output = Output(input)
 
-    var overview: MonthOverview? by mutableStateOf(null)
-        private set
+    private val dependencies = Dependencies(database, entryList)
 
-    val month: YearMonth?
-        get() = overview?.month
+    class State(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+    }
 
-    val periodText: String
-        get() {
-            val period = overview?.period ?: return ""
-            return PeriodText.range(period)
+    class Input {
+        var overview: MonthOverview? by mutableStateOf(null)
+            internal set
+    }
+
+    class Output(
+        private val input: Input,
+    ) {
+        val month: YearMonth?
+            get() = input.overview?.month
+
+        val periodText: String
+            get() {
+                val period = input.overview?.period ?: return ""
+                return PeriodText.range(period)
+            }
+
+        val usage: BudgetUsage?
+            get() = input.overview?.budgetUsage
+
+        val recentRows: List<EntryRowItem> by derivedStateOf {
+            val list = input.overview?.list
+
+            list?.entries.orEmpty()
+                .sortedWith(recentOrder)
+                .take(RECENT_LIMIT)
+                .mapNotNull { entry ->
+                    list?.let {
+                        EntryRowItem.of(
+                            entry = entry,
+                            list = it,
+                            dayLabel = entry.date.monthDayText,
+                        )
+                    }
+                }
         }
 
-    val usage: BudgetUsage?
-        get() = overview?.budgetUsage
+        private companion object {
+            const val RECENT_LIMIT = 5
 
-    val recentRows: List<EntryRowItem> by derivedStateOf {
-        val list = overview?.list
-
-        list?.entries.orEmpty()
-            .sortedWith(recentOrder)
-            .take(RECENT_LIMIT)
-            .mapNotNull { entry ->
-                list?.let {
-                    EntryRowItem.of(
-                        entry = entry,
-                        list = it,
-                        dayLabel = entry.date.monthDayText,
-                    )
-                }
-            }
+            val recentOrder: Comparator<Entry> =
+                compareByDescending<Entry> { it.date }.thenByDescending { it.createdAt }
+        }
     }
+
+    private class Dependencies(
+        val database: AppDatabase,
+        val entryList: Flow<EntryList>,
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun observe() {
-        snapshotFlow { today }
+        snapshotFlow { state.today }
             .flatMapLatest { day ->
-                database.monthOverviewUpdates(
+                dependencies.database.monthOverviewUpdates(
                     on = day,
-                    list = entryList,
+                    list = dependencies.entryList,
                 )
-            }.collect { overview = it }
-    }
-
-    private companion object {
-        const val RECENT_LIMIT = 5
-
-        val recentOrder: Comparator<Entry> =
-            compareByDescending<Entry> { it.date }.thenByDescending { it.createdAt }
+            }.collect { input.overview = it }
     }
 }

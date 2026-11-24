@@ -80,7 +80,7 @@ fun RecordsView(
     }
 
     SideEffect {
-        model.today = today
+        model.state.today = today
     }
 
     val scope = rememberCoroutineScope()
@@ -109,10 +109,10 @@ fun RecordsView(
 
         item(key = "month") {
             PeriodStepper(
-                title = model.monthTitle,
+                title = model.output.monthTitle,
                 onPrevious = { model.move(months = -1) },
                 onNext = { model.move(months = 1) },
-                caption = model.periodText,
+                caption = model.output.periodText,
             )
         }
 
@@ -122,7 +122,7 @@ fun RecordsView(
 
         item(key = "layout") {
             SegmentSwitch(
-                selection = model.layout,
+                selection = model.state.layout,
                 options = layouts,
                 onSelect = { layout ->
                     scope.launch { model.select(layout) }
@@ -130,16 +130,16 @@ fun RecordsView(
             )
         }
 
-        if (model.layout == RecordsLayout.calendar) {
+        if (model.state.layout == RecordsLayout.calendar) {
             item(key = "calendar") {
                 RecordsCalendarCard(model = model)
             }
 
             item(key = "selected") {
-                val date = model.selectedDate
+                val date = model.output.selectedDate
 
                 DayCard(
-                    day = model.day(on = date) ?: EntryDay(
+                    day = model.output.day(on = date) ?: EntryDay(
                         date = date,
                         entries = emptyList(),
                     ),
@@ -148,14 +148,14 @@ fun RecordsView(
                 )
             }
         } else {
-            if (model.isLoaded && model.days.isEmpty()) {
+            if (model.input.isLoaded && model.output.days.isEmpty()) {
                 item(key = "empty") {
                     EmptyCard()
                 }
             }
 
             items(
-                items = model.days,
+                items = model.output.days,
                 key = { it.date.toString() },
             ) { day ->
                 DayCard(
@@ -170,9 +170,9 @@ fun RecordsView(
 
 @Composable
 private fun SummaryCard(model: RecordsModel) {
-    val expense = model.expenseTotal.clamped
-    val income = model.incomeTotal.clamped
-    val balance = model.balance.clamped
+    val expense = model.output.expenseTotal.clamped
+    val income = model.output.incomeTotal.clamped
+    val balance = model.output.balance.clamped
 
     Column(
         modifier = Modifier
@@ -208,7 +208,7 @@ private fun SummaryCard(model: RecordsModel) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = model.balanceTitle,
+                text = model.output.balanceTitle,
                 modifier = Modifier.weight(1f),
                 color = Palette.subtext,
                 style = textFont(style = FontTextStyle.Caption),
@@ -268,7 +268,7 @@ private fun DayCard(
     ) {
         DayHeader(
             day = day,
-            isToday = day.date == model.today,
+            isToday = day.date == model.state.today,
         )
 
         if (day.entries.isEmpty()) {
@@ -283,7 +283,7 @@ private fun DayCard(
             )
         }
 
-        model.rows(of = day).forEach { row ->
+        model.output.rows(of = day).forEach { row ->
             Hairline()
 
             EntryItemRow(

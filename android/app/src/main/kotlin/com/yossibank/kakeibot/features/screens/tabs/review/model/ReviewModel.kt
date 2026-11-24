@@ -13,7 +13,6 @@ import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.core.concepts.review.ReviewSummary
 import com.yossibank.kakeibot.features.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
@@ -24,10 +23,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ReviewModel(
-    private val database: AppDatabase,
-    private val entryList: Flow<EntryList>,
+    database: AppDatabase,
+    entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
+    val state = State(today)
+    val input = Input()
+    val output = Output(input, state)
+
+    private val dependencies = Dependencies(database, entryList)
+
     data class Row(
         val key: String,
         val icon: Icon?,
@@ -37,122 +42,146 @@ class ReviewModel(
         val ratio: Double,
     )
 
-    var today: LocalDate by mutableStateOf(today)
+    class State(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
 
-    var scale: ReviewPeriod.Scale by mutableStateOf(ReviewPeriod.Scale.month)
-        private set
+        var scale: ReviewPeriod.Scale by mutableStateOf(ReviewPeriod.Scale.month)
+            private set
 
-    var kind: Entry.Kind by mutableStateOf(Entry.Kind.expense)
+        var kind: Entry.Kind by mutableStateOf(Entry.Kind.expense)
 
-    private var offset: Int by mutableStateOf(0)
+        var offset: Int by mutableStateOf(0)
+            private set
 
-    private var list: EntryList? by mutableStateOf(null)
-
-    private var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
-
-    private var weekStart: Weekday by mutableStateOf(Weekday.monday)
-
-    val period: ReviewPeriod
-        get() = ReviewPeriod(
-            scale = scale,
-            containing = today,
-            monthStartDay = monthStartDay,
-            weekStart = weekStart,
-        ).adding(count = offset)
-
-    val title: String
-        get() {
-            val range = period.range
-
-            return when (scale) {
-                ReviewPeriod.Scale.week -> {
-                    PeriodText.range(range)
-                }
-
-                ReviewPeriod.Scale.month -> {
-                    val month = range.start.periodMonth(startingOn = monthStartDay)
-
-                    "${month.year}年 ${month.month}月"
-                }
-
-                ReviewPeriod.Scale.year -> {
-                    "${range.endInclusive.year}年"
-                }
-            }
+        fun select(scale: ReviewPeriod.Scale) {
+            this.scale = scale
+            offset = 0
         }
 
-    val rangeText: String
-        get() = PeriodText.range(period.range)
-
-    val summary: ReviewSummary by derivedStateOf {
-        ReviewSummary(
-            entries = list?.entries ?: emptyList(),
-            range = period.range,
-        )
+        fun move(count: Int) {
+            offset += count
+        }
     }
 
-    val previousTotal: Long
-        get() {
-            val previous = ReviewSummary(
-                entries = list?.entries ?: emptyList(),
-                range = period.comparisonRange(today = today),
-            )
+    class Input {
+        var list: EntryList? by mutableStateOf(null)
+            internal set
 
-            return previous.breakdown(of = kind)?.total ?: 0
-        }
+        var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
+            internal set
 
-    val total: Long
-        get() = summary.breakdown(of = kind)?.total ?: 0
+        var weekStart: Weekday by mutableStateOf(Weekday.monday)
+            internal set
+    }
 
-    val rows: List<Row>
-        get() {
-            val list = list ?: return emptyList()
-            val breakdown = summary.breakdown(of = kind) ?: return emptyList()
+    class Output(
+        private val input: Input,
+        private val state: State,
+    ) {
+        val period: ReviewPeriod
+            get() = ReviewPeriod(
+                scale = state.scale,
+                containing = state.today,
+                monthStartDay = input.monthStartDay,
+                weekStart = input.weekStart,
+            ).adding(count = state.offset)
 
-            if (breakdown.total <= 0) {
-                return emptyList()
+        val title: String
+            get() {
+                val range = period.range
+
+                return when (state.scale) {
+                    ReviewPeriod.Scale.week -> {
+                        PeriodText.range(range)
+                    }
+
+                    ReviewPeriod.Scale.month -> {
+                        val month = range.start.periodMonth(startingOn = input.monthStartDay)
+
+                        "${month.year}年 ${month.month}月"
+                    }
+
+                    ReviewPeriod.Scale.year -> {
+                        "${range.endInclusive.year}年"
+                    }
+                }
             }
 
-            return breakdown.byCategory
-                .entries
-                .sortedByDescending { it.value }
-                .map { (id, amount) ->
-                    val category = list.categories[id]
-                    val icon = category?.let { list.icons[it.iconId] }
+        val rangeText: String
+            get() = PeriodText.range(period.range)
 
-                    Row(
-                        key = id.toString(),
-                        icon = icon,
-                        name = category?.name ?: "未分類",
-                        color = icon?.color,
-                        amount = amount,
-                        ratio = amount.toDouble() / breakdown.total.toDouble(),
-                    )
-                }
+        val summary: ReviewSummary by derivedStateOf {
+            ReviewSummary(
+                entries = input.list?.entries ?: emptyList(),
+                range = period.range,
+            )
         }
+
+        val previousTotal: Long
+            get() {
+                val previous = ReviewSummary(
+                    entries = input.list?.entries ?: emptyList(),
+                    range = period.comparisonRange(today = state.today),
+                )
+
+                return previous.breakdown(of = state.kind)?.total ?: 0
+            }
+
+        val total: Long
+            get() = summary.breakdown(of = state.kind)?.total ?: 0
+
+        val rows: List<Row>
+            get() {
+                val list = input.list ?: return emptyList()
+                val breakdown = summary.breakdown(of = state.kind) ?: return emptyList()
+
+                if (breakdown.total <= 0) {
+                    return emptyList()
+                }
+
+                return breakdown.byCategory
+                    .entries
+                    .sortedByDescending { it.value }
+                    .map { (id, amount) ->
+                        val category = list.categories[id]
+                        val icon = category?.let { list.icons[it.iconId] }
+
+                        Row(
+                            key = id.toString(),
+                            icon = icon,
+                            name = category?.name ?: "未分類",
+                            color = icon?.color,
+                            amount = amount,
+                            ratio = amount.toDouble() / breakdown.total.toDouble(),
+                        )
+                    }
+            }
+    }
+
+    private class Dependencies(
+        val database: AppDatabase,
+        val entryList: Flow<EntryList>,
+    )
 
     suspend fun observe() {
+        val database = dependencies.database
+
         coroutineScope {
             launch {
-                database.settingUpdates(SettingKey.monthStartDay).collect { monthStartDay = it }
+                database.settingUpdates(SettingKey.monthStartDay).collect {
+                    input.monthStartDay = it
+                }
             }
 
             launch {
-                database.settingUpdates(SettingKey.weekStart).collect { weekStart = it }
+                database.settingUpdates(SettingKey.weekStart).collect { input.weekStart = it }
             }
 
             launch {
-                entryList.collect { list = it }
+                dependencies.entryList.collect { input.list = it }
             }
         }
-    }
-
-    fun select(scale: ReviewPeriod.Scale) {
-        this.scale = scale
-        offset = 0
-    }
-
-    fun move(count: Int) {
-        offset += count
     }
 }
