@@ -45,12 +45,12 @@ public struct HomeSectionListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(dragging != nil)
         }
-        .settingsScreen(errorNotice: $model.errorNotice)
-        .animation(.snappy, value: model.layout)
-        .transaction(value: model.isLoaded) { transaction in
+        .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
+        .animation(.snappy, value: model.state.layout)
+        .transaction(value: model.input.isLoaded) { transaction in
             transaction.disablesAnimations = true
         }
-        .haptic(.selection, trigger: model.layout)
+        .haptic(.selection, trigger: model.state.layout)
         .onChange(of: isPressing) { _, isPressing in
             if !isPressing {
                 finishDragging()
@@ -64,7 +64,7 @@ public struct HomeSectionListView: View {
 
 private extension HomeSectionListView {
     var board: some View {
-        let slots = model.layout.slots
+        let slots = model.state.layout.slots
 
         return VStack(spacing: 0) {
             ForEach(Array(slots.enumerated()), id: \.element) { index, slot in
@@ -93,7 +93,7 @@ private extension HomeSectionListView {
     }
 
     var zones: some View {
-        let shownHeight = CGFloat(model.layout.visible.count) * Self.rowHeight
+        let shownHeight = CGFloat(model.state.layout.visible.count) * Self.rowHeight
         let hiddenHeight = CGFloat(hiddenCount + 1) * Self.rowHeight - Self.zoneGap
 
         return VStack(spacing: Self.zoneGap) {
@@ -127,7 +127,7 @@ private extension HomeSectionListView {
     }
 
     func row(_ section: HomeSection) -> some View {
-        let isHidden = model.layout.isHidden(section)
+        let isHidden = model.state.layout.isHidden(section)
         let opacity = isHidden ? Emphasis.medium.rawValue : 1
         let isDragging = dragging == section
         let scale = isDragging ? Self.liftScale : 1
@@ -170,7 +170,7 @@ private extension HomeSectionListView {
     static let liftScale: CGFloat = 1.02
 
     var hiddenCount: Int {
-        model.layout.order.count - model.layout.visible.count
+        model.state.layout.order.count - model.state.layout.visible.count
     }
 
     var zoneShape: RoundedRectangle {
@@ -180,7 +180,7 @@ private extension HomeSectionListView {
     func offset(of section: HomeSection) -> CGFloat {
         guard
             dragging == section,
-            let index = model.layout.slots.firstIndex(of: .section(section))
+            let index = model.state.layout.slots.firstIndex(of: .section(section))
         else {
             return 0
         }
@@ -221,7 +221,7 @@ private extension HomeSectionListView {
             return
         }
 
-        dragStart = model.layout.slots.firstIndex(of: .section(section)) ?? 0
+        dragStart = model.state.layout.slots.firstIndex(of: .section(section)) ?? 0
         dragTranslation = 0
 
         withAnimation(.snappy) {
