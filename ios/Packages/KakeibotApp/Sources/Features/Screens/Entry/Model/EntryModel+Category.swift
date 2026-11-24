@@ -161,24 +161,6 @@ extension EntryModel {
     static func filledMemo(of template: EntryTemplate) -> String? {
         template.memo.flatMap { $0.isEmpty ? nil : $0 }
     }
-
-    func fitCategoryToWallet() {
-        guard
-            let categoryId = state.category.id,
-            let current = output.allCategories.first(where: { $0.id == categoryId }),
-            !output.categories.contains(where: { $0.id == categoryId })
-        else {
-            return
-        }
-
-        let tagId = state.category.tagId
-        let tagName = output.allTags.first { $0.id == tagId }?.name
-        let categories = output.categories
-        let fitted = categories.first { $0.name == current.name } ?? categories.first
-
-        state.setCategory(fitted?.id)
-        state.category.tagId = output.tags.first { $0.name == tagName }?.id
-    }
 }
 
 private extension EntryModel {

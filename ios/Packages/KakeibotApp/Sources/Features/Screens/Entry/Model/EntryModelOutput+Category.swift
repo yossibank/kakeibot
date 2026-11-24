@@ -26,12 +26,7 @@ public extension EntryModel.Output {
     }
 
     var tags: [EntryTag] {
-        let choice = state.category
-
-        return allTags.filter { tag in
-            tag.categoryId == choice.id
-                && (tag.archivedAt == nil || tag.id == choice.tagId)
-        }
+        state.category.tags(in: allTags)
     }
 
     var recentEntries: [Entry] {
@@ -124,9 +119,16 @@ extension EntryModel.Output {
     }
 
     func categories(for type: Entry.Kind) -> [EntryCategory] {
+        categories(for: type, walletId: state.payment.walletId)
+    }
+
+    func categories(
+        for type: Entry.Kind,
+        walletId: Wallet.ID?
+    ) -> [EntryCategory] {
         let categories = switch type {
-        case .expense: offeredCategories(of: .expense)
-        case .income: offeredCategories(of: .income)
+        case .expense: offeredCategories(of: .expense, walletId: walletId)
+        case .income: offeredCategories(of: .income, walletId: walletId)
         case .transfer: [EntryCategory]()
         }
 
@@ -148,15 +150,6 @@ extension EntryModel.Output {
 }
 
 private extension EntryModel.Output {
-    var walletCategories: [EntryCategory] {
-        let categories = input.options?.sharedCategories ?? []
-        let walletId = state.payment.walletId
-
-        return categories.filter { category in
-            category.walletId != nil && category.walletId == walletId
-        }
-    }
-
     static func recentKey(
         categoryId: EntryCategory.ID?,
         amount: Int?,
@@ -167,8 +160,19 @@ private extension EntryModel.Output {
         return "\(category)>\(amount)>\(memo ?? "")"
     }
 
-    func offeredCategories(of kind: EntryCategory.Kind) -> [EntryCategory] {
-        let shared = walletCategories
+    func walletCategories(of walletId: Wallet.ID?) -> [EntryCategory] {
+        let categories = input.options?.sharedCategories ?? []
+
+        return categories.filter { category in
+            category.walletId != nil && category.walletId == walletId
+        }
+    }
+
+    func offeredCategories(
+        of kind: EntryCategory.Kind,
+        walletId: Wallet.ID?
+    ) -> [EntryCategory] {
+        let shared = walletCategories(of: walletId)
 
         guard shared.isEmpty else {
             return shared.filter { $0.kind == kind }

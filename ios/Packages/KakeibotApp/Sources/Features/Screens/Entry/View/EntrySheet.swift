@@ -45,8 +45,7 @@ public struct EntrySheet: View {
         _model = State(initialValue: model)
         _deck = State(initialValue: EntryDeck.start(for: model.state.type))
         _notice = State(initialValue: model.newNoticeModel())
-        let voiceDependencies = EntryVoiceFlow.Dependencies.live(clock: model.input.clock)
-        _voice = State(initialValue: EntryVoiceFlow(dependencies: voiceDependencies))
+        _voice = State(initialValue: model.newVoiceFlow())
 
         self.onChange = onChange
         self.startsReceipt = startsReceipt
@@ -252,7 +251,7 @@ extension EntrySheet {
     }
 
     var today: LocalDate {
-        LocalDate(Date(), in: .current)
+        model.state.today
     }
 
     init(

@@ -16,9 +16,12 @@ public extension EntryModel {
     }
 
     func setWallet(_ id: Wallet.ID?) {
-        if state.payment.setWallet(id) {
-            fitCategoryToWallet()
-        }
+        state.setWallet(
+            id,
+            offering: output.categories(for: state.type, walletId: id),
+            allCategories: output.allCategories,
+            allTags: output.allTags
+        )
     }
 
     func newWalletModel() -> WalletEditModel {
@@ -49,7 +52,7 @@ public extension EntryModel {
                 chooseDestination()
             }
 
-            updateBalances()
+            updateToday()
         } catch {
             report(error)
         }
@@ -62,9 +65,17 @@ public extension EntryModel {
 }
 
 extension EntryModel {
-    func loadBalances() async throws {
+    func loadHistory() async throws {
         input.history = try await dependencies.database.latestEntryList()
-        updateBalances()
+        updateToday()
+    }
+
+    func updateToday() {
+        let today = dependencies.clock.today
+
+        if state.today != today {
+            state.today = today
+        }
     }
 
     func observeHistory() async {
@@ -78,53 +89,11 @@ extension EntryModel {
                 }
 
                 input.history = list
-                updateBalances()
+                updateToday()
             }
         } catch {
             report(error)
         }
-    }
-}
-
-private extension EntryModel {
-    static func isFee(
-        _ entry: Entry,
-        of editingId: Entry.ID?
-    ) -> Bool {
-        guard let editingId else {
-            return false
-        }
-
-        return entry.transferId == editingId
-    }
-
-    func updateBalances() {
-        guard let list = input.history else {
-            return
-        }
-
-        let editingId = input.editingId
-
-        let entries = list.entries
-            .filter { $0.id != editingId && !Self.isFee($0, of: editingId) }
-
-        let related = Wallet.entriesByWallet(entries)
-        let valuations = list.valuations
-        let adjustments = list.adjustments
-        let today = dependencies.clock.today
-
-        let pairs = output.wallets.map { wallet in
-            let balance = wallet.balance(
-                with: related[wallet.id] ?? [],
-                valuations: valuations,
-                adjustments: adjustments,
-                through: today
-            )
-
-            return (wallet.id, balance)
-        }
-
-        input.balances = Dictionary(uniqueKeysWithValues: pairs)
     }
 }
 

@@ -208,6 +208,7 @@ struct MainView: View {
             records.state.today = today
             review.state.today = today
             assets.setToday(today)
+            draft.state.today = today
 
             prepareDraft()
         }

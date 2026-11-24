@@ -8,7 +8,6 @@ public extension EntryModel {
     final class Input {
         public internal(set) var options: EntryOptions?
         public internal(set) var history: EntryList?
-        public internal(set) var balances: [Wallet.ID: Int] = [:]
         public internal(set) var recentMemos: [String] = []
         public internal(set) var recentItemNames: [String] = []
         public internal(set) var weekStart: Weekday = .sunday
@@ -24,25 +23,15 @@ public extension EntryModel {
         var original: Entry?
         var originalFee: Entry?
         var baseline: Snapshot?
-        var isSaving = false
 
         let startingTemplate: EntryTemplate?
-        let clock: ScreenClock
 
         init(
             editingId: Entry.ID?,
-            startingTemplate: EntryTemplate?,
-            clock: ScreenClock
+            startingTemplate: EntryTemplate?
         ) {
             self.editingId = editingId
             self.startingTemplate = startingTemplate
-            self.clock = clock
         }
-    }
-}
-
-extension EntryModel.Input {
-    var today: LocalDate {
-        clock.today
     }
 }

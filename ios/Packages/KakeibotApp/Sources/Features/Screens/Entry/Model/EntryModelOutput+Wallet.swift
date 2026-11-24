@@ -104,7 +104,7 @@ public extension EntryModel.Output {
     }
 
     func balance(of wallet: Wallet) -> Int? {
-        input.balances[wallet.id]
+        balances[wallet.id]
     }
 
     func balanceText(of wallet: Wallet) -> String? {
@@ -128,6 +128,41 @@ extension EntryModel.Output {
 }
 
 private extension EntryModel.Output {
+    var balances: [Wallet.ID: Int] {
+        balancesCache.value {
+            latestBalances
+        }
+    }
+
+    var latestBalances: [Wallet.ID: Int] {
+        guard let list = input.history else {
+            return [:]
+        }
+
+        let editingId = input.editingId
+
+        let entries = list.entries
+            .filter { $0.id != editingId && !Self.isFee($0, of: editingId) }
+
+        let related = Wallet.entriesByWallet(entries)
+        let valuations = list.valuations
+        let adjustments = list.adjustments
+        let today = state.today
+
+        let pairs = wallets.map { wallet in
+            let balance = wallet.balance(
+                with: related[wallet.id] ?? [],
+                valuations: valuations,
+                adjustments: adjustments,
+                through: today
+            )
+
+            return (wallet.id, balance)
+        }
+
+        return Dictionary(uniqueKeysWithValues: pairs)
+    }
+
     var recentWalletIds: [Entry.Kind: Wallet.ID] {
         recentWalletsCache.value {
             latestWalletIds
@@ -146,5 +181,16 @@ private extension EntryModel.Output {
         }
 
         return ids
+    }
+
+    static func isFee(
+        _ entry: Entry,
+        of editingId: Entry.ID?
+    ) -> Bool {
+        guard let editingId else {
+            return false
+        }
+
+        return entry.transferId == editingId
     }
 }

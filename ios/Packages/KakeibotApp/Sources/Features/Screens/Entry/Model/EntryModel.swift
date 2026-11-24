@@ -21,8 +21,8 @@ public final class EntryModel {
         type: Entry.Kind = .expense,
         template: EntryTemplate? = nil
     ) {
-        let state = State(type: type, date: date)
-        let input = Input(editingId: id, startingTemplate: template, clock: clock)
+        let state = State(type: type, date: date, today: clock.today)
+        let input = Input(editingId: id, startingTemplate: template)
 
         self.state = state
         self.input = input
@@ -62,7 +62,7 @@ public extension EntryModel {
             input.budgets = try await database.budgets()
 
             try await loadEntry()
-            try await loadBalances()
+            try await loadHistory()
 
             if !output.isEditing {
                 startNew()
@@ -114,13 +114,13 @@ public extension EntryModel {
 
     func save() async -> EntryChange? {
         guard
-            !input.isSaving,
+            !state.isSaving,
             let draft = output.draft
         else {
             return nil
         }
 
-        input.isSaving = true
+        state.isSaving = true
 
         do {
             let database = dependencies.database
@@ -152,7 +152,7 @@ public extension EntryModel {
                 clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
-            input.isSaving = false
+            state.isSaving = false
             report(error)
             return nil
         }
@@ -162,13 +162,13 @@ public extension EntryModel {
         state.clearForNext()
 
         do {
-            try await loadBalances()
+            try await loadHistory()
         } catch {
             report(error)
         }
 
         input.baseline = output.snapshot
-        input.isSaving = false
+        state.isSaving = false
     }
 
     func recordAgain() async {
@@ -178,7 +178,8 @@ public extension EntryModel {
         input.originalFee = nil
         state.keypad.feeCalculator = AmountCalculator()
         state.appliedTemplateId = nil
-        state.setDate(dependencies.clock.today)
+        updateToday()
+        state.setDate(state.today)
         state.payment.billMonth = nil
         state.items = Items()
         state.keypad.target = .amount
@@ -204,13 +205,13 @@ public extension EntryModel {
         }
 
         do {
-            try await loadBalances()
+            try await loadHistory()
         } catch {
             report(error)
         }
 
         input.baseline = output.snapshot
-        input.isSaving = false
+        state.isSaving = false
 
         state.errorNotice.inform(Self.recordAgainMessage)
     }
@@ -249,6 +250,10 @@ extension EntryModel {
     struct Dependencies {
         let database: AppDatabase
         let clock: ScreenClock
+    }
+
+    func newVoiceFlow() -> EntryVoiceFlow {
+        EntryVoiceFlow(dependencies: .live(clock: dependencies.clock))
     }
 
     func report(_ error: any Error) {

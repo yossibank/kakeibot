@@ -23,7 +23,7 @@ public extension EntryModel {
             billMonth = nil
         }
 
-        mutating func setWallet(_ id: Wallet.ID?) -> Bool {
+        fileprivate mutating func setWallet(_ id: Wallet.ID?) -> Bool {
             guard id != walletId else {
                 return false
             }
@@ -57,6 +57,13 @@ public extension EntryModel {
 
         mutating func remember(for type: Entry.Kind) {
             byType[type] = id
+        }
+
+        func tags(in allTags: [EntryTag]) -> [EntryTag] {
+            allTags.filter { tag in
+                tag.categoryId == id
+                    && (tag.archivedAt == nil || tag.id == tagId)
+            }
         }
     }
 
@@ -113,6 +120,7 @@ public extension EntryModel {
         public internal(set) var errorNotice = ErrorNotice()
 
         public var memo = ""
+        public var today: LocalDate
 
         public internal(set) var type: Entry.Kind
         public internal(set) var payment: Payment
@@ -123,13 +131,16 @@ public extension EntryModel {
 
         var appliedTemplateId: EntryTemplate.ID?
         var isClosing = false
+        var isSaving = false
 
         init(
             type: Entry.Kind,
-            date: LocalDate
+            date: LocalDate,
+            today: LocalDate
         ) {
             self.type = type
             self.payment = Payment(date: date)
+            self.today = today
         }
     }
 }
@@ -249,6 +260,27 @@ public extension EntryModel.State {
 }
 
 extension EntryModel.State {
+    func setWallet(
+        _ id: Wallet.ID?,
+        offering categories: [EntryCategory],
+        allCategories: [EntryCategory],
+        allTags: [EntryTag]
+    ) {
+        guard payment.setWallet(id),
+              let categoryId = category.id,
+              let current = allCategories.first(where: { $0.id == categoryId }),
+              !categories.contains(where: { $0.id == categoryId })
+        else {
+            return
+        }
+
+        let tagName = allTags.first { $0.id == category.tagId }?.name
+        let fitted = categories.first { $0.name == current.name } ?? categories.first
+
+        category.select(fitted?.id)
+        category.tagId = category.tags(in: allTags).first { $0.name == tagName }?.id
+    }
+
     func clearForNext() {
         keypad = EntryModel.Keypad()
         memo = ""

@@ -8,9 +8,10 @@ public extension EntryModel {
     final class Output {
         let input: Input
         let state: State
-        let monthCache = DerivedTable<LocalDate, MonthSummary>()
+        let monthCache = Derived<MonthSummary>()
         let feeChoicesCache = Derived<[Int]>()
         let recentWalletsCache = Derived<[Entry.Kind: Wallet.ID]>()
+        let balancesCache = Derived<[Wallet.ID: Int]>()
 
         init(
             input: Input,

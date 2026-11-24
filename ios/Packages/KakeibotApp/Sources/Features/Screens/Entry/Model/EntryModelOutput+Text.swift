@@ -43,7 +43,7 @@ public extension EntryModel.Output {
             budget: usage.baseBudget,
             carryover: usage.carryover,
             spent: usage.spent - totals.current + totals.after,
-            today: input.today,
+            today: state.today,
             periodEnd: monthOverview.period.upperBound
         )
     }
@@ -138,10 +138,8 @@ extension EntryModel.Output {
     }
 
     var currentMonth: MonthSummary {
-        let today = input.today
-
-        return monthCache.value(for: today) {
-            makeMonthSummary(today: today)
+        monthCache.value {
+            makeMonthSummary()
         }
     }
 }
@@ -165,14 +163,14 @@ private extension EntryModel.Output {
         return (current, current - previous + added)
     }
 
-    func makeMonthSummary(today: LocalDate) -> MonthSummary {
+    func makeMonthSummary() -> MonthSummary {
         let overview = MonthOverview(
             list: input.history,
             budgets: input.budgets,
             recurrings: [],
             monthStartDay: input.monthStartDay,
             carryoverFrom: input.carryoverFrom,
-            today: today
+            today: state.today
         )
 
         return MonthSummary(
