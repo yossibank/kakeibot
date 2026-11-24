@@ -12,13 +12,13 @@ extension OnboardingView {
                 )
 
                 PeriodCard(
-                    periodText: model.monthStart.output.periodText,
-                    month: model.monthStart.output.month
+                    periodText: model.state.monthStart.output.periodText,
+                    month: model.state.monthStart.output.month
                 )
 
-                MonthStartDayGrid(selection: model.monthStart.input.startDay) { day in
+                MonthStartDayGrid(selection: model.state.monthStart.input.startDay) { day in
                     Task {
-                        await model.monthStart.choose(day)
+                        await model.state.monthStart.choose(day)
                     }
                 }
 
@@ -52,11 +52,11 @@ extension OnboardingView {
 
             Button {
                 withAnimation(.snappy) {
-                    model.budget.startEditing(.total)
+                    model.state.budget.startEditing(.total)
                 }
             } label: {
                 VStack(spacing: 8) {
-                    Text("\(model.budget.input.month.month)月の予算")
+                    Text("\(model.state.budget.input.month.month)月の予算")
                         .textFont(.caption2)
                         .tracking(3)
                         .foregroundStyle(Palette.accent)
@@ -108,7 +108,7 @@ private extension OnboardingView {
             SectionTitle(title)
                 .padding(.leading, 8)
 
-            SetupList(items, model: model.setup) { item in
+            SetupList(items, model: model.state.setup) { item in
                 path.append(item)
             }
             .padding(.horizontal, 16)
@@ -137,16 +137,16 @@ private extension OnboardingView {
 
 private extension OnboardingView {
     var budgetText: String {
-        model.budget.output.totalAmount.map { Yen.text($0) } ?? "なし"
+        model.state.budget.output.totalAmount.map { Yen.text($0) } ?? "なし"
     }
 
     var budgetColor: Color {
-        model.budget.output.totalAmount == nil ? Palette.hint : Palette.accentStrong
+        model.state.budget.output.totalAmount == nil ? Palette.hint : Palette.accentStrong
     }
 
     var weekStartBinding: Binding<Weekday> {
         Binding {
-            model.weekStart
+            model.input.weekStart
         } set: { weekStart in
             Task {
                 await model.chooseWeekStart(weekStart)

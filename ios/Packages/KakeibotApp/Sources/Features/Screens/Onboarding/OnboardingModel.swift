@@ -7,26 +7,27 @@ import Store
 @MainActor
 @Observable
 public final class OnboardingModel {
-    public private(set) var weekStart: Weekday = .sunday
-    public private(set) var page: Page = .welcome
-    public private(set) var route: Route?
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    public let monthStart: MonthStartDayModel
-    public let budget: BudgetListModel
-    public let setup: SetupModel
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate
     ) {
-        self.database = database
-        self.monthStart = MonthStartDayModel(database: database, today: today)
-        self.budget = BudgetListModel(database: database, today: today)
-        self.setup = SetupModel(database: database)
+        let state = State(
+            monthStart: MonthStartDayModel(database: database, today: today),
+            budget: BudgetListModel(database: database, today: today),
+            setup: SetupModel(database: database)
+        )
+
+        self.state = state
+        self.input = Input()
+        self.output = Output(state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
@@ -52,50 +53,88 @@ public extension OnboardingModel {
         }
     }
 
-    var pages: [Page] {
-        route?.pages ?? [.welcome]
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public internal(set) var page: Page = .welcome
+        public internal(set) var route: Route?
+
+        public let monthStart: MonthStartDayModel
+        public let budget: BudgetListModel
+        public let setup: SetupModel
+
+        init(
+            monthStart: MonthStartDayModel,
+            budget: BudgetListModel,
+            setup: SetupModel
+        ) {
+            self.monthStart = monthStart
+            self.budget = budget
+            self.setup = setup
+        }
     }
 
-    var stepPages: [Page] {
-        pages.filter { $0 != .welcome }
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var weekStart: Weekday = .sunday
     }
 
-    var isFirstPage: Bool {
-        page == .welcome
-    }
+    @MainActor
+    final class Output {
+        let state: State
 
-    var isLastPage: Bool {
-        page == pages.last
-    }
+        public var pages: [Page] {
+            state.route?.pages ?? [.welcome]
+        }
 
-    var nextTitle: String {
-        isLastPage ? "はじめる" : "次へ"
+        public var stepPages: [Page] {
+            pages.filter { $0 != .welcome }
+        }
+
+        public var isFirstPage: Bool {
+            state.page == .welcome
+        }
+
+        public var isLastPage: Bool {
+            state.page == pages.last
+        }
+
+        public var nextTitle: String {
+            isLastPage ? "はじめる" : "次へ"
+        }
+
+        init(state: State) {
+            self.state = state
+        }
     }
 
     func load() async {
-        await monthStart.load()
-        await budget.load()
+        await state.monthStart.load()
+        await state.budget.load()
 
         do {
-            try await database.insertTemplatesIfEmpty(at: Date())
-            weekStart = try await database.setting(.weekStart)
+            try await dependencies.database.insertTemplatesIfEmpty(at: dependencies.clock.now)
+            input.weekStart = try await dependencies.database.setting(.weekStart)
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func chooseWeekStart(_ weekStart: Weekday) async {
-        self.weekStart = weekStart
+        input.weekStart = weekStart
 
         do {
-            try await database.setSetting(.weekStart, to: weekStart)
+            try await dependencies.database.setSetting(.weekStart, to: weekStart)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
     func choose(_ route: Route) {
-        self.route = route
+        state.route = route
     }
 
     func canTurn(forward: Bool) -> Bool {
@@ -107,12 +146,12 @@ public extension OnboardingModel {
             return
         }
 
-        page = next
+        state.page = next
     }
 
     func refreshPage() async {
-        if page == .budget {
-            await budget.load()
+        if state.page == .budget {
+            await state.budget.load()
         }
     }
 
@@ -121,25 +160,32 @@ public extension OnboardingModel {
             return
         }
 
-        page = previous
+        state.page = previous
     }
 
     func finish() async -> Bool {
         let version = WhatsNewRelease.latestVersion
 
         do {
-            let seen = try await database.setting(.whatsNewSeenVersion)
+            let seen = try await dependencies.database.setting(.whatsNewSeenVersion)
 
             if AppVersion.isNewer(version, than: seen) {
-                try await database.setSetting(.whatsNewSeenVersion, to: version)
+                try await dependencies.database.setSetting(.whatsNewSeenVersion, to: version)
             }
 
-            try await database.setSetting(.onboardingCompleted, to: true)
+            try await dependencies.database.setSetting(.onboardingCompleted, to: true)
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
+    }
+}
+
+extension OnboardingModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 
@@ -148,7 +194,9 @@ private extension OnboardingModel {
     static let saveFailedMessage = "設定を保存できませんでした"
 
     func neighbor(forward: Bool) -> Page? {
-        guard let index = pages.firstIndex(of: page) else {
+        let pages = output.pages
+
+        guard let index = pages.firstIndex(of: state.page) else {
             return nil
         }
 

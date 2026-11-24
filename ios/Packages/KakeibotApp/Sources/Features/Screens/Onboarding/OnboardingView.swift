@@ -16,10 +16,11 @@ public struct OnboardingView: View {
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate,
         onFinish: @escaping () -> Void
     ) {
-        let model = OnboardingModel(database: database, today: today)
+        let model = OnboardingModel(database: database, clock: clock, today: today)
 
         _model = State(initialValue: model)
 
@@ -45,9 +46,9 @@ public struct OnboardingView: View {
             await model.load()
         }
         .task {
-            await model.setup.run()
+            await model.state.setup.run()
         }
-        .task(id: model.page) {
+        .task(id: model.state.page) {
             await model.refreshPage()
         }
     }
@@ -70,8 +71,8 @@ private extension OnboardingView {
                     turnPage(direction)
                 }
 
-            if !model.isFirstPage {
-                PrimaryButton(model.nextTitle) {
+            if !model.output.isFirstPage {
+                PrimaryButton(model.output.nextTitle) {
                     Task {
                         await next()
                     }
@@ -83,15 +84,15 @@ private extension OnboardingView {
         .padding(.bottom, 8)
         .frame(maxWidth: Self.contentWidth, maxHeight: .infinity, alignment: .top)
         .frame(maxWidth: .infinity)
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .backdrop()
-        .budgetKeypad(model.budget)
-        .haptic(.selection, trigger: model.page)
+        .budgetKeypad(model.state.budget)
+        .haptic(.selection, trigger: model.state.page)
     }
 
     var topBar: some View {
         HStack {
-            if model.isFirstPage {
+            if model.output.isFirstPage {
                 Color.clear
                     .frame(width: 44, height: 44)
             } else {
@@ -102,16 +103,16 @@ private extension OnboardingView {
 
             Spacer()
 
-            if !model.isFirstPage {
+            if !model.output.isFirstPage {
                 PageDots(
-                    count: model.stepPages.count,
-                    current: model.stepPages.firstIndex(of: model.page) ?? 0
+                    count: model.output.stepPages.count,
+                    current: model.output.stepPages.firstIndex(of: model.state.page) ?? 0
                 )
             }
 
             Spacer()
 
-            if model.isFirstPage {
+            if model.output.isFirstPage {
                 Color.clear
                     .frame(width: 44, height: 44)
             } else {
@@ -131,7 +132,7 @@ private extension OnboardingView {
 
     @ViewBuilder
     var page: some View {
-        switch model.page {
+        switch model.state.page {
         case .welcome: welcomePage
         case .monthStart: monthStartPage
         case .budget: budgetPage
@@ -242,7 +243,7 @@ private extension OnboardingView {
 
 private extension OnboardingView {
     func next() async {
-        guard model.isLastPage else {
+        guard model.output.isLastPage else {
             turnPage(.forward)
             return
         }
