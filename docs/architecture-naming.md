@@ -115,7 +115,9 @@
 | 読み出し | `Store/Queries/Methods/` | `AppDatabase+ThemeQuery` |
 | 書き込み | `Store/Writes/Methods/` | `AppDatabase+Theme` |
 | 見た目の部品 | `DesignSystem/` の種類か題材のフォルダ | `DesignSystem/Theme/` |
+| 画面のモデル | `FeatureModels/Screens/<画面>/` | `Settings/Themes/` |
 | 画面 | `Features/Screens/<画面>/` | `Settings/Themes/`・`Settings/ThemeStyle/` |
+| 複数の画面のモデルの部品 | `FeatureModels/Shared/<役割>/` | |
 | 複数の画面の部品 | `Features/Shared/<役割>/` | |
 | OS の枠組みへの橋 | `AppFeature/Bridge/` の `<型>+<枠組み>` | `ProStore+StoreKit`・`SyncAccount+CloudKit` |
 
@@ -125,7 +127,8 @@
 | --- | --- |
 | 送る行の記録と、受け取った行の書き込み | `Store/Sync/` |
 | CKSyncEngine で送り受けする | `Sync/` |
-| 画面と、iCloud のアカウント（`SyncAccount`）と参加者の型 | `Features/Screens/Settings/Sync/` |
+| 画面のモデルと、iCloud のアカウント（`SyncAccount`）と参加者の型 | `FeatureModels/Screens/Settings/Sync/` |
+| 画面 | `Features/Screens/Settings/Sync/` |
 | CloudKit から iCloud のアカウントと参加者を読む | `AppFeature/Bridge/` |
 
 ## 🧪 テストの名前

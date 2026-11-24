@@ -6,26 +6,26 @@
 
 ## 🪝 プロトコル
 
-`Features/Shared/` と `Core/Shared/` に置くプロトコルは、すべてここに載せる。
+次の `Shared/` に置くプロトコルは、すべてここに載せる。置き場所は `FeatureModels`・`Features`・`Core` の 3 つである。
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
-| `ScreenModel` | 画面のモデル。`NoticeHolding` の状態を持ち、DB を見張って、読めなかった時は状態の知らせに出す | `Features/Shared/Model/` |
-| `NoticeHolding` | エラーの知らせを持つ、モデルの状態。状態がそれだけの時は `NoticeState` を使う | `Features/Shared/Model/` |
-| `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `Features/Shared/Model/` |
-| `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `Features/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardListModel` | 一覧を DB から読み、見張るモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `Features/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardDatabaseModel` | DB と時計だけで作れる一覧のモデル。`SettingsBoardSpec` の `makeModel()` の既定の実装を使える | `Features/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並びと知らせを持つ。それだけの時は `SettingsBoardMovingState` を使う | `Features/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardInput` | 一覧のモデルの入力で、DB から読んだ一覧を持つ。それだけの時は `SettingsBoardSnapshotInput` を使う | `Features/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardOutput` | 一覧のモデルの出力。出す行・非表示の行・並べ替え中の行を出す | `Features/Shared/SettingsParts/Board/Model/` |
+| `ScreenModel` | 画面のモデル。`NoticeHolding` の状態を持ち、DB を見張って、読めなかった時は状態の知らせに出す | `FeatureModels/Shared/Model/` |
+| `NoticeHolding` | エラーの知らせを持つ、モデルの状態。状態がそれだけの時は `NoticeState` を使う | `FeatureModels/Shared/Model/` |
+| `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `FeatureModels/Shared/Model/` |
+| `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardListModel` | 一覧を DB から読み、見張るモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardDatabaseModel` | DB と時計だけで作れる一覧のモデル。`SettingsBoardSpec` の `makeModel()` の既定の実装を使える | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並びと知らせを持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardInput` | 一覧のモデルの入力で、DB から読んだ一覧を持つ。それだけの時は `SettingsBoardSnapshotInput` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardOutput` | 一覧のモデルの出力。出す行・非表示の行・並べ替え中の行を出す | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardSpec` | 一覧の画面ごとの設定（題・文言・並びの形・タイル・編集画面・確認）。画面ごとに 1 つ書く | `Features/Shared/SettingsParts/Board/` |
 | `SettingsEditSheet` | 1 件を編集する画面。モデルと、削除・非表示の受け取りだけで作れる | `Features/Shared/SettingsParts/Input/` |
-| `SettingsEditInput` | 編集のモデルの入力。変わる前の値と、編集中の id を持つ | `Features/Shared/SettingsParts/Input/` |
-| `SettingsEditHidingInput` | 非表示にできるものの、編集のモデルの入力。非表示かどうかも持つ | `Features/Shared/SettingsParts/Input/` |
-| `SettingsEditModel` | 1 件を編集するモデル。状態と入力のまとまりを持ち、下書きと、保存できるかを出す | `Features/Shared/SettingsParts/Input/` |
+| `SettingsEditInput` | 編集のモデルの入力。変わる前の値と、編集中の id を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditHidingInput` | 非表示にできるものの、編集のモデルの入力。非表示かどうかも持つ | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditModel` | 1 件を編集するモデル。状態と入力のまとまりを持ち、下書きと、保存できるかを出す | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditing` | 編集の画面がモデルに頼む操作（非表示・削除）と状態 | `Features/Shared/SettingsParts/Input/` |
-| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足す | `Features/Shared/SettingsParts/Input/` |
+| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足す | `FeatureModels/Shared/SettingsParts/Input/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |

@@ -1,4 +1,5 @@
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 struct SettingsIconEditorDrawer<Field: Hashable>: ViewModifier {

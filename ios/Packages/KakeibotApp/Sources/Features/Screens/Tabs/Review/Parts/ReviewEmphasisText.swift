@@ -1,12 +1,13 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 struct ReviewEmphasisText: View {
     @Environment(\.themeStyle) private var themeStyle
     @Environment(\.sharedTextScale) private var shared
 
-    let parts: [Part]
+    let parts: [ReviewEmphasisPart]
     let face: Face
     let weight: Font.Weight?
     let numberFace: Face
@@ -19,27 +20,12 @@ struct ReviewEmphasisText: View {
 }
 
 extension ReviewEmphasisText {
-    enum Part: Hashable {
-        case plain(String)
-        case name(String)
-        case number(String)
-    }
-
     enum Face {
         case text(Font.TextStyle)
         case display(FontSize)
     }
 
-    nonisolated static func plain(_ parts: [Part]) -> String {
-        parts.map { part in
-            switch part {
-            case let .plain(text), let .name(text), let .number(text): text
-            }
-        }
-        .joined()
-    }
-
-    static func parts(of why: ReviewCompare.Why) -> [Part] {
+    static func parts(of why: ReviewCompare.Why) -> [ReviewEmphasisPart] {
         why.parts.map { part in
             switch part {
             case let .text(text): .plain(text)
@@ -56,7 +42,7 @@ private extension ReviewEmphasisText {
         }
     }
 
-    func run(_ part: Part) -> AttributedString {
+    func run(_ part: ReviewEmphasisPart) -> AttributedString {
         let style: (text: String, font: Font, color: Color) = switch part {
         case let .plain(text): (text, font(face, weight: weight), color)
         case let .name(text): (text, font(face, weight: weight), Palette.accent)

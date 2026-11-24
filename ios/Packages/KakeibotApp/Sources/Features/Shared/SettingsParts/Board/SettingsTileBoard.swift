@@ -1,4 +1,5 @@
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 struct SettingsTileBoard<Item: Identifiable, Face: View>: View {

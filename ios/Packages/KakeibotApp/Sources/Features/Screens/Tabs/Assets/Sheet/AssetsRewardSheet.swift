@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 struct AssetsRewardSheet: View {
@@ -43,7 +44,7 @@ struct AssetsRewardSheet: View {
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $isEditingRules) {
-                RewardRuleListView(board: model.rewardRuleBoard())
+                RewardRuleListView(database: model.childDatabase())
             }
         }
         .sheet(item: $goalTarget) { target in

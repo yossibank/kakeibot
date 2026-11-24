@@ -1,27 +1,9 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 extension ReviewClosingView {
-    struct Goals {
-        let answer: ReviewGoalItem?
-        let next: Next
-        let nextName: String
-        let nextStart: LocalDate
-        let checkDate: LocalDate
-    }
-
-    struct Reason: Hashable {
-        let text: String
-        let isWritten: Bool
-    }
-
-    enum Next {
-        case none
-        case rest
-        case goal(ReviewGoalItem, reason: Reason?)
-    }
-
     @ViewBuilder
     var nextCard: some View {
         switch goals.next {
@@ -154,7 +136,7 @@ private extension ReviewClosingView {
 
     func ticket(
         _ item: ReviewGoalItem,
-        reason: Reason?
+        reason: ReviewClosing.Reason?
     ) -> some View {
         let goal = item.goal
         let start = goals.nextStart
@@ -380,7 +362,7 @@ private extension ReviewClosingView {
         return percent < 0 ? "−\(-percent)" : "+\(percent)"
     }
 
-    static func reasonText(_ reason: Reason) -> Text {
+    static func reasonText(_ reason: ReviewClosing.Reason) -> Text {
         guard reason.isWritten else {
             return Text(reason.text)
         }

@@ -1,3 +1,5 @@
+import FeatureModels
+
 public struct WhatsNewRelease: Identifiable, Sendable {
     let version: String
     let month: String

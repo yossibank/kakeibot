@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 
 enum BillText {
     static let estimate = "見込み"

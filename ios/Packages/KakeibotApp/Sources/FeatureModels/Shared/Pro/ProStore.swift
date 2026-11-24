@@ -1,0 +1,60 @@
+import Foundation
+
+public struct ProStore: Sendable {
+    public let status: Status
+    public let updates: Updates
+    public let price: Price
+    public let cachedPrice: CachedPrice
+    public let purchase: Purchase
+    public let restore: Restore
+
+    public init(
+        status: @escaping Status,
+        updates: @escaping Updates,
+        price: @escaping Price,
+        cachedPrice: @escaping CachedPrice = { nil },
+        purchase: @escaping Purchase,
+        restore: @escaping Restore
+    ) {
+        self.status = status
+        self.updates = updates
+        self.price = price
+        self.cachedPrice = cachedPrice
+        self.purchase = purchase
+        self.restore = restore
+    }
+}
+
+public extension ProStore {
+    typealias Status = @Sendable () async -> ProStatus
+    typealias Updates = @Sendable () -> AsyncStream<ProStatus>
+    typealias Price = @Sendable () async throws -> String
+    typealias CachedPrice = @Sendable () -> String?
+    typealias Purchase = @Sendable () async throws -> ProStatus
+    typealias Restore = @Sendable () async throws -> ProStatus
+
+    static let unavailable = Self(
+        status: {
+            .locked
+        },
+        updates: {
+            AsyncStream { continuation in
+                continuation.finish()
+            }
+        },
+        price: {
+            throw ProStoreError.unavailable
+        },
+        purchase: {
+            .locked
+        },
+        restore: {
+            .locked
+        }
+    )
+}
+
+public enum ProStoreError: Error {
+    case unavailable
+    case cancelled
+}

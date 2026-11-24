@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import Store
 import SwiftUI
 
@@ -20,7 +21,12 @@ public struct OnboardingView: View {
         today: LocalDate,
         onFinish: @escaping () -> Void
     ) {
-        let model = OnboardingModel(database: database, clock: clock, today: today)
+        let model = OnboardingModel(
+            database: database,
+            clock: clock,
+            today: today,
+            newsVersion: WhatsNewRelease.latestVersion
+        )
 
         _model = State(initialValue: model)
 

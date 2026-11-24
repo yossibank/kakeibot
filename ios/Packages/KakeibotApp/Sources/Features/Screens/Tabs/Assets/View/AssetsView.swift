@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 public struct AssetsView: View {

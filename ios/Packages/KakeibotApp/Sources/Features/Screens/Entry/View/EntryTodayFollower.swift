@@ -1,3 +1,4 @@
+import FeatureModels
 import SwiftUI
 
 struct EntryTodayFollower: ViewModifier {

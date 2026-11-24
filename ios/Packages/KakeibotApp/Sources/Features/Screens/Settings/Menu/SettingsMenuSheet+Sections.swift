@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import Store
 import SwiftUI
 
@@ -47,12 +48,11 @@ extension SettingsMenuSheet {
 
             NavigationLink {
                 RecurringListView(
-                    board: RecurringListModel(
+                    board: RecurringBoard(
                         database: database,
                         clock: clock,
                         today: today
                     )
-                    .board()
                 )
             } label: {
                 row("固定費", systemImage: "repeat")

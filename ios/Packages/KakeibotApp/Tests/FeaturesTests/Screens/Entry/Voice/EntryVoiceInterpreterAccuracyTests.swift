@@ -1,4 +1,5 @@
 import Core
+@testable import FeatureModels
 @testable import Features
 import Foundation
 import FoundationModels

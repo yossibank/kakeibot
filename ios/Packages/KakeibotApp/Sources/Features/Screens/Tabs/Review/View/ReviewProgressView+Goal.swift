@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 extension ReviewProgressView {
@@ -85,7 +86,7 @@ private extension ReviewProgressView {
 }
 
 private extension ReviewProgressView {
-    static func goalNote(_ item: ReviewGoalItem) -> [ReviewEmphasisText.Part] {
+    static func goalNote(_ item: ReviewGoalItem) -> [ReviewEmphasisPart] {
         let goal = item.goal
         let progress = item.progress
 

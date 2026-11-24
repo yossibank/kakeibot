@@ -1,5 +1,6 @@
 import Core
 @testable import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -14,7 +15,7 @@ struct SnapshotTests {
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
         let model = HomeModel(database: database, clock: .fixed(now), today: today)
-        let setup = SetupModel(database: database)
+        let setup = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
         let appIcon = AppIconListModel()
 
         let tasks = [

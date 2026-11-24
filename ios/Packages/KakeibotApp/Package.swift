@@ -25,6 +25,7 @@ let package = Package(
             name: "AppFeature",
             dependencies: [
                 "DesignSystem",
+                "FeatureModels",
                 "Features",
                 "Notifications",
                 "Sync",
@@ -42,9 +43,18 @@ let package = Package(
             ]
         ),
         .target(
+            name: "FeatureModels",
+            dependencies: [
+                "DesignSystem",
+                .product(name: "Core", package: "KakeibotKit"),
+                .product(name: "Store", package: "KakeibotKit")
+            ]
+        ),
+        .target(
             name: "Features",
             dependencies: [
                 "DesignSystem",
+                "FeatureModels",
                 .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
@@ -75,6 +85,7 @@ let package = Package(
             name: "AppFeatureTests",
             dependencies: [
                 "AppFeature",
+                "FeatureModels",
                 "Notifications",
                 "TestSupport",
                 .product(name: "Store", package: "KakeibotKit")
@@ -98,6 +109,7 @@ let package = Package(
         .testTarget(
             name: "FeaturesTests",
             dependencies: [
+                "FeatureModels",
                 "Features",
                 "TestSupport",
                 .product(name: "Core", package: "KakeibotKit"),

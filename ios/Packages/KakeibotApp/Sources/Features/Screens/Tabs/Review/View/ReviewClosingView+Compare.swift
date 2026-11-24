@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 extension ReviewClosingView {
@@ -112,7 +113,7 @@ private extension ReviewClosingView {
     }
 
     func compareRow(
-        _ item: CompareRow,
+        _ item: ReviewClosing.CompareRow,
         scale: Int
     ) -> some View {
         let row = item.row
@@ -239,7 +240,7 @@ private extension ReviewClosingView {
         .frame(height: 14)
     }
 
-    func specialCard(_ special: Special) -> some View {
+    func specialCard(_ special: ReviewClosing.Special) -> some View {
         let date = special.date.monthDayText
         let amount = ReviewYen.number(special.amount)
 
