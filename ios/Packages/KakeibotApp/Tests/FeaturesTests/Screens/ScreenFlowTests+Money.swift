@@ -88,8 +88,7 @@ extension ScreenFlowTests {
         let nextDay = try #require(LocalDate("2026-11-10"))
         let tabs = await setup.openTabs()
         let editor = RecurringEditModel(
-            database: setup.database,
-            clock: setup.clock,
+            parts: ScreenParts(database: setup.database, clock: setup.clock),
             today: setup.today
         )
         await editor.load()

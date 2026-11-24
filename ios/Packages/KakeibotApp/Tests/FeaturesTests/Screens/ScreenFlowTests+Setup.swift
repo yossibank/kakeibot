@@ -24,15 +24,14 @@ extension ScreenFlowTests {
         private var tasks: [Task<Void, Never>] = []
 
         init(_ setup: Setup) {
-            let database = setup.database
-            let clock = setup.clock
+            let parts = ScreenParts(database: setup.database, clock: setup.clock)
             let today = setup.today
 
-            self.home = HomeModel(database: database, clock: clock, today: today)
-            self.records = RecordsModel(database: database, clock: clock, today: today)
-            self.review = ReviewModel(database: database, clock: clock, today: today)
-            self.assets = AssetsModel(database: database, clock: clock, today: today)
-            self.notice = EntryNoticeModel(database: database, clock: clock)
+            self.home = HomeModel(parts: parts, today: today)
+            self.records = RecordsModel(parts: parts, today: today)
+            self.review = ReviewModel(parts: parts, today: today)
+            self.assets = AssetsModel(parts: parts, today: today)
+            self.notice = EntryNoticeModel(parts: parts)
         }
     }
 }
@@ -91,8 +90,7 @@ extension ScreenFlowTests.Setup {
         type: Entry.Kind = .expense
     ) async -> EntryModel {
         let model = EntryModel(
-            database: database,
-            clock: clock,
+            parts: ScreenParts(database: database, clock: clock),
             editing: id,
             date: today,
             type: type
