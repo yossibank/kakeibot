@@ -121,6 +121,7 @@ public extension WalletEditModel {
     func paymentModel(for id: Wallet.ID? = nil) -> RecurringEditModel {
         RecurringEditModel(
             database: dependencies.database,
+            clock: dependencies.clock,
             today: dependencies.clock.today,
             editing: input.payment?.id,
             paying: id ?? editingId

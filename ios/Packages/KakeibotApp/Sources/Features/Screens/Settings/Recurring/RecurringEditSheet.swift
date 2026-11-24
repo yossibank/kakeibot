@@ -45,7 +45,7 @@ public struct RecurringEditSheet: View {
                 SettingsEditHeader(
                     title: headerTitle,
                     isEditing: model.isEditing,
-                    isHidden: model.isHidden
+                    isHidden: model.input.isHidden
                 ) {
                     edit.close()
                 } onHide: {
@@ -56,7 +56,7 @@ public struct RecurringEditSheet: View {
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
             }
-            .errorBanner($model.errorNotice)
+            .errorBanner(Bindable(model.state).errorNotice)
             .background {
                 Backdrop()
                     .ignoresSafeArea()
@@ -77,7 +77,7 @@ public struct RecurringEditSheet: View {
                     await edit.delete()
                 }
             }
-            .animation(.snappy, value: model.isNotificationDenied)
+            .animation(.snappy, value: model.output.isNotificationDenied)
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     Task {
@@ -132,12 +132,12 @@ private extension RecurringEditSheet {
             }
 
             SettingsPreviewSection(note: "一覧では、このカードで並びます") {
-                RecurringRowCard(row: model.previewRow)
+                RecurringRowCard(row: model.output.previewRow)
                     .frame(height: RecurringRowCard.height)
-                    .sharesTextScale(id: model.previewRow.place)
+                    .sharesTextScale(id: model.output.previewRow.place)
             }
 
-            SettingsField(namePrompt, text: $model.memo, focus: $focus, field: .name)
+            SettingsField(namePrompt, text: Bindable(model.state).memo, focus: $focus, field: .name)
 
             RecurringQuickCard(model: model) { panel in
                 open(panel)
@@ -149,8 +149,8 @@ private extension RecurringEditSheet {
                 }
             }
 
-            if model.isLoanRepayment,
-               model.plannedTotal != nil || model.autoPlan != nil {
+            if model.output.isLoanRepayment,
+               model.output.plannedTotal != nil || model.output.autoPlan != nil {
                 RecurringLoanPlan(model: model) {
                     withAnimation(.snappy) {
                         model.useAutoCount()
@@ -159,7 +159,7 @@ private extension RecurringEditSheet {
                 .transition(.opacity)
             }
 
-            if model.isNotificationDenied {
+            if model.output.isNotificationDenied {
                 NotificationDeniedBanner()
                     .transition(.opacity)
             }
@@ -181,7 +181,7 @@ private extension RecurringEditSheet {
     ]
 
     var namePrompt: String {
-        switch model.type {
+        switch model.state.type {
         case .expense: "家賃・サブスクなど"
         case .income: "給料・年金など"
         case .transfer: "カードの引き落とし・積立など"
@@ -194,7 +194,7 @@ private extension RecurringEditSheet {
 
     var typeBinding: Binding<Entry.Kind> {
         Binding {
-            model.type
+            model.state.type
         } set: { type in
             model.select(type)
         }

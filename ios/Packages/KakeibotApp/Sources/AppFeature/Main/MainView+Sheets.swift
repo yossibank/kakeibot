@@ -80,6 +80,7 @@ extension MainView {
             RecurringEditSheet(
                 model: RecurringEditModel(
                     database: database,
+                    clock: clock,
                     today: today,
                     editing: id
                 )

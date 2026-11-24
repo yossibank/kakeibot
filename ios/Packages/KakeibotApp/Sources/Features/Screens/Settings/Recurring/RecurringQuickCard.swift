@@ -11,33 +11,33 @@ struct RecurringQuickCard: View {
         SettingsFormCard {
             SettingsFormSection("金額") {
                 SettingsAmountButton(
-                    amount: model.amount,
-                    text: model.isCardBill ? "カードの利用分" : nil,
-                    isEmpty: !model.isCardBill && model.amount == 0
+                    amount: model.output.amount,
+                    text: model.output.isCardBill ? "カードの利用分" : nil,
+                    isEmpty: !model.output.isCardBill && model.output.amount == 0
                 ) {
-                    onOpen(model.isCardBill ? .closing : .amount)
+                    onOpen(model.output.isCardBill ? .closing : .amount)
                 }
             }
 
-            if model.type != .transfer {
+            if model.state.type != .transfer {
                 SettingsFormSection("カテゴリ") {
                     categoryGrid
                 }
             }
 
             SettingsFormSection(
-                model.walletTitle,
-                value: model.selectedWallet?.name,
-                valueIcon: model.selectedWallet.flatMap(model.icon(for:))
+                model.output.walletTitle,
+                value: model.output.selectedWallet?.name,
+                valueIcon: model.output.selectedWallet.flatMap(model.output.icon(for:))
             ) {
                 walletGrid
             }
 
-            if model.type == .transfer {
+            if model.state.type == .transfer {
                 SettingsFormSection(
                     RecurringEditModel.destinationTitle,
-                    value: model.selectedDestination?.name,
-                    valueIcon: model.selectedDestination.flatMap(model.icon(for:))
+                    value: model.output.selectedDestination?.name,
+                    valueIcon: model.output.selectedDestination.flatMap(model.output.icon(for:))
                 ) {
                     destinationGrid
                 }
@@ -51,16 +51,16 @@ struct RecurringQuickCard: View {
 private extension RecurringQuickCard {
     var categoryGrid: some View {
         SettingsPagedGrid(
-            items: model.categories,
-            selected: model.categoryId,
+            items: model.output.categories,
+            selected: model.state.categoryId,
             columns: 5,
             rows: 2,
             spacing: 4
         ) { category in
             SettingsCategoryTile(
                 category: category,
-                icon: model.icon(for: category),
-                isSelected: model.categoryId == category.id
+                icon: model.output.icon(for: category),
+                isSelected: model.state.categoryId == category.id
             ) {
                 model.select(category: category.id)
             }
@@ -70,41 +70,44 @@ private extension RecurringQuickCard {
     var walletGrid: some View {
         VStack(alignment: .leading, spacing: 12) {
             SettingsPagedGrid(
-                items: model.wallets,
-                selected: model.walletId,
+                items: model.output.wallets,
+                selected: model.state.walletId,
                 columns: 2,
                 rows: 3,
                 spacing: 8
             ) { wallet in
                 SettingsWalletTile(
                     wallet: wallet,
-                    icon: model.icon(for: wallet),
-                    isSelected: model.walletId == wallet.id
+                    icon: model.output.icon(for: wallet),
+                    isSelected: model.state.walletId == wallet.id
                 ) {
-                    model.walletId = wallet.id
+                    model.state.setWallet(wallet.id)
                 }
             }
 
-            if model.billRecurring != nil {
-                SettingsBillShiftPicker(shift: $model.billShift, dates: model.billDates)
+            if model.output.billRecurring != nil {
+                SettingsBillShiftPicker(
+                    shift: Bindable(model.state).billShift,
+                    dates: model.output.billDates
+                )
             }
         }
     }
 
     var destinationGrid: some View {
         SettingsPagedGrid(
-            items: model.wallets,
-            selected: model.toWalletId,
+            items: model.output.wallets,
+            selected: model.state.toWalletId,
             columns: 2,
             rows: 3,
             spacing: 8
         ) { wallet in
             SettingsWalletTile(
                 wallet: wallet,
-                icon: model.icon(for: wallet),
-                isSelected: model.toWalletId == wallet.id
+                icon: model.output.icon(for: wallet),
+                isSelected: model.state.toWalletId == wallet.id
             ) {
-                model.toWalletId = wallet.id
+                model.state.toWalletId = wallet.id
             }
         }
     }
@@ -113,7 +116,7 @@ private extension RecurringQuickCard {
         VStack(spacing: 12) {
             scheduleHeader
 
-            if model.isScheduleOpen {
+            if model.state.isScheduleOpen {
                 scheduleChooser
                     .transition(.opacity)
             }
@@ -123,7 +126,7 @@ private extension RecurringQuickCard {
     var scheduleHeader: some View {
         Button {
             withAnimation(.snappy) {
-                model.isScheduleOpen.toggle()
+                model.state.isScheduleOpen.toggle()
             }
         } label: {
             HStack(alignment: .firstTextBaseline) {
@@ -134,9 +137,9 @@ private extension RecurringQuickCard {
 
                 HStack(spacing: 4) {
                     Text(RecurringText.schedule(
-                        model.frequency,
-                        month: model.month,
-                        day: model.day
+                        model.state.schedule.frequency,
+                        month: model.state.schedule.month,
+                        day: model.state.schedule.day
                     ))
                     .textFont(.footnote)
                     .monospacedDigit()
@@ -145,7 +148,7 @@ private extension RecurringQuickCard {
 
                     Image(systemName: "chevron.down")
                         .sansFont(.small)
-                        .rotationEffect(.degrees(model.isScheduleOpen ? 180 : 0))
+                        .rotationEffect(.degrees(model.state.isScheduleOpen ? 180 : 0))
                 }
                 .foregroundStyle(Palette.accentStrong)
                 .padding(.trailing, 8)
@@ -158,13 +161,19 @@ private extension RecurringQuickCard {
 
     var scheduleChooser: some View {
         VStack(spacing: 12) {
-            CapsulePicker(selection: $model.frequency, options: Self.frequencyOptions)
+            CapsulePicker(
+                selection: Bindable(model.state).schedule.frequency,
+                options: Self.frequencyOptions
+            )
 
-            if model.frequency == .yearly {
+            if model.state.schedule.frequency == .yearly {
                 LazyVGrid(columns: Self.monthColumns, spacing: 8) {
                     ForEach(1...12, id: \.self) { month in
-                        SettingsChoice("\(month) 月", isSelected: model.month == month) {
-                            model.month = month
+                        SettingsChoice(
+                            "\(month) 月",
+                            isSelected: model.state.schedule.month == month
+                        ) {
+                            model.state.schedule.month = month
                         }
                     }
                 }
@@ -172,10 +181,10 @@ private extension RecurringQuickCard {
             }
 
             MonthStartDayGrid(selection: scheduleDay) { day in
-                model.day = day.day
+                model.state.schedule.day = day.day
             }
         }
-        .animation(.snappy, value: model.frequency)
+        .animation(.snappy, value: model.state.schedule.frequency)
     }
 }
 
@@ -194,6 +203,6 @@ private extension RecurringQuickCard {
     )
 
     var scheduleDay: MonthStartDay {
-        MonthStartDay(model.day) ?? .first
+        MonthStartDay(model.state.schedule.day) ?? .first
     }
 }
