@@ -71,6 +71,12 @@ public extension WalletListModel {
     }
 }
 
+public extension WalletListModel {
+    func balance(of wallet: Wallet) -> Int {
+        output.balance(of: wallet, through: dependencies.clock.today)
+    }
+}
+
 extension WalletListModel: SettingsBoardDatabaseModel {
     typealias Item = Wallet
 

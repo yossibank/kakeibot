@@ -20,6 +20,10 @@ extension RecurringBoard: SettingsBoardSpec {
         model.dependencies.database
     }
 
+    var clock: ScreenClock {
+        model.dependencies.clock
+    }
+
     var screen: SettingsScreen {
         .recurrings
     }

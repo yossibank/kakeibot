@@ -38,7 +38,7 @@ struct WalletListModelTests {
 
         #expect(model.output.shown.map(\.name) == ["財布"])
         #expect(model.output.hidden.map(\.name) == ["銀行"])
-        #expect(model.output.balance(of: cash, through: ScreenClock.system.today) == 0)
+        #expect(model.balance(of: cash) == 0)
     }
 
     @Test
@@ -71,7 +71,7 @@ struct WalletListModelTests {
         let model = WalletListModel(database: database, clock: .system)
         await model.load()
 
-        #expect(model.output.balance(of: cash, through: ScreenClock.system.today) == 1000)
+        #expect(model.balance(of: cash) == 1000)
     }
 
     @Test
@@ -96,7 +96,7 @@ struct WalletListModelTests {
         let model = WalletListModel(database: database, clock: .system)
         await model.load()
 
-        #expect(model.output.balance(of: cash, through: ScreenClock.system.today) == 0)
+        #expect(model.balance(of: cash) == 0)
         #expect(model.output.needsHideConfirmation(of: cash))
         #expect(!model.output.needsHideConfirmation(of: bank))
     }
