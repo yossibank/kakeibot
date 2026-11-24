@@ -122,7 +122,13 @@ struct SnapshotTests {
 
             for variant in Self.variants {
                 try Self.write(
-                    RecurringListView(board: recurring.board()),
+                    RecurringListView(
+                        board: RecurringBoard(
+                            model: recurring,
+                            database: database,
+                            clock: .fixed(snapshotNow)
+                        )
+                    ),
                     variant: variant,
                     title: "設定 › 固定費 › \(Self.kindTitle(type))",
                     to: "settings-recurring-\(type.rawValue)"

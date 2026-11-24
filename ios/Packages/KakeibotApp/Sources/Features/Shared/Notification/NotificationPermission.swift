@@ -1,5 +1,5 @@
 import Core
-import SwiftUI
+import Foundation
 
 public struct NotificationPermission: Sendable {
     public let authorization: Check
@@ -37,8 +37,4 @@ public extension NotificationPermission {
             await reschedule()
         }
     }
-}
-
-public extension EnvironmentValues {
-    @Entry var notificationPermission: NotificationPermission = .allowed
 }

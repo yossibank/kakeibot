@@ -16,8 +16,6 @@ struct SettingsListScreenTests {
 
         try database.insertDefaultsIfEmpty(at: now)
 
-        let recurring = RecurringListModel(database: database, clock: .system, today: today)
-
         let depths = [
             "CategoryListView": SettingsMenuSheetTests
                 .depth(of: CategoryListView(database: database).body),
@@ -28,7 +26,9 @@ struct SettingsListScreenTests {
             "WalletListView": SettingsMenuSheetTests
                 .depth(of: WalletListView(database: database).body),
             "RecurringListView": SettingsMenuSheetTests
-                .depth(of: RecurringListView(board: recurring.board()).body),
+                .depth(of: RecurringListView(
+                    board: RecurringBoard(database: database, clock: .system, today: today)
+                ).body),
             "TemplateListView": SettingsMenuSheetTests
                 .depth(of: TemplateListView(database: database).body)
         ]

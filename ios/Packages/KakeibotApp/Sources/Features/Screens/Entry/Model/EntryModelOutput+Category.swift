@@ -12,6 +12,10 @@ public extension EntryModel.Output {
         input.allTemplates.filter { $0.type == state.type }
     }
 
+    var categoryKind: EntryCategory.Kind {
+        state.type == .income ? .income : .expense
+    }
+
     var categoryPages: [[EntryModel.CategoryCell]] {
         let cells = categories.map(EntryModel.CategoryCell.category) + [.add, .edit]
         let size = EntryModel.categoriesPerPage

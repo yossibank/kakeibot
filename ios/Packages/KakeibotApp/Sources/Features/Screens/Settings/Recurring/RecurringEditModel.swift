@@ -150,5 +150,7 @@ extension RecurringEditModel: SettingsEditRemoving {
             today: input.today,
             at: dependencies.clock.now
         )
+
+        input.isHidden = isHidden
     }
 }

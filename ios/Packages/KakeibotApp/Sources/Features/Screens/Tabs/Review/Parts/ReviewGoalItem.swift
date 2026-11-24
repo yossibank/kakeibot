@@ -11,10 +11,10 @@ struct ReviewGoalItem: Identifiable {
     }
 
     func title(unit: String) -> String {
-        ReviewEmphasisText.plain(titleParts(unit: unit))
+        ReviewEmphasisPart.text(of: titleParts(unit: unit))
     }
 
-    func titleParts(unit: String) -> [ReviewEmphasisText.Part] {
+    func titleParts(unit: String) -> [ReviewEmphasisPart] {
         switch goal.kind {
         case .count:
             [

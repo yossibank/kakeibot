@@ -1,4 +1,4 @@
 @MainActor
 protocol SettingsEditHidingInput: SettingsEditInput {
-    var isHidden: Bool { get set }
+    var isHidden: Bool { get }
 }

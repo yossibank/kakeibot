@@ -38,8 +38,8 @@ public extension AssetsModel {
 }
 
 extension AssetsModel {
-    func rewardRuleBoard() -> RewardRuleBoard {
-        RewardRuleBoard(database: dependencies.database)
+    func childParts() -> ScreenParts {
+        ScreenParts(database: dependencies.database, clock: dependencies.clock)
     }
 }
 

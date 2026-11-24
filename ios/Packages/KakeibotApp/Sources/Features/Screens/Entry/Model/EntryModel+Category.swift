@@ -162,11 +162,8 @@ extension EntryModel {
         template.memo.flatMap { $0.isEmpty ? nil : $0 }
     }
 
-    func categoryBoard() -> CategoryBoard {
-        CategoryBoard(
-            database: dependencies.database,
-            kind: state.type == .income ? .income : .expense
-        )
+    func childParts() -> ScreenParts {
+        ScreenParts(database: dependencies.database, clock: dependencies.clock)
     }
 }
 

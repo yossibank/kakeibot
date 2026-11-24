@@ -64,13 +64,13 @@ extension ReviewModel.Output {
         return ReviewModel.ReasonTrigger(period: period.commentKey, goalId: goal?.id)
     }
 
-    func goalReason(for item: ReviewGoalItem) -> ReviewClosingView.Reason? {
+    func goalReason(for item: ReviewGoalItem) -> ReviewClosing.Reason? {
         if let written = input.reasons[period.commentKey] {
-            return ReviewClosingView.Reason(text: written, isWritten: true)
+            return ReviewClosing.Reason(text: written, isWritten: true)
         }
 
         return factReason(for: item).map { text in
-            ReviewClosingView.Reason(text: text, isWritten: false)
+            ReviewClosing.Reason(text: text, isWritten: false)
         }
     }
 }
@@ -94,7 +94,7 @@ private extension ReviewModel {
 }
 
 private extension ReviewModel.Output {
-    var reasonRow: ReviewClosingView.CompareRow? {
+    var reasonRow: ReviewClosing.CompareRow? {
         let next = period.adding(1).commentKey
         let goal = input.goals.first { $0.period == next }
         return closingContent.rows.first { $0.row.categoryId == goal?.categoryId }

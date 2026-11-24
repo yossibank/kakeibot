@@ -81,7 +81,9 @@ struct MainView: View {
             )
         )
 
-        _setup = State(initialValue: SetupModel(database: database))
+        _setup = State(
+            initialValue: SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        )
 
         _draft = State(
             initialValue: EntryModel(

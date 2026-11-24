@@ -27,7 +27,7 @@ extension ReviewModel.Output {
     }
 
     func whyShare(
-        of row: ReviewClosingView.CompareRow,
+        of row: ReviewClosing.CompareRow,
         why: ReviewCompare.Why
     ) -> ReviewModel.Share? {
         let name = why.memo.map { "\(row.name) · \($0)" } ?? row.name

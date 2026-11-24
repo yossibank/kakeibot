@@ -13,7 +13,7 @@ extension ReviewModel {
 }
 
 extension ReviewModel.Output {
-    var closingContent: ReviewClosingView.Content {
+    var closingContent: ReviewClosing.Content {
         let key = ReviewModel.ClosingKey(
             period: period,
             budgets: input.budgets,
@@ -41,7 +41,7 @@ private extension ReviewModel.Output {
         return count
     }
 
-    func makeClosingContent() -> ReviewClosingView.Content {
+    func makeClosingContent() -> ReviewClosing.Content {
         let history = (1...ReviewModel.averagePeriods).map { period.adding(-$0).range }
         let compare = ReviewCompare(entries: entries, in: period.range, history: history)
         let spent = ReviewSummary(entries: entries, in: period.range).expense.total
@@ -62,7 +62,7 @@ private extension ReviewModel.Output {
             periods: periods
         )
 
-        return ReviewClosingView.Content(
+        return ReviewClosing.Content(
             scale: input.scale,
             range: period.range,
             weekStart: input.weekStart,
@@ -70,11 +70,11 @@ private extension ReviewModel.Output {
             spent: spent,
             previousTotal: hasPrevious ? previousTotal : nil,
             rows: compare.rows.prefix(ReviewModel.closingRows).map { row in
-                ReviewClosingView.CompareRow(name: categoryName(of: row.categoryId), row: row)
+                ReviewClosing.CompareRow(name: categoryName(of: row.categoryId), row: row)
             },
             averagePeriods: compare.periods,
             special: compare.special.map { entry in
-                ReviewClosingView.Special(
+                ReviewClosing.Special(
                     date: entry.date,
                     name: entry.memo ?? categoryName(of: entry.categoryId),
                     amount: entry.amount

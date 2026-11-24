@@ -34,9 +34,6 @@ extension SettingsEditRemoving {
 
         do {
             try await saveHidden(editingId, isHidden: isHidden)
-
-            input.isHidden = isHidden
-
             return true
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)

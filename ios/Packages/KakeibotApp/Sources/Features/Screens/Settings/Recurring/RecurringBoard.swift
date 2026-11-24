@@ -10,6 +10,20 @@ struct RecurringBoard {
     let clock: ScreenClock
 }
 
+extension RecurringBoard {
+    init(
+        database: AppDatabase,
+        clock: ScreenClock,
+        today: LocalDate
+    ) {
+        self.init(
+            model: RecurringListModel(database: database, clock: clock, today: today),
+            database: database,
+            clock: clock
+        )
+    }
+}
+
 extension RecurringBoard: SettingsBoardSpec {
     enum Destination: Hashable {
         case new(Entry.Kind)

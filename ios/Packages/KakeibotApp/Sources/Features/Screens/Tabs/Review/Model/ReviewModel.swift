@@ -83,7 +83,7 @@ public extension ReviewModel {
         let summaries = DerivedTable<ClosedRange<LocalDate>, ReviewSummary>()
         let moveLists = DerivedTable<ClosedRange<LocalDate>, [Move]>()
         let upcomingTotals = DerivedTable<ClosedRange<LocalDate>, Int>()
-        let closingContents = DerivedTable<ClosingKey, ReviewClosingView.Content>()
+        let closingContents = DerivedTable<ClosingKey, ReviewClosing.Content>()
 
         var entries: [Entry] {
             input.list?.entries ?? []

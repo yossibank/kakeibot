@@ -50,7 +50,7 @@ struct SnapshotTests {
         )
 
         let rows = [
-            ReviewClosingView.CompareRow(
+            ReviewClosing.CompareRow(
                 name: "食費",
                 row: ReviewCompare.Row(
                     categoryId: EntryCategory.ID(),
@@ -58,11 +58,11 @@ struct SnapshotTests {
                     average: 32500
                 )
             ),
-            ReviewClosingView.CompareRow(
+            ReviewClosing.CompareRow(
                 name: "日用品",
                 row: ReviewCompare.Row(categoryId: EntryCategory.ID(), amount: 6100, average: 8400)
             ),
-            ReviewClosingView.CompareRow(
+            ReviewClosing.CompareRow(
                 name: "交際費",
                 row: ReviewCompare.Row(
                     categoryId: EntryCategory.ID(),
@@ -72,7 +72,7 @@ struct SnapshotTests {
             )
         ]
 
-        let special = ReviewClosingView.Special(
+        let special = ReviewClosing.Special(
             date: start.adding(days: 7),
             name: "冷蔵庫",
             amount: 32000
@@ -122,12 +122,12 @@ struct SnapshotTests {
             )
         )
 
-        let reason = ReviewClosingView.Reason(
+        let reason = ReviewClosing.Reason(
             text: "10月は日用品をまとめて買った日が多く、1 回の平均が 2,400円 になりました。",
             isWritten: true
         )
 
-        let goalCases: [String: (ReviewGoalItem?, ReviewClosingView.Next)] = [
+        let goalCases: [String: (ReviewGoalItem?, ReviewClosing.Next)] = [
             "budget": (answer, .goal(next, reason: reason)),
             "average": (nil, .rest)
         ]
@@ -144,7 +144,7 @@ struct SnapshotTests {
                 let weekRange = start.adding(days: 3)...start.adding(days: 9)
                 let shownRange = scale == .week ? weekRange : range
 
-                let content = ReviewClosingView.Content(
+                let content = ReviewClosing.Content(
                     scale: scale,
                     range: shownRange,
                     weekStart: .sunday,
@@ -161,7 +161,7 @@ struct SnapshotTests {
 
                 let goalCase = goalCases[name]
 
-                let goals = ReviewClosingView.Goals(
+                let goals = ReviewClosing.Goals(
                     answer: goalCase?.0,
                     next: goalCase?.1 ?? .none,
                     nextName: "11月",
@@ -171,7 +171,7 @@ struct SnapshotTests {
 
                 let whys = Dictionary(uniqueKeysWithValues: rows.prefix(1)
                     .map { ($0.id, Self.why) })
-                let notes = ReviewClosingView.Notes(summary: Self.summary, whys: whys)
+                let notes = ReviewClosing.Notes(summary: Self.summary, whys: whys)
 
                 let view = ReviewClosingView(
                     content: content,

@@ -82,16 +82,16 @@ extension RecurringListModel: SettingsBoardListModel {
 
     static let loadFailedMessage = "固定費を読めませんでした"
 
+    func load() async {
+        await load(into: \.input.snapshot)
+    }
+
     func read() async throws -> [Recurring] {
         try await dependencies.database.recurrings(includingHidden: true)
     }
 
     func updates() -> some AsyncSequence<[Recurring], any Error> {
         dependencies.database.recurringUpdates(includingHidden: true)
-    }
-
-    func board() -> RecurringBoard {
-        RecurringBoard(model: self, database: dependencies.database, clock: dependencies.clock)
     }
 }
 

@@ -16,12 +16,13 @@ public final class OnboardingModel {
     public init(
         database: AppDatabase,
         clock: ScreenClock,
-        today: LocalDate
+        today: LocalDate,
+        newsVersion: String
     ) {
         let state = State(
             monthStart: MonthStartDayModel(database: database, today: today),
             budget: BudgetListModel(database: database, today: today),
-            setup: SetupModel(database: database)
+            setup: SetupModel(database: database, newsVersion: newsVersion)
         )
 
         self.state = state
@@ -164,7 +165,7 @@ public extension OnboardingModel {
     }
 
     func finish() async -> Bool {
-        let version = WhatsNewRelease.latestVersion
+        let version = state.setup.input.newsVersion
 
         do {
             let seen = try await dependencies.database.setting(.whatsNewSeenVersion)

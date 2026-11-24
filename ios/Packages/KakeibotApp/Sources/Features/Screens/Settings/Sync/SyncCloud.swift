@@ -1,6 +1,6 @@
 import Core
+import Foundation
 import Store
-import SwiftUI
 
 public struct SyncCloud: Sendable {
     public let account: Account
@@ -67,8 +67,4 @@ public extension SyncCloud {
         deleteShare: { _ in },
         leaveShare: { _, _ in }
     )
-}
-
-public extension EnvironmentValues {
-    @Entry var syncCloud: SyncCloud = .unavailable
 }

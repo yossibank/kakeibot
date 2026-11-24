@@ -3,14 +3,14 @@ import DesignSystem
 import SwiftUI
 
 struct ReviewClosingView: View {
-    let content: Content
-    let goals: Goals
-    let notes: Notes
+    let content: ReviewClosing.Content
+    let goals: ReviewClosing.Goals
+    let notes: ReviewClosing.Notes
     let name: String
     let previousName: String
     let unit: String
     let onOpenGoal: (ReviewGoalItem) -> Void
-    let onOpenWhy: (CompareRow, ReviewCompare.Why) -> Void
+    let onOpenWhy: (ReviewClosing.CompareRow, ReviewCompare.Why) -> Void
 
     var body: some View {
         VStack(spacing: 12) {
@@ -40,43 +40,6 @@ struct ReviewClosingView: View {
 }
 
 extension ReviewClosingView {
-    struct Content {
-        let scale: ReviewPeriod.Scale
-        let range: ClosedRange<LocalDate>
-        let weekStart: Weekday
-        let pace: ReviewPace?
-        let spent: Int
-        let previousTotal: Int?
-        let rows: [CompareRow]
-        let averagePeriods: Int
-        let special: Special?
-        let streak: ReviewStreak
-        let continuing: Int
-        let budgetStreak: Int
-    }
-
-    struct CompareRow: Identifiable {
-        let name: String
-        let row: ReviewCompare.Row
-
-        var id: EntryCategory.ID {
-            row.categoryId
-        }
-    }
-
-    struct Special {
-        let date: LocalDate
-        let name: String
-        let amount: Int
-    }
-
-    struct Notes {
-        static let empty = Notes(summary: nil, whys: [:])
-
-        let summary: String?
-        let whys: [EntryCategory.ID: ReviewCompare.Why]
-    }
-
     var periodsUnit: String {
         ReviewPace.periodsUnit(unit)
     }

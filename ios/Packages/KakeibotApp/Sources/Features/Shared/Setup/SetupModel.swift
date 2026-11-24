@@ -12,8 +12,11 @@ public final class SetupModel: ScreenModel {
 
     let dependencies: Dependencies
 
-    public init(database: AppDatabase) {
-        let input = Input()
+    public init(
+        database: AppDatabase,
+        newsVersion: String
+    ) {
+        let input = Input(newsVersion: newsVersion)
 
         self.input = input
         self.output = Output(input: input)
@@ -33,6 +36,12 @@ public extension SetupModel {
 
         var cardClosed: Bool?
         var seenNews: Loadable<String?> = .loading
+
+        let newsVersion: String
+
+        init(newsVersion: String) {
+            self.newsVersion = newsVersion
+        }
     }
 
     @MainActor
@@ -82,7 +91,7 @@ public extension SetupModel {
     }
 
     func markNewsSeen() async {
-        let version = WhatsNewRelease.latestVersion
+        let version = input.newsVersion
 
         guard AppVersion.isNewer(version, than: output.seenNewsVersion) else {
             return
@@ -144,7 +153,7 @@ public extension SetupModel.Output {
 
     var hasUnreadNews: Bool {
         input.seenNews.isLoaded && AppVersion.isNewer(
-            WhatsNewRelease.latestVersion,
+            input.newsVersion,
             than: seenNewsVersion
         )
     }

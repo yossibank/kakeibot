@@ -79,7 +79,7 @@ extension ReviewModel.Output {
         isCurrentPeriod && state.newReportKey != nil
     }
 
-    var closingGoals: ReviewClosingView.Goals {
+    var closingGoals: ReviewClosing.Goals {
         let next = period.adding(1)
         let answer = input.goals.first { $0.period == period.commentKey }
         let checked = answer.map { answered($0, now: state.checkTime) }
@@ -92,7 +92,7 @@ extension ReviewModel.Output {
             && count >= ReviewComment.minimumEntries
             && !hasMore
 
-        let nextCard: ReviewClosingView.Next = if let nextItem {
+        let nextCard: ReviewClosing.Next = if let nextItem {
             .goal(nextItem, reason: goalReason(for: nextItem))
         } else if rests {
             .rest
@@ -100,7 +100,7 @@ extension ReviewModel.Output {
             .none
         }
 
-        return ReviewClosingView.Goals(
+        return ReviewClosing.Goals(
             answer: checked.flatMap { goalItem($0, in: period) },
             next: nextCard,
             nextName: next.displayName,

@@ -170,5 +170,7 @@ extension RewardRuleEditModel: SettingsEditRemoving {
             isHidden: isHidden,
             at: dependencies.clock.now
         )
+
+        input.isHidden = isHidden
     }
 }

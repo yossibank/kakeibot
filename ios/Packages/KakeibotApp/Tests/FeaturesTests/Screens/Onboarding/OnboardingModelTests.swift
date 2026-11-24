@@ -10,7 +10,12 @@ struct OnboardingModelTests {
     func walksFullRouteAndSavesChoices() async throws {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))
-        let model = OnboardingModel(database: setup.database, clock: .system, today: setup.today)
+        let model = OnboardingModel(
+            database: setup.database,
+            clock: .system,
+            today: setup.today,
+            newsVersion: WhatsNewRelease.latestVersion
+        )
 
         await model.load()
         let first = model.output.isFirstPage
@@ -45,7 +50,12 @@ struct OnboardingModelTests {
     @Test
     func endsMinimalRouteAtBudget() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = OnboardingModel(database: setup.database, clock: .system, today: setup.today)
+        let model = OnboardingModel(
+            database: setup.database,
+            clock: .system,
+            today: setup.today,
+            newsVersion: WhatsNewRelease.latestVersion
+        )
 
         model.choose(.minimal)
         model.next()
@@ -60,7 +70,12 @@ struct OnboardingModelTests {
     @Test
     func addsStarterTemplatesOnce() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = OnboardingModel(database: setup.database, clock: .system, today: setup.today)
+        let model = OnboardingModel(
+            database: setup.database,
+            clock: .system,
+            today: setup.today,
+            newsVersion: WhatsNewRelease.latestVersion
+        )
 
         await model.load()
         await model.load()

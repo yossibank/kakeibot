@@ -1,4 +1,4 @@
-import SwiftUI
+import Foundation
 
 public struct ProStore: Sendable {
     public let status: Status
@@ -57,9 +57,4 @@ public extension ProStore {
 public enum ProStoreError: Error {
     case unavailable
     case cancelled
-}
-
-public extension EnvironmentValues {
-    @Entry var proStore: ProStore = .unavailable
-    @Entry var isPro = false
 }

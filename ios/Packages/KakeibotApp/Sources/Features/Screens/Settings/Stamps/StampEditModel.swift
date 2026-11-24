@@ -127,5 +127,7 @@ extension StampEditModel: SettingsEditRemoving {
             isHidden: isHidden,
             at: dependencies.clock.now
         )
+
+        input.isHidden = isHidden
     }
 }

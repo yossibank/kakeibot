@@ -4,32 +4,39 @@ import Store
 
 @MainActor
 protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel {
-    associatedtype Input: SettingsBoardInput
-    associatedtype Updates: AsyncSequence where Updates.Element == Input.Snapshot
+    associatedtype Snapshot
+    associatedtype Input: SettingsBoardInput where Input.Snapshot == Snapshot
+    associatedtype Updates: AsyncSequence where Updates.Element == Snapshot
 
     var input: Input { get }
     var dependencies: SettingsBoardDependencies { get }
 
-    func read() async throws -> Input.Snapshot
+    func read() async throws -> Snapshot
     func updates() -> Updates
     func observe() async
 }
 
 extension SettingsBoardListModel {
-    func load() async {
+    func load(into snapshot: ReferenceWritableKeyPath<Self, Snapshot?>) async {
         do {
-            input.snapshot = try await read()
+            self[keyPath: snapshot] = try await read()
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
-    func observe() async {
-        await observe(updates(), into: \.input.snapshot)
-    }
-
     func restoreRemoved(_ deletion: Deletion) async throws {
         try await dependencies.database.restore(deletion)
+    }
+}
+
+extension SettingsBoardListModel where Input == SettingsBoardSnapshotInput<Snapshot> {
+    func load() async {
+        await load(into: \.input.snapshot)
+    }
+
+    func observe() async {
+        await observe(updates(), into: \.input.snapshot)
     }
 }
 

@@ -60,7 +60,7 @@ extension ReviewModel {
 }
 
 extension ReviewModel.Output {
-    var closingNotes: ReviewClosingView.Notes {
+    var closingNotes: ReviewClosing.Notes {
         let range = period.range
         let history = (1...ReviewModel.averagePeriods).map { period.adding(-$0).range }
         let rising = closingContent.rows.filter { $0.row.tone == .more }
@@ -76,7 +76,7 @@ extension ReviewModel.Output {
             return why.map { (item.id, $0) }
         }
 
-        return ReviewClosingView.Notes(
+        return ReviewClosing.Notes(
             summary: input.notes[ReviewModel.summaryKey(period.commentKey)],
             whys: Dictionary(uniqueKeysWithValues: pairs)
         )
