@@ -250,6 +250,16 @@ extension SyncEngine: CKSyncEngineDelegate {
         let changes = syncEngine.state.pendingRecordZoneChanges
             .filter { context.options.scope.contains($0) }
 
+        let saves = changes.compactMap { change -> SyncRecordID? in
+            guard case let .saveRecord(id) = change else {
+                return nil
+            }
+
+            return SyncRecordID(id)
+        }
+
+        try? await database.noteSyncSends(saves)
+
         let local = await (try? database.pendingSyncChanges()) ?? []
 
         for change in local {
