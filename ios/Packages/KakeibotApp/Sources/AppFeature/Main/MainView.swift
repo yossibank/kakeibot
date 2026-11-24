@@ -91,7 +91,7 @@ struct MainView: View {
             )
         )
 
-        _notice = State(initialValue: EntryNoticeModel(database: database))
+        _notice = State(initialValue: EntryNoticeModel(database: database, clock: clock))
 
         _undo = State(initialValue: DeletionUndo(database: database))
 
@@ -262,7 +262,7 @@ private extension MainView {
             .errorBanner(undo.errorNotice, bottom: noticeBottom) {
                 undo.errorNotice.clear()
             }
-            .onChange(of: notice.notice) { _, new in
+            .onChange(of: notice.state.notice) { _, new in
                 if new != nil {
                     replaceNotices(with: .entry)
                 }

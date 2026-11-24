@@ -118,8 +118,8 @@ public struct EntrySheet: View {
                 above: bannerBottom - 12,
                 clearsOnTap: false
             )
-            .onChange(of: notice.notice) {
-                if notice.notice == .undone {
+            .onChange(of: notice.state.notice) {
+                if notice.state.notice == .undone {
                     Task {
                         await model.reloadWallets()
                     }

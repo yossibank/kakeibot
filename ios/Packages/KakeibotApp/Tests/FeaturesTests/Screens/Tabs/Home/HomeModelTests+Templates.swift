@@ -166,7 +166,7 @@ extension HomeModelTests {
         let setup = try await TemplateSetup()
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)
         let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
-        let notice = EntryNoticeModel(database: setup.database)
+        let notice = EntryNoticeModel(database: setup.database, clock: .system)
 
         let change = try #require(await home.record(lunch))
         notice.show(change)
@@ -179,6 +179,6 @@ extension HomeModelTests {
         #expect(afterRecord.days.first?.entries.first?.amount == 980)
         #expect(afterRecord.days.first?.date == setup.date)
         #expect(afterUndo.days.isEmpty)
-        #expect(notice.change == nil)
+        #expect(notice.output.change == nil)
     }
 }
