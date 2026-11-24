@@ -31,6 +31,7 @@ public final class RecordsModel: ScreenModel {
 public extension RecordsModel {
     func open(_ date: LocalDate) {
         state.open(date, in: date.periodMonth(startingOn: input.monthStartDay))
+        input.layout = .calendar
     }
 
     func openCurrentMonth() {
@@ -39,15 +40,19 @@ public extension RecordsModel {
 
     func loadLayout() async {
         do {
-            try await state.setLayout(dependencies.database.setting(.recordsLayout))
+            input.layout = try await dependencies.database.setting(.recordsLayout)
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
+    func chooseLayout(_ layout: RecordsLayout) {
+        input.layout = layout
+    }
+
     func saveLayout() async {
         do {
-            try await dependencies.database.setSetting(.recordsLayout, to: state.layout)
+            try await dependencies.database.setSetting(.recordsLayout, to: input.layout)
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
         }

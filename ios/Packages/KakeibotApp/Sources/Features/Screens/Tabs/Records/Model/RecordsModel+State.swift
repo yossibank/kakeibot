@@ -17,7 +17,6 @@ public extension RecordsModel {
         public var filter = EntryFilter()
 
         public private(set) var month: YearMonth
-        public private(set) var layout: RecordsLayout = .calendar
         public private(set) var pendingDeleteIDs: [Entry.ID] = []
 
         init(today: LocalDate) {
@@ -40,10 +39,6 @@ public extension RecordsModel.State {
     func move(months: Int) {
         month = month.adding(months: months)
         selectedDate = nil
-    }
-
-    func setLayout(_ layout: RecordsLayout) {
-        self.layout = layout
     }
 
     func requestDelete(
@@ -79,7 +74,6 @@ extension RecordsModel.State {
         closeSearch()
         self.month = month
         selectedDate = date
-        layout = .calendar
     }
 
     func openMonth(_ month: YearMonth) {

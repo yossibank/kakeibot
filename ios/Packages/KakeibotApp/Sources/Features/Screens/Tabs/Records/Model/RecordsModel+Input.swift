@@ -16,5 +16,6 @@ public extension RecordsModel {
         public internal(set) var rewardBank: RewardBank?
         public internal(set) var recurrings: [Recurring] = []
         public internal(set) var recentSearches: [String] = []
+        public internal(set) var layout: RecordsLayout = .calendar
     }
 }

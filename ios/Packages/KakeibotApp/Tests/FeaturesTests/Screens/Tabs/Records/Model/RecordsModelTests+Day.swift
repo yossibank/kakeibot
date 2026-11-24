@@ -58,13 +58,13 @@ extension RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
 
-        model.state.setLayout(.list)
+        model.chooseLayout(.list)
         await model.saveLayout()
 
         let reopened = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await reopened.loadLayout()
 
-        #expect(reopened.state.layout == .list)
+        #expect(reopened.input.layout == .list)
     }
 
     @Test
@@ -74,7 +74,7 @@ extension RecordsModelTests {
         let category = try #require(options.expenseCategories.first?.id)
         let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         let date = try #require(LocalDate("2026-08-03"))
-        model.state.setLayout(.list)
+        model.chooseLayout(.list)
         model.state.isSearching = true
         model.state.searchText = "ランチ"
         model.state.filter = EntryFilter(categoryIds: [category])
@@ -83,7 +83,7 @@ extension RecordsModelTests {
 
         #expect(model.state.month.description == "2026-08")
         #expect(model.output.shownDate == date)
-        #expect(model.state.layout == .calendar)
+        #expect(model.input.layout == .calendar)
         #expect(!model.state.isSearching)
         #expect(model.state.searchText.isEmpty)
         #expect(model.state.filter == EntryFilter(categoryIds: [category]))

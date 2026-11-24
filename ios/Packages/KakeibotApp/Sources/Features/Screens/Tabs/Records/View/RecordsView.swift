@@ -71,7 +71,7 @@ public struct RecordsView: View {
                         )
 
                         HStack(spacing: 8) {
-                            if model.state.layout == .list {
+                            if model.input.layout == .list {
                                 selectButton
                             }
 
@@ -88,7 +88,7 @@ public struct RecordsView: View {
                     Group {
                         monthContent
                     }
-                    .frame(maxWidth: model.state.layout == .list ? Self.listWidth : nil)
+                    .frame(maxWidth: model.input.layout == .list ? Self.listWidth : nil)
                     .pageSlide(slide, page: model.state.month)
                 }
             }
@@ -118,7 +118,7 @@ public struct RecordsView: View {
                 finishSelecting()
             }
         }
-        .onChange(of: model.state.layout) {
+        .onChange(of: model.input.layout) {
             finishSelecting()
         }
         .onChange(of: model.state.month) {
@@ -224,7 +224,7 @@ private extension RecordsView {
     var monthContent: some View {
         summary
 
-        switch model.state.layout {
+        switch model.input.layout {
         case .list:
             if model.output.isMonthHiddenByFilter {
                 filteredEmpty
@@ -286,14 +286,14 @@ private extension RecordsView {
 
     var layoutBinding: Binding<RecordsLayout> {
         Binding {
-            model.state.layout
+            model.input.layout
         } set: { layout in
             let layouts = RecordsLayout.allCases
-            let from = layouts.firstIndex(of: model.state.layout) ?? 0
+            let from = layouts.firstIndex(of: model.input.layout) ?? 0
             let to = layouts.firstIndex(of: layout) ?? 0
 
             PageSlide.run($slide, forward: to > from) {
-                model.state.setLayout(layout)
+                model.chooseLayout(layout)
 
                 Task {
                     await model.saveLayout()
