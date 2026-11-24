@@ -30,7 +30,7 @@ public extension RecordsModel {
         do {
             try await dependencies.database.setSetting(.recentSearches, to: words)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }
@@ -40,7 +40,7 @@ private extension RecordsModel {
         do {
             try await dependencies.database.setSetting(.recentSearches, to: input.recentSearches)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

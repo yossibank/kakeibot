@@ -29,15 +29,6 @@ public final class RecordsModel: ScreenModel {
 }
 
 public extension RecordsModel {
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     func open(_ date: LocalDate) {
         state.open(date, in: date.periodMonth(startingOn: input.monthStartDay))
     }
@@ -50,7 +41,7 @@ public extension RecordsModel {
         do {
             try await state.setLayout(dependencies.database.setting(.recordsLayout))
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -58,7 +49,7 @@ public extension RecordsModel {
         do {
             try await dependencies.database.setSetting(.recordsLayout, to: state.layout)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -67,7 +58,7 @@ public extension RecordsModel {
             input.list = try await dependencies.database.entryList()
             input.recurrings = try await dependencies.database.recurrings()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 

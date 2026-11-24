@@ -44,15 +44,6 @@ public extension SetupModel {
         }
     }
 
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     func run() async {
         let database = dependencies.database
 

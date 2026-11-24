@@ -91,15 +91,6 @@ public extension ReviewModel {
         }
     }
 
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     func run() async {
         await loadSelection()
 

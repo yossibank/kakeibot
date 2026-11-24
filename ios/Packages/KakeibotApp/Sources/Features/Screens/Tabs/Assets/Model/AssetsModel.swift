@@ -59,15 +59,6 @@ public extension AssetsModel {
 
     static let monthCount = AssetsSummary.Input.monthCount
 
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     func setToday(_ today: LocalDate) {
         guard today != input.latest.today else {
             return

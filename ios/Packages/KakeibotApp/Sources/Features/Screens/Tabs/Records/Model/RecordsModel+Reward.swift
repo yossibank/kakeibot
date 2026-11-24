@@ -30,9 +30,9 @@ public extension RecordsModel {
                 at: dependencies.clock.now
             )
         } catch AppDatabase.RewardRuleWriteError.shortOfBalance {
-            errorNotice.show(Self.rewardShortOfBalanceMessage)
+            state.errorNotice.show(Self.rewardShortOfBalanceMessage)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }
