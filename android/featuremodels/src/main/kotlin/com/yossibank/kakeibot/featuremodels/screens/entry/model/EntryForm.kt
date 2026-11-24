@@ -23,9 +23,27 @@ data class EntryForm(
     val items: List<EntryItem.Draft> = emptyList(),
     val taxIncluded: Boolean = false,
     val templateId: Identifier<EntryTemplate>? = null,
+    val categoryByType: Map<Entry.Kind, Identifier<EntryCategory>> = emptyMap(),
 ) {
     val store: String
         get() = memo.split("\n").first()
+
+    fun withType(type: Entry.Kind): EntryForm {
+        if (type == this.type) {
+            return this
+        }
+
+        val leaving = categoryId
+
+        return copy(
+            type = type,
+            categoryByType = if (leaving == null) {
+                categoryByType - this.type
+            } else {
+                categoryByType + (this.type to leaving)
+            },
+        )
+    }
 
     fun withWallet(id: Identifier<Wallet>?): EntryForm {
         if (id == walletId) {

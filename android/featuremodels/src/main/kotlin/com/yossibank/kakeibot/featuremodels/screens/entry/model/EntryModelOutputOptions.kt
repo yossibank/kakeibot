@@ -38,6 +38,18 @@ val EntryModel.Output.wallet: Wallet?
 val EntryModel.Output.toWallet: Wallet?
     get() = wallets.firstOrNull { it.id == state.form.toWalletId }
 
+internal val EntryModel.Output.usualWalletId: Identifier<Wallet>?
+    get() {
+        val type = state.form.type
+
+        val recent = input.history?.entries.orEmpty()
+            .filter { it.type == type && type != Entry.Kind.transfer && it.transferId == null }
+            .maxByOrNull { it.createdAt }
+            ?.walletId
+
+        return if (wallets.any { it.id == recent }) recent else wallets.firstOrNull()?.id
+    }
+
 internal val EntryModel.Output.allTags: List<EntryTag>
     get() = (input.options?.tags ?: emptyList()) + (input.options?.sharedTags ?: emptyList())
 

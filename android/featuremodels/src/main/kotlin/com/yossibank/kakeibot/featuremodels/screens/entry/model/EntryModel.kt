@@ -230,9 +230,17 @@ class EntryModel(
             return
         }
 
-        state.update { copy(type = type) }
+        state.update { withType(type) }
 
         val form = state.form
+        val categories = output.categories
+        val remembered = form.categoryByType[type]
+
+        val categoryId = when {
+            categories.any { it.id == remembered } -> remembered
+            categories.any { it.id == form.categoryId } -> form.categoryId
+            else -> categories.firstOrNull()?.id
+        }
 
         val destination = if (type == Entry.Kind.transfer) {
             form.toWalletId ?: output.wallets.firstOrNull { it.id != form.walletId }?.id
@@ -240,14 +248,7 @@ class EntryModel(
             null
         }
 
-        state.update {
-            copy(
-                categoryId = output.categories.firstOrNull()?.id,
-                tagId = null,
-                toWalletId = destination,
-            )
-        }
-
+        state.update { withCategory(categoryId).copy(toWalletId = destination) }
         state.focus(output.startField)
 
         state.task.clear()
@@ -287,7 +288,7 @@ class EntryModel(
                 state.update {
                     copy(
                         categoryId = output.categories.firstOrNull()?.id,
-                        walletId = loaded.wallets.firstOrNull()?.id,
+                        walletId = output.usualWalletId,
                     )
                 }
             }
