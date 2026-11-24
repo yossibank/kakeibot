@@ -45,6 +45,23 @@ extension SyncRoute {
         return isSyncEnabled || zoneName != SyncZone.own
     }
 
+    func unsentDeletionZone(of change: SyncChange) -> String? {
+        guard
+            !isShared,
+            change.isDeletion,
+            change.zones.isEmpty,
+            sends(to: SyncZone.own)
+        else {
+            return nil
+        }
+
+        return SyncZone.own
+    }
+
+    func drops(_ change: SyncChange) -> Bool {
+        !isShared && !change.zones.contains(where: isForeign)
+    }
+
     func finish(
         sending: [SyncKey: SyncChange],
         saved: [SyncRecordID],
