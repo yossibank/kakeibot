@@ -17,10 +17,12 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
+import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
+import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
 @Composable
@@ -30,6 +32,7 @@ fun PeriodStepper(
     onNext: () -> Unit,
     modifier: Modifier = Modifier,
     caption: String? = null,
+    canMoveForward: Boolean = true,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -37,6 +40,7 @@ fun PeriodStepper(
     ) {
         StepButton(
             rotation = 180f,
+            isEnabled = true,
             onSelect = onPrevious,
         )
 
@@ -61,6 +65,7 @@ fun PeriodStepper(
 
         StepButton(
             rotation = 0f,
+            isEnabled = canMoveForward,
             onSelect = onNext,
         )
     }
@@ -69,13 +74,17 @@ fun PeriodStepper(
 @Composable
 private fun StepButton(
     rotation: Float,
+    isEnabled: Boolean,
     onSelect: () -> Unit,
 ) {
     Box(
         modifier = Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .clickable(onClick = onSelect),
+            .clickable(
+                enabled = isEnabled,
+                onClick = onSelect,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -84,7 +93,7 @@ private fun StepButton(
             modifier = Modifier
                 .size(24.dp)
                 .rotate(rotation),
-            tint = Palette.accent,
+            tint = if (isEnabled) Palette.accent else Palette.accent.opacity(Emphasis.Muted),
         )
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
-import com.yossibank.kakeibot.core.concepts.entry.title
+import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
@@ -57,6 +58,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
@@ -73,6 +75,8 @@ fun ReviewView(
             today = today,
         )
     }
+
+    val scope = rememberCoroutineScope()
 
     SideEffect {
         model.state.today = today
@@ -102,9 +106,12 @@ fun ReviewView(
                 )
 
                 SegmentSwitch(
-                    selection = model.state.scale,
+                    selection = model.input.scale,
                     options = scales,
-                    onSelect = model.state::select,
+                    onSelect = { scale ->
+                        model.setScale(scale)
+                        scope.launch { model.saveSelection() }
+                    },
                 )
             }
         }
@@ -115,9 +122,10 @@ fun ReviewView(
                 onPrevious = { model.state.move(count = -1) },
                 onNext = { model.state.move(count = 1) },
                 caption = model.output.rangeText.takeIf {
-                    model.state.scale !=
+                    model.input.scale !=
                         ReviewPeriod.Scale.week
                 },
+                canMoveForward = model.output.canMoveForward,
             )
         }
 
@@ -213,6 +221,7 @@ private fun Total(
 @Composable
 private fun BreakdownCard(model: ReviewModel) {
     val rows = model.output.rows
+    val scope = rememberCoroutineScope()
     val difference = model.output.total - model.output.previousTotal
 
     Column(
@@ -238,9 +247,12 @@ private fun BreakdownCard(model: ReviewModel) {
             )
 
             SegmentSwitch(
-                selection = model.state.kind,
+                selection = model.input.kind,
                 options = kinds,
-                onSelect = { model.state.kind = it },
+                onSelect = { kind ->
+                    model.setKind(kind)
+                    scope.launch { model.saveSelection() }
+                },
             )
         }
 
@@ -249,7 +261,7 @@ private fun BreakdownCard(model: ReviewModel) {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = model.state.kind.title,
+                    text = title(of = model.input.kind),
                     color = Palette.subtext,
                     style = textFont(style = FontTextStyle.Caption),
                 )
@@ -334,4 +346,10 @@ private val scales = listOf(
     ReviewPeriod.Scale.year to "年",
 )
 
-private val kinds = listOf(Entry.Kind.expense, Entry.Kind.income).map { it to it.title }
+private val kinds = listOf(ReviewKind.expense, ReviewKind.income).map { it to title(of = it) }
+
+private fun title(of: ReviewKind): String = when (of) {
+    ReviewKind.expense -> "支出"
+    ReviewKind.income -> "収入"
+    ReviewKind.balance -> "収支"
+}

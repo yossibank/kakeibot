@@ -7,17 +7,23 @@ import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
-import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
+import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.core.concepts.review.ReviewSummary
+import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.entryType
+import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
+import com.yossibank.kakeibot.store.queries.methods.setting
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
+import com.yossibank.kakeibot.store.records.settingkeys.reviewKind
+import com.yossibank.kakeibot.store.records.settingkeys.reviewScale
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
+import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -47,25 +53,29 @@ class ReviewModel(
     ) {
         var today: LocalDate by mutableStateOf(today)
 
-        var scale: ReviewPeriod.Scale by mutableStateOf(ReviewPeriod.Scale.month)
-            private set
-
-        var kind: Entry.Kind by mutableStateOf(Entry.Kind.expense)
-
         var offset: Int by mutableStateOf(0)
             private set
 
-        fun select(scale: ReviewPeriod.Scale) {
-            this.scale = scale
-            offset = 0
+        fun move(count: Int) {
+            if (offset + count > 0) {
+                return
+            }
+
+            offset += count
         }
 
-        fun move(count: Int) {
-            offset += count
+        internal fun restart() {
+            offset = 0
         }
     }
 
     class Input {
+        var scale: ReviewPeriod.Scale by mutableStateOf(ReviewPeriod.Scale.month)
+            internal set
+
+        var kind: ReviewKind by mutableStateOf(ReviewKind.expense)
+            internal set
+
         var list: EntryList? by mutableStateOf(null)
             internal set
 
@@ -82,17 +92,20 @@ class ReviewModel(
     ) {
         val period: ReviewPeriod
             get() = ReviewPeriod(
-                scale = state.scale,
+                scale = input.scale,
                 containing = state.today,
                 monthStartDay = input.monthStartDay,
                 weekStart = input.weekStart,
             ).adding(count = state.offset)
 
+        val canMoveForward: Boolean
+            get() = state.offset < 0
+
         val title: String
             get() {
                 val range = period.range
 
-                return when (state.scale) {
+                return when (input.scale) {
                     ReviewPeriod.Scale.week -> {
                         PeriodText.range(range)
                     }
@@ -126,16 +139,17 @@ class ReviewModel(
                     range = period.comparisonRange(today = state.today),
                 )
 
-                return previous.breakdown(of = state.kind)?.total ?: 0
+                return total(of = previous)
             }
 
         val total: Long
-            get() = summary.breakdown(of = state.kind)?.total ?: 0
+            get() = total(of = summary)
 
         val rows: List<Row>
             get() {
                 val list = input.list ?: return emptyList()
-                val breakdown = summary.breakdown(of = state.kind) ?: return emptyList()
+                val type = input.kind.entryType ?: return emptyList()
+                val breakdown = summary.breakdown(of = type) ?: return emptyList()
 
                 if (breakdown.total <= 0) {
                     return emptyList()
@@ -158,6 +172,12 @@ class ReviewModel(
                         )
                     }
             }
+
+        private fun total(of: ReviewSummary): Long = when (input.kind) {
+            ReviewKind.expense -> of.expense.total
+            ReviewKind.income -> of.income.total
+            ReviewKind.balance -> of.balance
+        }
     }
 
     private class Dependencies(
@@ -166,6 +186,8 @@ class ReviewModel(
     )
 
     suspend fun observe() {
+        loadSelection()
+
         val database = dependencies.database
 
         coroutineScope {
@@ -182,6 +204,39 @@ class ReviewModel(
             launch {
                 dependencies.entryList.collect { input.list = it }
             }
+        }
+    }
+
+    suspend fun loadSelection() {
+        val database = dependencies.database
+
+        ModelTask.quiet {
+            input.scale = database.setting(SettingKey.reviewScale)
+            input.kind = database.setting(SettingKey.reviewKind)
+        }
+    }
+
+    fun setScale(scale: ReviewPeriod.Scale) {
+        state.restart()
+        input.scale = scale
+    }
+
+    fun setKind(kind: ReviewKind) {
+        input.kind = kind
+    }
+
+    suspend fun saveSelection() {
+        val database = dependencies.database
+
+        ModelTask.quiet {
+            database.setSetting(
+                key = SettingKey.reviewScale,
+                to = input.scale,
+            )
+            database.setSetting(
+                key = SettingKey.reviewKind,
+                to = input.kind,
+            )
         }
     }
 }
