@@ -12,14 +12,14 @@ struct CategoryListModelTests {
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
         try await database.setHidden(food.id, isHidden: true, at: Date())
-        let model = CategoryListModel(database: database)
+        let model = CategoryListModel(database: database, clock: .system)
 
         await model.load()
-        let expenseShown = model.shown.map(\.name)
-        let expenseHidden = model.hidden.map(\.name)
+        let expenseShown = model.output.shown.map(\.name)
+        let expenseHidden = model.output.hidden.map(\.name)
 
-        model.kind = .income
-        let incomeShown = model.shown.map(\.name)
+        model.state.kind = .income
+        let incomeShown = model.output.shown.map(\.name)
 
         #expect(expenseShown.count == 11)
         #expect(expenseShown.first == "日用品")
@@ -30,48 +30,48 @@ struct CategoryListModelTests {
     @Test
     func savesMovedOrder() async throws {
         let database = try Self.database()
-        let model = CategoryListModel(database: database)
+        let model = CategoryListModel(database: database, clock: .system)
         await model.load()
-        let first = try #require(model.shown.first)
+        let first = try #require(model.output.shown.first)
 
         model.move(first.id, to: 2)
-        let moving = model.shown.map(\.name)
+        let moving = model.output.shown.map(\.name)
 
         await model.finishMoving()
-        let saved = model.shown.map(\.name)
+        let saved = model.output.shown.map(\.name)
 
         #expect(Array(moving.prefix(3)) == ["日用品", "交通", "食費"])
         #expect(saved == moving)
-        #expect(model.movingOrder == nil)
+        #expect(model.state.movingOrder == nil)
     }
 
     @Test
     func hidesWhileMoving() async throws {
         let database = try Self.database()
-        let model = CategoryListModel(database: database)
+        let model = CategoryListModel(database: database, clock: .system)
         await model.load()
-        let first = try #require(model.shown.first)
+        let first = try #require(model.output.shown.first)
 
         model.move(first.id, to: 4)
         await model.hide(first.id)
 
-        #expect(model.hidden.map(\.name) == ["食費"])
-        #expect(model.shown.first?.name == "日用品")
-        #expect(model.movingOrder == nil)
+        #expect(model.output.hidden.map(\.name) == ["食費"])
+        #expect(model.output.shown.first?.name == "日用品")
+        #expect(model.state.movingOrder == nil)
     }
 
     @Test
     func showsHiddenCategory() async throws {
         let database = try Self.database()
-        let model = CategoryListModel(database: database)
+        let model = CategoryListModel(database: database, clock: .system)
         await model.load()
-        let first = try #require(model.shown.first)
+        let first = try #require(model.output.shown.first)
         await model.hide(first.id)
 
         await model.show(first.id)
 
-        #expect(model.hidden.isEmpty)
-        #expect(model.shown.first?.name == "食費")
+        #expect(model.output.hidden.isEmpty)
+        #expect(model.output.shown.first?.name == "食費")
     }
 }
 

@@ -50,7 +50,7 @@ extension CategoryBoard: SettingsBoardSpec {
     }
 
     func header(in model: CategoryListModel) -> some View {
-        CapsulePicker(selection: Bindable(model).kind, options: Self.kindOptions)
+        CapsulePicker(selection: Bindable(model.state).kind, options: Self.kindOptions)
     }
 
     func tile(
@@ -59,7 +59,7 @@ extension CategoryBoard: SettingsBoardSpec {
         isHidden: Bool
     ) -> some View {
         CategoryTileFace(
-            icon: model.icon(for: item),
+            icon: model.output.icon(for: item),
             name: item.name,
             isHidden: isHidden
         )
@@ -73,11 +73,7 @@ extension CategoryBoard: SettingsBoardSpec {
     }
 
     func makeModel() -> CategoryListModel {
-        let model = CategoryListModel(database: database)
-
-        model.kind = kind
-
-        return model
+        CategoryListModel(database: database, clock: clock, kind: kind)
     }
 
     func intro(
@@ -101,11 +97,11 @@ extension CategoryBoard: SettingsBoardSpec {
     }
 
     func addTitle(in model: CategoryListModel) -> String {
-        model.kind == .income ? "収入のカテゴリを追加" : "支出のカテゴリを追加"
+        model.state.kind == .income ? "収入のカテゴリを追加" : "支出のカテゴリを追加"
     }
 
     func newDestination(in model: CategoryListModel) -> Destination {
-        .new(model.kind)
+        .new(model.state.kind)
     }
 
     func destination(editing item: EntryCategory) -> Destination {

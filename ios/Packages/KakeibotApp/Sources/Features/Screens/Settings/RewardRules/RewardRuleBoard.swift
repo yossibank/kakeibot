@@ -50,10 +50,10 @@ extension RewardRuleBoard: SettingsBoardSpec {
         isHidden: Bool
     ) -> some View {
         RewardRuleTile(
-            icon: model.icon(for: item),
+            icon: model.output.icon(for: item),
             name: item.name,
             amount: item.amount,
-            total: model.total(for: item),
+            total: model.output.total(for: item),
             isHidden: isHidden
         )
     }

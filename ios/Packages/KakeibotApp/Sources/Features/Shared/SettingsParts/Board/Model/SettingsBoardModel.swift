@@ -4,11 +4,11 @@ import Store
 @MainActor
 protocol SettingsBoardModel: AnyObject {
     associatedtype Item: Identifiable where Item.ID: Sendable
+    associatedtype State: SettingsBoardState where State.ID == Item.ID
+    associatedtype Output: SettingsBoardOutput where Output.Item == Item
 
-    var movingOrder: [Item.ID]? { get set }
-    var errorNotice: ErrorNotice { get set }
-    var visible: [Item] { get }
-    var hidden: [Item] { get }
+    var state: State { get }
+    var output: Output { get }
 
     func load() async
     func reload() async
@@ -26,18 +26,6 @@ protocol SettingsBoardModel: AnyObject {
 }
 
 extension SettingsBoardModel {
-    var shown: [Item] {
-        let visible = visible
-
-        guard let movingOrder else {
-            return visible
-        }
-
-        return movingOrder.compactMap { id in
-            visible.first { $0.id == id }
-        }
-    }
-
     func reload() async {
         await load()
     }
@@ -58,7 +46,7 @@ extension SettingsBoardModel {
         _ id: Item.ID,
         to index: Int
     ) {
-        var order = movingOrder ?? shown.map(\.id)
+        var order = state.movingOrder ?? output.shown.map(\.id)
 
         guard let from = order.firstIndex(of: id) else {
             return
@@ -73,15 +61,15 @@ extension SettingsBoardModel {
         order.remove(at: from)
         order.insert(id, at: to)
 
-        movingOrder = order
+        state.movingOrder = order
     }
 
     func cancelMoving() {
-        movingOrder = nil
+        state.movingOrder = nil
     }
 
     func finishMoving() async {
-        guard let movingOrder else {
+        guard let movingOrder = state.movingOrder else {
             return
         }
 
@@ -89,15 +77,15 @@ extension SettingsBoardModel {
             try await saveOrder(movingOrder)
             await reload()
         } catch {
-            errorNotice.show(Self.saveFailedText, for: error)
+            state.errorNotice.show(Self.saveFailedText, for: error)
         }
 
-        self.movingOrder = nil
+        state.movingOrder = nil
     }
 
     @discardableResult
     func hide(_ id: Item.ID) async -> Bool {
-        movingOrder = nil
+        state.movingOrder = nil
 
         do {
             try await saveHidden(id, isHidden: true)
@@ -105,7 +93,7 @@ extension SettingsBoardModel {
             return true
         } catch {
             let message = hideFailedMessage(for: error) ?? Self.hideFailedText
-            errorNotice.show(message, for: error)
+            state.errorNotice.show(message, for: error)
             return false
         }
     }
@@ -115,12 +103,12 @@ extension SettingsBoardModel {
             try await saveHidden(id, isHidden: false)
             await reload()
         } catch {
-            errorNotice.show(Self.showFailedText, for: error)
+            state.errorNotice.show(Self.showFailedText, for: error)
         }
     }
 
     func delete(_ id: Item.ID) async -> Deletion? {
-        movingOrder = nil
+        state.movingOrder = nil
 
         do {
             let deletion = try await remove(id)
@@ -128,15 +116,15 @@ extension SettingsBoardModel {
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error) ?? Self.deleteFailedText
-            errorNotice.show(message, for: error)
+            state.errorNotice.show(message, for: error)
             return nil
         }
     }
 
     func deleteHidden() async -> SettingsBulkDelete {
-        movingOrder = nil
+        state.movingOrder = nil
 
-        let ids = hidden.map(\.id)
+        let ids = output.hidden.map(\.id)
 
         let result = await SettingsBulkDelete.run(ids) { id in
             try await remove(id)
@@ -147,9 +135,9 @@ extension SettingsBoardModel {
         await reload()
 
         if let message = result.errorMessage {
-            errorNotice.show(message)
+            state.errorNotice.show(message)
         } else if let message = result.infoMessage {
-            errorNotice.inform(message)
+            state.errorNotice.inform(message)
         }
 
         return result
@@ -160,7 +148,7 @@ extension SettingsBoardModel {
             try await restoreRemoved(deletion)
             await reload()
         } catch {
-            errorNotice.show(Self.restoreFailedText, for: error)
+            state.errorNotice.show(Self.restoreFailedText, for: error)
         }
     }
 }

@@ -10,17 +10,17 @@ struct WalletListModelTests {
     func reordersShownWallets() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let model = WalletListModel(database: database)
+        let model = WalletListModel(database: database, clock: .system)
         await model.load()
-        let bank = try #require(model.shown.last)
+        let bank = try #require(model.output.shown.last)
 
         model.move(bank.id, to: 0)
-        let moving = model.shown.map(\.name)
+        let moving = model.output.shown.map(\.name)
         await model.finishMoving()
         let options = try await database.entryOptions()
 
         #expect(moving == ["銀行", "財布"])
-        #expect(model.movingOrder == nil)
+        #expect(model.state.movingOrder == nil)
         #expect(options.wallets.map(\.name) == ["銀行", "財布"])
     }
 
@@ -32,13 +32,13 @@ struct WalletListModelTests {
         let bank = try #require(options.wallets.last)
         try await database.setHidden(bank.id, isHidden: true, at: Date())
 
-        let model = WalletListModel(database: database)
+        let model = WalletListModel(database: database, clock: .system)
         await model.load()
-        let cash = try #require(model.shown.first)
+        let cash = try #require(model.output.shown.first)
 
-        #expect(model.shown.map(\.name) == ["財布"])
-        #expect(model.hidden.map(\.name) == ["銀行"])
-        #expect(model.balance(of: cash) == 0)
+        #expect(model.output.shown.map(\.name) == ["財布"])
+        #expect(model.output.hidden.map(\.name) == ["銀行"])
+        #expect(model.output.balance(of: cash, through: ScreenClock.system.today) == 0)
     }
 
     @Test
@@ -68,10 +68,10 @@ struct WalletListModelTests {
 
         try await database.saveEntry(income, at: Date())
         try await database.saveEntry(future, at: Date())
-        let model = WalletListModel(database: database)
+        let model = WalletListModel(database: database, clock: .system)
         await model.load()
 
-        #expect(model.balance(of: cash) == 1000)
+        #expect(model.output.balance(of: cash, through: ScreenClock.system.today) == 1000)
     }
 
     @Test
@@ -93,48 +93,48 @@ struct WalletListModelTests {
         )
 
         try await database.saveEntry(future, at: Date())
-        let model = WalletListModel(database: database)
+        let model = WalletListModel(database: database, clock: .system)
         await model.load()
 
-        #expect(model.balance(of: cash) == 0)
-        #expect(model.needsHideConfirmation(of: cash))
-        #expect(!model.needsHideConfirmation(of: bank))
+        #expect(model.output.balance(of: cash, through: ScreenClock.system.today) == 0)
+        #expect(model.output.needsHideConfirmation(of: cash))
+        #expect(!model.output.needsHideConfirmation(of: bank))
     }
 
     @Test
     func hidesWalletButKeepsTheLastOne() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let model = WalletListModel(database: database)
+        let model = WalletListModel(database: database, clock: .system)
         await model.load()
-        let cash = try #require(model.shown.first)
-        let bank = try #require(model.shown.last)
+        let cash = try #require(model.output.shown.first)
+        let bank = try #require(model.output.shown.last)
 
         model.move(bank.id, to: 0)
         await model.hide(bank.id)
-        let shown = model.shown.map(\.name)
-        let hidden = model.hidden.map(\.name)
+        let shown = model.output.shown.map(\.name)
+        let hidden = model.output.hidden.map(\.name)
         await model.hide(cash.id)
 
         #expect(shown == ["財布"])
         #expect(hidden == ["銀行"])
-        #expect(model.movingOrder == nil)
-        #expect(model.shown.map(\.name) == ["財布"])
-        #expect(model.errorNotice.message == "最後の 1 つの口座は非表示にできません")
+        #expect(model.state.movingOrder == nil)
+        #expect(model.output.shown.map(\.name) == ["財布"])
+        #expect(model.state.errorNotice.message == "最後の 1 つの口座は非表示にできません")
     }
 
     @Test
     func showsHiddenWallet() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let model = WalletListModel(database: database)
+        let model = WalletListModel(database: database, clock: .system)
         await model.load()
-        let bank = try #require(model.shown.last)
+        let bank = try #require(model.output.shown.last)
         await model.hide(bank.id)
 
         await model.show(bank.id)
 
-        #expect(model.hidden.isEmpty)
-        #expect(model.shown.map(\.name) == ["財布", "銀行"])
+        #expect(model.output.hidden.isEmpty)
+        #expect(model.output.shown.map(\.name) == ["財布", "銀行"])
     }
 }

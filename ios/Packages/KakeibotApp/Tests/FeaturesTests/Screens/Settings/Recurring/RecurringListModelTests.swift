@@ -26,29 +26,29 @@ struct RecurringListModelTests {
         )
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecurringListModel(database: setup.database, today: setup.today)
+        let model = RecurringListModel(database: setup.database, clock: .system, today: setup.today)
 
         let task = Task {
             await model.observe()
         }
 
         await ObservationWait.until {
-            !model.rows.isEmpty
+            !model.output.rows.isEmpty
         }
 
         task.cancel()
-        let row = try #require(model.rows.first)
+        let row = try #require(model.output.rows.first)
 
         #expect(row.title == "家賃")
         #expect(row.schedule == "毎月 27 日")
         #expect(row.place == "財布")
         #expect(row.next?.description == "2026-10-27")
-        #expect(model.monthTotal == 78000)
+        #expect(model.output.monthTotal == 78000)
 
-        model.type = .income
+        model.state.type = .income
 
-        #expect(model.rows.isEmpty)
-        #expect(model.monthTotal == 0)
+        #expect(model.output.rows.isEmpty)
+        #expect(model.output.monthTotal == 0)
     }
 
     @Test
@@ -72,19 +72,19 @@ struct RecurringListModelTests {
         )
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecurringListModel(database: setup.database, today: setup.today)
+        let model = RecurringListModel(database: setup.database, clock: .system, today: setup.today)
 
         let task = Task {
             await model.observe()
         }
 
         await ObservationWait.until {
-            !model.rows.isEmpty && model.monthStartDay == payday
+            !model.output.rows.isEmpty && model.input.monthStartDay == payday
         }
 
         task.cancel()
 
-        #expect(model.monthTotal == 0)
+        #expect(model.output.monthTotal == 0)
     }
 
     @Test
@@ -106,36 +106,36 @@ struct RecurringListModelTests {
         )
 
         let saved = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecurringListModel(database: setup.database, today: setup.today)
+        let model = RecurringListModel(database: setup.database, clock: .system, today: setup.today)
 
         let task = Task {
             await model.observe()
         }
 
         await ObservationWait.until {
-            !model.rows.isEmpty
+            !model.output.rows.isEmpty
         }
 
         await model.hide(saved.id)
 
         await ObservationWait.until {
-            !model.hiddenRows.isEmpty
+            !model.output.hiddenRows.isEmpty
         }
 
-        let shownWhileHidden = model.rows.count
-        let totalWhileHidden = model.monthTotal
+        let shownWhileHidden = model.output.rows.count
+        let totalWhileHidden = model.output.monthTotal
 
         await model.show(saved.id)
 
         await ObservationWait.until {
-            !model.rows.isEmpty
+            !model.output.rows.isEmpty
         }
 
         task.cancel()
 
         #expect(shownWhileHidden == 0)
         #expect(totalWhileHidden == 0)
-        #expect(model.hiddenRows.isEmpty)
-        #expect(model.rows.first?.title == "家賃")
+        #expect(model.output.hiddenRows.isEmpty)
+        #expect(model.output.rows.first?.title == "家賃")
     }
 }

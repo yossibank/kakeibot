@@ -32,7 +32,7 @@ extension SettingsBoardController {
         _ id: Model.Item.ID,
         to location: CGPoint
     ) {
-        let index = model.shown.firstIndex { $0.id == id } ?? 0
+        let index = model.output.shown.firstIndex { $0.id == id } ?? 0
         let start = grid.center(at: index)
 
         let center = drag.follow(id, from: start, to: location) { next in
@@ -43,7 +43,7 @@ extension SettingsBoardController {
             return
         }
 
-        let target = grid.index(at: center, count: model.shown.count)
+        let target = grid.index(at: center, count: model.output.shown.count)
 
         withAnimation(.snappy) {
             model.move(id, to: target)

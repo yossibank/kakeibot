@@ -50,6 +50,7 @@ public struct SetupDestination: View {
             RecurringListView(
                 model: RecurringListModel(
                     database: database,
+                    clock: .system,
                     today: today
                 )
             )

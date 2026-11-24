@@ -16,7 +16,7 @@ struct SettingsListScreenTests {
 
         try database.insertDefaultsIfEmpty(at: now)
 
-        let recurring = RecurringListModel(database: database, today: today)
+        let recurring = RecurringListModel(database: database, clock: .system, today: today)
 
         let depths = [
             "CategoryListView": SettingsMenuSheetTests

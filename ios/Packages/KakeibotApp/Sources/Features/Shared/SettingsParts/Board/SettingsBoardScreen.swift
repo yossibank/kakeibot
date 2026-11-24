@@ -80,7 +80,7 @@ struct SettingsBoardScreen<
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    if model.shown.isEmpty {
+                    if model.output.shown.isEmpty {
                         SettingsEmptyNote(
                             systemImage: emptyNote.systemImage,
                             text: emptyNote.text
@@ -89,7 +89,7 @@ struct SettingsBoardScreen<
 
                     board
 
-                    if !model.hidden.isEmpty {
+                    if !model.output.hidden.isEmpty {
                         hiddenSection
                     }
                 }
@@ -133,7 +133,7 @@ struct SettingsBoardScreen<
         .errorBanner(errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
-        .settingsBoardHaptics(drag, movingOrder: model.movingOrder)
+        .settingsBoardHaptics(drag, movingOrder: model.state.movingOrder)
     }
 }
 
