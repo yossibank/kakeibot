@@ -129,7 +129,7 @@ public struct BackupView: View {
             defaultFilename: model.state.file?.name
         ) { result in
             Task {
-                await model.finishExport(result, at: Date())
+                await model.finishExport(result)
             }
         }
         .fileImporter(
@@ -222,7 +222,7 @@ private extension BackupView {
 
     func exportFile(_ kind: BackupModel.FileKind) {
         Task {
-            isExporting = await model.makeFile(kind, at: Date())
+            isExporting = await model.makeFile(kind)
         }
     }
 

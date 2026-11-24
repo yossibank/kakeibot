@@ -154,10 +154,9 @@ public extension BackupModel {
     }
 
     @discardableResult
-    func makeFile(
-        _ kind: FileKind,
-        at date: Date
-    ) async -> Bool {
+    func makeFile(_ kind: FileKind) async -> Bool {
+        let date = dependencies.clock.now
+
         state.isWorking = true
         state.doneMessage = nil
 
@@ -178,10 +177,7 @@ public extension BackupModel {
         }
     }
 
-    func finishExport(
-        _ result: Result<URL, any Error>,
-        at date: Date
-    ) async {
+    func finishExport(_ result: Result<URL, any Error>) async {
         let kind = state.file?.kind
 
         state.file = nil
@@ -191,7 +187,10 @@ public extension BackupModel {
             state.doneMessage = Self.exportedMessage
 
             if kind == .json {
-                try? await dependencies.database.setSetting(.backupExportedAt, to: date)
+                try? await dependencies.database.setSetting(
+                    .backupExportedAt,
+                    to: dependencies.clock.now
+                )
             }
 
         case .failure:

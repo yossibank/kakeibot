@@ -51,4 +51,9 @@ extension BackupModelTests.Setup {
 
         return formatter.date(from: text)
     }
+
+    @MainActor
+    func exporter() -> BackupModel {
+        BackupModel(database: source, clock: .fixed(now), stash: stash)
+    }
 }

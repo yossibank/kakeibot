@@ -11,12 +11,12 @@ struct BackupModelTests {
         let setup = try Setup()
         let model = BackupModel(
             database: setup.source,
-            clock: .system,
+            clock: .fixed(setup.now),
             stash: setup.stash,
             appVersion: "1.2"
         )
 
-        let isMade = await model.makeFile(.json, at: setup.now)
+        let isMade = await model.makeFile(.json)
         let file = try #require(model.state.file)
         let export = try ExportV1(json: file.data)
 
@@ -28,9 +28,9 @@ struct BackupModelTests {
     @Test
     func writesSpreadsheet() async throws {
         let setup = try Setup()
-        let model = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let model = setup.exporter()
 
-        await model.makeFile(.csv, at: setup.now)
+        await model.makeFile(.csv)
         let file = try #require(model.state.file)
         let text = String(decoding: file.data, as: UTF8.self)
 
@@ -41,9 +41,9 @@ struct BackupModelTests {
     @Test
     func restoresAfterConfirming() async throws {
         let setup = try Setup()
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
         let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         let isRead = target.read(file.data)
@@ -60,9 +60,9 @@ struct BackupModelTests {
     @Test
     func refusesRestoringWhileSyncing() async throws {
         let setup = try Setup()
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
         let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
         target.read(file.data)
         try await setup.target.turnOnSync()
@@ -80,7 +80,7 @@ struct BackupModelTests {
     func asksPermissionAfterRestoringReminder() async throws {
         let setup = try Setup()
         let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
 
         let target = BackupModel(
             database: setup.target, clock: .system,
@@ -89,7 +89,7 @@ struct BackupModelTests {
         )
 
         try await setup.source.setSetting(.reminderTime, to: .evening)
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         target.read(file.data)
@@ -105,7 +105,7 @@ struct BackupModelTests {
     func asksPermissionAfterRestoringRecurringWithNotice() async throws {
         let setup = try Setup()
         let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
         let today = LocalDate(setup.now, in: .current)
         let options = try await setup.source.entryOptions()
 
@@ -130,7 +130,7 @@ struct BackupModelTests {
             permission: client.permission
         )
 
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         target.read(file.data)
@@ -144,7 +144,7 @@ struct BackupModelTests {
     func doesNotAskPermissionWithoutNotifications() async throws {
         let setup = try Setup()
         let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
 
         let target = BackupModel(
             database: setup.target, clock: .system,
@@ -152,7 +152,7 @@ struct BackupModelTests {
             permission: client.permission
         )
 
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         target.read(file.data)
@@ -165,9 +165,9 @@ struct BackupModelTests {
     @Test
     func keepsDataWhenCancelled() async throws {
         let setup = try Setup()
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
         let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         target.read(file.data)
@@ -181,11 +181,11 @@ struct BackupModelTests {
     @Test
     func stashesCurrentDataBeforeRestoring() async throws {
         let setup = try Setup()
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
         let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let before = try setup.target.snapshot()
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         target.read(file.data)
@@ -204,9 +204,9 @@ struct BackupModelTests {
         try Data().write(to: blocker)
         let url = blocker.appending(path: "previous.json")
         let stash = BackupStash(urls: [url])
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
         let target = BackupModel(database: setup.target, clock: .system, stash: stash)
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         target.read(file.data)
@@ -220,11 +220,11 @@ struct BackupModelTests {
     @Test
     func readsStashedDataToGoBack() async throws {
         let setup = try Setup()
-        let source = BackupModel(database: setup.source, clock: .system, stash: setup.stash)
+        let source = setup.exporter()
         let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let before = try setup.target.snapshot()
-        await source.makeFile(.json, at: setup.now)
+        await source.makeFile(.json)
         let file = try #require(source.state.file)
 
         target.read(file.data)
