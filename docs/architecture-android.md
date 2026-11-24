@@ -158,11 +158,12 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 | 対象 | 決まり |
 | --- | --- |
-| モデルの形 | `state`・`input`・`output` の `val` と、`private val dependencies` だけを持つ。使わないまとまりは書かない |
+| モデルの形 | `state`・`input`・`output` の `val` と、`private val dependencies` を持つ。使わないまとまりは書かない |
 | `State` | 人の操作で変わる値と、進み具合・知らせを持つ。`mutableStateOf` は 12 個まで、Boolean は 3 個までである |
 | `Input` | DB から読んだ値と、最初に渡された値を持つ。setter を `internal set` にし、モデルの関数だけが書く |
 | `Output` | `input` と `state` から出す値を持つ。`derivedStateOf` はここに置き、DB と `dependencies` を使わない |
-| `Dependencies` | DB・時計・外から渡される `Flow` を持つ。`private class` にし、モデルの関数だけが使う |
+| `Dependencies` | DB・時計・`Flow`・`Context`・`CoroutineScope` のような外の口を持つ。`private class` にし、モデルの関数だけが使う |
+| 動いている間の持ち物 | 認識の部品や `Job` は、`private val` の入れ物に置く。`EntryVoiceFlow` の `Runtime` が当たり、`mutableStateOf` を使わない |
 | 連動する値 | `private set` にして、`State` の関数で一緒に書き換える |
 | 操作の置き場所 | 状態だけを変える操作は `State` の関数に置く。DB や `output` が要る操作は、モデルの関数に置く |
 | 分けたファイル | `Output` の計算は、`EntryModelOutputText.kt` のように拡張プロパティのファイルへ出す |

@@ -185,6 +185,7 @@ private fun ColumnScope.Listening(
         FinishButton(
             silenceStart = listening.silenceStart,
             duration = flow.input.silenceMillis,
+            passed = flow::silencePassed,
             onSelect = flow::finish,
         )
     }
@@ -341,6 +342,7 @@ private fun RowScope.CardButton(
 private fun RowScope.FinishButton(
     silenceStart: Long?,
     duration: Long,
+    passed: (Long) -> Long,
     onSelect: () -> Unit,
 ) {
     val fill = remember { Animatable(0f) }
@@ -352,13 +354,13 @@ private fun RowScope.FinishButton(
             return@LaunchedEffect
         }
 
-        val passed = (System.currentTimeMillis() - silenceStart).coerceIn(0L, duration)
+        val start = passed(silenceStart)
 
-        fill.snapTo(passed.toFloat() / duration)
+        fill.snapTo(start.toFloat() / duration)
         fill.animateTo(
             targetValue = 1f,
             animationSpec = tween(
-                durationMillis = (duration - passed).toInt(),
+                durationMillis = (duration - start).toInt(),
                 easing = LinearEasing,
             ),
         )
