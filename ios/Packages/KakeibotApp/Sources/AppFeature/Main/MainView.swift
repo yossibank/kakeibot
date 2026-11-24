@@ -300,7 +300,7 @@ private extension MainView {
     var tabErrorCounts: [Int] {
         [
             home.errorNotice.count,
-            records.errorNotice.count,
+            records.state.errorNotice.count,
             review.state.errorNotice.count,
             assets.state.errorNotice.count
         ]
