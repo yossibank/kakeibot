@@ -3,6 +3,7 @@ import Core
 import Foundation
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct EntryVoiceFlowTests {
@@ -93,7 +94,7 @@ struct EntryVoiceFlowTests {
 
         await flow.start(for: model, today: setup.date) {}
         source.say("500円")
-        try await Task.sleep(for: .milliseconds(300))
+        await ObservationWait.until { flow.step == nil }
 
         #expect(flow.step == nil)
         #expect(model.amount == 500)
@@ -162,7 +163,7 @@ struct EntryVoiceFlowTests {
         source.hear(0.8)
         source.hear(0)
         let counting = flow.silenceStart != nil
-        try await Task.sleep(for: .milliseconds(200))
+        await ObservationWait.until { flow.step == nil }
 
         #expect(counting)
         #expect(flow.step == nil)
@@ -200,7 +201,7 @@ struct EntryVoiceFlowTests {
         source.say("500円")
         await flow.finish()
         let shown = flow.notice != nil
-        try await Task.sleep(for: .milliseconds(300))
+        await ObservationWait.until { flow.notice == nil }
 
         #expect(shown)
         #expect(flow.notice == nil)
