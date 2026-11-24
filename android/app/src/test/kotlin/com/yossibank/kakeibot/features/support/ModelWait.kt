@@ -26,16 +26,4 @@ object ModelWait {
             }
         }
     }
-
-    suspend fun settle() {
-        Snapshot.sendApplyNotifications()
-
-        withContext(Dispatchers.Default) {
-            delay(SETTLE_MILLIS)
-        }
-
-        Snapshot.sendApplyNotifications()
-    }
-
-    private const val SETTLE_MILLIS = 200L
 }

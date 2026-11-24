@@ -87,7 +87,8 @@ val sqliteNativePlatform: Pair<String, String> = run {
     val arm = System.getProperty("os.arch") in setOf("aarch64", "arm64")
 
     when {
-        os.contains("mac") -> "osx_arm64" to "libsqliteJni.dylib"
+        os.contains("mac") && arm -> "osx_arm64" to "libsqliteJni.dylib"
+        os.contains("mac") -> error("sqlite-bundled-jvm に macOS の Intel 向けの部品が無い")
         os.contains("win") -> "windows_x64" to "sqliteJni.dll"
         arm -> "linux_arm64" to "libsqliteJni.so"
         else -> "linux_x64" to "libsqliteJni.so"
