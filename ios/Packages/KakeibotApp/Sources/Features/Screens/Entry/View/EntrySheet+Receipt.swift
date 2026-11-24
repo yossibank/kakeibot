@@ -10,10 +10,10 @@ extension EntrySheet {
     var isScanningReceipt: Binding<Bool> {
         Binding(
             get: {
-                receipt.isScanning
+                receipt.output.isScanning
             },
             set: { isScanning in
-                if !isScanning, receipt.isScanning {
+                if !isScanning, receipt.output.isScanning {
                     receipt.cancel()
                 }
             }
@@ -22,14 +22,14 @@ extension EntrySheet {
 
     @ViewBuilder
     var receiptLayer: some View {
-        switch receipt.step {
+        switch receipt.state.step {
         case .guide:
             EntryGuideCard(
                 onConfirm: {
                     receipt.confirmGuide()
                     saveReceiptGuideChoice()
                 },
-                hidesNext: $receipt.hidesGuide,
+                hidesNext: Bindable(receipt.state).hidesGuide,
                 guide: .receipt
             ) {
                 withAnimation(.snappy) {

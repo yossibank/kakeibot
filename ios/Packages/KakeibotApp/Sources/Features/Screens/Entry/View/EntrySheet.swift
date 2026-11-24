@@ -126,7 +126,7 @@ public struct EntrySheet: View {
                     }
                 }
             }
-            .proOffer(receipt.offer, presentsInSheet: true) {
+            .proOffer(receipt.state.offer, presentsInSheet: true) {
                 receipt.closeOffer()
             } onUnlock: {
                 receipt.closeOffer()
