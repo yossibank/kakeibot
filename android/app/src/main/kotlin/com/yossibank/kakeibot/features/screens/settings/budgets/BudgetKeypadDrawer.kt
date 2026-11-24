@@ -54,6 +54,8 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.suggestions
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import kotlinx.coroutines.launch
 

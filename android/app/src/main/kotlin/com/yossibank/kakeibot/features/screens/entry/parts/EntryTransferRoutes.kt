@@ -40,7 +40,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.icon.IconImage
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -51,29 +50,12 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.BalanceLine
-import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
-import com.yossibank.kakeibot.features.screens.entry.model.TransferRoute
-import com.yossibank.kakeibot.features.screens.entry.model.afterLine
-import com.yossibank.kakeibot.features.screens.entry.model.apply
-import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
-import com.yossibank.kakeibot.features.screens.entry.model.applyRoute
-import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
-import com.yossibank.kakeibot.features.screens.entry.model.categoryText
-import com.yossibank.kakeibot.features.screens.entry.model.currentLine
-import com.yossibank.kakeibot.features.screens.entry.model.dateText
-import com.yossibank.kakeibot.features.screens.entry.model.expressionText
-import com.yossibank.kakeibot.features.screens.entry.model.frequentRoutes
-import com.yossibank.kakeibot.features.screens.entry.model.idleAfterLine
-import com.yossibank.kakeibot.features.screens.entry.model.isOverSourceBalance
-import com.yossibank.kakeibot.features.screens.entry.model.loanRemaining
-import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
-import com.yossibank.kakeibot.features.screens.entry.model.payOffLoan
-import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
-import com.yossibank.kakeibot.features.screens.entry.model.routeText
-import com.yossibank.kakeibot.features.screens.entry.model.wallet
-import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
-import com.yossibank.kakeibot.features.shared.entrylist.EntryText
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.TransferRoute
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.applyRoute
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.frequentRoutes
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallet
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 
 @Composable
 internal fun EntryTransferRoutes(model: EntryModel) {

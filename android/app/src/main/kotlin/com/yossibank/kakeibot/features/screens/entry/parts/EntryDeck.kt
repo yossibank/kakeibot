@@ -49,7 +49,6 @@ import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.date.MonthCalendar
-import com.yossibank.kakeibot.designsystem.components.date.shortName
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.row.FeeChoiceRow
@@ -64,20 +63,11 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
-import com.yossibank.kakeibot.features.screens.entry.model.apply
-import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
-import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
-import com.yossibank.kakeibot.features.screens.entry.model.categoryText
-import com.yossibank.kakeibot.features.screens.entry.model.dateText
-import com.yossibank.kakeibot.features.screens.entry.model.expressionText
-import com.yossibank.kakeibot.features.screens.entry.model.feeChoices
-import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
-import com.yossibank.kakeibot.features.screens.entry.model.routeText
-import com.yossibank.kakeibot.features.screens.entry.model.showsItems
-import com.yossibank.kakeibot.features.screens.entry.model.tags
-import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
-import com.yossibank.kakeibot.features.shared.entrylist.EntryText
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.feeChoices
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsItems
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.tags
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
 @Composable

@@ -74,7 +74,6 @@ import com.yossibank.kakeibot.designsystem.components.modal.BottomDrawer
 import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
 import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.surface.card
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -82,9 +81,17 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.autoPlan
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.canSave
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isChanged
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isLoanRepayment
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.plannedTotal
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.previewRow
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.saveTitle
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
-import com.yossibank.kakeibot.features.shared.period.title
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
@@ -280,7 +287,7 @@ fun RecurringEditSheet(
             )
 
             RecurringDetailRows(
-                rows = model.output.detailRows,
+                rows = model.detailRows,
                 onOpen = ::open,
             )
 

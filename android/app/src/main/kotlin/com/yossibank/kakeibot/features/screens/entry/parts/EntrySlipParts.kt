@@ -36,21 +36,12 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.card
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
-import com.yossibank.kakeibot.features.screens.entry.model.isDateFromVoice
-import com.yossibank.kakeibot.features.screens.entry.model.isMemoFromVoice
-import com.yossibank.kakeibot.features.screens.entry.model.isWalletFromVoice
-import com.yossibank.kakeibot.features.screens.entry.model.itemAdjustment
-import com.yossibank.kakeibot.features.screens.entry.model.itemTotal
-import com.yossibank.kakeibot.features.screens.entry.model.showsItems
-import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceWave
 
 @Composable

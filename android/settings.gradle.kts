@@ -23,4 +23,5 @@ rootProject.name = "Kakeibot"
 
 include(":app")
 include(":core")
+include(":featuremodels")
 include(":store")

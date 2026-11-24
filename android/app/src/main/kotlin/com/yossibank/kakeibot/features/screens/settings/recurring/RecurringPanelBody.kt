@@ -24,7 +24,16 @@ import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.period.title
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.autoPlan
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.countCalculator
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.loanOwed
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.scheduledEndDate
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.usesAutoCount
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
+import com.yossibank.kakeibot.featuremodels.shared.amount.FeeChoiceRow
+import com.yossibank.kakeibot.featuremodels.shared.period.title
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 
 @Composable

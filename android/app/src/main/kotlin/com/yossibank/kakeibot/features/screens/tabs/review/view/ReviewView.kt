@@ -1,6 +1,5 @@
 package com.yossibank.kakeibot.features.screens.tabs.review.view
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,10 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,17 +43,17 @@ import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
-import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
-import com.yossibank.kakeibot.designsystem.theme.colorOf
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.tabs.review.model.ReviewModel
+import com.yossibank.kakeibot.featuremodels.screens.tabs.review.model.ReviewModel
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
+import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -249,7 +245,7 @@ private fun BreakdownCard(model: ReviewModel) {
         }
 
         Box(contentAlignment = Alignment.Center) {
-            Donut(rows = rows)
+            ReviewDonut(rows = rows)
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
@@ -331,65 +327,6 @@ private fun CategoryRow(row: ReviewModel.Row) {
         )
     }
 }
-
-@Composable
-private fun Donut(rows: List<ReviewModel.Row>) {
-    val track = Palette.accent.opacity(Emphasis.Subtle)
-    val other = Palette.subtext.opacity(Emphasis.Medium)
-
-    val slices = rows.take(DONUT_SLICES).map { row ->
-        (row.color?.let { colorOf(hex = it) } ?: other) to row.ratio
-    }
-
-    val rest = rows.drop(DONUT_SLICES).sumOf { it.ratio }
-
-    Canvas(modifier = Modifier.size(200.dp)) {
-        val stroke = 22.dp.toPx()
-
-        val box = Size(
-            width = size.width - stroke,
-            height = size.height - stroke,
-        )
-
-        val corner = Offset(
-            x = stroke / 2,
-            y = stroke / 2,
-        )
-
-        drawArc(
-            color = track,
-            startAngle = 0f,
-            sweepAngle = 360f,
-            useCenter = false,
-            topLeft = corner,
-            size = box,
-            style = Stroke(width = stroke),
-        )
-
-        var start = -90f
-
-        (slices + (other to rest)).forEach { (color, ratio) ->
-            val sweep = (360 * ratio).toFloat()
-
-            if (sweep > 0f) {
-                drawArc(
-                    color = color,
-                    startAngle = start,
-                    sweepAngle = (sweep - GAP_DEGREES).coerceAtLeast(0.5f),
-                    useCenter = false,
-                    topLeft = corner,
-                    size = box,
-                    style = Stroke(width = stroke),
-                )
-            }
-
-            start += sweep
-        }
-    }
-}
-
-private const val DONUT_SLICES = 5
-private const val GAP_DEGREES = 1.5f
 
 private val scales = listOf(
     ReviewPeriod.Scale.week to "週",

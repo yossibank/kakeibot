@@ -38,7 +38,15 @@ import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.entrylist.EntryText
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.billDates
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.billRecurring
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.categories
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isCardBill
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.walletTitle
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.wallets
+import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryText
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 

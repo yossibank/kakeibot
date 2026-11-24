@@ -11,12 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.core.concepts.date.Weekday
-import com.yossibank.kakeibot.designsystem.components.date.shortName
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.period.title
+import com.yossibank.kakeibot.featuremodels.shared.datechoice.shortName
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 
 val Weekday.title: String

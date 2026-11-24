@@ -3,8 +3,15 @@ package com.yossibank.kakeibot.features.screens.settings.recurring
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.entry.Entry
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
-import com.yossibank.kakeibot.features.shared.period.title
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.canUseClosingDay
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isLoanRepayment
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.repaymentCount
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.scheduledEndDate
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.usesAutoCount
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
+import com.yossibank.kakeibot.featuremodels.shared.period.title
 
 data class RecurringDetailRow(
     val panel: RecurringPanel,
@@ -13,10 +20,10 @@ data class RecurringDetailRow(
     val isEmpty: Boolean,
 )
 
-val RecurringEditModel.Output.detailRows: List<RecurringDetailRow>
+val RecurringEditModel.detailRows: List<RecurringDetailRow>
     get() = transferRows + scheduleRows
 
-private val RecurringEditModel.Output.transferRows: List<RecurringDetailRow>
+private val RecurringEditModel.transferRows: List<RecurringDetailRow>
     get() {
         if (state.form.type != Entry.Kind.transfer) {
             return emptyList()
@@ -25,24 +32,24 @@ private val RecurringEditModel.Output.transferRows: List<RecurringDetailRow>
         val feeRow = RecurringDetailRow(
             panel = RecurringPanel.Fee,
             icon = R.drawable.ic_bank,
-            value = if (fee > 0) AmountText.text(amount = fee) else "なし",
-            isEmpty = fee == 0,
+            value = if (output.fee > 0) AmountText.text(amount = output.fee) else "なし",
+            isEmpty = output.fee == 0,
         )
 
         return listOfNotNull(countRow ?: closingRow, feeRow)
     }
 
-private val RecurringEditModel.Output.countRow: RecurringDetailRow?
+private val RecurringEditModel.countRow: RecurringDetailRow?
     get() {
-        if (!isLoanRepayment) {
+        if (!output.isLoanRepayment) {
             return null
         }
 
-        val count = repaymentCount
+        val count = output.repaymentCount
 
         val value = when {
             count == null -> "決めない"
-            usesAutoCount -> "自動 · $count 回"
+            output.usesAutoCount -> "自動 · $count 回"
             else -> "$count 回"
         }
 
@@ -54,9 +61,9 @@ private val RecurringEditModel.Output.countRow: RecurringDetailRow?
         )
     }
 
-private val RecurringEditModel.Output.closingRow: RecurringDetailRow?
+private val RecurringEditModel.closingRow: RecurringDetailRow?
     get() {
-        if (!canUseClosingDay) {
+        if (!output.canUseClosingDay) {
             return null
         }
 
@@ -68,9 +75,9 @@ private val RecurringEditModel.Output.closingRow: RecurringDetailRow?
         )
     }
 
-private val RecurringEditModel.Output.scheduleRows: List<RecurringDetailRow>
+private val RecurringEditModel.scheduleRows: List<RecurringDetailRow>
     get() {
-        val end = scheduledEndDate
+        val end = output.scheduledEndDate
 
         return listOf(
             RecurringDetailRow(

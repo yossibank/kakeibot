@@ -56,7 +56,6 @@ import com.yossibank.kakeibot.designsystem.components.tag.TagLineItem
 import com.yossibank.kakeibot.designsystem.components.template.TemplateCard
 import com.yossibank.kakeibot.designsystem.components.template.TemplateCardAmount
 import com.yossibank.kakeibot.designsystem.components.template.TemplateCardSize
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -65,7 +64,9 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.screens.settings.templates.TemplateEditModel
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider

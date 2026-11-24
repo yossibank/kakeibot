@@ -30,6 +30,8 @@ import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsScreenFlag
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.title
@@ -37,7 +39,6 @@ import com.yossibank.kakeibot.features.screens.settings.recurring.RecurringListV
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNote
-import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsScreenFlag
 import com.yossibank.kakeibot.features.shared.settingsparts.input.SettingsRow
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider

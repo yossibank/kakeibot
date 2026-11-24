@@ -29,18 +29,7 @@ import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
-
-data class RecurringRow(
-    val id: Identifier<Recurring>,
-    val title: String,
-    val schedule: String,
-    val place: String?,
-    val amount: Int?,
-    val type: Entry.Kind,
-    val icon: Icon?,
-    val next: LocalDate?,
-    val closing: String?,
-)
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringRow
 
 val recurringRowHeight: Dp = 84.dp
 
@@ -76,9 +65,11 @@ fun RecurringRowCard(
                     style = textFont(style = FontTextStyle.Subheadline),
                 )
 
-                if (row.amount != null) {
+                val amount = row.amount
+
+                if (amount != null) {
                     AmountText(
-                        amount = row.amount,
+                        amount = amount,
                         style = textFont(style = FontTextStyle.Body),
                         type = row.type,
                     )
