@@ -22,10 +22,10 @@ struct ProOfferCard: View {
                 Spacer(minLength: 0)
             }
 
-            CardButton(model.purchaseTitle, style: .filled) {
+            CardButton(model.output.purchaseTitle, style: .filled) {
                 purchase()
             }
-            .disabled(model.isWorking)
+            .disabled(model.output.isWorking)
 
             HStack(spacing: 12) {
                 CardButton("Pro について", style: .outlined(Palette.accent), action: onLearnMore)
@@ -34,7 +34,7 @@ struct ProOfferCard: View {
         }
         .padding(16)
         .floatingCard()
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .task {
             await model.load()
         }

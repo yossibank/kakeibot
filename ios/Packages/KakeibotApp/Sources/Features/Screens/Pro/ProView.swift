@@ -24,7 +24,7 @@ public struct ProView: View {
 
             ScrollView {
                 VStack(spacing: 20) {
-                    ProHero(price: model.price)
+                    ProHero(price: model.input.price)
 
                     ForEach(ProFeature.all) { feature in
                         ProFeatureCard(feature: feature)
@@ -42,10 +42,10 @@ public struct ProView: View {
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
-        .interactiveDismissDisabled(model.isWorking)
+        .interactiveDismissDisabled(model.output.isWorking)
         .task {
             await model.load()
         }
@@ -67,7 +67,7 @@ private extension ProView {
                     purchase()
                 } label: {
                     workLabel(
-                        model.purchaseTitle,
+                        model.output.purchaseTitle,
                         work: .purchase,
                         tint: Palette.backgroundBottom
                     )
@@ -94,7 +94,7 @@ private extension ProView {
                 .buttonStyle(.plain)
                 .opacity(opacity(of: .restore))
             }
-            .allowsHitTesting(!model.isWorking)
+            .allowsHitTesting(!model.output.isWorking)
         }
     }
 
@@ -103,7 +103,7 @@ private extension ProView {
         work: ProPurchaseModel.Work,
         tint: Color
     ) -> some View {
-        let isWorking = model.working == work
+        let isWorking = model.state.working == work
 
         return ZStack {
             Text(title)
@@ -123,7 +123,7 @@ private extension ProView {
 
 private extension ProView {
     func opacity(of work: ProPurchaseModel.Work) -> Double {
-        model.isWorking && model.working != work
+        model.output.isWorking && model.state.working != work
             ? 0.4
             : 1
     }

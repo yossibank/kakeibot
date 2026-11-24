@@ -9,8 +9,8 @@ struct ProPurchaseModelTests {
 
         await model.load()
 
-        #expect(model.price == "¥600")
-        #expect(model.purchaseTitle == "¥600 で購入する")
+        #expect(model.input.price == "¥600")
+        #expect(model.output.purchaseTitle == "¥600 で購入する")
     }
 
     @Test
@@ -19,16 +19,16 @@ struct ProPurchaseModelTests {
 
         await model.load()
 
-        #expect(model.price == nil)
-        #expect(model.purchaseTitle == "購入する")
+        #expect(model.input.price == nil)
+        #expect(model.output.purchaseTitle == "購入する")
     }
 
     @Test
     func showsCachedPriceBeforeLoading() {
         let model = ProPurchaseModel(store: .stub(cachedPrice: "¥600"))
 
-        #expect(model.price == "¥600")
-        #expect(model.purchaseTitle == "¥600 で購入する")
+        #expect(model.input.price == "¥600")
+        #expect(model.output.purchaseTitle == "¥600 で購入する")
     }
 
     @Test
@@ -37,13 +37,13 @@ struct ProPurchaseModelTests {
 
         await model.load()
 
-        #expect(model.purchaseTitle == "¥600 で購入する")
+        #expect(model.output.purchaseTitle == "¥600 で購入する")
     }
 
     @Test
     func keepsPlainTitleBeforeLoading() {
         let model = ProPurchaseModel(store: .stub())
-        #expect(model.purchaseTitle == "購入する")
+        #expect(model.output.purchaseTitle == "購入する")
     }
 
     @Test
@@ -53,8 +53,8 @@ struct ProPurchaseModelTests {
         let isUnlocked = await model.purchase()
 
         #expect(isUnlocked)
-        #expect(model.errorNotice.message == nil)
-        #expect(!model.isWorking)
+        #expect(model.state.errorNotice.message == nil)
+        #expect(!model.output.isWorking)
     }
 
     @Test
@@ -64,7 +64,7 @@ struct ProPurchaseModelTests {
         let isUnlocked = await model.purchase()
 
         #expect(!isUnlocked)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 
     @Test
@@ -74,9 +74,9 @@ struct ProPurchaseModelTests {
         let isUnlocked = await model.purchase()
 
         #expect(!isUnlocked)
-        #expect(model.errorNotice.message == "購入できませんでした。時間をおいて試してください")
-        #expect(model.errorNotice.tone == .error)
-        #expect(!model.isWorking)
+        #expect(model.state.errorNotice.message == "購入できませんでした。時間をおいて試してください")
+        #expect(model.state.errorNotice.tone == .error)
+        #expect(!model.output.isWorking)
     }
 
     @Test
@@ -86,7 +86,7 @@ struct ProPurchaseModelTests {
         let isUnlocked = await model.restore()
 
         #expect(isUnlocked)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 
     @Test
@@ -96,8 +96,8 @@ struct ProPurchaseModelTests {
         let isUnlocked = await model.restore()
 
         #expect(!isUnlocked)
-        #expect(model.errorNotice.message == "復元できる購入が見つかりませんでした")
-        #expect(model.errorNotice.tone == .info)
+        #expect(model.state.errorNotice.message == "復元できる購入が見つかりませんでした")
+        #expect(model.state.errorNotice.tone == .info)
     }
 
     @Test
@@ -107,7 +107,7 @@ struct ProPurchaseModelTests {
         let isUnlocked = await model.restore()
 
         #expect(!isUnlocked)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 
     @Test
@@ -117,20 +117,20 @@ struct ProPurchaseModelTests {
         let isUnlocked = await model.restore()
 
         #expect(!isUnlocked)
-        #expect(model.errorNotice.message == "購入を復元できませんでした。時間をおいて試してください")
-        #expect(model.errorNotice.tone == .error)
-        #expect(model.working == nil)
+        #expect(model.state.errorNotice.message == "購入を復元できませんでした。時間をおいて試してください")
+        #expect(model.state.errorNotice.tone == .error)
+        #expect(model.state.working == nil)
     }
 
     @Test
     func clearsPreviousNoticeOnNextTry() async {
         let model = ProPurchaseModel(store: .stub(restore: .success(.unlocked)))
-        model.errorNotice.show("前の失敗")
+        model.state.errorNotice.show("前の失敗")
 
         let isUnlocked = await model.restore()
 
         #expect(isUnlocked)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 }
 
