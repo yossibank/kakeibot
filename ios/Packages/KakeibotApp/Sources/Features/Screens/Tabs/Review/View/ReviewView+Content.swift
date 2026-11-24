@@ -10,24 +10,24 @@ extension ReviewView {
                     kindTile(kind)
                 }
             }
-            .animation(.snappy, value: model.kind)
+            .animation(.snappy, value: model.state.kind)
 
             detailCard
 
-            if model.kind == .balance {
-                let moves = model.moves
+            if model.state.kind == .balance {
+                let moves = model.output.moves
 
                 if !moves.isEmpty {
                     moveCard(moves)
                 }
             }
 
-            if model.kind != .balance {
-                let categoryShares = model.categoryShares
-                let walletShares = model.walletShares
+            if model.state.kind != .balance {
+                let categoryShares = model.output.categoryShares
+                let walletShares = model.output.walletShares
                 let isEmpty = categoryShares.isEmpty && walletShares.isEmpty
 
-                if model.list == nil {
+                if model.input.list == nil {
                     EmptyView()
                 } else if isEmpty {
                     PlaceholderEmpty(
@@ -43,11 +43,11 @@ extension ReviewView {
                 } else {
                     ReviewSharesCard(
                         title: "カテゴリごと",
-                        type: model.entryType,
+                        type: model.output.entryType,
                         shares: categoryShares,
                         total: ReviewSharesCard.Total(
                             title: totalTitle,
-                            amount: model.total
+                            amount: model.output.total
                         ),
                         onOpen: { share in
                             openShare = share
@@ -57,7 +57,7 @@ extension ReviewView {
 
                     ReviewSharesCard(
                         title: "口座ごと",
-                        type: model.entryType,
+                        type: model.output.entryType,
                         shares: walletShares,
                         total: nil,
                         onOpen: { share in
@@ -67,7 +67,7 @@ extension ReviewView {
                 }
             }
 
-            let tallies = model.stampTallies
+            let tallies = model.output.stampTallies
 
             if !tallies.isEmpty {
                 StampTallyCard(
@@ -125,11 +125,11 @@ extension ReviewView {
 
 private extension ReviewView {
     func kindTile(_ kind: ReviewKind) -> some View {
-        let isSelected = kind == model.kind
+        let isSelected = kind == model.state.kind
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let rim = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
         let titleColor = isSelected ? Palette.accent : Palette.subtext
-        let change = model.change(of: kind)
+        let change = model.output.change(of: kind)
 
         return Button {
             select(kind)
@@ -149,7 +149,7 @@ private extension ReviewView {
 
                     Spacer(minLength: 0)
 
-                    if model.hasPreviousEntries {
+                    if model.output.hasPreviousEntries {
                         Image(systemName: Self.changeImage(change))
                             .sansFont(.caption, weight: .semibold)
                             .foregroundStyle(Self.changeColor(change, of: kind))
@@ -178,7 +178,7 @@ private extension ReviewView {
 
     @ViewBuilder
     func tileAmount(of kind: ReviewKind) -> some View {
-        let total = model.total(of: kind)
+        let total = model.output.total(of: kind)
 
         if kind == .balance {
             AmountText(
@@ -195,12 +195,12 @@ private extension ReviewView {
 
 private extension ReviewView {
     var totalTitle: String {
-        Self.title(of: model.kind)
+        Self.title(of: model.state.kind)
     }
 
     var recordDate: LocalDate {
-        let range = model.period.range
-        return range.contains(model.today) ? model.today : range.lowerBound
+        let range = model.output.period.range
+        return range.contains(model.state.today) ? model.state.today : range.lowerBound
     }
 
     func tileTitle(of kind: ReviewKind) -> String {
@@ -208,6 +208,6 @@ private extension ReviewView {
             return Self.title(of: kind)
         }
 
-        return ReviewText.balanceTitle(model.total(of: kind))
+        return ReviewText.balanceTitle(model.output.total(of: kind))
     }
 }

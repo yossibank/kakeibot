@@ -4,29 +4,32 @@ extension ReviewModel {
     struct MonthKey: Hashable {
         let range: ClosedRange<LocalDate>
     }
+}
 
+extension ReviewModel.Output {
     var yearProgress: ReviewYearProgress? {
         guard
-            scale == .year,
+            state.scale == .year,
             isCurrentPeriod
         else {
             return nil
         }
 
         let range = period.range
-        let comparison = period.comparisonRange(today: today)
+        let comparison = period.comparisonRange(today: state.today)
         let hasPrevious = entries.contains { comparison.contains($0.date) }
-        let spent = ReviewSummary(entries: entries, in: range.lowerBound...today).expense.total
+        let spent = ReviewSummary(entries: entries, in: range.lowerBound...state.today).expense
+            .total
         let previousSpent = ReviewSummary(entries: entries, in: comparison).expense.total
 
         let first = ReviewPeriod(
             scale: .month,
             containing: range.lowerBound,
-            monthStartDay: monthStartDay,
-            weekStart: weekStart
+            monthStartDay: input.monthStartDay,
+            weekStart: input.weekStart
         )
 
-        let months = (0..<Self.yearMonths)
+        let months = (0..<ReviewModel.yearMonths)
             .map { first.adding($0) }
             .filter { $0.range.lowerBound <= range.upperBound }
             .enumerated()
@@ -41,9 +44,9 @@ extension ReviewModel {
         )
     }
 
-    func monthShare(of month: ReviewYearProgress.Month) -> Share {
-        Share(
-            id: AnyHashable(MonthKey(range: month.range)),
+    func monthShare(of month: ReviewYearProgress.Month) -> ReviewModel.Share {
+        ReviewModel.Share(
+            id: AnyHashable(ReviewModel.MonthKey(range: month.range)),
             name: month.name,
             icon: nil,
             amount: month.total,
@@ -52,8 +55,8 @@ extension ReviewModel {
         )
     }
 
-    func monthRows(of key: MonthKey) -> [EntryRowItem] {
-        guard let list else {
+    func monthRows(of key: ReviewModel.MonthKey) -> [EntryRowItem] {
+        guard let list = input.list else {
             return []
         }
 
@@ -68,7 +71,9 @@ extension ReviewModel {
 
 private extension ReviewModel {
     static let yearMonths = 12
+}
 
+private extension ReviewModel.Output {
     func yearMonth(
         _ month: ReviewPeriod,
         index: Int
@@ -76,9 +81,9 @@ private extension ReviewModel {
         let total = ReviewSummary(entries: entries, in: month.range).expense.total
         let limit = budgetLimit(of: month)
 
-        let state: ReviewYearProgress.State = if month.range.upperBound < today {
+        let state: ReviewYearProgress.State = if month.range.upperBound < state.today {
             .closed
-        } else if month.range.contains(today) {
+        } else if month.range.contains(state.today) {
             .current
         } else {
             .upcoming

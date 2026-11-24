@@ -16,32 +16,22 @@ public extension ReviewModel {
         }
     }
 
-    var moves: [Move] {
-        guard let list else {
-            return []
-        }
-
-        let range = period.range
-
-        _ = recurrings
-
-        if let cached = cache.moves[range] {
-            return cached
-        }
-
-        let made = moves(in: list)
-
-        cache.moves[range] = made
-
-        return made
-    }
-
     static func total(of moves: [Move]) -> Int {
         moves.reduce(0) { $0 + $1.amount }
     }
+}
 
-    func repaymentRatio(in moves: [Move]) -> Double {
-        let total = Self.total(of: moves)
+public extension ReviewModel.Output {
+    var moves: [ReviewModel.Move] {
+        moveLists.value(for: period.range) {
+            _ = input.recurrings
+
+            return input.list.map { moves(in: $0) } ?? []
+        }
+    }
+
+    func repaymentRatio(in moves: [ReviewModel.Move]) -> Double {
+        let total = ReviewModel.total(of: moves)
 
         let repaid = moves
             .filter { $0.wallet.kind.role == .loan }
@@ -50,9 +40,9 @@ public extension ReviewModel {
         return total == 0 ? 0 : Double(repaid) / Double(total)
     }
 
-    func share(of move: Move) -> Share {
-        Share(
-            id: AnyHashable(MoveKey(walletId: move.wallet.id)),
+    func share(of move: ReviewModel.Move) -> ReviewModel.Share {
+        ReviewModel.Share(
+            id: AnyHashable(ReviewModel.MoveKey(walletId: move.wallet.id)),
             name: move.wallet.name,
             icon: move.icon,
             amount: move.amount,
@@ -66,10 +56,12 @@ extension ReviewModel {
     struct MoveKey: Hashable {
         let walletId: Wallet.ID
     }
+}
 
+extension ReviewModel.Output {
     func moveRows(to walletId: Wallet.ID) -> [EntryRowItem] {
         guard
-            let list,
+            let list = input.list,
             let wallet = list.wallets[walletId]
         else {
             return []
@@ -85,13 +77,15 @@ extension ReviewModel {
 
 private extension ReviewModel {
     static let moveRoles: [Wallet.Kind.Role] = [.loan, .investment]
+}
 
-    func moves(in list: EntryList) -> [Move] {
+private extension ReviewModel.Output {
+    func moves(in list: EntryList) -> [ReviewModel.Move] {
         list.wallets.values
-            .filter { Self.moveRoles.contains($0.kind.role) }
+            .filter { ReviewModel.moveRoles.contains($0.kind.role) }
             .sorted { lhs, rhs in
-                let lhsOrder = Self.moveRoles.firstIndex(of: lhs.kind.role) ?? 0
-                let rhsOrder = Self.moveRoles.firstIndex(of: rhs.kind.role) ?? 0
+                let lhsOrder = ReviewModel.moveRoles.firstIndex(of: lhs.kind.role) ?? 0
+                let rhsOrder = ReviewModel.moveRoles.firstIndex(of: rhs.kind.role) ?? 0
 
                 if lhsOrder != rhsOrder {
                     return lhsOrder < rhsOrder
@@ -106,9 +100,9 @@ private extension ReviewModel {
                     return nil
                 }
 
-                let balance = list.balance(of: wallet, through: today)
+                let balance = list.balance(of: wallet, through: state.today)
 
-                return Move(
+                return ReviewModel.Move(
                     wallet: wallet,
                     icon: list.icons[wallet.iconId],
                     amount: amount,
@@ -143,14 +137,14 @@ private extension ReviewModel {
             return nil
         }
 
-        let repayments = recurrings.filter { recurring in
+        let repayments = input.recurrings.filter { recurring in
             recurring.type == .transfer && recurring.toWalletId == wallet.id
         }
 
         return LoanPayoff(
             balance: balance,
             repayments: repayments,
-            after: today
+            after: state.today
         )
     }
 }

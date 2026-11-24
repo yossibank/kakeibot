@@ -8,28 +8,79 @@ extension ReviewModel {
         let isLoaded: Bool
     }
 
+    func refreshGoals(now: Date) async {
+        guard input.list != nil else {
+            return
+        }
+
+        let current = output.currentPeriod
+        let closed = current.previous
+
+        do {
+            try await checkGoals(of: closed, now: now)
+            try await makeGoal(after: closed, for: current, now: now)
+
+            let seen = try await dependencies.database.setting(.reviewSeenReports)
+            let hasEntries = output.entries.contains { closed.range.contains($0.date) }
+
+            guard current == output.currentPeriod else {
+                return
+            }
+
+            state.newReportKey = hasEntries && !seen.contains(closed.commentKey)
+                ? closed.commentKey
+                : nil
+        } catch {
+            return
+        }
+
+        await loadGoals()
+    }
+
+    func markReportSeen() async {
+        let key = output.period.commentKey
+
+        guard state.newReportKey == key else {
+            return
+        }
+
+        state.newReportKey = nil
+
+        do {
+            let seen = try await dependencies.database.setting(.reviewSeenReports)
+            let prefix = "\(output.period.scale.rawValue):"
+            let kept = seen.filter { !$0.hasPrefix(prefix) }
+
+            try await dependencies.database.setSetting(.reviewSeenReports, to: kept.union([key]))
+        } catch {
+            return
+        }
+    }
+}
+
+extension ReviewModel.Output {
     var currentPeriod: ReviewPeriod {
         ReviewPeriod(
-            scale: scale,
-            containing: today,
-            monthStartDay: monthStartDay,
-            weekStart: weekStart
+            scale: state.scale,
+            containing: state.today,
+            monthStartDay: input.monthStartDay,
+            weekStart: input.weekStart
         )
     }
 
-    var goalTrigger: GoalTrigger {
-        GoalTrigger(period: currentPeriod, isLoaded: list != nil)
+    var goalTrigger: ReviewModel.GoalTrigger {
+        ReviewModel.GoalTrigger(period: currentPeriod, isLoaded: input.list != nil)
     }
 
     var hasNewReport: Bool {
-        isCurrentPeriod && newReportKey != nil
+        isCurrentPeriod && state.newReportKey != nil
     }
 
     func closingGoals(now: Date) -> ReviewClosingView.Goals {
         let next = period.adding(1)
-        let answer = goals.first { $0.period == period.commentKey }
+        let answer = input.goals.first { $0.period == period.commentKey }
         let checked = answer.map { answered($0, now: now) }
-        let nextGoal = goals.first { $0.period == next.commentKey }
+        let nextGoal = input.goals.first { $0.period == next.commentKey }
         let nextItem = nextGoal.flatMap { goalItem($0, in: next) }
         let count = entryCount(in: period.range)
         let hasMore = closingContent.rows.contains { $0.row.tone == .more }
@@ -54,78 +105,18 @@ extension ReviewModel {
             checkDate: next.range.upperBound.adding(days: 1)
         )
     }
-
-    func refreshGoals(now: Date) async {
-        guard list != nil else {
-            return
-        }
-
-        let current = currentPeriod
-        let closed = current.previous
-
-        do {
-            try await checkGoals(of: closed, now: now)
-            try await makeGoal(after: closed, for: current, now: now)
-
-            let seen = try await database.setting(.reviewSeenReports)
-            let hasEntries = entries.contains { closed.range.contains($0.date) }
-
-            guard current == currentPeriod else {
-                return
-            }
-
-            newReportKey = hasEntries && !seen.contains(closed.commentKey)
-                ? closed.commentKey
-                : nil
-        } catch {
-            return
-        }
-
-        await loadGoals()
-    }
-
-    func markReportSeen() async {
-        let key = period.commentKey
-
-        guard newReportKey == key else {
-            return
-        }
-
-        newReportKey = nil
-
-        do {
-            let seen = try await database.setting(.reviewSeenReports)
-            let prefix = "\(period.scale.rawValue):"
-            let kept = seen.filter { !$0.hasPrefix(prefix) }
-
-            try await database.setSetting(.reviewSeenReports, to: kept.union([key]))
-        } catch {
-            return
-        }
-    }
 }
 
 private extension ReviewModel {
-    func answered(
-        _ goal: ReviewGoal,
-        now: Date
-    ) -> ReviewGoal {
-        guard goal.checkedAt == nil else {
-            return goal
-        }
-
-        return goal.checked(entries: entries, in: period.range, now: now)
-    }
-
     func checkGoals(
         of closed: ReviewPeriod,
         now: Date
     ) async throws {
-        let goals = try await database.reviewGoals(for: closed.commentKey)
+        let goals = try await dependencies.database.reviewGoals(for: closed.commentKey)
 
         for goal in goals where goal.checkedAt == nil {
-            let checked = goal.checked(entries: entries, in: closed.range, now: now)
-            try await database.saveReviewGoal(checked)
+            let checked = goal.checked(entries: output.entries, in: closed.range, now: now)
+            try await dependencies.database.saveReviewGoal(checked)
         }
     }
 
@@ -134,8 +125,8 @@ private extension ReviewModel {
         for current: ReviewPeriod,
         now: Date
     ) async throws {
-        let existing = try await database.reviewGoals(for: current.commentKey)
-        let count = entryCount(in: closed.range)
+        let existing = try await dependencies.database.reviewGoals(for: current.commentKey)
+        let count = output.entryCount(in: closed.range)
 
         guard
             existing.isEmpty,
@@ -147,7 +138,7 @@ private extension ReviewModel {
         let history = (1...Self.averagePeriods).map { closed.adding(-$0).range }
 
         let goal = ReviewGoal.make(
-            entries: entries,
+            entries: output.entries,
             closed: closed.range,
             history: history,
             period: current.commentKey,
@@ -155,7 +146,20 @@ private extension ReviewModel {
         )
 
         if let goal {
-            try await database.saveReviewGoal(goal)
+            try await dependencies.database.saveReviewGoal(goal)
         }
+    }
+}
+
+private extension ReviewModel.Output {
+    func answered(
+        _ goal: ReviewGoal,
+        now: Date
+    ) -> ReviewGoal {
+        guard goal.checkedAt == nil else {
+            return goal
+        }
+
+        return goal.checked(entries: entries, in: period.range, now: now)
     }
 }

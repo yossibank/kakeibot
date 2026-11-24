@@ -3,22 +3,22 @@ import DesignSystem
 import Foundation
 import Store
 
-public extension ReviewModel {
+public extension ReviewModel.Output {
     var budgetUsage: BudgetUsage? {
         usage(for: nil, spent: summary.expense.total)
     }
 
-    var categoryShares: [Share] {
+    var categoryShares: [ReviewModel.Share] {
         guard
             let breakdown,
-            let list
+            let list = input.list
         else {
             return []
         }
 
         let ranked = breakdown.byCategory.compactMap { id, amount in
             list.categories[id].map { category in
-                let share = Share(
+                let share = ReviewModel.Share(
                     id: category.id,
                     name: category.name,
                     icon: list.icons[category.iconId],
@@ -27,24 +27,24 @@ public extension ReviewModel {
                     usage: usage(for: category.id, spent: amount)
                 )
 
-                return Ranked(share: share, sortOrder: category.sortOrder)
+                return ReviewModel.Ranked(share: share, sortOrder: category.sortOrder)
             }
         }
 
-        return Self.sorted(ranked)
+        return ReviewModel.sorted(ranked)
     }
 
-    var walletShares: [Share] {
+    var walletShares: [ReviewModel.Share] {
         guard
             let breakdown,
-            let list
+            let list = input.list
         else {
             return []
         }
 
         let ranked = breakdown.byWallet.compactMap { id, amount in
             list.wallets[id].map { wallet in
-                let share = Share(
+                let share = ReviewModel.Share(
                     id: wallet.id,
                     name: wallet.name,
                     icon: list.icons[wallet.iconId],
@@ -53,11 +53,11 @@ public extension ReviewModel {
                     usage: nil
                 )
 
-                return Ranked(share: share, sortOrder: wallet.sortOrder)
+                return ReviewModel.Ranked(share: share, sortOrder: wallet.sortOrder)
             }
         }
 
-        return Self.sorted(ranked)
+        return ReviewModel.sorted(ranked)
     }
 
     var recurringTotal: Int? {
@@ -78,46 +78,41 @@ public extension ReviewModel {
 
     var upcomingRecurringTotal: Int? {
         guard
-            let type = entryType,
-            period.range.contains(today)
+            entryType != nil,
+            period.range.contains(state.today)
         else {
             return nil
         }
 
         let range = period.range
 
-        _ = list
-        _ = recurrings
+        let total = upcomingTotals.value(for: range) {
+            let type = entryType
 
-        if let cached = cache.upcoming[range] {
-            return cached > 0 ? cached : nil
+            let all = PeriodRecurring.all(
+                of: input.recurrings,
+                in: range,
+                entries: entries,
+                today: state.today
+            )
+
+            return all
+                .filter { $0.status == .upcoming && $0.recurring.type == type }
+                .reduce(0) { $0 + $1.amount }
         }
-
-        let all = PeriodRecurring.all(
-            of: recurrings,
-            in: range,
-            entries: entries,
-            today: today
-        )
-
-        let total = all
-            .filter { $0.status == .upcoming && $0.recurring.type == type }
-            .reduce(0) { $0 + $1.amount }
-
-        cache.upcoming[range] = total
 
         return total > 0 ? total : nil
     }
 
-    var recurringShare: Share? {
+    var recurringShare: ReviewModel.Share? {
         guard let recurringTotal else {
             return nil
         }
 
-        let total = max(total(of: kind), 1)
+        let total = max(total(of: state.kind), 1)
 
-        return Share(
-            id: Self.recurringShareId,
+        return ReviewModel.Share(
+            id: ReviewModel.recurringShareId,
             name: "固定費",
             icon: nil,
             amount: recurringTotal,
@@ -127,13 +122,13 @@ public extension ReviewModel {
     }
 }
 
-extension ReviewModel {
+extension ReviewModel.Output {
     func carryover(into month: YearMonth) -> Int {
-        list?.budgetCarryover(
-            budgets: budgets,
-            from: carryoverFrom,
+        input.list?.budgetCarryover(
+            budgets: input.budgets,
+            from: input.carryoverFrom,
             into: month,
-            startingOn: monthStartDay
+            startingOn: input.monthStartDay
         ) ?? 0
     }
 }
@@ -142,14 +137,6 @@ private extension ReviewModel {
     struct Ranked {
         let share: Share
         let sortOrder: Int
-    }
-
-    var breakdown: ReviewSummary.Breakdown? {
-        switch kind {
-        case .expense: summary.expense
-        case .income: summary.income
-        case .balance: nil
-        }
     }
 
     static func sorted(_ ranked: [Ranked]) -> [Share] {
@@ -162,6 +149,16 @@ private extension ReviewModel {
                 return lhs.sortOrder < rhs.sortOrder
             }
             .map(\.share)
+    }
+}
+
+private extension ReviewModel.Output {
+    var breakdown: ReviewSummary.Breakdown? {
+        switch state.kind {
+        case .expense: summary.expense
+        case .income: summary.income
+        case .balance: nil
+        }
     }
 
     func ratio(
@@ -176,15 +173,15 @@ private extension ReviewModel {
         spent: Int
     ) -> BudgetUsage? {
         guard
-            scale == .month,
-            kind == .expense
+            state.scale == .month,
+            state.kind == .expense
         else {
             return nil
         }
 
         let month = period.range.upperBound.yearMonth
 
-        guard let budget = budgets.amount(for: categoryId, in: month) else {
+        guard let budget = input.budgets.amount(for: categoryId, in: month) else {
             return nil
         }
 
@@ -194,7 +191,7 @@ private extension ReviewModel {
             budget: budget,
             carryover: carried,
             spent: spent,
-            today: today,
+            today: state.today,
             periodEnd: period.range.upperBound
         )
     }

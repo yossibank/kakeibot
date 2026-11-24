@@ -5,9 +5,29 @@ import Store
 extension ReviewModel {
     static let averagePeriods = 3
 
+    func loadGoals() async {
+        let key = output.period.commentKey
+        let nextKey = output.period.adding(1).commentKey
+
+        do {
+            let loaded = try await dependencies.database.reviewGoals(for: key)
+            let next = try await dependencies.database.reviewGoals(for: nextKey)
+
+            guard key == output.period.commentKey else {
+                return
+            }
+
+            input.goals = loaded + next
+        } catch {
+            return
+        }
+    }
+}
+
+extension ReviewModel.Output {
     var elapsedRange: ClosedRange<LocalDate> {
         let range = period.range
-        let end = range.contains(today) ? today : range.upperBound
+        let end = range.contains(state.today) ? state.today : range.upperBound
         return range.lowerBound...end
     }
 
@@ -20,11 +40,11 @@ extension ReviewModel {
                 basis: .budget,
                 spent: spent,
                 range: period.range,
-                today: today
+                today: state.today
             )
         }
 
-        let totals = (1...Self.averagePeriods)
+        let totals = (1...ReviewModel.averagePeriods)
             .map { ReviewSummary(entries: entries, in: period.adding(-$0).range).expense.total }
             .filter { $0 > 0 }
 
@@ -37,14 +57,14 @@ extension ReviewModel {
             basis: .average(periods: totals.count),
             spent: spent,
             range: period.range,
-            today: today
+            today: state.today
         )
     }
 
     var goalItems: [ReviewGoalItem] {
         let key = period.commentKey
 
-        return goals.filter { $0.period == key }.compactMap { goal in
+        return input.goals.filter { $0.period == key }.compactMap { goal in
             goalItem(goal, in: period)
         }
     }
@@ -53,14 +73,14 @@ extension ReviewModel {
         _ goal: ReviewGoal,
         in period: ReviewPeriod
     ) -> ReviewGoalItem? {
-        guard let category = goal.categoryId.flatMap({ list?.categories[$0]?.name }) else {
+        guard let category = goal.categoryId.flatMap({ input.list?.categories[$0]?.name }) else {
             return nil
         }
 
         let progress = goal.progress(
             of: entries,
             in: period.range,
-            today: today
+            today: state.today
         )
 
         return ReviewGoalItem(
@@ -70,33 +90,15 @@ extension ReviewModel {
             progress: progress
         )
     }
-
-    func loadGoals() async {
-        let key = period.commentKey
-        let nextKey = period.adding(1).commentKey
-
-        do {
-            let loaded = try await database.reviewGoals(for: key)
-            let next = try await database.reviewGoals(for: nextKey)
-
-            guard key == period.commentKey else {
-                return
-            }
-
-            goals = loaded + next
-        } catch {
-            return
-        }
-    }
 }
 
-extension ReviewModel {
+extension ReviewModel.Output {
     func budgetLimit(of period: ReviewPeriod) -> Int? {
         guard period.scale == .month else {
             return nil
         }
 
         let month = period.range.upperBound.yearMonth
-        return budgets.amount(for: nil, in: month).map { $0 + carryover(into: month) }
+        return input.budgets.amount(for: nil, in: month).map { $0 + carryover(into: month) }
     }
 }

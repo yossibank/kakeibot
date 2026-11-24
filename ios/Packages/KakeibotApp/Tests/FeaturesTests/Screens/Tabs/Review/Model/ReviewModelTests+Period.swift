@@ -30,19 +30,19 @@ extension ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            model.list != nil && model.upcomingRecurringTotal != nil
+            model.input.list != nil && model.output.upcomingRecurringTotal != nil
         }
 
-        #expect(model.upcomingRecurringTotal == 3000)
+        #expect(model.output.upcomingRecurringTotal == 3000)
 
         model.setKind(.income)
 
-        #expect(model.upcomingRecurringTotal == nil)
+        #expect(model.output.upcomingRecurringTotal == nil)
 
         model.setKind(.expense)
         model.move(by: -1)
 
-        #expect(model.upcomingRecurringTotal == nil)
+        #expect(model.output.upcomingRecurringTotal == nil)
     }
 
     @Test
@@ -59,10 +59,10 @@ extension ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            model.list != nil && !model.budgets.isEmpty
+            model.input.list != nil && !model.input.budgets.isEmpty
         }
 
-        let shares = model.categoryShares
+        let shares = model.output.categoryShares
 
         #expect(shares.map(\.name) == [daily.name, food.name])
         #expect(shares.map(\.amount) == [6000, 2000])
@@ -71,9 +71,9 @@ extension ReviewModelTests {
         #expect(shares.first?.usage == nil)
 
         let foodShare = try #require(shares.last)
-        let walletShare = try #require(model.walletShares.first)
-        let foodRows = model.rows(for: foodShare)
-        let walletRows = model.rows(for: walletShare)
+        let walletShare = try #require(model.output.walletShares.first)
+        let foodRows = model.output.rows(for: foodShare)
+        let walletRows = model.output.rows(for: walletShare)
 
         #expect(foodRows.map(\.amount) == [1500, 500])
         #expect(walletRows.map(\.amount) == [6000, 1500, 500])
@@ -85,34 +85,34 @@ extension ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         model.move(by: 1)
-        let current = model.period.range
+        let current = model.output.period.range
         model.move(by: -2)
-        let earlier = model.period.range
+        let earlier = model.output.period.range
         model.setScale(.year)
-        let year = model.period.range
+        let year = model.output.period.range
 
         #expect(current.lowerBound.description == "2026-10-01")
         #expect(earlier.lowerBound.description == "2026-08-01")
         #expect(year.lowerBound.description == "2026-01-01")
-        #expect(!model.canMoveForward)
+        #expect(!model.output.canMoveForward)
     }
 
     @Test
     func movesBackToCurrentPeriod() async throws {
         let setup = try await RecordsModelTests.Setup()
         let model = ReviewModel(database: setup.database, today: setup.today)
-        let isCurrentAtFirst = model.isCurrentPeriod
+        let isCurrentAtFirst = model.output.isCurrentPeriod
 
         model.move(by: -3)
-        let isCurrentAfterMove = model.isCurrentPeriod
+        let isCurrentAfterMove = model.output.isCurrentPeriod
 
         model.moveToCurrent()
 
         #expect(isCurrentAtFirst)
         #expect(!isCurrentAfterMove)
-        #expect(model.isCurrentPeriod)
-        #expect(model.isMovingForward)
-        #expect(model.period.range.lowerBound.description == "2026-10-01")
+        #expect(model.output.isCurrentPeriod)
+        #expect(model.state.isMovingForward)
+        #expect(model.output.period.range.lowerBound.description == "2026-10-01")
     }
 
     @Test
@@ -126,8 +126,8 @@ extension ReviewModelTests {
         let reopened = ReviewModel(database: setup.database, today: setup.today)
         await reopened.loadSelection()
 
-        #expect(reopened.scale == .week)
-        #expect(reopened.kind == .income)
+        #expect(reopened.state.scale == .week)
+        #expect(reopened.state.kind == .income)
     }
 
     @Test
@@ -153,11 +153,11 @@ extension ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            !model.stampTallies.isEmpty
+            !model.output.stampTallies.isEmpty
         }
 
-        let tally = try #require(model.stampTallies.first)
-        let days = model.stampDays(of: tally).map(\.description)
+        let tally = try #require(model.output.stampTallies.first)
+        let days = model.output.stampDays(of: tally).map(\.description)
 
         #expect(tally.count == 2)
         #expect(days == ["2026-10-12", "2026-10-05"])

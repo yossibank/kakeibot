@@ -87,7 +87,7 @@ extension MainView {
                 onAddEntry: addEntry(on:),
                 onOpenRecurrings: openRecurrings
             )
-            .loadFailed(review.isListFailed, onRetry: retry)
+            .loadFailed(review.input.isListFailed, onRetry: retry)
             .tabContent()
         }
     }

@@ -204,7 +204,7 @@ struct MainView: View {
         .onChange(of: today) { _, today in
             home.state.today = today
             records.today = today
-            review.today = today
+            review.state.today = today
             assets.setToday(today)
 
             prepareDraft()
@@ -300,7 +300,7 @@ private extension MainView {
         [
             home.errorNotice.count,
             records.errorNotice.count,
-            review.errorNotice.count,
+            review.state.errorNotice.count,
             assets.state.errorNotice.count
         ]
     }

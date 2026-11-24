@@ -14,7 +14,7 @@ extension ReviewView {
 
     var analysisBanner: some View {
         Button {
-            if model.hasNewReport {
+            if model.output.hasNewReport {
                 model.move(by: -1)
             }
 
@@ -46,7 +46,7 @@ extension ReviewView {
 
                 Spacer(minLength: 8)
 
-                if model.hasNewReport {
+                if model.output.hasNewReport {
                     Text("NEW")
                         .sansFont(.micro, weight: .bold)
                         .tracking(1)
@@ -70,7 +70,7 @@ extension ReviewView {
                     .strokeBorder(Palette.accent.opacity(.muted))
             }
             .shadow(color: Palette.accent.opacity(.subtle), radius: 12, y: 6)
-            .animation(.smooth, value: model.hasNewReport)
+            .animation(.smooth, value: model.output.hasNewReport)
             .contentShape(.rect)
         }
         .buttonStyle(PressButtonStyle())
@@ -90,9 +90,9 @@ extension ReviewView {
             PeriodStepper(
                 title: periodTitle,
                 subtitle: analysisNote,
-                currentTitle: model.isCurrentPeriod ? nil : currentPeriodTitle,
+                currentTitle: model.output.isCurrentPeriod ? nil : currentPeriodTitle,
                 transition: periodTextTransition,
-                canMoveForward: model.canMoveForward,
+                canMoveForward: model.output.canMoveForward,
                 onMove: { count in
                     move(by: count)
                 },
@@ -104,23 +104,23 @@ extension ReviewView {
                 sheetContent
                     .padding(.horizontal, 16)
                     .padding(.bottom, 24)
-                    .pageSlide(slide, page: model.period)
+                    .pageSlide(slide, page: model.output.period)
             }
             .scrollIndicators(.hidden)
-            .id(model.period.commentKey)
+            .id(model.output.period.commentKey)
             .onPageSwipe(following: $slide, canMove: canMove) { direction in
                 move(direction)
             }
         }
         .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .task(id: model.period.commentKey) {
+        .task(id: model.output.period.commentKey) {
             await model.loadGoals()
         }
-        .task(id: model.reasonTrigger) {
+        .task(id: model.output.reasonTrigger) {
             await model.refreshReason(now: Date())
         }
-        .task(id: model.noteTrigger(now: Date())) {
+        .task(id: model.output.noteTrigger(now: Date())) {
             await model.refreshNotes(now: Date())
         }
         .sheet(item: $analysisShare) { share in
@@ -134,41 +134,41 @@ extension ReviewView {
 private extension ReviewView {
     @ViewBuilder
     var sheetContent: some View {
-        if model.isCurrentPeriod {
+        if model.output.isCurrentPeriod {
             progressView
         } else {
             ReviewClosingView(
-                content: model.closingContent,
-                goals: model.closingGoals(now: Date()),
-                notes: model.closingNotes,
+                content: model.output.closingContent,
+                goals: model.output.closingGoals(now: Date()),
+                notes: model.output.closingNotes,
                 name: analysisName,
-                previousName: model.period.previous.displayName,
-                unit: model.scale.unitName,
+                previousName: model.output.period.previous.displayName,
+                unit: model.state.scale.unitName,
                 onOpenGoal: { item in
-                    analysisShare = model.goalShare(of: item)
+                    analysisShare = model.output.goalShare(of: item)
                 },
                 onOpenWhy: { row, why in
-                    analysisShare = model.whyShare(of: row, why: why)
+                    analysisShare = model.output.whyShare(of: row, why: why)
                 }
             )
-            .task(id: model.period) {
+            .task(id: model.output.period) {
                 await model.markReportSeen()
             }
         }
     }
 
     var progressView: some View {
-        let period = model.period
+        let period = model.output.period
         let closingDate = period.range.upperBound.adding(days: 1)
         let previousTitle = "\(period.previous.displayName)のふりかえりを見る"
-        let daysLeft = model.today.days(until: closingDate)
+        let daysLeft = model.state.today.days(until: closingDate)
 
         return ReviewProgressView(
-            pace: model.pace,
-            year: model.yearProgress,
-            unit: model.scale.unitName,
+            pace: model.output.pace,
+            year: model.output.yearProgress,
+            unit: model.state.scale.unitName,
             currentName: currentName,
-            goals: model.goalItems,
+            goals: model.output.goalItems,
             closingTitle: "\(analysisName)のふりかえり",
             closingDate: closingDate,
             closingDaysLeft: daysLeft,
@@ -178,7 +178,7 @@ private extension ReviewView {
                 move(by: -1)
             },
             onOpenMonth: { month in
-                analysisShare = model.monthShare(of: month)
+                analysisShare = model.output.monthShare(of: month)
             }
         )
     }
@@ -186,31 +186,31 @@ private extension ReviewView {
 
 private extension ReviewView {
     var bannerSymbol: String {
-        model.isCurrentPeriod && !model.hasNewReport
+        model.output.isCurrentPeriod && !model.output.hasNewReport
             ? "chart.bar.xaxis"
             : "envelope.open"
     }
 
     var bannerLabel: String {
-        model.isCurrentPeriod && !model.hasNewReport
+        model.output.isCurrentPeriod && !model.output.hasNewReport
             ? "途中経過"
             : "締めのレポート"
     }
 
     var bannerTitle: String {
-        if model.hasNewReport {
-            return "\(model.period.previous.displayName)のレポートが届きました"
+        if model.output.hasNewReport {
+            return "\(model.output.period.previous.displayName)のレポートが届きました"
         }
 
-        return model.isCurrentPeriod
+        return model.output.isCurrentPeriod
             ? "\(analysisName)の途中経過を見る"
             : "\(analysisName)のレポートを見る"
     }
 
     var analysisName: String {
-        let month = model.period.range.upperBound.yearMonth
+        let month = model.output.period.range.upperBound.yearMonth
 
-        return switch model.scale {
+        return switch model.state.scale {
         case .week: currentName
         case .month: "\(month.month)月"
         case .year: "\(String(month.year))年"
@@ -218,15 +218,15 @@ private extension ReviewView {
     }
 
     var analysisNote: String {
-        let span = Self.span(of: model.elapsedRange, separator: "〜")
-        let count = model.entryCount(in: model.period.range)
+        let span = Self.span(of: model.output.elapsedRange, separator: "〜")
+        let count = model.output.entryCount(in: model.output.period.range)
         return "\(span) · \(count) 件の記録"
     }
 
     var currentName: String {
-        let isCurrent = model.period.range.contains(model.today)
+        let isCurrent = model.output.period.range.contains(model.state.today)
 
-        return switch model.scale {
+        return switch model.state.scale {
         case .week: isCurrent ? "今週" : "この週"
         case .month: isCurrent ? "今月" : "この月"
         case .year: isCurrent ? "今年" : "この年"
