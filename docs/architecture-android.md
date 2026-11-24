@@ -176,6 +176,8 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
 
+モデルのテストは `app/src/test/` に置く。`modelTest` が DB をメモリに開き、`ModelWait` が値を待つ。iOS と違う動きは `@Ignore` の理由に書く。
+
 複数の画面で使う部品は、次の場所に置く。
 
 | 部品 | 置き場所 |
@@ -213,7 +215,7 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 ## 🧪 確認
 
-`make android-test` は `:core` と `:store` のテストを走らせる。`make android-build` はデバッグの APK を作る。どちらも `make verify` に含まれる。
+`make android-test` は `:core`・`:store`・`:app` のテストを走らせる。`make android-build` はデバッグの APK を作る。どちらも `make verify` に含まれる。
 
 JDK と SDK の場所は、Makefile の次の変数で変えられる。
 

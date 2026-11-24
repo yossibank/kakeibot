@@ -62,7 +62,7 @@ android-build:
 	$(GRADLE) :app:assembleDebug
 
 android-test:
-	$(GRADLE) :core:test :store:jvmTest
+	$(GRADLE) :core:test :store:jvmTest :app:testDebugUnitTest
 
 verify: verify-docs
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
@@ -76,7 +76,7 @@ verify: verify-docs
 	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build scripts/no-warnings.sh $(XCODEBUILD) $(ANY_SIMULATOR) build
-	scripts/verify.sh android-test $(GRADLE) :core:test :store:jvmTest
+	scripts/verify.sh android-test $(GRADLE) :core:test :store:jvmTest :app:testDebugUnitTest
 	scripts/verify.sh android-build $(GRADLE) :app:assembleDebug
 
 verify-docs:
