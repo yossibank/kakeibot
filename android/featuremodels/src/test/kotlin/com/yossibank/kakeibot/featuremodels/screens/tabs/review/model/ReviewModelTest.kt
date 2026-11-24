@@ -2,19 +2,23 @@ package com.yossibank.kakeibot.featuremodels.screens.tabs.review.model
 
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
+import com.yossibank.kakeibot.store.queries.methods.setting
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
+import com.yossibank.kakeibot.store.records.settingkeys.reviewKind
+import com.yossibank.kakeibot.store.records.settingkeys.reviewScale
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.launch
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ReviewModelTest {
@@ -30,10 +34,16 @@ class ReviewModelTest {
         assertEquals(3980L, model.output.total)
         assertEquals(5000L, model.output.previousTotal)
 
-        model.state.kind = Entry.Kind.income
+        model.setKind(ReviewKind.income)
 
         assertEquals(250_000L, model.output.total)
         assertEquals(0L, model.output.previousTotal)
+
+        model.setKind(ReviewKind.balance)
+
+        assertEquals(246_020L, model.output.total)
+        assertEquals(-5000L, model.output.previousTotal)
+        assertTrue(model.output.rows.isEmpty())
     }
 
     @Test
@@ -76,7 +86,7 @@ class ReviewModelTest {
         setup.save(Entry.Kind.expense, amount = 500, on = date("2026-10-12"))
         val model = setup.observedModel()
 
-        model.state.kind = Entry.Kind.income
+        model.setKind(ReviewKind.income)
 
         assertEquals(0L, model.output.total)
         assertTrue(model.output.rows.isEmpty())
@@ -90,7 +100,7 @@ class ReviewModelTest {
         model.state.move(count = -2)
         val earlier = model.output.period.range.start
         val earlierTitle = model.output.title
-        model.state.select(scale = ReviewPeriod.Scale.year)
+        model.setScale(ReviewPeriod.Scale.year)
         val year = model.output.period.range
 
         assertEquals("2026-10-01", current.toString())
@@ -106,7 +116,8 @@ class ReviewModelTest {
     @Test
     fun startsWeekOnSetting() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.reviewModel()
-        model.state.select(scale = ReviewPeriod.Scale.week)
+        model.setScale(ReviewPeriod.Scale.week)
+        model.saveSelection()
         val monday = model.output.title
 
         setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.sunday)
@@ -117,14 +128,102 @@ class ReviewModelTest {
         assertEquals("10/11〜10/17", model.output.title)
     }
 
-    @Ignore("iOS は今の期間より先へ進めない。Android は先の期間へ進める")
     @Test
     fun movesOnlyUpToCurrentPeriod() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.reviewModel()
 
         model.state.move(count = 1)
+        val current = model.output.period.range.start
+        val canMoveAtCurrent = model.output.canMoveForward
+        model.state.move(count = -2)
+        val earlier = model.output.period.range.start
+        val canMoveFromEarlier = model.output.canMoveForward
+        model.state.move(count = 3)
+        val skipped = model.output.period.range.start
+        model.setScale(ReviewPeriod.Scale.year)
+
+        assertEquals("2026-10-01", current.toString())
+        assertFalse(canMoveAtCurrent)
+        assertEquals("2026-08-01", earlier.toString())
+        assertTrue(canMoveFromEarlier)
+        assertEquals("2026-08-01", skipped.toString())
+        assertEquals("2026-01-01", model.output.period.range.start.toString())
+        assertFalse(model.output.canMoveForward)
+    }
+
+    @Test
+    fun movesForwardUpToCurrentPeriod() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.reviewModel()
+
+        model.state.move(count = -2)
+        model.state.move(count = 2)
 
         assertEquals("2026-10-01", model.output.period.range.start.toString())
+        assertEquals(0, model.state.offset)
+    }
+
+    @Test
+    fun remembersSelection() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.reviewModel()
+
+        model.setScale(ReviewPeriod.Scale.week)
+        model.setKind(ReviewKind.income)
+        model.saveSelection()
+        val reopened = setup.reviewModel()
+        reopened.loadSelection()
+
+        assertEquals(ReviewPeriod.Scale.week, reopened.input.scale)
+        assertEquals(ReviewKind.income, reopened.input.kind)
+    }
+
+    @Test
+    fun startsWithMonthAndExpenseWithoutSelection() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.reviewModel()
+
+        model.loadSelection()
+
+        assertEquals(ReviewPeriod.Scale.month, model.input.scale)
+        assertEquals(ReviewKind.expense, model.input.kind)
+    }
+
+    @Test
+    fun startsWithExpenseWhenBalanceWasSaved() = modelTest(today = "2026-10-17") { setup ->
+        setup.database.setSetting(
+            key = SettingKey.reviewKind,
+            to = ReviewKind.balance,
+        )
+        val model = setup.reviewModel()
+
+        model.loadSelection()
+
+        assertEquals(ReviewKind.expense, model.input.kind)
+    }
+
+    @Test
+    fun keepsSelectionOnlyAfterSaving() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.reviewModel()
+
+        model.setScale(ReviewPeriod.Scale.year)
+        model.setKind(ReviewKind.income)
+        val scaleBefore = setup.database.setting(SettingKey.reviewScale)
+        val kindBefore = setup.database.setting(SettingKey.reviewKind)
+        model.saveSelection()
+
+        assertEquals(ReviewPeriod.Scale.month, scaleBefore)
+        assertEquals(ReviewKind.expense, kindBefore)
+        assertEquals(ReviewPeriod.Scale.year, setup.database.setting(SettingKey.reviewScale))
+        assertEquals(ReviewKind.income, setup.database.setting(SettingKey.reviewKind))
+    }
+
+    @Test
+    fun readsSavedSelectionWhenObserving() = modelTest(today = "2026-10-17") { setup ->
+        setup.database.setSetting(key = SettingKey.reviewScale, to = ReviewPeriod.Scale.year)
+        setup.database.setSetting(key = SettingKey.reviewKind, to = ReviewKind.income)
+        val model = setup.observedModel()
+
+        assertEquals(ReviewPeriod.Scale.year, model.input.scale)
+        assertEquals(ReviewKind.income, model.input.kind)
+        assertEquals("2026年", model.output.title)
     }
 
     private fun ModelTestSetup.reviewModel() = ReviewModel(

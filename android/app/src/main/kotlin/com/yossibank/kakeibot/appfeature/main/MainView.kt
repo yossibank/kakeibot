@@ -138,7 +138,10 @@ private fun MainLayers(
                         }
 
                         MainTab.Assets -> {
-                            AssetsView(database = database)
+                            AssetsView(
+                                database = database,
+                                today = today,
+                            )
                         }
                     }
                 }

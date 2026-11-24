@@ -80,7 +80,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 下書きの決まり | 口座・カテゴリ・日付を変えたときの消し込みは、下書きの型の関数に置く |
 | 保存と読み込みの失敗 | `featuremodels/shared/model/` の `ModelTask` に通す。失敗の文と実行中かどうかを、`State` の `task` に持つ |
 | 今の時刻 | `featuremodels/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
-| 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる |
+| 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる。`AssetsModel` だけは iOS と同じく `input.today` に持ち、画面が `setToday` で入れる |
 | 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
 

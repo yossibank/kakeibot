@@ -26,7 +26,7 @@ class HomeModel(
 ) {
     val state = State(today)
     val input = Input()
-    val output = Output(input)
+    val output = Output(input, state)
 
     private val dependencies = Dependencies(database, entryList)
 
@@ -43,6 +43,7 @@ class HomeModel(
 
     class Output(
         private val input: Input,
+        private val state: State,
     ) {
         val month: YearMonth?
             get() = input.overview?.month
@@ -67,10 +68,16 @@ class HomeModel(
                         EntryRowItem.of(
                             entry = entry,
                             list = it,
-                            dayLabel = entry.date.monthDayText,
+                            dayLabel = dayLabel(entry.date),
                         )
                     }
                 }
+        }
+
+        private fun dayLabel(date: LocalDate): String = when (date) {
+            state.today -> "今日"
+            state.today.adding(days = -1) -> "昨日"
+            else -> date.monthDayText
         }
 
         private companion object {

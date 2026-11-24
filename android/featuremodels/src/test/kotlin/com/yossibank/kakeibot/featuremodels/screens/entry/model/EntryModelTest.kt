@@ -11,7 +11,6 @@ import com.yossibank.kakeibot.store.queries.methods.entryList
 import com.yossibank.kakeibot.store.writes.methods.deleteEntry
 import com.yossibank.kakeibot.store.writes.methods.saveTemplate
 import kotlinx.coroutines.async
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -83,7 +82,6 @@ class EntryModelTest {
         assertEquals("入金先", model.output.walletTitle)
     }
 
-    @Ignore("iOS は記録の種類ごとに選んだカテゴリを覚える。Android は種類を替えるたびに先頭のカテゴリに戻す")
     @Test
     fun remembersCategoryForEachType() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
@@ -91,20 +89,49 @@ class EntryModelTest {
         model.state.select(transit)
 
         model.select(type = Entry.Kind.income)
+        val incomeFirst = model.output.category?.name
+        val bonus = model.output.categories.first { it.name == "臨時収入" }
+        model.state.select(bonus)
+
+        model.select(type = Entry.Kind.expense)
+        val expenseBack = model.output.category?.name
+
+        model.select(type = Entry.Kind.income)
+
+        assertEquals("給料", incomeFirst)
+        assertEquals("交通", expenseBack)
+        assertEquals("臨時収入", model.output.category?.name)
+    }
+
+    @Test
+    fun remembersCategoryAcrossTransfer() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        val transit = model.output.categories.first { it.name == "交通" }
+        model.state.select(transit)
+
+        model.select(type = Entry.Kind.transfer)
+        val transferCategory = model.state.form.categoryId
+        model.select(type = Entry.Kind.income)
+        val incomeFirst = model.output.category?.name
         model.select(type = Entry.Kind.expense)
 
+        assertNull(transferCategory)
+        assertEquals("給料", incomeFirst)
         assertEquals("交通", model.output.category?.name)
     }
 
-    @Ignore("iOS は最後に記録した口座から始める。Android は常に先頭の口座から始める")
     @Test
-    fun startsWithLastRecordedWallet() = modelTest(today = "2026-10-12") { setup ->
-        val bank = setup.options().wallets[1]
-        setup.save(Entry.Kind.expense, amount = 500, on = setup.today, walletId = bank.id)
-
+    fun clearsTagWhenTypeChanges() = modelTest(today = "2026-10-12") { setup ->
+        val food = setup.options().expenseCategories[0]
+        val tag = setup.addTags(categoryId = food.id, names = listOf("ランチ")).first()
         val model = setup.loadedModel()
+        model.state.toggleTag(tag.id)
 
-        assertEquals(bank.id, model.state.form.walletId)
+        model.select(type = Entry.Kind.income)
+        model.select(type = Entry.Kind.expense)
+
+        assertEquals(food.id, model.state.form.categoryId)
+        assertNull(model.state.form.tagId)
     }
 
     @Test
