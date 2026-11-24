@@ -68,8 +68,8 @@ final class FakeVoiceSource: EntryVoiceSource {
     }
 }
 
+@MainActor
 extension EntryVoiceFlow.Dependencies {
-    @MainActor
     static func fake(_ source: FakeVoiceSource) -> Self {
         Self(
             isAvailable: { true },
@@ -78,6 +78,7 @@ extension EntryVoiceFlow.Dependencies {
             makeSource: { source },
             prepare: {},
             choose: { _ in nil },
+            clock: .system,
             silence: .milliseconds(100),
             noticeDuration: .milliseconds(100)
         )

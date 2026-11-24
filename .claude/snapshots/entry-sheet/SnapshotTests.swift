@@ -396,6 +396,7 @@ private extension EntryVoiceFlow.Dependencies {
             makeSource: { source },
             prepare: {},
             choose: { _ in nil },
+            clock: .fixed(snapshotNow),
             silence: .seconds(60),
             noticeDuration: .seconds(60)
         )

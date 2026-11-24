@@ -21,7 +21,7 @@ struct EntryVoiceFlowTests {
         }
 
         source.say("昨日コンビニで980円、\(wallet.name)で")
-        let previewAmount = flow.preview?.amount
+        let previewAmount = flow.input.preview?.amount
         await flow.finish()
 
         #expect(previewAmount == 980)
@@ -32,11 +32,11 @@ struct EntryVoiceFlowTests {
         #expect(model.output.isDateFromVoice)
         #expect(model.output.isWalletFromVoice)
         #expect(model.output.isMemoFromVoice)
-        #expect(flow.notice?.outcome == .applied)
-        #expect(flow.notice?.count == 4)
-        #expect(flow.notice?.title == "声から 4 つ入れました")
+        #expect(flow.state.notice?.outcome == .applied)
+        #expect(flow.state.notice?.count == 4)
+        #expect(flow.state.notice?.title == "声から 4 つ入れました")
         #expect(applied == 1)
-        #expect(flow.step == nil)
+        #expect(flow.state.step == nil)
         #expect(source.isFinished)
 
         flow.undoLast(in: model)
@@ -45,7 +45,7 @@ struct EntryVoiceFlowTests {
         #expect(model.state.payment.date == setup.date)
         #expect(model.state.memo.isEmpty)
         #expect(!model.output.isDateFromVoice)
-        #expect(flow.notice == nil)
+        #expect(flow.state.notice == nil)
     }
 
     @Test
@@ -65,9 +65,9 @@ struct EntryVoiceFlowTests {
 
         #expect(model.output.amount == 0)
         #expect(model.state.payment.date == setup.date.adding(days: -1))
-        #expect(flow.notice?.outcome == .missingAmount)
-        #expect(flow.notice?.message == "「昨日のコンビニ」")
-        #expect(flow.notice?.canUndo == false)
+        #expect(flow.state.notice?.outcome == .missingAmount)
+        #expect(flow.state.notice?.message == "「昨日のコンビニ」")
+        #expect(flow.state.notice?.canUndo == false)
         #expect(applied == 0)
     }
 
@@ -80,9 +80,9 @@ struct EntryVoiceFlowTests {
         await flow.start(for: model, today: setup.date) {}
         await flow.finish()
 
-        #expect(flow.notice?.outcome == .unheard)
-        #expect(flow.notice?.title == "聞き取れませんでした")
-        #expect(flow.notice?.message == nil)
+        #expect(flow.state.notice?.outcome == .unheard)
+        #expect(flow.state.notice?.title == "聞き取れませんでした")
+        #expect(flow.state.notice?.message == nil)
     }
 
     @Test
@@ -94,9 +94,9 @@ struct EntryVoiceFlowTests {
 
         await flow.start(for: model, today: setup.date) {}
         source.say("500円")
-        await ObservationWait.until { flow.step == nil }
+        await ObservationWait.until { flow.state.step == nil }
 
-        #expect(flow.step == nil)
+        #expect(flow.state.step == nil)
         #expect(model.output.amount == 500)
         #expect(source.isFinished)
     }
@@ -112,13 +112,13 @@ struct EntryVoiceFlowTests {
         source.hear(0.4)
         source.hear(0.8)
 
-        #expect(flow.levels.count == EntryVoiceFlow.levelCount)
-        #expect(Array(flow.levels.prefix(3)) == [0.8, 0.4, 0])
+        #expect(flow.input.levels.count == EntryVoiceFlow.levelCount)
+        #expect(Array(flow.input.levels.prefix(3)) == [0.8, 0.4, 0])
 
         await flow.cancel()
         source.hear(0.6)
 
-        #expect(flow.levels.allSatisfy { $0 == 0 })
+        #expect(flow.input.levels.allSatisfy { $0 == 0 })
     }
 
     @Test
@@ -130,26 +130,26 @@ struct EntryVoiceFlowTests {
 
         await flow.start(for: model, today: setup.date) {}
 
-        #expect(flow.silenceStart == nil)
-        #expect(flow.silenceDuration == 0.1)
+        #expect(flow.state.silenceStart == nil)
+        #expect(flow.input.silenceDuration == 0.1)
 
         source.say("500円")
-        let first = try #require(flow.silenceStart)
+        let first = try #require(flow.state.silenceStart)
 
         try await Task.sleep(for: .milliseconds(20))
         source.hear(0.8)
 
-        #expect(flow.silenceStart == nil)
+        #expect(flow.state.silenceStart == nil)
 
         source.say("500円、カードで")
         source.hear(0)
-        let second = try #require(flow.silenceStart)
+        let second = try #require(flow.state.silenceStart)
 
         #expect(second > first)
 
         await flow.cancel()
 
-        #expect(flow.silenceStart == nil)
+        #expect(flow.state.silenceStart == nil)
     }
 
     @Test
@@ -162,11 +162,11 @@ struct EntryVoiceFlowTests {
         await flow.start(for: model, today: setup.date) {}
         source.hear(0.8)
         source.hear(0)
-        let counting = flow.silenceStart != nil
-        await ObservationWait.until { flow.step == nil }
+        let counting = flow.state.silenceStart != nil
+        await ObservationWait.until { flow.state.step == nil }
 
         #expect(counting)
-        #expect(flow.step == nil)
+        #expect(flow.state.step == nil)
         #expect(source.isFinished)
     }
 
@@ -185,7 +185,7 @@ struct EntryVoiceFlowTests {
             try await Task.sleep(for: .milliseconds(40))
         }
 
-        #expect(flow.step == .listening)
+        #expect(flow.state.step == .listening)
 
         await flow.cancel()
     }
@@ -200,11 +200,11 @@ struct EntryVoiceFlowTests {
         await flow.start(for: model, today: setup.date) {}
         source.say("500円")
         await flow.finish()
-        let shown = flow.notice != nil
-        await ObservationWait.until { flow.notice == nil }
+        let shown = flow.state.notice != nil
+        await ObservationWait.until { flow.state.notice == nil }
 
         #expect(shown)
-        #expect(flow.notice == nil)
+        #expect(flow.state.notice == nil)
     }
 
     @Test
@@ -216,14 +216,14 @@ struct EntryVoiceFlowTests {
         var counts: [Int] = []
 
         await flow.start(for: model, today: setup.date) {}
-        counts.append(flow.startCount)
+        counts.append(flow.state.startCount)
         source.say("980円")
         await flow.cancel()
-        counts.append(flow.endCount)
+        counts.append(flow.state.endCount)
 
         #expect(model.output.amount == 0)
-        #expect(flow.step == nil)
-        #expect(flow.notice == nil)
+        #expect(flow.state.step == nil)
+        #expect(flow.state.notice == nil)
         #expect(source.isCancelled)
         #expect(counts == [1, 1])
     }
@@ -238,12 +238,12 @@ struct EntryVoiceFlowTests {
         let flow = EntryVoiceFlow(dependencies: dependencies)
 
         await flow.start(for: model, today: setup.date) {}
-        let step = flow.step
+        let step = flow.state.step
         flow.closeDenied()
 
         #expect(step == .denied)
-        #expect(flow.step == nil)
-        #expect(flow.startCount == 0)
+        #expect(flow.state.step == nil)
+        #expect(flow.state.startCount == 0)
     }
 }
 

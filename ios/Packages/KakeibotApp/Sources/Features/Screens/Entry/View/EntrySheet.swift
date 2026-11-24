@@ -20,7 +20,7 @@ public struct EntrySheet: View {
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
     @State var receipt = EntryReceiptFlow()
-    @State var voice = EntryVoiceFlow()
+    @State var voice: EntryVoiceFlow
 
     @Environment(\.themeStyle.corner) var corner
     @Environment(\.isPro) var isPro
@@ -45,6 +45,8 @@ public struct EntrySheet: View {
         _model = State(initialValue: model)
         _deck = State(initialValue: EntryDeck.start(for: model.state.type))
         _notice = State(initialValue: model.newNoticeModel())
+        let voiceDependencies = EntryVoiceFlow.Dependencies.live(clock: model.input.clock)
+        _voice = State(initialValue: EntryVoiceFlow(dependencies: voiceDependencies))
 
         self.onChange = onChange
         self.startsReceipt = startsReceipt
@@ -87,13 +89,13 @@ public struct EntrySheet: View {
             ) { _, menu in
                 menu != nil
             }
-            .onChange(of: voice.isActive) {
-                if voice.isActive {
+            .onChange(of: voice.output.isActive) {
+                if voice.output.isActive {
                     show(.amount)
                 }
             }
-            .haptic(.impact(weight: .light), trigger: voice.startCount)
-            .haptic(.impact(weight: .light), trigger: voice.endCount)
+            .haptic(.impact(weight: .light), trigger: voice.state.startCount)
+            .haptic(.impact(weight: .light), trigger: voice.state.endCount)
             .errorBanner(
                 model.state.errorNotice,
                 bottom: bannerBottom

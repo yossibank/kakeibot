@@ -48,7 +48,7 @@ extension EntrySheet {
         let target: AmountTarget = next == .fee ? .fee : .amount
 
         if next != .amount,
-           voice.step == .listening {
+           voice.state.step == .listening {
             cancelVoice()
         }
 
@@ -215,7 +215,7 @@ private extension EntrySheet {
                 ) { amount in
                     model.state.setFee(amount)
                 }
-            } else if !voice.isActive {
+            } else if !voice.output.isActive {
                 HStack(spacing: 8) {
                     Text("金額を入力")
                         .textFont(.caption2, weight: .bold)
@@ -231,7 +231,7 @@ private extension EntrySheet {
             }
 
             EntryLiveSlot {
-                if voice.isActive {
+                if voice.output.isActive {
                     voiceCard
                         .transition(.opacity)
                 } else {
@@ -244,7 +244,7 @@ private extension EntrySheet {
                 }
             }
         }
-        .animation(.snappy, value: voice.isActive)
+        .animation(.snappy, value: voice.output.isActive)
     }
 
     var itemPill: some View {

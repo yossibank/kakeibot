@@ -7,7 +7,7 @@ struct EntryVoiceWave: View {
     let height: CGFloat
 
     var body: some View {
-        let levels = flow.levels
+        let levels = flow.input.levels
 
         ZStack {
             Capsule()

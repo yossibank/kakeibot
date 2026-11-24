@@ -5,7 +5,7 @@ import UIKit
 
 extension EntrySheet {
     var showsVoiceButton: Bool {
-        voice.isAvailable && model.output.showsVoice
+        voice.input.isAvailable && model.output.showsVoice
     }
 
     var voiceCard: some View {
@@ -27,7 +27,7 @@ extension EntrySheet {
         VStack {
             Spacer(minLength: 0)
 
-            if let notice = voice.notice {
+            if let notice = voice.state.notice {
                 EntryVoiceNotice(notice: notice) {
                     withAnimation(.snappy) {
                         voice.undoLast(in: model)
@@ -42,7 +42,7 @@ extension EntrySheet {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .animation(.snappy, value: voice.notice)
+        .animation(.snappy, value: voice.state.notice)
     }
 
     func startVoice() {
@@ -54,7 +54,7 @@ extension EntrySheet {
     }
 
     func cancelVoice() {
-        guard voice.step != .denied else {
+        guard voice.state.step != .denied else {
             voice.closeDenied()
             return
         }
