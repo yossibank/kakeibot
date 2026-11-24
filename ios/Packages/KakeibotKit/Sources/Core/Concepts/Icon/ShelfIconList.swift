@@ -1,5 +1,3 @@
-import Core
-
 public struct ShelfIconList: Equatable, Sendable {
     public let shelfIcons: [ShelfIcon]
     public let icons: [Icon.ID: Icon]

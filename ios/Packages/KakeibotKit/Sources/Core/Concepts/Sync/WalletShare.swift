@@ -1,17 +1,15 @@
-import Core
-
-public struct JoinedShare: Hashable, Sendable {
+public struct WalletShare: Hashable, Sendable {
     public let wallet: Wallet
     public let icon: Icon?
-    public let ownerName: String
+    public let isShared: Bool
 
     public init(
         wallet: Wallet,
         icon: Icon?,
-        ownerName: String
+        isShared: Bool
     ) {
         self.wallet = wallet
         self.icon = icon
-        self.ownerName = ownerName
+        self.isShared = isShared
     }
 }

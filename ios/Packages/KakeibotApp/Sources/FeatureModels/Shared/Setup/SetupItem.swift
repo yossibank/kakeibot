@@ -1,3 +1,4 @@
+import Core
 import Store
 
 public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {

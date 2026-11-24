@@ -1,5 +1,3 @@
-import Core
-
 public struct EntryList: Sendable {
     public let days: [EntryDay]
     public let categories: [EntryCategory.ID: EntryCategory]

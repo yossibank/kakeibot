@@ -1,6 +1,5 @@
 import Core
 import Foundation
-import Store
 import Testing
 
 struct EntryListTemplateTests {

@@ -1,5 +1,3 @@
-import Core
-
 public extension EntryList {
     func title(of entry: Entry) -> String {
         if let category = entry.categoryId.flatMap({ categories[$0] }) {

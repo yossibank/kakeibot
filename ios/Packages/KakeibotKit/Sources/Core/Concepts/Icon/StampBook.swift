@@ -1,5 +1,3 @@
-import Core
-
 public struct StampBook: Equatable, Sendable {
     public let stamps: [LocalDate: CalendarStamp]
     public let icons: [Icon.ID: Icon]

@@ -68,6 +68,7 @@ let package = Package(
         .target(
             name: "Sync",
             dependencies: [
+                .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
         ),
@@ -120,6 +121,7 @@ let package = Package(
             name: "SyncTests",
             dependencies: [
                 "Sync",
+                .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
         )

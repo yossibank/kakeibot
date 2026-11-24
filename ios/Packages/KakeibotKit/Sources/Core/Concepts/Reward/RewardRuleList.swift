@@ -1,5 +1,3 @@
-import Core
-
 public struct RewardRuleList: Equatable, Sendable {
     public let rules: [RewardRule]
     public let icons: [Icon.ID: Icon]

@@ -71,6 +71,7 @@ KakeibotKit/
 │   │   │   ├── Review/
 │   │   │   ├── Reward/
 │   │   │   ├── Setting/
+│   │   │   ├── Sync/
 │   │   │   ├── Theme/
 │   │   │   ├── Voice/
 │   │   │   └── Wallet/
@@ -113,10 +114,13 @@ KakeibotKit/
 | `Concepts/Review/` | 振り返りの範囲と集計 |
 | `Concepts/Reward/` | ごほうびと貯金箱 |
 | `Concepts/Setting/` | 設定の値 |
+| `Concepts/Sync/` | 同期の状態とまとめ、共有している口座と誘われた口座 |
 | `Concepts/Theme/` | テーマの色・書体・形 |
 | `Concepts/Voice/` | 話した文から金額・日付・カテゴリ・口座・メモを読む決まり |
 | `Concepts/Wallet/` | 財布と残高 |
+| `Core/Concepts/` の読み出しの型 | DB から読んだ値をまとめた型（`EntryList`・`MonthOverview` など）。DB を知らないので、画面も使う |
 | `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、金額の表記、下書きの決まりと問題、文字の前後の空白を除く拡張 |
+| `Core/Shared/` の `Deletion` | 取り消しに使う削除の値。中の行は、Kit の中だけが読む |
 | `Core/Shared/` の `NamedIconDraft` | 名前とアイコンを持つ下書き。カテゴリと口座の下書きが適合する |
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
 | `Store/Queries/Methods/` | 返す型の名前で付ける。書き込みと同じ型なら `+<型>Query` |

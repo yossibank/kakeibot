@@ -1,5 +1,3 @@
-import Core
-
 public extension EntryList {
     func title(of recurring: Recurring) -> String? {
         let category = recurring.categoryId.flatMap { categories[$0] }

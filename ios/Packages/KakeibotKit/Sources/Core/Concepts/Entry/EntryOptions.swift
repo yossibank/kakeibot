@@ -1,5 +1,3 @@
-import Core
-
 public struct EntryOptions: Equatable, Sendable {
     public let expenseCategories: [EntryCategory]
     public let incomeCategories: [EntryCategory]

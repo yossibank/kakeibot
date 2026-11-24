@@ -1,5 +1,3 @@
-import Core
-
 public struct MonthOverview: Equatable, Sendable {
     public let list: EntryList?
     public let budgets: [Budget]

@@ -1,4 +1,5 @@
 import CloudKit
+import Core
 import Store
 
 extension SyncSendProblem {

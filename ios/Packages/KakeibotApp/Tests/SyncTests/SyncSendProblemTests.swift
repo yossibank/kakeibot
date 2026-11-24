@@ -1,4 +1,5 @@
 import CloudKit
+import Core
 import Store
 @testable import Sync
 import Testing
