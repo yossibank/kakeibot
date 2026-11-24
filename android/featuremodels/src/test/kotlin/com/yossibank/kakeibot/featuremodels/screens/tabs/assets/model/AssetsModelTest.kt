@@ -10,7 +10,6 @@ import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.writes.methods.setHidden
 import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.launch
-import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -18,7 +17,10 @@ import kotlin.test.assertTrue
 class AssetsModelTest {
     @Test
     fun showsNoRowsBeforeListArrives() = modelTest(today = "2026-10-17") { setup ->
-        val model = AssetsModel(entryList = setup.database.entryListUpdates())
+        val model = AssetsModel(
+            entryList = setup.database.entryListUpdates(),
+            today = setup.today,
+        )
 
         assertTrue(model.output.rows.isEmpty())
         assertEquals(0L, model.output.netWorth)
@@ -80,7 +82,6 @@ class AssetsModelTest {
         assertEquals(1000L, model.output.rows.first().balance)
     }
 
-    @Ignore("iOS は今日より後の記録を残高に入れない。Android は残高に入れる")
     @Test
     fun leavesOutFutureEntriesFromBalances() = modelTest(today = "2026-10-17") { setup ->
         setup.save(Entry.Kind.income, amount = 1000, on = date("2026-10-10"))
@@ -89,10 +90,82 @@ class AssetsModelTest {
 
         assertEquals(1000L, model.output.rows.first().balance)
         assertEquals(1000L, model.output.netWorth)
+        assertEquals(1000L, model.output.onHand)
+    }
+
+    @Test
+    fun countsEntriesOfToday() = modelTest(today = "2026-10-17") { setup ->
+        setup.save(Entry.Kind.income, amount = 1000, on = date("2026-10-16"))
+        setup.save(Entry.Kind.expense, amount = 400, on = date("2026-10-17"))
+        setup.save(Entry.Kind.expense, amount = 50, on = date("2026-10-18"))
+        val model = setup.observedModel()
+
+        assertEquals(600L, model.output.rows.first().balance)
+    }
+
+    @Test
+    fun leavesOutFutureTransfersFromBothWallets() = modelTest(today = "2026-10-17") { setup ->
+        val options = setup.options()
+        val cash = options.wallets[0].id
+        val bank = options.wallets[1].id
+        setup.save(Entry.Kind.income, amount = 5000, on = date("2026-10-10"), walletId = bank)
+        setup.save(
+            Entry.Kind.transfer,
+            amount = 300,
+            on = date("2026-10-18"),
+            walletId = bank,
+            toWalletId = cash,
+        )
+        val model = setup.observedModel()
+
+        assertEquals(listOf(0L, 5000L), model.output.rows.map { it.balance })
+    }
+
+    @Test
+    fun leavesOutFutureCardUsageFromDebts() = modelTest(today = "2026-10-17") { setup ->
+        val card = setup.addWallet(kind = Wallet.Kind.card, name = "カード")
+        setup.save(Entry.Kind.expense, amount = 3000, on = date("2026-10-05"), walletId = card.id)
+        setup.save(Entry.Kind.expense, amount = 800, on = date("2026-10-25"), walletId = card.id)
+        val model = setup.observedModel()
+
+        assertEquals(listOf(-3000L), model.output.debts.map { it.balance })
+        assertEquals(-3000L, model.output.netWorth)
+    }
+
+    @Test
+    fun countsEntriesWhenTodayReachesThem() = modelTest(today = "2026-10-17") { setup ->
+        setup.save(Entry.Kind.income, amount = 1000, on = date("2026-10-10"))
+        setup.save(Entry.Kind.expense, amount = 400, on = date("2026-10-20"))
+        val model = setup.observedModel()
+        val before = model.output.netWorth
+
+        model.setToday(date("2026-10-19"))
+        val dayBefore = model.output.netWorth
+        model.setToday(date("2026-10-20"))
+
+        assertEquals(1000L, before)
+        assertEquals(1000L, dayBefore)
+        assertEquals(600L, model.output.netWorth)
+        assertEquals(600L, model.output.rows.first().balance)
+        assertEquals(date("2026-10-20"), model.input.today)
+    }
+
+    @Test
+    fun leavesOutEntriesWhenTodayGoesBack() = modelTest(today = "2026-10-17") { setup ->
+        setup.save(Entry.Kind.income, amount = 1000, on = date("2026-10-10"))
+        setup.save(Entry.Kind.expense, amount = 400, on = date("2026-10-15"))
+        val model = setup.observedModel()
+
+        model.setToday(date("2026-10-14"))
+
+        assertEquals(1000L, model.output.netWorth)
     }
 
     private suspend fun ModelTestSetup.observedModel(): AssetsModel {
-        val model = AssetsModel(entryList = database.entryListUpdates())
+        val model = AssetsModel(
+            entryList = database.entryListUpdates(),
+            today = today,
+        )
 
         scope.launch { model.observe() }
         ModelWait.until { model.output.rows.isNotEmpty() }

@@ -15,12 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
@@ -38,9 +40,22 @@ import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
-fun AssetsView(database: AppDatabase) {
+fun AssetsView(
+    database: AppDatabase,
+    today: LocalDate,
+) {
     val entryList = rememberEntryList(database)
-    val model = remember(entryList) { AssetsModel(entryList = entryList) }
+
+    val model = remember(entryList) {
+        AssetsModel(
+            entryList = entryList,
+            today = today,
+        )
+    }
+
+    SideEffect {
+        model.setToday(today)
+    }
 
     LaunchedEffect(model) {
         model.observe()

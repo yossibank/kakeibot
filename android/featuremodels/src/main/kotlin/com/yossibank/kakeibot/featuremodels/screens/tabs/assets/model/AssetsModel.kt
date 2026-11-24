@@ -4,6 +4,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.concepts.wallet.isDebt
@@ -14,8 +15,9 @@ import kotlinx.coroutines.flow.Flow
 
 class AssetsModel(
     entryList: Flow<EntryList>,
+    today: LocalDate,
 ) {
-    val input = Input()
+    val input = Input(today)
     val output = Output(input)
 
     private val dependencies = Dependencies(entryList)
@@ -28,7 +30,12 @@ class AssetsModel(
         val balance: Long,
     )
 
-    class Input {
+    class Input(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var list: EntryList? by mutableStateOf(null)
             internal set
     }
@@ -48,7 +55,10 @@ class AssetsModel(
                         icon = list?.icons?.get(wallet.iconId),
                         name = wallet.name,
                         kind = wallet.kind,
-                        balance = list?.balance(of = wallet) ?: 0L,
+                        balance = list?.balance(
+                            of = wallet,
+                            through = input.today,
+                        ) ?: 0L,
                     )
                 }
         }
@@ -69,6 +79,10 @@ class AssetsModel(
     private class Dependencies(
         val entryList: Flow<EntryList>,
     )
+
+    fun setToday(today: LocalDate) {
+        input.today = today
+    }
 
     suspend fun observe() {
         dependencies.entryList.collect { input.list = it }
