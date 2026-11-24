@@ -5,6 +5,8 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
@@ -46,7 +48,7 @@ struct SnapshotTests {
             baseline: 9,
             target: 7,
             saving: 6000,
-            createdAt: Date()
+            createdAt: snapshotNow
         )
 
         let item = ReviewGoalItem(

@@ -109,6 +109,7 @@ private extension RootView {
         case let .ready(database):
             MainView(
                 database: database,
+                clock: model.clock,
                 today: model.today,
                 route: model.route,
                 isRevealed: !isLaunching

@@ -6,15 +6,17 @@ import Testing
 import UIKit
 import WidgetKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
     func render() throws {
-        let today = LocalDate(Date(), in: .current)
+        let today = LocalDate(snapshotNow, in: .current)
 
         for (name, title, summary) in Self.cases(on: today) {
             let entry = BudgetWidgetEntry(
-                date: Date(),
+                date: snapshotNow,
                 summary: summary,
                 look: .followsDevice,
                 style: .standard
@@ -36,7 +38,7 @@ struct SnapshotTests {
 
         for (name, title, summary) in Self.quickCases() {
             let entry = QuickRecordWidgetEntry(
-                date: Date(),
+                date: snapshotNow,
                 summary: summary,
                 look: .followsDevice,
                 style: .standard
@@ -94,7 +96,7 @@ private extension SnapshotTests {
 
     static func quickCases() -> [(String, String, QuickRecordWidgetSummary)] {
         let sample = QuickRecordWidgetSummary.sample()
-        let until = Date().addingTimeInterval(60)
+        let until = snapshotNow.addingTimeInterval(60)
 
         let recorded = QuickRecordWidgetSummary.Recorded(
             id: Entry.ID(),

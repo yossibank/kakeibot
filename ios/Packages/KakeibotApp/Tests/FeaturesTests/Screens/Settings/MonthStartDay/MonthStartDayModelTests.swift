@@ -56,20 +56,20 @@ struct MonthStartDayModelTests {
         try await setup.save(.expense, amount: 3000, daysAgo: 18)
         let startDay = try #require(MonthStartDay(25))
         try await setup.database.setSetting(.monthStartDay, to: startDay)
-        let model = HomeModel(database: setup.database, today: setup.today)
+        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
 
         let task = Task {
             await model.run()
         }
 
         try await wait {
-            model.monthStartDay == startDay && model.list != nil
+            model.output.monthStartDay == startDay && model.input.list != nil
         }
 
         task.cancel()
 
-        #expect(model.monthExpense == 1480)
-        #expect(model.monthRangeText == "9/25〜10/24")
+        #expect(model.output.monthExpense == 1480)
+        #expect(model.output.monthRangeText == "9/25〜10/24")
     }
 
     @Test

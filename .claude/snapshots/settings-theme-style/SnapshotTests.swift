@@ -6,11 +6,13 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
     func render() async throws {
-        let now = Date()
+        let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
 

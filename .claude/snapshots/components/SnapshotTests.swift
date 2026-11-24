@@ -5,11 +5,13 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
     func render() throws {
-        let now = Date()
+        let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let september = LocalDate(year: 2026, month: 9, day: 1) ?? today
         let names = ["発表会の衣装と靴", "朝ごはん", "夜ごはん", "まとめ買い", "飲み会", "ランチ会"]

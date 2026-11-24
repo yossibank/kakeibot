@@ -17,7 +17,7 @@ extension WalletEditSheet {
                 iconBottom = maxY
             }
 
-            SettingsField("名前", text: $model.name, focus: $focus, field: .name)
+            SettingsField("名前", text: Bindable(model.state).name, focus: $focus, field: .name)
 
             SettingsFormCard {
                 kindChooser
@@ -25,7 +25,7 @@ extension WalletEditSheet {
                 balanceField
             }
 
-            if model.showsValuation {
+            if model.output.showsValuation {
                 valuationField
             }
 
@@ -43,8 +43,8 @@ extension WalletEditSheet {
             SettingsEditHeader(
                 title: title,
                 isEditing: model.isEditing,
-                isHidden: model.isHidden,
-                canDelete: !(model.isHidden && model.hasEntries)
+                isHidden: model.input.isHidden,
+                canDelete: !(model.input.isHidden && model.input.hasEntries)
             ) {
                 close()
             } onHide: {
@@ -75,8 +75,8 @@ extension WalletEditSheet {
     var preview: some View {
         WalletRowCard(
             name: previewName,
-            kind: model.kind,
-            amount: model.initialBalance,
+            kind: model.state.kind,
+            amount: model.output.initialBalance,
             caption: "最初の残高"
         ) {
             Button {
@@ -84,7 +84,7 @@ extension WalletEditSheet {
                 isEditingIcon = true
             } label: {
                 WalletRowIcon(
-                    icon: model.icon.preview,
+                    icon: model.state.icon.preview,
                     strokeWidth: iconStrokeWidth
                 )
                 .overlay(alignment: .bottomTrailing) {
@@ -108,7 +108,7 @@ extension WalletEditSheet {
                 openAmount()
             } label: {
                 HStack(spacing: 8) {
-                    Text(model.balanceText)
+                    Text(model.output.balanceText)
                         .displayFont(.headline)
                         .monospacedDigit()
                         .foregroundStyle(signColor)
@@ -133,7 +133,7 @@ extension WalletEditSheet {
 
             SettingsCaption(balanceHint)
                 .contentTransition(.opacity)
-                .animation(.snappy, value: model.kind)
+                .animation(.snappy, value: model.state.kind)
         }
     }
 
@@ -145,7 +145,7 @@ extension WalletEditSheet {
 
             SettingsCaption("値動きの分は、収入や支出に入れず、残高だけを合わせます。")
 
-            if !model.valuations.isEmpty {
+            if !model.input.valuations.isEmpty {
                 valuationHistory
             }
         }
@@ -156,7 +156,7 @@ extension WalletEditSheet {
             SettingsSectionTitle("これまでの評価額")
                 .padding(.top, 12)
 
-            ForEach(model.valuations) { valuation in
+            ForEach(model.input.valuations) { valuation in
                 SwipeRow(id: valuation.id, openId: $openValuationId) {
                     openValuationId = nil
                 } onAction: {
@@ -251,7 +251,7 @@ extension WalletEditSheet {
     }
 
     func signButton(isNegative: Bool) -> some View {
-        let isSelected = model.isNegative == isNegative
+        let isSelected = model.state.isNegative == isNegative
         let tint = isNegative ? Palette.rose : Palette.accent
         let color = isSelected ? tint : Palette.subtext
         let fill = isSelected ? tint.opacity(.subtle) : Color.clear
@@ -260,7 +260,7 @@ extension WalletEditSheet {
 
         return Button {
             withAnimation(.snappy) {
-                model.isNegative = isNegative
+                model.state.isNegative = isNegative
             }
         } label: {
             VStack(alignment: .leading, spacing: 2) {

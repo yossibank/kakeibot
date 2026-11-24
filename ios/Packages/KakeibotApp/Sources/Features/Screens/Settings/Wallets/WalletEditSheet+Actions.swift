@@ -24,9 +24,9 @@ extension WalletEditSheet {
             .init(
                 panel: .payment,
                 systemImage: "repeat",
-                title: model.paymentTitle,
-                value: model.paymentText,
-                isEmpty: model.payment == nil
+                title: model.output.paymentTitle,
+                value: model.output.paymentText,
+                isEmpty: model.input.payment == nil
             )
         ]
     }
@@ -36,25 +36,25 @@ extension WalletEditSheet {
             panel: .loanAmount,
             systemImage: "yensign.circle",
             title: "最初に借りた額",
-            value: model.loanAmountText,
-            detail: model.repaidText,
-            isEmpty: model.loanAmount.amount == 0,
+            value: model.output.loanAmountText,
+            detail: model.output.repaidText,
+            isEmpty: model.state.loanAmount.amount == 0,
             isAmount: true
         )
     }
 
     var rowItems: [SettingsRowList<Panel>.Item] {
-        let loan = model.showsLoanAmount ? [loanAmountItem] : []
-        let payment = model.showsPayment ? paymentItems : []
+        let loan = model.output.showsLoanAmount ? [loanAmountItem] : []
+        let payment = model.output.showsPayment ? paymentItems : []
         return payment + loan
     }
 
     var noteColor: Color {
-        Color(hex: model.icon.color) ?? Palette.subtext
+        Color(hex: model.state.icon.color) ?? Palette.subtext
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
-        let amount = isEnteringValuation ? model.valuation.amount : model.balance
+        let amount = isEnteringValuation ? model.state.valuation.amount : model.input.balance
 
         return [
             .init(
@@ -69,11 +69,11 @@ extension WalletEditSheet {
     }
 
     var previewName: String {
-        model.name.isEmpty ? "名前" : model.name
+        model.state.name.isEmpty ? "名前" : model.state.name
     }
 
     var balanceHint: String {
-        switch model.kind {
+        switch model.state.kind {
         case .card: "まだ引き落とされていない額を、\n「払う・返す分」で入れます。"
         case .loan: "まだ返していない額を、\n「払う・返す分」で入れます。"
         default: "記録を始める前の、いまの残高を入れます。\nカードの未払いや借入は「払う・返す分」です。"
@@ -81,7 +81,7 @@ extension WalletEditSheet {
     }
 
     var signColor: Color {
-        model.isNegative ? Palette.rose : Palette.accentStrong
+        model.state.isNegative ? Palette.rose : Palette.accentStrong
     }
 
     var iconStrokeWidth: CGFloat {
@@ -169,16 +169,16 @@ extension WalletEditSheet {
 
         guard
             !model.isEditing,
-            model.asksPayment
+            model.output.asksPayment
         else {
             onSave(wallet)
 
             if hiding {
-                guard await model.setHidden(!model.isHidden) else {
+                guard await model.setHidden(!model.input.isHidden) else {
                     return
                 }
 
-                if model.isHidden {
+                if model.input.isHidden {
                     onHide()
                 }
             }
@@ -215,7 +215,7 @@ extension WalletEditSheet {
     func toggleHidden() {
         focus = nil
 
-        guard !model.needsHideConfirmation else {
+        guard !model.output.needsHideConfirmation else {
             isConfirmingHide = true
             return
         }
@@ -226,7 +226,7 @@ extension WalletEditSheet {
     func requestHide() {
         guard model.isChanged else {
             Task {
-                await setHidden(!model.isHidden)
+                await setHidden(!model.input.isHidden)
             }
 
             return

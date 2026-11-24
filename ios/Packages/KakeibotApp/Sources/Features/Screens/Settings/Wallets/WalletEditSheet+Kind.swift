@@ -46,7 +46,7 @@ extension WalletEditSheet {
     )
 
     var kindChooser: some View {
-        SettingsFormSection("種類", value: model.kind.title) {
+        SettingsFormSection("種類", value: model.state.kind.title) {
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(KindGroup.allCases, id: \.self) { group in
                     kindGroup(group)
@@ -79,13 +79,13 @@ extension WalletEditSheet {
     }
 
     func kindButton(_ kind: Wallet.Kind) -> some View {
-        let isSelected = model.kind == kind
+        let isSelected = model.state.kind == kind
         let textColor = isSelected ? Palette.accentStrong : Palette.subtext
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
 
         return Button {
-            model.kind = kind
+            model.state.setKind(kind)
         } label: {
             Text(kind.title)
                 .textFont(.footnote)

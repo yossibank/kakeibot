@@ -32,7 +32,7 @@ public struct HomeTemplateShelfSheet: View {
                 header
 
                 CapsulePicker(
-                    selection: $model.templateType,
+                    selection: Bindable(model.state).templateType,
                     options: Self.typeOptions
                 )
 
@@ -96,9 +96,9 @@ private extension HomeTemplateShelfSheet {
                     use(template)
                 } label: {
                     TemplateRowCard(
-                        icon: model.icon(for: template),
+                        icon: model.output.icon(for: template),
                         name: template.name,
-                        detail: model.detail(for: template),
+                        detail: model.output.detail(for: template),
                         amount: template.amount
                     )
                 }
@@ -115,7 +115,7 @@ private extension HomeTemplateShelfSheet {
     ]
 
     var sections: [HomeModel.TemplateSection] {
-        model.templateSections(matching: query)
+        model.output.templateSections(matching: query)
     }
 
     var emptyText: String {

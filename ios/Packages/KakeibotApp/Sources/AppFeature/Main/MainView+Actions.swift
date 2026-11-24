@@ -5,14 +5,14 @@ import SwiftUI
 
 extension MainView {
     var isLoaded: Bool {
-        let isHomeLoaded = home.list != nil || home.errorNotice.message != nil
+        let isHomeLoaded = home.input.list != nil || home.errorNotice.message != nil
         let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
         return isHomeLoaded && isSetupLoaded && launchScreen != nil && areTabsLoaded
     }
 
     var templateOrderBinding: Binding<TemplateOrder> {
         Binding {
-            home.templateOrder
+            home.input.templateOrder
         } set: { order in
             Task {
                 await home.setTemplateOrder(order)

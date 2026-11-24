@@ -37,7 +37,7 @@ extension MainView {
                 },
                 onDeleteEntry: { id in
                     Task {
-                        await notice.delete(id, in: home.list)
+                        await notice.delete(id, in: home.input.list)
                     }
                 },
                 onOpenRecurrings: openRecurrings,

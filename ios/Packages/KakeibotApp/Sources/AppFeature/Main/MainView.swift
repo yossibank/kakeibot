@@ -32,6 +32,7 @@ struct MainView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     let database: AppDatabase
+    let clock: ScreenClock
     let today: LocalDate
     let route: PlannedNotification.Route?
     let onRouteOpened: () -> Void
@@ -41,6 +42,7 @@ struct MainView: View {
 
     init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate,
         route: PlannedNotification.Route? = nil,
         isRevealed: Bool = true,
@@ -50,6 +52,7 @@ struct MainView: View {
         _home = State(
             initialValue: HomeModel(
                 database: database,
+                clock: clock,
                 today: today
             )
         )
@@ -89,6 +92,7 @@ struct MainView: View {
         _undo = State(initialValue: DeletionUndo(database: database))
 
         self.database = database
+        self.clock = clock
         self.today = today
         self.route = route
         self.isRevealed = isRevealed
@@ -197,7 +201,7 @@ struct MainView: View {
             }
         }
         .onChange(of: today) { _, today in
-            home.today = today
+            home.state.today = today
             records.today = today
             review.today = today
             assets.today = today
@@ -327,6 +331,7 @@ private extension MainView {
 
         MainView(
             database: database,
+            clock: .system,
             today: LocalDate(Date(), in: .current)
         )
     }

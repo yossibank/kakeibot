@@ -65,7 +65,7 @@ extension WalletBoard: SettingsBoardSpec {
     }
 
     func editModel(for destination: Destination) -> WalletEditModel {
-        WalletEditModel(database: database, editing: destination.editingID)
+        WalletEditModel(database: database, clock: .system, editing: destination.editingID)
     }
 
     func intro(

@@ -6,20 +6,26 @@ import SwiftUI
 import Testing
 import UIKit
 
+private let snapshotNow = Date(timeIntervalSince1970: 1_791_774_000)
+
 @MainActor
 struct SnapshotTests {
     @Test
     func render() async throws {
-        let now = Date()
+        let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
         let options = try await database.entryOptions()
         let longWallet = options.wallets.max { $0.name.count < $1.name.count }
         let sheet = SettingsMenuSheet(database: database, today: today, appIcon: AppIconListModel())
-        let wallets = WalletListView(database: database)
-        let rules = RewardRuleListView(database: database)
+        let wallets = SettingsBoardPage(WalletBoard(database: database))
+        let rules = SettingsBoardPage(RewardRuleBoard(database: database))
         let categories = SettingsBoardPage(CategoryBoard(database: database, kind: .expense))
-        let walletEdit = WalletEditModel(database: database, editing: longWallet?.id)
+        let walletEdit = WalletEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            editing: longWallet?.id
+        )
 
         let reminder = ReminderModel(
             database: database,
@@ -178,7 +184,7 @@ struct SnapshotTests {
             initialBalance: -3_896_752
         )
 
-        let loan = try await database.save(loanDraft, at: Date())
+        let loan = try await database.save(loanDraft, at: snapshotNow)
         let loanEdit = RecurringEditModel(database: database, today: today, paying: loan.id)
 
         await loanEdit.load()
@@ -203,17 +209,17 @@ struct SnapshotTests {
             editing: savedTemplate?.id
         )
         let budgetDrawer = BudgetListModel(database: database, today: today)
-        let minusWallet = WalletEditModel(database: database)
+        let minusWallet = WalletEditModel(database: database, clock: .fixed(snapshotNow))
 
         await templateEditing.load()
         await budgetDrawer.load()
 
         budgetDrawer.startEditing(.total)
-        minusWallet.name = "楽天カード"
-        minusWallet.kind = .card
+        minusWallet.state.name = "楽天カード"
+        minusWallet.state.setKind(.card)
 
         for key in [AmountCalculator.Key.digit(5), .digit(2), .tripleZero] {
-            minusWallet.press(key)
+            minusWallet.state.press(key)
         }
 
         for variant in Self.variants {

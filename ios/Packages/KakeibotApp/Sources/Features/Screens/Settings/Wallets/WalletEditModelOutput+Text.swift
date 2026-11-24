@@ -1,17 +1,17 @@
 import Core
 import DesignSystem
 
-public extension WalletEditModel {
+public extension WalletEditModel.Output {
     var showsPayment: Bool {
-        isEditing && (kind == .card || kind == .loan)
+        isEditing && (state.kind == .card || state.kind == .loan)
     }
 
     var showsValuation: Bool {
-        isEditing && kind == .investment
+        isEditing && state.kind == .investment
     }
 
     var showsLoanAmount: Bool {
-        kind == .loan
+        state.kind == .loan
     }
 
     var balanceText: String {
@@ -19,23 +19,19 @@ public extension WalletEditModel {
     }
 
     var loanAmountText: String {
-        loanAmount.amount > 0 ? Yen.text(loanAmount.amount) : "未入力"
+        state.loanAmount.amount > 0 ? Yen.text(state.loanAmount.amount) : "未入力"
     }
 
     var repaidText: String? {
-        let borrowed = loanAmount.amount
+        let borrowed = state.loanAmount.amount
 
-        guard borrowed > 0 else {
-            return nil
-        }
-
-        guard isEditing || calculator.amount > 0 else {
+        guard borrowed > 0, isEditing || state.calculator.amount > 0 else {
             return nil
         }
 
         let repaid = Wallet.repaid(
             borrowed: borrowed,
-            balance: isEditing ? balance : initialBalance
+            balance: isEditing ? input.balance : initialBalance
         )
         let percent = Percent.floor(repaid, of: borrowed)
 
@@ -43,23 +39,23 @@ public extension WalletEditModel {
     }
 
     var paymentTitle: String {
-        kind == .loan ? "毎月の返済" : "締め日と引き落とし"
+        state.kind == .loan ? "毎月の返済" : "締め日と引き落とし"
     }
 
     var asksPayment: Bool {
-        kind.isDebt
+        state.kind.isDebt
     }
 
     var paymentQuestion: String {
-        kind == .loan ? "毎月の返済も決めますか" : "締め日と引き落としも決めますか"
+        state.kind == .loan ? "毎月の返済も決めますか" : "締め日と引き落としも決めますか"
     }
 
     var paymentQuestionNote: String {
-        kind == .loan ? "固定費として、返済の日と額を決められます" : "締め日までの利用分を、引き落とし日に銀行から振り替えます"
+        state.kind == .loan ? "固定費として、返済の日と額を決められます" : "締め日までの利用分を、引き落とし日に銀行から振り替えます"
     }
 
     var paymentText: String {
-        guard let payment else {
+        guard let payment = input.payment else {
             return "決めていません"
         }
 

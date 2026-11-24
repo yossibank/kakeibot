@@ -89,7 +89,7 @@ public struct HomeView: View {
                         setupCard
                     }
 
-                    ForEach(model.homeLayout.visible) { section in
+                    ForEach(model.output.homeLayout.visible) { section in
                         sectionView(section)
                             .layoutColumn(Self.column(of: section))
                     }
@@ -99,15 +99,15 @@ public struct HomeView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
             .animation(.snappy, value: setup.showsCard)
-            .animation(.snappy, value: model.homeLayout)
+            .animation(.snappy, value: model.output.homeLayout)
         }
         .errorBanner($model.errorNotice)
         .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
             StampDaysSheet(
                 tally: tally,
                 periodTitle: periodTitle,
-                days: model.stampDays(of: tally),
-                entryDay: model.day(on:)
+                days: model.output.stampDays(of: tally),
+                entryDay: model.output.day(on:)
             ) { date in
                 pendingDay = date
                 openStamp = nil
@@ -119,7 +119,7 @@ public struct HomeView: View {
 
 private extension HomeView {
     var header: some View {
-        TabHeader("\(model.month.month)月", subtitle: model.monthRangeText) {
+        TabHeader("\(model.output.month.month)月", subtitle: model.output.monthRangeText) {
             HStack(spacing: 8) {
                 HeaderButton(systemImage: "bell", action: onOpenNews)
                     .overlay(alignment: .topTrailing) {
@@ -131,11 +131,11 @@ private extension HomeView {
 
                 HeaderButton(systemImage: "gearshape", action: onOpenSettings)
                     .overlay(alignment: .topTrailing) {
-                        if model.syncStatus.hasTrouble {
+                        if model.input.syncStatus.hasTrouble {
                             headerDot(Palette.amber)
                         }
                     }
-                    .animation(.snappy, value: model.syncStatus.hasTrouble)
+                    .animation(.snappy, value: model.input.syncStatus.hasTrouble)
             }
         }
     }
@@ -154,18 +154,18 @@ private extension HomeView {
                     .frame(minHeight: 44)
             }
 
-            if model.isListFailed {
+            if model.input.isListFailed {
                 PlaceholderLoadFailed(onRetry: onRetry)
-            } else if model.showsNoRecords {
+            } else if model.output.showsNoRecords {
                 PlaceholderEmpty(
                     systemImage: "square.and.pencil",
                     text: "まだ記録がありません",
                     onRecord: {
-                        onAddEntry(model.today)
+                        onAddEntry(model.state.today)
                     }
                 )
             } else {
-                ForEach(model.recentRows) { row in
+                ForEach(model.output.recentRows) { row in
                     SwipeRow(id: row.id, openId: $openId) {
                         onOpenEntry(row.id)
                     } onAction: {
@@ -190,12 +190,12 @@ private extension HomeView {
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
         .card()
-        .sharesTextScale(id: model.recentRows)
+        .sharesTextScale(id: model.output.recentRows)
     }
 
     var stampCard: some View {
         StampTallyCard(
-            tallies: model.stampTallies,
+            tallies: model.output.stampTallies,
             emptyText: "今月はまだスタンプを押していません",
             onOpen: { tally in
                 openStamp = tally
@@ -254,7 +254,7 @@ private extension HomeView {
     }
 
     var periodTitle: String {
-        model.month.title
+        model.output.month.title
     }
 
     static func column(of section: HomeSection) -> TwoColumnLayout.Column {

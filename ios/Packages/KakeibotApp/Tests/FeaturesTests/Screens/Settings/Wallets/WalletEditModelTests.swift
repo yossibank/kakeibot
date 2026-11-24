@@ -9,19 +9,19 @@ struct WalletEditModelTests {
     @Test
     func addsCardWithNegativeBalance() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database)
-        model.name = "楽天カード"
-        model.kind = .card
-        model.press(.digit(3))
-        model.press(.digit(8))
-        model.press(.doubleZero)
-        model.press(.digit(0))
+        let model = WalletEditModel(database: setup.database, clock: .system)
+        model.state.name = "楽天カード"
+        model.state.setKind(.card)
+        model.state.press(.digit(3))
+        model.state.press(.digit(8))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
 
         let saved = try #require(await model.save())
         let list = try await setup.database.entryList()
         let icon = try #require(list.icons[saved.iconId])
 
-        #expect(model.calculator.amount == 38000)
+        #expect(model.state.calculator.amount == 38000)
         #expect(saved.initialBalance == -38000)
         #expect(saved.kind == .card)
         #expect(icon.glyph == .card)
@@ -31,14 +31,14 @@ struct WalletEditModelTests {
     func namesWhatIsMissingOnSaveButton() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
-        let model = WalletEditModel(database: setup.database)
-        let editing = WalletEditModel(database: setup.database, editing: bank.id)
+        let model = WalletEditModel(database: setup.database, clock: .system)
+        let editing = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
         await editing.load()
 
         let empty = model.saveTitle
-        model.name = "楽天カード"
+        model.state.name = "楽天カード"
         let named = model.saveTitle
-        model.icon.markKind = .emoji
+        model.state.icon.markKind = .emoji
         let noMark = model.saveTitle
 
         #expect(empty == "名前を入れてください")
@@ -50,16 +50,16 @@ struct WalletEditModelTests {
     @Test
     func tracksChangesFromStart() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database)
+        let model = WalletEditModel(database: setup.database, clock: .system)
         let start = model.isChanged
 
-        model.name = "楽天カード"
+        model.state.name = "楽天カード"
         let named = model.isChanged
 
-        model.name = ""
+        model.state.name = ""
         let cleared = model.isChanged
 
-        model.kind = .bank
+        model.state.setKind(.bank)
         let kindChanged = model.isChanged
 
         #expect(!start)
@@ -71,70 +71,70 @@ struct WalletEditModelTests {
     @Test
     func keepsChosenGlyphWhenKindChanges() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database)
+        let model = WalletEditModel(database: setup.database, clock: .system)
 
-        model.kind = .bank
-        let followed = model.icon.glyph
-        model.icon.glyph = .coin
-        model.kind = .card
+        model.state.setKind(.bank)
+        let followed = model.state.icon.glyph
+        model.state.icon.glyph = .coin
+        model.state.setKind(.card)
 
         #expect(followed == .bank)
-        #expect(model.icon.glyph == .coin)
+        #expect(model.state.icon.glyph == .coin)
     }
 
     @Test
     func followsSignWhenKindChanges() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database)
+        let model = WalletEditModel(database: setup.database, clock: .system)
 
-        model.kind = .card
-        let card = model.isNegative
-        model.kind = .bank
-        let bank = model.isNegative
-        model.isNegative = true
-        model.kind = .cash
+        model.state.setKind(.card)
+        let card = model.state.isNegative
+        model.state.setKind(.bank)
+        let bank = model.state.isNegative
+        model.state.isNegative = true
+        model.state.setKind(.cash)
 
         #expect(card)
         #expect(!bank)
-        #expect(model.isNegative)
+        #expect(model.state.isNegative)
     }
 
     @Test
     func switchesSignWithKeypadOnlyBeforeAmount() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database)
+        let model = WalletEditModel(database: setup.database, clock: .system)
 
-        model.press(.operation(.subtract))
-        let minus = model.isNegative
-        model.press(.operation(.add))
-        let plus = model.isNegative
-        model.press(.operation(.subtract))
-        model.press(.digit(5))
-        model.press(.doubleZero)
-        model.press(.operation(.add))
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.operation(.subtract))
-        model.press(.digit(1))
-        model.press(.doubleZero)
+        model.state.press(.operation(.subtract))
+        let minus = model.state.isNegative
+        model.state.press(.operation(.add))
+        let plus = model.state.isNegative
+        model.state.press(.operation(.subtract))
+        model.state.press(.digit(5))
+        model.state.press(.doubleZero)
+        model.state.press(.operation(.add))
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.operation(.subtract))
+        model.state.press(.digit(1))
+        model.state.press(.doubleZero)
 
         #expect(minus)
         #expect(!plus)
-        #expect(model.isNegative)
-        #expect(model.initialBalance == -700)
-        #expect(model.balanceText == "−¥700")
+        #expect(model.state.isNegative)
+        #expect(model.output.initialBalance == -700)
+        #expect(model.output.balanceText == "−¥700")
     }
 
     @Test
     func startsDebtAsMinusAndKeepsChosenSign() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database)
+        let model = WalletEditModel(database: setup.database, clock: .system)
 
-        model.kind = .loan
-        let loan = model.isNegative
-        model.isNegative = false
-        model.kind = .card
-        let overpaid = model.isNegative
+        model.state.setKind(.loan)
+        let loan = model.state.isNegative
+        model.state.isNegative = false
+        model.state.setKind(.card)
+        let overpaid = model.state.isNegative
 
         #expect(loan)
         #expect(!overpaid)
@@ -156,18 +156,18 @@ struct WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(draft, at: Date())
-        let used = WalletEditModel(database: setup.database, editing: bank.id)
-        let unused = WalletEditModel(database: setup.database, editing: cash.id)
+        let used = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
+        let unused = WalletEditModel(database: setup.database, clock: .system, editing: cash.id)
         await used.load()
         await unused.load()
 
-        used.kind = .card
-        unused.kind = .card
+        used.state.setKind(.card)
+        unused.state.setKind(.card)
 
-        #expect(used.draft.problems == [.kindLocked])
-        #expect(unused.draft.problems.isEmpty)
-        #expect(used.hasEntries)
-        #expect(!unused.hasEntries)
+        #expect(used.output.draft.problems == [.kindLocked])
+        #expect(unused.output.draft.problems.isEmpty)
+        #expect(used.input.hasEntries)
+        #expect(!unused.input.hasEntries)
     }
 
     @Test
@@ -196,11 +196,11 @@ struct WalletEditModelTests {
 
         try await setup.database.saveEntry(income, at: Date())
         try await setup.database.saveEntry(future, at: Date())
-        let model = WalletEditModel(database: setup.database, editing: bank.id)
+        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
 
         await model.load()
 
-        #expect(model.balance == 1000)
+        #expect(model.input.balance == 1000)
     }
 
     @Test
@@ -220,12 +220,12 @@ struct WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(future, at: Date())
-        let model = WalletEditModel(database: setup.database, editing: bank.id)
+        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
 
         await model.load()
 
-        #expect(model.balance == 0)
-        #expect(model.needsHideConfirmation)
+        #expect(model.input.balance == 0)
+        #expect(model.output.needsHideConfirmation)
     }
 
     @Test
@@ -257,13 +257,13 @@ struct WalletEditModelTests {
             at: Date()
         )
 
-        let model = WalletEditModel(database: setup.database, editing: cash.id)
+        let model = WalletEditModel(database: setup.database, clock: .system, editing: cash.id)
         await model.load()
 
-        model.kind = .card
+        model.state.setKind(.card)
 
-        #expect(model.draft.problems == [.kindLocked])
-        #expect(!model.hasEntries)
+        #expect(model.output.draft.problems == [.kindLocked])
+        #expect(!model.input.hasEntries)
     }
 }
 
