@@ -15,18 +15,18 @@ struct SnapshotTests {
         let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = RecordsModel(database: database, today: today)
+        let model = RecordsModel(database: database, clock: .fixed(snapshotNow), today: today)
         let task = Task {
             await model.run()
         }
 
         try await Self.wait {
-            model.list != nil && !model.recurrings.isEmpty
+            model.input.list != nil && !model.input.recurrings.isEmpty
         }
 
         for layout in [RecordsLayout.calendar, .list] {
-            model.setLayout(layout)
-            model.selectedDate = today
+            model.state.setLayout(layout)
+            model.state.selectedDate = today
 
             for variant in Self.variants {
                 let view = RecordsView(
@@ -47,7 +47,7 @@ struct SnapshotTests {
             }
         }
 
-        model.setLayout(.calendar)
+        model.state.setLayout(.calendar)
 
         let wide = Variant(name: "wide", width: 820, scheme: .light, textSize: .standard)
 
@@ -58,9 +58,9 @@ struct SnapshotTests {
             to: "records-calendar"
         )
 
-        model.setLayout(.list)
+        model.state.setLayout(.list)
 
-        let selectedDays = model.days.prefix(2)
+        let selectedDays = model.output.days.prefix(2)
         let firstDayIds = selectedDays.first?.entries.map(\.id) ?? []
         let secondDayIds = selectedDays.dropFirst().first?.entries.prefix(1).map(\.id) ?? []
         let selection = Set(firstDayIds + secondDayIds)
@@ -99,10 +99,10 @@ struct SnapshotTests {
             }
         }
 
-        model.move(months: -1)
+        model.state.move(months: -1)
 
         try await Self.wait {
-            !model.isCurrentMonth
+            !model.output.isCurrentMonth
         }
 
         for variant in Self.variants {
@@ -273,8 +273,8 @@ private extension SnapshotTests {
         let options = try await database.entryOptions()
         let income = try #require(options.incomeCategories.last)
 
-        model.isSearching = true
-        model.searchText = "サブスクの解約金"
+        model.state.isSearching = true
+        model.state.searchText = "サブスクの解約金"
 
         for variant in variants {
             try write(
@@ -285,11 +285,11 @@ private extension SnapshotTests {
             )
         }
 
-        model.searchText = "発表会"
+        model.state.searchText = "発表会"
 
-        let category = try #require(model.searchDays.first?.entries.first?.categoryId)
+        let category = try #require(model.output.searchDays.first?.entries.first?.categoryId)
 
-        model.filter = EntryFilter(categoryIds: [income.id])
+        model.state.filter = EntryFilter(categoryIds: [income.id])
 
         for variant in variants {
             try write(
@@ -300,7 +300,7 @@ private extension SnapshotTests {
             )
         }
 
-        model.filter = EntryFilter(categoryIds: [category])
+        model.state.filter = EntryFilter(categoryIds: [category])
         model.openCurrentMonth()
 
         for variant in variants {
@@ -310,7 +310,7 @@ private extension SnapshotTests {
             try write(sheet, variant: variant, title: "記録 › 絞り込み", to: "records-filter-sheet")
         }
 
-        model.filter = EntryFilter(categoryIds: [income.id])
+        model.state.filter = EntryFilter(categoryIds: [income.id])
 
         for variant in variants {
             let sheet = RecordsFilterSheet(model: model)
@@ -324,7 +324,7 @@ private extension SnapshotTests {
             )
         }
 
-        model.clearFilter()
+        model.state.clearFilter()
     }
 
     static func recordsView(_ model: RecordsModel) -> RecordsView {
@@ -339,11 +339,11 @@ private extension SnapshotTests {
     }
 
     static func deletions(in model: RecordsModel) -> [(String, EntryChange)] {
-        guard let list = model.list else {
+        guard let list = model.input.list else {
             return []
         }
 
-        let entries = model.days.flatMap(\.entries)
+        let entries = model.output.days.flatMap(\.entries)
 
         let label = { (entry: Entry) in
             EntryChange.label(for: entry) { id in

@@ -7,7 +7,7 @@ extension RecordsView {
         HStack(spacing: 12) {
             SearchField(
                 "メモや金額で探す",
-                text: $model.searchText,
+                text: Bindable(model.state).searchText,
                 focus: $isSearchFocused
             ) {
                 rememberSearch()
@@ -30,16 +30,16 @@ extension RecordsView {
 
     @ViewBuilder
     var searchContent: some View {
-        let days = model.searchDays
+        let days = model.output.searchDays
 
-        if EntrySearch(model.searchText).isEmpty {
+        if EntrySearch(model.state.searchText).isEmpty {
             RecordsSearchHistory(
-                words: model.recentSearches,
+                words: model.input.recentSearches,
                 onSelect: selectRecent,
                 onClear: clearRecent,
                 onRestore: restoreRecent
             )
-        } else if let summary = model.searchSummary {
+        } else if let summary = model.output.searchSummary {
             searchSummary(summary)
 
             ForEach(days, id: \.date) { day in
@@ -53,8 +53,8 @@ extension RecordsView {
 
 private extension RecordsView {
     var searchEmpty: some View {
-        let word = model.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let hiddenCount = model.searchHiddenCount
+        let word = model.state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hiddenCount = model.output.searchHiddenCount
 
         return PlaceholderEmpty(
             systemImage: "magnifyingglass",
@@ -72,7 +72,7 @@ private extension RecordsView {
 
 private extension RecordsView {
     func rememberSearch() {
-        let text = model.searchText
+        let text = model.state.searchText
 
         Task {
             await model.rememberSearch(text)
@@ -80,7 +80,7 @@ private extension RecordsView {
     }
 
     func selectRecent(_ word: String) {
-        model.searchText = word
+        model.state.searchText = word
         rememberSearch()
     }
 
@@ -99,12 +99,12 @@ private extension RecordsView {
     func closeSearch() {
         isSearchFocused = false
 
-        if model.searchSummary != nil {
+        if model.output.searchSummary != nil {
             rememberSearch()
         }
 
         withAnimation(.snappy) {
-            model.closeSearch()
+            model.state.closeSearch()
         }
     }
 }

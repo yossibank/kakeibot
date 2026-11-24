@@ -11,15 +11,15 @@ extension RecordsModelTests {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.adjust(-500, on: "2026-10-14")
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
         let date = try #require(LocalDate("2026-10-14"))
-        let rows = model.adjustmentRows(on: date)
+        let rows = model.output.adjustmentRows(on: date)
 
-        #expect(model.days.map(\.date.description) == ["2026-10-14", "2026-10-12"])
-        #expect(model.expenseTotal == 980)
-        #expect(model.day(on: date)?.entries.isEmpty == true)
+        #expect(model.output.days.map(\.date.description) == ["2026-10-14", "2026-10-12"])
+        #expect(model.output.expenseTotal == 980)
+        #expect(model.output.day(on: date)?.entries.isEmpty == true)
         #expect(rows.map { Yen.text($0.adjustment.amount, sign: .plus) } == ["−¥500"])
         #expect(rows.map(\.walletName) == ["財布"])
     }
@@ -29,24 +29,24 @@ extension RecordsModelTests {
         let setup = try await Setup()
         try await setup.adjust(700, on: "2026-10-14")
         let options = try await setup.database.entryOptions()
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
-        model.filter.walletIds = [options.wallets[0].id]
+        model.state.filter.walletIds = [options.wallets[0].id]
         let date = try #require(LocalDate("2026-10-14"))
 
-        #expect(model.days.isEmpty)
-        #expect(model.adjustmentRows(on: date).isEmpty)
+        #expect(model.output.days.isEmpty)
+        #expect(model.output.adjustmentRows(on: date).isEmpty)
     }
 
     @Test
     func deletesAdjustmentWithUndo() async throws {
         let setup = try await Setup()
         try await setup.adjust(700, on: "2026-10-14")
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
         let date = try #require(LocalDate("2026-10-14"))
-        let row = try #require(model.adjustmentRows(on: date).first)
+        let row = try #require(model.output.adjustmentRows(on: date).first)
 
         let deletion = try #require(await model.deleteAdjustment(row.id))
         let deleted = try await setup.database.entryList().adjustments

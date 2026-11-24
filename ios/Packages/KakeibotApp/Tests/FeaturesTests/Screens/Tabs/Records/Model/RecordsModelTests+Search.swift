@@ -11,20 +11,20 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
         try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "コーヒー")
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
 
-        model.searchText = "ランチ"
-        let lunch = model.searchDays.map(\.date.description)
+        model.state.searchText = "ランチ"
+        let lunch = model.output.searchDays.map(\.date.description)
 
-        model.searchText = "食費"
-        let food = model.searchDays.map(\.date.description)
+        model.state.searchText = "食費"
+        let food = model.output.searchDays.map(\.date.description)
 
-        model.searchText = "¥500"
-        let amount = model.searchDays.map(\.date.description)
+        model.state.searchText = "¥500"
+        let amount = model.output.searchDays.map(\.date.description)
 
-        model.searchText = " "
-        let blank = model.searchDays
+        model.state.searchText = " "
+        let blank = model.output.searchDays
 
         #expect(lunch == ["2026-10-12"])
         #expect(food == ["2026-10-12", "2026-09-30"])
@@ -41,14 +41,14 @@ extension RecordsModelTests {
         ]
         try await setup.save(.expense, amount: 616, on: "2026-10-12", items: items)
         try await setup.save(.expense, amount: 500, on: "2026-10-11", memo: "コーヒー")
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
 
-        model.searchText = "牛乳"
-        let milk = model.searchDays.map(\.date.description)
+        model.state.searchText = "牛乳"
+        let milk = model.output.searchDays.map(\.date.description)
 
-        model.searchText = "パン"
-        let bread = model.searchDays.map(\.date.description)
+        model.state.searchText = "パン"
+        let bread = model.output.searchDays.map(\.date.description)
 
         #expect(milk == ["2026-10-12"])
         #expect(bread == ["2026-10-12"])
@@ -63,11 +63,11 @@ extension RecordsModelTests {
         ]
         try await setup.save(.expense, amount: 616, on: "2026-10-12", items: items)
         try await setup.save(.expense, amount: 500, on: "2026-10-12", memo: "コーヒー")
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let day = try #require(model.days.first)
+        let day = try #require(model.output.days.first)
 
-        let rows = model.rows(for: day)
+        let rows = model.output.rows(for: day)
 
         #expect(rows.map(\.items.count).sorted() == [0, 2])
         #expect(rows.flatMap(\.items).map(\.name) == ["牛乳", "食パン"])
@@ -82,17 +82,17 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "ランチ")
         let options = try await setup.database.entryOptions()
         let food = try #require(options.expenseCategories.first)
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
 
-        model.searchText = "ランチ"
-        let summary = model.searchSummary
+        model.state.searchText = "ランチ"
+        let summary = model.output.searchSummary
 
-        model.filter = EntryFilter(categoryIds: [food.id])
-        let filtered = model.days.map(\.date.description)
-        let title = model.filterTitle
+        model.state.filter = EntryFilter(categoryIds: [food.id])
+        let filtered = model.output.days.map(\.date.description)
+        let title = model.output.filterTitle
 
-        model.filter = EntryFilter()
+        model.state.filter = EntryFilter()
 
         #expect(summary?.count == 2)
         #expect(summary?.expenseTotal == 1480)
@@ -100,7 +100,7 @@ extension RecordsModelTests {
         #expect(summary?.range.upperBound.description == "2026-10-12")
         #expect(filtered == ["2026-10-12"])
         #expect(title == food.name)
-        #expect(model.days.count == 2)
+        #expect(model.output.days.count == 2)
     }
 
     @Test
@@ -109,36 +109,36 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
         let options = try await setup.database.entryOptions()
         let salary = try #require(options.incomeCategories.first)
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
 
-        model.filter = EntryFilter(categoryIds: [salary.id])
-        model.searchText = "ランチ"
-        let isMonthHidden = model.isMonthHiddenByFilter
-        let isSearchHidden = model.isSearchHiddenByFilter
+        model.state.filter = EntryFilter(categoryIds: [salary.id])
+        model.state.searchText = "ランチ"
+        let isMonthHidden = model.output.isMonthHiddenByFilter
+        let isSearchHidden = model.output.isSearchHiddenByFilter
 
-        model.searchText = "コーヒー"
-        let isMissingWordHidden = model.isSearchHiddenByFilter
+        model.state.searchText = "コーヒー"
+        let isMissingWordHidden = model.output.isSearchHiddenByFilter
 
-        model.move(months: -1)
-        let isEmptyMonthHidden = model.isMonthHiddenByFilter
+        model.state.move(months: -1)
+        let isEmptyMonthHidden = model.output.isMonthHiddenByFilter
 
-        model.move(months: 1)
-        model.clearFilter()
+        model.state.move(months: 1)
+        model.state.clearFilter()
 
         #expect(isMonthHidden)
         #expect(isSearchHidden)
         #expect(!isMissingWordHidden)
         #expect(!isEmptyMonthHidden)
-        #expect(model.filter.isEmpty)
-        #expect(!model.isMonthHiddenByFilter)
-        #expect(model.days.map(\.date.description) == ["2026-10-12"])
+        #expect(model.state.filter.isEmpty)
+        #expect(!model.output.isMonthHiddenByFilter)
+        #expect(model.output.days.map(\.date.description) == ["2026-10-12"])
     }
 
     @Test
     func remembersSearchedWords() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.rememberSearch("ランチ")
         await model.rememberSearch("本")
@@ -147,16 +147,16 @@ extension RecordsModelTests {
         await model.clearRecentSearches()
 
         #expect(saved == ["本", "ランチ"])
-        #expect(model.recentSearches.isEmpty)
+        #expect(model.input.recentSearches.isEmpty)
     }
 
     @Test
     func restoresClearedSearches() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.rememberSearch("ランチ")
         await model.rememberSearch("本")
-        let words = model.recentSearches
+        let words = model.input.recentSearches
         await model.clearRecentSearches()
 
         await model.restoreRecentSearches(words)
@@ -172,16 +172,16 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "ランチ")
         let options = try await setup.database.entryOptions()
         let salary = try #require(options.incomeCategories.first)
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        model.searchText = "ランチ"
-        let unfiltered = model.searchHiddenCount
+        model.state.searchText = "ランチ"
+        let unfiltered = model.output.searchHiddenCount
 
-        model.filter = EntryFilter(categoryIds: [salary.id])
-        let hidden = model.searchHiddenCount
+        model.state.filter = EntryFilter(categoryIds: [salary.id])
+        let hidden = model.output.searchHiddenCount
 
-        model.searchText = "コーヒー"
-        let missing = model.searchHiddenCount
+        model.state.searchText = "コーヒー"
+        let missing = model.output.searchHiddenCount
 
         #expect(unfiltered == 0)
         #expect(hidden == 2)
@@ -197,21 +197,21 @@ extension RecordsModelTests {
         let options = try await setup.database.entryOptions()
         let food = try #require(options.expenseCategories.first)
         let salary = try #require(options.incomeCategories.first)
-        let model = RecordsModel(database: setup.database, today: setup.today)
+        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let month = model.shownEntryCount
+        let month = model.output.shownEntryCount
 
-        model.filter = EntryFilter(categoryIds: [food.id])
-        let filteredMonth = model.shownEntryCount
+        model.state.filter = EntryFilter(categoryIds: [food.id])
+        let filteredMonth = model.output.shownEntryCount
 
-        model.isSearching = true
-        let blankSearch = model.shownEntryCount
+        model.state.isSearching = true
+        let blankSearch = model.output.shownEntryCount
 
-        model.searchText = "ランチ"
-        let searched = model.shownEntryCount
+        model.state.searchText = "ランチ"
+        let searched = model.output.shownEntryCount
 
-        model.filter = EntryFilter(categoryIds: [salary.id])
-        let hiddenSearch = model.shownEntryCount
+        model.state.filter = EntryFilter(categoryIds: [salary.id])
+        let hiddenSearch = model.output.shownEntryCount
 
         #expect(month == 2)
         #expect(filteredMonth == 1)

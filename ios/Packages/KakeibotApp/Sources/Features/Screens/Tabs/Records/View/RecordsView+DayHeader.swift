@@ -106,7 +106,7 @@ private extension RecordsView {
 
     func dayTitle(_ date: LocalDate) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Text(PeriodText.day(date, today: model.today))
+            Text(PeriodText.day(date, today: model.state.today))
                 .displayFont(.headline)
                 .foregroundStyle(Palette.accentStrong)
                 .fixedSize()
@@ -116,7 +116,7 @@ private extension RecordsView {
                 .foregroundStyle(Self.weekdayColor(for: date))
                 .fixedSize()
 
-            if date == model.today {
+            if date == model.state.today {
                 Text("今日")
                     .textFont(.caption2, weight: .semibold)
                     .foregroundStyle(Palette.accent)
@@ -136,9 +136,9 @@ private extension RecordsView {
 
     @ViewBuilder
     func dayButtons(on date: LocalDate) -> some View {
-        let canReward = model.canReward(on: date)
-        let hasReward = model.rewardTotal(on: date) > 0
-        let hasStamp = model.stampIcon(on: date) != nil
+        let canReward = model.output.canReward(on: date)
+        let hasReward = model.output.rewardTotal(on: date) > 0
+        let hasStamp = model.output.stampIcon(on: date) != nil
 
         if canReward, !hasReward, !hasStamp {
             RecordsMarkButton { anchor in
@@ -172,10 +172,10 @@ private extension RecordsView {
         _ day: EntryDay,
         in selection: Set<Entry.ID>
     ) -> some View {
-        let isSelected = model.isSelected(day, in: selection)
+        let isSelected = model.output.isSelected(day, in: selection)
 
         return Button {
-            self.selection = model.toggling(day, in: selection)
+            self.selection = model.output.toggling(day, in: selection)
         } label: {
             SelectionMark(isSelected: isSelected)
                 .frame(minHeight: 26)
@@ -186,7 +186,7 @@ private extension RecordsView {
 
     @ViewBuilder
     func rewardButtonLabel(on date: LocalDate) -> some View {
-        if model.rewardTotal(on: date) > 0 {
+        if model.output.rewardTotal(on: date) > 0 {
             Image(systemName: "gift.fill")
                 .sansFont(.small)
                 .foregroundStyle(Palette.background)
@@ -210,7 +210,7 @@ private extension RecordsView {
 
     @ViewBuilder
     func stampButtonLabel(on date: LocalDate) -> some View {
-        if let stamp = model.stampIcon(on: date) {
+        if let stamp = model.output.stampIcon(on: date) {
             IconSeal(stamp, size: 26)
         } else {
             emptyButtonLabel("seal")

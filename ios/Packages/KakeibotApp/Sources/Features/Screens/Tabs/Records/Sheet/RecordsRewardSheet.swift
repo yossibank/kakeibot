@@ -48,7 +48,7 @@ public struct RecordsRewardSheet: View {
         .sheet(isPresented: $isAddingRule) {
             RewardRuleEditSheet(model: model.rewardRuleEditModel())
         }
-        .haptic(.success, trigger: model.rewardTotal(on: date))
+        .haptic(.success, trigger: model.output.rewardTotal(on: date))
     }
 }
 
@@ -76,20 +76,20 @@ private extension RecordsRewardSheet {
             Spacer()
 
             AmountText(
-                model.rewardTotal(on: date),
+                model.output.rewardTotal(on: date),
                 font: .size(.headline),
                 color: Palette.accentStrong
             )
             .lineLimit(1)
             .minimumScaleFactor(0.5)
             .contentTransition(.numericText())
-            .animation(.snappy, value: model.rewardTotal(on: date))
+            .animation(.snappy, value: model.output.rewardTotal(on: date))
         }
         .padding(.horizontal, 8)
     }
 
     func row(_ rule: RewardRule) -> some View {
-        let isAchieved = model.isAchieved(rule, on: date)
+        let isAchieved = model.output.isAchieved(rule, on: date)
         let mark = isAchieved ? "checkmark.circle.fill" : "circle"
         let stroke = isAchieved ? Palette.accent : Palette.line
 
@@ -99,7 +99,7 @@ private extension RecordsRewardSheet {
             }
         } label: {
             HStack(spacing: 12) {
-                IconBadge(model.rewardIcon(for: rule), size: 36)
+                IconBadge(model.output.rewardIcon(for: rule), size: 36)
 
                 Text(rule.name)
                     .textFont(.subheadline)
@@ -135,7 +135,7 @@ private extension RecordsRewardSheet {
 
 private extension RecordsRewardSheet {
     var rules: [RewardRule] {
-        model.rewardRules(on: date)
+        model.output.rewardRules(on: date)
     }
 
     var shape: RoundedRectangle {

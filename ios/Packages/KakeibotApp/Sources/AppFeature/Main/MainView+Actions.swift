@@ -211,7 +211,7 @@ private extension MainView {
     static let sheetCloseDuration: Duration = .milliseconds(600)
 
     var areTabsLoaded: Bool {
-        let isRecordsLoaded = records.list != nil || records.errorNotice.message != nil
+        let isRecordsLoaded = records.input.list != nil || records.state.errorNotice.message != nil
         let isReviewLoaded = review.input.list != nil || review.state.errorNotice.message != nil
         let isAssetsLoaded = assets.output.list != nil || assets.state.errorNotice.message != nil
         return isRecordsLoaded && isReviewLoaded && isAssetsLoaded

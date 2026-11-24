@@ -4,7 +4,7 @@ import SwiftUI
 
 extension RecordsView {
     var summary: some View {
-        totals(expense: model.expenseTotal, income: model.incomeTotal)
+        totals(expense: model.output.expenseTotal, income: model.output.incomeTotal)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .card()
@@ -22,7 +22,7 @@ extension RecordsView {
 
                 Spacer()
 
-                Text(PeriodText.range(summary.range, today: model.today))
+                Text(PeriodText.range(summary.range, today: model.state.today))
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)

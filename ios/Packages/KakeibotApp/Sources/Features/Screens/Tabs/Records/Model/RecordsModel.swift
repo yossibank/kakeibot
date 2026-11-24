@@ -7,218 +7,56 @@ import Store
 @MainActor
 @Observable
 public final class RecordsModel: ScreenModel {
-    public var today: LocalDate
-    public var selectedDate: LocalDate?
-    public var isSearching = false
-    public var isConfirmingDelete = false
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public var searchText = "" {
-        didSet {
-            updateSearch()
-        }
-    }
-
-    public var filter = EntryFilter() {
-        didSet {
-            updateSearch()
-        }
-    }
-
-    public private(set) var month: YearMonth
-    public private(set) var monthStartDay: MonthStartDay = .first
-    public private(set) var weekStart: Weekday = .sunday
-    public private(set) var layout: RecordsLayout = .calendar
-    public private(set) var isListFailed = false
-    public private(set) var noSpendDays: Set<LocalDate> = []
-    public private(set) var stampBook: StampBook?
-    public private(set) var stampShelf: ShelfIconList?
-    public private(set) var rewardBank: RewardBank?
-    public private(set) var recurrings: [Recurring] = []
-    public private(set) var recentSearches: [String] = []
-    public private(set) var pendingDeleteIDs: [Entry.ID] = []
-    public private(set) var searchDays: [EntryDay] = []
-    public private(set) var searchHiddenCount = 0
-
-    public private(set) var list: EntryList? {
-        didSet {
-            listGeneration += 1
-            searchIndex = nil
-            updateSearch()
-        }
-    }
-
-    public internal(set) var errorNotice = ErrorNotice()
-
-    let database: AppDatabase
-
-    private var listGeneration = 0
-
-    @ObservationIgnored private var monthDaysMemo = Memoized<MonthDays.Key, MonthDays>()
-    @ObservationIgnored private var searchIndex: EntrySearchIndex?
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate
     ) {
-        self.database = database
-        self.today = today
-        self.month = today.yearMonth
+        let state = State(today: today)
+        let input = Input()
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension RecordsModel {
-    var period: ClosedRange<LocalDate> {
-        month.period(startingOn: monthStartDay)
-    }
-
-    var periodText: String {
-        PeriodText.range(period)
-    }
-
-    var currentMonth: YearMonth {
-        today.periodMonth(startingOn: monthStartDay)
-    }
-
-    var isCurrentMonth: Bool {
-        month == currentMonth
-    }
-
-    var days: [EntryDay] {
-        currentMonthDays.days
-    }
-
-    var showsNoRecords: Bool {
-        list != nil && days.isEmpty
-    }
-
-    var expenseTotal: Int {
-        currentMonthDays.expenseTotal
-    }
-
-    var incomeTotal: Int {
-        currentMonthDays.incomeTotal
-    }
-
-    var filterTitle: String? {
-        list?.title(of: filter)
-    }
-
-    var weeks: [[LocalDate?]] {
-        period.weeks(startingOn: weekStart)
-    }
-
-    var shownDate: LocalDate {
-        if let selectedDate,
-           period.contains(selectedDate) {
-            return selectedDate
+    internal(set) var errorNotice: ErrorNotice {
+        get {
+            state.errorNotice
         }
-
-        return period.contains(today) ? today : period.lowerBound
-    }
-
-    var pendingDeleteCount: Int {
-        pendingDeleteIDs.count
-    }
-
-    func icon(for category: EntryCategory) -> Icon? {
-        list?.icons[category.iconId]
-    }
-
-    func icon(for wallet: Wallet) -> Icon? {
-        list?.icons[wallet.iconId]
-    }
-
-    func rememberSearch(_ text: String) async {
-        let words = EntrySearch.remembering(text, in: recentSearches)
-
-        guard words != recentSearches else {
-            return
+        set {
+            state.errorNotice = newValue
         }
-
-        recentSearches = words
-
-        await saveRecentSearches()
-    }
-
-    func clearRecentSearches() async {
-        recentSearches = []
-        await saveRecentSearches()
-    }
-
-    func day(on date: LocalDate) -> EntryDay? {
-        currentMonthDays.byDate[date]
-    }
-
-    func requestDelete(
-        _ ids: [Entry.ID],
-        delete: ([Entry.ID]) -> Void
-    ) {
-        guard ids.count >= Self.confirmDeleteThreshold else {
-            delete(ids)
-            return
-        }
-
-        pendingDeleteIDs = ids
-        isConfirmingDelete = true
-    }
-
-    func confirmDelete(delete: ([Entry.ID]) -> Void) {
-        let ids = pendingDeleteIDs
-        cancelDelete()
-        delete(ids)
-    }
-
-    func cancelDelete() {
-        pendingDeleteIDs = []
-        isConfirmingDelete = false
-    }
-
-    func rows(for day: EntryDay) -> [EntryRowItem] {
-        guard let list else {
-            return []
-        }
-
-        return day.entries.map { EntryRowItem($0, in: list) }
     }
 
     func open(_ date: LocalDate) {
-        closeSearch()
-        month = date.periodMonth(startingOn: monthStartDay)
-        selectedDate = date
-        layout = .calendar
+        state.open(date, in: date.periodMonth(startingOn: input.monthStartDay))
     }
 
     func openCurrentMonth() {
-        closeSearch()
-        month = currentMonth
-        selectedDate = nil
-    }
-
-    func closeSearch() {
-        isSearching = false
-        searchText = ""
-    }
-
-    func move(months: Int) {
-        month = month.adding(months: months)
-        selectedDate = nil
+        state.openMonth(output.currentMonth)
     }
 
     func loadLayout() async {
         do {
-            layout = try await database.setting(.recordsLayout)
+            try await state.setLayout(dependencies.database.setting(.recordsLayout))
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
     }
 
-    func setLayout(_ layout: RecordsLayout) {
-        self.layout = layout
-    }
-
     func saveLayout() async {
         do {
-            try await database.setSetting(.recordsLayout, to: layout)
+            try await dependencies.database.setSetting(.recordsLayout, to: state.layout)
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
@@ -226,8 +64,8 @@ public extension RecordsModel {
 
     func load() async {
         do {
-            list = try await database.entryList()
-            recurrings = try await database.recurrings()
+            input.list = try await dependencies.database.entryList()
+            input.recurrings = try await dependencies.database.recurrings()
         } catch {
             errorNotice.show(Self.loadFailedMessage)
         }
@@ -239,36 +77,54 @@ public extension RecordsModel {
         await observeAll([
             {
                 await self.observe(
-                    self.database.entryListUpdates(),
-                    into: \.list,
-                    failing: \.isListFailed
+                    self.dependencies.database.entryListUpdates(),
+                    into: \.input.list,
+                    failing: \.input.isListFailed
                 )
             },
             {
-                await self.observe(self.database.noSpendDayUpdates(), into: \.noSpendDays)
+                await self.observe(
+                    self.dependencies.database.noSpendDayUpdates(),
+                    into: \.input.noSpendDays
+                )
             },
             {
-                await self.observe(self.database.stampBookUpdates(), into: \.stampBook)
+                await self.observe(
+                    self.dependencies.database.stampBookUpdates(),
+                    into: \.input.stampBook
+                )
             },
             {
-                await self.observe(self.database.shelfIconListUpdates(), into: \.stampShelf)
+                await self.observe(
+                    self.dependencies.database.shelfIconListUpdates(),
+                    into: \.input.stampShelf
+                )
             },
             {
-                await self.observe(self.database.rewardBankUpdates(), into: \.rewardBank)
+                await self.observe(
+                    self.dependencies.database.rewardBankUpdates(),
+                    into: \.input.rewardBank
+                )
             },
             {
-                await self.observe(self.database.recurringUpdates(), into: \.recurrings)
+                await self.observe(
+                    self.dependencies.database.recurringUpdates(),
+                    into: \.input.recurrings
+                )
             },
             {
-                await self.observe(self.database.settingUpdates(.weekStart), into: \.weekStart)
+                await self.observe(
+                    self.dependencies.database.settingUpdates(.weekStart),
+                    into: \.input.weekStart
+                )
             },
             {
                 await self.observeMonthStartDay()
             },
             {
                 await self.observe(
-                    self.database.settingUpdates(.recentSearches),
-                    into: \.recentSearches
+                    self.dependencies.database.settingUpdates(.recentSearches),
+                    into: \.input.recentSearches
                 )
             }
         ])
@@ -276,114 +132,28 @@ public extension RecordsModel {
 }
 
 extension RecordsModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+    }
+
     static let loadFailedMessage = "記録を読めませんでした"
     static let saveFailedMessage = "保存できませんでした"
+    static let confirmDeleteThreshold = 10
 }
 
 private extension RecordsModel {
-    struct MonthDays {
-        struct Key: Equatable {
-            let listGeneration: Int
-            let month: YearMonth
-            let monthStartDay: MonthStartDay
-            let filter: EntryFilter
-            let isSearching: Bool
-        }
-
-        let days: [EntryDay]
-        let byDate: [LocalDate: EntryDay]
-        let expenseTotal: Int
-        let incomeTotal: Int
-    }
-
-    static let confirmDeleteThreshold = 10
-
-    var monthDaysKey: MonthDays.Key {
-        MonthDays.Key(
-            listGeneration: listGeneration,
-            month: month,
-            monthStartDay: monthStartDay,
-            filter: filter,
-            isSearching: isSearching
-        )
-    }
-
-    var currentMonthDays: MonthDays {
-        monthDaysMemo.value(for: monthDaysKey) {
-            makeMonthDays()
-        }
-    }
-
-    func makeMonthDays() -> MonthDays {
-        let days = makeDays()
-        let byDate = Dictionary(
-            days.map { ($0.date, $0) },
-            uniquingKeysWith: { first, _ in
-                first
-            }
-        )
-
-        return MonthDays(
-            days: days,
-            byDate: byDate,
-            expenseTotal: days.expenseTotal,
-            incomeTotal: days.incomeTotal
-        )
-    }
-
-    func makeDays() -> [EntryDay] {
-        let days = list?.days.within(period) ?? []
-        let filtered = shownFilter.apply(to: days)
-        let adjusted = adjustedDays(besides: filtered)
-
-        guard !adjusted.isEmpty else {
-            return filtered
-        }
-
-        return (filtered + adjusted).sorted { $0.date > $1.date }
-    }
-
-    func updateSearch() {
-        let search = EntrySearch(searchText)
-
-        guard
-            !search.isEmpty,
-            let list
-        else {
-            searchDays = []
-            searchHiddenCount = 0
-            return
-        }
-
-        let index = searchIndex ?? EntrySearchIndex(list)
-        let matched = index.days(matching: search)
-        let shown = shownFilter.apply(to: matched)
-        let isHidden = !filter.isEmpty && shown.isEmpty
-
-        searchIndex = index
-        searchDays = shown
-        searchHiddenCount = isHidden ? Self.entryCount(in: matched) : 0
-    }
-
-    func saveRecentSearches() async {
-        do {
-            try await database.setSetting(.recentSearches, to: recentSearches)
-        } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
-        }
-    }
-
     func observeMonthStartDay() async {
         await observe(
-            database.settingUpdates(.monthStartDay),
+            dependencies.database.settingUpdates(.monthStartDay),
             failure: Self.loadFailedMessage
         ) { startDay in
-            guard startDay != monthStartDay else {
+            guard startDay != input.monthStartDay else {
                 return
             }
 
-            monthStartDay = startDay
-            month = today.periodMonth(startingOn: startDay)
+            input.monthStartDay = startDay
+            state.setMonth(state.today.periodMonth(startingOn: startDay))
         }
     }
 }

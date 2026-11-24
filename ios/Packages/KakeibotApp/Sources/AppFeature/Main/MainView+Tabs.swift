@@ -72,7 +72,7 @@ extension MainView {
                     undo.deletion = deletion
                 }
             )
-            .loadFailed(records.isListFailed, onRetry: retry)
+            .loadFailed(records.input.isListFailed, onRetry: retry)
             .tabContent()
         }
     }

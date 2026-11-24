@@ -9,27 +9,36 @@ public extension RecordsModel {
         public let range: ClosedRange<LocalDate>
     }
 
-    var searchSummary: SearchSummary? {
-        let days = searchDays
+    func rememberSearch(_ text: String) async {
+        let words = EntrySearch.remembering(text, in: input.recentSearches)
 
-        guard
-            let first = days.last?.date,
-            let last = days.first?.date
-        else {
-            return nil
+        guard words != input.recentSearches else {
+            return
         }
 
-        return SearchSummary(
-            count: days.reduce(0) { $0 + $1.entries.count },
-            expenseTotal: days.expenseTotal,
-            incomeTotal: days.incomeTotal,
-            range: first...last
-        )
+        input.recentSearches = words
+
+        await saveRecentSearches()
+    }
+
+    func clearRecentSearches() async {
+        input.recentSearches = []
+        await saveRecentSearches()
     }
 
     func restoreRecentSearches(_ words: [String]) async {
         do {
-            try await database.setSetting(.recentSearches, to: words)
+            try await dependencies.database.setSetting(.recentSearches, to: words)
+        } catch {
+            errorNotice.show(Self.saveFailedMessage, for: error)
+        }
+    }
+}
+
+private extension RecordsModel {
+    func saveRecentSearches() async {
+        do {
+            try await dependencies.database.setSetting(.recentSearches, to: input.recentSearches)
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
