@@ -217,7 +217,7 @@ extension SettingsMenuSheet {
             NavigationLink {
                 BackupView(
                     model: BackupModel(
-                        database: database,
+                        database: database, clock: .system,
                         permission: permission
                     )
                 )

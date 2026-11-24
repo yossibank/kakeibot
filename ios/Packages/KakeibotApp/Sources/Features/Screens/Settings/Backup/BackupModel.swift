@@ -7,30 +7,87 @@ import Store
 @MainActor
 @Observable
 public final class BackupModel {
-    public private(set) var file: BackupFile?
-    public private(set) var pending: ExportV1?
-    public private(set) var doneMessage: String?
-    public private(set) var isWorking = false
-    public private(set) var isSyncActive = false
-    public private(set) var previous: [Previous] = []
+    public let state = State()
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let database: AppDatabase
-    private let stash: BackupStash
-    private let appVersion: String
-    private let permission: NotificationPermission
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         stash: BackupStash = .standard,
         appVersion: String = Bundle.main.shortVersion,
         permission: NotificationPermission = .allowed
     ) {
-        self.database = database
-        self.stash = stash
-        self.permission = permission
-        self.appVersion = appVersion
+        let input = Input()
+
+        self.input = input
+        self.output = Output(state: state)
+
+        self.dependencies = Dependencies(
+            database: database,
+            clock: clock,
+            stash: stash,
+            appVersion: appVersion,
+            permission: permission
+        )
+    }
+}
+
+public extension BackupModel {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public internal(set) var file: BackupFile?
+        public internal(set) var pending: ExportV1?
+        public internal(set) var doneMessage: String?
+        public internal(set) var isWorking = false
+    }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var isSyncActive = false
+        public internal(set) var previous: [Previous] = []
+    }
+
+    @MainActor
+    final class Output {
+        let state: State
+
+        public var pendingSummary: String? {
+            guard let pending = state.pending else {
+                return nil
+            }
+
+            let data = pending.data
+            let date = BackupModel.dayText(pending.exportedAt)
+            let counts = "記録 \(data.entries.count) 件・口座 \(data.wallets.count) 件"
+
+            return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
+        }
+
+        init(state: State) {
+            self.state = state
+        }
+
+        public func previousTitle(of item: Previous) -> String {
+            let text = BackupModel.dayTimeText(item.date)
+            return "\(text) の退避に戻す"
+        }
+    }
+}
+
+extension BackupModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+        let stash: BackupStash
+        let appVersion: String
+        let permission: NotificationPermission
     }
 }
 
@@ -49,18 +106,6 @@ public extension BackupModel {
     enum FileKind: String, Sendable {
         case json
         case csv
-    }
-
-    var pendingSummary: String? {
-        guard let pending else {
-            return nil
-        }
-
-        let data = pending.data
-        let date = Self.dayText(pending.exportedAt)
-        let counts = "記録 \(data.entries.count) 件・口座 \(data.wallets.count) 件"
-
-        return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
     }
 
     static func exportAgeText(
@@ -87,30 +132,25 @@ public extension BackupModel {
     }
 
     func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.backup, in: database)
+        .closedHint(.backup, in: dependencies.database)
     }
 
     func observeSync() async {
         do {
-            for try await activity in database.syncActivityUpdates() {
-                isSyncActive = activity.isActive
+            for try await activity in dependencies.database.syncActivityUpdates() {
+                input.isSyncActive = activity.isActive
             }
         } catch {
-            isSyncActive = false
+            input.isSyncActive = false
         }
     }
 
     func loadPrevious() async {
-        let stash = stash
+        let stash = dependencies.stash
 
-        previous = await Task.detached {
+        input.previous = await Task.detached {
             Self.previous(in: stash)
         }.value
-    }
-
-    func previousTitle(of item: Previous) -> String {
-        let text = Self.dayTimeText(item.date)
-        return "\(text) の退避に戻す"
     }
 
     @discardableResult
@@ -118,22 +158,22 @@ public extension BackupModel {
         _ kind: FileKind,
         at date: Date
     ) async -> Bool {
-        isWorking = true
-        doneMessage = nil
+        state.isWorking = true
+        state.doneMessage = nil
 
         defer {
-            isWorking = false
+            state.isWorking = false
         }
 
         do {
             let data = try await data(of: kind, at: date)
             let name = Self.fileName(of: kind, at: date)
 
-            file = BackupFile(kind: kind, data: data, name: name)
+            state.file = BackupFile(kind: kind, data: data, name: name)
 
             return true
         } catch {
-            errorNotice.show(Self.exportFailedMessage)
+            state.errorNotice.show(Self.exportFailedMessage)
             return false
         }
     }
@@ -142,28 +182,28 @@ public extension BackupModel {
         _ result: Result<URL, any Error>,
         at date: Date
     ) async {
-        let kind = file?.kind
+        let kind = state.file?.kind
 
-        file = nil
+        state.file = nil
 
         switch result {
         case .success:
-            doneMessage = Self.exportedMessage
+            state.doneMessage = Self.exportedMessage
 
             if kind == .json {
-                try? await database.setSetting(.backupExportedAt, to: date)
+                try? await dependencies.database.setSetting(.backupExportedAt, to: date)
             }
 
         case .failure:
-            errorNotice.show(Self.exportFailedMessage)
+            state.errorNotice.show(Self.exportFailedMessage)
         }
     }
 
     func read(_ result: Result<URL, any Error>) async -> Bool {
-        doneMessage = nil
+        state.doneMessage = nil
 
         guard case let .success(url) = result else {
-            errorNotice.show(Self.readFailedMessage)
+            state.errorNotice.show(Self.readFailedMessage)
             return false
         }
 
@@ -191,7 +231,7 @@ public extension BackupModel {
 
     @discardableResult
     func readPrevious(_ item: Previous) async -> Bool {
-        doneMessage = nil
+        state.doneMessage = nil
 
         let export = await Task.detached {
             Result {
@@ -203,51 +243,51 @@ public extension BackupModel {
     }
 
     func cancelRestore() {
-        pending = nil
+        state.pending = nil
     }
 
     func restore() async {
-        guard let pending else {
+        guard let pending = state.pending else {
             return
         }
 
         guard await !isSyncActiveNow() else {
-            self.pending = nil
-            errorNotice.show(Self.syncActiveMessage)
+            state.pending = nil
+            state.errorNotice.show(Self.syncActiveMessage)
             return
         }
 
-        isWorking = true
+        state.isWorking = true
 
         defer {
-            isWorking = false
+            state.isWorking = false
         }
 
         do {
-            let app = ExportV1.App(platform: .ios, version: appVersion)
-            let stash = stash
+            let app = ExportV1.App(platform: .ios, version: dependencies.appVersion)
+            let stash = dependencies.stash
 
-            try await database.restoreBackup(
+            try await dependencies.database.restoreBackup(
                 pending,
-                stashingAt: Date(),
+                stashingAt: dependencies.clock.now,
                 app: app
             ) {
                 try stash.save($0)
             }
 
-            try? await database.setSetting(.backupExportedAt, to: pending.exportedAt)
+            try? await dependencies.database.setSetting(.backupExportedAt, to: pending.exportedAt)
 
-            doneMessage = Self.restoredMessage
+            state.doneMessage = Self.restoredMessage
 
             if pending.data.needsNotifications {
-                await permission.requestIfUndecided()
+                await dependencies.permission.requestIfUndecided()
             }
         } catch {
-            errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.errorNotice.show(Self.restoreFailedMessage, for: error)
         }
 
         await loadPrevious()
-        self.pending = nil
+        state.pending = nil
     }
 }
 
@@ -279,62 +319,19 @@ private extension BackupModel {
         }
     }
 
-    static func fileName(
-        of kind: FileKind,
-        at date: Date
-    ) -> String {
-        let day = text(
-            of: date,
-            format: "\(year: .defaultDigits)-\(month: .twoDigits)-\(day: .twoDigits)"
-        )
-
-        return "kakeibot-\(day).\(kind.rawValue)"
-    }
-
-    static func dayText(_ date: Date) -> String {
-        text(
-            of: date,
-            format: "\(year: .defaultDigits)/\(month: .defaultDigits)/\(day: .defaultDigits)"
-        )
-    }
-
-    static func dayTimeText(_ date: Date) -> String {
-        let hour = Date.FormatStyle.Symbol.VerbatimHour.defaultDigits(
-            clock: .twentyFourHour,
-            hourCycle: .zeroBased
-        )
-
-        let time = text(of: date, format: "\(hour: hour):\(minute: .twoDigits)")
-
-        return "\(dayText(date)) \(time)"
-    }
-
-    static func text(
-        of date: Date,
-        format: Date.FormatString
-    ) -> String {
-        let style = Date.VerbatimFormatStyle(
-            format: format,
-            timeZone: .current,
-            calendar: Calendar(identifier: .gregorian)
-        )
-
-        return date.formatted(style)
-    }
-
     func accept(_ export: Result<ExportV1, any Error>) -> Bool {
         do {
-            pending = try export.get()
+            state.pending = try export.get()
             return true
         } catch {
-            errorNotice.show(Self.readMessage(for: error))
+            state.errorNotice.show(Self.readMessage(for: error))
             return false
         }
     }
 
     func isSyncActiveNow() async -> Bool {
         do {
-            for try await activity in database.syncActivityUpdates() {
+            for try await activity in dependencies.database.syncActivityUpdates() {
                 return activity.isActive
             }
         } catch {
@@ -350,11 +347,11 @@ private extension BackupModel {
     ) async throws -> Data {
         switch kind {
         case .json:
-            let app = ExportV1.App(platform: .ios, version: appVersion)
-            return try await database.backup(at: date, app: app)
+            let app = ExportV1.App(platform: .ios, version: dependencies.appVersion)
+            return try await dependencies.database.backup(at: date, app: app)
 
         case .csv:
-            return try await database.spreadsheet()
+            return try await dependencies.database.spreadsheet()
         }
     }
 }
