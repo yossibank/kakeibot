@@ -172,7 +172,7 @@ class EntryModel(
     class Input(
         editingId: Identifier<Entry>?,
     ) {
-        var editingId: Identifier<Entry>? = editingId
+        var editingId: Identifier<Entry>? by mutableStateOf(editingId)
             internal set
 
         var history: EntryList? by mutableStateOf(null)

@@ -125,7 +125,7 @@ class RecurringEditModel(
         var loanBalances: Map<Identifier<Wallet>, Long> by mutableStateOf(emptyMap())
             internal set
 
-        var generatedUntil: LocalDate? = null
+        var generatedUntil: LocalDate? by mutableStateOf(null)
             internal set
 
         var options: EntryOptions? by mutableStateOf(null)
