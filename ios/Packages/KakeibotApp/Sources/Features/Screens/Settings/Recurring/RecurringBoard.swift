@@ -6,6 +6,8 @@ import SwiftUI
 @MainActor
 struct RecurringBoard {
     let model: RecurringListModel
+    let database: AppDatabase
+    let clock: ScreenClock
 }
 
 extension RecurringBoard: SettingsBoardSpec {
@@ -15,14 +17,6 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     typealias Editor = RecurringEditSheet
-
-    var database: AppDatabase {
-        model.dependencies.database
-    }
-
-    var clock: ScreenClock {
-        model.dependencies.clock
-    }
 
     var screen: SettingsScreen {
         .recurrings

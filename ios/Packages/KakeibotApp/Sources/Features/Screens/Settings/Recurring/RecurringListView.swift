@@ -1,13 +1,13 @@
 import SwiftUI
 
 public struct RecurringListView: View {
-    private let model: RecurringListModel
+    private let board: RecurringBoard
 
-    public init(model: RecurringListModel) {
-        self.model = model
+    init(board: RecurringBoard) {
+        self.board = board
     }
 
     public var body: some View {
-        SettingsBoardPage(RecurringBoard(model: model))
+        SettingsBoardPage(board)
     }
 }

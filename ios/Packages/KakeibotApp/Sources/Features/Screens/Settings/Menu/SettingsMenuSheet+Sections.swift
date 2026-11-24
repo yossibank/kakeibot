@@ -47,11 +47,12 @@ extension SettingsMenuSheet {
 
             NavigationLink {
                 RecurringListView(
-                    model: RecurringListModel(
+                    board: RecurringListModel(
                         database: database,
                         clock: clock,
                         today: today
                     )
+                    .board()
                 )
             } label: {
                 row("固定費", systemImage: "repeat")
