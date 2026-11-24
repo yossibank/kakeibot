@@ -59,7 +59,7 @@ extension RewardRuleBoard: SettingsBoardSpec {
     }
 
     func editModel(for destination: Destination) -> RewardRuleEditModel {
-        RewardRuleEditModel(database: database, editing: destination.editingID)
+        RewardRuleEditModel(database: database, clock: clock, editing: destination.editingID)
     }
 
     func intro(

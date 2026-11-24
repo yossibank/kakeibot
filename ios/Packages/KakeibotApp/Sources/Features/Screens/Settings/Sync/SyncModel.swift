@@ -7,126 +7,83 @@ import Store
 @MainActor
 @Observable
 public final class SyncModel {
-    public private(set) var isOn = false
-    public private(set) var account = SyncAccount.available
-    public private(set) var isWorking = false
-    public private(set) var stopReason: SyncStopReason?
-    public private(set) var sendProblem: SyncSendProblem?
-    public private(set) var isFetching = false
-    public private(set) var syncedAt: Date?
-    public private(set) var choice: SyncChoice?
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var shares: [WalletShare] = []
-    public internal(set) var joined: [JoinedShare] = []
-    public internal(set) var workingWallet: Wallet.ID?
-    public internal(set) var invitation: WalletShare?
-    public internal(set) var opened: WalletShare?
-    public internal(set) var errorNotice = ErrorNotice()
-
-    var members: Loadable<[SyncParticipant]> = .loading
-
-    let database: AppDatabase
-    let cloud: SyncCloud
-
-    private var pending: Loadable<Int> = .loading
-    private var requestedOn: Bool?
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         cloud: SyncCloud
     ) {
-        self.database = database
-        self.cloud = cloud
+        let state = State()
+        let input = Input()
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock, cloud: cloud)
     }
 }
 
 public extension SyncModel {
-    var isAvailable: Bool {
-        account == .available
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public internal(set) var isWorking = false
+        public internal(set) var choice: SyncChoice?
+        public internal(set) var workingWallet: Wallet.ID?
+        public internal(set) var invitation: WalletShare?
+        public internal(set) var opened: WalletShare?
+
+        var requestedOn: Bool?
     }
 
-    var pendingCount: Int? {
-        pending.value
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var isOn = false
+        public internal(set) var account = SyncAccount.available
+        public internal(set) var stopReason: SyncStopReason?
+        public internal(set) var sendProblem: SyncSendProblem?
+        public internal(set) var isFetching = false
+        public internal(set) var syncedAt: Date?
+        public internal(set) var shares: [WalletShare] = []
+        public internal(set) var joined: [JoinedShare] = []
+
+        var members: Loadable<[SyncParticipant]> = .loading
+        var pending: Loadable<Int> = .loading
     }
 
-    var isPendingFailed: Bool {
-        pending.isFailed
-    }
-
-    var participants: [SyncParticipant]? {
-        members.value
-    }
-
-    var isParticipantsFailed: Bool {
-        members.isFailed
-    }
-
-    var isChoosing: Bool {
-        choice != nil
-    }
-
-    var shownOn: Bool {
-        requestedOn ?? isOn
-    }
-
-    var isSwitching: Bool {
-        requestedOn != nil
-    }
-
-    var progress: SyncProgress? {
-        if isWorking {
-            return .switching
+    internal(set) var errorNotice: ErrorNotice {
+        get {
+            state.errorNotice
         }
-
-        guard isOn else {
-            return stopReason.map(SyncProgress.stopped)
-        }
-
-        guard let pendingCount else {
-            return isPendingFailed ? nil : .checking
-        }
-
-        if isFetching {
-            return .receiving
-        }
-
-        guard pendingCount > 0 else {
-            return .upToDate(syncedAt)
-        }
-
-        return sendProblem.map { .stuck($0, pendingCount) } ?? .sending(pendingCount)
-    }
-
-    var footnote: String {
-        guard !isOn else {
-            return "切っても、この \(DeviceName.current) のデータは残ります。"
-        }
-
-        return switch account {
-        case .available: "オンにすると、ほかの端末と記録がそろいます。"
-        case .noAccount: "設定アプリで iCloud にサインインすると使えます。"
-        case .restricted: "この \(DeviceName.current) では、制限で iCloud を使えません。"
-        case .temporarilyUnavailable: "設定アプリで iCloud にサインインし直すと使えます。"
-        case .couldNotDetermine: "iCloud の状態を確かめられませんでした。\n時間をおいて開き直してください。"
+        set {
+            state.errorNotice = newValue
         }
     }
 
     func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.sync, in: database)
+        .closedHint(.sync, in: dependencies.database)
     }
 
     func load() async {
         do {
-            isOn = try await database.isSyncEnabled()
+            input.isOn = try await dependencies.database.isSyncEnabled()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
 
-        account = await cloud.account()
+        input.account = await dependencies.cloud.account()
     }
 
     func refreshAccount() async {
-        account = await cloud.account()
+        input.account = await dependencies.cloud.account()
     }
 
     func observe() async {
@@ -138,80 +95,92 @@ public extension SyncModel {
                 await self.observePending()
             },
             {
-                await self.observe(self.database.walletShareUpdates(), into: \.shares)
+                await self.observe(
+                    self.dependencies.database.walletShareUpdates(),
+                    into: \.input.shares
+                )
             },
             {
-                await self.observe(self.database.joinedShareUpdates(), into: \.joined)
+                await self.observe(
+                    self.dependencies.database.joinedShareUpdates(),
+                    into: \.input.joined
+                )
             }
         ])
     }
 
     func request(_ isOn: Bool) -> Bool {
         guard
-            !isWorking,
-            !isSwitching
+            !state.isWorking,
+            !output.isSwitching
         else {
             return false
         }
 
-        requestedOn = isOn
+        state.requestedOn = isOn
         return true
     }
 
     func setOn(_ isOn: Bool) async {
-        requestedOn = isOn
+        state.requestedOn = isOn
 
         if isOn {
             await turnOn()
         } else {
             await work {
-                try await database.turnOffSync()
+                try await dependencies.database.turnOffSync()
             }
         }
 
-        if choice == nil {
-            requestedOn = nil
+        if state.choice == nil {
+            state.requestedOn = nil
         }
     }
 
     func useCloudData() async {
-        guard isChoosing else {
+        guard output.isChoosing else {
             return
         }
 
-        choice = nil
+        state.choice = nil
 
         await work {
-            try await database.turnOnSyncReplacingLocal()
+            try await dependencies.database.turnOnSyncReplacingLocal()
         }
 
-        requestedOn = nil
+        state.requestedOn = nil
     }
 
     func useLocalData() async {
-        guard isChoosing else {
+        guard output.isChoosing else {
             return
         }
 
-        choice = nil
+        state.choice = nil
 
         await work {
-            try await cloud.deleteData()
-            try await database.turnOnSync()
+            try await dependencies.cloud.deleteData()
+            try await dependencies.database.turnOnSync()
         }
 
-        requestedOn = nil
+        state.requestedOn = nil
     }
 
     func cancelChoice() {
-        choice = nil
-        requestedOn = nil
+        state.choice = nil
+        state.requestedOn = nil
     }
 }
 
 extension SyncModel: ScreenModel {}
 
 extension SyncModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+        let cloud: SyncCloud
+    }
+
     static let loadFailedMessage = "同期の状態を読めませんでした"
 }
 
@@ -220,69 +189,69 @@ private extension SyncModel {
 
     func observeStatus() async {
         await observe(
-            database.syncStatusUpdates(),
+            dependencies.database.syncStatusUpdates(),
             failure: Self.loadFailedMessage
         ) { status in
-            self.isOn = status.isEnabled
-            self.stopReason = status.stopReason
-            self.sendProblem = status.sendProblem
-            self.isFetching = status.isFetching
-            self.syncedAt = status.syncedAt
+            self.input.isOn = status.isEnabled
+            self.input.stopReason = status.stopReason
+            self.input.sendProblem = status.sendProblem
+            self.input.isFetching = status.isFetching
+            self.input.syncedAt = status.syncedAt
         }
     }
 
     func observePending() async {
         let isFailed = await observe(
-            database.pendingSyncCountUpdates(),
+            dependencies.database.pendingSyncCountUpdates(),
             failure: Self.loadFailedMessage
         ) { count in
-            self.pending = .loaded(count)
+            self.input.pending = .loaded(count)
         }
 
         if isFailed,
-           !pending.isLoaded {
-            pending = .failed
+           !input.pending.isLoaded {
+            input.pending = .failed
         }
     }
 
     func turnOn() async {
-        isWorking = true
-        account = await cloud.account()
+        state.isWorking = true
+        input.account = await dependencies.cloud.account()
 
-        guard isAvailable else {
-            isWorking = false
+        guard output.isAvailable else {
+            state.isWorking = false
             return
         }
 
         await work {
-            guard let cloudSummary = try await cloud.summary() else {
-                try await database.turnOnSync()
+            guard let cloudSummary = try await dependencies.cloud.summary() else {
+                try await dependencies.database.turnOnSync()
                 return
             }
 
-            let localSummary = try await database.syncSummary()
+            let localSummary = try await dependencies.database.syncSummary()
 
             guard localSummary.entryCount > 0 else {
-                try await database.turnOnSyncReplacingLocal()
+                try await dependencies.database.turnOnSyncReplacingLocal()
                 return
             }
 
-            choice = SyncChoice(local: localSummary, cloud: cloudSummary)
+            state.choice = SyncChoice(local: localSummary, cloud: cloudSummary)
         }
     }
 
     func work(_ operation: () async throws -> Void) async {
-        isWorking = true
-        errorNotice.clear()
+        state.isWorking = true
+        state.errorNotice.clear()
 
         do {
             try await operation()
 
-            isOn = try await database.isSyncEnabled()
+            input.isOn = try await dependencies.database.isSyncEnabled()
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
 
-        isWorking = false
+        state.isWorking = false
     }
 }

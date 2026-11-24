@@ -5,7 +5,7 @@ import Store
 protocol SettingsBoardModel: AnyObject {
     associatedtype Item: Identifiable where Item.ID: Sendable
     associatedtype State: SettingsBoardState where State.ID == Item.ID
-    associatedtype Output: SettingsBoardOutput where Output.Item == Item
+    associatedtype Output: SettingsBoardOutput where Output.Item == Item, Output.State == State
 
     var state: State { get }
     var output: Output { get }

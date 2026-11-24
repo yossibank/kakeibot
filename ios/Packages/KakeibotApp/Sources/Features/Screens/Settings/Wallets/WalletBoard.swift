@@ -56,7 +56,7 @@ extension WalletBoard: SettingsBoardSpec {
         WalletRowCard(
             name: item.name,
             kind: item.kind,
-            amount: model.output.balance(of: item, through: clock.today),
+            amount: model.balance(of: item),
             caption: item.kind.role.balanceLabel(model.output.balance(
                 of: item,
                 through: clock.today
@@ -104,7 +104,7 @@ extension WalletBoard: SettingsBoardSpec {
             return nil
         }
 
-        return .hidingWallet(balance: model.output.balance(of: item, through: clock.today))
+        return .hidingWallet(balance: model.balance(of: item))
     }
 
     func deleteConfirmation(

@@ -32,15 +32,6 @@ public final class WalletEditModel {
 }
 
 public extension WalletEditModel {
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     static func glyph(for kind: Wallet.Kind) -> Icon.Glyph {
         switch kind {
         case .cash: .cash
@@ -76,14 +67,6 @@ extension WalletEditModel {
 extension WalletEditModel: SettingsEditModel {
     var edited: WalletDraft {
         output.draft
-    }
-
-    var baseline: WalletDraft? {
-        input.baseline
-    }
-
-    var editingId: Wallet.ID? {
-        input.editingId
     }
 
     var problemMessage: String? {

@@ -140,17 +140,18 @@ public extension EntryModel {
             memo: memo
         )
 
-        return TemplateEditModel(database: database, draft: draft)
+        return TemplateEditModel(database: database, clock: .system, draft: draft)
     }
 
     func newCategoryModel() -> CategoryEditModel {
         let kind: EntryCategory.Kind = type == .income ? .income : .expense
-        return CategoryEditModel(database: database, kind: kind)
+        return CategoryEditModel(database: database, clock: .system, kind: kind)
     }
 
     func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
         CategoryEditModel(
             database: database,
+            clock: .system,
             kind: category.kind,
             editing: category.id
         )

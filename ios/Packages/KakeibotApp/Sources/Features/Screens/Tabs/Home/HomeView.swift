@@ -85,7 +85,7 @@ public struct HomeView: View {
                     minWidth: Self.twoColumnWidth,
                     isLazy: false
                 ) {
-                    if setup.showsCard {
+                    if setup.output.showsCard {
                         setupCard
                     }
 
@@ -98,7 +98,7 @@ public struct HomeView: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
-            .animation(.snappy, value: setup.showsCard)
+            .animation(.snappy, value: setup.output.showsCard)
             .animation(.snappy, value: model.output.homeLayout)
         }
         .errorBanner($model.errorNotice)
@@ -123,11 +123,11 @@ private extension HomeView {
             HStack(spacing: 8) {
                 HeaderButton(systemImage: "bell", action: onOpenNews)
                     .overlay(alignment: .topTrailing) {
-                        if setup.hasUnreadNews {
+                        if setup.output.hasUnreadNews {
                             headerDot(Palette.rose)
                         }
                     }
-                    .animation(.snappy, value: setup.hasUnreadNews)
+                    .animation(.snappy, value: setup.output.hasUnreadNews)
 
                 HeaderButton(systemImage: "gearshape", action: onOpenSettings)
                     .overlay(alignment: .topTrailing) {

@@ -7,94 +7,140 @@ import Store
 @MainActor
 @Observable
 public final class RewardRuleEditModel {
-    public var name = ""
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public private(set) var calculator = AmountCalculator()
-
-    public internal(set) var isHidden = false
-
-    public private(set) var hasLogs = false
-
-    public internal(set) var errorNotice = ErrorNotice()
-
-    public let icon = SettingsIconEditorModel(glyph: .giftbox)
-
-    private(set) var baseline: RewardRuleDraft?
-
-    let editingId: RewardRule.ID?
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         editing id: RewardRule.ID? = nil
     ) {
-        self.database = database
-        self.editingId = id
-        self.baseline = draft
+        let state = State()
+        let input = Input(editingId: id)
+        let output = Output(state: state)
+
+        input.baseline = output.draft
+
+        self.state = state
+        self.input = input
+        self.output = output
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension RewardRuleEditModel {
-    var amount: Int? {
-        calculator.amount > 0 ? calculator.amount : nil
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public var name = ""
+
+        public private(set) var calculator = AmountCalculator()
+
+        public let icon = SettingsIconEditorModel(glyph: .giftbox)
+
+        public func press(_ key: AmountCalculator.Key) {
+            calculator.press(key)
+        }
+
+        func apply(
+            _ rule: RewardRule,
+            icon saved: Icon
+        ) {
+            name = rule.name
+            calculator = AmountCalculator(amount: rule.amount)
+
+            icon.apply(saved)
+        }
     }
 
-    var draft: RewardRuleDraft {
-        RewardRuleDraft(
-            name: name,
-            amount: calculator.amount,
-            icon: icon.draft
-        )
+    @MainActor
+    @Observable
+    final class Input: SettingsEditHidingInput {
+        public internal(set) var isHidden = false
+        public internal(set) var hasLogs = false
+
+        var baseline: RewardRuleDraft?
+
+        let editingId: RewardRule.ID?
+
+        init(editingId: RewardRule.ID?) {
+            self.editingId = editingId
+        }
     }
 
-    func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+    @MainActor
+    final class Output {
+        let state: State
+
+        public var amount: Int? {
+            state.calculator.amount > 0 ? state.calculator.amount : nil
+        }
+
+        public var draft: RewardRuleDraft {
+            RewardRuleDraft(
+                name: state.name,
+                amount: state.calculator.amount,
+                icon: state.icon.draft
+            )
+        }
+
+        init(state: State) {
+            self.state = state
+        }
     }
 
     func load() async {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
 
         do {
-            let list = try await database.rewardRuleList()
+            let list = try await dependencies.database.rewardRuleList()
             let rule = list.rules.first { $0.id == editingId }
 
             guard
                 let rule,
                 let saved = list.icons[rule.iconId]
             else {
-                errorNotice.show(Self.loadFailedMessage)
+                state.errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
-            name = rule.name
-            calculator = AmountCalculator(amount: rule.amount)
+            state.apply(rule, icon: saved)
 
-            icon.apply(saved)
-
-            isHidden = !rule.isActive
-            hasLogs = list.total(of: rule) != nil
-            baseline = draft
+            input.isHidden = !rule.isActive
+            input.hasLogs = list.total(of: rule) != nil
+            input.baseline = output.draft
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func save() async -> Bool {
         do {
-            try await database.save(
-                draft,
-                editing: editingId,
-                at: Date()
+            try await dependencies.database.save(
+                output.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
             )
 
             return true
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
+    }
+}
+
+extension RewardRuleEditModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 
@@ -104,25 +150,25 @@ private extension RewardRuleEditModel {
 
 extension RewardRuleEditModel: SettingsEditRemoving {
     var edited: RewardRuleDraft {
-        draft
+        output.draft
     }
 
     var problemMessage: String? {
-        draft.problems.first?.message
+        output.draft.problems.first?.message
     }
 
     func remove(_ id: RewardRule.ID) async throws -> Deletion {
-        try await database.deleteRewardRule(id)
+        try await dependencies.database.deleteRewardRule(id)
     }
 
     func saveHidden(
         _ id: RewardRule.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setHidden(
+        try await dependencies.database.setHidden(
             id,
             isHidden: isHidden,
-            at: Date()
+            at: dependencies.clock.now
         )
     }
 }

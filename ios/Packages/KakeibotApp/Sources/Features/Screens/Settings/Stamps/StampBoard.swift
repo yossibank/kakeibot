@@ -53,7 +53,7 @@ extension StampBoard: SettingsBoardSpec {
     }
 
     func editModel(for destination: Destination) -> StampEditModel {
-        StampEditModel(database: database, editing: destination.editingID)
+        StampEditModel(database: database, clock: clock, editing: destination.editingID)
     }
 
     func intro(

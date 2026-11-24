@@ -29,7 +29,7 @@ public extension RecordsModel {
     }
 
     func rewardRuleEditModel() -> RewardRuleEditModel {
-        RewardRuleEditModel(database: database)
+        RewardRuleEditModel(database: database, clock: .system)
     }
 
     func toggleReward(

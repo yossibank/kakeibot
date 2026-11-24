@@ -7,146 +7,65 @@ import Store
 @MainActor
 @Observable
 public final class TemplateEditModel {
-    public var name: String
-    public var memo: String
-    public var billShift: Int
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public var walletId: Wallet.ID? {
-        didSet {
-            if walletId != oldValue {
-                billShift = 0
-            }
-        }
-    }
-
-    public var categoryId: EntryCategory.ID? {
-        didSet {
-            if categoryId != oldValue {
-                tagId = nil
-            }
-        }
-    }
-
-    public private(set) var tagId: EntryTag.ID?
-    public private(set) var type: Entry.Kind
-    public private(set) var calculator: AmountCalculator
-    public private(set) var options: EntryOptions?
-    public private(set) var cardBills: [Recurring] = []
-
-    public internal(set) var isHidden = false
-
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private(set) var baseline: EntryTemplateDraft?
-
-    let editingId: EntryTemplate.ID?
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         type: Entry.Kind,
         editing id: EntryTemplate.ID? = nil
     ) {
-        self.database = database
-        self.editingId = id
-        self.name = ""
-        self.type = type
-        self.calculator = AmountCalculator()
-        self.memo = ""
-        self.billShift = 0
+        let state = State(type: type)
+        let input = Input(editingId: id)
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         draft: EntryTemplateDraft
     ) {
-        self.database = database
-        self.editingId = nil
-        self.name = draft.name
-        self.type = draft.type
-        self.calculator = AmountCalculator(amount: draft.amount ?? 0)
-        self.categoryId = draft.categoryId
-        self.tagId = draft.tagId
-        self.walletId = draft.walletId
-        self.memo = draft.memo
-        self.billShift = draft.billShift
+        let state = State(type: draft.type)
+        let input = Input(editingId: nil)
+
+        state.apply(draft)
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension TemplateEditModel {
-    var amount: Int? {
-        calculator.amount > 0 ? calculator.amount : nil
-    }
+    @MainActor
+    @Observable
+    final class Input: SettingsEditHidingInput {
+        public internal(set) var isHidden = false
+        public internal(set) var options: EntryOptions?
+        public internal(set) var cardBills: [Recurring] = []
 
-    var typeName: String {
-        type == .income ? "収入" : "支出"
-    }
+        var baseline: EntryTemplateDraft?
 
-    var walletTitle: String {
-        type == .income ? "入金先" : "支払い元"
-    }
+        let editingId: EntryTemplate.ID?
 
-    var draft: EntryTemplateDraft {
-        EntryTemplateDraft(
-            name: name,
-            type: type,
-            amount: amount,
-            categoryId: categoryId,
-            tagId: tagId,
-            walletId: walletId,
-            memo: memo,
-            billShift: billRecurring == nil ? 0 : billShift
-        )
-    }
-
-    var billRecurring: Recurring? {
-        cardBills.cardBill(paidBy: walletId)
-    }
-
-    var categories: [EntryCategory] {
-        options?.categories(of: type) ?? []
-    }
-
-    var wallets: [Wallet] {
-        options?.wallets ?? []
-    }
-
-    var selectedCategory: EntryCategory? {
-        categories.first { $0.id == categoryId }
-    }
-
-    var selectedWallet: Wallet? {
-        wallets.first { $0.id == walletId }
-    }
-
-    var tags: [EntryTag] {
-        options?.tags(of: categoryId, keeping: tagId) ?? []
-    }
-
-    var selectedTag: EntryTag? {
-        tags.first { $0.id == tagId }
-    }
-
-    func icon(for category: EntryCategory) -> Icon? {
-        options?.icon(for: category)
-    }
-
-    func icon(for wallet: Wallet) -> Icon? {
-        options?.icon(for: wallet)
-    }
-
-    func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
-    }
-
-    func toggleTag(_ id: EntryTag.ID) {
-        tagId = tagId == id ? nil : id
+        init(editingId: EntryTemplate.ID?) {
+            self.editingId = editingId
+        }
     }
 
     func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
         CategoryEditModel(
-            database: database,
+            database: dependencies.database,
+            clock: dependencies.clock,
             kind: category.kind,
             editing: category.id
         )
@@ -154,89 +73,81 @@ public extension TemplateEditModel {
 
     func reloadTags() async {
         do {
-            options = try await database.entryOptions()
+            input.options = try await dependencies.database.entryOptions()
         } catch is CancellationError {
             return
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func load() async {
         do {
-            options = try await database.entryOptions()
-            cardBills = try await database.recurrings()
+            input.options = try await dependencies.database.entryOptions()
+            input.cardBills = try await dependencies.database.recurrings()
 
             try await loadTemplate()
 
-            if categoryId == nil {
-                categoryId = categories.first?.id
+            if state.categoryId == nil {
+                state.setCategory(output.categories.first?.id)
             }
 
-            if walletId == nil {
-                walletId = wallets.first?.id
+            if state.walletId == nil {
+                state.setWallet(output.wallets.first?.id)
             }
 
-            baseline = draft
+            input.baseline = output.draft
         } catch is CancellationError {
             return
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func save() async -> EntryTemplate? {
-        if let problem = draft.problems.first {
-            let text = message(for: problem)
-
-            errorNotice.show(text)
+        if let text = output.problemMessage {
+            state.errorNotice.show(text)
             return nil
         }
 
         do {
-            return try await database.saveTemplate(draft, editing: editingId, at: Date())
+            return try await dependencies.database.saveTemplate(
+                output.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
+    }
+}
+
+extension TemplateEditModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 
 private extension TemplateEditModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
 
-    func message(for problem: EntryTemplateDraft.Problem) -> String {
-        switch problem {
-        case .emptyName: "名前を入れてください"
-        case .missingCategory: "カテゴリを選んでください"
-        case .missingWallet: "\(walletTitle)を選んでください"
-        case .amountNotPositive, .transfer: SettingsEditMessage.saveFailed
-        }
-    }
-
     func loadTemplate() async throws {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
 
-        let templates = try await database.templates(includingHidden: true)
+        let templates = try await dependencies.database.templates(includingHidden: true)
         let template = templates.first { $0.id == editingId }
 
         guard let template else {
             throw AppDatabase.TemplateWriteError.templateNotFound
         }
 
-        let draft = EntryTemplateDraft(template)
+        input.isHidden = template.archivedAt != nil
 
-        isHidden = template.archivedAt != nil
-        name = draft.name
-        type = draft.type
-        calculator = AmountCalculator(amount: draft.amount ?? 0)
-        categoryId = draft.categoryId
-        tagId = draft.tagId
-        walletId = draft.walletId
-        memo = draft.memo
-        billShift = draft.billShift
+        state.apply(EntryTemplateDraft(template))
     }
 }
 
@@ -244,21 +155,25 @@ extension TemplateEditModel: SettingsEditRemoving {
     static let deleteFailedMessage = SettingsEditMessage.saveFailed
 
     var edited: EntryTemplateDraft {
-        draft
+        output.draft
     }
 
     var problemMessage: String? {
-        draft.problems.first.map(message)
+        output.problemMessage
     }
 
     func remove(_ id: EntryTemplate.ID) async throws -> Deletion {
-        try await database.deleteTemplate(id)
+        try await dependencies.database.deleteTemplate(id)
     }
 
     func saveHidden(
         _ id: EntryTemplate.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setHidden(id, isHidden: isHidden, at: Date())
+        try await dependencies.database.setHidden(
+            id,
+            isHidden: isHidden,
+            at: dependencies.clock.now
+        )
     }
 }

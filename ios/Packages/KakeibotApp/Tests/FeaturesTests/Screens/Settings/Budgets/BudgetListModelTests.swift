@@ -14,32 +14,32 @@ struct BudgetListModelTests {
         let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
-        let food = try #require(model.categories.first)
-        let emptyTitle = model.saveTitle
+        let food = try #require(model.output.categories.first)
+        let emptyTitle = model.output.saveTitle
 
         model.startEditing(.total)
-        model.press(.digit(1))
-        model.press(.digit(2))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
-        let title = model.saveTitle
+        model.state.press(.digit(1))
+        model.state.press(.digit(2))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
+        let title = model.output.saveTitle
         await model.save()
 
         model.startEditing(.category(food))
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
         await model.save()
         let budgets = try await setup.database.budgets()
 
-        #expect(model.month == YearMonth(year: 2026, month: 11))
+        #expect(model.input.month == YearMonth(year: 2026, month: 11))
         #expect(emptyTitle == "金額を入れてください")
         #expect(title == "11月からこの額にする")
-        #expect(model.totalAmount == 120_000)
-        #expect(model.amount(for: food.id) == 30000)
-        #expect(model.categoriesTotal == 30000)
-        #expect(model.editing == nil)
-        #expect(budgets.allSatisfy { $0.fromMonth == model.month })
+        #expect(model.output.totalAmount == 120_000)
+        #expect(model.output.amount(for: food.id) == 30000)
+        #expect(model.output.categoriesTotal == 30000)
+        #expect(model.state.editing == nil)
+        #expect(budgets.allSatisfy { $0.fromMonth == model.input.month })
     }
 
     @Test
@@ -51,9 +51,9 @@ struct BudgetListModelTests {
 
         await model.load()
         model.startEditing(.total)
-        let current = model.calculator.amount
+        let current = model.state.calculator.amount
         let cleared = try #require(await model.clear())
-        let afterClear = model.totalAmount
+        let afterClear = model.output.totalAmount
 
         await model.restore(cleared)
         let budgets = try await setup.database.budgets()
@@ -61,7 +61,7 @@ struct BudgetListModelTests {
         #expect(current == 50000)
         #expect(afterClear == nil)
         #expect(cleared.target.title == "月全体の予算")
-        #expect(model.totalAmount == 50000)
+        #expect(model.output.totalAmount == 50000)
         #expect(budgets.count == 1)
     }
 
@@ -79,7 +79,7 @@ struct BudgetListModelTests {
         await model.restore(cleared)
         let budgets = try await setup.database.budgets()
 
-        #expect(model.totalAmount == 30000)
+        #expect(model.output.totalAmount == 30000)
         #expect(budgets.map(\.fromMonth) == [earlier])
     }
 
@@ -91,25 +91,25 @@ struct BudgetListModelTests {
         let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
-        let food = try #require(model.categories.first)
+        let food = try #require(model.output.categories.first)
         model.startEditing(.category(food))
-        model.press(.digit(1))
-        model.press(.digit(0))
-        model.press(.doubleZero)
-        model.press(.digit(0))
+        model.state.press(.digit(1))
+        model.state.press(.digit(0))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
         await model.finishEditing()
-        let usage = try #require(model.usage(for: food.id))
+        let usage = try #require(model.output.usage(for: food.id))
 
         model.startEditing(.total)
         await model.finishEditing()
 
-        #expect(model.amount(for: food.id) == 10000)
+        #expect(model.output.amount(for: food.id) == 10000)
         #expect(usage.spent == 9000)
         #expect(usage.remaining == 1000)
         #expect(usage.isNearLimit)
-        #expect(model.spent(for: nil) == 9000)
-        #expect(model.totalAmount == nil)
-        #expect(model.editing == nil)
+        #expect(model.output.spent(for: nil) == 9000)
+        #expect(model.output.totalAmount == nil)
+        #expect(model.state.editing == nil)
     }
 
     @Test
@@ -119,22 +119,22 @@ struct BudgetListModelTests {
         let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
-        let closed = model.isChanged
+        let closed = model.output.isChanged
 
         model.startEditing(.total)
-        let opened = model.isChanged
+        let opened = model.output.isChanged
 
-        model.press(.digit(1))
-        let changed = model.isChanged
+        model.state.press(.digit(1))
+        let changed = model.output.isChanged
 
         model.cancelEditing()
-        let canceled = model.isChanged
+        let canceled = model.output.isChanged
 
         #expect(!closed)
         #expect(!opened)
         #expect(changed)
         #expect(!canceled)
-        #expect(model.totalAmount == 50000)
+        #expect(model.output.totalAmount == 50000)
     }
 
     @Test
@@ -143,20 +143,20 @@ struct BudgetListModelTests {
         let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
-        let initial = model.isCarryoverOn
+        let initial = model.output.isCarryoverOn
 
         await model.setCarryover(true)
         let stored = try await setup.database.setting(.budgetCarryoverFrom)
-        let enabled = model.isCarryoverOn
+        let enabled = model.output.isCarryoverOn
 
         await model.setCarryover(false)
         let cleared = try await setup.database.setting(.budgetCarryoverFrom)
 
         #expect(!initial)
-        #expect(stored == model.month)
+        #expect(stored == model.input.month)
         #expect(enabled)
         #expect(cleared == nil)
-        #expect(!model.isCarryoverOn)
+        #expect(!model.output.isCarryoverOn)
     }
 
     @Test
@@ -165,11 +165,11 @@ struct BudgetListModelTests {
         let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
-        let food = try #require(model.categories.first)
-        let total = try #require(model.usage(for: nil))
-        let category = try #require(model.usage(for: food.id))
+        let food = try #require(model.output.categories.first)
+        let total = try #require(model.output.usage(for: nil))
+        let category = try #require(model.output.usage(for: food.id))
 
-        #expect(model.carryover == 70000)
+        #expect(model.output.carryover == 70000)
         #expect(total.carryover == 70000)
         #expect(category.carryover == 0)
     }
@@ -180,9 +180,9 @@ struct BudgetListModelTests {
         let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
-        let start = model.carryoverFrom
+        let start = model.input.carryoverFrom
         let previous = try #require(await model.resetCarryover())
-        let reset = model.carryover
+        let reset = model.output.carryover
         let resetStart = try await setup.database.setting(.budgetCarryoverFrom)
 
         await model.restoreCarryover(from: previous)
@@ -190,8 +190,8 @@ struct BudgetListModelTests {
 
         #expect(previous == start)
         #expect(reset == 0)
-        #expect(resetStart == model.month)
-        #expect(model.carryover == 70000)
+        #expect(resetStart == model.input.month)
+        #expect(model.output.carryover == 70000)
         #expect(restoredStart == start)
     }
 
@@ -208,9 +208,9 @@ struct BudgetListModelTests {
         let stored = try await setup.database.setting(.budgetCarryoverFrom)
 
         #expect(off == nil)
-        #expect(model.carryover == 0)
+        #expect(model.output.carryover == 0)
         #expect(zero == nil)
-        #expect(stored == model.month)
+        #expect(stored == model.input.month)
     }
 
     @Test
@@ -224,22 +224,22 @@ struct BudgetListModelTests {
         let model = BudgetListModel(database: setup.database, today: setup.today)
 
         await model.load()
-        let closed = model.suggestions
+        let closed = model.output.suggestions
 
         model.startEditing(.total)
-        let total = model.suggestions
+        let total = model.output.suggestions
 
-        let food = try #require(model.categories.first)
+        let food = try #require(model.output.categories.first)
         model.startEditing(.category(food))
-        let category = model.suggestions
+        let category = model.output.suggestions
         let average = try #require(category.last)
-        model.choose(average)
+        model.state.choose(average)
 
         #expect(closed.isEmpty)
         #expect(total.map(\.title) == ["先月", "3 か月の平均", "固定費"])
         #expect(total.map(\.amount) == [48200, 44500, 82800])
         #expect(category.map(\.amount) == [48200, 44500])
-        #expect(model.calculator.amount == 44500)
+        #expect(model.state.calculator.amount == 44500)
     }
 
     @Test
@@ -252,7 +252,7 @@ struct BudgetListModelTests {
         await model.load()
         model.startEditing(.total)
 
-        #expect(model.suggestions.map(\.amount) == [30000, 25100])
+        #expect(model.output.suggestions.map(\.amount) == [30000, 25100])
     }
 
     @Test
@@ -264,7 +264,7 @@ struct BudgetListModelTests {
         await model.load()
         model.startEditing(.total)
 
-        #expect(model.suggestions.map(\.title) == ["先月"])
+        #expect(model.output.suggestions.map(\.title) == ["先月"])
     }
 
     @Test
@@ -274,20 +274,20 @@ struct BudgetListModelTests {
 
         await model.load()
         model.startEditing(.total)
-        let empty = model.suggestions
+        let empty = model.output.suggestions
 
         try await setup.saveRecurring(amount: 82800, day: 25)
         await model.load()
         model.startEditing(.total)
-        let total = model.suggestions
+        let total = model.output.suggestions
 
-        let food = try #require(model.categories.first)
+        let food = try #require(model.output.categories.first)
         model.startEditing(.category(food))
 
         #expect(empty.isEmpty)
         #expect(total.map(\.title) == ["固定費"])
         #expect(total.map(\.amount) == [82800])
-        #expect(model.suggestions.isEmpty)
+        #expect(model.output.suggestions.isEmpty)
     }
 }
 

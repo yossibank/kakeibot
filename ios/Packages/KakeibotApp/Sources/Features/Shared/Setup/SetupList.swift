@@ -50,7 +50,7 @@ private extension SetupList {
 
             Spacer()
 
-            if model.isDone(item) {
+            if model.output.isDone(item) {
                 Image(systemName: "checkmark")
                     .sansFont(.small, weight: .semibold)
                     .foregroundStyle(Palette.accent)
@@ -61,6 +61,6 @@ private extension SetupList {
         }
         .frame(minHeight: 48)
         .contentShape(.rect)
-        .animation(.snappy, value: model.isDone(item))
+        .animation(.snappy, value: model.output.isDone(item))
     }
 }

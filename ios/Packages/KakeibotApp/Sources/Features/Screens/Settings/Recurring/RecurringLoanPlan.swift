@@ -8,12 +8,12 @@ struct RecurringLoanPlan: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if let total = model.plannedTotal,
-               let end = model.scheduledEndDate {
+            if let total = model.output.plannedTotal,
+               let end = model.output.scheduledEndDate {
                 summary(total: total, end: end)
             }
 
-            if let finalAmount = model.finalAmount {
+            if let finalAmount = model.output.finalAmount {
                 HStack {
                     Text("最後の回")
                         .textFont(.caption)
@@ -42,24 +42,24 @@ private extension RecurringLoanPlan {
     }
 
     var noteText: String? {
-        if model.usesAutoCount,
-           let owed = model.loanOwed {
+        if model.output.usesAutoCount,
+           let owed = model.output.loanOwed {
             return "残高 \(Yen.text(owed)) から回数と最後の回を出しています"
         }
 
-        guard let plan = model.autoPlan else {
+        guard let plan = model.output.autoPlan else {
             return nil
         }
 
-        if let gap = model.balanceGap {
+        if let gap = model.output.balanceGap {
             return "残高と \(Yen.text(abs(gap))) ずれています"
         }
 
-        return model.plannedTotal == nil ? "残高から出すと、あと \(plan.count) 回で終わります" : nil
+        return model.output.plannedTotal == nil ? "残高から出すと、あと \(plan.count) 回で終わります" : nil
     }
 
     var canMatch: Bool {
-        !model.usesAutoCount && model.autoPlan != nil
+        !model.output.usesAutoCount && model.output.autoPlan != nil
     }
 
     @ViewBuilder
@@ -68,8 +68,10 @@ private extension RecurringLoanPlan {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(noteText)
                     .textFont(.caption)
-                    .foregroundStyle(model.balanceGap == nil ? Palette.subtext : Palette.amber)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .foregroundStyle(model.output.balanceGap == nil
+                        ? Palette.subtext
+                        : Palette.amber)
+                        .fixedSize(horizontal: false, vertical: true)
 
                 Spacer(minLength: 0)
 

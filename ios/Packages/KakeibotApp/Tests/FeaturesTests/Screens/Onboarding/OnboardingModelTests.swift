@@ -20,7 +20,7 @@ struct OnboardingModelTests {
         await model.monthStart.choose(payday)
         model.next()
         await model.refreshPage()
-        let budgetMonth = model.budget.month
+        let budgetMonth = model.budget.input.month
         model.back()
         let back = model.page
         model.next()

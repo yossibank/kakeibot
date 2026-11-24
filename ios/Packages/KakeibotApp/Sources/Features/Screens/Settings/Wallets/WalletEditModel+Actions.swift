@@ -8,7 +8,7 @@ public extension WalletEditModel {
     }
 
     func saveValuation() async -> Bool {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return false
         }
 
@@ -24,7 +24,7 @@ public extension WalletEditModel {
             await loadBalance()
             return true
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
@@ -35,7 +35,7 @@ public extension WalletEditModel {
             await loadBalance()
             return deletion
         } catch {
-            errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
             return nil
         }
     }
@@ -45,12 +45,12 @@ public extension WalletEditModel {
             try await dependencies.database.restore(deletion)
             await loadBalance()
         } catch {
-            errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.errorNotice.show(Self.restoreFailedMessage, for: error)
         }
     }
 
     func loadBalance() async {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
 
@@ -68,12 +68,12 @@ public extension WalletEditModel {
             input.baseline?.recordedKind = input.recordedKind
             input.baseline?.hasValuations = input.hasValuations
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func load() async {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
 
@@ -84,7 +84,7 @@ public extension WalletEditModel {
                 let wallet = list.wallets[editingId],
                 let icon = list.icons[wallet.iconId]
             else {
-                errorNotice.show(Self.loadFailedMessage)
+                state.errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
@@ -100,12 +100,12 @@ public extension WalletEditModel {
 
             await loadPayment()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func loadPayment() async {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
 
@@ -114,16 +114,17 @@ public extension WalletEditModel {
                 recurring.type == .transfer && recurring.toWalletId == editingId
             }
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func paymentModel(for id: Wallet.ID? = nil) -> RecurringEditModel {
         RecurringEditModel(
             database: dependencies.database,
+            clock: dependencies.clock,
             today: dependencies.clock.today,
             editing: input.payment?.id,
-            paying: id ?? editingId
+            paying: id ?? input.editingId
         )
     }
 
@@ -131,17 +132,17 @@ public extension WalletEditModel {
         do {
             return try await dependencies.database.save(
                 output.draft,
-                editing: editingId,
+                editing: input.editingId,
                 at: dependencies.clock.now
             )
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }
 
     func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return false
         }
 
@@ -154,16 +155,16 @@ public extension WalletEditModel {
             input.isHidden = isHidden
             return true
         } catch AppDatabase.WalletWriteError.lastShownWallet {
-            errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
+            state.errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
             return false
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
 
     func delete() async -> Deletion? {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return nil
         }
 
@@ -174,7 +175,7 @@ public extension WalletEditModel {
             )
         } catch {
             let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
-            errorNotice.show(message, for: error)
+            state.errorNotice.show(message, for: error)
             return nil
         }
     }

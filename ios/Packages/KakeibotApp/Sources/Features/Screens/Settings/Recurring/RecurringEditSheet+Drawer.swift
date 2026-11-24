@@ -9,17 +9,20 @@ extension RecurringEditSheet {
         switch panel {
         case .amount:
             VStack(spacing: 12) {
-                SettingsKeypadValue(model.amount)
+                SettingsKeypadValue(model.output.amount)
 
-                Keypad(calculator: model.calculator) {
+                Keypad(calculator: model.state.calculator) {
                     closePanel()
                 } onKey: { key in
-                    model.press(key)
+                    model.state.press(key)
                 }
             }
 
         case .start:
-            MonthCalendar(selection: $model.startDate, today: model.today)
+            MonthCalendar(
+                selection: Bindable(model.state).schedule.startDate,
+                today: model.input.today
+            )
 
         case .end:
             endChooser
@@ -32,16 +35,19 @@ extension RecurringEditSheet {
 
         case .fee:
             VStack(spacing: 12) {
-                SettingsKeypadValue(model.fee)
+                SettingsKeypadValue(model.output.fee)
 
-                FeeChoiceRow(choices: FeeChoiceRow.defaultChoices, selection: model.fee) { amount in
-                    model.setFee(amount)
+                FeeChoiceRow(
+                    choices: FeeChoiceRow.defaultChoices,
+                    selection: model.output.fee
+                ) { amount in
+                    model.state.setFee(amount)
                 }
 
-                Keypad(calculator: model.feeCalculator) {
+                Keypad(calculator: model.state.feeCalculator) {
                     closePanel()
                 } onKey: { key in
-                    model.pressFee(key)
+                    model.state.pressFee(key)
                 }
             }
 
@@ -51,7 +57,7 @@ extension RecurringEditSheet {
 
                 countValue
 
-                Keypad(calculator: model.repayment.countCalculator) {
+                Keypad(calculator: model.state.repayment.countCalculator) {
                     closePanel()
                 } onKey: { key in
                     model.pressCount(key)
@@ -67,14 +73,14 @@ extension RecurringEditSheet {
 private extension RecurringEditSheet {
     var countValue: some View {
         VStack(spacing: 4) {
-            Text("\(model.repayment.countCalculator.amount) 回")
+            Text("\(model.state.repayment.countCalculator.amount) 回")
                 .displayFont(.largeTitle, weight: .bold)
                 .monospacedDigit()
                 .foregroundStyle(Palette.accentStrong)
                 .contentTransition(.numericText())
-                .animation(.snappy, value: model.repayment.countCalculator.amount)
+                .animation(.snappy, value: model.state.repayment.countCalculator.amount)
 
-            Text(model.scheduledEndDate
+            Text(model.output.scheduledEndDate
                 .map { "終わり \(RecurringText.date($0))" } ?? "回数を入れると、終わりの日が決まります")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
@@ -83,23 +89,23 @@ private extension RecurringEditSheet {
 
     @ViewBuilder
     var countChoices: some View {
-        if let plan = model.autoPlan,
-           let owed = model.loanOwed {
+        if let plan = model.output.autoPlan,
+           let owed = model.output.loanOwed {
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
-                    SettingsChoice("残高から自動", isSelected: model.usesAutoCount) {
-                        model.useAutoCount()
+                    SettingsChoice("残高から自動", isSelected: model.output.usesAutoCount) {
+                        model.state.repayment.useAutoCount()
                         model.prepareCount()
                     }
 
-                    SettingsChoice("決めない", isSelected: model.scheduledEndDate == nil) {
+                    SettingsChoice("決めない", isSelected: model.output.scheduledEndDate == nil) {
                         model.setEnd(nil)
                         closePanel()
                     }
                 }
 
                 Text(
-                    "残高 \(Yen.text(owed)) ÷ \(Yen.text(model.amount)) で \(plan.count) 回。端数は最後の回に足します"
+                    "残高 \(Yen.text(owed)) ÷ \(Yen.text(model.output.amount)) で \(plan.count) 回。端数は最後の回に足します"
                 )
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
@@ -111,18 +117,18 @@ private extension RecurringEditSheet {
     var endChooser: some View {
         VStack(spacing: 12) {
             HStack(spacing: 8) {
-                SettingsChoice("終わりなし", isSelected: model.scheduledEndDate == nil) {
+                SettingsChoice("終わりなし", isSelected: model.output.scheduledEndDate == nil) {
                     model.setEnd(nil)
                     closePanel()
                 }
 
                 SettingsChoice("今日で終える", isSelected: isEndingToday) {
-                    model.setEnd(model.today)
+                    model.setEnd(model.input.today)
                     closePanel()
                 }
             }
 
-            MonthCalendar(selection: endBinding, today: model.today)
+            MonthCalendar(selection: endBinding, today: model.input.today)
         }
     }
 
@@ -137,9 +143,9 @@ private extension RecurringEditSheet {
                 ForEach(HolidayShift.allCases, id: \.self) { shift in
                     SettingsChoice(
                         shift.title,
-                        isSelected: model.holidayShift == shift
+                        isSelected: model.state.schedule.holidayShift == shift
                     ) {
-                        model.choose(shift)
+                        model.state.schedule.choose(shift)
                         closePanel()
                     }
                 }
@@ -155,13 +161,16 @@ private extension RecurringEditSheet {
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
-            SettingsChoice(RecurringText.closingDay(nil), isSelected: model.closingDay == nil) {
-                model.closingDay = nil
+            SettingsChoice(
+                RecurringText.closingDay(nil),
+                isSelected: model.state.schedule.closingDay == nil
+            ) {
+                model.state.schedule.closingDay = nil
                 closePanel()
             }
 
             MonthStartDayGrid(selection: closingDaySelection) { day in
-                model.closingDay = day.day
+                model.state.schedule.closingDay = day.day
                 closePanel()
             }
         }
@@ -173,9 +182,9 @@ private extension RecurringEditSheet {
             ForEach(RecurringEditModel.remindChoices, id: \.self) { days in
                 SettingsChoice(
                     RecurringText.remind(days),
-                    isSelected: model.remindDaysBefore == days
+                    isSelected: model.state.schedule.remindDaysBefore == days
                 ) {
-                    model.remindDaysBefore = days
+                    model.state.schedule.remindDaysBefore = days
                     closePanel()
                 }
             }
@@ -194,16 +203,16 @@ private extension RecurringEditSheet {
     )
 
     var closingDaySelection: MonthStartDay? {
-        model.closingDay.flatMap { MonthStartDay($0) }
+        model.state.schedule.closingDay.flatMap { MonthStartDay($0) }
     }
 
     var isEndingToday: Bool {
-        model.scheduledEndDate == model.today
+        model.output.scheduledEndDate == model.input.today
     }
 
     var endBinding: Binding<LocalDate> {
         Binding {
-            model.scheduledEndDate ?? model.startDate
+            model.output.scheduledEndDate ?? model.state.schedule.startDate
         } set: { date in
             model.setEnd(date)
         }

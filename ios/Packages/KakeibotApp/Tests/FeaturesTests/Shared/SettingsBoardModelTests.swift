@@ -101,10 +101,10 @@ extension SettingsBoardModelTests {
     struct Output: SettingsBoardOutput {
         let state: SettingsBoardMovingState<String>
         let items: [Item]
-        let hidden: Set<String>
+        let hiddenIDs: Set<String>
 
         func isHidden(_ item: Item) -> Bool {
-            hidden.contains(item.id)
+            hiddenIDs.contains(item.id)
         }
     }
 
@@ -135,7 +135,7 @@ extension SettingsBoardModelTests {
             self.output = Output(
                 state: state,
                 items: (visible + hidden).map(Item.init),
-                hidden: Set(hidden)
+                hiddenIDs: Set(hidden)
             )
             self.inUse = inUse
             self.failing = failing

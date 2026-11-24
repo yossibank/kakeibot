@@ -20,6 +20,10 @@ extension RecurringBoard: SettingsBoardSpec {
         model.dependencies.database
     }
 
+    var clock: ScreenClock {
+        model.dependencies.clock
+    }
+
     var screen: SettingsScreen {
         .recurrings
     }
@@ -87,6 +91,7 @@ extension RecurringBoard: SettingsBoardSpec {
         case let .new(type):
             RecurringEditModel(
                 database: database,
+                clock: clock,
                 today: model.input.today,
                 type: type,
                 editing: nil
@@ -95,6 +100,7 @@ extension RecurringBoard: SettingsBoardSpec {
         case let .edit(type, id):
             RecurringEditModel(
                 database: database,
+                clock: clock,
                 today: model.input.today,
                 type: type,
                 editing: id

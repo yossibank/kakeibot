@@ -9,7 +9,7 @@ extension ThemeListView {
         title: String,
         theme: Theme?
     ) -> some View {
-        let isCurrent = choice == model.current
+        let isCurrent = choice == model.input.current
         let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
         let scale: CGFloat = pressing == choice ? 0.94 : 1
 
@@ -89,7 +89,7 @@ private extension ThemeListView {
         theme: Theme?
     ) {
         if let theme,
-           choice == model.current {
+           choice == model.input.current {
             editing = .edit(theme)
         } else {
             select(choice)

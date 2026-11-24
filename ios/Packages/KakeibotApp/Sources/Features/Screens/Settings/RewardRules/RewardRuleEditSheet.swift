@@ -39,7 +39,7 @@ public struct RewardRuleEditSheet: View {
             }
             .iconEditorDrawer(
                 isPresented: $isEditingIcon,
-                model: model.icon,
+                model: model.state.icon,
                 focus: $focus,
                 textField: .text,
                 below: iconBottom
@@ -48,8 +48,8 @@ public struct RewardRuleEditSheet: View {
                 SettingsEditHeader(
                     title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
                     isEditing: model.isEditing,
-                    isHidden: model.isHidden,
-                    canDelete: !(model.isHidden && model.hasLogs)
+                    isHidden: model.input.isHidden,
+                    canDelete: !(model.input.isHidden && model.input.hasLogs)
                 ) {
                     edit.close()
                 } onHide: {
@@ -67,7 +67,7 @@ public struct RewardRuleEditSheet: View {
                         focus = nil
                     }
             }
-            .errorBanner($model.errorNotice)
+            .errorBanner(Bindable(model.state).errorNotice)
             .settingsEditConfirmations(edit)
             .confirmation(
                 isPresented: $isConfirmingDelete,
@@ -78,7 +78,7 @@ public struct RewardRuleEditSheet: View {
                 confirmTitle: deleteConfirmTitle,
                 role: deleteRole
             ) {
-                if model.hasLogs {
+                if model.input.hasLogs {
                     edit.toggleHidden()
                 } else {
                     Task {
@@ -107,9 +107,9 @@ private extension RewardRuleEditSheet {
                     isEditingIcon = true
                 } label: {
                     RewardRuleTile(
-                        icon: model.icon.preview,
-                        name: model.name.isEmpty ? "名前" : model.name,
-                        amount: model.amount ?? 0,
+                        icon: model.state.icon.preview,
+                        name: model.state.name.isEmpty ? "名前" : model.state.name,
+                        amount: model.output.amount ?? 0,
                         total: nil,
                         isHidden: false
                     )
@@ -136,7 +136,7 @@ private extension RewardRuleEditSheet {
 
             SettingsField(
                 "自炊した日など",
-                text: $model.name,
+                text: Bindable(model.state).name,
                 focus: $focus,
                 field: .name
             )
@@ -145,9 +145,9 @@ private extension RewardRuleEditSheet {
                 SettingsFormCard {
                     SettingsFormSection("金額") {
                         SettingsAmountButton(
-                            amount: model.amount ?? 0,
+                            amount: model.output.amount ?? 0,
                             text: amountPrompt,
-                            isEmpty: (model.amount ?? 0) == 0
+                            isEmpty: (model.output.amount ?? 0) == 0
                         ) {
                             open(.amount)
                         }
@@ -175,10 +175,10 @@ private extension RewardRuleEditSheet {
             closePanel()
         } content: {
             VStack(spacing: 12) {
-                Keypad(calculator: model.calculator) {
+                Keypad(calculator: model.state.calculator) {
                     closePanel()
                 } onKey: { key in
-                    model.press(key)
+                    model.state.press(key)
                 }
             }
         }
@@ -196,27 +196,27 @@ private extension RewardRuleEditSheet {
     }
 
     var amountPrompt: String? {
-        model.amount == nil ? "金額を入れる" : nil
+        model.output.amount == nil ? "金額を入れる" : nil
     }
 
     var deleteImage: String {
-        model.hasLogs ? "eye.slash" : "trash"
+        model.input.hasLogs ? "eye.slash" : "trash"
     }
 
     var deleteTitle: String {
-        model.hasLogs ? "この決まりは削除できません" : "この決まりを削除しますか"
+        model.input.hasLogs ? "この決まりは削除できません" : "この決まりを削除しますか"
     }
 
     var deleteMessage: String? {
-        model.hasLogs ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます" : nil
+        model.input.hasLogs ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます" : nil
     }
 
     var deleteConfirmTitle: String {
-        model.hasLogs ? "非表示にする" : "削除する"
+        model.input.hasLogs ? "非表示にする" : "削除する"
     }
 
     var deleteRole: ConfirmCard.Role {
-        model.hasLogs ? .suggestion : .destructive
+        model.input.hasLogs ? .suggestion : .destructive
     }
 
     var edit: SettingsEditController<RewardRuleEditModel> {
@@ -260,7 +260,7 @@ extension RewardRuleEditModel: SettingsEditing {}
 
 #Preview {
     if let database = try? AppDatabase.inMemory() {
-        RewardRuleEditSheet(model: RewardRuleEditModel(database: database))
+        RewardRuleEditSheet(model: RewardRuleEditModel(database: database, clock: .system))
     }
 }
 

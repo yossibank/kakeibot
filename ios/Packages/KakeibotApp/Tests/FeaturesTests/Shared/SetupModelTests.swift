@@ -17,17 +17,17 @@ struct SetupModelTests {
         }
 
         try await Self.wait {
-            model.isLoaded
+            model.output.isLoaded
         }
 
-        let shownBefore = model.showsCard
+        let shownBefore = model.output.showsCard
         await model.closeCard()
         let closed = try await database.setting(.setupCardClosed)
         task.cancel()
 
         #expect(shownBefore)
-        #expect(model.cardItems == SetupItem.home)
-        #expect(model.showsCard == false)
+        #expect(model.output.cardItems == SetupItem.home)
+        #expect(model.output.showsCard == false)
         #expect(closed)
     }
 
@@ -40,7 +40,7 @@ struct SetupModelTests {
         }
 
         try await Self.wait {
-            model.isLoaded && !model.isEntryOpened
+            model.output.isLoaded && !model.input.isEntryOpened
         }
 
         await model.markEntryOpened()
@@ -62,7 +62,7 @@ struct SetupModelTests {
         }
 
         try await Self.wait {
-            model.hasUnreadNews
+            model.output.hasUnreadNews
         }
 
         await model.markNewsSeen()
@@ -70,7 +70,7 @@ struct SetupModelTests {
         task.cancel()
 
         #expect(seen == WhatsNewRelease.latestVersion)
-        #expect(model.hasUnreadNews == false)
+        #expect(model.output.hasUnreadNews == false)
         #expect(model.errorNotice.message == nil)
     }
 
@@ -84,12 +84,12 @@ struct SetupModelTests {
         }
 
         try await Self.wait {
-            model.seenNewsVersion != nil
+            model.output.seenNewsVersion != nil
         }
 
         task.cancel()
 
-        #expect(model.hasUnreadNews == false)
+        #expect(model.output.hasUnreadNews == false)
     }
 
     @Test
@@ -102,7 +102,7 @@ struct SetupModelTests {
         }
 
         try await Self.wait {
-            model.seenNewsVersion != nil
+            model.output.seenNewsVersion != nil
         }
 
         await model.markNewsSeen()
@@ -110,7 +110,7 @@ struct SetupModelTests {
         task.cancel()
 
         #expect(seen == "999.0")
-        #expect(model.hasUnreadNews == false)
+        #expect(model.output.hasUnreadNews == false)
     }
 
     @Test

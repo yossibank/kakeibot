@@ -10,28 +10,28 @@ struct RecurringEditModelTests {
     func warnsThatRemindersCannotArriveWhenDenied() async throws {
         let setup = try await HomeModelTests.Setup()
         let client = ReminderModelTests.FakePermission(authorization: .denied)
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
 
         await model.refreshAuthorization(client.permission)
-        let withoutReminder = model.isNotificationDenied
-        model.remindDaysBefore = 1
+        let withoutReminder = model.output.isNotificationDenied
+        model.state.schedule.remindDaysBefore = 1
 
         #expect(withoutReminder == false)
-        #expect(model.isNotificationDenied)
+        #expect(model.output.isNotificationDenied)
     }
 
     @Test
     func doesNotWarnWhenRemindersAreAllowed() async throws {
         let setup = try await HomeModelTests.Setup()
         let client = ReminderModelTests.FakePermission(authorization: .allowed)
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        model.remindDaysBefore = 1
+        model.state.schedule.remindDaysBefore = 1
 
         await model.refreshAuthorization(client.permission)
 
-        #expect(model.isNotificationDenied == false)
+        #expect(model.output.isNotificationDenied == false)
     }
 
     @Test
@@ -40,16 +40,17 @@ struct RecurringEditModelTests {
 
         let model = RecurringEditModel(
             database: setup.database,
+            clock: .system,
             today: setup.today,
             type: .transfer
         )
 
         await model.load()
 
-        #expect(model.type == .transfer)
-        #expect(model.categoryId == nil)
-        #expect(model.toWalletId != nil)
-        #expect(model.toWalletId != model.walletId)
+        #expect(model.state.type == .transfer)
+        #expect(model.state.categoryId == nil)
+        #expect(model.state.toWalletId != nil)
+        #expect(model.state.toWalletId != model.state.walletId)
         #expect(model.isChanged == false)
     }
 
@@ -57,9 +58,9 @@ struct RecurringEditModelTests {
     func opensScheduleWhenAddingRecurring() async throws {
         let setup = try await HomeModelTests.Setup()
 
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
 
-        #expect(model.isScheduleOpen)
+        #expect(model.state.isScheduleOpen)
     }
 
     @Test
@@ -68,20 +69,21 @@ struct RecurringEditModelTests {
 
         let model = RecurringEditModel(
             database: setup.database,
+            clock: .system,
             today: setup.today,
             editing: Recurring.ID()
         )
 
-        #expect(!model.isScheduleOpen)
+        #expect(!model.state.isScheduleOpen)
     }
 
     @Test
     func doesNotCountClosingScheduleAsChange() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
 
-        model.isScheduleOpen = false
+        model.state.isScheduleOpen = false
 
         #expect(model.isChanged == false)
     }
@@ -90,16 +92,16 @@ struct RecurringEditModelTests {
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
-        model.press(.digit(7))
-        model.press(.digit(8))
-        model.press(.doubleZero)
-        model.press(.digit(0))
-        model.memo = "家賃"
-        model.day = 27
-        model.startDate = start
+        model.state.press(.digit(7))
+        model.state.press(.digit(8))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
+        model.state.memo = "家賃"
+        model.state.schedule.day = 27
+        model.state.schedule.startDate = start
         let saved = await model.save()
         let snapshot = try setup.database.snapshot()
 
@@ -114,19 +116,23 @@ struct RecurringEditModelTests {
         let setup = try await RecordsModelTests.Setup()
         let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
 
-        let without = RecurringEditModel(database: setup.database, today: setup.today)
+        let without = RecurringEditModel(
+            database: setup.database,
+            clock: .system,
+            today: setup.today
+        )
         await without.load()
-        without.press(.digit(5))
-        without.memo = "家賃"
+        without.state.press(.digit(5))
+        without.state.memo = "家賃"
 
         _ = await without.save(permission: client.permission)
         let askedWithout = await client.requested
 
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        model.press(.digit(5))
-        model.memo = "保険"
-        model.remindDaysBefore = 1
+        model.state.press(.digit(5))
+        model.state.memo = "保険"
+        model.state.schedule.remindDaysBefore = 1
 
         let saved = await model.save(permission: client.permission)
         let asked = await client.requested
@@ -141,18 +147,18 @@ struct RecurringEditModelTests {
     @Test
     func suggestsHolidayShiftFromCategory() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
         model.select(.income)
-        let salary = model.holidayShift
+        let salary = model.state.schedule.holidayShift
 
         model.select(.transfer)
-        let transfer = model.holidayShift
+        let transfer = model.state.schedule.holidayShift
 
-        model.choose(.none)
+        model.state.schedule.choose(.none)
         model.select(.income)
-        let chosen = model.holidayShift
+        let chosen = model.state.schedule.holidayShift
 
         #expect(salary == .previous)
         #expect(transfer == .next)
@@ -175,19 +181,20 @@ struct RecurringEditModelTests {
 
         let model = RecurringEditModel(
             database: setup.database,
+            clock: .system,
             today: setup.today,
             paying: card.id
         )
 
         await model.load()
 
-        #expect(model.type == .transfer)
-        #expect(model.toWalletId == card.id)
-        #expect(model.selectedWallet?.kind == .bank)
-        #expect(model.isCardBill)
-        #expect(model.closingDay == 31)
-        #expect(model.day == 27)
-        #expect(model.memo == "カード")
+        #expect(model.state.type == .transfer)
+        #expect(model.state.toWalletId == card.id)
+        #expect(model.output.selectedWallet?.kind == .bank)
+        #expect(model.output.isCardBill)
+        #expect(model.state.schedule.closingDay == 31)
+        #expect(model.state.schedule.day == 27)
+        #expect(model.state.memo == "カード")
         #expect(model.canSave)
     }
 
@@ -207,17 +214,18 @@ struct RecurringEditModelTests {
 
         let model = RecurringEditModel(
             database: setup.database,
+            clock: .system,
             today: setup.today,
             paying: loan.id
         )
 
         await model.load()
 
-        #expect(model.type == .transfer)
-        #expect(model.toWalletId == loan.id)
-        #expect(!model.isCardBill)
-        #expect(model.closingDay == nil)
-        #expect(model.memo == "奨学金の返済")
+        #expect(model.state.type == .transfer)
+        #expect(model.state.toWalletId == loan.id)
+        #expect(!model.output.isCardBill)
+        #expect(model.state.schedule.closingDay == nil)
+        #expect(model.state.memo == "奨学金の返済")
         #expect(!model.canSave)
     }
 
@@ -226,14 +234,14 @@ struct RecurringEditModelTests {
         let model = try await Self.loanModel()
         let end = try #require(LocalDate("2046-09-27"))
 
-        #expect(model.isLoanRepayment)
-        #expect(model.usesAutoCount)
-        #expect(model.scheduledEndDate == end)
-        #expect(model.repaymentCount == 240)
-        #expect(model.plannedTotal == 3_896_752)
-        #expect(model.balanceGap == nil)
-        #expect(model.draft.endDate == end)
-        #expect(model.draft.finalAmount == 16587)
+        #expect(model.output.isLoanRepayment)
+        #expect(model.output.usesAutoCount)
+        #expect(model.output.scheduledEndDate == end)
+        #expect(model.output.repaymentCount == 240)
+        #expect(model.output.plannedTotal == 3_896_752)
+        #expect(model.output.balanceGap == nil)
+        #expect(model.output.draft.endDate == end)
+        #expect(model.output.draft.finalAmount == 16587)
     }
 
     @Test
@@ -244,10 +252,10 @@ struct RecurringEditModelTests {
         model.pressCount(.delete)
         model.pressCount(.digit(1))
 
-        #expect(!model.usesAutoCount)
-        #expect(model.repaymentCount == 241)
-        #expect(model.draft.finalAmount == 352)
-        #expect(model.balanceGap == nil)
+        #expect(!model.output.usesAutoCount)
+        #expect(model.output.repaymentCount == 241)
+        #expect(model.output.draft.finalAmount == 352)
+        #expect(model.output.balanceGap == nil)
     }
 
     @Test
@@ -260,35 +268,35 @@ struct RecurringEditModelTests {
         model.pressCount(.digit(3))
         model.pressCount(.digit(9))
 
-        #expect(model.repaymentCount == 239)
-        #expect(model.draft.finalAmount == 0)
-        #expect(model.balanceGap == -16587)
+        #expect(model.output.repaymentCount == 239)
+        #expect(model.output.draft.finalAmount == 0)
+        #expect(model.output.balanceGap == -16587)
 
-        model.useAutoCount()
+        model.state.repayment.useAutoCount()
 
-        #expect(model.repaymentCount == 240)
-        #expect(model.balanceGap == nil)
+        #expect(model.output.repaymentCount == 240)
+        #expect(model.output.balanceGap == nil)
     }
 
     @Test
     func savesTransferBetweenWallets() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
         model.select(.transfer)
-        model.press(.digit(3))
-        model.press(.digit(0))
-        model.press(.doubleZero)
-        model.press(.digit(0))
-        model.day = 26
-        model.startDate = start
+        model.state.press(.digit(3))
+        model.state.press(.digit(0))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
+        model.state.schedule.day = 26
+        model.state.schedule.startDate = start
         let saved = await model.save()
         let entry = try #require(setup.database.snapshot().entries.first)
 
         #expect(saved)
-        #expect(model.walletTitle == "振替元")
+        #expect(model.output.walletTitle == "振替元")
         #expect(entry.type == .transfer)
         #expect(entry.categoryId == nil)
         #expect(entry.toWalletId != nil)
@@ -298,28 +306,28 @@ struct RecurringEditModelTests {
     @Test
     func refusesSameWalletTransfer() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
         model.select(.transfer)
-        model.press(.digit(5))
-        model.toWalletId = model.walletId
+        model.state.press(.digit(5))
+        model.state.toWalletId = model.state.walletId
         let saved = await model.save()
 
         #expect(!saved)
-        #expect(model.errorNotice.message == "振替元と振替先を別にしてください")
+        #expect(model.state.errorNotice.message == "振替元と振替先を別にしてください")
     }
 
     @Test
     func refusesEmptyAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, today: setup.today)
+        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
         let saved = await model.save()
 
         #expect(!saved)
-        #expect(model.errorNotice.message == "金額を入れてください")
+        #expect(model.state.errorNotice.message == "金額を入れてください")
     }
 }
 
@@ -340,16 +348,17 @@ private extension RecurringEditModelTests {
 
         let model = RecurringEditModel(
             database: setup.database,
+            clock: .system,
             today: setup.today,
             paying: loan.id
         )
 
         await model.load()
-        model.startDate = start
-        model.choose(.none)
+        model.state.schedule.startDate = start
+        model.state.schedule.choose(.none)
 
         for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
-            model.press(key)
+            model.state.press(key)
         }
 
         return model

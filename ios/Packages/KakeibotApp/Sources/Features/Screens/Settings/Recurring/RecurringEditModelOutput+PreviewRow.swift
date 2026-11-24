@@ -3,17 +3,23 @@ import DesignSystem
 import Foundation
 import Store
 
-public extension RecurringEditModel {
+public extension RecurringEditModel.Output {
     var previewRow: RecurringListModel.Row {
-        let schedule = RecurringText.schedule(frequency, month: month, day: day)
-        let holiday = RecurringText.holidayNote(holidayShift)
-        let detail = [schedule, holiday].rowDetail ?? schedule
-        let closing = canUseClosingDay ? closingDay.map(RecurringText.closingNote) : nil
-        let name = memo.trimmingCharacters(in: .whitespaces)
+        let schedule = state.schedule
+        let type = state.type
+        let text = RecurringText.schedule(
+            schedule.frequency,
+            month: schedule.month,
+            day: schedule.day
+        )
+        let holiday = RecurringText.holidayNote(schedule.holidayShift)
+        let detail = [text, holiday].rowDetail ?? text
+        let closing = canUseClosingDay ? schedule.closingDay.map(RecurringText.closingNote) : nil
+        let name = state.memo.trimmingCharacters(in: .whitespaces)
         let destination = type == .transfer ? selectedDestination?.name : nil
         let place = [selectedWallet?.name, destination].compactMap(\.self).joined(separator: " → ")
         let rowPlace = place.isEmpty ? nil : place
-        let wallet = walletId ?? Wallet.ID()
+        let wallet = state.walletId ?? Wallet.ID()
         let rowAmount = isCardBill ? nil : amount
 
         let title = name.isEmpty
@@ -27,19 +33,19 @@ public extension RecurringEditModel {
         let recurring = Recurring(
             type: type,
             amount: amount,
-            categoryId: categoryId,
+            categoryId: state.categoryId,
             walletId: wallet,
-            frequency: frequency,
-            month: month,
-            day: day,
-            holidayShift: holidayShift,
-            startDate: startDate,
+            frequency: schedule.frequency,
+            month: schedule.month,
+            day: schedule.day,
+            holidayShift: schedule.holidayShift,
+            startDate: schedule.startDate,
             endDate: scheduledEndDate,
-            createdAt: Date(),
-            updatedAt: Date()
+            createdAt: .distantPast,
+            updatedAt: .distantPast
         )
 
-        let next = recurring.nextDate(onOrAfter: today)
+        let next = recurring.nextDate(onOrAfter: input.today)
 
         return RecurringListModel.Row(
             id: recurring.id,

@@ -8,7 +8,7 @@ extension SyncModelTests {
     func showsReceivingUntilFirstFetchEnds() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let syncedAt = Date(timeIntervalSince1970: 1_793_000_000)
 
         let task = Task {
@@ -18,7 +18,7 @@ extension SyncModelTests {
         await model.setOn(true)
 
         try await wait {
-            model.progress == .receiving
+            model.output.progress == .receiving
         }
 
         let changes = try await setup.database.pendingSyncChanges()
@@ -27,19 +27,19 @@ extension SyncModelTests {
         try await setup.database.setSyncedAt(syncedAt)
 
         try await wait {
-            model.progress == .upToDate(syncedAt)
+            model.output.progress == .upToDate(syncedAt)
         }
 
         task.cancel()
 
-        #expect(model.progress?.isBusy == false)
+        #expect(model.output.progress?.isBusy == false)
     }
 
     @Test
     func showsHowManyAreLeftToSend() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         try await setup.database.turnOnSync()
         try await setup.database.setSyncFetching(false)
         let count = try await setup.database.pendingSyncChanges().count
@@ -49,25 +49,25 @@ extension SyncModelTests {
         }
 
         try await wait {
-            model.progress == .sending(count)
+            model.output.progress == .sending(count)
         }
 
         try await setup.database.setSyncSendProblem(.quotaExceeded)
 
         try await wait {
-            model.progress == .stuck(.quotaExceeded, count)
+            model.output.progress == .stuck(.quotaExceeded, count)
         }
 
         task.cancel()
 
-        #expect(model.progress?.isProblem == true)
+        #expect(model.output.progress?.isProblem == true)
     }
 
     @Test
     func showsNothingWhileOffByHand() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         let task = Task {
             await model.observe()
@@ -77,20 +77,20 @@ extension SyncModelTests {
         await model.setOn(false)
 
         try await wait {
-            model.isOn == false && model.pendingCount != nil
+            model.input.isOn == false && model.output.pendingCount != nil
         }
 
         task.cancel()
 
-        #expect(model.progress == nil)
-        #expect(model.footnote == "オンにすると、ほかの端末と記録がそろいます。")
+        #expect(model.output.progress == nil)
+        #expect(model.output.footnote == "オンにすると、ほかの端末と記録がそろいます。")
     }
 
     @Test
     func showsWhySyncStoppedInsteadOfProgress() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         try await setup.database.turnOnSync()
         try await setup.database.turnOffSync(because: .cloudReplaced)
 
@@ -99,12 +99,12 @@ extension SyncModelTests {
         }
 
         try await wait {
-            model.progress == .stopped(.cloudReplaced)
+            model.output.progress == .stopped(.cloudReplaced)
         }
 
         task.cancel()
 
-        #expect(model.progress?.isProblem == true)
+        #expect(model.output.progress?.isProblem == true)
     }
 
     @Test

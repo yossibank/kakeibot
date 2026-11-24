@@ -29,13 +29,13 @@ public struct ThemeEditSheet: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.form) {
-                    ThemePreview(palette: model.palette)
+                    ThemePreview(palette: model.output.palette)
                         .frame(width: 150)
                         .frame(maxWidth: .infinity)
 
                     SettingsField(
                         "名前",
-                        text: $model.draft.name,
+                        text: Bindable(model.state).draft.name,
                         focus: $focus,
                         field: .name
                     )
@@ -71,7 +71,7 @@ public struct ThemeEditSheet: View {
             focus = nil
         }
         .backdrop()
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .confirmsDiscard(
             when: model.isChanged,
             isPresented: $isConfirmingDiscard
@@ -132,15 +132,15 @@ private extension ThemeEditSheet {
         _ hex: String,
         in slot: ThemeEditModel.Slot
     ) -> some View {
-        let isSelected = model.draft[keyPath: slot.keyPath] == hex
-        let isAvailable = model.isAvailable(hex, for: slot)
+        let isSelected = model.state.draft[keyPath: slot.keyPath] == hex
+        let isAvailable = model.output.isAvailable(hex, for: slot)
         let ring = isSelected ? Palette.accent : Palette.line
         let ringWidth: CGFloat = isSelected ? 2 : 1
         let opacity: Double = isAvailable ? 1 : 0.35
         let color = Color(hex: hex) ?? .clear
 
         return Button {
-            model.choose(hex, for: slot)
+            model.state.choose(hex, for: slot)
         } label: {
             Circle()
                 .fill(color)
@@ -177,9 +177,9 @@ private extension ThemeEditSheet {
 
     func colorBinding(_ slot: ThemeEditModel.Slot) -> Binding<Color> {
         Binding {
-            Color(hex: model.draft[keyPath: slot.keyPath]) ?? .clear
+            Color(hex: model.state.draft[keyPath: slot.keyPath]) ?? .clear
         } set: { color in
-            model.choose(color.hex, for: slot)
+            model.state.choose(color.hex, for: slot)
         }
     }
 

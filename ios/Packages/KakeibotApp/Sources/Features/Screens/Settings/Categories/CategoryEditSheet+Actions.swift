@@ -27,14 +27,14 @@ extension CategoryEditSheet {
     }
 
     func editTag(_ id: UUID) {
-        let name = model.tags.first { $0.id == id }?.draft.name ?? ""
+        let name = model.state.tags.first { $0.id == id }?.draft.name ?? ""
         showTag(.rename(id), name: name)
     }
 
     func closeTag() {
         isTagFocused = nil
 
-        model.clearTagProblem()
+        model.state.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.2)) {
             tagEdit = nil
@@ -43,8 +43,8 @@ extension CategoryEditSheet {
 
     func commitTag() {
         let isDone = switch tagEdit {
-        case .add: model.addTag(tagName)
-        case let .rename(id): model.renameTag(id, to: tagName)
+        case .add: model.state.addTag(tagName)
+        case let .rename(id): model.state.renameTag(id, to: tagName)
         case nil: true
         }
 
@@ -79,7 +79,7 @@ private extension CategoryEditSheet {
         tagName = name
         ignoresKeyboard = true
 
-        model.clearTagProblem()
+        model.state.clearTagProblem()
 
         withAnimation(.snappy(duration: 0.25)) {
             tagEdit = edit

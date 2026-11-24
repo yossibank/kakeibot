@@ -58,12 +58,12 @@ public struct CategoryEditSheet: View {
         }
         .iconEditorDrawer(
             isPresented: $isEditingIcon,
-            model: model.icon,
+            model: model.state.icon,
             focus: $focus,
             textField: .text,
             below: iconBottom
         )
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .settingsEditConfirmations(edit)
         .confirmation(
             isPresented: $isConfirmingDelete,
@@ -74,7 +74,7 @@ public struct CategoryEditSheet: View {
             confirmTitle: deleteConfirmTitle,
             role: deleteRole
         ) {
-            if model.hasEntries {
+            if model.input.hasEntries {
                 edit.toggleHidden()
             } else {
                 Task {
@@ -122,7 +122,7 @@ private extension CategoryEditSheet {
 
             SettingsField(
                 "名前",
-                text: $model.name,
+                text: Bindable(model.state).name,
                 focus: $focus,
                 field: .name
             )
@@ -155,8 +155,8 @@ private extension CategoryEditSheet {
         SettingsEditHeader(
             title: model.isEditing ? "カテゴリを編集" : "カテゴリを追加",
             isEditing: model.isEditing,
-            isHidden: model.isHidden,
-            canDelete: !(model.isHidden && model.hasEntries),
+            isHidden: model.input.isHidden,
+            canDelete: !(model.input.isHidden && model.input.hasEntries),
             subtitle: kindName
         ) {
             edit.close()
@@ -178,8 +178,8 @@ private extension CategoryEditSheet {
                 isEditingIcon = true
             } label: {
                 CategoryTileFace(
-                    icon: model.icon.preview,
-                    name: model.name.isEmpty ? "名前" : model.name,
+                    icon: model.state.icon.preview,
+                    name: model.state.name.isEmpty ? "名前" : model.state.name,
                     isHidden: false
                 )
                 .frame(width: 80, height: 78)
@@ -206,13 +206,13 @@ private extension CategoryEditSheet {
             } onAdd: {
                 addTag()
             } onMove: { id, index in
-                model.moveTag(id, to: index)
+                model.state.moveTag(id, to: index)
             }
             .onPreferenceChange(TagLineMovingKey.self) { isMoving in
                 isMovingTag = isMoving
             }
 
-            if model.tags.count > 1 {
+            if model.state.tags.count > 1 {
                 SettingsCaption("長押しで並べ替えられます")
             }
         }
@@ -223,7 +223,7 @@ private extension CategoryEditSheet {
             name: $tagName,
             isFocused: $isTagFocused,
             isAdding: edit == .add,
-            errorMessage: model.tagProblem,
+            errorMessage: model.state.tagProblem,
             onCommit: {
                 commitTag()
             },
@@ -239,31 +239,31 @@ private extension CategoryEditSheet {
     static let hasEntriesMessage = "記録があります。非表示にすると、記録を残したまま一覧から外せます"
 
     var kindName: String {
-        model.kind == .income ? "収入" : "支出"
+        model.input.kind == .income ? "収入" : "支出"
     }
 
     var graphColor: Color {
-        Color(hex: model.icon.color) ?? Palette.subtext
+        Color(hex: model.state.icon.color) ?? Palette.subtext
     }
 
     var deleteImage: String {
-        model.hasEntries ? "eye.slash" : "trash"
+        model.input.hasEntries ? "eye.slash" : "trash"
     }
 
     var deleteTitle: String {
-        model.hasEntries ? "このカテゴリは削除できません" : "このカテゴリを削除しますか"
+        model.input.hasEntries ? "このカテゴリは削除できません" : "このカテゴリを削除しますか"
     }
 
     var deleteMessage: String {
-        model.hasEntries ? Self.hasEntriesMessage : "使っている固定費・テンプレート・予算・タグも消えます"
+        model.input.hasEntries ? Self.hasEntriesMessage : "使っている固定費・テンプレート・予算・タグも消えます"
     }
 
     var deleteConfirmTitle: String {
-        model.hasEntries ? "非表示にする" : "削除する"
+        model.input.hasEntries ? "非表示にする" : "削除する"
     }
 
     var deleteRole: ConfirmCard.Role {
-        model.hasEntries ? .suggestion : .destructive
+        model.input.hasEntries ? .suggestion : .destructive
     }
 
     var keyboardRegions: SafeAreaRegions {
@@ -271,7 +271,7 @@ private extension CategoryEditSheet {
     }
 
     var tagItems: [TagLine<UUID>.Item] {
-        model.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
+        model.state.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
     }
 
     func deleteAction(for edit: TagEdit) -> (() -> Void)? {
@@ -280,7 +280,7 @@ private extension CategoryEditSheet {
         }
 
         return {
-            model.removeTag(id)
+            model.state.removeTag(id)
             closeTag()
         }
     }
@@ -295,6 +295,7 @@ extension CategoryEditModel: SettingsEditing {}
         CategoryEditSheet(
             model: CategoryEditModel(
                 database: database,
+                clock: .system,
                 kind: .expense
             )
         )

@@ -7,13 +7,13 @@ extension SyncModelTests {
     func asksBeforeSharingAWallet() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
         let after = try await firstShare(in: setup.database)
 
-        #expect(model.invitation == item)
+        #expect(model.state.invitation == item)
         #expect(await cloud.shareCalls.isEmpty)
         #expect(after.isShared == false)
     }
@@ -22,7 +22,7 @@ extension SyncModelTests {
     func startsSharingAndShowsSheetAfterConfirming() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -31,23 +31,23 @@ extension SyncModelTests {
 
         #expect(await cloud.shareCalls == ["create", "show"])
         #expect(shared.isShared)
-        #expect(model.invitation == nil)
-        #expect(model.workingWallet == nil)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.invitation == nil)
+        #expect(model.state.workingWallet == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 
     @Test
     func leavesWalletAloneWhenInvitationIsCancelled() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
         model.cancelInvitation()
         await model.confirmInvitation()
 
-        #expect(model.invitation == nil)
+        #expect(model.state.invitation == nil)
         #expect(await cloud.shareCalls.isEmpty)
     }
 
@@ -59,14 +59,14 @@ extension SyncModelTests {
             SyncParticipant(name: "家族", state: .invited)
         ]
         let cloud = FakeCloud(hasData: false, participants: members)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
 
-        #expect(model.opened == item)
-        #expect(model.participants == members)
-        #expect(model.isParticipantsFailed == false)
+        #expect(model.state.opened == item)
+        #expect(model.output.participants == members)
+        #expect(model.output.isParticipantsFailed == false)
         #expect(await cloud.shareCalls == ["list"])
     }
 
@@ -74,34 +74,34 @@ extension SyncModelTests {
     func tellsWhenMembersCannotBeLoaded() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToList: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
 
-        #expect(model.participants == nil)
-        #expect(model.isParticipantsFailed)
+        #expect(model.output.participants == nil)
+        #expect(model.output.isParticipantsFailed)
     }
 
     @Test
     func invitesMoreWithoutCreatingAgain() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
         await model.inviteMore()
 
         #expect(await cloud.shareCalls == ["list", "show"])
-        #expect(model.opened == nil)
+        #expect(model.state.opened == nil)
     }
 
     @Test
     func stopsSharingInICloudThenOnThisIPhone() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.stopSharing(item)
@@ -109,14 +109,14 @@ extension SyncModelTests {
 
         #expect(await cloud.shareCalls == ["delete"])
         #expect(after.isShared == false)
-        #expect(model.workingWallet == nil)
+        #expect(model.state.workingWallet == nil)
     }
 
     @Test
     func endsSharingWhenSheetStops() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, stopsInSheet: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -131,20 +131,20 @@ extension SyncModelTests {
     func tellsWhenSheetCannotSaveInvitation() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsInSheet: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
         await model.inviteMore()
 
-        #expect(model.errorNotice.message == "招待を保存できませんでした。時間をおいて試してください")
+        #expect(model.state.errorNotice.message == "招待を保存できませんでした。時間をおいて試してください")
     }
 
     @Test
     func keepsWalletUnsharedWhenCreatingFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToCreate: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -152,22 +152,22 @@ extension SyncModelTests {
         let after = try await firstShare(in: setup.database)
 
         #expect(after.isShared == false)
-        #expect(model.workingWallet == nil)
-        #expect(model.errorNotice.message == "共有を開けませんでした。時間をおいて試してください")
+        #expect(model.state.workingWallet == nil)
+        #expect(model.state.errorNotice.message == "共有を開けませんでした。時間をおいて試してください")
     }
 
     @Test
     func keepsSharingWhenDeletingCloudShareFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToDelete: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.stopSharing(item)
         let after = try await firstShare(in: setup.database)
 
         #expect(after.isShared)
-        #expect(model.errorNotice.message == "共有を終えられませんでした。時間をおいて試してください")
+        #expect(model.state.errorNotice.message == "共有を終えられませんでした。時間をおいて試してください")
     }
 }
 

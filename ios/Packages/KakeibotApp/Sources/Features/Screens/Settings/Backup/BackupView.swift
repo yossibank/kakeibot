@@ -64,11 +64,11 @@ public struct BackupView: View {
                                 importFile()
                             }
 
-                            ForEach(model.previous) { item in
+                            ForEach(model.input.previous) { item in
                                 Hairline()
 
                                 actionButton(
-                                    model.previousTitle(of: item),
+                                    model.output.previousTitle(of: item),
                                     systemImage: "arrow.uturn.backward",
                                     detail: "読み込む前に退避したデータです"
                                 ) {
@@ -76,15 +76,20 @@ public struct BackupView: View {
                                 }
                             }
                         }
-                        .disabled(model.isSyncActive)
+                        .disabled(model.input.isSyncActive)
                         .opacity(restoreOpacity)
                         .padding(.horizontal, 16)
                         .card()
 
-                        SettingsCaption(restoreNote, kind: model.isSyncActive ? .info : .caution)
+                        SettingsCaption(
+                            restoreNote,
+                            kind: model.input.isSyncActive
+                                ? .info
+                                : .caution
+                        )
                     }
 
-                    if let message = model.doneMessage {
+                    if let message = model.state.doneMessage {
                         Label(message, systemImage: "checkmark.circle")
                             .textFont(.footnote)
                             .foregroundStyle(Palette.accent)
@@ -92,7 +97,7 @@ public struct BackupView: View {
                             .transition(.opacity)
                     }
                 }
-                .disabled(model.isWorking)
+                .disabled(model.state.isWorking)
                 .buttonStyle(.plain)
                 .padding(.vertical, 8)
             }
@@ -102,7 +107,7 @@ public struct BackupView: View {
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .task {
@@ -111,8 +116,8 @@ public struct BackupView: View {
         .task {
             await model.loadPrevious()
         }
-        .animation(.snappy, value: model.doneMessage)
-        .onChange(of: model.isWorking) { _, isWorking in
+        .animation(.snappy, value: model.state.doneMessage)
+        .onChange(of: model.state.isWorking) { _, isWorking in
             if !isWorking {
                 pressed = nil
             }
@@ -121,10 +126,10 @@ public struct BackupView: View {
             isPresented: $isExporting,
             document: document,
             contentType: exportType,
-            defaultFilename: model.file?.name
+            defaultFilename: model.state.file?.name
         ) { result in
             Task {
-                await model.finishExport(result, at: Date())
+                await model.finishExport(result)
             }
         }
         .fileImporter(
@@ -139,7 +144,7 @@ public struct BackupView: View {
             isPresented: $isConfirmingRestore,
             systemImage: "arrow.triangle.2.circlepath",
             title: "データを置き換えますか",
-            message: model.pendingSummary ?? "",
+            message: model.output.pendingSummary ?? "",
             keepTitle: "やめる",
             confirmTitle: "置き換える"
         ) {
@@ -159,7 +164,7 @@ private extension BackupView {
         detail: String,
         action: @escaping () -> Void
     ) -> some View {
-        let isWorking = model.isWorking && pressed == title
+        let isWorking = model.state.isWorking && pressed == title
 
         return Button {
             pressed = title
@@ -200,24 +205,24 @@ private extension BackupView {
 
 private extension BackupView {
     var restoreOpacity: Double {
-        model.isSyncActive ? 0.5 : 1
+        model.input.isSyncActive ? 0.5 : 1
     }
 
     var restoreNote: String {
-        model.isSyncActive ? "同期と共有をやめると、読み込めます。" : "読み込むと、いまのデータと置き換わります。"
+        model.input.isSyncActive ? "同期と共有をやめると、読み込めます。" : "読み込むと、いまのデータと置き換わります。"
     }
 
     var document: BackupDocument? {
-        model.file.map { BackupDocument(data: $0.data) }
+        model.state.file.map { BackupDocument(data: $0.data) }
     }
 
     var exportType: UTType {
-        model.file?.kind == .csv ? .commaSeparatedText : .json
+        model.state.file?.kind == .csv ? .commaSeparatedText : .json
     }
 
     func exportFile(_ kind: BackupModel.FileKind) {
         Task {
-            isExporting = await model.makeFile(kind, at: Date())
+            isExporting = await model.makeFile(kind)
         }
     }
 
@@ -235,7 +240,7 @@ private extension BackupView {
 #Preview {
     if let database = try? AppDatabase.inMemory() {
         NavigationStack {
-            BackupView(model: BackupModel(database: database))
+            BackupView(model: BackupModel(database: database, clock: .system))
         }
     }
 }

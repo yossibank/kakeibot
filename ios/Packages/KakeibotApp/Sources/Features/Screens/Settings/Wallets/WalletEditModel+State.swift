@@ -5,7 +5,7 @@ import Observation
 public extension WalletEditModel {
     @MainActor
     @Observable
-    final class State {
+    final class State: NoticeHolding {
         public var name = ""
         public var isNegative: Bool
 

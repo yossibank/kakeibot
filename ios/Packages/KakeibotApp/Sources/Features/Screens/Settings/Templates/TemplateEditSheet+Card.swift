@@ -68,7 +68,7 @@ extension TemplateEditSheet {
 
             TextField(
                 "メモ",
-                text: $model.memo,
+                text: Bindable(model.state).memo,
                 prompt: Text("メモを書く").foregroundStyle(Palette.hint),
                 axis: .vertical
             )
@@ -88,7 +88,7 @@ extension TemplateEditSheet {
 
 extension TemplateEditSheet {
     var amountValue: String {
-        model.amount.map { Yen.text($0) } ?? "毎回入れる"
+        model.output.amount.map { Yen.text($0) } ?? "毎回入れる"
     }
 }
 
@@ -98,7 +98,7 @@ private extension TemplateEditSheet {
             HStack(spacing: 8) {
                 TextField(
                     "名前",
-                    text: $model.name,
+                    text: Bindable(model.state).name,
                     prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
                 )
                 .font(TemplateCardSize.large.nameFont(in: themeStyle))
@@ -131,7 +131,7 @@ private extension TemplateEditSheet {
                 open(.amount)
             } label: {
                 HStack(spacing: 8) {
-                    TemplateCardAmount(amount: model.amount, size: .large)
+                    TemplateCardAmount(amount: model.output.amount, size: .large)
 
                     Spacer(minLength: 8)
 
@@ -155,14 +155,14 @@ private extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     var categoryIcon: Icon? {
-        model.selectedCategory.flatMap { model.icon(for: $0) }
+        model.output.selectedCategory.flatMap { model.output.icon(for: $0) }
     }
 
     var detail: String {
         let parts = [
-            model.selectedCategory?.name,
-            model.selectedTag?.name,
-            model.selectedWallet?.name
+            model.output.selectedCategory?.name,
+            model.output.selectedTag?.name,
+            model.output.selectedWallet?.name
         ]
 
         return parts.rowDetail ?? ""
@@ -173,8 +173,8 @@ private extension TemplateEditSheet {
     }
 
     var nameLine: Color {
-        if model.errorNotice.message != nil,
-           model.name.isEmpty {
+        if model.state.errorNotice.message != nil,
+           model.state.name.isEmpty {
             Palette.rose
         } else if focus == .name {
             Palette.accent
@@ -184,6 +184,6 @@ private extension TemplateEditSheet {
     }
 
     var previewName: String {
-        model.name.isEmpty ? "名前" : model.name
+        model.state.name.isEmpty ? "名前" : model.state.name
     }
 }

@@ -66,10 +66,10 @@ struct ReminderModelTests {
         let saved = try await database.setting(.reminderTime)
         let requested = await client.requested
 
-        #expect(model.time == .evening)
+        #expect(model.input.time == .evening)
         #expect(saved == .evening)
         #expect(requested)
-        #expect(model.authorization == .allowed)
+        #expect(model.input.authorization == .allowed)
     }
 
     @Test
@@ -94,8 +94,8 @@ struct ReminderModelTests {
         await model.setOn(true)
 
         #expect(cleared == nil)
-        #expect(model.time == time)
-        #expect(model.isCustom)
+        #expect(model.input.time == time)
+        #expect(model.output.isCustom)
     }
 
     @Test
@@ -112,11 +112,11 @@ struct ReminderModelTests {
         )
 
         await model.load()
-        let deniedWhileOff = model.isDenied
+        let deniedWhileOff = model.output.isDenied
         await model.setOn(true)
 
         #expect(!deniedWhileOff)
-        #expect(model.isDenied)
+        #expect(model.output.isDenied)
     }
 }
 
@@ -152,9 +152,9 @@ extension ReminderModelTests {
         )
 
         await model.load()
-        let notice = try #require(model.upcomingNotices.first)
+        let notice = try #require(model.output.upcomingNotices.first)
 
-        #expect(model.upcomingNotices.count == 1)
+        #expect(model.output.upcomingNotices.count == 1)
         #expect(notice.title == "家賃")
         #expect(notice.date.description == "2026-10-24")
         #expect(notice.time == .morning)

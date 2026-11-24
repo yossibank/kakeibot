@@ -6,95 +6,126 @@ import Store
 @MainActor
 @Observable
 public final class ThemeListModel {
-    public private(set) var current: ThemeChoice = .system
-    public private(set) var customThemes: [Theme] = []
-    public private(set) var suggestedIcon: AppIconChoice?
+    public let state = State()
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let database: AppDatabase
-    private let appIcon: AppIconListModel
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
         appIcon: AppIconListModel
     ) {
-        self.database = database
-        self.appIcon = appIcon
+        let input = Input()
+
+        self.input = input
+        self.output = Output(input: input)
+        self.dependencies = Dependencies(database: database, appIcon: appIcon)
     }
 }
 
 public extension ThemeListModel {
-    var currentPalette: ThemePalette {
-        switch current {
-        case .system:
-            return ThemePreset.white.palette
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
 
-        case let .preset(preset):
-            return preset.palette
+        public internal(set) var suggestedIcon: AppIconChoice?
+    }
 
-        case let .custom(id):
-            let theme = customThemes.first { $0.id == id }
-            return theme?.palette ?? ThemePreset.white.palette
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var current: ThemeChoice = .system
+        public internal(set) var customThemes: [Theme] = []
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+
+        public var currentPalette: ThemePalette {
+            switch input.current {
+            case .system:
+                return ThemePreset.white.palette
+
+            case let .preset(preset):
+                return preset.palette
+
+            case let .custom(id):
+                let theme = input.customThemes.first { $0.id == id }
+                return theme?.palette ?? ThemePreset.white.palette
+            }
+        }
+
+        init(input: Input) {
+            self.input = input
         }
     }
 
     func load() async {
         do {
-            current = try await database.setting(.theme)
-            customThemes = try await database.customThemes()
+            input.current = try await dependencies.database.setting(.theme)
+            input.customThemes = try await dependencies.database.customThemes()
         } catch {
-            errorNotice.show(SettingMessage.loadFailed)
+            state.errorNotice.show(SettingMessage.loadFailed)
         }
     }
 
     func select(_ choice: ThemeChoice) async {
-        guard choice != current else {
+        guard choice != input.current else {
             return
         }
 
-        let previous = current
+        let previous = input.current
 
-        current = choice
+        input.current = choice
 
         do {
-            try await database.setSetting(.theme, to: choice)
+            try await dependencies.database.setSetting(.theme, to: choice)
         } catch {
-            current = previous
-            errorNotice.show(SettingMessage.saveFailed, for: error)
+            input.current = previous
+            state.errorNotice.show(SettingMessage.saveFailed, for: error)
             return
         }
 
         guard let icon = AppIconChoice(choice) else {
-            suggestedIcon = nil
+            state.suggestedIcon = nil
             return
         }
 
-        suggestedIcon = icon == appIcon.input.current ? nil : icon
+        state.suggestedIcon = icon == dependencies.appIcon.input.current ? nil : icon
     }
 
     func use(_ icon: AppIconChoice?) async {
-        suggestedIcon = nil
+        state.suggestedIcon = nil
 
         guard let icon else {
             return
         }
 
-        await appIcon.select(icon)
+        await dependencies.appIcon.select(icon)
     }
 
     func dismissSuggestion() {
-        suggestedIcon = nil
+        state.suggestedIcon = nil
     }
 
     func restore(_ deletion: Deletion) async {
         do {
-            try await database.restore(deletion)
+            try await dependencies.database.restore(deletion)
         } catch {
-            errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.errorNotice.show(Self.restoreFailedMessage, for: error)
         }
 
         await load()
+    }
+}
+
+extension ThemeListModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let appIcon: AppIconListModel
     }
 }
 

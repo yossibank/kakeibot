@@ -6,53 +6,53 @@ import Store
 public extension SyncModel {
     func open(_ item: WalletShare) async {
         guard item.isShared else {
-            invitation = item
+            state.invitation = item
             return
         }
 
         let id = item.wallet.id
 
-        opened = item
-        members = .loading
+        state.opened = item
+        input.members = .loading
 
         do {
-            let participants = try await cloud.participants(id, item.wallet.name)
+            let participants = try await dependencies.cloud.participants(id, item.wallet.name)
 
-            guard opened?.wallet.id == id else {
+            guard state.opened?.wallet.id == id else {
                 return
             }
 
-            members = .loaded(participants)
+            input.members = .loaded(participants)
         } catch {
-            guard opened?.wallet.id == id else {
+            guard state.opened?.wallet.id == id else {
                 return
             }
 
-            members = .failed
+            input.members = .failed
         }
     }
 
     func cancelInvitation() {
-        invitation = nil
+        state.invitation = nil
     }
 
     func closeOpened() {
-        opened = nil
-        members = .loading
+        state.opened = nil
+        input.members = .loading
     }
 
     func confirmInvitation() async {
-        guard let item = invitation else {
+        guard let item = state.invitation else {
             return
         }
 
-        invitation = nil
+        state.invitation = nil
 
         await show(item, creates: true)
     }
 
     func inviteMore() async {
-        guard let item = opened else {
+        guard let item = state.opened else {
             return
         }
 
@@ -69,8 +69,8 @@ public extension SyncModel {
         let id = item.wallet.id
 
         await workOnWallet(id, failure: Self.leaveFailedMessage) {
-            try await cloud.leaveShare(id, item.ownerName)
-            try await database.endSharing(id, at: Date())
+            try await dependencies.cloud.leaveShare(id, item.ownerName)
+            try await dependencies.database.endSharing(id, at: dependencies.clock.now)
         }
     }
 }
@@ -94,23 +94,23 @@ private extension SyncModel {
         }
 
         let onFail: SyncCloud.Fail = { [weak self] in
-            self?.errorNotice.show(Self.inviteFailedMessage)
+            self?.state.errorNotice.show(Self.inviteFailedMessage)
         }
 
         await workOnWallet(id, failure: Self.shareFailedMessage) {
             if creates {
-                try await cloud.createShare(id, name)
-                try await database.startSharing(id)
+                try await dependencies.cloud.createShare(id, name)
+                try await dependencies.database.startSharing(id)
             }
 
-            try await cloud.showShare(id, name, onStop, onFail)
+            try await dependencies.cloud.showShare(id, name, onStop, onFail)
         }
     }
 
     func endShare(_ id: Wallet.ID) async {
         await workOnWallet(id, failure: Self.stopFailedMessage) {
-            try await cloud.deleteShare(id)
-            try await database.endSharing(id, at: Date())
+            try await dependencies.cloud.deleteShare(id)
+            try await dependencies.database.endSharing(id, at: dependencies.clock.now)
         }
     }
 
@@ -119,8 +119,8 @@ private extension SyncModel {
         failure: String,
         _ operation: () async throws -> Void
     ) async {
-        workingWallet = id
-        errorNotice.clear()
+        state.workingWallet = id
+        state.errorNotice.clear()
 
         do {
             try await operation()
@@ -131,11 +131,11 @@ private extension SyncModel {
             Self.logger.error(
                 "\(failure, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
             )
-            errorNotice.show(failure, for: error)
+            state.errorNotice.show(failure, for: error)
         }
 
-        if workingWallet == id {
-            workingWallet = nil
+        if state.workingWallet == id {
+            state.workingWallet = nil
         }
     }
 }

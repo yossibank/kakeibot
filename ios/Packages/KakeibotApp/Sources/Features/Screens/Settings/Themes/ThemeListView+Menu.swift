@@ -20,7 +20,7 @@ extension ThemeListView {
             }
             .transition(.opacity)
 
-        preview(menu.palette, isCurrent: menu.choice == model.current)
+        preview(menu.palette, isCurrent: menu.choice == model.input.current)
             .frame(width: menu.frame.width, height: menu.frame.height)
             .scaleEffect(1.04)
             .glow(Palette.glow.opacity(.muted), radius: 12)

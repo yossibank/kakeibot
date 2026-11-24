@@ -71,6 +71,7 @@ extension MainView {
             TemplateEditSheet(
                 model: TemplateEditModel(
                     database: database,
+                    clock: clock,
                     type: home.state.templateType
                 )
             )
@@ -79,6 +80,7 @@ extension MainView {
             RecurringEditSheet(
                 model: RecurringEditModel(
                     database: database,
+                    clock: clock,
                     today: today,
                     editing: id
                 )

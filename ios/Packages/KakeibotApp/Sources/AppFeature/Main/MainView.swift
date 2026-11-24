@@ -236,7 +236,7 @@ private extension MainView {
         MainTabBar(
             selection: selection,
             hasSidebar: hasSidebar,
-            isAddHinted: !setup.isEntryOpened
+            isAddHinted: !setup.input.isEntryOpened
         ) {
             sheet = .new
         }

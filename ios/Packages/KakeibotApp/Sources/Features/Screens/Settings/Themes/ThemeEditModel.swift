@@ -7,26 +7,121 @@ import Store
 @MainActor
 @Observable
 public final class ThemeEditModel {
-    public var draft: ThemeDraft
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    let baseline: ThemeDraft?
-    let editingId: Theme.ID?
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         editing theme: Theme?,
         base palette: ThemePalette
     ) {
         let draft = theme.map(ThemeDraft.init) ?? ThemeDraft(name: "", palette: palette)
+        let state = State(draft: draft)
 
-        self.draft = draft
-        self.baseline = draft
-        self.database = database
-        self.editingId = theme?.id
+        self.state = state
+        self.input = Input(baseline: draft, editingId: theme?.id)
+        self.output = Output(state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
+    }
+}
+
+public extension ThemeEditModel {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public var draft: ThemeDraft
+
+        init(draft: ThemeDraft) {
+            self.draft = draft
+        }
+    }
+
+    @MainActor
+    @Observable
+    final class Input: SettingsEditInput {
+        let baseline: ThemeDraft?
+        let editingId: Theme.ID?
+
+        init(
+            baseline: ThemeDraft,
+            editingId: Theme.ID?
+        ) {
+            self.baseline = baseline
+            self.editingId = editingId
+        }
+    }
+
+    @MainActor
+    final class Output {
+        let state: State
+
+        public var palette: ThemePalette {
+            state.draft.palette ?? .night
+        }
+
+        init(state: State) {
+            self.state = state
+        }
+
+        public func isAvailable(
+            _ hex: String,
+            for slot: Slot
+        ) -> Bool {
+            if slot == .surface {
+                return ThemeEditModel.isLight(hex) == ThemeEditModel.isLight(state.draft.background)
+            }
+
+            var draft = state.draft
+
+            draft[keyPath: slot.keyPath] = hex
+
+            return ThemeEditModel.isReadable(draft, slot)
+        }
+    }
+}
+
+extension ThemeEditModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+    }
+}
+
+public extension ThemeEditModel.State {
+    func choose(
+        _ hex: String,
+        for slot: ThemeEditModel.Slot
+    ) {
+        var next = draft
+
+        next[keyPath: slot.keyPath] = hex
+
+        if slot == .background,
+           ThemeEditModel.isLight(next.surface) != ThemeEditModel.isLight(hex) {
+            next.surface = ThemeEditModel.pairedSurface(for: hex)
+        }
+
+        for other in ThemeEditModel.Slot.allCases where !ThemeEditModel.isReadable(next, other) {
+            let readable = other.swatches.first { swatch in
+                var candidate = next
+
+                candidate[keyPath: other.keyPath] = swatch
+
+                return ThemeEditModel.isReadable(candidate, other)
+            }
+
+            if let readable {
+                next[keyPath: other.keyPath] = readable
+            }
+        }
+
+        draft = next
     }
 }
 
@@ -39,83 +134,34 @@ public extension ThemeEditModel {
         case accent
     }
 
-    var palette: ThemePalette {
-        draft.palette ?? .night
-    }
-
-    func isAvailable(
-        _ hex: String,
-        for slot: Slot
-    ) -> Bool {
-        if slot == .surface {
-            return Self.isLight(hex) == Self.isLight(draft.background)
-        }
-
-        var draft = draft
-
-        draft[keyPath: slot.keyPath] = hex
-
-        return Self.isReadable(draft, slot)
-    }
-
-    func choose(
-        _ hex: String,
-        for slot: Slot
-    ) {
-        var next = draft
-
-        next[keyPath: slot.keyPath] = hex
-
-        if slot == .background,
-           Self.isLight(next.surface) != Self.isLight(hex) {
-            next.surface = Self.pairedSurface(for: hex)
-        }
-
-        for other in Slot.allCases where !Self.isReadable(next, other) {
-            let readable = other.swatches.first { swatch in
-                var candidate = next
-
-                candidate[keyPath: other.keyPath] = swatch
-
-                return Self.isReadable(candidate, other)
-            }
-
-            if let readable {
-                next[keyPath: other.keyPath] = readable
-            }
-        }
-
-        draft = next
-    }
-
     func save() async -> Bool {
         do {
-            let theme = try await database.saveTheme(
-                draft,
-                editing: editingId,
-                at: Date()
+            let theme = try await dependencies.database.saveTheme(
+                state.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
             )
 
-            if editingId == nil {
-                try await database.setSetting(.theme, to: .custom(theme.id))
+            if input.editingId == nil {
+                try await dependencies.database.setSetting(.theme, to: .custom(theme.id))
             }
 
             return true
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
 
     func delete() async -> Deletion? {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return nil
         }
 
         do {
-            return try await database.deleteTheme(editingId)
+            return try await dependencies.database.deleteTheme(editingId)
         } catch {
-            errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
             return nil
         }
     }
@@ -227,10 +273,10 @@ private extension ThemeEditModel {
 
 extension ThemeEditModel: SettingsEditModel {
     var edited: ThemeDraft {
-        draft
+        state.draft
     }
 
     var problemMessage: String? {
-        draft.problems.first?.message
+        state.draft.problems.first?.message
     }
 }

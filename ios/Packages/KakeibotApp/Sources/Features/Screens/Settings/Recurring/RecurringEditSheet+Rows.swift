@@ -11,7 +11,7 @@ extension RecurringEditSheet {
 
 private extension RecurringEditSheet {
     var transferItems: [SettingsRowList<Panel>.Item] {
-        guard model.type == .transfer else {
+        guard model.state.type == .transfer else {
             return []
         }
 
@@ -19,16 +19,16 @@ private extension RecurringEditSheet {
             panel: .fee,
             systemImage: "yensign.circle",
             title: "手数料",
-            value: model.fee > 0 ? Yen.text(model.fee) : "なし",
-            isEmpty: model.fee == 0,
+            value: model.output.fee > 0 ? Yen.text(model.output.fee) : "なし",
+            isEmpty: model.output.fee == 0,
             isAmount: true
         )
 
-        guard !model.isLoanRepayment else {
+        guard !model.output.isLoanRepayment else {
             return loanItems + [fee]
         }
 
-        guard model.canUseClosingDay else {
+        guard model.output.canUseClosingDay else {
             return [fee]
         }
 
@@ -36,8 +36,8 @@ private extension RecurringEditSheet {
             panel: .closing,
             systemImage: "creditcard",
             title: "金額の決め方",
-            value: RecurringText.closingDay(model.closingDay),
-            isEmpty: model.closingDay == nil
+            value: RecurringText.closingDay(model.state.schedule.closingDay),
+            isEmpty: model.state.schedule.closingDay == nil
         )
 
         return [closing, fee]
@@ -50,17 +50,17 @@ private extension RecurringEditSheet {
                 systemImage: "number",
                 title: "回数",
                 value: countText,
-                isEmpty: model.repaymentCount == nil
+                isEmpty: model.output.repaymentCount == nil
             )
         ]
     }
 
     var countText: String {
-        guard let count = model.repaymentCount else {
+        guard let count = model.output.repaymentCount else {
             return "決めない"
         }
 
-        return model.usesAutoCount ? "自動 · \(count) 回" : "\(count) 回"
+        return model.output.usesAutoCount ? "自動 · \(count) 回" : "\(count) 回"
     }
 
     var scheduleItems: [SettingsRowList<Panel>.Item] {
@@ -69,29 +69,29 @@ private extension RecurringEditSheet {
                 panel: .start,
                 systemImage: "calendar",
                 title: "始まり",
-                value: RecurringText.date(model.startDate),
+                value: RecurringText.date(model.state.schedule.startDate),
                 isEmpty: false
             ),
             .init(
                 panel: .end,
                 systemImage: "calendar.badge.checkmark",
                 title: "終わり",
-                value: model.scheduledEndDate.map(RecurringText.date) ?? "なし",
-                isEmpty: model.scheduledEndDate == nil
+                value: model.output.scheduledEndDate.map(RecurringText.date) ?? "なし",
+                isEmpty: model.output.scheduledEndDate == nil
             ),
             .init(
                 panel: .holiday,
                 systemImage: "calendar.badge.exclamationmark",
                 title: "休日なら",
-                value: model.holidayShift.title,
-                isEmpty: model.holidayShift == .none
+                value: model.state.schedule.holidayShift.title,
+                isEmpty: model.state.schedule.holidayShift == .none
             ),
             .init(
                 panel: .remind,
                 systemImage: "bell",
                 title: "前に知らせる",
-                value: RecurringText.remind(model.remindDaysBefore),
-                isEmpty: model.remindDaysBefore == nil
+                value: RecurringText.remind(model.state.schedule.remindDaysBefore),
+                isEmpty: model.state.schedule.remindDaysBefore == nil
             )
         ]
     }

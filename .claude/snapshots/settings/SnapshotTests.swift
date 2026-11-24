@@ -53,9 +53,13 @@ struct SnapshotTests {
         let walletSheet = WalletEditSheet(model: walletEdit)
             .frame(height: 1000)
 
-        let categoryEdit = CategoryEditModel(database: database, kind: .expense)
-        let stampEdit = StampEditModel(database: database)
-        let ruleEdit = RewardRuleEditModel(database: database)
+        let categoryEdit = CategoryEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            kind: .expense
+        )
+        let stampEdit = StampEditModel(database: database, clock: .fixed(snapshotNow))
+        let ruleEdit = RewardRuleEditModel(database: database, clock: .fixed(snapshotNow))
 
         await categoryEdit.load()
         await stampEdit.load()
@@ -94,7 +98,11 @@ struct SnapshotTests {
 
         try await database.setSetting(.backupExportedAt, to: exportedAt)
 
-        let recurring = RecurringListModel(database: database, clock: .system, today: today)
+        let recurring = RecurringListModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            today: today
+        )
 
         let observing = Task {
             await recurring.observe()
@@ -119,8 +127,16 @@ struct SnapshotTests {
 
         observing.cancel()
 
-        let templateEdit = TemplateEditModel(database: database, type: .expense)
-        let recurringEdit = RecurringEditModel(database: database, today: today)
+        let templateEdit = TemplateEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            type: .expense
+        )
+        let recurringEdit = RecurringEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            today: today
+        )
 
         await templateEdit.load()
         await recurringEdit.load()
@@ -141,14 +157,23 @@ struct SnapshotTests {
         }
 
         let card = options.wallets.first { $0.kind == .card }
-        let expenseEdit = RecurringEditModel(database: database, today: today)
-        let transferEdit = RecurringEditModel(database: database, today: today, type: .transfer)
+        let expenseEdit = RecurringEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            today: today
+        )
+        let transferEdit = RecurringEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            today: today,
+            type: .transfer
+        )
 
         await expenseEdit.load()
         await transferEdit.load()
 
-        expenseEdit.day = 27
-        transferEdit.toWalletId = card?.id
+        expenseEdit.state.schedule.day = 27
+        transferEdit.state.toWalletId = card?.id
 
         for variant in Self.variants {
             try Self.write(
@@ -165,7 +190,7 @@ struct SnapshotTests {
             )
         }
 
-        transferEdit.closingDay = 27
+        transferEdit.state.schedule.closingDay = 27
 
         for variant in Self.variants {
             try Self.write(
@@ -185,12 +210,17 @@ struct SnapshotTests {
         )
 
         let loan = try await database.save(loanDraft, at: snapshotNow)
-        let loanEdit = RecurringEditModel(database: database, today: today, paying: loan.id)
+        let loanEdit = RecurringEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            today: today,
+            paying: loan.id
+        )
 
         await loanEdit.load()
 
         for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
-            loanEdit.press(key)
+            loanEdit.state.press(key)
         }
 
         for variant in Self.variants {
@@ -205,6 +235,7 @@ struct SnapshotTests {
         let savedTemplate = try await database.templates().first
         let templateEditing = TemplateEditModel(
             database: database,
+            clock: .fixed(snapshotNow),
             type: .expense,
             editing: savedTemplate?.id
         )
@@ -243,8 +274,8 @@ struct SnapshotTests {
             )
         }
 
-        templateEdit.walletId = card?.id
-        recurringEdit.walletId = card?.id
+        templateEdit.state.setWallet(card?.id)
+        recurringEdit.state.setWallet(card?.id)
 
         for variant in Self.variants {
             try Self.write(

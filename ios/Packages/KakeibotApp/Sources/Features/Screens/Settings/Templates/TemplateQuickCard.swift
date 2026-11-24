@@ -12,9 +12,9 @@ struct TemplateQuickCard: View {
             SettingsFormSection("金額") {
                 VStack(alignment: .leading, spacing: 8) {
                     SettingsAmountButton(
-                        amount: model.amount ?? 0,
-                        text: model.amount == nil ? "毎回入れる" : nil,
-                        isEmpty: (model.amount ?? 0) == 0
+                        amount: model.output.amount ?? 0,
+                        text: model.output.amount == nil ? "毎回入れる" : nil,
+                        isEmpty: (model.output.amount ?? 0) == 0
                     ) {
                         onOpen(.amount)
                     }
@@ -25,46 +25,46 @@ struct TemplateQuickCard: View {
 
             SettingsFormSection("カテゴリ") {
                 SettingsPagedGrid(
-                    items: model.categories,
-                    selected: model.categoryId,
+                    items: model.output.categories,
+                    selected: model.state.categoryId,
                     columns: 5,
                     rows: 2,
                     spacing: 4
                 ) { category in
                     SettingsCategoryTile(
                         category: category,
-                        icon: model.icon(for: category),
-                        isSelected: model.categoryId == category.id
+                        icon: model.output.icon(for: category),
+                        isSelected: model.state.categoryId == category.id
                     ) {
-                        model.categoryId = category.id
+                        model.state.setCategory(category.id)
                     }
                 }
             }
 
             SettingsFormSection(
-                model.walletTitle,
-                value: model.selectedWallet?.name,
-                valueIcon: model.selectedWallet.flatMap(model.icon(for:))
+                model.output.walletTitle,
+                value: model.output.selectedWallet?.name,
+                valueIcon: model.output.selectedWallet.flatMap(model.output.icon(for:))
             ) {
                 VStack(alignment: .leading, spacing: 12) {
                     SettingsPagedGrid(
-                        items: model.wallets,
-                        selected: model.walletId,
+                        items: model.output.wallets,
+                        selected: model.state.walletId,
                         columns: 2,
                         rows: 3,
                         spacing: 8
                     ) { wallet in
                         SettingsWalletTile(
                             wallet: wallet,
-                            icon: model.icon(for: wallet),
-                            isSelected: model.walletId == wallet.id
+                            icon: model.output.icon(for: wallet),
+                            isSelected: model.state.walletId == wallet.id
                         ) {
-                            model.walletId = wallet.id
+                            model.state.setWallet(wallet.id)
                         }
                     }
 
-                    if model.billRecurring != nil {
-                        SettingsBillShiftPicker(shift: $model.billShift, dates: [])
+                    if model.output.billRecurring != nil {
+                        SettingsBillShiftPicker(shift: Bindable(model.state).billShift, dates: [])
                     }
                 }
             }

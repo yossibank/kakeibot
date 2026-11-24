@@ -1,35 +1,34 @@
 import Core
 import DesignSystem
-import Foundation
 import Store
 
 public extension RecurringEditModel {
     func load() async {
         do {
-            options = try await database.entryOptions()
-            cardBills = try await database.recurrings()
+            input.options = try await dependencies.database.entryOptions()
+            input.cardBills = try await dependencies.database.recurrings()
 
             try await loadLoanBalances()
             try await loadRecurring()
             presetPayment()
 
-            if categoryId == nil {
-                categoryId = categories.first?.id
+            if state.categoryId == nil {
+                state.categoryId = output.categories.first?.id
             }
 
             suggestHolidayShift()
 
-            if walletId == nil {
-                walletId = wallets.first?.id
+            if state.walletId == nil {
+                state.setWallet(output.wallets.first?.id)
             }
 
             presetDestination()
             chooseCountMode()
-            baseline = draft
+            input.baseline = output.draft
         } catch is CancellationError {
             return
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 }
@@ -39,101 +38,70 @@ extension RecurringEditModel {
     static let billPaymentDay = 27
     static let loadFailedMessage = "固定費を読めませんでした"
 
-    var suggestedHolidayShift: HolidayShift {
-        guard type != .transfer else {
-            return .next
-        }
-
-        let glyph = selectedCategory.flatMap { icon(for: $0) }?.glyph
-
-        switch glyph {
-        case .salary, .bonus: return .previous
-        case .home, .utility, .phone: return .next
-        default: return .none
-        }
-    }
-
     func presetPayment() {
         guard
-            !isEditing,
-            let target = paidWallet
+            !output.isEditing,
+            let target = input.paidWallet
         else {
             return
         }
 
+        let wallets = output.wallets
         let bank = wallets.first { $0.kind == .bank && $0.id != target }
         let other = wallets.first { $0.id != target }
 
-        type = .transfer
-        categoryId = nil
-        toWalletId = target
-        walletId = (bank ?? other)?.id
-        day = Self.billPaymentDay
+        state.type = .transfer
+        state.categoryId = nil
+        state.toWalletId = target
+        state.setWallet((bank ?? other)?.id)
+        state.schedule.day = Self.billPaymentDay
 
-        let name = selectedDestination?.name ?? ""
+        let destination = output.selectedDestination
+        let name = destination?.name ?? ""
 
-        if selectedDestination?.kind == .card {
-            closingDay = Self.billClosingDay
-            memo = name
+        if destination?.kind == .card {
+            state.schedule.closingDay = Self.billClosingDay
+            state.memo = name
         } else {
-            memo = "\(name)の返済"
+            state.memo = "\(name)の返済"
         }
     }
 
     func presetDestination() {
         guard
-            type == .transfer,
-            toWalletId == nil
+            state.type == .transfer,
+            state.toWalletId == nil
         else {
             return
         }
 
-        toWalletId = wallets.first { $0.id != walletId }?.id
+        state.toWalletId = output.wallets.first { $0.id != state.walletId }?.id
     }
 
     func suggestHolidayShift() {
-        guard
-            !isEditing,
-            !isHolidayShiftChosen
-        else {
+        guard !output.isEditing else {
             return
         }
 
-        holidayShift = suggestedHolidayShift
+        state.schedule.suggest(output.suggestedHolidayShift)
     }
 
     func loadRecurring() async throws {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
 
-        let recurrings = try await database.recurrings(includingHidden: true)
+        let recurrings = try await dependencies.database.recurrings(includingHidden: true)
         let recurring = recurrings.first { $0.id == editingId }
 
         guard let recurring else {
             throw AppDatabase.RecurringWriteError.recurringNotFound
         }
 
-        let draft = RecurringDraft(recurring)
+        input.isHidden = recurring.archivedAt != nil
+        input.generatedUntil = recurring.generatedUntil
 
-        isHidden = recurring.archivedAt != nil
-        type = draft.type
-        calculator = AmountCalculator(amount: draft.amount)
-        categoryId = draft.categoryId
-        walletId = draft.walletId
-        toWalletId = draft.toWalletId
-        memo = draft.memo
-        frequency = draft.frequency
-        month = draft.month
-        day = draft.day
-        holidayShift = draft.holidayShift
-        closingDay = draft.closingDay
-        feeCalculator = AmountCalculator(amount: draft.fee)
-        repayment.manualFinal = recurring.finalAmount
-        repayment.generatedUntil = recurring.generatedUntil
-        billShift = draft.billShift
-        startDate = draft.startDate
-        endDate = draft.endDate
-        remindDaysBefore = draft.remindDaysBefore
+        state.apply(RecurringDraft(recurring))
+        state.repayment.load(final: recurring.finalAmount)
     }
 }

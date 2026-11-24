@@ -10,12 +10,12 @@ struct SyncModelTests {
     func sendsLocalDataWhenCloudIsEmpty() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         await model.setOn(true)
 
-        #expect(model.isOn)
-        #expect(model.isChoosing == false)
+        #expect(model.input.isOn)
+        #expect(model.output.isChoosing == false)
         #expect(try await setup.database.pendingSyncChanges().isEmpty == false)
     }
 
@@ -23,12 +23,12 @@ struct SyncModelTests {
     func usesCloudDataWithoutAskingWhenNoEntries() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         await model.setOn(true)
 
-        #expect(model.isOn)
-        #expect(model.isChoosing == false)
+        #expect(model.input.isOn)
+        #expect(model.output.isChoosing == false)
         #expect(try await setup.database.pendingSyncChanges().isEmpty)
     }
 
@@ -37,16 +37,16 @@ struct SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         await model.setOn(true)
 
-        #expect(model.isOn == false)
-        #expect(model.isChoosing)
+        #expect(model.input.isOn == false)
+        #expect(model.output.isChoosing)
 
         await model.useLocalData()
 
-        #expect(model.isOn)
+        #expect(model.input.isOn)
         #expect(await cloud.deleted)
         #expect(try await setup.database.hasEntries())
     }
@@ -55,12 +55,12 @@ struct SyncModelTests {
     func staysOffWhenSignedOut() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(account: .noAccount, hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         await model.setOn(true)
 
-        #expect(model.isOn == false)
-        #expect(model.isAvailable == false)
+        #expect(model.input.isOn == false)
+        #expect(model.output.isAvailable == false)
     }
 
     @Test(
@@ -77,37 +77,37 @@ struct SyncModelTests {
     ) async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(account: account, hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         await model.load()
 
-        #expect(model.footnote == expected)
+        #expect(model.output.footnote == expected)
     }
 
     @Test
     func checksICloudAgainWhenBack() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(account: .noAccount, hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         await model.load()
         await cloud.signIn()
         await model.refreshAccount()
 
-        #expect(model.isAvailable)
-        #expect(model.footnote == "オンにすると、ほかの端末と記録がそろいます。")
+        #expect(model.output.isAvailable)
+        #expect(model.output.footnote == "オンにすると、ほかの端末と記録がそろいます。")
     }
 
     @Test
     func turnsOff() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
 
         await model.setOn(true)
         await model.setOn(false)
 
-        #expect(model.isOn == false)
+        #expect(model.input.isOn == false)
         #expect(try await setup.database.pendingSyncChanges().isEmpty)
     }
 
@@ -115,7 +115,7 @@ struct SyncModelTests {
     func showsWhySyncStoppedOnItsOwn() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         try await setup.database.turnOnSync()
 
         let task = Task {
@@ -123,26 +123,26 @@ struct SyncModelTests {
         }
 
         try await wait {
-            model.isOn
+            model.input.isOn
         }
 
         try await setup.database.turnOffSyncForAccountChange(.signedOut)
 
         try await wait {
-            model.stopReason != nil
+            model.input.stopReason != nil
         }
 
         task.cancel()
 
-        #expect(model.isOn == false)
-        #expect(model.stopReason?.message == "iCloud からサインアウトしたため、同期が切れました")
+        #expect(model.input.isOn == false)
+        #expect(model.input.stopReason?.message == "iCloud からサインアウトしたため、同期が切れました")
     }
 
     @Test
     func clearsWhySyncStoppedWhenTurnedOnAgain() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         try await setup.database.turnOnSync()
         try await setup.database.turnOffSync(because: .cloudReplaced)
 
@@ -151,19 +151,19 @@ struct SyncModelTests {
         }
 
         try await wait {
-            model.stopReason != nil
+            model.input.stopReason != nil
         }
 
         await model.setOn(true)
 
         try await wait {
-            model.stopReason == nil
+            model.input.stopReason == nil
         }
 
         task.cancel()
 
-        #expect(model.isOn)
-        #expect(model.stopReason == nil)
+        #expect(model.input.isOn)
+        #expect(model.input.stopReason == nil)
     }
 }
 

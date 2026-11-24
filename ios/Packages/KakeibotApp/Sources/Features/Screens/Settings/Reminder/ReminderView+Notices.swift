@@ -4,7 +4,7 @@ import SwiftUI
 
 extension ReminderView {
     var recurringText: String {
-        let time = model.time ?? .morning
+        let time = model.input.time ?? .morning
         return "固定費の通知は \(time) に届きます"
     }
 
@@ -33,7 +33,7 @@ extension ReminderView {
             SettingsSectionTitle("固定費の通知")
 
             VStack(spacing: 0) {
-                ForEach(model.upcomingNotices, id: \.self) { notice in
+                ForEach(model.output.upcomingNotices, id: \.self) { notice in
                     noticeRow(notice)
                 }
             }
@@ -69,12 +69,12 @@ private extension ReminderView {
                         .foregroundStyle(Palette.subtext)
                 }
 
-                Text(model.previewMessage.title)
+                Text(model.output.previewMessage.title)
                     .textFont(.subheadline, weight: .semibold)
                     .foregroundStyle(Palette.text)
                     .contentTransition(.opacity)
 
-                Text(model.previewMessage.body)
+                Text(model.output.previewMessage.body)
                     .textFont(.footnote)
                     .foregroundStyle(Palette.text.opacity(.strong))
                     .fixedSize(horizontal: false, vertical: true)
@@ -88,7 +88,7 @@ private extension ReminderView {
     }
 
     func dayButton(_ day: Weekday) -> some View {
-        let isSelected = model.previewDay == day
+        let isSelected = model.state.previewDay == day
         let color = isSelected ? Palette.accentStrong : Palette.subtext
         let weight: Font.Weight = isSelected ? .semibold : .regular
 
@@ -177,7 +177,7 @@ private extension ReminderView {
     }
 
     func showPreview(by step: Int) {
-        let index = Self.days.firstIndex(of: model.previewDay) ?? 0
+        let index = Self.days.firstIndex(of: model.state.previewDay) ?? 0
         let next = (index + step + Self.days.count) % Self.days.count
 
         model.showPreview(on: Self.days[next])

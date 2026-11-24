@@ -9,9 +9,9 @@ struct StampEditModelTests {
     @Test
     func addsShelfIcon() async throws {
         let database = try Self.database()
-        let model = StampEditModel(database: database)
-        model.icon.markKind = .emoji
-        model.icon.inputEmoji("🎉")
+        let model = StampEditModel(database: database, clock: .system)
+        model.state.icon.markKind = .emoji
+        model.state.icon.inputEmoji("🎉")
 
         let isSaved = await model.save()
         let shelf = try await database.shelfIconList()
@@ -25,9 +25,9 @@ struct StampEditModelTests {
     @Test
     func cannotSaveWithoutMark() throws {
         let database = try Self.database()
-        let model = StampEditModel(database: database)
+        let model = StampEditModel(database: database, clock: .system)
 
-        model.icon.markKind = .text
+        model.state.icon.markKind = .text
 
         #expect(!model.canSave)
         #expect(model.saveTitle == "アイコンを選んでください")
@@ -37,13 +37,13 @@ struct StampEditModelTests {
     func editsExistingShelfIcon() async throws {
         let database = try Self.database()
         let first = try await Self.firstShelfIcon(in: database)
-        let model = StampEditModel(database: database, editing: first.id)
+        let model = StampEditModel(database: database, clock: .system, editing: first.id)
 
         await model.load()
-        let loadedGlyph = model.icon.glyph
+        let loadedGlyph = model.state.icon.glyph
         let changedBeforeEdit = model.isChanged
 
-        model.icon.color = "#4A6FA5"
+        model.state.icon.color = "#4A6FA5"
         let changedAfterEdit = model.isChanged
         let isSaved = await model.save()
         let shelf = try await database.shelfIconList()
@@ -60,14 +60,14 @@ struct StampEditModelTests {
     func hidesStamp() async throws {
         let database = try Self.database()
         let first = try await Self.firstShelfIcon(in: database)
-        let model = StampEditModel(database: database, editing: first.id)
+        let model = StampEditModel(database: database, clock: .system, editing: first.id)
         await model.load()
 
         let isHidden = await model.setHidden(true)
         let shelf = try await database.shelfIconList()
 
         #expect(isHidden)
-        #expect(model.isHidden)
+        #expect(model.input.isHidden)
         #expect(shelf.shelfIcons.first?.archivedAt != nil)
     }
 }

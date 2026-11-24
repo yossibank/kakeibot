@@ -3,22 +3,22 @@ import Store
 
 @MainActor
 protocol SettingsEditModel: AnyObject {
-    associatedtype Edited: Equatable
-    associatedtype EditingID
+    associatedtype State: NoticeHolding
+    associatedtype Input: SettingsEditInput
 
-    var edited: Edited { get }
-    var baseline: Edited? { get }
-    var editingId: EditingID? { get }
+    var state: State { get }
+    var input: Input { get }
+    var edited: Input.Edited { get }
     var problemMessage: String? { get }
 }
 
 extension SettingsEditModel {
     var isEditing: Bool {
-        editingId != nil
+        input.editingId != nil
     }
 
     var isChanged: Bool {
-        baseline.map { $0 != edited } ?? false
+        input.baseline.map { $0 != edited } ?? false
     }
 
     var canSave: Bool {

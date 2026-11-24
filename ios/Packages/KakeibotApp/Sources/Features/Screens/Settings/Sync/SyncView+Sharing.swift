@@ -9,15 +9,15 @@ extension SyncView {
                 .padding(.leading, 8)
 
             VStack(spacing: 0) {
-                ForEach(model.shares, id: \.wallet.id) { item in
-                    if item.wallet.id != model.shares.first?.wallet.id {
+                ForEach(model.input.shares, id: \.wallet.id) { item in
+                    if item.wallet.id != model.input.shares.first?.wallet.id {
                         Hairline()
                     }
 
                     shareRow(item)
                 }
             }
-            .sharesTextScale(id: model.shares.map(\.wallet.name))
+            .sharesTextScale(id: model.input.shares.map(\.wallet.name))
             .padding(.horizontal, 16)
             .card()
             .disabled(isSharingLocked)
@@ -34,15 +34,15 @@ extension SyncView {
                 .padding(.leading, 8)
 
             VStack(spacing: 0) {
-                ForEach(model.joined, id: \.wallet.id) { item in
-                    if item.wallet.id != model.joined.first?.wallet.id {
+                ForEach(model.input.joined, id: \.wallet.id) { item in
+                    if item.wallet.id != model.input.joined.first?.wallet.id {
                         Hairline()
                     }
 
                     joinedRow(item)
                 }
             }
-            .sharesTextScale(id: model.joined.map(\.wallet.name))
+            .sharesTextScale(id: model.input.joined.map(\.wallet.name))
             .padding(.horizontal, 16)
             .card()
             .disabled(isSharingLocked)
@@ -107,7 +107,7 @@ private extension SyncView {
             } label: {
                 shareLabel(
                     isShared: item.isShared,
-                    isWorking: model.workingWallet == item.wallet.id
+                    isWorking: model.state.workingWallet == item.wallet.id
                 )
             }
             .buttonStyle(.plain)
@@ -175,7 +175,7 @@ private extension SyncView {
                     systemImage: nil,
                     color: Palette.rose,
                     isFilled: false,
-                    isWorking: model.workingWallet == item.wallet.id
+                    isWorking: model.state.workingWallet == item.wallet.id
                 )
             }
             .buttonStyle(.plain)
@@ -224,6 +224,6 @@ private extension SyncView {
 
 private extension SyncView {
     var isSharingLocked: Bool {
-        model.isWorking || model.workingWallet != nil || !model.isAvailable
+        model.state.isWorking || model.state.workingWallet != nil || !model.output.isAvailable
     }
 }
