@@ -94,7 +94,7 @@ private extension RecurringEditSheet {
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
                     SettingsChoice("残高から自動", isSelected: model.output.usesAutoCount) {
-                        model.useAutoCount()
+                        model.state.repayment.useAutoCount()
                         model.prepareCount()
                     }
 
@@ -145,7 +145,7 @@ private extension RecurringEditSheet {
                         shift.title,
                         isSelected: model.state.schedule.holidayShift == shift
                     ) {
-                        model.choose(shift)
+                        model.state.schedule.choose(shift)
                         closePanel()
                     }
                 }

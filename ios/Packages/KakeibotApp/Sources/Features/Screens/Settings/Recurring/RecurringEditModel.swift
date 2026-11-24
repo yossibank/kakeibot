@@ -80,10 +80,6 @@ public extension RecurringEditModel {
         suggestHolidayShift()
     }
 
-    func choose(_ shift: HolidayShift) {
-        state.schedule.choose(shift)
-    }
-
     func refreshAuthorization(_ permission: NotificationPermission) async {
         input.authorization = await permission.authorization()
     }

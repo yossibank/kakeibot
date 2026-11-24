@@ -153,7 +153,7 @@ private extension RecurringEditSheet {
                model.output.plannedTotal != nil || model.output.autoPlan != nil {
                 RecurringLoanPlan(model: model) {
                     withAnimation(.snappy) {
-                        model.useAutoCount()
+                        model.state.repayment.useAutoCount()
                     }
                 }
                 .transition(.opacity)

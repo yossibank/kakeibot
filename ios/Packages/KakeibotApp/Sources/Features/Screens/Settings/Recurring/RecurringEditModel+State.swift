@@ -51,11 +51,11 @@ public extension RecurringEditModel {
             manualFinal = amount
         }
 
-        mutating func load(
-            isCountAuto: Bool,
-            final amount: Int?
-        ) {
+        mutating func setCountAuto(_ isCountAuto: Bool) {
             self.isCountAuto = isCountAuto
+        }
+
+        mutating func load(final amount: Int?) {
             manualFinal = amount
         }
     }

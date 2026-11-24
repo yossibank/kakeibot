@@ -102,6 +102,6 @@ extension RecurringEditModel {
         input.generatedUntil = recurring.generatedUntil
 
         state.apply(RecurringDraft(recurring))
-        state.repayment.load(isCountAuto: state.repayment.isCountAuto, final: recurring.finalAmount)
+        state.repayment.load(final: recurring.finalAmount)
     }
 }

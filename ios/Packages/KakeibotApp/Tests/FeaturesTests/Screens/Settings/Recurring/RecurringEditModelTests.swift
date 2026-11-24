@@ -156,7 +156,7 @@ struct RecurringEditModelTests {
         model.select(.transfer)
         let transfer = model.state.schedule.holidayShift
 
-        model.choose(.none)
+        model.state.schedule.choose(.none)
         model.select(.income)
         let chosen = model.state.schedule.holidayShift
 
@@ -272,7 +272,7 @@ struct RecurringEditModelTests {
         #expect(model.output.draft.finalAmount == 0)
         #expect(model.output.balanceGap == -16587)
 
-        model.useAutoCount()
+        model.state.repayment.useAutoCount()
 
         #expect(model.output.repaymentCount == 240)
         #expect(model.output.balanceGap == nil)
@@ -355,7 +355,7 @@ private extension RecurringEditModelTests {
 
         await model.load()
         model.state.schedule.startDate = start
-        model.choose(.none)
+        model.state.schedule.choose(.none)
 
         for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
             model.state.press(key)
