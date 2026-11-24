@@ -185,7 +185,7 @@ extension MainView {
         notice.show(change)
 
         Task {
-            guard await request.shouldAsk(after: change, at: Date()) else {
+            guard await request.shouldAsk(after: change, at: clock.now) else {
                 return
             }
 

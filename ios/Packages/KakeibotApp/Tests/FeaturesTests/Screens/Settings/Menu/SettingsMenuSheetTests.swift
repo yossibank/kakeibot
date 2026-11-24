@@ -17,6 +17,7 @@ struct SettingsMenuSheetTests {
 
         let sheet = SettingsMenuSheet(
             database: database,
+            clock: .system,
             today: LocalDate(now, in: .current),
             appIcon: AppIconListModel()
         )

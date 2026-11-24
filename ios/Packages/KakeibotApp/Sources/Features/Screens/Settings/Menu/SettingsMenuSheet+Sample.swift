@@ -49,7 +49,7 @@ private extension SettingsMenuSheet {
         sampleMessage = nil
 
         do {
-            try await SettingsMenuSampleData.insert(into: database, today: today, now: Date())
+            try await SettingsMenuSampleData.insert(into: database, today: today, now: clock.now)
             sampleMessage = "テストデータを入れました"
         } catch {
             sampleMessage = "テストデータを入れられませんでした"

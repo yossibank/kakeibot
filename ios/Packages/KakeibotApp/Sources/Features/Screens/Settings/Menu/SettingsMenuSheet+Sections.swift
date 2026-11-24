@@ -49,7 +49,7 @@ extension SettingsMenuSheet {
                 RecurringListView(
                     model: RecurringListModel(
                         database: database,
-                        clock: .system,
+                        clock: clock,
                         today: today
                     )
                 )
@@ -205,7 +205,7 @@ extension SettingsMenuSheet {
                 SyncView(
                     model: SyncModel(
                         database: database,
-                        clock: .system,
+                        clock: clock,
                         cloud: syncCloud
                     )
                 )
@@ -218,7 +218,7 @@ extension SettingsMenuSheet {
             NavigationLink {
                 BackupView(
                     model: BackupModel(
-                        database: database, clock: .system,
+                        database: database, clock: clock,
                         permission: permission
                     )
                 )
@@ -286,7 +286,7 @@ private extension SettingsMenuSheet {
         return BackupModel.exportAgeText(
             exportedAt: backupExportedAt,
             firstCreatedAt: firstEntryCreatedAt,
-            now: Date()
+            now: clock.now
         )
     }
 
