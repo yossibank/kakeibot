@@ -126,8 +126,8 @@ extension ReviewModelTests {
         let reopened = ReviewModel(database: setup.database, clock: .system, today: setup.today)
         await reopened.loadSelection()
 
-        #expect(reopened.state.scale == .week)
-        #expect(reopened.state.kind == .income)
+        #expect(reopened.input.scale == .week)
+        #expect(reopened.input.kind == .income)
     }
 
     @Test

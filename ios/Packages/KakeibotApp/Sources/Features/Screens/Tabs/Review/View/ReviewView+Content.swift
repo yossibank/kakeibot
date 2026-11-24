@@ -10,11 +10,11 @@ extension ReviewView {
                     kindTile(kind)
                 }
             }
-            .animation(.snappy, value: model.state.kind)
+            .animation(.snappy, value: model.input.kind)
 
             detailCard
 
-            if model.state.kind == .balance {
+            if model.input.kind == .balance {
                 let moves = model.output.moves
 
                 if !moves.isEmpty {
@@ -22,7 +22,7 @@ extension ReviewView {
                 }
             }
 
-            if model.state.kind != .balance {
+            if model.input.kind != .balance {
                 let categoryShares = model.output.categoryShares
                 let walletShares = model.output.walletShares
                 let isEmpty = categoryShares.isEmpty && walletShares.isEmpty
@@ -125,7 +125,7 @@ extension ReviewView {
 
 private extension ReviewView {
     func kindTile(_ kind: ReviewKind) -> some View {
-        let isSelected = kind == model.state.kind
+        let isSelected = kind == model.input.kind
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
         let rim = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
         let titleColor = isSelected ? Palette.accent : Palette.subtext
@@ -195,7 +195,7 @@ private extension ReviewView {
 
 private extension ReviewView {
     var totalTitle: String {
-        Self.title(of: model.state.kind)
+        Self.title(of: model.input.kind)
     }
 
     var recordDate: LocalDate {

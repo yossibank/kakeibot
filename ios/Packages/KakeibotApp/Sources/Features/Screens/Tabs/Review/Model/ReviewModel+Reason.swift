@@ -118,7 +118,7 @@ private extension ReviewModel.Output {
 
     func reasonBasis(for item: ReviewGoalItem) -> String {
         let goal = item.goal
-        let unit = state.scale.unitName
+        let unit = input.scale.unitName
 
         let spent = reasonRow.map { row in
             let amount = ReviewYen.text(row.row.amount)

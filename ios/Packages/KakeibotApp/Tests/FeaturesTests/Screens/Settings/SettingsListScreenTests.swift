@@ -28,7 +28,7 @@ struct SettingsListScreenTests {
             "WalletListView": SettingsMenuSheetTests
                 .depth(of: WalletListView(database: database).body),
             "RecurringListView": SettingsMenuSheetTests
-                .depth(of: RecurringListView(model: recurring).body),
+                .depth(of: RecurringListView(board: recurring.board()).body),
             "TemplateListView": SettingsMenuSheetTests
                 .depth(of: TemplateListView(database: database).body)
         ]

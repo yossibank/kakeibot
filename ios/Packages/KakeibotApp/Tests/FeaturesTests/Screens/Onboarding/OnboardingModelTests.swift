@@ -10,22 +10,22 @@ struct OnboardingModelTests {
     func walksFullRouteAndSavesChoices() async throws {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))
-        let model = OnboardingModel(database: setup.database, today: setup.today)
+        let model = OnboardingModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
-        let first = model.isFirstPage
+        let first = model.output.isFirstPage
         let locked = model.canTurn(forward: true)
         model.choose(.full)
         model.next()
-        await model.monthStart.choose(payday)
+        await model.state.monthStart.choose(payday)
         model.next()
         await model.refreshPage()
-        let budgetMonth = model.budget.input.month
+        let budgetMonth = model.state.budget.input.month
         model.back()
-        let back = model.page
+        let back = model.state.page
         model.next()
         model.next()
-        let title = model.nextTitle
+        let title = model.output.nextTitle
         let finished = await model.finish()
         let completed = try await setup.database.setting(.onboardingCompleted)
         let seenNews = try await setup.database.setting(.whatsNewSeenVersion)
@@ -34,8 +34,8 @@ struct OnboardingModelTests {
         #expect(!locked)
         #expect(budgetMonth == YearMonth(year: 2026, month: 10))
         #expect(back == .monthStart)
-        #expect(model.page == .setup)
-        #expect(model.isLastPage)
+        #expect(model.state.page == .setup)
+        #expect(model.output.isLastPage)
         #expect(title == "はじめる")
         #expect(finished)
         #expect(completed)
@@ -45,22 +45,22 @@ struct OnboardingModelTests {
     @Test
     func endsMinimalRouteAtBudget() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = OnboardingModel(database: setup.database, today: setup.today)
+        let model = OnboardingModel(database: setup.database, clock: .system, today: setup.today)
 
         model.choose(.minimal)
         model.next()
         model.next()
 
-        #expect(model.page == .budget)
-        #expect(model.stepPages == [.monthStart, .budget])
-        #expect(model.isLastPage)
+        #expect(model.state.page == .budget)
+        #expect(model.output.stepPages == [.monthStart, .budget])
+        #expect(model.output.isLastPage)
         #expect(!model.canTurn(forward: true))
     }
 
     @Test
     func addsStarterTemplatesOnce() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = OnboardingModel(database: setup.database, today: setup.today)
+        let model = OnboardingModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
         await model.load()

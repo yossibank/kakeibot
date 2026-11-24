@@ -25,7 +25,7 @@ struct SnapshotTests {
         }
 
         for layout in [RecordsLayout.calendar, .list] {
-            model.state.setLayout(layout)
+            model.chooseLayout(layout)
             model.state.selectedDate = today
 
             for variant in Self.variants {
@@ -47,7 +47,7 @@ struct SnapshotTests {
             }
         }
 
-        model.state.setLayout(.calendar)
+        model.chooseLayout(.calendar)
 
         let wide = Variant(name: "wide", width: 820, scheme: .light, textSize: .standard)
 
@@ -58,7 +58,7 @@ struct SnapshotTests {
             to: "records-calendar"
         )
 
-        model.state.setLayout(.list)
+        model.chooseLayout(.list)
 
         let selectedDays = model.output.days.prefix(2)
         let firstDayIds = selectedDays.first?.entries.map(\.id) ?? []

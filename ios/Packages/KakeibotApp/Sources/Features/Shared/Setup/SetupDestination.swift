@@ -48,11 +48,12 @@ public struct SetupDestination: View {
 
         case .recurrings:
             RecurringListView(
-                model: RecurringListModel(
+                board: RecurringListModel(
                     database: database,
                     clock: .system,
                     today: today
                 )
+                .board()
             )
 
         case .templates:

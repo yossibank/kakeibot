@@ -78,7 +78,7 @@ extension ReviewView {
                 }
             }
 
-            if model.state.kind == .balance {
+            if model.input.kind == .balance {
                 VStack(spacing: 12) {
                     balanceBar(
                         "収入",
@@ -164,7 +164,7 @@ private extension ReviewView {
     }
 
     var showsMoveRow: Bool {
-        model.state.kind == .expense && !model.output.moves.isEmpty
+        model.input.kind == .expense && !model.output.moves.isEmpty
     }
 
     var detailRows: [DetailRow] {
@@ -179,7 +179,7 @@ private extension ReviewView {
     }
 
     var selectedChangeColor: Color {
-        Self.changeColor(model.output.change, of: model.state.kind)
+        Self.changeColor(model.output.change, of: model.input.kind)
     }
 
     var moveText: String {
@@ -193,8 +193,8 @@ private extension ReviewView {
         }
 
         let previous = model.output.isComparingPartially
-            ? Self.partialName(of: model.state.scale)
-            : Self.previousName(of: model.state.scale)
+            ? Self.partialName(of: model.input.scale)
+            : Self.previousName(of: model.input.scale)
 
         let change = model.output.change
         let amount = Yen.text(abs(change))
@@ -239,7 +239,7 @@ private extension ReviewView {
     }
 
     func recurringText(_ recurring: Int) -> String {
-        let other = model.output.total(of: model.state.kind) - recurring
+        let other = model.output.total(of: model.input.kind) - recurring
         let fixed = "固定費 \(Yen.text(recurring))"
         return "\(fixed)・それ以外 \(Yen.text(other))"
     }

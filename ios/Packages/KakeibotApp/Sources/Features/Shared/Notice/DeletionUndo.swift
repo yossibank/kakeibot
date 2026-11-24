@@ -5,23 +5,37 @@ import Store
 @MainActor
 @Observable
 public final class DeletionUndo {
-    public var deletion: Deletion?
-    public var errorNotice = ErrorNotice()
+    public let state: State
 
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(database: AppDatabase) {
-        self.database = database
+        self.state = State()
+        self.dependencies = Dependencies(database: database)
     }
 }
 
 public extension DeletionUndo {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public var errorNotice = ErrorNotice()
+
+        public var deletion: Deletion?
+    }
+
     func restore(_ deletion: Deletion) async {
         do {
-            try await database.restore(deletion)
+            try await dependencies.database.restore(deletion)
         } catch {
-            errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.errorNotice.show(Self.restoreFailedMessage, for: error)
         }
+    }
+}
+
+extension DeletionUndo {
+    struct Dependencies {
+        let database: AppDatabase
     }
 }
 

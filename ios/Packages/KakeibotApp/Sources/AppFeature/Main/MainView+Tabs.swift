@@ -69,7 +69,7 @@ extension MainView {
                     }
                 },
                 onDeleteAdjustment: { deletion in
-                    undo.deletion = deletion
+                    undo.state.deletion = deletion
                 }
             )
             .loadFailed(records.input.isListFailed, onRetry: retry)

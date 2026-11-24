@@ -38,11 +38,9 @@ public extension ReviewModel {
 
         public internal(set) var checkTime: Date
 
-        public private(set) var scale: ReviewPeriod.Scale = .month
         public private(set) var offset = 0
         public private(set) var isMovingForward = true
 
-        public internal(set) var kind: ReviewKind = .expense
         public internal(set) var showsStoreReviewCard = false
         public internal(set) var newReportKey: String?
 
@@ -58,6 +56,8 @@ public extension ReviewModel {
     @MainActor
     @Observable
     final class Input {
+        public internal(set) var scale: ReviewPeriod.Scale = .month
+        public internal(set) var kind: ReviewKind = .expense
         public internal(set) var isListFailed = false
         public internal(set) var monthStartDay: MonthStartDay = .first
         public internal(set) var weekStart: Weekday = .sunday
@@ -143,27 +143,30 @@ public extension ReviewModel {
 
     func loadSelection() async {
         do {
-            let scale = try await dependencies.database.setting(.reviewScale)
-
-            state.load(scale)
-            state.kind = try await dependencies.database.setting(.reviewKind)
+            input.scale = try await dependencies.database.setting(.reviewScale)
+            input.kind = try await dependencies.database.setting(.reviewKind)
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func setScale(_ scale: ReviewPeriod.Scale) {
-        state.setScale(scale)
+        let scales = ReviewPeriod.Scale.allCases
+        let from = scales.firstIndex(of: input.scale) ?? 0
+        let to = scales.firstIndex(of: scale) ?? 0
+
+        state.restart(movingForward: to > from)
+        input.scale = scale
     }
 
     func setKind(_ kind: ReviewKind) {
-        state.kind = kind
+        input.kind = kind
     }
 
     func saveSelection() async {
         do {
-            try await dependencies.database.setSetting(.reviewScale, to: state.scale)
-            try await dependencies.database.setSetting(.reviewKind, to: state.kind)
+            try await dependencies.database.setSetting(.reviewScale, to: input.scale)
+            try await dependencies.database.setSetting(.reviewKind, to: input.kind)
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
@@ -179,17 +182,8 @@ public extension ReviewModel {
 }
 
 extension ReviewModel.State {
-    func load(_ scale: ReviewPeriod.Scale) {
-        self.scale = scale
-    }
-
-    func setScale(_ scale: ReviewPeriod.Scale) {
-        let scales = ReviewPeriod.Scale.allCases
-        let from = scales.firstIndex(of: self.scale) ?? 0
-        let to = scales.firstIndex(of: scale) ?? 0
-
-        isMovingForward = to > from
-        self.scale = scale
+    func restart(movingForward isMovingForward: Bool) {
+        self.isMovingForward = isMovingForward
         offset = 0
     }
 
@@ -235,7 +229,7 @@ public extension ReviewModel {
 public extension ReviewModel.Output {
     var period: ReviewPeriod {
         let current = ReviewPeriod(
-            scale: state.scale,
+            scale: input.scale,
             containing: state.today,
             monthStartDay: input.monthStartDay,
             weekStart: input.weekStart
@@ -270,11 +264,11 @@ public extension ReviewModel.Output {
     }
 
     var total: Int {
-        total(of: state.kind)
+        total(of: input.kind)
     }
 
     var change: Int {
-        change(of: state.kind)
+        change(of: input.kind)
     }
 
     var stampTallies: [StampBook.Tally] {
@@ -350,7 +344,7 @@ public extension ReviewModel.Output {
 
 extension ReviewModel.Output {
     var entryType: Entry.Kind? {
-        state.kind.entryType
+        input.kind.entryType
     }
 }
 

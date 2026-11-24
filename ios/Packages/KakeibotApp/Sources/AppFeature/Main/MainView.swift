@@ -254,25 +254,25 @@ private extension MainView {
         return Color.clear
             .padding(.leading, Self.noticeLeading(hasSidebar: hasSidebar))
             .entryNotice(notice, above: noticeAbove)
-            .deletionNotice($undo.deletion, bottom: noticeBottom) { deletion in
+            .deletionNotice(Bindable(undo.state).deletion, bottom: noticeBottom) { deletion in
                 Task {
                     await undo.restore(deletion)
                 }
             }
-            .errorBanner(undo.errorNotice, bottom: noticeBottom) {
-                undo.errorNotice.clear()
+            .errorBanner(undo.state.errorNotice, bottom: noticeBottom) {
+                undo.state.errorNotice.clear()
             }
             .onChange(of: notice.state.notice) { _, new in
                 if new != nil {
                     replaceNotices(with: .entry)
                 }
             }
-            .onChange(of: undo.deletion) { _, new in
+            .onChange(of: undo.state.deletion) { _, new in
                 if new != nil {
                     replaceNotices(with: .deletion)
                 }
             }
-            .onChange(of: undo.errorNotice.count) {
+            .onChange(of: undo.state.errorNotice.count) {
                 replaceNotices(with: .undoError)
             }
             .onChange(of: tabErrorCounts) {
@@ -317,11 +317,11 @@ private extension MainView {
         }
 
         if source != .deletion {
-            undo.deletion = nil
+            undo.state.deletion = nil
         }
 
         if source != .undoError {
-            undo.errorNotice.clear()
+            undo.state.errorNotice.clear()
         }
 
         if source != .tab {

@@ -89,6 +89,10 @@ extension RecurringListModel: SettingsBoardListModel {
     func updates() -> some AsyncSequence<[Recurring], any Error> {
         dependencies.database.recurringUpdates(includingHidden: true)
     }
+
+    func board() -> RecurringBoard {
+        RecurringBoard(model: self, database: dependencies.database, clock: dependencies.clock)
+    }
 }
 
 extension RecurringListModel: SettingsBoardModel {

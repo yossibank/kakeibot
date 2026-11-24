@@ -6,16 +6,20 @@ import OSLog
 @MainActor
 @Observable
 public final class ProPurchaseModel {
-    public private(set) var price: String?
-    public private(set) var working: Work?
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let store: ProStore
+    let dependencies: Dependencies
 
     public init(store: ProStore) {
-        self.store = store
-        self.price = store.cachedPrice()
+        let state = State()
+        let input = Input(price: store.cachedPrice())
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(store: store)
     }
 }
 
@@ -32,24 +36,56 @@ public extension ProPurchaseModel {
         }
     }
 
-    var isWorking: Bool {
-        working != nil
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public internal(set) var working: Work?
     }
 
-    var purchaseTitle: String {
-        guard let price else {
-            return "購入する"
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var price: String?
+
+        init(price: String?) {
+            self.price = price
+        }
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+        let state: State
+
+        public var isWorking: Bool {
+            state.working != nil
         }
 
-        return "\(price) で購入する"
+        public var purchaseTitle: String {
+            guard let price = input.price else {
+                return "購入する"
+            }
+
+            return "\(price) で購入する"
+        }
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
+            self.state = state
+        }
     }
 
     func load() async {
-        guard let price = try? await store.price() else {
+        guard let price = try? await dependencies.store.price() else {
             return
         }
 
-        self.price = price
+        input.price = price
     }
 
     func purchase() async -> Bool {
@@ -57,7 +93,7 @@ public extension ProPurchaseModel {
             .purchase,
             failedMessage: Self.purchaseFailedMessage
         ) {
-            try await store.purchase()
+            try await dependencies.store.purchase()
         }
 
         return status?.isUnlocked == true
@@ -68,7 +104,7 @@ public extension ProPurchaseModel {
             .restore,
             failedMessage: Self.restoreFailedMessage
         ) {
-            try await store.restore()
+            try await dependencies.store.restore()
         }
 
         guard let status else {
@@ -76,10 +112,16 @@ public extension ProPurchaseModel {
         }
 
         if !status.isUnlocked {
-            errorNotice.inform(Self.nothingToRestoreMessage)
+            state.errorNotice.inform(Self.nothingToRestoreMessage)
         }
 
         return status.isUnlocked
+    }
+}
+
+extension ProPurchaseModel {
+    struct Dependencies {
+        let store: ProStore
     }
 }
 
@@ -94,15 +136,15 @@ private extension ProPurchaseModel {
         failedMessage: String,
         _ operation: () async throws -> ProStatus
     ) async -> ProStatus? {
-        guard !isWorking else {
+        guard !output.isWorking else {
             return nil
         }
 
-        working = work
-        errorNotice.clear()
+        state.working = work
+        state.errorNotice.clear()
 
         defer {
-            working = nil
+            state.working = nil
         }
 
         do {
@@ -116,7 +158,7 @@ private extension ProPurchaseModel {
             Self.logger.error(
                 "\(failedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
             )
-            errorNotice.show(failedMessage)
+            state.errorNotice.show(failedMessage)
             return nil
         }
     }

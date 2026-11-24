@@ -34,7 +34,15 @@ public extension EntryNoticeModel {
     @MainActor
     @Observable
     final class State {
-        public internal(set) var notice: Notice?
+        public private(set) var notice: Notice?
+
+        func show(_ notice: Notice) {
+            self.notice = notice
+        }
+
+        func clear() {
+            notice = nil
+        }
     }
 
     @MainActor
@@ -55,13 +63,13 @@ public extension EntryNoticeModel {
     }
 
     func show(_ change: EntryChange) {
-        state.notice = .changed(change)
+        state.show(.changed(change))
     }
 
     func undo() async {
         let undone = state.notice
 
-        state.notice = nil
+        state.clear()
 
         do {
             switch undone {
@@ -80,9 +88,9 @@ public extension EntryNoticeModel {
                 return
             }
 
-            state.notice = .undone
+            state.show(.undone)
         } catch {
-            state.notice = .failed(Self.undoFailedMessage)
+            state.show(.failed(Self.undoFailedMessage))
         }
     }
 
@@ -104,9 +112,9 @@ public extension EntryNoticeModel {
 
             let batch = EntryBatch(kind: kind, previous: previous)
 
-            state.notice = .batch(batch)
+            state.show(.batch(batch))
         } catch {
-            state.notice = .failed(Self.changeFailedMessage(of: kind))
+            state.show(.failed(Self.changeFailedMessage(of: kind)))
         }
     }
 
@@ -118,9 +126,9 @@ public extension EntryNoticeModel {
                 at: dependencies.clock.now
             )
             let batch = EntryBatch(kind: .deleted, previous: previous, items: items)
-            state.notice = .batch(batch)
+            state.show(.batch(batch))
         } catch {
-            state.notice = .failed(Self.deleteFailedMessage)
+            state.show(.failed(Self.deleteFailedMessage))
         }
     }
 
@@ -162,12 +170,12 @@ public extension EntryNoticeModel {
 
             show(change)
         } catch {
-            state.notice = .failed(Self.deleteFailedMessage)
+            state.show(.failed(Self.deleteFailedMessage))
         }
     }
 
     func clear() {
-        state.notice = nil
+        state.clear()
     }
 
     func clearOnTap() {
@@ -175,7 +183,7 @@ public extension EntryNoticeModel {
             return
         }
 
-        state.notice = nil
+        state.clear()
     }
 }
 

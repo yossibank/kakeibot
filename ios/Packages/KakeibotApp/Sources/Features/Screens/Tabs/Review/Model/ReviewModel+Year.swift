@@ -9,7 +9,7 @@ extension ReviewModel {
 extension ReviewModel.Output {
     var yearProgress: ReviewYearProgress? {
         guard
-            state.scale == .year,
+            input.scale == .year,
             isCurrentPeriod
         else {
             return nil

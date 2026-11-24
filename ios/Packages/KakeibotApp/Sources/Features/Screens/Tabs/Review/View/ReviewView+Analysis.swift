@@ -143,7 +143,7 @@ private extension ReviewView {
                 notes: model.output.closingNotes,
                 name: analysisName,
                 previousName: model.output.period.previous.displayName,
-                unit: model.state.scale.unitName,
+                unit: model.input.scale.unitName,
                 onOpenGoal: { item in
                     analysisShare = model.output.goalShare(of: item)
                 },
@@ -166,7 +166,7 @@ private extension ReviewView {
         return ReviewProgressView(
             pace: model.output.pace,
             year: model.output.yearProgress,
-            unit: model.state.scale.unitName,
+            unit: model.input.scale.unitName,
             currentName: currentName,
             goals: model.output.goalItems,
             closingTitle: "\(analysisName)のふりかえり",
@@ -210,7 +210,7 @@ private extension ReviewView {
     var analysisName: String {
         let month = model.output.period.range.upperBound.yearMonth
 
-        return switch model.state.scale {
+        return switch model.input.scale {
         case .week: currentName
         case .month: "\(month.month)月"
         case .year: "\(String(month.year))年"
@@ -226,7 +226,7 @@ private extension ReviewView {
     var currentName: String {
         let isCurrent = model.output.period.range.contains(model.state.today)
 
-        return switch model.state.scale {
+        return switch model.input.scale {
         case .week: isCurrent ? "今週" : "この週"
         case .month: isCurrent ? "今月" : "この月"
         case .year: isCurrent ? "今年" : "この年"

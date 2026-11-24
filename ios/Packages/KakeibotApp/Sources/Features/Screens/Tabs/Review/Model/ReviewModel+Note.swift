@@ -38,7 +38,7 @@ extension ReviewModel {
 
         guard let body = await Self.writeSummary(
             facts: facts,
-            scale: state.scale,
+            scale: input.scale,
             categories: names
         )
         else {

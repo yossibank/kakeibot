@@ -62,7 +62,7 @@ public struct ReviewView: View {
             move(direction)
         }
         .haptic(.selection, trigger: model.output.period)
-        .haptic(.selection, trigger: model.state.kind)
+        .haptic(.selection, trigger: model.input.kind)
         .task(id: model.output.goalTrigger) {
             await model.refreshGoals()
         }
@@ -102,7 +102,7 @@ extension ReviewView {
         let range = model.output.period.range
         let month = range.upperBound.yearMonth
 
-        switch model.state.scale {
+        switch model.input.scale {
         case .week: return PeriodText.range(range, today: model.state.today)
         case .month: return month.title
         case .year: return "\(String(month.year))年"
@@ -110,7 +110,7 @@ extension ReviewView {
     }
 
     var currentPeriodTitle: String {
-        switch model.state.scale {
+        switch model.input.scale {
         case .week: "今週"
         case .month: "今月"
         case .year: "今年"
@@ -203,10 +203,10 @@ private extension ReviewView {
 
     var scaleBinding: Binding<ReviewPeriod.Scale> {
         Binding {
-            model.state.scale
+            model.input.scale
         } set: { scale in
             let scales = ReviewPeriod.Scale.allCases
-            let from = scales.firstIndex(of: model.state.scale) ?? 0
+            let from = scales.firstIndex(of: model.input.scale) ?? 0
             let to = scales.firstIndex(of: scale) ?? 0
 
             PageSlide.run($slide, forward: to > from) {
@@ -220,7 +220,7 @@ private extension ReviewView {
     }
 
     var periodSubtitle: String? {
-        switch model.state.scale {
+        switch model.input.scale {
         case .week: nil
         case .month, .year: PeriodText.range(model.output.period.range)
         }

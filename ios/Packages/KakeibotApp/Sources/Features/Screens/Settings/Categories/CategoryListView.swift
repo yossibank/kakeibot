@@ -3,19 +3,21 @@ import Store
 import SwiftUI
 
 public struct CategoryListView: View {
-    private let database: AppDatabase
-    private let kind: EntryCategory.Kind
+    private let board: CategoryBoard
 
     public init(
         database: AppDatabase,
         kind: EntryCategory.Kind = .expense
     ) {
-        self.database = database
-        self.kind = kind
+        self.init(board: CategoryBoard(database: database, kind: kind))
+    }
+
+    init(board: CategoryBoard) {
+        self.board = board
     }
 
     public var body: some View {
-        SettingsBoardPage(CategoryBoard(database: database, kind: kind))
+        SettingsBoardPage(board)
     }
 }
 
