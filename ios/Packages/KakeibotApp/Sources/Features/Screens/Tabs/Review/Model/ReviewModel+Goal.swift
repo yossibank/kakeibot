@@ -8,11 +8,12 @@ extension ReviewModel {
         let isLoaded: Bool
     }
 
-    func refreshGoals(now: Date) async {
+    func refreshGoals() async {
         guard input.list != nil else {
             return
         }
 
+        let now = dependencies.clock.now
         let current = output.currentPeriod
         let closed = current.previous
 
@@ -35,6 +36,10 @@ extension ReviewModel {
         }
 
         await loadGoals()
+    }
+
+    func goalCheckTime() -> Date {
+        dependencies.clock.now
     }
 
     func markReportSeen() async {

@@ -8,7 +8,8 @@ extension ReviewModel {
         let basis: String?
     }
 
-    func refreshNotes(now: Date) async {
+    func refreshNotes() async {
+        let now = dependencies.clock.now
         let key = Self.summaryKey(output.period.commentKey)
         let facts = output.closingFacts(now: now)
         let basis = facts.basis

@@ -8,7 +8,8 @@ extension ReviewModel {
         let goalId: ReviewGoal.ID?
     }
 
-    func refreshReason(now: Date) async {
+    func refreshReason() async {
+        let now = dependencies.clock.now
         let key = output.period.commentKey
         let next = output.period.adding(1)
 

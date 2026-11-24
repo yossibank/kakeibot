@@ -15,6 +15,7 @@ public final class ReviewModel: ScreenModel {
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate
     ) {
         let state = State(today: today)
@@ -23,7 +24,7 @@ public final class ReviewModel: ScreenModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
@@ -208,6 +209,7 @@ extension ReviewModel.State {
 extension ReviewModel {
     struct Dependencies {
         let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 

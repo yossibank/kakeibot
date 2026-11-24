@@ -68,6 +68,7 @@ struct MainView: View {
         _review = State(
             initialValue: ReviewModel(
                 database: database,
+                clock: clock,
                 today: today
             )
         )
