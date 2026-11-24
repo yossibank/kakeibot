@@ -3,14 +3,18 @@ import Store
 import SwiftUI
 
 public struct RewardRuleListView: View {
-    private let database: AppDatabase
+    private let board: RewardRuleBoard
 
     public init(database: AppDatabase) {
-        self.database = database
+        self.init(board: RewardRuleBoard(database: database))
+    }
+
+    init(board: RewardRuleBoard) {
+        self.board = board
     }
 
     public var body: some View {
-        SettingsBoardPage(RewardRuleBoard(database: database))
+        SettingsBoardPage(board)
     }
 }
 

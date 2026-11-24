@@ -51,7 +51,7 @@ extension EntrySheet {
 
         case .categories:
             NavigationStack {
-                SettingsBoardPage(model.categoryBoard())
+                CategoryListView(board: model.categoryBoard())
                     .toolbar(.hidden, for: .navigationBar)
             }
         }
