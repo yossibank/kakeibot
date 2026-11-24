@@ -49,7 +49,7 @@ extension StampBoard: SettingsBoardSpec {
         in model: StampListModel,
         isHidden: Bool
     ) -> some View {
-        StampTileFace(icon: model.icon(for: item), isHidden: isHidden)
+        StampTileFace(icon: model.output.icon(for: item), isHidden: isHidden)
     }
 
     func editModel(for destination: Destination) -> StampEditModel {

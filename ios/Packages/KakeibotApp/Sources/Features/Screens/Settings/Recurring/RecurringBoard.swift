@@ -17,7 +17,7 @@ extension RecurringBoard: SettingsBoardSpec {
     typealias Editor = RecurringEditSheet
 
     var database: AppDatabase {
-        model.database
+        model.dependencies.database
     }
 
     var screen: SettingsScreen {
@@ -61,12 +61,12 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func header(in model: RecurringListModel) -> some View {
-        CapsulePicker(selection: Bindable(model).type, options: Self.typeOptions)
+        CapsulePicker(selection: Bindable(model.state).type, options: Self.typeOptions)
     }
 
     @ViewBuilder
     func lead(in model: RecurringListModel) -> some View {
-        if !model.rows.isEmpty {
+        if !model.output.rows.isEmpty {
             totalCard(in: model)
         }
     }
@@ -77,7 +77,7 @@ extension RecurringBoard: SettingsBoardSpec {
         in model: RecurringListModel,
         isHidden: Bool
     ) -> some View {
-        if let row = model.row(for: item) {
+        if let row = model.output.row(for: item) {
             RecurringRowCard(row: row, isPaused: isHidden)
         }
     }
@@ -85,10 +85,20 @@ extension RecurringBoard: SettingsBoardSpec {
     func editModel(for destination: Destination) -> RecurringEditModel {
         switch destination {
         case let .new(type):
-            RecurringEditModel(database: database, today: model.today, type: type, editing: nil)
+            RecurringEditModel(
+                database: database,
+                today: model.input.today,
+                type: type,
+                editing: nil
+            )
 
         case let .edit(type, id):
-            RecurringEditModel(database: database, today: model.today, type: type, editing: id)
+            RecurringEditModel(
+                database: database,
+                today: model.input.today,
+                type: type,
+                editing: id
+            )
         }
     }
 
@@ -109,7 +119,7 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func emptyNote(in model: RecurringListModel) -> (systemImage: String, text: String) {
-        switch model.type {
+        switch model.state.type {
         case .expense: ("repeat", "家賃やサブスクなどを足すと、ここに並びます")
         case .income: ("repeat", "給料や年金などを足すと、ここに並びます")
         case .transfer: ("repeat", "カードの引き落としや積立などを足すと、ここに並びます")
@@ -117,15 +127,15 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func addTitle(in model: RecurringListModel) -> String {
-        "\(model.type.name)の固定費を追加"
+        "\(model.state.type.name)の固定費を追加"
     }
 
     func scaleID(in model: RecurringListModel) -> [String?]? {
-        (model.rows + model.hiddenRows).map(\.place)
+        (model.output.rows + model.output.hiddenRows).map(\.place)
     }
 
     func newDestination(in model: RecurringListModel) -> Destination {
-        .new(model.type)
+        .new(model.state.type)
     }
 
     func destination(editing item: Recurring) -> Destination {
@@ -157,12 +167,12 @@ private extension RecurringBoard {
 
     func totalCard(in model: RecurringListModel) -> some View {
         VStack(spacing: 4) {
-            Text("今月の\(model.type.name)")
+            Text("今月の\(model.state.type.name)")
                 .textFont(.caption2)
                 .tracking(2)
                 .foregroundStyle(Palette.accent)
 
-            AmountText(model.monthTotal, font: .size(.headline), color: Palette.accentStrong)
+            AmountText(model.output.monthTotal, font: .size(.headline), color: Palette.accentStrong)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         }
@@ -177,7 +187,7 @@ private extension RecurringBoard {
             .init("bell", "前もって通知で知らせられます")
         ]
 
-        if model.rows.isEmpty {
+        if model.output.rows.isEmpty {
             return purpose
         }
 

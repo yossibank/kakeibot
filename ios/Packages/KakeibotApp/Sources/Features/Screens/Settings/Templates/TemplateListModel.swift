@@ -7,46 +7,89 @@ import Store
 @MainActor
 @Observable
 public final class TemplateListModel {
-    public var type: Entry.Kind = .expense
-    public var movingOrder: [EntryTemplate.ID]?
-    public var errorNotice = ErrorNotice()
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var snapshot: [EntryTemplate]?
+    let dependencies: SettingsBoardDependencies
 
-    public private(set) var list: EntryList?
+    public init(
+        database: AppDatabase,
+        clock: ScreenClock
+    ) {
+        let state = State()
+        let input = Input()
 
-    private let database: AppDatabase
-
-    public init(database: AppDatabase) {
-        self.database = database
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = SettingsBoardDependencies(database: database, clock: clock)
     }
 }
 
 public extension TemplateListModel {
-    func icon(for template: EntryTemplate) -> Icon? {
-        list?.icon(for: template)
+    @MainActor
+    @Observable
+    final class State: SettingsBoardState {
+        public var errorNotice = ErrorNotice()
+
+        public var type: Entry.Kind = .expense
+        public var movingOrder: [EntryTemplate.ID]?
     }
 
-    func detail(for template: EntryTemplate) -> String {
-        list?.detail(for: template) ?? ""
+    @MainActor
+    @Observable
+    final class Input: SettingsBoardInput {
+        public internal(set) var snapshot: [EntryTemplate]?
+        public internal(set) var list: EntryList?
+    }
+
+    @MainActor
+    final class Output: SettingsBoardOutput {
+        let input: Input
+        let state: State
+
+        var items: [EntryTemplate] {
+            let templates = input.snapshot ?? []
+            return templates.filter { $0.type == state.type }
+        }
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
+            self.state = state
+        }
+
+        public func icon(for template: EntryTemplate) -> Icon? {
+            input.list?.icon(for: template)
+        }
+
+        public func detail(for template: EntryTemplate) -> String {
+            input.list?.detail(for: template) ?? ""
+        }
     }
 
     func load() async {
         do {
-            snapshot = try await read()
-            list = try await database.entryList()
+            input.snapshot = try await read()
+            input.list = try await dependencies.database.entryList()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func observe() async {
         await observeAll([
             {
-                await self.observe(self.updates(), into: \.snapshot)
+                await self.observe(self.updates(), into: \.input.snapshot)
             },
             {
-                await self.observe(self.database.entryListUpdates(), into: \.list)
+                await self.observe(
+                    self.dependencies.database.entryListUpdates(),
+                    into: \.input.list
+                )
             }
         ])
     }
@@ -58,50 +101,31 @@ extension TemplateListModel: SettingsBoardDatabaseModel {
     static let loadFailedMessage = "テンプレートを読めませんでした"
 
     func read() async throws -> [EntryTemplate] {
-        try await database.templates(includingHidden: true)
+        try await dependencies.database.templates(includingHidden: true)
     }
 
     func updates() -> some AsyncSequence<[EntryTemplate], any Error> {
-        database.templateUpdates(includingHidden: true)
-    }
-
-    func items(in snapshot: [EntryTemplate]) -> [EntryTemplate] {
-        snapshot.filter { $0.type == type }
-    }
-
-    func isHidden(_ item: EntryTemplate) -> Bool {
-        item.archivedAt != nil
+        dependencies.database.templateUpdates(includingHidden: true)
     }
 }
 
 extension TemplateListModel: SettingsBoardModel {
     public func reload() async {
         do {
-            snapshot = try await read()
+            input.snapshot = try await read()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     public func saveOrder(_ ids: [EntryTemplate.ID]) async throws {
-        let others = (snapshot ?? []).map(\.id).filter { !ids.contains($0) }
+        let others = (input.snapshot ?? []).map(\.id).filter { !ids.contains($0) }
         let ordered = ids + others
 
-        try await database.reorder(ordered, at: Date())
-    }
-
-    public func saveHidden(
-        _ id: EntryTemplate.ID,
-        isHidden: Bool
-    ) async throws {
-        try await database.setHidden(id, isHidden: isHidden, at: Date())
+        try await dependencies.database.reorder(ordered, at: dependencies.clock.now)
     }
 
     public func remove(_ id: EntryTemplate.ID) async throws -> Deletion {
-        try await database.deleteTemplate(id)
-    }
-
-    public func restoreRemoved(_ deletion: Deletion) async throws {
-        try await database.restore(deletion)
+        try await dependencies.database.deleteTemplate(id)
     }
 }

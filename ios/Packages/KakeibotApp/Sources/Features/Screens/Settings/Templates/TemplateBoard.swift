@@ -57,7 +57,7 @@ extension TemplateBoard: SettingsBoardSpec {
     }
 
     func header(in model: TemplateListModel) -> some View {
-        CapsulePicker(selection: Bindable(model).type, options: Self.typeOptions)
+        CapsulePicker(selection: Bindable(model.state).type, options: Self.typeOptions)
     }
 
     func tile(
@@ -66,9 +66,9 @@ extension TemplateBoard: SettingsBoardSpec {
         isHidden _: Bool
     ) -> some View {
         TemplateRowCard(
-            icon: model.icon(for: item),
+            icon: model.output.icon(for: item),
             name: item.name,
-            detail: model.detail(for: item),
+            detail: model.output.detail(for: item),
             amount: item.amount
         )
     }
@@ -100,12 +100,12 @@ extension TemplateBoard: SettingsBoardSpec {
     }
 
     func addTitle(in model: TemplateListModel) -> String {
-        let typeName = model.type == .income ? "収入" : "支出"
+        let typeName = model.state.type == .income ? "収入" : "支出"
         return "\(typeName)のテンプレートを追加"
     }
 
     func newDestination(in model: TemplateListModel) -> Destination {
-        .new(model.type)
+        .new(model.state.type)
     }
 
     func destination(editing item: EntryTemplate) -> Destination {
@@ -143,7 +143,7 @@ private extension TemplateBoard {
             .init("apps.iphone", "ウィジェットからも記録できます")
         ]
 
-        if model.shown.isEmpty {
+        if model.output.shown.isEmpty {
             return purpose
         }
 

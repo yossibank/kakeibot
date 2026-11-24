@@ -31,9 +31,9 @@ public struct MonthStartDayView: View {
 
             ScrollView {
                 VStack(spacing: SettingsSpacing.section) {
-                    PeriodCard(periodText: model.periodText, month: model.month)
+                    PeriodCard(periodText: model.output.periodText, month: model.output.month)
 
-                    MonthStartDayGrid(selection: model.startDay) { day in
+                    MonthStartDayGrid(selection: model.input.startDay) { day in
                         Task {
                             await model.choose(day)
                         }
@@ -45,8 +45,8 @@ public struct MonthStartDayView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .settingsScreen(errorNotice: $model.errorNotice)
-        .haptic(.selection, trigger: model.startDay)
+        .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
+        .haptic(.selection, trigger: model.input.startDay)
         .task {
             await model.load()
         }
@@ -63,7 +63,7 @@ private extension MonthStartDayView {
 
             HStack(spacing: 8) {
                 ForEach(HolidayShift.allCases, id: \.self) { shift in
-                    SettingsChoice(shift.title, isSelected: model.startDay.shift == shift) {
+                    SettingsChoice(shift.title, isSelected: model.input.startDay.shift == shift) {
                         Task {
                             await model.choose(shift)
                         }
@@ -71,7 +71,7 @@ private extension MonthStartDayView {
                 }
             }
 
-            Text(model.shiftNote)
+            Text(model.output.shiftNote)
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .monospacedDigit()
@@ -81,7 +81,7 @@ private extension MonthStartDayView {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .card()
-        .animation(.snappy, value: model.shiftNote)
+        .animation(.snappy, value: model.output.shiftNote)
     }
 }
 

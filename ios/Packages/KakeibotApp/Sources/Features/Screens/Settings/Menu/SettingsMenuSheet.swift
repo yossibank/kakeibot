@@ -48,7 +48,10 @@ public struct SettingsMenuSheet: View {
             )
         )
 
-        _recordReset = State(initialValue: SettingsMenuResetModel(database: database))
+        _recordReset = State(initialValue: SettingsMenuResetModel(
+            database: database,
+            clock: .system
+        ))
 
         self.database = database
         self.today = today
@@ -98,13 +101,13 @@ public struct SettingsMenuSheet: View {
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
         }
-        .errorBanner($weekStart.errorNotice)
-        .errorBanner($recordReset.errorNotice)
+        .errorBanner(Bindable(weekStart.state).errorNotice)
+        .errorBanner(Bindable(recordReset.state).errorNotice)
         .confirmation(
             isPresented: $isConfirmingReset,
             systemImage: "trash",
             title: "記録をすべて削除しますか",
-            message: recordReset.message(isSyncing: syncStatus.isEnabled),
+            message: recordReset.output.message(isSyncing: syncStatus.isEnabled),
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {

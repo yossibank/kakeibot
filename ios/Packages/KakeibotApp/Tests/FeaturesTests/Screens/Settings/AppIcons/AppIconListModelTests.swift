@@ -7,7 +7,7 @@ struct AppIconListModelTests {
     func startsFromCurrentIcon() {
         let switcher = Switcher(name: "AppIcon-Forest")
         let model = AppIconListModel(switcher: switcher.client)
-        #expect(model.current == .forest)
+        #expect(model.input.current == .forest)
     }
 
     @Test
@@ -22,7 +22,7 @@ struct AppIconListModelTests {
 
         #expect(gold == "AppIcon-Gold")
         #expect(switcher.name == nil)
-        #expect(model.current == .white)
+        #expect(model.input.current == .white)
     }
 
     @Test
@@ -32,8 +32,8 @@ struct AppIconListModelTests {
 
         await model.select(.black)
 
-        #expect(model.current == .white)
-        #expect(model.errorNotice.message == "アイコンを変えられませんでした")
+        #expect(model.input.current == .white)
+        #expect(model.state.errorNotice.message == "アイコンを変えられませんでした")
     }
 }
 

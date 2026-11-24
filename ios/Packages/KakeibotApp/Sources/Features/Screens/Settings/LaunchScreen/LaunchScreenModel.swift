@@ -6,37 +6,48 @@ import Store
 @MainActor
 @Observable
 public final class LaunchScreenModel: SettingSaving {
-    public private(set) var screen: LaunchScreen = .home
+    public let state = NoticeState()
+    public let input = Input()
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(database: AppDatabase) {
-        self.database = database
+        self.dependencies = Dependencies(database: database)
     }
 }
 
 public extension LaunchScreenModel {
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var screen: LaunchScreen = .home
+    }
+
     func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.launchScreen, in: database)
+        .closedHint(.launchScreen, in: dependencies.database)
     }
 
     func load() async {
         do {
-            screen = try await database.setting(.launchScreen)
+            input.screen = try await dependencies.database.setting(.launchScreen)
         } catch {
-            errorNotice.show(SettingMessage.loadFailed)
+            state.errorNotice.show(SettingMessage.loadFailed)
         }
     }
 
     func choose(_ screen: LaunchScreen) async {
-        let previous = self.screen
+        let previous = input.screen
 
-        self.screen = screen
+        input.screen = screen
 
-        await saveSetting(screen, for: .launchScreen, in: database) {
-            self.screen = previous
+        await saveSetting(screen, for: .launchScreen, in: dependencies.database) {
+            input.screen = previous
         }
+    }
+}
+
+extension LaunchScreenModel {
+    struct Dependencies {
+        let database: AppDatabase
     }
 }

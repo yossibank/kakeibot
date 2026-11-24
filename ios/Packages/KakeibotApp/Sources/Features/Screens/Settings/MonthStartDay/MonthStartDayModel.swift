@@ -7,33 +7,81 @@ import Store
 @MainActor
 @Observable
 public final class MonthStartDayModel: SettingSaving {
-    public private(set) var startDay: MonthStartDay = .first
+    public let state = NoticeState()
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let database: AppDatabase
-    private let today: LocalDate
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
         today: LocalDate
     ) {
-        self.database = database
-        self.today = today
+        let input = Input(today: today)
+
+        self.input = input
+        self.output = Output(input: input)
+        self.dependencies = Dependencies(database: database)
     }
 }
 
 public extension MonthStartDayModel {
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var startDay: MonthStartDay = .first
+
+        let today: LocalDate
+
+        init(today: LocalDate) {
+            self.today = today
+        }
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+
+        init(input: Input) {
+            self.input = input
+        }
+    }
+
+    func hintFlag() -> SettingsScreenFlag {
+        .closedHint(.monthStartDay, in: dependencies.database)
+    }
+
+    func load() async {
+        do {
+            input.startDay = try await dependencies.database.setting(.monthStartDay)
+        } catch {
+            state.errorNotice.show(SettingMessage.loadFailed)
+        }
+    }
+
+    func choose(_ day: MonthStartDay) async {
+        let chosen = day.shifted(by: input.startDay.shift)
+        await save(chosen)
+    }
+
+    func choose(_ shift: HolidayShift) async {
+        let chosen = input.startDay.shifted(by: shift)
+        await save(chosen)
+    }
+}
+
+public extension MonthStartDayModel.Output {
     var month: YearMonth {
-        today.periodMonth(startingOn: startDay)
+        input.today.periodMonth(startingOn: input.startDay)
     }
 
     var periodText: String {
-        let period = month.period(startingOn: startDay)
+        let period = month.period(startingOn: input.startDay)
         return PeriodText.range(period)
     }
 
     var shiftNote: String {
+        let startDay = input.startDay
         let start = month.period(startingOn: startDay).lowerBound
         let unshiftedDay = startDay.shifted(by: .none)
         let unshifted = month.period(startingOn: unshiftedDay).lowerBound
@@ -48,38 +96,22 @@ public extension MonthStartDayModel {
 
         return "\(PeriodText.weekdayDate(unshifted))を \(PeriodText.weekdayDate(start))にずらしています"
     }
+}
 
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.monthStartDay, in: database)
-    }
-
-    func load() async {
-        do {
-            startDay = try await database.setting(.monthStartDay)
-        } catch {
-            errorNotice.show(SettingMessage.loadFailed)
-        }
-    }
-
-    func choose(_ day: MonthStartDay) async {
-        let chosen = day.shifted(by: startDay.shift)
-        await save(chosen)
-    }
-
-    func choose(_ shift: HolidayShift) async {
-        let chosen = startDay.shifted(by: shift)
-        await save(chosen)
+extension MonthStartDayModel {
+    struct Dependencies {
+        let database: AppDatabase
     }
 }
 
 private extension MonthStartDayModel {
     func save(_ startDay: MonthStartDay) async {
-        let previous = self.startDay
+        let previous = input.startDay
 
-        self.startDay = startDay
+        input.startDay = startDay
 
-        await saveSetting(startDay, for: .monthStartDay, in: database) {
-            self.startDay = previous
+        await saveSetting(startDay, for: .monthStartDay, in: dependencies.database) {
+            input.startDay = previous
         }
     }
 }

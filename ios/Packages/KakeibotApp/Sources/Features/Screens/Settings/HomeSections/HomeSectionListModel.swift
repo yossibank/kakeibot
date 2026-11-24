@@ -6,47 +6,63 @@ import Store
 @MainActor
 @Observable
 public final class HomeSectionListModel {
-    public private(set) var layout = HomeLayout.standard
-    public private(set) var isLoaded = false
+    public let state = State()
+    public let input = Input()
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(database: AppDatabase) {
-        self.database = database
+        self.dependencies = Dependencies(database: database)
     }
 }
 
 public extension HomeSectionListModel {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public internal(set) var layout = HomeLayout.standard
+    }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var isLoaded = false
+    }
+
     func load() async {
         do {
-            let order = try await database.setting(.homeSections)
-            let hidden = try await database.setting(.homeHiddenSections)
+            let order = try await dependencies.database.setting(.homeSections)
+            let hidden = try await dependencies.database.setting(.homeHiddenSections)
 
-            layout = HomeLayout(order: order, hidden: hidden)
+            state.layout = HomeLayout(order: order, hidden: hidden)
         } catch {
-            errorNotice.show(SettingMessage.loadFailed)
+            state.errorNotice.show(SettingMessage.loadFailed)
         }
 
-        isLoaded = true
+        input.isLoaded = true
     }
 
     func move(
         _ section: HomeSection,
         toSlot index: Int
     ) {
-        layout.move(section, toSlot: index)
+        state.layout.move(section, toSlot: index)
     }
 
     func save() async {
         do {
-            try await database.setSetting(.homeSections, to: layout.order)
-            try await database.setSetting(.homeHiddenSections, to: layout.hidden)
+            try await dependencies.database.setSetting(.homeSections, to: state.layout.order)
+            try await dependencies.database.setSetting(.homeHiddenSections, to: state.layout.hidden)
         } catch {
-            errorNotice.show(SettingMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingMessage.saveFailed, for: error)
         }
     }
 }
 
-private extension HomeSectionListModel {}
+extension HomeSectionListModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+}

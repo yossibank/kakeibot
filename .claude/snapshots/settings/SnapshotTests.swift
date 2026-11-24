@@ -94,18 +94,18 @@ struct SnapshotTests {
 
         try await database.setSetting(.backupExportedAt, to: exportedAt)
 
-        let recurring = RecurringListModel(database: database, today: today)
+        let recurring = RecurringListModel(database: database, clock: .system, today: today)
 
         let observing = Task {
             await recurring.observe()
         }
 
         try await Self.wait {
-            !recurring.rows.isEmpty
+            !recurring.output.rows.isEmpty
         }
 
         for type in Entry.Kind.allCases {
-            recurring.type = type
+            recurring.state.type = type
 
             for variant in Self.variants {
                 try Self.write(

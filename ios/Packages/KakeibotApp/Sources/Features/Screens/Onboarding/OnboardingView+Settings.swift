@@ -12,11 +12,11 @@ extension OnboardingView {
                 )
 
                 PeriodCard(
-                    periodText: model.monthStart.periodText,
-                    month: model.monthStart.month
+                    periodText: model.monthStart.output.periodText,
+                    month: model.monthStart.output.month
                 )
 
-                MonthStartDayGrid(selection: model.monthStart.startDay) { day in
+                MonthStartDayGrid(selection: model.monthStart.input.startDay) { day in
                     Task {
                         await model.monthStart.choose(day)
                     }

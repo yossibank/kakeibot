@@ -29,7 +29,7 @@ public struct LaunchScreenView: View {
 
             ScrollView {
                 VStack(spacing: SettingsSpacing.section) {
-                    LaunchScreenPreview(selection: model.screen)
+                    LaunchScreenPreview(selection: model.input.screen)
 
                     VStack(spacing: 12) {
                         ForEach(LaunchScreen.allCases, id: \.self) { screen in
@@ -37,7 +37,7 @@ public struct LaunchScreenView: View {
                                 screen.title,
                                 note: screen.note,
                                 systemImage: screen.systemImage,
-                                isSelected: model.screen == screen
+                                isSelected: model.input.screen == screen
                             ) {
                                 Task {
                                     await model.choose(screen)
@@ -50,8 +50,8 @@ public struct LaunchScreenView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .settingsScreen(errorNotice: $model.errorNotice)
-        .haptic(.selection, trigger: model.screen)
+        .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
+        .haptic(.selection, trigger: model.input.screen)
         .task {
             await model.load()
         }

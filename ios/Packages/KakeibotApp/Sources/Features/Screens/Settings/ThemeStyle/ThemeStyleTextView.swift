@@ -33,12 +33,12 @@ public struct ThemeStyleTextView: View {
             ThemeStyleChoices(
                 title: "文字の大きさ",
                 options: ThemeTextSize.allCases,
-                selection: model.style.textSize,
+                selection: model.output.style.textSize,
                 columns: 3,
                 label: \.title
             ) { size in
                 Text("あ")
-                    .font(.text(.headline, in: model.style.textFont, scale: size.scale))
+                    .font(.text(.headline, in: model.output.style.textFont, scale: size.scale))
                     .foregroundStyle(Palette.text)
                     .frame(height: Self.sizeSampleHeight)
             } choose: { size in
@@ -48,7 +48,7 @@ public struct ThemeStyleTextView: View {
             ThemeStyleChoices(
                 title: "見出しと金額の字体",
                 options: ThemeFont.allCases,
-                selection: model.style.displayFont,
+                selection: model.output.style.displayFont,
                 columns: 3,
                 label: \.title,
                 isLocked: isLocked
@@ -65,7 +65,7 @@ public struct ThemeStyleTextView: View {
             ThemeStyleChoices(
                 title: "本文の字体",
                 options: ThemeFont.allCases,
-                selection: model.style.textFont,
+                selection: model.output.style.textFont,
                 columns: 3,
                 label: \.title,
                 isLocked: isLocked
@@ -103,7 +103,7 @@ private extension ThemeStyleTextView {
 
 private extension ThemeStyleTextView {
     var suggestsLarge: Bool {
-        dynamicTypeSize >= .xLarge && model.style.textSize != .large
+        dynamicTypeSize >= .xLarge && model.output.style.textSize != .large
     }
 }
 
@@ -193,12 +193,12 @@ private extension ThemeStyleTextView {
 
     func choose(_ offer: FontOffer) async {
         switch offer {
-        case let .display(font) where isLocked(font) && font != model.savedStyle.displayFont:
+        case let .display(font) where isLocked(font) && font != model.output.savedStyle.displayFont:
             model.cancelPreview()
             model.preview(displayFont: font)
             fontOffer = offer
 
-        case let .text(font) where isLocked(font) && font != model.savedStyle.textFont:
+        case let .text(font) where isLocked(font) && font != model.output.savedStyle.textFont:
             model.cancelPreview()
             model.preview(textFont: font)
             fontOffer = offer

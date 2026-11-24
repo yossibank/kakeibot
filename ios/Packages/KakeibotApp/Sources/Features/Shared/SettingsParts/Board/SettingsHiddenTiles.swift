@@ -96,7 +96,7 @@ extension SettingsHiddenTiles {
         self.init(
             flag: flag,
             title: title,
-            items: controller.model.hidden,
+            items: controller.model.output.hidden,
             drag: controller.drag,
             grid: grid,
             space: space,

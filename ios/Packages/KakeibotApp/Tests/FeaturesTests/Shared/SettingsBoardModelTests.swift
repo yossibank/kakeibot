@@ -10,9 +10,9 @@ struct SettingsBoardModelTests {
         let board = FakeBoard(visible: ["a", "b", "c"])
 
         board.move("c", to: -5)
-        let toStart = board.shown.map(\.id)
+        let toStart = board.output.shown.map(\.id)
         board.move("c", to: 99)
-        let toEnd = board.shown.map(\.id)
+        let toEnd = board.output.shown.map(\.id)
 
         #expect(toStart == ["c", "a", "b"])
         #expect(toEnd == ["a", "b", "c"])
@@ -23,11 +23,11 @@ struct SettingsBoardModelTests {
         let board = FakeBoard(visible: ["a", "b", "c"])
 
         board.move("b", to: 1)
-        let samePlace = board.movingOrder
+        let samePlace = board.state.movingOrder
         board.move("x", to: 0)
 
         #expect(samePlace == nil)
-        #expect(board.movingOrder == nil)
+        #expect(board.state.movingOrder == nil)
     }
 
     @Test
@@ -38,7 +38,7 @@ struct SettingsBoardModelTests {
 
         #expect(result.deletion == nil)
         #expect(board.removed.isEmpty)
-        #expect(board.errorNotice.message == nil)
+        #expect(board.state.errorNotice.message == nil)
     }
 
     @Test
@@ -52,8 +52,8 @@ struct SettingsBoardModelTests {
         #expect(result.note(for: result.deletion) == nil)
         #expect(board.removed == ["x", "y"])
         #expect(board.reloadCount == 1)
-        #expect(board.movingOrder == nil)
-        #expect(board.errorNotice.message == nil)
+        #expect(board.state.movingOrder == nil)
+        #expect(board.state.errorNotice.message == nil)
     }
 
     @Test
@@ -67,7 +67,7 @@ struct SettingsBoardModelTests {
         #expect(board.removed == ["x"])
         #expect(result.note(for: result.deletion) == "記録がある 1 件は残しました")
         #expect(result.note(for: other) == nil)
-        #expect(board.errorNotice.message == nil)
+        #expect(board.state.errorNotice.message == nil)
     }
 
     @Test
@@ -77,8 +77,8 @@ struct SettingsBoardModelTests {
         let result = await board.deleteHidden()
 
         #expect(result.deletion == nil)
-        #expect(board.errorNotice.message == "記録があるので削除しませんでした")
-        #expect(board.errorNotice.tone == .info)
+        #expect(board.state.errorNotice.message == "記録があるので削除しませんでした")
+        #expect(board.state.errorNotice.tone == .info)
     }
 
     @Test
@@ -88,8 +88,8 @@ struct SettingsBoardModelTests {
         let result = await board.deleteHidden()
 
         #expect(result.deletion == nil)
-        #expect(board.errorNotice.message == "削除できないものがありました")
-        #expect(board.errorNotice.tone == .error)
+        #expect(board.state.errorNotice.message == "削除できないものがありました")
+        #expect(board.state.errorNotice.tone == .error)
     }
 }
 
@@ -98,20 +98,27 @@ extension SettingsBoardModelTests {
         let id: String
     }
 
+    struct Output: SettingsBoardOutput {
+        let state: SettingsBoardMovingState<String>
+        let items: [Item]
+        let hidden: Set<String>
+
+        func isHidden(_ item: Item) -> Bool {
+            hidden.contains(item.id)
+        }
+    }
+
     struct InUse: Error {}
 
     struct Failure: Error {}
 
     @MainActor
     final class FakeBoard: SettingsBoardModel {
-        var movingOrder: [String]?
-        var errorNotice = ErrorNotice()
+        let state: SettingsBoardMovingState<String>
+        let output: Output
 
         private(set) var removed: [String] = []
         private(set) var reloadCount = 0
-
-        let visible: [Item]
-        let hidden: [Item]
 
         private let inUse: Set<String>
         private let failing: Set<String>
@@ -122,8 +129,14 @@ extension SettingsBoardModelTests {
             inUse: Set<String> = [],
             failing: Set<String> = []
         ) {
-            self.visible = visible.map(Item.init)
-            self.hidden = hidden.map(Item.init)
+            let state = SettingsBoardMovingState<String>()
+
+            self.state = state
+            self.output = Output(
+                state: state,
+                items: (visible + hidden).map(Item.init),
+                hidden: Set(hidden)
+            )
             self.inUse = inUse
             self.failing = failing
         }

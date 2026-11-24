@@ -12,8 +12,8 @@ struct HomeSectionListModelTests {
 
         await model.load()
 
-        #expect(model.isLoaded)
-        #expect(model.layout == .standard)
+        #expect(model.input.isLoaded)
+        #expect(model.state.layout == .standard)
     }
 
     @Test
@@ -29,7 +29,7 @@ struct HomeSectionListModelTests {
         await reloaded.load()
 
         #expect(order.first == .recent)
-        #expect(reloaded.layout == model.layout)
+        #expect(reloaded.state.layout == model.state.layout)
     }
 
     @Test
@@ -43,7 +43,7 @@ struct HomeSectionListModelTests {
         await model.save()
         let order = try await database.setting(.homeSections)
 
-        #expect(model.errorNotice.message == "設定を保存できませんでした")
+        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
         #expect(order == HomeSection.standard)
     }
 }

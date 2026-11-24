@@ -56,16 +56,19 @@ extension WalletBoard: SettingsBoardSpec {
         WalletRowCard(
             name: item.name,
             kind: item.kind,
-            amount: model.balance(of: item),
-            caption: item.kind.role.balanceLabel(model.balance(of: item)),
-            isShared: model.isShared(item)
+            amount: model.output.balance(of: item, through: clock.today),
+            caption: item.kind.role.balanceLabel(model.output.balance(
+                of: item,
+                through: clock.today
+            )),
+            isShared: model.output.isShared(item)
         ) {
-            WalletRowIcon(icon: model.icon(for: item))
+            WalletRowIcon(icon: model.output.icon(for: item))
         }
     }
 
     func editModel(for destination: Destination) -> WalletEditModel {
-        WalletEditModel(database: database, clock: .system, editing: destination.editingID)
+        WalletEditModel(database: database, clock: clock, editing: destination.editingID)
     }
 
     func intro(
@@ -90,24 +93,24 @@ extension WalletBoard: SettingsBoardSpec {
     }
 
     func scaleID(in model: WalletListModel) -> [Wallet]? {
-        model.shown + model.hidden
+        model.output.shown + model.output.hidden
     }
 
     func hideConfirmation(
         of item: Wallet,
         in model: WalletListModel
     ) -> SettingsConfirmation? {
-        guard model.needsHideConfirmation(of: item) else {
+        guard model.output.needsHideConfirmation(of: item) else {
             return nil
         }
 
-        return .hidingWallet(balance: model.balance(of: item))
+        return .hidingWallet(balance: model.output.balance(of: item, through: clock.today))
     }
 
     func deleteConfirmation(
         of item: Wallet,
         in model: WalletListModel
     ) -> SettingsConfirmation? {
-        .deletingWallet(hasEntries: model.hasEntries(item))
+        .deletingWallet(hasEntries: model.output.hasEntries(item))
     }
 }

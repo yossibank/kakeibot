@@ -7,58 +7,89 @@ import Store
 @MainActor
 @Observable
 public final class SettingsMenuResetModel {
-    public private(set) var count = 0
-    public private(set) var hasSharedWallets = false
+    public let state = NoticeState()
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
+    let dependencies: Dependencies
 
-    private let database: AppDatabase
+    public init(
+        database: AppDatabase,
+        clock: ScreenClock
+    ) {
+        let input = Input()
 
-    public init(database: AppDatabase) {
-        self.database = database
+        self.input = input
+        self.output = Output(input: input)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension SettingsMenuResetModel {
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var count = 0
+        public internal(set) var hasSharedWallets = false
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+
+        init(input: Input) {
+            self.input = input
+        }
+    }
+
     func prepare() async -> Bool {
         do {
-            count = try await database.deletableRecordCount()
-            hasSharedWallets = try await sharesWallets()
+            input.count = try await dependencies.database.deletableRecordCount()
+            input.hasSharedWallets = try await sharesWallets()
         } catch {
-            errorNotice.show(Self.loadFailedMessage, for: error)
+            state.errorNotice.show(Self.loadFailedMessage, for: error)
 
             return false
         }
 
-        if count == 0 {
-            errorNotice.inform(Self.emptyMessage)
+        if input.count == 0 {
+            state.errorNotice.inform(Self.emptyMessage)
         }
 
-        return count > 0
+        return input.count > 0
     }
 
     func deleteAll() async {
         do {
-            try await database.deleteAllRecords(at: Date())
-            errorNotice.inform(Self.deletedMessage)
+            try await dependencies.database.deleteAllRecords(at: dependencies.clock.now)
+            state.errorNotice.inform(Self.deletedMessage)
         } catch {
-            errorNotice.show(Self.deleteFailedMessage, for: error)
+            state.errorNotice.show(Self.deleteFailedMessage, for: error)
         }
     }
+}
 
+public extension SettingsMenuResetModel.Output {
     func message(isSyncing: Bool) -> String {
-        let amount = count.formatted(.number)
+        let amount = input.count.formatted(.number)
         var text = "記録・評価額・スタンプなど\(amount)件を削除します。口座・カテゴリ・設定は残ります。元に戻せません。"
 
         if isSyncing {
             text += "ほかの端末からも消えます。"
         }
 
-        if hasSharedWallets {
+        if input.hasSharedWallets {
             text += "共有中の口座の記録は残ります。"
         }
 
         return text
+    }
+}
+
+extension SettingsMenuResetModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 
@@ -69,7 +100,7 @@ private extension SettingsMenuResetModel {
     static let deleteFailedMessage = "記録を削除できませんでした"
 
     func sharesWallets() async throws -> Bool {
-        for try await shares in database.walletShareUpdates() {
+        for try await shares in dependencies.database.walletShareUpdates() {
             if shares.contains(where: \.isShared) {
                 return true
             }
@@ -77,7 +108,7 @@ private extension SettingsMenuResetModel {
             break
         }
 
-        for try await joined in database.joinedShareUpdates() {
+        for try await joined in dependencies.database.joinedShareUpdates() {
             return !joined.isEmpty
         }
 

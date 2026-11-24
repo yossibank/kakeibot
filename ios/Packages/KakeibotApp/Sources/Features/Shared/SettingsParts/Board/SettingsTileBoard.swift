@@ -63,7 +63,7 @@ extension SettingsTileBoard {
     ) where Model.Item == Item {
         self.init(
             grid: grid,
-            items: controller.model.shown,
+            items: controller.model.output.shown,
             drag: controller.drag,
             space: space,
             face: face,

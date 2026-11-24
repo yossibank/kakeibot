@@ -6,35 +6,90 @@ import Store
 @MainActor
 @Observable
 public final class ThemeStyleModel: SettingSaving {
-    public private(set) var style: ThemeStyle = .standard
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let database: AppDatabase
-
-    private var previewBase: ThemeStyle?
+    let dependencies: Dependencies
 
     public init(database: AppDatabase) {
-        self.database = database
+        let state = State()
+        let input = Input()
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database)
     }
 }
 
 extension ThemeStyleModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+
     func closedHint(_ screen: SettingsScreen) -> SettingsScreenFlag {
-        .closedHint(screen, in: database)
+        .closedHint(screen, in: dependencies.database)
     }
 }
 
 public extension ThemeStyleModel {
-    var savedStyle: ThemeStyle {
-        previewBase ?? style
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public private(set) var preview: ThemeStyle?
+
+        func show<Value>(
+            _ value: Value,
+            at keyPath: WritableKeyPath<ThemeStyle, Value>,
+            over saved: ThemeStyle
+        ) {
+            var style = preview ?? saved
+
+            style[keyPath: keyPath] = value
+            preview = style
+        }
+
+        func clearPreview() {
+            preview = nil
+        }
+    }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var style: ThemeStyle = .standard
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+        let state: State
+
+        public var style: ThemeStyle {
+            state.preview ?? input.style
+        }
+
+        public var savedStyle: ThemeStyle {
+            input.style
+        }
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
+            self.state = state
+        }
     }
 
     func load() async {
         do {
-            style = try await database.style()
+            input.style = try await dependencies.database.style()
         } catch {
-            errorNotice.show(SettingMessage.loadFailed)
+            state.errorNotice.show(SettingMessage.loadFailed)
         }
     }
 
@@ -59,11 +114,7 @@ public extension ThemeStyleModel {
     }
 
     func cancelPreview() {
-        if let previewBase {
-            style = previewBase
-        }
-
-        previewBase = nil
+        state.clearPreview()
     }
 
     func choose(_ size: ThemeTextSize) async {
@@ -101,14 +152,16 @@ private extension ThemeStyleModel {
         at keyPath: WritableKeyPath<ThemeStyle, Value>,
         key: SettingKey<Value>
     ) async {
-        let previous = previewBase ?? style
+        let previous = input.style
+        var chosen = output.style
 
-        previewBase = nil
+        chosen[keyPath: keyPath] = value
 
-        style[keyPath: keyPath] = value
+        state.clearPreview()
+        input.style = chosen
 
-        await saveSetting(value, for: key, in: database) {
-            style = previous
+        await saveSetting(value, for: key, in: dependencies.database) {
+            input.style = previous
         }
     }
 
@@ -116,10 +169,6 @@ private extension ThemeStyleModel {
         _ value: Value,
         at keyPath: WritableKeyPath<ThemeStyle, Value>
     ) {
-        if previewBase == nil {
-            previewBase = style
-        }
-
-        style[keyPath: keyPath] = value
+        state.show(value, at: keyPath, over: input.style)
     }
 }

@@ -6,50 +6,89 @@ import Store
 @MainActor
 @Observable
 public final class SettingsMenuValueModel<Value: Equatable & Sendable> {
-    public private(set) var value: Value
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let database: AppDatabase
-    private let key: SettingKey<Value>
-
-    private var savedValue: Value
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
         key: SettingKey<Value>
     ) {
-        self.database = database
-        self.key = key
-        self.value = key.defaultValue
-        self.savedValue = key.defaultValue
+        let state = State()
+        let input = Input(value: key.defaultValue)
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, key: key)
     }
 }
 
 public extension SettingsMenuValueModel {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public internal(set) var chosen: Value?
+    }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var value: Value
+
+        init(value: Value) {
+            self.value = value
+        }
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+        let state: State
+
+        public var value: Value {
+            state.chosen ?? input.value
+        }
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
+            self.state = state
+        }
+    }
+
     func load() async {
-        value = await (try? database.setting(key)) ?? key.defaultValue
-        savedValue = value
+        let key = dependencies.key
+
+        input.value = await (try? dependencies.database.setting(key)) ?? key.defaultValue
+        state.chosen = nil
     }
 
     func choose(_ newValue: Value) async {
-        value = newValue
+        state.chosen = newValue
 
         do {
-            try await database.setSetting(key, to: newValue)
-            savedValue = newValue
+            try await dependencies.database.setSetting(dependencies.key, to: newValue)
+            input.value = newValue
         } catch {
-            if value == newValue {
-                value = savedValue
-            }
+            state.errorNotice.show(SettingMessage.saveFailed, for: error)
+        }
 
-            errorNotice.show(SettingMessage.saveFailed, for: error)
+        if state.chosen == newValue {
+            state.chosen = nil
         }
     }
 }
 
-private extension SettingsMenuValueModel {
-    static var saveFailedMessage: String {
-        "設定を保存できませんでした"
+extension SettingsMenuValueModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let key: SettingKey<Value>
     }
 }

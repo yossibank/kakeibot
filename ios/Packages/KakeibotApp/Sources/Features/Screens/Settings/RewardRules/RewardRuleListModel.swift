@@ -7,25 +7,55 @@ import Store
 @MainActor
 @Observable
 public final class RewardRuleListModel {
-    public var movingOrder: [RewardRule.ID]?
-    public var errorNotice = ErrorNotice()
+    public let state: SettingsBoardMovingState<RewardRule.ID>
+    public let input: SettingsBoardSnapshotInput<RewardRuleList>
+    public let output: Output
 
-    public internal(set) var snapshot: RewardRuleList?
+    let dependencies: SettingsBoardDependencies
 
-    private let database: AppDatabase
+    public init(
+        database: AppDatabase,
+        clock: ScreenClock
+    ) {
+        let state = SettingsBoardMovingState<RewardRule.ID>()
+        let input = SettingsBoardSnapshotInput<RewardRuleList>()
 
-    public init(database: AppDatabase) {
-        self.database = database
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = SettingsBoardDependencies(database: database, clock: clock)
     }
 }
 
 public extension RewardRuleListModel {
-    func icon(for rule: RewardRule) -> Icon? {
-        snapshot?.icons[rule.iconId]
-    }
+    @MainActor
+    final class Output: SettingsBoardOutput {
+        let input: SettingsBoardSnapshotInput<RewardRuleList>
+        let state: SettingsBoardMovingState<RewardRule.ID>
 
-    func total(for rule: RewardRule) -> RewardRuleList.Total? {
-        snapshot?.total(of: rule)
+        var items: [RewardRule] {
+            input.snapshot?.rules ?? []
+        }
+
+        init(
+            input: SettingsBoardSnapshotInput<RewardRuleList>,
+            state: SettingsBoardMovingState<RewardRule.ID>
+        ) {
+            self.input = input
+            self.state = state
+        }
+
+        public func icon(for rule: RewardRule) -> Icon? {
+            input.snapshot?.icons[rule.iconId]
+        }
+
+        public func total(for rule: RewardRule) -> RewardRuleList.Total? {
+            input.snapshot?.total(of: rule)
+        }
+
+        func isHidden(_ item: RewardRule) -> Bool {
+            !item.isActive
+        }
     }
 }
 
@@ -35,48 +65,20 @@ extension RewardRuleListModel: SettingsBoardDatabaseModel {
     static let loadFailedMessage = "決まりを読めませんでした"
 
     func read() async throws -> RewardRuleList {
-        try await database.rewardRuleList()
+        try await dependencies.database.rewardRuleList()
     }
 
     func updates() -> some AsyncSequence<RewardRuleList, any Error> {
-        database.rewardRuleListUpdates()
-    }
-
-    func items(in snapshot: RewardRuleList) -> [RewardRule] {
-        snapshot.rules
-    }
-
-    func isHidden(_ item: RewardRule) -> Bool {
-        !item.isActive
+        dependencies.database.rewardRuleListUpdates()
     }
 }
 
 extension RewardRuleListModel: SettingsBoardModel {
-    public func saveOrder(_ ids: [RewardRule.ID]) async throws {
-        let ids = ids + hidden.map(\.id)
-        try await database.reorder(ids, at: Date())
-    }
-
-    public func saveHidden(
-        _ id: RewardRule.ID,
-        isHidden: Bool
-    ) async throws {
-        try await database.setHidden(
-            id,
-            isHidden: isHidden,
-            at: Date()
-        )
-    }
-
     public func isInUse(_ error: any Error) -> Bool {
         error as? AppDatabase.RewardRuleWriteError == .hasLogs
     }
 
     public func remove(_ id: RewardRule.ID) async throws -> Deletion {
-        try await database.deleteRewardRule(id)
-    }
-
-    public func restoreRemoved(_ deletion: Deletion) async throws {
-        try await database.restore(deletion)
+        try await dependencies.database.deleteRewardRule(id)
     }
 }

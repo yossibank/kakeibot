@@ -50,7 +50,7 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
             hideMessage: spec.hideMessage,
             liftScale: spec.liftScale,
             controller: controller,
-            errorNotice: $model.errorNotice
+            errorNotice: Bindable(model.state).errorNotice
         ) {
             destination = spec.newDestination(in: model)
         } header: {
@@ -138,7 +138,7 @@ private extension SettingsBoardPage {
 
         case .swipeRows:
             SettingsRowBoard(
-                items: model.shown,
+                items: model.output.shown,
                 drag: drag,
                 grid: grid,
                 space: spec.space,
@@ -174,7 +174,7 @@ private extension SettingsBoardPage {
 
     @ViewBuilder
     func floatingTile(_ id: Spec.Model.Item.ID) -> some View {
-        if let item = (model.shown + model.hidden).first(where: { $0.id == id }) {
+        if let item = (model.output.shown + model.output.hidden).first(where: { $0.id == id }) {
             tileFace(item, isHidden: false)
         }
     }
@@ -213,7 +213,7 @@ private extension SettingsBoardPage {
 
     func drop() {
         controller.drop { id in
-            let item = model.shown.first { $0.id == id }
+            let item = model.output.shown.first { $0.id == id }
 
             withAnimation(.snappy) {
                 model.cancelMoving()

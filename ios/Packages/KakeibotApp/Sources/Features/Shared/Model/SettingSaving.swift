@@ -3,7 +3,9 @@ import Store
 
 @MainActor
 protocol SettingSaving: AnyObject {
-    var errorNotice: ErrorNotice { get set }
+    associatedtype State: NoticeHolding
+
+    var state: State { get }
 }
 
 extension SettingSaving {
@@ -17,7 +19,7 @@ extension SettingSaving {
             try await database.setSetting(key, to: value)
         } catch {
             rollback()
-            errorNotice.show(SettingMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingMessage.saveFailed, for: error)
         }
     }
 }
