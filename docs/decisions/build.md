@@ -68,6 +68,9 @@
 | 理由 | Room の Android 版は、空の `Context` でメモリに開ける。SQLite は JVM 版の部品を Gradle が渡す |
 | 却下 | Robolectric、モデルを JVM のモジュールに移す |
 
+> [!NOTE]
+> テストには、本物と同じ形の `android.database.SQLException` を置く。テスト用の空の型では、保存がまれに失敗した。
+
 ## リポジトリ
 
 **決定：1 つにまとめる。**
