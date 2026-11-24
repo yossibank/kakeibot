@@ -88,3 +88,4 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `FeatureModels` のテスト | テストのターゲットを分けず、`FeaturesTests/` に置く。フォルダは `Screens/`・`Shared/` の形にそろえる |
 | `TestSupport` のテスト | `TestSupport` にテストのターゲットが無いので、`FeaturesTests/Shared/` に置く |
 | `Notifications` のテスト | テストのターゲットが無いので、`AppFeatureTests/Notifications/` に置く |
+| 画面をまたぐ流れのテスト（`ScreenFlowTests`） | 当たるソースが 1 つでないので、`FeaturesTests/Screens/` の直下に置く。1 つの DB に 4 つのタブと入力・設定のモデルを立てる |
