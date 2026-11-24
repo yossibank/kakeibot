@@ -15,13 +15,13 @@ struct SnapshotTests {
         let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = AssetsModel(database: database, today: today)
+        let model = AssetsModel(database: database, clock: .system, today: today)
         let task = Task {
             await model.run()
         }
 
         try await Self.wait {
-            model.list != nil && model.rewardBank != nil
+            model.output.list != nil && model.input.rewardBank != nil
         }
 
         for variant in Self.variants {
@@ -46,7 +46,7 @@ struct SnapshotTests {
 
             try Self.write(adding, variant: variant, title: "資産 › 目標の追加", to: "assets-goal-new")
 
-            let goal = try #require(model.waitingGoals.first)
+            let goal = try #require(model.output.waitingGoals.first)
 
             let editing = AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: goal))
                 .frame(height: 852)
@@ -60,7 +60,7 @@ struct SnapshotTests {
                 to: "assets-bills"
             )
 
-            model.billPage = 1
+            model.state.billPage = 1
 
             try Self.write(
                 view.billCard.padding(16),
@@ -69,9 +69,9 @@ struct SnapshotTests {
                 to: "assets-bills-next"
             )
 
-            model.billPage = 0
+            model.state.billPage = 0
 
-            let content = AssetsEntrySheet.Content.unpaid(of: model.rows)
+            let content = AssetsEntrySheet.Content.unpaid(of: model.output.rows)
 
             let unpaidSheet = AssetsEntrySheet(content: content) { _ in }
                 .frame(height: 1200)
@@ -91,7 +91,7 @@ struct SnapshotTests {
 
             try Self.write(outlook, variant: variant, title: "資産 › 月末の見込み", to: "assets-outlook")
 
-            let wallet = try #require(model.rows.first)
+            let wallet = try #require(model.output.rows.first)
 
             for (name, title, keys) in [
                 ("assets-adjust", "資産 › 残高の調整", [AmountCalculator.Key]()),
@@ -104,7 +104,7 @@ struct SnapshotTests {
                 let adjust = model.adjustModel(for: wallet)
 
                 for key in keys {
-                    adjust.press(key)
+                    adjust.state.press(key)
                 }
 
                 let sheet = AssetsAdjustmentSheet(model: adjust).content
@@ -118,13 +118,17 @@ struct SnapshotTests {
 
         task.cancel()
 
-        let emptyModel = try AssetsModel(database: AppDatabase.inMemory(), today: today)
+        let emptyModel = try AssetsModel(
+            database: AppDatabase.inMemory(),
+            clock: .system,
+            today: today
+        )
         let emptyTask = Task {
             await emptyModel.run()
         }
 
         try await Self.wait {
-            emptyModel.list != nil
+            emptyModel.output.list != nil
         }
 
         for variant in Self.variants {

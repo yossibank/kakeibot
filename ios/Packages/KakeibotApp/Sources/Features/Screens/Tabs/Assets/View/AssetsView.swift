@@ -51,7 +51,7 @@ public struct AssetsView: View {
 
                     trendCard
 
-                    if !model.upcomingBills.isEmpty {
+                    if !model.output.upcomingBills.isEmpty {
                         billCard
                     }
 
@@ -69,7 +69,7 @@ public struct AssetsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .sheet(isPresented: $isShowingReward) {
             AssetsRewardSheet(model: model)
         }
@@ -79,7 +79,7 @@ public struct AssetsView: View {
         .sheet(isPresented: $isAddingWallet) {
             WalletEditSheet(
                 model: WalletEditModel(
-                    database: model.database,
+                    database: model.dependencies.database,
                     clock: .system,
                     kind: addingKind
                 )
@@ -110,11 +110,11 @@ public struct AssetsView: View {
 
 extension AssetsView {
     var ownedSections: [AssetsModel.WalletSection] {
-        model.sections.filter { !Self.isOwed($0.role) }
+        model.output.sections.filter { !Self.isOwed($0.role) }
     }
 
     var owedSections: [AssetsModel.WalletSection] {
-        model.sections.filter { Self.isOwed($0.role) }
+        model.output.sections.filter { Self.isOwed($0.role) }
     }
 }
 
@@ -142,7 +142,7 @@ private extension AssetsView {
 
     var trendCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CardHeader(model.showsNetWorth ? "純資産と推移" : "推移")
+            CardHeader(model.output.showsNetWorth ? "純資産と推移" : "推移")
 
             trendContent
         }
@@ -175,7 +175,7 @@ private extension AssetsView {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 AmountText(
-                    model.total,
+                    model.output.total,
                     font: .size(.largeTitle, weight: .bold),
                     color: Palette.accentStrong
                 )
@@ -195,7 +195,7 @@ private extension AssetsView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 
-            if model.outlook.isShown {
+            if model.output.outlook.isShown {
                 outlookButton
             }
         }
@@ -204,7 +204,7 @@ private extension AssetsView {
 
 private extension AssetsView {
     var breakdownText: String {
-        let holdings = model.holdings
+        let holdings = model.output.holdings
         let onHand = "手持ち \(Yen.text(holdings.onHand))"
 
         if holdings.unpaid > 0 {
@@ -219,7 +219,7 @@ private extension AssetsView {
     }
 
     var changeText: String {
-        let change = model.changeFromLastMonth
+        let change = model.output.changeFromLastMonth
         let sign = change > 0 ? "+" : ""
         return "先月末より \(sign)\(Yen.text(change))"
     }

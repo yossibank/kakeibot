@@ -7,13 +7,13 @@ extension AssetsRewardSheet {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle("達成の履歴")
 
-            if model.rewardHistory.isEmpty {
+            if model.output.rewardHistory.isEmpty {
                 Text("資産の「今日の達成を付ける」か、記録の日の見出しの贈り物のボタンから付けられます")
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .padding(.leading, 8)
             } else {
-                ForEach(model.rewardHistory) { month in
+                ForEach(model.output.rewardHistory) { month in
                     monthBlock(month)
                 }
             }
@@ -48,8 +48,8 @@ private extension AssetsRewardSheet {
     }
 
     func logRow(_ log: RewardLog) -> some View {
-        let rule = model.rewardRule(for: log)
-        let icon = rule.flatMap { model.rewardIcon(for: $0) }
+        let rule = model.output.rewardRule(for: log)
+        let icon = rule.flatMap { model.output.rewardIcon(for: $0) }
 
         return HStack(spacing: 12) {
             IconBadge(icon, size: 36)

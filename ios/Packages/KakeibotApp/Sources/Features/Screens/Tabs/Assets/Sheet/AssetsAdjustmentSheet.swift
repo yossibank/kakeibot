@@ -16,7 +16,7 @@ struct AssetsAdjustmentSheet: View {
         FittedSheet {
             content
         }
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .confirmation(
             isPresented: $isConfirmingDiscard,
             systemImage: "pencil.slash",
@@ -37,7 +37,7 @@ private extension AssetsAdjustmentSheet {
 
 private extension AssetsAdjustmentSheet {
     var differenceColor: Color {
-        model.difference < 0 ? Palette.rose : Palette.accent
+        model.output.difference < 0 ? Palette.rose : Palette.accent
     }
 }
 
@@ -68,7 +68,7 @@ private extension AssetsAdjustmentSheet {
                     .tracking(4)
                     .foregroundStyle(Palette.accent)
 
-                Text(model.wallet.name)
+                Text(model.input.wallet.name)
                     .textFont(.subheadline, weight: .semibold)
                     .foregroundStyle(Palette.text)
                     .lineLimit(1)
@@ -78,7 +78,7 @@ private extension AssetsAdjustmentSheet {
 
             line(
                 "記録の残高",
-                value: Yen.text(model.balance),
+                value: Yen.text(model.input.balance),
                 titleColor: Palette.subtext,
                 valueColor: Palette.subtext
             )
@@ -89,13 +89,13 @@ private extension AssetsAdjustmentSheet {
 
             line(
                 "調整",
-                value: model.differenceText,
+                value: model.output.differenceText,
                 titleColor: differenceColor,
-                valueColor: model.canSave ? differenceColor : Palette.subtext,
+                valueColor: model.output.canSave ? differenceColor : Palette.subtext,
                 weight: .semibold
             )
 
-            Text(model.differenceNote)
+            Text(model.output.differenceNote)
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -125,14 +125,14 @@ private extension AssetsAdjustmentSheet {
             EntryReceiptLeader()
 
             AmountText(
-                model.calculator.amount,
+                model.state.calculator.amount,
                 font: .size(.title, weight: .bold),
                 color: Palette.accentStrong
             )
             .lineLimit(1)
             .fixedSize()
             .contentTransition(.numericText())
-            .animation(.snappy, value: model.calculator.amount)
+            .animation(.snappy, value: model.state.calculator.amount)
         }
     }
 
@@ -163,7 +163,7 @@ private extension AssetsAdjustmentSheet {
 
 private extension AssetsAdjustmentSheet {
     func close() {
-        if model.isChanged {
+        if model.output.isChanged {
             isConfirmingDiscard = true
         } else {
             dismiss()
@@ -185,16 +185,16 @@ extension AssetsAdjustmentSheet {
             slip
 
             Keypad(
-                calculator: model.calculator,
-                onKey: model.press
+                calculator: model.state.calculator,
+                onKey: model.state.press
             )
 
-            PrimaryButton(model.saveTitle) {
+            PrimaryButton(model.output.saveTitle) {
                 Task {
                     await save()
                 }
             }
-            .disabled(!model.canSave)
+            .disabled(!model.output.canSave)
         }
     }
 }

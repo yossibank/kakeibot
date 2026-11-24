@@ -74,6 +74,7 @@ struct MainView: View {
         _assets = State(
             initialValue: AssetsModel(
                 database: database,
+                clock: clock,
                 today: today
             )
         )
@@ -204,7 +205,7 @@ struct MainView: View {
             home.state.today = today
             records.today = today
             review.today = today
-            assets.today = today
+            assets.setToday(today)
 
             prepareDraft()
         }
@@ -300,7 +301,7 @@ private extension MainView {
             home.errorNotice.count,
             records.errorNotice.count,
             review.errorNotice.count,
-            assets.errorNotice.count
+            assets.state.errorNotice.count
         ]
     }
 }

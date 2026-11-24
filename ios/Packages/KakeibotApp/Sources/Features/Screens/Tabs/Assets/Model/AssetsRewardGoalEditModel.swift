@@ -7,101 +7,159 @@ import Store
 @MainActor
 @Observable
 public final class AssetsRewardGoalEditModel {
-    public var name: String
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public private(set) var calculator: AmountCalculator
-
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private let baseline: RewardGoalDraft
-    private let database: AppDatabase
-    private let editing: RewardGoal?
-    private let balance: Int
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         editing goal: RewardGoal? = nil,
         balance: Int = 0
     ) {
         let name = goal?.name ?? ""
         let amount = goal?.targetAmount ?? 0
+        let state = State(name: name, amount: amount)
 
-        self.database = database
-        self.editing = goal
-        self.balance = balance
-        self.name = name
-        self.calculator = AmountCalculator(amount: amount)
-        self.baseline = RewardGoalDraft(name: name, targetAmount: amount)
+        let input = Input(
+            baseline: RewardGoalDraft(name: name, targetAmount: amount),
+            editing: goal,
+            balance: balance
+        )
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension AssetsRewardGoalEditModel {
-    var isEditing: Bool {
-        editing != nil
-    }
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
 
-    var draft: RewardGoalDraft {
-        RewardGoalDraft(name: name, targetAmount: calculator.amount)
-    }
+        public var name: String
 
-    var isChanged: Bool {
-        draft != baseline
-    }
+        public private(set) var calculator: AmountCalculator
 
-    var canSave: Bool {
-        draft.problems.isEmpty
-    }
-
-    var remaining: Int {
-        max(calculator.amount - balance, 0)
-    }
-
-    var progress: Double {
-        guard calculator.amount > 0 else {
-            return 0
+        init(
+            name: String,
+            amount: Int
+        ) {
+            self.name = name
+            self.calculator = AmountCalculator(amount: amount)
         }
 
-        return Double(balance) / Double(calculator.amount)
+        public func press(_ key: AmountCalculator.Key) {
+            calculator.press(key)
+        }
     }
 
-    var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first?.message,
-            isEditing: isEditing
-        )
+    @MainActor
+    @Observable
+    final class Input {
+        let baseline: RewardGoalDraft
+        let editing: RewardGoal?
+        let balance: Int
+
+        init(
+            baseline: RewardGoalDraft,
+            editing: RewardGoal?,
+            balance: Int
+        ) {
+            self.baseline = baseline
+            self.editing = editing
+            self.balance = balance
+        }
     }
 
-    func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+    @MainActor
+    final class Output {
+        let input: Input
+        let state: State
+
+        public var isEditing: Bool {
+            input.editing != nil
+        }
+
+        public var draft: RewardGoalDraft {
+            RewardGoalDraft(name: state.name, targetAmount: state.calculator.amount)
+        }
+
+        public var isChanged: Bool {
+            draft != input.baseline
+        }
+
+        public var canSave: Bool {
+            draft.problems.isEmpty
+        }
+
+        public var remaining: Int {
+            max(state.calculator.amount - input.balance, 0)
+        }
+
+        public var progress: Double {
+            guard state.calculator.amount > 0 else {
+                return 0
+            }
+
+            return Double(input.balance) / Double(state.calculator.amount)
+        }
+
+        public var saveTitle: String {
+            SettingsSaveTitle.text(
+                problem: draft.problems.first?.message,
+                isEditing: isEditing
+            )
+        }
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
+            self.state = state
+        }
     }
 
     func save() async -> Bool {
         do {
-            try await database.saveRewardGoal(
-                draft,
-                editing: editing?.id,
-                at: Date()
+            try await dependencies.database.saveRewardGoal(
+                output.draft,
+                editing: input.editing?.id,
+                at: dependencies.clock.now
             )
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
 
     func delete() async -> Bool {
-        guard let editing else {
+        guard let editing = input.editing else {
             return false
         }
 
         do {
-            try await database.deleteRewardGoal(editing.id)
+            try await dependencies.database.deleteRewardGoal(editing.id)
             return true
         } catch {
-            errorNotice.show(Self.deleteFailedMessage, for: error)
+            state.errorNotice.show(Self.deleteFailedMessage, for: error)
             return false
         }
+    }
+}
+
+extension AssetsRewardGoalEditModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 

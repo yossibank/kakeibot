@@ -213,7 +213,7 @@ private extension MainView {
     var areTabsLoaded: Bool {
         let isRecordsLoaded = records.list != nil || records.errorNotice.message != nil
         let isReviewLoaded = review.list != nil || review.errorNotice.message != nil
-        let isAssetsLoaded = assets.list != nil || assets.errorNotice.message != nil
+        let isAssetsLoaded = assets.output.list != nil || assets.state.errorNotice.message != nil
         return isRecordsLoaded && isReviewLoaded && isAssetsLoaded
     }
 

@@ -5,22 +5,22 @@ import SwiftUI
 extension AssetsView {
     var trendContent: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if model.showsNetWorth {
+            if model.output.showsNetWorth {
                 netWorthRow
             }
 
             AssetsBalanceTrend(
-                totals: model.monthTotals.map(\.total),
+                totals: model.output.monthTotals.map(\.total),
                 netWorths: netWorths
             )
             .frame(height: 70)
 
-            if model.showsNetWorth {
+            if model.output.showsNetWorth {
                 trendLegend
             }
 
             HStack(spacing: 0) {
-                ForEach(model.monthTotals) { total in
+                ForEach(model.output.monthTotals) { total in
                     Text("\(total.month.month)月")
                         .textFont(size: .micro)
                         .foregroundStyle(monthColor(total.month))
@@ -57,7 +57,7 @@ private extension AssetsView {
 
     var netWorthAmount: some View {
         AmountText(
-            model.holdings.netWorth,
+            model.output.holdings.netWorth,
             font: .size(.headline),
             color: Palette.accentStrong
         )
@@ -156,10 +156,10 @@ private extension AssetsView {
     }
 
     var netWorths: [Int]? {
-        model.showsNetWorth ? model.monthTotals.map(\.netWorth) : nil
+        model.output.showsNetWorth ? model.output.monthTotals.map(\.netWorth) : nil
     }
 
     func monthColor(_ month: YearMonth) -> Color {
-        month == model.currentMonth ? Palette.accent : Palette.hint
+        month == model.output.currentMonth ? Palette.accent : Palette.hint
     }
 }

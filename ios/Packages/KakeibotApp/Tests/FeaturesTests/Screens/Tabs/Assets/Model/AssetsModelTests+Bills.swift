@@ -47,15 +47,15 @@ extension AssetsModelTests {
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let row = try #require(model.rows.first { $0.wallet.id == card.id })
+        let row = try #require(model.output.rows.first { $0.wallet.id == card.id })
         let unpaid = try #require(row.unpaid)
         let bills = row.bills
 
-        #expect(model.billPages.map(\.month) == [YearMonth("2026-10"), YearMonth("2026-11")])
-        #expect(model.upcomingBillTotal == 30000)
-        #expect(model.shownUpcomingBills.map(\.bill.isOpen) == [false])
+        #expect(model.output.billPages.map(\.month) == [YearMonth("2026-10"), YearMonth("2026-11")])
+        #expect(model.output.upcomingBillTotal == 30000)
+        #expect(model.output.shownUpcomingBills.map(\.bill.isOpen) == [false])
         #expect(bills.map(\.amount) == [30000, 17000])
         #expect(bills.map(\.isOpen) == [false, true])
         #expect(bills[1].balanceBefore == bills[0].balanceBefore + 250_000)
@@ -64,11 +64,11 @@ extension AssetsModelTests {
         #expect(unpaid.later.map(\.amount) == [800])
         #expect(unpaid.total == 42800)
 
-        model.billPage = 1
+        model.state.billPage = 1
 
-        #expect(model.upcomingBillTotal == 17000)
-        #expect(model.shownBillPage?.isOpen == true)
-        #expect(model.billPages.count == 2)
+        #expect(model.output.upcomingBillTotal == 17000)
+        #expect(model.output.shownBillPage?.isOpen == true)
+        #expect(model.output.billPages.count == 2)
     }
 
     @Test
@@ -104,9 +104,9 @@ extension AssetsModelTests {
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let row = try #require(model.rows.first { $0.wallet.id == card.id })
+        let row = try #require(model.output.rows.first { $0.wallet.id == card.id })
         let unpaid = try #require(row.unpaid)
         let ids = unpaid.bills.flatMap(\.rows).map(\.id) + unpaid.later.map(\.id)
 

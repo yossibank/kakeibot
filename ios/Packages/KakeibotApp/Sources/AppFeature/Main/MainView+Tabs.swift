@@ -106,7 +106,7 @@ extension MainView {
                     sheet = .reward
                 }
             )
-            .loadFailed(assets.isListFailed, onRetry: retry)
+            .loadFailed(assets.input.isListFailed, onRetry: retry)
             .tabContent()
         }
     }

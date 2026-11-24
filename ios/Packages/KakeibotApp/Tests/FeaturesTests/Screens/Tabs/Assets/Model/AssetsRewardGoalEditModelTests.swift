@@ -9,14 +9,14 @@ struct AssetsRewardGoalEditModelTests {
     @Test
     func newGoalIsChangedAfterInput() throws {
         let database = try AppDatabase.inMemory()
-        let model = AssetsRewardGoalEditModel(database: database)
+        let model = AssetsRewardGoalEditModel(database: database, clock: .system)
 
-        let changedBeforeInput = model.isChanged
+        let changedBeforeInput = model.output.isChanged
 
-        model.name = "新しい靴"
+        model.state.name = "新しい靴"
 
         #expect(!changedBeforeInput)
-        #expect(model.isChanged)
+        #expect(model.output.isChanged)
     }
 
     @Test
@@ -30,12 +30,12 @@ struct AssetsRewardGoalEditModelTests {
             updatedAt: Date()
         )
 
-        let model = AssetsRewardGoalEditModel(database: database, editing: goal)
+        let model = AssetsRewardGoalEditModel(database: database, clock: .system, editing: goal)
 
-        let changedBeforeEdit = model.isChanged
+        let changedBeforeEdit = model.output.isChanged
 
-        model.press(.digit(5))
-        let changedAfterEdit = model.isChanged
+        model.state.press(.digit(5))
+        let changedAfterEdit = model.output.isChanged
 
         #expect(!changedBeforeEdit)
         #expect(changedAfterEdit)
@@ -44,10 +44,10 @@ struct AssetsRewardGoalEditModelTests {
     @Test
     func savesNewGoal() async throws {
         let database = try AppDatabase.inMemory()
-        let model = AssetsRewardGoalEditModel(database: database)
-        model.name = "新しい靴"
-        model.press(.digit(5))
-        model.press(.doubleZero)
+        let model = AssetsRewardGoalEditModel(database: database, clock: .system)
+        model.state.name = "新しい靴"
+        model.state.press(.digit(5))
+        model.state.press(.doubleZero)
 
         let isSaved = await model.save()
         let goals = try await database.rewardBank().waitingGoals
@@ -60,15 +60,15 @@ struct AssetsRewardGoalEditModelTests {
     @Test
     func tellsWhenGoalCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
-        let model = AssetsRewardGoalEditModel(database: database)
-        model.name = "新しい靴"
-        model.press(.digit(5))
+        let model = AssetsRewardGoalEditModel(database: database, clock: .system)
+        model.state.name = "新しい靴"
+        model.state.press(.digit(5))
         try await database.failWrites(to: "reward_goal")
 
         let isSaved = await model.save()
 
         #expect(isSaved == false)
-        #expect(model.errorNotice.message == "目標を保存できませんでした")
+        #expect(model.state.errorNotice.message == "目標を保存できませんでした")
     }
 
     @Test
@@ -76,7 +76,7 @@ struct AssetsRewardGoalEditModelTests {
         let database = try AppDatabase.inMemory()
         let draft = RewardGoalDraft(name: "新しい靴", targetAmount: 12000)
         let goal = try await database.saveRewardGoal(draft, at: Date())
-        let model = AssetsRewardGoalEditModel(database: database, editing: goal)
+        let model = AssetsRewardGoalEditModel(database: database, clock: .system, editing: goal)
 
         let isDeleted = await model.delete()
         let goals = try await database.rewardBank().waitingGoals
@@ -90,8 +90,8 @@ struct AssetsRewardGoalEditModelTests {
         let database = try AppDatabase.inMemory()
         let draft = RewardGoalDraft(name: "新しい靴", targetAmount: 12000)
         let goal = try await database.saveRewardGoal(draft, at: Date())
-        let model = AssetsRewardGoalEditModel(database: database, editing: goal)
-        let adding = AssetsRewardGoalEditModel(database: database)
+        let model = AssetsRewardGoalEditModel(database: database, clock: .system, editing: goal)
+        let adding = AssetsRewardGoalEditModel(database: database, clock: .system)
         try await database.failWrites(to: "reward_goal")
 
         let isDeleted = await model.delete()
@@ -99,7 +99,7 @@ struct AssetsRewardGoalEditModelTests {
 
         #expect(isDeleted == false)
         #expect(isNewDeleted == false)
-        #expect(model.errorNotice.message == "目標を削除できませんでした")
-        #expect(adding.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == "目標を削除できませんでした")
+        #expect(adding.state.errorNotice.message == nil)
     }
 }

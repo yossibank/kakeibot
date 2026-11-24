@@ -106,20 +106,20 @@ struct MonthStartDayModelTests {
         let setup = try await HomeModelTests.Setup()
         let startDay = try #require(MonthStartDay(10))
         try await setup.database.setSetting(.monthStartDay, to: startDay)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
 
         let task = Task {
             await model.run()
         }
 
         try await wait {
-            model.monthStartDay == startDay && model.list != nil
+            model.output.monthStartDay == startDay && model.output.list != nil
         }
 
         task.cancel()
 
-        #expect(model.currentMonth == YearMonth(year: 2026, month: 11))
-        #expect(model.monthTotals.last?.month == model.currentMonth)
+        #expect(model.output.currentMonth == YearMonth(year: 2026, month: 11))
+        #expect(model.output.monthTotals.last?.month == model.output.currentMonth)
     }
 }
 

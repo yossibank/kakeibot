@@ -13,16 +13,16 @@ struct AssetsModelTests {
         try await setup.save(.expense, 980, on: "2026-10-01", from: setup.cash)
         try await setup.save(.transfer, 10000, on: "2026-10-02", from: setup.bank, to: setup.cash)
 
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let balances = model.rows.map(\.balance)
-        let totals = model.monthTotals.map(\.total)
+        let balances = model.output.rows.map(\.balance)
+        let totals = model.output.monthTotals.map(\.total)
 
-        #expect(model.total == 249_020)
+        #expect(model.output.total == 249_020)
         #expect(balances == [9020, 240_000])
-        #expect(model.changeFromLastMonth == -980)
+        #expect(model.output.changeFromLastMonth == -980)
         #expect(totals == [0, 0, 0, 0, 250_000, 249_020])
-        #expect(model.monthTotals.last?.month == setup.today.yearMonth)
+        #expect(model.output.monthTotals.last?.month == setup.today.yearMonth)
     }
 
     @Test
@@ -30,12 +30,12 @@ struct AssetsModelTests {
         let setup = try await Setup()
         try await setup.save(.income, 1000, on: "2026-10-10", from: setup.cash)
         try await setup.save(.expense, 400, on: "2026-10-20", from: setup.cash)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
 
-        #expect(model.rows.first?.balance == 1000)
-        #expect(model.total == 1000)
+        #expect(model.output.rows.first?.balance == 1000)
+        #expect(model.output.total == 1000)
     }
 
     @Test
@@ -45,14 +45,14 @@ struct AssetsModelTests {
         try await setup.save(.income, 5000, on: "2026-10-25", from: setup.bank)
         try await setup.save(.expense, 400, on: "2026-10-20", from: setup.cash)
         try await setup.save(.transfer, 300, on: "2026-10-18", from: setup.bank, to: setup.cash)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
 
-        #expect(model.plans.map(\.change) == [-400, 5000])
-        #expect(model.plans.first?.date == LocalDate("2026-10-20"))
-        #expect(model.plans.first?.wallet == "財布")
-        #expect(model.total == 1000)
+        #expect(model.output.plans.map(\.change) == [-400, 5000])
+        #expect(model.output.plans.first?.date == LocalDate("2026-10-20"))
+        #expect(model.output.plans.first?.wallet == "財布")
+        #expect(model.output.total == 1000)
     }
 
     @Test
@@ -114,9 +114,9 @@ struct AssetsModelTests {
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let row = try #require(model.upcomingBills.first)
+        let row = try #require(model.output.upcomingBills.first)
         let bill = row.bill
         let from = try #require(LocalDate("2026-09-16"))
         let through = try #require(LocalDate("2026-10-15"))
@@ -124,15 +124,15 @@ struct AssetsModelTests {
         #expect(bill.date == LocalDate("2026-10-26"))
         #expect(bill.amount == 42500)
         #expect(bill.period == from...through)
-        #expect(model.upcomingBillTotal == 42500)
+        #expect(model.output.upcomingBillTotal == 42500)
         #expect(row.source == "銀行")
         #expect(row.movedIn.map(\.amount) == [500])
         #expect(row.movedOut.map(\.amount) == [800])
         #expect(bill.balanceAfter == -42500)
         #expect(bill.shortage == 42500)
-        #expect(model.rows.last?.nextBill?.amount == 42500)
-        #expect(model.holdings.unpaid == 43300)
-        #expect(model.sections.map(\.role) == [.onHand, .card])
+        #expect(model.output.rows.last?.nextBill?.amount == 42500)
+        #expect(model.output.holdings.unpaid == 43300)
+        #expect(model.output.sections.map(\.role) == [.onHand, .card])
     }
 
     @Test
@@ -164,14 +164,14 @@ struct AssetsModelTests {
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let row = try #require(model.rows.first { $0.wallet.id == loan.id })
+        let row = try #require(model.output.rows.first { $0.wallet.id == loan.id })
         let lastDate = try #require(LocalDate("2027-01-27"))
         let payoff = LoanPayoff(count: 4, lastDate: lastDate)
 
         #expect(row.repayment == .until(payoff))
-        #expect(model.rows.first?.repayment == nil)
+        #expect(model.output.rows.first?.repayment == nil)
     }
 }
 

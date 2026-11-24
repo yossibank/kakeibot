@@ -7,81 +7,132 @@ import Store
 @MainActor
 @Observable
 public final class AssetsAdjustmentModel {
-    public private(set) var calculator: AmountCalculator
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    public let wallet: Wallet
-    public let balance: Int
-
-    private let database: AppDatabase
-    private let today: LocalDate
-    private let openingAmount: Int
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         wallet: Wallet,
         balance: Int,
         today: LocalDate
     ) {
-        let calculator = AmountCalculator()
+        let state = State()
+        let input = Input(
+            wallet: wallet,
+            balance: balance,
+            today: today,
+            openingAmount: state.calculator.amount
+        )
 
-        self.calculator = calculator
-        self.database = database
-        self.wallet = wallet
-        self.balance = balance
-        self.today = today
-        self.openingAmount = calculator.amount
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension AssetsAdjustmentModel {
-    var difference: Int {
-        calculator.amount - balance
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public private(set) var calculator = AmountCalculator()
+
+        public func press(_ key: AmountCalculator.Key) {
+            calculator.press(key)
+        }
     }
 
-    var canSave: Bool {
-        difference != 0
+    @MainActor
+    @Observable
+    final class Input {
+        public let wallet: Wallet
+        public let balance: Int
+
+        let today: LocalDate
+        let openingAmount: Int
+
+        init(
+            wallet: Wallet,
+            balance: Int,
+            today: LocalDate,
+            openingAmount: Int
+        ) {
+            self.wallet = wallet
+            self.balance = balance
+            self.today = today
+            self.openingAmount = openingAmount
+        }
     }
 
-    var isChanged: Bool {
-        calculator.amount != openingAmount
-    }
+    @MainActor
+    final class Output {
+        let input: Input
+        let state: State
 
-    var differenceText: String {
-        canSave ? Yen.text(difference, type: .income) : "なし"
-    }
+        public var difference: Int {
+            state.calculator.amount - input.balance
+        }
 
-    var differenceNote: String {
-        canSave ? "差は今日の記録に入ります" : "記録の残高と同じです"
-    }
+        public var canSave: Bool {
+            difference != 0
+        }
 
-    var saveTitle: String {
-        canSave ? "\(differenceText) で合わせる" : "合わせる"
-    }
+        public var isChanged: Bool {
+            state.calculator.amount != input.openingAmount
+        }
 
-    func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        public var differenceText: String {
+            canSave ? Yen.text(difference, type: .income) : "なし"
+        }
+
+        public var differenceNote: String {
+            canSave ? "差は今日の記録に入ります" : "記録の残高と同じです"
+        }
+
+        public var saveTitle: String {
+            canSave ? "\(differenceText) で合わせる" : "合わせる"
+        }
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
+            self.state = state
+        }
     }
 
     func save() async -> Bool {
-        guard canSave else {
+        guard output.canSave else {
             return false
         }
 
         do {
-            try await database.saveAdjustment(
-                difference,
-                of: wallet.id,
-                on: today,
-                at: Date()
+            try await dependencies.database.saveAdjustment(
+                output.difference,
+                of: input.wallet.id,
+                on: input.today,
+                at: dependencies.clock.now
             )
 
             return true
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
+    }
+}
+
+extension AssetsAdjustmentModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 
