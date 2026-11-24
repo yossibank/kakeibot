@@ -43,6 +43,7 @@ flowchart TD
     AppWidget --> Store
     FeatureModels --> Store
     Sync --> Store
+    Sync --> Core
     AppFeature --> Core
     AppWidget --> Core
     Features --> Core
