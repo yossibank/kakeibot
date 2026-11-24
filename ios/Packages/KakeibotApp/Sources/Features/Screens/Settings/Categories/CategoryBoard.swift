@@ -67,8 +67,13 @@ extension CategoryBoard: SettingsBoardSpec {
 
     func editModel(for destination: Destination) -> CategoryEditModel {
         switch destination {
-        case let .new(kind): CategoryEditModel(database: database, kind: kind)
-        case let .edit(kind, id): CategoryEditModel(database: database, kind: kind, editing: id)
+        case let .new(kind): CategoryEditModel(database: database, clock: clock, kind: kind)
+        case let .edit(kind, id): CategoryEditModel(
+                database: database,
+                clock: clock,
+                kind: kind,
+                editing: id
+            )
         }
     }
 

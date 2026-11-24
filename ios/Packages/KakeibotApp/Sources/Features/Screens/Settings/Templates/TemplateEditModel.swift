@@ -147,6 +147,7 @@ public extension TemplateEditModel {
     func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
         CategoryEditModel(
             database: database,
+            clock: .system,
             kind: category.kind,
             editing: category.id
         )

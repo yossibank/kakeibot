@@ -53,7 +53,7 @@ struct SnapshotTests {
         let walletSheet = WalletEditSheet(model: walletEdit)
             .frame(height: 1000)
 
-        let categoryEdit = CategoryEditModel(database: database, kind: .expense)
+        let categoryEdit = CategoryEditModel(database: database, clock: .system, kind: .expense)
         let stampEdit = StampEditModel(database: database, clock: .system)
         let ruleEdit = RewardRuleEditModel(database: database, clock: .system)
 

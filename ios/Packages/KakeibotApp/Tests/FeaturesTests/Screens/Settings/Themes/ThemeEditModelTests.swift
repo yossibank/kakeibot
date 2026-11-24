@@ -11,11 +11,12 @@ struct ThemeEditModelTests {
 
         let model = ThemeEditModel(
             database: setup.database,
+            clock: .system,
             editing: nil,
             base: ThemePreset.forest.palette
         )
 
-        model.draft.name = "森の夜"
+        model.state.draft.name = "森の夜"
 
         let isSaved = await model.save()
         let themes = try await setup.database.customThemes()
@@ -32,16 +33,18 @@ struct ThemeEditModelTests {
 
         let creating = ThemeEditModel(
             database: setup.database,
+            clock: .system,
             editing: nil,
             base: ThemePreset.forest.palette
         )
 
-        creating.draft.name = "森の夜"
+        creating.state.draft.name = "森の夜"
         _ = await creating.save()
         let theme = try #require(try await setup.database.customThemes().first)
 
         let editing = ThemeEditModel(
             database: setup.database,
+            clock: .system,
             editing: theme,
             base: ThemePreset.forest.palette
         )
@@ -62,21 +65,31 @@ struct ThemeEditModelTests {
     @Test
     func keepsTextReadableWhenBackgroundChanges() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeEditModel(database: setup.database, editing: nil, base: .night)
+        let model = ThemeEditModel(
+            database: setup.database,
+            clock: .system,
+            editing: nil,
+            base: .night
+        )
 
-        model.choose("#FFFFFF", for: .background)
+        model.state.choose("#FFFFFF", for: .background)
 
-        #expect(model.draft.background == "#FFFFFF")
-        #expect(model.palette.unreadableRoles.isEmpty)
+        #expect(model.state.draft.background == "#FFFFFF")
+        #expect(model.output.palette.unreadableRoles.isEmpty)
     }
 
     @Test
     func disablesUnreadableSwatches() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeEditModel(database: setup.database, editing: nil, base: .night)
+        let model = ThemeEditModel(
+            database: setup.database,
+            clock: .system,
+            editing: nil,
+            base: .night
+        )
 
-        let dark = model.isAvailable("#1E1E22", for: .text)
-        let light = model.isAvailable("#EDE6D6", for: .text)
+        let dark = model.output.isAvailable("#1E1E22", for: .text)
+        let light = model.output.isAvailable("#EDE6D6", for: .text)
 
         #expect(!dark)
         #expect(light)
@@ -85,10 +98,15 @@ struct ThemeEditModelTests {
     @Test
     func blocksUnreadableColors() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeEditModel(database: setup.database, editing: nil, base: .night)
+        let model = ThemeEditModel(
+            database: setup.database,
+            clock: .system,
+            editing: nil,
+            base: .night
+        )
 
-        model.draft.name = "読めない"
-        model.draft.text = model.draft.background
+        model.state.draft.name = "読めない"
+        model.state.draft.text = model.state.draft.background
 
         #expect(!model.canSave)
         #expect(model.saveTitle == "文字が読みにくい色です")

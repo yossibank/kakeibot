@@ -285,13 +285,13 @@ struct EntryModelTests {
         let model = try await Self.newModel()
         model.select(.income)
         let editor = model.newCategoryModel()
-        editor.name = "配当"
-        editor.icon.glyph = .invest
+        editor.state.name = "配当"
+        editor.state.icon.glyph = .invest
 
         let saved = try #require(await editor.save())
         await model.reloadCategories(selecting: saved.id)
 
-        #expect(editor.kind == .income)
+        #expect(editor.input.kind == .income)
         #expect(model.categoryId == saved.id)
         #expect(model.categories.last?.name == "配当")
     }

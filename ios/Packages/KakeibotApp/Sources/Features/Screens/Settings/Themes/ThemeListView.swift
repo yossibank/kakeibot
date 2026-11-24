@@ -118,6 +118,7 @@ public struct ThemeListView: View {
             ThemeEditSheet(
                 model: ThemeEditModel(
                     database: database,
+                    clock: .system,
                     editing: target.theme,
                     base: target.base ?? model.output.currentPalette
                 )
