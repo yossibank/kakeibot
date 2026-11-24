@@ -34,8 +34,11 @@ public extension AppDatabase {
         try await writer.write { db in
             var change = CardBillChange()
 
-            for draft in drafts {
-                try Self.saveEntry(draft, editing: nil, change: &change, in: db, at: now)
+            for (index, draft) in drafts.enumerated() {
+                let steps = Double(index - drafts.count + 1)
+                let savedAt = now.addingTimeInterval(steps * Self.batchStep)
+
+                try Self.saveEntry(draft, editing: nil, change: &change, in: db, at: savedAt)
             }
 
             try Self.recalculateCardBills(change, in: db, at: now)
@@ -229,6 +232,8 @@ extension AppDatabase {
 }
 
 private extension AppDatabase {
+    static let batchStep: TimeInterval = 1
+
     static func canChange(
         _ entry: Entry,
         to change: EntryBatchChange,
