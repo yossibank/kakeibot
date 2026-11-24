@@ -205,6 +205,7 @@ extension SettingsMenuSheet {
                 SyncView(
                     model: SyncModel(
                         database: database,
+                        clock: .system,
                         cloud: syncCloud
                     )
                 )

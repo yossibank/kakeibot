@@ -41,9 +41,10 @@ public struct SyncView: View {
                                 CapsulePicker(selection: onBinding, options: Self.onOptions)
                             }
                             .frame(minHeight: 58)
-                            .disabled(model.isWorking || model.isSwitching || !canChange)
+                            .disabled(model.state.isWorking || model.output
+                                .isSwitching || !canChange)
 
-                            if let progress = model.progress {
+                            if let progress = model.output.progress {
                                 Hairline()
 
                                 status(progress)
@@ -53,14 +54,14 @@ public struct SyncView: View {
                         .padding(.horizontal, 16)
                         .card()
 
-                        SettingsCaption(model.footnote)
+                        SettingsCaption(model.output.footnote)
                     }
 
-                    if !model.shares.isEmpty {
+                    if !model.input.shares.isEmpty {
                         sharingSection
                     }
 
-                    if !model.joined.isEmpty {
+                    if !model.input.joined.isEmpty {
                         joinedSection
                     }
                 }
@@ -72,7 +73,7 @@ public struct SyncView: View {
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .onChange(of: scenePhase) { _, phase in
@@ -109,24 +110,24 @@ public struct SyncView: View {
             stopSharing(stopping)
         }
         .overlay {
-            if let choice = model.choice {
+            if let choice = model.state.choice {
                 SyncChoiceCard(
                     choice: choice,
                     onUseLocal: useLocalData,
                     onUseCloud: useCloudData,
                     onKeep: model.cancelChoice
                 )
-            } else if let invitation = model.invitation {
+            } else if let invitation = model.state.invitation {
                 SyncInviteCard(
                     item: invitation,
                     onInvite: confirmInvitation,
                     onCancel: model.cancelInvitation
                 )
-            } else if let opened = model.opened {
+            } else if let opened = model.state.opened {
                 SyncSharedCard(
                     item: opened,
-                    participants: model.participants,
-                    isFailed: model.isParticipantsFailed,
+                    participants: model.output.participants,
+                    isFailed: model.output.isParticipantsFailed,
                     onInvite: inviteMore,
                     onStop: {
                         askToStop(opened)
@@ -135,18 +136,18 @@ public struct SyncView: View {
                 )
             }
         }
-        .animation(.snappy(duration: 0.25), value: model.choice)
-        .animation(.snappy(duration: 0.25), value: model.invitation)
-        .animation(.snappy(duration: 0.25), value: model.opened)
+        .animation(.snappy(duration: 0.25), value: model.state.choice)
+        .animation(.snappy(duration: 0.25), value: model.state.invitation)
+        .animation(.snappy(duration: 0.25), value: model.state.opened)
         .proOffer(proOffer?.feature) {
             proOffer = nil
         } onUnlock: {
             unlock()
         }
-        .haptic(.selection, trigger: model.isChoosing) { _, new in
+        .haptic(.selection, trigger: model.output.isChoosing) { _, new in
             new
         }
-        .haptic(.success, trigger: model.progress) { old, new in
+        .haptic(.success, trigger: model.output.progress) { old, new in
             Self.hasFinishedSyncing(from: old, to: new)
         }
     }
@@ -210,7 +211,7 @@ private extension SyncView {
     ]
 
     var canChange: Bool {
-        model.isOn || model.isAvailable
+        model.input.isOn || model.output.isAvailable
     }
 
     var isLeavingBinding: Binding<Bool> {
@@ -235,7 +236,7 @@ private extension SyncView {
 
     var onBinding: Binding<Bool> {
         Binding {
-            model.shownOn
+            model.output.shownOn
         } set: { isOn in
             guard !isOn || isPro else {
                 proOffer = .sync
@@ -344,6 +345,7 @@ private extension SyncView {
             SyncView(
                 model: SyncModel(
                     database: database,
+                    clock: .system,
                     cloud: .unavailable
                 )
             )

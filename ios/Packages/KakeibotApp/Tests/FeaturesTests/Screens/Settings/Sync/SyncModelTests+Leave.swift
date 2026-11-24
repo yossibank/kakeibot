@@ -8,7 +8,7 @@ extension SyncModelTests {
     func leavesJoinedShareInICloudThenOnThisIPhone() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await joinShare(in: setup.database)
 
         await model.leave(item)
@@ -18,21 +18,21 @@ extension SyncModelTests {
         #expect(await cloud.shareCalls == ["leave _owner"])
         #expect(joined.isEmpty)
         #expect(wallets.contains { $0.id == item.wallet.id } == false)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 
     @Test
     func staysInShareWhenLeavingICloudFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToLeave: true)
-        let model = SyncModel(database: setup.database, cloud: cloud.cloud)
+        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
         let item = try await joinShare(in: setup.database)
 
         await model.leave(item)
         let joined = try await joinedShares(in: setup.database)
 
         #expect(joined.map(\.wallet.id) == [item.wallet.id])
-        #expect(model.errorNotice.message == "共有から抜けられませんでした。時間をおいて試してください")
+        #expect(model.state.errorNotice.message == "共有から抜けられませんでした。時間をおいて試してください")
     }
 }
 
