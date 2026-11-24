@@ -14,6 +14,7 @@ public extension WalletEditModel {
         public private(set) var loanAmount = AmountCalculator()
 
         public internal(set) var valuation = AmountCalculator()
+
         public var errorNotice = ErrorNotice()
 
         public let icon: SettingsIconEditorModel

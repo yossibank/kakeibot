@@ -77,6 +77,7 @@ public extension RecurringEditModel {
         public private(set) var feeCalculator = AmountCalculator()
 
         public internal(set) var type: Entry.Kind
+
         public var repayment = Repayment()
 
         init(

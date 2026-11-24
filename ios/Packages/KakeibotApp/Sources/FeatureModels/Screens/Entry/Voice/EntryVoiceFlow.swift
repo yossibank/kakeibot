@@ -62,7 +62,9 @@ public extension EntryVoiceFlow {
     }
 
     internal static let failedMessage = "声を聞き取れませんでした。もう一度押してください"
+
     static let levelCount = 16
+
     internal static let quietLevels = [Double](repeating: 0, count: levelCount)
 
     func checkAvailability() async {

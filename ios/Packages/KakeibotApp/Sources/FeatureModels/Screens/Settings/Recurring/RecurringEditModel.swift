@@ -44,6 +44,7 @@ public extension RecurringEditModel {
         public let today: LocalDate
 
         public internal(set) var baseline: RecurringDraft?
+
         public let editingId: Recurring.ID?
 
         var generatedUntil: LocalDate?

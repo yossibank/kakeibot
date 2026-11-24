@@ -3,6 +3,7 @@ import Core
 public struct ReviewGoalItem: Identifiable {
     public let goal: ReviewGoal
     public let name: String
+
     let categoryName: String
 
     public let progress: ReviewGoal.Progress

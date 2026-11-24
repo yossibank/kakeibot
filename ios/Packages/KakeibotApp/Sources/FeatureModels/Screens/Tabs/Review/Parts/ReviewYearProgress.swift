@@ -9,7 +9,9 @@ public struct ReviewYearProgress {
 public extension ReviewYearProgress {
     struct Month: Identifiable {
         public let id: Int
+
         let range: ClosedRange<LocalDate>
+
         public let name: String
         public let total: Int
         public let state: State
