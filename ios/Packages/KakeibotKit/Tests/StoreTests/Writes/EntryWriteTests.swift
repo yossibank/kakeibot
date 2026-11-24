@@ -148,6 +148,24 @@ struct EntryWriteTests {
     }
 
     @Test
+    func keepsOrderOfEntriesSavedTogether() async throws {
+        let setup = try await Setup()
+        var first = setup.draft
+        var second = setup.draft
+        first.memo = "先"
+        second.memo = "後"
+
+        try await setup.database.saveEntries([first, second], at: setup.now)
+        let entries = try setup.database.snapshot().entries
+        let saved = Dictionary(uniqueKeysWithValues: entries.map { ($0.memo, $0.createdAt) })
+        let firstAt = try #require(saved["先"])
+        let secondAt = try #require(saved["後"])
+
+        #expect(firstAt < secondAt)
+        #expect(secondAt == setup.now)
+    }
+
+    @Test
     func deletesEntry() async throws {
         let setup = try await Setup()
 
