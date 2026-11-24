@@ -53,7 +53,7 @@ public struct ThemeListView: View {
 
                         section("ダーク", isLight: false)
 
-                        if !model.customThemes.isEmpty {
+                        if !model.input.customThemes.isEmpty {
                             customSection
                         }
 
@@ -86,7 +86,7 @@ public struct ThemeListView: View {
         } action: { size in
             self.size = size
         }
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .errorBanner(appIcon.state.errorNotice) {
             appIcon.state.errorNotice.clear()
         }
@@ -98,7 +98,7 @@ public struct ThemeListView: View {
             keepTitle: "そのまま",
             confirmTitle: "そろえる",
             role: .suggestion
-        ) { [icon = model.suggestedIcon] in
+        ) { [icon = model.state.suggestedIcon] in
             Task {
                 await model.use(icon)
             }
@@ -110,7 +110,7 @@ public struct ThemeListView: View {
         } onUnlock: {
             unlock()
         }
-        .haptic(.selection, trigger: model.current)
+        .haptic(.selection, trigger: model.input.current)
         .haptic(.impact(weight: .medium), trigger: menu) { _, new in
             new != nil
         }
@@ -119,7 +119,7 @@ public struct ThemeListView: View {
                 model: ThemeEditModel(
                     database: database,
                     editing: target.theme,
-                    base: target.base ?? model.currentPalette
+                    base: target.base ?? model.output.currentPalette
                 )
             ) { deletion in
                 self.deletion = deletion
@@ -181,7 +181,7 @@ extension ThemeListView {
 
     func select(_ choice: ThemeChoice) {
         if case .custom = choice,
-           choice != model.current,
+           choice != model.input.current,
            !isPro {
             proOffer = .select(choice)
             return
@@ -222,7 +222,7 @@ extension ThemeListView {
 
 private extension ThemeListView {
     var systemSection: some View {
-        let isCurrent = model.current == .system
+        let isCurrent = model.input.current == .system
         let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
 
         return VStack(alignment: .leading, spacing: 12) {
@@ -266,7 +266,7 @@ private extension ThemeListView {
             SettingsSectionTitle("つくったテーマ")
 
             LazyVGrid(columns: Self.columns, spacing: 20) {
-                ForEach(model.customThemes) { theme in
+                ForEach(model.input.customThemes) { theme in
                     tile(
                         .custom(theme.id),
                         palette: theme.palette,
@@ -276,7 +276,7 @@ private extension ThemeListView {
                 }
             }
         }
-        .sharesTextScale(id: model.customThemes.map(\.name))
+        .sharesTextScale(id: model.input.customThemes.map(\.name))
     }
 
     func section(
@@ -315,12 +315,12 @@ private extension ThemeListView {
         let select = SettingsIntroCard.Note("hand.tap", "押すと、そのテーマに切り替わります")
         let edit = SettingsIntroCard.Note("square.and.pencil", "つくったテーマは、もう一度押すと編集できます")
         let base = SettingsIntroCard.Note("plus.square.on.square", "長押しで、その色をもとにつくれます")
-        return model.customThemes.isEmpty ? [select, base] : [select, edit, base]
+        return model.input.customThemes.isEmpty ? [select, base] : [select, edit, base]
     }
 
     var isSuggestingIcon: Binding<Bool> {
         Binding {
-            model.suggestedIcon != nil
+            model.state.suggestedIcon != nil
         } set: { isShown in
             if !isShown {
                 model.dismissSuggestion()
@@ -329,7 +329,7 @@ private extension ThemeListView {
     }
 
     var suggestionMessage: String {
-        let title = model.suggestedIcon?.title ?? ""
+        let title = model.state.suggestedIcon?.title ?? ""
         return "アプリアイコンも\(title)にできます"
     }
 

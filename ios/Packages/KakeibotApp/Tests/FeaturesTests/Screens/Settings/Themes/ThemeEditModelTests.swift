@@ -55,8 +55,8 @@ struct ThemeEditModelTests {
         await list.restore(deletion)
 
         #expect(afterDelete == .preset(.white))
-        #expect(list.current == .custom(theme.id))
-        #expect(list.customThemes == [theme])
+        #expect(list.input.current == .custom(theme.id))
+        #expect(list.input.customThemes == [theme])
     }
 
     @Test
