@@ -109,7 +109,7 @@ public extension ReviewModel.Output {
             return nil
         }
 
-        let total = max(total(of: state.kind), 1)
+        let total = max(total(of: input.kind), 1)
 
         return ReviewModel.Share(
             id: ReviewModel.recurringShareId,
@@ -154,7 +154,7 @@ private extension ReviewModel {
 
 private extension ReviewModel.Output {
     var breakdown: ReviewSummary.Breakdown? {
-        switch state.kind {
+        switch input.kind {
         case .expense: summary.expense
         case .income: summary.income
         case .balance: nil
@@ -173,8 +173,8 @@ private extension ReviewModel.Output {
         spent: Int
     ) -> BudgetUsage? {
         guard
-            state.scale == .month,
-            state.kind == .expense
+            input.scale == .month,
+            input.kind == .expense
         else {
             return nil
         }

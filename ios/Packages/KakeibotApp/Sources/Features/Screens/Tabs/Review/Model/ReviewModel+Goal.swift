@@ -64,7 +64,7 @@ extension ReviewModel {
 extension ReviewModel.Output {
     var currentPeriod: ReviewPeriod {
         ReviewPeriod(
-            scale: state.scale,
+            scale: input.scale,
             containing: state.today,
             monthStartDay: input.monthStartDay,
             weekStart: input.weekStart

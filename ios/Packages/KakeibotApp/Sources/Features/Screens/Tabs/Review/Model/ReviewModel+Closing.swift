@@ -63,7 +63,7 @@ private extension ReviewModel.Output {
         )
 
         return ReviewClosingView.Content(
-            scale: state.scale,
+            scale: input.scale,
             range: period.range,
             weekStart: input.weekStart,
             pace: pace,
