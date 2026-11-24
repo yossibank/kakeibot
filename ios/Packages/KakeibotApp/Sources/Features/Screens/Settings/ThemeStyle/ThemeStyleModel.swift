@@ -7,15 +7,18 @@ import Store
 @Observable
 public final class ThemeStyleModel: SettingSaving {
     public let state: State
+    public let input: Input
     public let output: Output
 
     let dependencies: Dependencies
 
     public init(database: AppDatabase) {
         let state = State()
+        let input = Input()
 
         self.state = state
-        self.output = Output(state: state)
+        self.input = input
+        self.output = Output(input: input, state: state)
         self.dependencies = Dependencies(database: database)
     }
 }
@@ -34,28 +37,57 @@ public extension ThemeStyleModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public internal(set) var style: ThemeStyle = .standard
         public internal(set) var errorNotice = ErrorNotice()
 
-        var previewBase: ThemeStyle?
+        public private(set) var preview: ThemeStyle?
+
+        func show<Value>(
+            _ value: Value,
+            at keyPath: WritableKeyPath<ThemeStyle, Value>,
+            over saved: ThemeStyle
+        ) {
+            var style = preview ?? saved
+
+            style[keyPath: keyPath] = value
+            preview = style
+        }
+
+        func clearPreview() {
+            preview = nil
+        }
+    }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var style: ThemeStyle = .standard
     }
 
     @MainActor
     final class Output {
+        let input: Input
         let state: State
 
-        public var savedStyle: ThemeStyle {
-            state.previewBase ?? state.style
+        public var style: ThemeStyle {
+            state.preview ?? input.style
         }
 
-        init(state: State) {
+        public var savedStyle: ThemeStyle {
+            input.style
+        }
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
             self.state = state
         }
     }
 
     func load() async {
         do {
-            state.style = try await dependencies.database.style()
+            input.style = try await dependencies.database.style()
         } catch {
             state.errorNotice.show(SettingMessage.loadFailed)
         }
@@ -82,11 +114,7 @@ public extension ThemeStyleModel {
     }
 
     func cancelPreview() {
-        if let previewBase = state.previewBase {
-            state.style = previewBase
-        }
-
-        state.previewBase = nil
+        state.clearPreview()
     }
 
     func choose(_ size: ThemeTextSize) async {
@@ -124,14 +152,16 @@ private extension ThemeStyleModel {
         at keyPath: WritableKeyPath<ThemeStyle, Value>,
         key: SettingKey<Value>
     ) async {
-        let previous = output.savedStyle
+        let previous = input.style
+        var chosen = output.style
 
-        state.previewBase = nil
+        chosen[keyPath: keyPath] = value
 
-        state.style[keyPath: keyPath] = value
+        state.clearPreview()
+        input.style = chosen
 
         await saveSetting(value, for: key, in: dependencies.database) {
-            state.style = previous
+            input.style = previous
         }
     }
 
@@ -139,10 +169,6 @@ private extension ThemeStyleModel {
         _ value: Value,
         at keyPath: WritableKeyPath<ThemeStyle, Value>
     ) {
-        if state.previewBase == nil {
-            state.previewBase = state.style
-        }
-
-        state.style[keyPath: keyPath] = value
+        state.show(value, at: keyPath, over: input.style)
     }
 }

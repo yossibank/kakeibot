@@ -20,9 +20,9 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
             SettingsBackHeader(title, hint: hint)
 
             preview
-                .animation(.snappy(duration: 0.25), value: model.state.style)
-                .environment(\.themeStyle, model.state.style)
-                .font(model.state.style.bodyFont)
+                .animation(.snappy(duration: 0.25), value: model.output.style)
+                .environment(\.themeStyle, model.output.style)
+                .font(model.output.style.bodyFont)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
@@ -52,8 +52,8 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
         }
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
-        .haptic(.selection, trigger: model.state.style, condition: Self.isSwitchKept)
-        .environment(\.themeStyle.haptics, model.state.style.haptics)
+        .haptic(.selection, trigger: model.output.style, condition: Self.isSwitchKept)
+        .environment(\.themeStyle.haptics, model.output.style.haptics)
         .onAppear {
             openedStyle = openedStyle ?? appStyle
         }

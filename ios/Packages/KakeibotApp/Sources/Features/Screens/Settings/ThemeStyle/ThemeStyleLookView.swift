@@ -25,7 +25,7 @@ public struct ThemeStyleLookView: View {
             ThemeStyleChoices(
                 title: "角の丸み",
                 options: ThemeCorner.allCases,
-                selection: model.state.style.corner,
+                selection: model.output.style.corner,
                 columns: 4,
                 label: \.title
             ) { corner in
@@ -37,7 +37,7 @@ public struct ThemeStyleLookView: View {
             ThemeStyleChoices(
                 title: "行の間隔",
                 options: ThemeRowSpacing.allCases,
-                selection: model.state.style.rowSpacing,
+                selection: model.output.style.rowSpacing,
                 columns: 3,
                 label: \.title
             ) { spacing in
@@ -49,7 +49,7 @@ public struct ThemeStyleLookView: View {
             ThemeStyleChoices(
                 title: "スタンプの形",
                 options: ThemeStampShape.allCases,
-                selection: model.state.style.stampShape,
+                selection: model.output.style.stampShape,
                 columns: 3,
                 label: \.title
             ) { shape in
@@ -62,7 +62,7 @@ public struct ThemeStyleLookView: View {
             ThemeStyleChoices(
                 title: "タブの名前",
                 options: [true, false],
-                selection: model.state.style.showsTabTitles,
+                selection: model.output.style.showsTabTitles,
                 columns: 2,
                 label: Self.tabTitle
             ) { showsTitles in
@@ -75,7 +75,7 @@ public struct ThemeStyleLookView: View {
             ThemeStyleChoices(
                 title: "背景",
                 options: ThemeBackdrop.allCases,
-                selection: model.state.style.backdrop,
+                selection: model.output.style.backdrop,
                 columns: 3,
                 label: \.title
             ) { backdrop in
@@ -91,7 +91,7 @@ public struct ThemeStyleLookView: View {
                     title: "押した時の振動",
                     detail: "選んだ時や記録した時に、軽く振動します",
                     systemImage: "waveform",
-                    isOn: model.state.style.haptics
+                    isOn: model.output.style.haptics
                 ) { isOn in
                     await model.choose(haptics: isOn)
                 }
@@ -100,19 +100,19 @@ public struct ThemeStyleLookView: View {
                     title: "金の光などの飾り",
                     detail: "ボタンの光とタブの金の輪を出します",
                     systemImage: "sparkle",
-                    isOn: model.state.style.decorations
+                    isOn: model.output.style.decorations
                 ) { isOn in
                     await model.choose(decorations: isOn)
                 }
             }
-            .environment(\.themeStyle.decorations, model.state.style.decorations)
+            .environment(\.themeStyle.decorations, model.output.style.decorations)
         }
     }
 }
 
 private extension ThemeStyleLookView {
     var preview: some View {
-        let shape = RoundedRectangle(cornerRadius: model.state.style.corner.radius(28))
+        let shape = RoundedRectangle(cornerRadius: model.output.style.corner.radius(28))
 
         return VStack(spacing: 8) {
             dayCard
@@ -197,7 +197,7 @@ private extension ThemeStyleLookView {
     }
 
     func cornerMark(_ option: ThemeCorner) -> some View {
-        let color = option == model.state.style.corner ? Palette.accent : Palette.subtext
+        let color = option == model.output.style.corner ? Palette.accent : Palette.subtext
         return ThemeStyleCornerMark(corner: option, color: color, size: Self.markSize)
     }
 }

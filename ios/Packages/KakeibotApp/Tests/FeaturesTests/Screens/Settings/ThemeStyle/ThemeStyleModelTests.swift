@@ -37,7 +37,7 @@ struct ThemeStyleModelTests {
             decorations: false
         )
 
-        #expect(model.state.style == expected)
+        #expect(model.output.style == expected)
         #expect(style == expected)
     }
 
@@ -72,8 +72,8 @@ struct ThemeStyleModelTests {
 
         let style = try await setup.database.style()
 
-        #expect(model.state.style.displayFont == .gothic)
-        #expect(model.state.style.textFont == .rounded)
+        #expect(model.output.style.displayFont == .gothic)
+        #expect(model.output.style.textFont == .rounded)
         #expect(style == .standard)
     }
 
@@ -86,7 +86,7 @@ struct ThemeStyleModelTests {
         model.preview(displayFont: .gothic)
         model.cancelPreview()
 
-        #expect(model.state.style == .standard)
+        #expect(model.output.style == .standard)
     }
 
     @Test
@@ -99,7 +99,7 @@ struct ThemeStyleModelTests {
         model.preview(displayFont: .rounded)
         model.cancelPreview()
 
-        #expect(model.state.style == .standard)
+        #expect(model.output.style == .standard)
     }
 
     @Test
@@ -111,7 +111,7 @@ struct ThemeStyleModelTests {
 
         model.cancelPreview()
 
-        #expect(!model.state.style.haptics)
+        #expect(!model.output.style.haptics)
     }
 
     @Test
@@ -126,11 +126,11 @@ struct ThemeStyleModelTests {
         let style = try await setup.database.style()
 
         #expect(style.displayFont == .gothic)
-        #expect(model.state.style.displayFont == .gothic)
+        #expect(model.output.style.displayFont == .gothic)
 
         model.cancelPreview()
 
-        #expect(model.state.style.displayFont == .gothic)
+        #expect(model.output.style.displayFont == .gothic)
     }
 
     @Test
@@ -143,7 +143,7 @@ struct ThemeStyleModelTests {
         model.preview(displayFont: .gothic)
         await model.choose(displayFont: .rounded)
 
-        #expect(model.state.style == .standard)
+        #expect(model.output.style == .standard)
         #expect(model.state.errorNotice.message == "設定を保存できませんでした")
     }
 }
