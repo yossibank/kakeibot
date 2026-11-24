@@ -129,7 +129,7 @@ public extension EntryModel {
         public internal(set) var items = Items()
         public internal(set) var voiceFilled: VoiceFilled?
 
-        public var isClosing = false
+        public internal(set) var isClosing = false
 
         var appliedTemplateId: EntryTemplate.ID?
         var isSaving = false

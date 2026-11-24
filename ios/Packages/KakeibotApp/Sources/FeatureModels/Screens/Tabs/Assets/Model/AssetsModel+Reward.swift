@@ -38,8 +38,8 @@ public extension AssetsModel {
 }
 
 public extension AssetsModel {
-    func childParts() -> ScreenParts {
-        ScreenParts(database: dependencies.database, clock: dependencies.clock)
+    func childDatabase() -> AppDatabase {
+        dependencies.database
     }
 }
 

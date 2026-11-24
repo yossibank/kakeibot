@@ -162,8 +162,8 @@ extension EntryModel {
         template.memo.flatMap { $0.isEmpty ? nil : $0 }
     }
 
-    public func childParts() -> ScreenParts {
-        ScreenParts(database: dependencies.database, clock: dependencies.clock)
+    public func childDatabase() -> AppDatabase {
+        dependencies.database
     }
 }
 

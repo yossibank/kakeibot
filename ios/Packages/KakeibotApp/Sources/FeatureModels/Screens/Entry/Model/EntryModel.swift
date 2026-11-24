@@ -241,6 +241,10 @@ public extension EntryModel {
         }
     }
 
+    func beginClosing() {
+        state.isClosing = true
+    }
+
     func newNoticeModel() -> EntryNoticeModel {
         EntryNoticeModel(database: dependencies.database, clock: dependencies.clock)
     }

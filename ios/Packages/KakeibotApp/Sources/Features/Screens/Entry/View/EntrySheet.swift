@@ -235,7 +235,7 @@ extension EntrySheet {
             return
         }
 
-        model.state.isClosing = true
+        model.beginClosing()
         onChange(change)
         dismiss()
     }
@@ -369,7 +369,7 @@ private extension EntrySheet {
             return
         }
 
-        model.state.isClosing = true
+        model.beginClosing()
         onChange(change)
         dismiss()
     }
