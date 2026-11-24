@@ -17,7 +17,7 @@ extension RecordsView {
     }
 
     func dayCard(_ day: EntryDay) -> some View {
-        let rows = model.rows(for: day)
+        let rows = model.output.rows(for: day)
 
         return VStack(spacing: 0) {
             dayHeader(day.date, day: day)
@@ -31,7 +31,7 @@ extension RecordsView {
             adjustmentList(on: day.date)
 
             if selection == nil {
-                let upcoming = model.listRecurrings(on: day.date)
+                let upcoming = model.output.listRecurrings(on: day.date)
 
                 if !upcoming.isEmpty {
                     upcomingList(upcoming, on: day.date)
@@ -74,14 +74,14 @@ extension RecordsView {
         _ recurring: Recurring,
         on date: LocalDate
     ) -> some View {
-        let amount = model.amount(of: recurring, on: date)
+        let amount = model.output.amount(of: recurring, on: date)
 
         return HStack(spacing: 12) {
             Image(systemName: "repeat")
                 .sansFont(.small, weight: .light)
                 .foregroundStyle(Palette.hint)
 
-            Text(model.title(of: recurring))
+            Text(model.output.title(of: recurring))
                 .textFont(.subheadline)
                 .foregroundStyle(Palette.subtext)
                 .lineLimit(2)
@@ -114,7 +114,7 @@ extension RecordsView {
         VStack(spacing: 0) {
             dayHeader(date, day: nil)
 
-            upcomingList(model.listRecurrings(on: date), on: date)
+            upcomingList(model.output.listRecurrings(on: date), on: date)
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
@@ -152,7 +152,7 @@ extension RecordsView {
     @ViewBuilder
     func adjustmentList(on date: LocalDate) -> some View {
         if selection == nil {
-            ForEach(model.adjustmentRows(on: date)) { row in
+            ForEach(model.output.adjustmentRows(on: date)) { row in
                 Button {
                     openAdjustment = row
                 } label: {
@@ -199,6 +199,6 @@ private extension RecordsView {
             return
         }
 
-        self.selection = model.toggling(id, in: selection)
+        self.selection = model.output.toggling(id, in: selection)
     }
 }

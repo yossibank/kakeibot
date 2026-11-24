@@ -53,7 +53,7 @@ public struct RecordsView: View {
     public var body: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                if model.isSearching {
+                if model.state.isSearching {
                     searchBar
 
                     filterLine
@@ -71,7 +71,7 @@ public struct RecordsView: View {
                         )
 
                         HStack(spacing: 8) {
-                            if model.layout == .list {
+                            if model.state.layout == .list {
                                 selectButton
                             }
 
@@ -88,8 +88,8 @@ public struct RecordsView: View {
                     Group {
                         monthContent
                     }
-                    .frame(maxWidth: model.layout == .list ? Self.listWidth : nil)
-                    .pageSlide(slide, page: model.month)
+                    .frame(maxWidth: model.state.layout == .list ? Self.listWidth : nil)
+                    .pageSlide(slide, page: model.state.month)
                 }
             }
             .padding(.horizontal, 16)
@@ -106,34 +106,34 @@ public struct RecordsView: View {
             }
         }
         .confirmation(
-            isPresented: $model.isConfirmingDelete,
+            isPresented: Bindable(model.state).isConfirmingDelete,
             systemImage: "trash",
-            title: "\(model.pendingDeleteCount) 件の記録を削除しますか",
+            title: "\(model.output.pendingDeleteCount) 件の記録を削除しますか",
             message: deleteUndoMessage,
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
-            model.confirmDelete { ids in
+            model.state.confirmDelete { ids in
                 onDeleteEntries(ids)
                 finishSelecting()
             }
         }
-        .onChange(of: model.layout) {
+        .onChange(of: model.state.layout) {
             finishSelecting()
         }
-        .onChange(of: model.month) {
+        .onChange(of: model.state.month) {
             finishSelecting()
         }
-        .onChange(of: model.isSearching) {
+        .onChange(of: model.state.isSearching) {
             finishSelecting()
         }
-        .haptic(.selection, trigger: model.month)
-        .haptic(.selection, trigger: model.selectedDate)
+        .haptic(.selection, trigger: model.state.month)
+        .haptic(.selection, trigger: model.state.selectedDate)
         .sheet(item: $stampTarget) { target in
             RecordsStampSheet(
                 date: target.date,
-                choices: model.stampChoices,
-                current: model.stampIcon(on: target.date),
+                choices: model.output.stampChoices,
+                current: model.output.stampIcon(on: target.date),
                 editModel: model.stampEditModel
             ) { icon in
                 stampCount += 1
@@ -197,9 +197,9 @@ private extension RecordsView {
 
     var monthStepper: some View {
         PeriodStepper(
-            title: model.month.title,
-            subtitle: model.periodText,
-            currentTitle: model.isCurrentMonth ? nil : "今月",
+            title: model.state.month.title,
+            subtitle: model.output.periodText,
+            currentTitle: model.output.isCurrentMonth ? nil : "今月",
             transition: monthTextTransition,
             canMoveForward: true,
             onMove: { months in
@@ -211,7 +211,7 @@ private extension RecordsView {
 
     @ViewBuilder
     var filterLine: some View {
-        if let title = model.filterTitle {
+        if let title = model.output.filterTitle {
             RecordsFilterLine(title: title) {
                 isFiltering = true
             } onClear: {
@@ -224,11 +224,11 @@ private extension RecordsView {
     var monthContent: some View {
         summary
 
-        switch model.layout {
+        switch model.state.layout {
         case .list:
-            if model.isMonthHiddenByFilter {
+            if model.output.isMonthHiddenByFilter {
                 filteredEmpty
-            } else if model.showsNoRecords {
+            } else if model.output.showsNoRecords {
                 PlaceholderEmpty(
                     systemImage: "calendar",
                     text: "この月の記録はありません",
@@ -236,8 +236,8 @@ private extension RecordsView {
                 )
             }
 
-            let days = model.listDays
-            let captions = model.listCaptions(in: days)
+            let days = model.output.listDays
+            let captions = model.output.listCaptions(in: days)
 
             ForEach(days) { item in
                 if selection == nil,
@@ -286,14 +286,14 @@ private extension RecordsView {
 
     var layoutBinding: Binding<RecordsLayout> {
         Binding {
-            model.layout
+            model.state.layout
         } set: { layout in
             let layouts = RecordsLayout.allCases
-            let from = layouts.firstIndex(of: model.layout) ?? 0
+            let from = layouts.firstIndex(of: model.state.layout) ?? 0
             let to = layouts.firstIndex(of: layout) ?? 0
 
             PageSlide.run($slide, forward: to > from) {
-                model.setLayout(layout)
+                model.state.setLayout(layout)
 
                 Task {
                     await model.saveLayout()
@@ -312,7 +312,7 @@ private extension RecordsView {
     }
 
     var canSwipeMonth: Bool {
-        !model.isSearching && selection == nil
+        !model.state.isSearching && selection == nil
     }
 
     var swipeSlide: Binding<PageSlide> {
@@ -320,11 +320,11 @@ private extension RecordsView {
     }
 
     var recordAction: (() -> Void)? {
-        guard model.filter.isEmpty else {
+        guard model.state.filter.isEmpty else {
             return nil
         }
 
-        let date = model.isCurrentMonth ? model.today : model.period.lowerBound
+        let date = model.output.isCurrentMonth ? model.state.today : model.output.period.lowerBound
 
         return {
             onAddEntry(date)
@@ -333,7 +333,7 @@ private extension RecordsView {
 
     func openSearch() {
         withAnimation(.snappy) {
-            model.isSearching = true
+            model.state.isSearching = true
         }
 
         isSearchFocused = true
@@ -354,12 +354,12 @@ private extension RecordsView {
         isMovingForward = months > 0
 
         PageSlide.run($slide, forward: months > 0) {
-            model.move(months: months)
+            model.state.move(months: months)
         }
     }
 
     func moveToCurrentMonth() {
-        let isForward = model.month < model.currentMonth
+        let isForward = model.state.month < model.output.currentMonth
 
         isMovingForward = isForward
 

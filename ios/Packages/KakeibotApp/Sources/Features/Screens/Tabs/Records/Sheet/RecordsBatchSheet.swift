@@ -19,19 +19,19 @@ struct RecordsBatchSheet: View {
                 VStack(spacing: 8) {
                     switch target {
                     case let .category(type):
-                        ForEach(model.batchCategories(for: type)) { category in
+                        ForEach(model.output.batchCategories(for: type)) { category in
                             row(
                                 category.name,
-                                icon: model.icon(for: category),
+                                icon: model.output.icon(for: category),
                                 change: .category(category.id)
                             )
                         }
 
                     case .wallet:
-                        ForEach(model.batchWallets) { wallet in
+                        ForEach(model.output.batchWallets) { wallet in
                             row(
                                 wallet.name,
-                                icon: model.icon(for: wallet),
+                                icon: model.output.icon(for: wallet),
                                 change: .wallet(wallet.id)
                             )
                         }
@@ -104,8 +104,8 @@ private extension RecordsBatchSheet {
 
     var names: [String] {
         switch target {
-        case let .category(type): model.batchCategories(for: type).map(\.name)
-        case .wallet: model.batchWallets.map(\.name)
+        case let .category(type): model.output.batchCategories(for: type).map(\.name)
+        case .wallet: model.output.batchWallets.map(\.name)
         }
     }
 

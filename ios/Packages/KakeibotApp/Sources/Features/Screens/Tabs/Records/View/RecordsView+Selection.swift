@@ -4,7 +4,7 @@ import SwiftUI
 
 extension RecordsView {
     func selectionBar(_ selection: Set<Entry.ID>) -> some View {
-        let type = model.batchType(of: selection)
+        let type = model.output.batchType(of: selection)
 
         return ViewThatFits(in: .horizontal) {
             barContent(
@@ -64,7 +64,7 @@ private extension RecordsView {
         _ selection: Set<Entry.ID>,
         isCompact: Bool
     ) -> some View {
-        let selectsAll = model.selectsAllShown(selection)
+        let selectsAll = model.output.selectsAllShown(selection)
         let title = selectsAll ? "すべて外す" : "すべて選ぶ"
         let systemImage = selectsAll ? "xmark" : "checkmark"
 
@@ -77,7 +77,7 @@ private extension RecordsView {
                 .fixedSize()
 
             ChipButton(isSelected: selectsAll) {
-                self.selection = selectsAll ? [] : model.selectingAllShown(in: selection)
+                self.selection = selectsAll ? [] : model.output.selectingAllShown(in: selection)
             } content: {
                 HStack(spacing: 4) {
                     Image(systemName: systemImage)
@@ -89,7 +89,7 @@ private extension RecordsView {
                 .lineLimit(1)
             }
             .fixedSize()
-            .disabled(model.shownEntryIDs.isEmpty)
+            .disabled(model.output.shownEntryIDs.isEmpty)
         }
         .padding(.leading, 8)
         .animation(.snappy, value: selectsAll)
@@ -104,7 +104,7 @@ private extension RecordsView {
             barButton(
                 "カテゴリ",
                 systemImage: "tag",
-                block: model.batchCategoryBlock(of: selection),
+                block: model.output.batchCategoryBlock(of: selection),
                 isStacked: isStacked
             ) {
                 if let type {
@@ -115,7 +115,7 @@ private extension RecordsView {
             barButton(
                 "口座",
                 systemImage: "building.columns",
-                block: model.batchWalletBlock(of: selection),
+                block: model.output.batchWalletBlock(of: selection),
                 isStacked: isStacked
             ) {
                 batchTarget = .wallet
@@ -124,11 +124,11 @@ private extension RecordsView {
             barButton(
                 "削除",
                 systemImage: "trash",
-                block: model.batchDeleteBlock(of: selection),
+                block: model.output.batchDeleteBlock(of: selection),
                 isStacked: isStacked,
                 tint: Palette.rose
             ) {
-                model.requestDelete(Array(selection)) { ids in
+                model.state.requestDelete(Array(selection)) { ids in
                     onDeleteEntries(ids)
                     finishSelecting()
                 }
@@ -148,7 +148,7 @@ private extension RecordsView {
 
         return Button {
             if let block {
-                model.errorNotice.inform(block)
+                model.state.errorNotice.inform(block)
             } else {
                 action()
             }

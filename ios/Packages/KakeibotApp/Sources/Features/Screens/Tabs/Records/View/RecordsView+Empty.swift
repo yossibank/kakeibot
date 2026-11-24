@@ -15,7 +15,7 @@ extension RecordsView {
 
     func clearFilter() {
         withAnimation(.snappy) {
-            model.clearFilter()
+            model.state.clearFilter()
         }
     }
 }

@@ -2,13 +2,13 @@ import Core
 import Foundation
 import Store
 
-public extension RecordsModel {
+public extension RecordsModel.Output {
     var batchWallets: [Wallet] {
-        list?.filterWallets ?? []
+        input.list?.filterWallets ?? []
     }
 
     func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
-        let categories = list?.filterCategories ?? []
+        let categories = input.list?.filterCategories ?? []
         return categories.filter { $0.kind.rawValue == type.rawValue }
     }
 
@@ -63,13 +63,13 @@ public extension RecordsModel {
     }
 }
 
-private extension RecordsModel {
+private extension RecordsModel.Output {
     static let emptySelectionBlock = "記録を選んでください"
 }
 
-private extension RecordsModel {
+private extension RecordsModel.Output {
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
-        let entries = list?.entries ?? []
+        let entries = input.list?.entries ?? []
         return entries.filter { ids.contains($0.id) }
     }
 }

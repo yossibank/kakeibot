@@ -60,6 +60,7 @@ struct MainView: View {
         _records = State(
             initialValue: RecordsModel(
                 database: database,
+                clock: clock,
                 today: today
             )
         )
@@ -203,7 +204,7 @@ struct MainView: View {
         }
         .onChange(of: today) { _, today in
             home.state.today = today
-            records.today = today
+            records.state.today = today
             review.state.today = today
             assets.setToday(today)
 

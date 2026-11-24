@@ -1,8 +1,8 @@
 import Core
 
-public extension RecordsModel {
+public extension RecordsModel.Output {
     var shownEntryIDs: [Entry.ID] {
-        let shown = isSearching ? searchDays : days
+        let shown = state.isSearching ? searchDays : days
         return shown.flatMap(\.entries).map(\.id)
     }
 

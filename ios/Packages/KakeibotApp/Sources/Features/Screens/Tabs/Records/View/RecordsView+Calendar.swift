@@ -6,7 +6,7 @@ extension RecordsView {
     var calendar: some View {
         VStack(spacing: 2) {
             HStack(spacing: 0) {
-                ForEach(Weekday.week(startingOn: model.weekStart), id: \.self) { weekday in
+                ForEach(Weekday.week(startingOn: model.input.weekStart), id: \.self) { weekday in
                     Text(weekday.shortName)
                         .textFont(.caption2)
                         .foregroundStyle(weekday.tint ?? Palette.subtext)
@@ -14,9 +14,9 @@ extension RecordsView {
                 }
             }
 
-            let peak = isCalendarWide ? model.days.map(\.expenseTotal).max() ?? 0 : 0
+            let peak = isCalendarWide ? model.output.days.map(\.expenseTotal).max() ?? 0 : 0
 
-            ForEach(Array(model.weeks.enumerated()), id: \.offset) { _, week in
+            ForEach(Array(model.output.weeks.enumerated()), id: \.offset) { _, week in
                 HStack(spacing: 0) {
                     ForEach(Array(week.enumerated()), id: \.offset) { _, date in
                         calendarCell(date, peak: peak)
@@ -30,14 +30,14 @@ extension RecordsView {
     }
 
     var shownDayCard: some View {
-        let date = model.shownDate
-        let day = model.day(on: date)
+        let date = model.output.shownDate
+        let day = model.output.day(on: date)
 
         return VStack(spacing: 0) {
             dayHeader(date, day: day)
 
             if let day {
-                ForEach(model.rows(for: day)) { row in
+                ForEach(model.output.rows(for: day)) { row in
                     recordRow(row)
 
                     itemList(row)
@@ -46,8 +46,8 @@ extension RecordsView {
 
             adjustmentList(on: date)
 
-            let upcoming = model.upcomingRecurrings(on: date)
-            let isEmptyDay = day == nil && model.list != nil
+            let upcoming = model.output.upcomingRecurrings(on: date)
+            let isEmptyDay = day == nil && model.input.list != nil
 
             if !upcoming.isEmpty {
                 upcomingList(upcoming, on: date)
@@ -64,8 +64,8 @@ extension RecordsView {
                     onAddEntry(date)
                 }
 
-                if model.canMarkNoSpend(on: date) {
-                    let isMarked = model.noSpendDays.contains(date)
+                if model.output.canMarkNoSpend(on: date) {
+                    let isMarked = model.input.noSpendDays.contains(date)
                     let title = isMarked ? "支出なしの印を外す" : "支出なしの日にする"
                     let image = isMarked ? "leaf.fill" : "leaf"
 
@@ -95,28 +95,28 @@ private extension RecordsView {
         peak: Int
     ) -> some View {
         if let date {
-            let isShown = date == model.shownDate
-            let day = model.day(on: date)
+            let isShown = date == model.output.shownDate
+            let day = model.output.day(on: date)
             let expense = day?.expenseTotal ?? 0
-            let isNoSpend = model.noSpendDays.contains(date)
+            let isNoSpend = model.input.noSpendDays.contains(date)
             let hasUpcoming = expense == 0
                 && !isNoSpend
-                && !model.upcomingRecurrings(on: date).isEmpty
+                && !model.output.upcomingRecurrings(on: date).isEmpty
 
             RecordsCalendarCell(
                 day: date.day,
                 dayColor: dayColor(date, isShown: isShown),
                 isShown: isShown,
-                isToday: date == model.today,
-                isDimmed: date > model.today && !isShown,
-                stamp: model.stampIcon(on: date),
+                isToday: date == model.state.today,
+                isDimmed: date > model.state.today && !isShown,
+                stamp: model.output.stampIcon(on: date),
                 expense: expense,
                 income: day?.incomeTotal ?? 0,
                 isNoSpend: isNoSpend,
                 hasUpcoming: hasUpcoming,
                 heat: Self.heat(of: expense, peak: peak)
             ) {
-                model.selectedDate = date
+                model.state.selectedDate = date
             }
             .equatable()
         } else {

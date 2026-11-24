@@ -189,19 +189,19 @@ private extension RecordsFilterSheet {
 
     var filter: EntryFilter {
         get {
-            model.filter
+            model.state.filter
         }
         nonmutating set {
-            model.filter = newValue
+            model.state.filter = newValue
         }
     }
 
     var list: EntryList? {
-        model.list
+        model.input.list
     }
 
     var showTitle: String {
-        let count = model.shownEntryCount
+        let count = model.output.shownEntryCount
         return count > 0 ? "\(count) 件を表示" : "当てはまる記録はありません"
     }
 

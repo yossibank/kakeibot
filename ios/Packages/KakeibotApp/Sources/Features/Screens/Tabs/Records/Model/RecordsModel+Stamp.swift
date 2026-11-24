@@ -3,26 +3,12 @@ import Foundation
 import Store
 
 public extension RecordsModel {
-    var stampChoices: [Icon] {
-        guard let stampShelf else {
-            return []
-        }
-
-        return stampShelf.shelfIcons
-            .filter { $0.archivedAt == nil }
-            .compactMap { stampShelf.icons[$0.iconId] }
-    }
-
-    func stampIcon(on date: LocalDate) -> Icon? {
-        stampBook?.icon(on: date)
-    }
-
     func stamp(
         _ icon: Icon,
         on date: LocalDate
     ) async {
         do {
-            try await database.stamp(icon.id, on: date, at: Date())
+            try await dependencies.database.stamp(icon.id, on: date, at: dependencies.clock.now)
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
@@ -30,26 +16,22 @@ public extension RecordsModel {
 
     func removeStamp(on date: LocalDate) async {
         do {
-            try await database.removeStamp(on: date)
+            try await dependencies.database.removeStamp(on: date)
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
     func stampEditModel() -> StampEditModel {
-        StampEditModel(database: database, clock: .system)
-    }
-
-    func canMarkNoSpend(on date: LocalDate) -> Bool {
-        date <= today && (day(on: date)?.expenseTotal ?? 0) == 0
+        StampEditModel(database: dependencies.database, clock: dependencies.clock)
     }
 
     func toggleNoSpendDay(on date: LocalDate) async {
         do {
-            if noSpendDays.contains(date) {
-                try await database.unmarkNoSpendDay(date)
+            if input.noSpendDays.contains(date) {
+                try await dependencies.database.unmarkNoSpendDay(date)
             } else {
-                try await database.markNoSpendDay(date, at: Date())
+                try await dependencies.database.markNoSpendDay(date, at: dependencies.clock.now)
             }
         } catch {
             errorNotice.show(Self.saveFailedMessage, for: error)
