@@ -4,16 +4,16 @@ import SwiftUI
 
 extension EntrySheet {
     var showsReceiptButton: Bool {
-        model.showsReceipt && canScanReceipt
+        model.output.showsReceipt && canScanReceipt
     }
 
     var isScanningReceipt: Binding<Bool> {
         Binding(
             get: {
-                receipt.isScanning
+                receipt.output.isScanning
             },
             set: { isScanning in
-                if !isScanning, receipt.isScanning {
+                if !isScanning, receipt.output.isScanning {
                     receipt.cancel()
                 }
             }
@@ -22,14 +22,14 @@ extension EntrySheet {
 
     @ViewBuilder
     var receiptLayer: some View {
-        switch receipt.step {
+        switch receipt.state.step {
         case .guide:
             EntryGuideCard(
                 onConfirm: {
                     receipt.confirmGuide()
                     saveReceiptGuideChoice()
                 },
-                hidesNext: $receipt.hidesGuide,
+                hidesNext: Bindable(receipt.state).hidesGuide,
                 guide: .receipt
             ) {
                 withAnimation(.snappy) {
@@ -73,11 +73,7 @@ private extension EntrySheet {
     func scanReceipt(_ pages: [CGImage]) async {
         let outcome = await receipt.scan(pages, into: model)
 
-        guard case let .read(itemCount, _) = outcome else {
-            return
-        }
-
-        guard itemCount > 0 else {
+        guard case let .read(itemCount, _) = outcome, itemCount > 0 else {
             return
         }
 

@@ -9,7 +9,7 @@ struct EntryDiscardGuard: ViewModifier {
 
     func body(content: Content) -> some View {
         content.confirmsDiscard(
-            when: model.isChanged,
+            when: model.output.isChanged,
             isPresented: $isPresented,
             onDiscard: onDiscard
         )

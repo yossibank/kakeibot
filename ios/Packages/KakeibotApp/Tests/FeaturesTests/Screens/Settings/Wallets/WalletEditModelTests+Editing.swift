@@ -110,7 +110,7 @@ extension WalletEditModelTests {
     func entrySheetSeesAddedWallet() async throws {
         let setup = try await Setup()
         let date = try #require(LocalDate("2026-10-12"))
-        let entry = EntryModel(database: setup.database, date: date)
+        let entry = EntryModel(database: setup.database, clock: .system, date: date)
         await entry.load()
 
         let editor = entry.newWalletModel()
@@ -118,10 +118,10 @@ extension WalletEditModelTests {
         editor.state.setKind(.card)
         let saved = try #require(await editor.save())
         await entry.reloadWallets()
-        let wallet = try #require(entry.wallet(saved.id))
+        let wallet = try #require(entry.output.wallet(saved.id))
 
         #expect(wallet.name == "楽天カード")
-        #expect(entry.balance(of: wallet) == 0)
+        #expect(entry.output.balance(of: wallet) == 0)
     }
 
     @Test

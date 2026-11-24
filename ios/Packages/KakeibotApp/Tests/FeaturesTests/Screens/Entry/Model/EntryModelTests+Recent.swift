@@ -13,11 +13,11 @@ extension EntryModelTests {
         _ = try await setup.saveEntry(amount: 220)
         _ = try await setup.saveEntry(amount: 1540)
         _ = try await setup.saveEntry(amount: 300)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
         await model.reloadCategories()
 
-        let amounts = model.recentEntries.map(\.amount)
+        let amounts = model.output.recentEntries.map(\.amount)
 
         #expect(amounts.count == EntryModel.recentEntryLimit)
         #expect(Set(amounts).count == amounts.count)
@@ -47,35 +47,40 @@ extension EntryModelTests {
 
         _ = try await setup.database.saveEntry(same, at: Date())
         _ = try await setup.database.saveEntry(other, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
         await model.reloadCategories()
 
-        #expect(model.recentEntries.map(\.amount) == [220])
+        #expect(model.output.recentEntries.map(\.amount) == [220])
     }
 
     @Test
     func listsNoRecentEntriesForTransfers() async throws {
         let setup = try await Setup()
         _ = try await setup.saveEntry(amount: 980)
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
         await model.load()
         await model.reloadCategories()
 
-        #expect(model.recentEntries.isEmpty)
+        #expect(model.output.recentEntries.isEmpty)
     }
 
     @Test
     func appliesRecentEntry() async throws {
         let setup = try await Setup()
         let saved = try await setup.saveEntry(amount: 980)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         model.applyRecent(saved)
 
-        #expect(model.amount == 980)
-        #expect(model.categoryId == saved.categoryId)
-        #expect(model.walletId == saved.walletId)
+        #expect(model.output.amount == 980)
+        #expect(model.state.category.id == saved.categoryId)
+        #expect(model.state.payment.walletId == saved.walletId)
     }
 }

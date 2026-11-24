@@ -7,193 +7,100 @@ import Store
 @MainActor
 @Observable
 public final class EntryModel {
-    public var date: LocalDate {
-        didSet {
-            if date != oldValue {
-                billMonth = nil
-            }
-        }
-    }
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public var walletId: Wallet.ID? {
-        didSet {
-            if walletId != oldValue {
-                billMonth = nil
-                fitCategoryToWallet()
-            }
-        }
-    }
-
-    public var categoryId: EntryCategory.ID? {
-        didSet {
-            if categoryId != oldValue {
-                tagId = nil
-            }
-        }
-    }
-
-    public var toWalletId: Wallet.ID?
-    public var memo = ""
-
-    public private(set) var type: Entry.Kind
-    public private(set) var recentMemos: [String] = []
-    public private(set) var recentItemNames: [String] = []
-    public private(set) var weekStart: Weekday = .sunday
-
-    public internal(set) var tagId: EntryTag.ID?
-    public internal(set) var billMonth: YearMonth?
-    public internal(set) var calculator = AmountCalculator()
-    public internal(set) var feeCalculator = AmountCalculator()
-    public internal(set) var items: [EntryItem.Draft] = []
-    public internal(set) var taxIncluded = false
-    public internal(set) var keypadTarget: KeypadTarget = .amount
-    public internal(set) var options: EntryOptions?
-    public internal(set) var balances: [Wallet.ID: Int] = [:]
-    public internal(set) var errorNotice = ErrorNotice()
-    public internal(set) var receiptSavedCount = 0
-    public internal(set) var receiptGuideHidden = false
-    public internal(set) var voiceFilled: VoiceFilled?
-
-    var allTemplates: [EntryTemplate] = []
-    var appliedTemplateId: EntryTemplate.ID?
-    var history: EntryList? {
-        didSet {
-            historyGeneration += 1
-        }
-    }
-
-    var isReceiptRead = false
-    var isClosing = false
-    var receiptStore: String?
-
-    private(set) var original: Entry?
-    private(set) var categoryByType: [Entry.Kind: EntryCategory.ID] = [:]
-    private(set) var cardBills: [Recurring] = []
-    private(set) var budgets: [Budget] = []
-    private(set) var monthStartDay: MonthStartDay = .first
-    private(set) var carryoverFrom: YearMonth?
-    private(set) var editingId: Entry.ID?
-    private(set) var historyGeneration = 0
-
-    @ObservationIgnored var monthMemo = Memoized<MonthSummary.Key, MonthSummary>()
-    @ObservationIgnored var feeChoicesMemo = Memoized<Int, [Int]>()
-    @ObservationIgnored var recentWalletsMemo = Memoized<Int, [Entry.Kind: Wallet.ID]>()
-
-    let database: AppDatabase
-
-    private var baseline: Snapshot?
-    private var originalFee: Entry?
-    private var isSaving = false
-
-    private let startingTemplate: EntryTemplate?
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         editing id: Entry.ID? = nil,
         date: LocalDate,
         type: Entry.Kind = .expense,
         template: EntryTemplate? = nil
     ) {
-        self.database = database
-        self.editingId = id
-        self.date = date
-        self.type = type
-        self.startingTemplate = template
+        let state = State(type: type, date: date, today: clock.today)
+        let input = Input(editingId: id, startingTemplate: template)
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension EntryModel {
-    var isEditing: Bool {
-        editingId != nil
-    }
-
-    var isLoaded: Bool {
-        options != nil
-    }
-
-    var isChanged: Bool {
-        baseline.map { $0 != snapshot } ?? false
-    }
-
-    var amount: Int {
-        calculator.amount
-    }
-
-    var fee: Int {
-        type == .transfer ? feeCalculator.amount : 0
-    }
-
-    var canSave: Bool {
-        draft?.problems.isEmpty == true
-    }
-
     func load() async {
         do {
+            let database = dependencies.database
             let limit = Self.recentMemoLimit
             let itemLimit = Self.recentItemNameLimit
 
-            options = try await database.entryOptions()
+            input.options = try await database.entryOptions()
 
-            recentMemos = try await database.recentMemos(limit: limit)
+            input.recentMemos = try await database.recentMemos(limit: limit)
 
-            recentItemNames = try await database.recentItemNames(limit: itemLimit)
+            input.recentItemNames = try await database.recentItemNames(limit: itemLimit)
 
-            allTemplates = try await database.templates()
+            input.allTemplates = try await database.templates()
 
-            cardBills = try await database.recurrings()
+            input.cardBills = try await database.recurrings()
                 .filter { $0.type == .transfer && $0.closingDay != nil }
 
-            weekStart = try await database.setting(.weekStart)
+            input.weekStart = try await database.setting(.weekStart)
 
-            monthStartDay = try await database.setting(.monthStartDay)
+            input.monthStartDay = try await database.setting(.monthStartDay)
 
-            carryoverFrom = try await database.setting(.budgetCarryoverFrom)
+            input.carryoverFrom = try await database.setting(.budgetCarryoverFrom)
 
-            receiptSavedCount = try await database.setting(.receiptSavedCount)
+            input.receiptSavedCount = try await database.setting(.receiptSavedCount)
 
-            receiptGuideHidden = try await database.setting(.receiptGuideHidden)
+            input.receiptGuideHidden = try await database.setting(.receiptGuideHidden)
 
-            budgets = try await database.budgets()
+            input.budgets = try await database.budgets()
 
             try await loadEntry()
-            try await loadBalances()
+            try await loadHistory()
 
-            if !isEditing {
+            if !output.isEditing {
                 startNew()
             }
 
-            if let startingTemplate {
+            if let startingTemplate = input.startingTemplate {
                 apply(startingTemplate)
             }
 
-            baseline = snapshot
+            input.baseline = output.snapshot
         } catch {
             report(error)
         }
     }
 
     func select(_ type: Entry.Kind) {
-        guard type != self.type else {
+        guard type != state.type else {
             return
         }
 
-        let isUntouched = !isEditing && !isChanged
+        let isUntouched = !output.isEditing && !output.isChanged
 
-        categoryByType[self.type] = categoryId
-        self.type = type
-        keypadTarget = .amount
+        state.category.remember(for: state.type)
+        state.type = type
+        state.keypad.target = .amount
 
         if isUntouched,
            type != .transfer {
-            walletId = usualWalletId
+            setWallet(output.usualWalletId)
         }
 
-        let remembered = categoryByType[type]
+        let remembered = state.category.byType[type]
+        let categories = output.categories
 
         if categories.contains(where: { $0.id == remembered }) {
-            categoryId = remembered
-        } else if !categories.contains(where: { $0.id == categoryId }) {
-            categoryId = categories.first?.id
+            state.setCategory(remembered)
+        } else if !categories.contains(where: { $0.id == state.category.id }) {
+            state.setCategory(categories.first?.id)
         }
 
         if type == .transfer {
@@ -201,25 +108,27 @@ public extension EntryModel {
         }
 
         if isUntouched {
-            baseline = snapshot
+            input.baseline = output.snapshot
         }
     }
 
     func save() async -> EntryChange? {
         guard
-            !isSaving,
-            let draft
+            !state.isSaving,
+            let draft = output.draft
         else {
             return nil
         }
 
-        isSaving = true
+        state.isSaving = true
 
         do {
+            let database = dependencies.database
+
             let saved = try await database.saveEntryResult(
                 draft,
-                editing: editingId,
-                at: Date()
+                editing: input.editingId,
+                at: dependencies.clock.now
             )
 
             let entry = saved.entry
@@ -227,10 +136,10 @@ public extension EntryModel {
             await finishReceipt()
 
             let fee = try await database.fee(of: entry.id)
-            let title = label(for: entry)
+            let title = output.label(for: entry)
 
-            let kind: EntryChange.Kind = if let original {
-                .edited(previous: original, previousFee: originalFee)
+            let kind: EntryChange.Kind = if let original = input.original {
+                .edited(previous: original, previousFee: input.originalFee)
             } else {
                 .recorded
             }
@@ -243,89 +152,82 @@ public extension EntryModel {
                 clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
-            isSaving = false
+            state.isSaving = false
             report(error)
             return nil
         }
     }
 
     func startNext() async {
-        calculator = AmountCalculator()
-        feeCalculator = AmountCalculator()
-        keypadTarget = .amount
-        memo = ""
-        items = []
-        taxIncluded = false
-        isReceiptRead = false
-        receiptStore = nil
-        tagId = nil
-        billMonth = nil
-        appliedTemplateId = nil
-        voiceFilled = nil
+        state.clearForNext()
 
         do {
-            try await loadBalances()
+            try await loadHistory()
         } catch {
             report(error)
         }
 
-        baseline = snapshot
-        isSaving = false
+        input.baseline = output.snapshot
+        state.isSaving = false
     }
 
     func recordAgain() async {
-        voiceFilled = nil
-        editingId = nil
-        original = nil
-        originalFee = nil
-        feeCalculator = AmountCalculator()
-        appliedTemplateId = nil
-        date = Self.today
-        billMonth = nil
-        items = []
-        taxIncluded = false
-        isReceiptRead = false
-        receiptStore = nil
-        keypadTarget = .amount
+        state.voiceFilled = nil
+        input.editingId = nil
+        input.original = nil
+        input.originalFee = nil
+        state.keypad.feeCalculator = AmountCalculator()
+        state.appliedTemplateId = nil
+        updateToday()
+        state.setDate(state.today)
+        state.payment.billMonth = nil
+        state.items = Items()
+        state.keypad.target = .amount
 
-        if !wallets.contains(where: { $0.id == walletId }) {
-            walletId = wallets.first?.id
+        if !output.wallets.contains(where: { $0.id == state.payment.walletId }) {
+            setWallet(output.wallets.first?.id)
         }
 
-        if !wallets.contains(where: { $0.id == toWalletId }) {
-            toWalletId = nil
+        if !output.wallets.contains(where: { $0.id == state.payment.toWalletId }) {
+            state.setDestination(nil)
         }
 
-        if type == .transfer {
+        if state.type == .transfer {
             chooseDestination()
-        } else if !categories.contains(where: { $0.id == categoryId }) {
-            categoryId = categories.first?.id
+        } else if !output.categories.contains(where: { $0.id == state.category.id }) {
+            state.setCategory(output.categories.first?.id)
         }
 
-        if !tags.contains(where: { $0.id == tagId && $0.archivedAt == nil }) {
-            tagId = nil
+        let tagId = state.category.tagId
+
+        if !output.tags.contains(where: { $0.id == tagId && $0.archivedAt == nil }) {
+            state.category.tagId = nil
         }
 
         do {
-            try await loadBalances()
+            try await loadHistory()
         } catch {
             report(error)
         }
 
-        baseline = snapshot
-        isSaving = false
+        input.baseline = output.snapshot
+        state.isSaving = false
 
-        errorNotice.inform(Self.recordAgainMessage)
+        state.errorNotice.inform(Self.recordAgainMessage)
     }
 
     func delete() async -> EntryChange? {
-        guard let original else {
+        guard let original = input.original else {
             return nil
         }
 
         do {
-            let deleted = try await database.deleteEntry(original.id, at: Date())
-            let title = label(for: original)
+            let deleted = try await dependencies.database.deleteEntry(
+                original.id,
+                at: dependencies.clock.now
+            )
+
+            let title = output.label(for: original)
 
             return EntryChange(
                 kind: .deleted,
@@ -338,11 +240,20 @@ public extension EntryModel {
             return nil
         }
     }
+
+    func newNoticeModel() -> EntryNoticeModel {
+        EntryNoticeModel(database: dependencies.database)
+    }
 }
 
 extension EntryModel {
-    static var today: LocalDate {
-        LocalDate(Date(), in: .current)
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+    }
+
+    func newVoiceFlow() -> EntryVoiceFlow {
+        EntryVoiceFlow(dependencies: .live(clock: dependencies.clock))
     }
 
     func report(_ error: any Error) {
@@ -350,7 +261,7 @@ extension EntryModel {
             return
         }
 
-        errorNotice.show(Self.message(for: error))
+        state.errorNotice.show(Self.message(for: error))
     }
 }
 
@@ -358,18 +269,20 @@ private extension EntryModel {
     static let recordAgainMessage = "同じ内容で新しい記録にしました"
 
     func startNew() {
-        categoryId = categories.first?.id
-        walletId = usualWalletId
+        state.setCategory(output.categories.first?.id)
+        setWallet(output.usualWalletId)
 
-        if type == .transfer {
+        if state.type == .transfer {
             chooseDestination()
         }
     }
 
     func loadEntry() async throws {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
+
+        let database = dependencies.database
 
         guard var entry = try await database.entry(editingId) else {
             throw AppDatabase.EntryWriteError.entryNotFound
@@ -378,23 +291,23 @@ private extension EntryModel {
         if let transferId = entry.transferId,
            let transfer = try await database.entry(transferId) {
             entry = transfer
-            self.editingId = transferId
+            input.editingId = transferId
         }
 
-        originalFee = try await database.fee(of: entry.id)
-        original = entry
-        type = entry.type
-        calculator = AmountCalculator(amount: entry.amount)
-        date = entry.date
-        categoryId = entry.categoryId
-        tagId = entry.tagId
-        walletId = entry.walletId
-        toWalletId = entry.toWalletId
-        memo = entry.memo ?? ""
-        appliedTemplateId = entry.templateId
-        billMonth = entry.billMonth
-        feeCalculator = AmountCalculator(amount: originalFee?.amount ?? 0)
-        items = try await database.entryItems(of: entry.id).map(EntryItem.Draft.init)
-        taxIncluded = entry.taxIncluded
+        input.originalFee = try await database.fee(of: entry.id)
+        input.original = entry
+        state.type = entry.type
+        state.keypad.setAmount(entry.amount)
+        state.setDate(entry.date)
+        state.setCategory(entry.categoryId)
+        state.category.tagId = entry.tagId
+        setWallet(entry.walletId)
+        state.setDestination(entry.toWalletId)
+        state.memo = entry.memo ?? ""
+        state.appliedTemplateId = entry.templateId
+        state.payment.billMonth = entry.billMonth
+        state.keypad.setFee(input.originalFee?.amount ?? 0)
+        state.items.list = try await database.entryItems(of: entry.id).map(EntryItem.Draft.init)
+        state.items.taxIncluded = entry.taxIncluded
     }
 }

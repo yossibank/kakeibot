@@ -297,7 +297,7 @@ private extension SnapshotTests {
         }
 
         let listeningModel = try await Self.model(.expense, digits: [])
-        let category = try #require(listeningModel.categories.first)
+        let category = try #require(listeningModel.output.categories.first)
 
         let listeningSource = VoiceSnapshotSource()
         let listeningFlow = EntryVoiceFlow(dependencies: .snapshot(listeningSource))
@@ -328,7 +328,7 @@ private extension SnapshotTests {
         try Self.write(listening, title: "記録の入力 › 声を聞いている紙のカード", to: "voice-slip-listening.png")
 
         let appliedModel = try await Self.model(.expense, digits: [])
-        let wallet = try #require(appliedModel.wallets.last)
+        let wallet = try #require(appliedModel.output.wallets.last)
 
         appliedModel.apply(VoiceReading(
             amount: 980,
@@ -396,6 +396,7 @@ private extension EntryVoiceFlow.Dependencies {
             makeSource: { source },
             prepare: {},
             choose: { _ in nil },
+            clock: .fixed(snapshotNow),
             silence: .seconds(60),
             noticeDuration: .seconds(60)
         )
@@ -432,7 +433,7 @@ private extension SnapshotTests {
             hasTemplates: true
         )
 
-        pastModel.date = LocalDate(snapshotNow, in: .current).adding(days: -3)
+        pastModel.state.setDate(LocalDate(snapshotNow, in: .current).adding(days: -3))
 
         for (name, size) in [
             ("entry-past-date", Self.mini),
@@ -458,7 +459,7 @@ private extension SnapshotTests {
             hasLongNames: true
         )
 
-        transferModel.setFee(440)
+        transferModel.state.setFee(440)
 
         let transfer = EntrySheet(model: transferModel)
             .frame(width: Self.narrow.width, height: Self.narrow.height)
@@ -677,12 +678,17 @@ private extension SnapshotTests {
             try await renameLong(in: database, at: now)
         }
 
-        let model = EntryModel(database: database, date: date, type: type)
+        let model = EntryModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            date: date,
+            type: type
+        )
 
         await model.load()
 
         for key in digits {
-            model.press(key)
+            model.state.press(key)
         }
 
         return model
@@ -711,21 +717,29 @@ private extension SnapshotTests {
             _ = try await database.saveTemplate(template, at: now)
         }
 
-        for (amount, memo, offset) in [(980, "ランチ", -1), (220, "", -1), (1540, "ドラッグストア", -2)] {
-            let draft = EntryModel(database: database, date: date.adding(days: offset))
+        let entries = [(980, "ランチ", -1), (220, "", -1), (1540, "ドラッグストア", -2)]
+
+        for (index, (amount, memo, offset)) in entries.enumerated() {
+            let savedAt = snapshotNow.addingTimeInterval(TimeInterval(index - entries.count))
+
+            let draft = EntryModel(
+                database: database,
+                clock: .fixed(savedAt),
+                date: date.adding(days: offset)
+            )
 
             await draft.load()
 
-            draft.memo = memo
+            draft.state.memo = memo
 
             for character in String(amount) {
-                draft.press(.digit(Int(String(character)) ?? 0))
+                draft.state.press(.digit(Int(String(character)) ?? 0))
             }
 
             _ = try #require(await draft.save())
         }
 
-        let model = EntryModel(database: database, date: date)
+        let model = EntryModel(database: database, clock: .fixed(snapshotNow), date: date)
 
         await model.load()
         await model.reloadCategories()
@@ -740,16 +754,21 @@ private extension SnapshotTests {
 
         try database.insertDefaultsIfEmpty(at: now)
 
-        let draft = EntryModel(database: database, date: date)
+        let draft = EntryModel(database: database, clock: .fixed(snapshotNow), date: date)
 
         await draft.load()
 
         for key in smallDigits {
-            draft.press(key)
+            draft.state.press(key)
         }
 
         let saved = try #require(await draft.save())
-        let model = EntryModel(database: database, editing: saved.entry.id, date: date)
+        let model = EntryModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            editing: saved.entry.id,
+            date: date
+        )
 
         await model.load()
 
@@ -777,12 +796,12 @@ private extension SnapshotTests {
     }
 
     static func addItems(to model: EntryModel) {
-        model.memo = "スーパー山田"
-        model.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
-        model.addItem(name: "食パン", amount: 250, taxRate: .reduced)
-        model.addItem(name: "洗剤", amount: 398, taxRate: .standard)
-        model.addItem(name: "シール値引", amount: -30, taxRate: .standard)
-        model.addItem(name: "弁当", amount: 540)
+        model.state.memo = "スーパー山田"
+        model.state.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
+        model.state.addItem(name: "食パン", amount: 250, taxRate: .reduced)
+        model.state.addItem(name: "洗剤", amount: 398, taxRate: .standard)
+        model.state.addItem(name: "シール値引", amount: -30, taxRate: .standard)
+        model.state.addItem(name: "弁当", amount: 540)
     }
 
     static func write(

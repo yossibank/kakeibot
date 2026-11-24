@@ -13,7 +13,7 @@ struct SnapshotTests {
     @Test
     func render() async throws {
         let model = try await Self.model()
-        let transfers = model.recentTransfers
+        let transfers = model.output.recentTransfers
 
         for (suffix, label, preset) in [
             ("light", "ライト", ThemePreset.white),
@@ -91,7 +91,12 @@ private extension SnapshotTests {
             try await database.saveEntry(draft, at: createdAt)
         }
 
-        let model = EntryModel(database: database, date: date, type: .transfer)
+        let model = EntryModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            date: date,
+            type: .transfer
+        )
 
         await model.load()
 

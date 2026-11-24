@@ -4,7 +4,11 @@ import Store
 import SwiftUI
 
 struct EntryItemSheet: View {
-    @Bindable var model: EntryModel
+    @State private var isShowingHelp = false
+
+    @Environment(\.dismiss) private var dismiss
+
+    let model: EntryModel
 
     @State var name = ""
     @State var unit = AmountCalculator()
@@ -26,10 +30,6 @@ struct EntryItemSheet: View {
     @FocusState var focus: Field?
 
     @Environment(\.themeStyle.corner) var corner
-
-    @State private var isShowingHelp = false
-
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         GeometryReader { _ in
@@ -154,7 +154,7 @@ extension EntryItemSheet {
     ]
 
     var showsRates: Bool {
-        Set(model.items.map(\.taxRate)).count > 1
+        Set(model.state.items.list.map(\.taxRate)).count > 1
     }
 
     var receiptShape: EntryReceiptShape {
@@ -162,7 +162,7 @@ extension EntryItemSheet {
     }
 
     var dateText: String {
-        let date = model.date
+        let date = model.state.payment.date
         return "\(date.year)/\(PeriodText.weekdayDate(date))"
     }
 
@@ -172,7 +172,7 @@ extension EntryItemSheet {
             self.editingIndex = editingIndex + 1
         }
 
-        model.restoreItem(removed)
+        model.state.restoreItem(removed)
     }
 }
 
@@ -180,6 +180,6 @@ extension EntryItemSheet {
     if let database = try? AppDatabase.inMemory() {
         let today = LocalDate(Date(), in: .current)
 
-        EntryItemSheet(model: EntryModel(database: database, date: today))
+        EntryItemSheet(model: EntryModel(database: database, clock: .system, date: today))
     }
 }

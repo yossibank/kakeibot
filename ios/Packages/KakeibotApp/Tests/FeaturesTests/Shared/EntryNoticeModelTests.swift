@@ -10,8 +10,8 @@ struct EntryNoticeModelTests {
     func undoesNewEntry() async throws {
         let setup = try await Setup()
         let model = try await setup.entryModel()
-        model.press(.digit(5))
-        model.press(.doubleZero)
+        model.state.press(.digit(5))
+        model.state.press(.doubleZero)
 
         let change = try #require(await model.save())
         setup.notice.show(change)
@@ -55,7 +55,7 @@ struct EntryNoticeModelTests {
         let setup = try await Setup()
         let saved = try await setup.saveEntry()
         let model = try await setup.entryModel(editing: saved.id)
-        model.press(.delete)
+        model.state.press(.delete)
 
         let change = try #require(await model.save())
         let edited = try setup.database.snapshot().entries
@@ -148,9 +148,9 @@ struct EntryNoticeModelTests {
     func namesTransferByWallets() async throws {
         let setup = try await Setup()
         let model = try await setup.entryModel(type: .transfer)
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.digit(0))
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
 
         let change = try #require(await model.save())
 
@@ -161,7 +161,7 @@ struct EntryNoticeModelTests {
     func clearsNotice() async throws {
         let setup = try await Setup()
         let model = try await setup.entryModel()
-        model.press(.digit(5))
+        model.state.press(.digit(5))
 
         let change = try #require(await model.save())
         setup.notice.show(change)
@@ -233,7 +233,7 @@ struct EntryNoticeModelTests {
         let setup = try await Setup()
         try await setup.database.markNoSpendDay(setup.date, at: Date())
         let model = try await setup.entryModel()
-        model.press(.digit(5))
+        model.state.press(.digit(5))
 
         let change = try #require(await model.save())
         let cleared = try setup.database.snapshot().noSpendDays
@@ -249,7 +249,7 @@ struct EntryNoticeModelTests {
     func doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay() async throws {
         let setup = try await Setup()
         let model = try await setup.entryModel()
-        model.press(.digit(5))
+        model.state.press(.digit(5))
 
         let change = try #require(await model.save())
         setup.notice.show(change)
@@ -283,7 +283,13 @@ extension EntryNoticeModelTests.Setup {
         editing id: Entry.ID? = nil,
         type: Entry.Kind = .expense
     ) async throws -> EntryModel {
-        let model = EntryModel(database: database, editing: id, date: date, type: type)
+        let model = EntryModel(
+            database: database,
+            clock: .system,
+            editing: id,
+            date: date,
+            type: type
+        )
         await model.load()
         return model
     }

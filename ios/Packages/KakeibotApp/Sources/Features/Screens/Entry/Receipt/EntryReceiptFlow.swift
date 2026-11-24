@@ -5,20 +5,19 @@ import Observation
 @MainActor
 @Observable
 final class EntryReceiptFlow {
-    var hidesGuide = false
-
-    private(set) var step: Step?
-    private(set) var offer: String?
-
-    private let read: ([CGImage]) async -> ReceiptReading
-    private let prepare: @MainActor () -> Void
+    let state: State
+    let output: Output
+    let dependencies: Dependencies
 
     init(
         read: @escaping ([CGImage]) async -> ReceiptReading = EntryReceiptReader.read,
         prepare: @escaping @MainActor () -> Void = EntryReceiptReader.prepare
     ) {
-        self.read = read
-        self.prepare = prepare
+        let state = State()
+
+        self.state = state
+        self.output = Output(state: state)
+        self.dependencies = Dependencies(read: read, prepare: prepare)
     }
 }
 
@@ -34,40 +33,58 @@ extension EntryReceiptFlow {
         case read(itemCount: Int, hasAmount: Bool)
     }
 
+    @MainActor
+    @Observable
+    final class State {
+        var hidesGuide = false
+        var step: Step?
+        var offer: String?
+    }
+
+    @MainActor
+    final class Output {
+        let state: State
+
+        init(state: State) {
+            self.state = state
+        }
+    }
+
+    struct Dependencies {
+        let read: ([CGImage]) async -> ReceiptReading
+        let prepare: @MainActor () -> Void
+    }
+
     static let offerFeature = "4 回目からのレシートの読み取り"
     static let unreadMessage = "レシートを読めませんでした。明るい所で撮り直してください"
     static let totalMessage = "レシートの合計を読みました"
-
-    var isScanning: Bool {
-        step == .camera
-    }
 
     func start(
         for model: EntryModel,
         isPro: Bool
     ) {
-        guard model.canReadReceipt(isPro: isPro) else {
-            offer = Self.offerFeature
+        guard model.output.canReadReceipt(isPro: isPro) else {
+            state.offer = Self.offerFeature
             return
         }
 
-        offer = nil
-        hidesGuide = false
-        prepare()
-        step = model.showsReceiptGuide ? .guide : .camera
+        state.offer = nil
+        state.hidesGuide = false
+        dependencies.prepare()
+        state.step = model.output.showsReceiptGuide ? .guide : .camera
     }
 
     func confirmGuide() {
-        prepare()
-        step = .camera
+        dependencies.prepare()
+        state.step = .camera
     }
 
     func cancel() {
-        step = nil
+        state.step = nil
     }
 
     func saveGuideChoice(for model: EntryModel) async {
-        guard hidesGuide else {
+        guard state.hidesGuide else {
             return
         }
 
@@ -75,30 +92,36 @@ extension EntryReceiptFlow {
     }
 
     func closeOffer() {
-        offer = nil
+        state.offer = nil
     }
 
     func scan(
         _ pages: [CGImage],
         into model: EntryModel
     ) async -> Outcome {
-        step = .reading
+        state.step = .reading
 
-        let reading = await read(pages)
+        let reading = await dependencies.read(pages)
 
-        step = nil
+        state.step = nil
 
         guard !reading.isEmpty else {
-            model.errorNotice.show(Self.unreadMessage)
+            model.state.errorNotice.show(Self.unreadMessage)
             return .unread
         }
 
         let hasAmount = await model.apply(reading)
 
         if reading.items.isEmpty, hasAmount {
-            model.errorNotice.inform(Self.totalMessage)
+            model.state.errorNotice.inform(Self.totalMessage)
         }
 
         return .read(itemCount: reading.items.count, hasAmount: hasAmount)
+    }
+}
+
+extension EntryReceiptFlow.Output {
+    var isScanning: Bool {
+        state.step == .camera
     }
 }

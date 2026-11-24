@@ -9,7 +9,7 @@ extension EntrySheet {
 
             Spacer(minLength: 0)
 
-            if model.isEditing {
+            if model.output.isEditing {
                 RingButton(
                     systemImage: "trash",
                     style: .destructive,
@@ -32,7 +32,7 @@ private extension EntrySheet {
     var typeBinding: Binding<Entry.Kind> {
         Binding(
             get: {
-                model.type
+                model.state.type
             },
             set: { type in
                 var transaction = Transaction()

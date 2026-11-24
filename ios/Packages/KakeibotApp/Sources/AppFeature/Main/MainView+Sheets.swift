@@ -34,6 +34,7 @@ extension MainView {
             EntrySheet(
                 model: EntryModel(
                     database: database,
+                    clock: clock,
                     editing: id,
                     date: today
                 ),
@@ -51,6 +52,7 @@ extension MainView {
             EntrySheet(
                 model: EntryModel(
                     database: database,
+                    clock: clock,
                     date: today,
                     template: template
                 ),

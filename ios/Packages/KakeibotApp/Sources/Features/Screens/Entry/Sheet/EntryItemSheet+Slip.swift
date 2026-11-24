@@ -84,11 +84,11 @@ extension EntryItemSheet {
     }
 
     func edit(_ index: Int) {
-        guard model.items.indices.contains(index) else {
+        guard model.state.items.list.indices.contains(index) else {
             return
         }
 
-        let item = model.items[index]
+        let item = model.state.items.list[index]
         let price = EntryModel.unitPrice(of: item)
 
         openIndex = nil
@@ -120,12 +120,12 @@ extension EntryItemSheet {
         }
 
         withAnimation(.snappy) {
-            removed = model.removeItem(at: index)
+            removed = model.state.removeItem(at: index)
         }
     }
 
     func scroll(to index: Int) {
-        guard model.items.indices.contains(index) else {
+        guard model.state.items.list.indices.contains(index) else {
             return
         }
 
@@ -213,7 +213,7 @@ private extension EntryItemSheet {
     }
 
     var suggestions: [String] {
-        model.itemNameSuggestions(for: name)
+        model.output.itemNameSuggestions(for: name)
     }
 
     var equation: some View {
@@ -306,7 +306,7 @@ private extension EntryItemSheet {
 
     func openSlip() {
         resetInput()
-        showSlip(scrollingTo: model.items.count - 1)
+        showSlip(scrollingTo: model.state.items.list.count - 1)
         focus = .name
     }
 
@@ -316,7 +316,7 @@ private extension EntryItemSheet {
         }
 
         if let editingIndex {
-            model.updateItem(
+            model.state.updateItem(
                 at: editingIndex,
                 name: trimmedName,
                 quantity: lineQuantity,
@@ -327,7 +327,7 @@ private extension EntryItemSheet {
             closeSlip()
         } else {
             withAnimation(.snappy) {
-                model.addItem(
+                model.state.addItem(
                     name: trimmedName,
                     quantity: quantityValue,
                     amount: lineAmount,
@@ -336,7 +336,7 @@ private extension EntryItemSheet {
             }
 
             resetInput()
-            scroll(to: model.items.count - 1)
+            scroll(to: model.state.items.list.count - 1)
         }
     }
 
@@ -378,7 +378,7 @@ private extension EntryItemSheet {
             target = .unit
             editingIndex = nil
             editingItem = nil
-            taxRate = model.items.last?.taxRate
+            taxRate = model.state.items.list.last?.taxRate
             isDiscount = false
         }
     }

@@ -9,46 +9,61 @@ struct EntryModelTransferTests {
     @Test
     func startsWithTwoDifferentWallets() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
 
-        #expect(model.walletId == setup.cash)
-        #expect(model.toWalletId == setup.bank)
-        #expect(model.categoryId == nil)
-        #expect(model.walletTitle == "振替元")
-        #expect(!model.isChanged)
+        #expect(model.state.payment.walletId == setup.cash)
+        #expect(model.state.payment.toWalletId == setup.bank)
+        #expect(model.state.category.id == nil)
+        #expect(model.output.walletTitle == "振替元")
+        #expect(!model.output.isChanged)
     }
 
     @Test
     func loadedDraftSwitchedToTransferMatchesFreshTransfer() async throws {
         let setup = try await Setup()
-        let fresh = EntryModel(database: setup.database, date: setup.date, type: .transfer)
-        let draft = EntryModel(database: setup.database, date: setup.date)
+        let fresh = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
+        let draft = EntryModel(database: setup.database, clock: .system, date: setup.date)
 
         await fresh.load()
         await draft.load()
         draft.select(.transfer)
 
-        #expect(draft.type == .transfer)
-        #expect(draft.walletId == fresh.walletId)
-        #expect(draft.toWalletId == fresh.toWalletId)
-        #expect(draft.categoryId == fresh.categoryId)
-        #expect(!draft.isChanged)
+        #expect(draft.state.type == .transfer)
+        #expect(draft.state.payment.walletId == fresh.state.payment.walletId)
+        #expect(draft.state.payment.toWalletId == fresh.state.payment.toWalletId)
+        #expect(draft.state.category.id == fresh.state.category.id)
+        #expect(!draft.output.isChanged)
     }
 
     @Test
     func savesSwappedTransfer() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
         model.swapWallets()
 
-        let title = model.saveTitle
+        let title = model.output.saveTitle
         let saved = await model.save()
         let entry = try setup.database.snapshot().entries.first
 
@@ -63,18 +78,18 @@ struct EntryModelTransferTests {
     @Test
     func keepsCategoryWhenComingBackFromTransfer() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        let category = model.categoryId
+        let category = model.state.category.id
 
         model.select(.transfer)
-        let transferCategory = model.categoryId
-        let destination = model.toWalletId
+        let transferCategory = model.state.category.id
+        let destination = model.state.payment.toWalletId
         model.select(.expense)
 
         #expect(transferCategory == nil)
         #expect(destination == setup.bank)
-        #expect(model.categoryId == category)
+        #expect(model.state.category.id == category)
     }
 
     @Test
@@ -91,16 +106,21 @@ struct EntryModelTransferTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.press(.digit(5))
-        let bank = try #require(model.wallet(setup.bank))
-        let balance = model.balance(of: bank)
-        model.toWalletId = nil
+        model.state.press(.digit(5))
+        let bank = try #require(model.output.wallet(setup.bank))
+        let balance = model.output.balance(of: bank)
+        model.state.setDestination(nil)
 
         #expect(balance == 5000)
-        #expect(model.saveTitle == "振替先を選んでください")
+        #expect(model.output.saveTitle == "振替先を選んでください")
     }
 
     @Test
@@ -117,18 +137,23 @@ struct EntryModelTransferTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.digit(0))
-        let atBalance = model.isOverSourceBalance
-        model.press(.digit(1))
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
+        let atBalance = model.output.isOverSourceBalance
+        model.state.press(.digit(1))
 
         #expect(!atBalance)
-        #expect(model.isOverSourceBalance)
-        #expect(model.canSave)
+        #expect(model.output.isOverSourceBalance)
+        #expect(model.output.canSave)
     }
 
     @Test
@@ -144,15 +169,20 @@ struct EntryModelTransferTests {
         )
 
         let card = try await setup.database.save(wallet, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.walletId = card.id
-        let empty = model.isOverSourceBalance
-        model.press(.digit(1))
+        model.setWallet(card.id)
+        let empty = model.output.isOverSourceBalance
+        model.state.press(.digit(1))
 
         #expect(!empty)
-        #expect(model.isOverSourceBalance)
+        #expect(model.output.isOverSourceBalance)
     }
 
     @Test
@@ -168,17 +198,22 @@ struct EntryModelTransferTests {
         )
 
         let loan = try await setup.database.save(wallet, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.walletId = setup.bank
-        model.toWalletId = loan.id
-        let remaining = model.loanRemaining
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
-        let current = model.currentLine(of: loan)
-        let partial = model.afterLine(of: loan, isSource: false)
+        model.setWallet(setup.bank)
+        model.state.setDestination(loan.id)
+        let remaining = model.output.loanRemaining
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
+        let current = model.output.currentLine(of: loan)
+        let partial = model.output.afterLine(of: loan, isSource: false)
         model.payOffLoan()
 
         #expect(remaining == 100_000)
@@ -186,20 +221,25 @@ struct EntryModelTransferTests {
         #expect(current?.amount == 100_000)
         #expect(partial?.title == "返済後")
         #expect(partial?.amount == 70000)
-        #expect(model.amount == 100_000)
-        #expect(model.afterLine(of: loan, isSource: false)?.amount == 0)
+        #expect(model.output.amount == 100_000)
+        #expect(model.output.afterLine(of: loan, isSource: false)?.amount == 0)
     }
 
     @Test
     func reportsSameWallet() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.press(.digit(5))
-        model.toWalletId = model.walletId
+        model.state.press(.digit(5))
+        model.state.setDestination(model.state.payment.walletId)
 
-        #expect(!model.canSave)
+        #expect(!model.output.canSave)
     }
 
     @Test
@@ -209,17 +249,22 @@ struct EntryModelTransferTests {
         try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 2)
         try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 3)
         try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 4)
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        let amounts = model.recentTransfers.map(\.amount)
-        let oldest = try #require(model.recentTransfers.last)
+        let amounts = model.output.recentTransfers.map(\.amount)
+        let oldest = try #require(model.output.recentTransfers.last)
         model.applyTransfer(oldest)
 
         #expect(amounts == [1000, 5000, 3000])
-        #expect(model.walletId == setup.cash)
-        #expect(model.toWalletId == setup.bank)
-        #expect(model.amount == 3000)
+        #expect(model.state.payment.walletId == setup.cash)
+        #expect(model.state.payment.toWalletId == setup.bank)
+        #expect(model.output.amount == 3000)
     }
 
     @Test
@@ -228,44 +273,59 @@ struct EntryModelTransferTests {
         try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
         try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 2)
         try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 3)
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        let routes = model.frequentRoutes
+        let routes = model.output.frequentRoutes
         let last = try #require(routes.last)
         model.applyRoute(last)
 
         #expect(routes.map(\.walletId) == [setup.bank, setup.cash])
-        #expect(model.walletId == setup.cash)
-        #expect(model.toWalletId == setup.bank)
+        #expect(model.state.payment.walletId == setup.cash)
+        #expect(model.state.payment.toWalletId == setup.bank)
     }
 
     @Test
     func choosesAnotherSourceWhenHidden() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
         try await setup.database.setHidden(setup.cash, isHidden: true, at: Date())
         await model.reloadWallets()
 
-        #expect(model.walletId != setup.cash)
-        #expect(model.walletId != nil)
-        #expect(model.walletId != model.toWalletId)
+        #expect(model.state.payment.walletId != setup.cash)
+        #expect(model.state.payment.walletId != nil)
+        #expect(model.state.payment.walletId != model.state.payment.toWalletId)
     }
 
     @Test
     func choosesAnotherDestinationWhenHidden() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
         try await setup.database.setHidden(setup.bank, isHidden: true, at: Date())
         await model.reloadWallets()
 
-        #expect(model.walletId == setup.cash)
-        #expect(model.toWalletId != setup.bank)
-        #expect(model.toWalletId != setup.cash)
+        #expect(model.state.payment.walletId == setup.cash)
+        #expect(model.state.payment.toWalletId != setup.bank)
+        #expect(model.state.payment.toWalletId != setup.cash)
     }
 }
 

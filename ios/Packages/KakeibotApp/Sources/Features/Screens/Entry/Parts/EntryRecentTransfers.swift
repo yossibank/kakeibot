@@ -12,7 +12,7 @@ struct EntryRecentTransfers: View {
             EntryRecentLine {
                 ForEach(transfers) { transfer in
                     EntryRecentCard(
-                        title: model.wallet(transfer.walletId)?.name ?? "",
+                        title: model.output.wallet(transfer.walletId)?.name ?? "",
                         amount: transfer.amount,
                         detail: destination(transfer),
                         isPinned: false,
@@ -31,11 +31,11 @@ struct EntryRecentTransfers: View {
 
 private extension EntryRecentTransfers {
     func destination(_ transfer: Entry) -> String {
-        let name = model.wallet(transfer.toWalletId)?.name ?? ""
+        let name = model.output.wallet(transfer.toWalletId)?.name ?? ""
         return "→ \(name)"
     }
 
     func sourceIcon(_ transfer: Entry) -> Icon? {
-        model.wallet(transfer.walletId).flatMap(model.icon(for:))
+        model.output.wallet(transfer.walletId).flatMap(model.output.icon(for:))
     }
 }

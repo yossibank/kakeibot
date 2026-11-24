@@ -85,6 +85,7 @@ struct MainView: View {
         _draft = State(
             initialValue: EntryModel(
                 database: database,
+                clock: clock,
                 date: today
             )
         )
@@ -207,6 +208,7 @@ struct MainView: View {
             records.state.today = today
             review.state.today = today
             assets.setToday(today)
+            draft.state.today = today
 
             prepareDraft()
         }

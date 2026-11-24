@@ -1,126 +1,11 @@
 import Core
 import DesignSystem
 import Foundation
-import Store
 
 public extension EntryModel {
     struct NoteLine: Equatable {
         public let title: String
         public let value: String
-    }
-
-    var memoPrompt: String {
-        switch type {
-        case .expense: "店名や買ったもの"
-        case .income: "どこから入ったか"
-        case .transfer: "何のための移動か"
-        }
-    }
-
-    var memoHint: String {
-        switch type {
-        case .expense: "店名など"
-        case .income: "入金元など"
-        case .transfer: "用途など"
-        }
-    }
-
-    var typeName: String {
-        type.name
-    }
-
-    var budgetUsage: BudgetUsage? {
-        guard type == .expense else {
-            return nil
-        }
-
-        return currentMonth.budgetUsage
-    }
-
-    var budgetUsageAfterSave: BudgetUsage? {
-        guard let usage = budgetUsage else {
-            return nil
-        }
-
-        let totals = monthTotals { $0.type == .expense }
-
-        return BudgetUsage(
-            budget: usage.baseBudget,
-            carryover: usage.carryover,
-            spent: usage.spent - totals.current + totals.after,
-            today: Self.today,
-            periodEnd: monthOverview.period.upperBound
-        )
-    }
-
-    var budgetNote: NoteLine? {
-        guard
-            let usage = budgetUsage,
-            let after = budgetUsageAfterSave
-        else {
-            return nil
-        }
-
-        guard after.spent != usage.spent else {
-            return NoteLine(title: usage.remainingTitle, value: usage.remainingAmountText)
-        }
-
-        let title = usage.isOver ? "予算オーバー" : "今月あと"
-
-        let label = switch (usage.isOver, after.isOver) {
-        case (false, true): "オーバー "
-        case (true, false): "あと "
-        default: ""
-        }
-
-        let value = "\(usage.remainingAmountText) → \(label)\(after.remainingAmountText)"
-        return NoteLine(title: title, value: value)
-    }
-
-    var budgetText: String? {
-        budgetNote.map { "\($0.title) \($0.value)" }
-    }
-
-    var monthTotalText: String? {
-        guard
-            type != .transfer,
-            budgetUsage == nil
-        else {
-            return nil
-        }
-
-        let totals = monthTotals { entry in
-            entry.type == type && (categoryId == nil || entry.categoryId == categoryId)
-        }
-
-        let title = "今月の\(selectedCategory?.name ?? typeName)"
-
-        guard totals.after != totals.current else {
-            return "\(title) \(Yen.text(totals.current))"
-        }
-
-        return "\(title) \(Yen.text(totals.current)) → \(Yen.text(totals.after))"
-    }
-
-    var monthOverview: MonthOverview {
-        currentMonth.overview
-    }
-
-    var saveTitle: String {
-        guard !isEditing else {
-            return saveAction
-        }
-
-        guard amount > 0 else {
-            return "金額を入れてください"
-        }
-
-        if type == .transfer,
-           toWalletId == nil {
-            return "\(Self.destinationTitle)を選んでください"
-        }
-
-        return saveAction
     }
 
     static func dateText(
@@ -166,80 +51,13 @@ public extension EntryModel {
         default: return "日付・\(-days)日後"
         }
     }
-
-    func quickDate(today: LocalDate) -> LocalDate {
-        date == today ? today.adding(days: -1) : today
-    }
-}
-
-extension EntryModel {
-    struct MonthSummary {
-        struct Key: Equatable {
-            let historyGeneration: Int
-            let budgets: [Budget]
-            let monthStartDay: MonthStartDay
-            let carryoverFrom: YearMonth?
-            let today: LocalDate
-        }
-
-        let overview: MonthOverview
-        let budgetUsage: BudgetUsage?
-        let entries: [Entry]
-    }
-
-    var currentMonth: MonthSummary {
-        let key = MonthSummary.Key(
-            historyGeneration: historyGeneration,
-            budgets: budgets,
-            monthStartDay: monthStartDay,
-            carryoverFrom: carryoverFrom,
-            today: Self.today
-        )
-
-        return monthMemo.value(for: key) {
-            makeMonthSummary()
-        }
-    }
 }
 
 private extension EntryModel {
-    var saveAction: String {
-        switch (isEditing, type) {
-        case (true, _): "変更を保存"
-        case (false, .transfer): "振り替える"
-        case (false, _): "記録する"
-        }
-    }
-
     static func weekdayText(
         for date: LocalDate,
         today: LocalDate
     ) -> String {
         "\(PeriodText.day(date, today: today))（\(date.weekday.shortName)）"
-    }
-
-    func monthTotals(matching isIncluded: (Entry) -> Bool) -> (current: Int, after: Int) {
-        let period = monthOverview.period
-        let entries = currentMonth.entries.filter(isIncluded)
-        let current = entries.reduce(0) { $0 + $1.amount }
-        let previous = entries.first { $0.id == original?.id }?.amount ?? 0
-        let added = period.contains(date) ? amount : 0
-        return (current, current - previous + added)
-    }
-
-    func makeMonthSummary() -> MonthSummary {
-        let overview = MonthOverview(
-            list: history,
-            budgets: budgets,
-            recurrings: [],
-            monthStartDay: monthStartDay,
-            carryoverFrom: carryoverFrom,
-            today: Self.today
-        )
-        return MonthSummary(
-            overview: overview,
-            budgetUsage: overview.budgetUsage,
-            entries: overview.monthDays.flatMap(\.entries)
-        )
     }
 }

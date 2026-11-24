@@ -14,7 +14,7 @@ struct EntryVoiceCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if flow.step == .denied {
+            if flow.state.step == .denied {
                 denied
             } else {
                 listening
@@ -40,11 +40,11 @@ private extension EntryVoiceCard {
     static let waveHeight: CGFloat = 40
 
     var isReading: Bool {
-        flow.step == .reading
+        flow.state.step == .reading
     }
 
     var transcriptStyle: Font.TextStyle {
-        switch flow.transcript.text.count {
+        switch flow.input.transcript.text.count {
         case ..<Self.largeTextLimit: .title3
         case ..<Self.mediumTextLimit: .body
         default: .subheadline
@@ -52,10 +52,10 @@ private extension EntryVoiceCard {
     }
 
     var spoken: AttributedString {
-        var settled = AttributedString(flow.transcript.settled)
+        var settled = AttributedString(flow.input.transcript.settled)
         settled.foregroundColor = Palette.accentStrong
 
-        var pending = AttributedString(flow.transcript.pending)
+        var pending = AttributedString(flow.input.transcript.pending)
         pending.foregroundColor = Palette.subtext
 
         return settled + pending
@@ -101,8 +101,8 @@ private extension EntryVoiceCard {
                     .frame(width: Self.cancelWidth)
 
                 EntryVoiceFinishButton(
-                    start: flow.silenceStart,
-                    duration: flow.silenceDuration,
+                    start: flow.state.silenceStart,
+                    duration: flow.input.silenceDuration,
                     isSpent: isReading,
                     action: onFinish
                 )
@@ -115,7 +115,7 @@ private extension EntryVoiceCard {
     var transcript: some View {
         ScrollView {
             Group {
-                if flow.transcript.isEmpty {
+                if flow.input.transcript.isEmpty {
                     Text("話してください\n\(Self.example)")
                         .foregroundStyle(Palette.hint)
                 } else {
@@ -134,14 +134,14 @@ private extension EntryVoiceCard {
     }
 
     var slots: some View {
-        let reading = flow.preview
+        let reading = flow.input.preview
 
         return SlotRows(spacing: 8) {
             slot(
                 systemImage: "square.grid.2x2",
                 label: "カテゴリ",
                 value: reading?.categoryId.flatMap { id in
-                    model.categories.first { $0.id == id }?.name
+                    model.output.categories.first { $0.id == id }?.name
                 }
             )
 
@@ -155,7 +155,7 @@ private extension EntryVoiceCard {
                 systemImage: "creditcard",
                 label: "口座",
                 value: reading?.walletId.flatMap { id in
-                    model.wallets.first { $0.id == id }?.name
+                    model.output.wallets.first { $0.id == id }?.name
                 }
             )
 

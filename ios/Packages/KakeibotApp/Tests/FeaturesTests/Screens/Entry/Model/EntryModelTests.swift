@@ -10,15 +10,15 @@ struct EntryModelTests {
     func buildsAmountFromKeys() async throws {
         let model = try await Self.newModel()
 
-        model.press(.digit(1))
-        model.press(.digit(2))
-        model.press(.doubleZero)
+        model.state.press(.digit(1))
+        model.state.press(.digit(2))
+        model.state.press(.doubleZero)
 
-        #expect(model.amount == 1200)
+        #expect(model.output.amount == 1200)
 
-        model.press(.delete)
+        model.state.press(.delete)
 
-        #expect(model.amount == 120)
+        #expect(model.output.amount == 120)
     }
 
     @Test
@@ -26,10 +26,10 @@ struct EntryModelTests {
         let model = try await Self.newModel()
 
         for _ in 0..<10 {
-            model.press(.digit(9))
+            model.state.press(.digit(9))
         }
 
-        #expect(model.amount == 999_999_999)
+        #expect(model.output.amount == 999_999_999)
     }
 
     @Test
@@ -38,17 +38,17 @@ struct EntryModelTests {
 
         model.select(.income)
 
-        #expect(model.categoryId == model.options?.incomeCategories.first?.id)
+        #expect(model.state.category.id == model.input.options?.incomeCategories.first?.id)
     }
 
     @Test
     func savesNewEntry() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.press(.digit(5))
-        model.press(.doubleZero)
-        model.memo = "ランチ"
+        model.state.press(.digit(5))
+        model.state.press(.doubleZero)
+        model.state.memo = "ランチ"
 
         let saved = await model.save()
         let entries = try setup.database.snapshot().entries
@@ -61,9 +61,9 @@ struct EntryModelTests {
     @Test
     func savesOnceWhenSaveIsTappedTwice() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.press(.digit(5))
+        model.state.press(.digit(5))
 
         async let first = model.save()
         async let second = model.save()
@@ -80,19 +80,24 @@ struct EntryModelTests {
 
         let saved = await model.save()
 
-        #expect(model.canSave == false)
+        #expect(model.output.canSave == false)
         #expect(saved == nil)
-        #expect(model.errorNotice.message == "金額を入れてください")
+        #expect(model.state.errorNotice.message == "金額を入れてください")
     }
 
     @Test
     func editsExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
         await model.load()
 
-        model.press(.delete)
+        model.state.press(.delete)
         let saved = await model.save()
         let stored = try await setup.database.entry(entry.id)
 
@@ -105,17 +110,22 @@ struct EntryModelTests {
     func recordsEditedEntryAgainAsNewEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
         await model.load()
-        model.memo = "ランチ"
+        model.state.memo = "ランチ"
 
         await model.recordAgain()
         let saved = await model.save()
         let entries = try setup.database.snapshot().entries
         let stored = try await setup.database.entry(entry.id)
 
-        #expect(!model.isEditing)
-        #expect(model.errorNotice.message == "同じ内容で新しい記録にしました")
+        #expect(!model.output.isEditing)
+        #expect(model.state.errorNotice.message == "同じ内容で新しい記録にしました")
         #expect(saved?.entry.id != entry.id)
         #expect(saved?.entry.amount == 980)
         #expect(saved?.entry.memo == "ランチ")
@@ -136,25 +146,25 @@ struct EntryModelTests {
             .operation(.add),
             .digit(8)
         ] {
-            model.press(key)
+            model.state.press(key)
         }
 
-        let expression = model.expressionText
-        model.press(.equals)
-        let settled = model.expressionText
-        model.press(.tax(.standard))
+        let expression = model.output.expressionText
+        model.state.press(.equals)
+        let settled = model.output.expressionText
+        model.state.press(.tax(.standard))
 
         #expect(expression == "1,200 ＋ 8")
         #expect(settled == nil)
-        #expect(model.expressionText == "1,208 の税込み 10%")
-        #expect(model.amount == 1328)
+        #expect(model.output.expressionText == "1,208 の税込み 10%")
+        #expect(model.output.amount == 1328)
     }
 
     @Test
     func groupsWalletsByKind() async throws {
         let model = try await Self.newModel()
 
-        let sections = model.walletSections
+        let sections = model.output.walletSections
 
         #expect(sections.map(\.kind) == [.cash, .bank])
         #expect(sections.map { $0.wallets.map(\.name) } == [["財布"], ["銀行"]])
@@ -164,9 +174,9 @@ struct EntryModelTests {
     func splitsCategoriesAddAndEditIntoPages() async throws {
         let model = try await Self.newModel()
 
-        let expensePages = model.categoryPages
+        let expensePages = model.output.categoryPages
         model.select(.income)
-        let incomePages = model.categoryPages
+        let incomePages = model.output.categoryPages
 
         #expect(expensePages.map(\.count) == [14])
         #expect(expensePages[0].suffix(2) == [.add, .edit])
@@ -177,43 +187,43 @@ struct EntryModelTests {
     @Test
     func remembersCategoryForEachType() async throws {
         let model = try await Self.newModel()
-        let expense = model.categories
+        let expense = model.output.categories
         let transit = try #require(expense.first { $0.name == "交通" })
-        model.categoryId = transit.id
+        model.state.setCategory(transit.id)
 
         model.select(.income)
-        let incomeFirst = model.selectedCategory?.name
-        let income = model.categories
+        let incomeFirst = model.output.selectedCategory?.name
+        let income = model.output.categories
         let bonus = try #require(income.first { $0.name == "臨時収入" })
-        model.categoryId = bonus.id
+        model.state.setCategory(bonus.id)
 
         model.select(.expense)
-        let expenseBack = model.selectedCategory?.name
+        let expenseBack = model.output.selectedCategory?.name
 
         model.select(.income)
 
         #expect(incomeFirst == "給料")
         #expect(expenseBack == "交通")
-        #expect(model.selectedCategory?.name == "臨時収入")
+        #expect(model.output.selectedCategory?.name == "臨時収入")
     }
 
     @Test
     func tracksChangesAfterLoading() async throws {
         let model = try await Self.newModel()
-        let loaded = model.isChanged
+        let loaded = model.output.isChanged
 
-        model.press(.digit(5))
-        let typed = model.isChanged
+        model.state.press(.digit(5))
+        let typed = model.output.isChanged
 
-        model.press(.clear)
-        let cleared = model.isChanged
+        model.state.press(.clear)
+        let cleared = model.output.isChanged
 
-        model.memo = "ランチ"
+        model.state.memo = "ランチ"
 
         #expect(!loaded)
         #expect(typed)
         #expect(!cleared)
-        #expect(model.isChanged)
+        #expect(model.output.isChanged)
     }
 
     @Test
@@ -221,23 +231,23 @@ struct EntryModelTests {
         let model = try await Self.newModel()
 
         model.select(.income)
-        let income = model.isChanged
+        let income = model.output.isChanged
 
         model.select(.transfer)
-        let transfer = model.isChanged
+        let transfer = model.output.isChanged
 
-        model.press(.digit(5))
+        model.state.press(.digit(5))
         model.select(.expense)
 
         #expect(!income)
         #expect(!transfer)
-        #expect(model.isChanged)
+        #expect(model.output.isChanged)
     }
 
     @Test
     func ignoresCancelledLoad() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
 
         let task = Task {
             await model.load()
@@ -246,38 +256,38 @@ struct EntryModelTests {
         task.cancel()
         await task.value
 
-        #expect(model.errorNotice.message == nil)
-        #expect(model.errorNotice.count == 0)
+        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.errorNotice.count == 0)
     }
 
     @Test
     func hidesSelectedCategoryAndSelectsItAgainOnUndo() async throws {
         let model = try await Self.newModel()
-        let food = try #require(model.selectedCategory)
+        let food = try #require(model.output.selectedCategory)
 
         let hidden = try #require(await model.hideCategory(food))
-        let next = model.selectedCategory?.name
+        let next = model.output.selectedCategory?.name
 
         await model.showCategory(hidden)
 
         #expect(hidden.wasSelected)
         #expect(next == "日用品")
-        #expect(model.categories.contains { $0.id == food.id })
-        #expect(model.selectedCategory?.id == food.id)
+        #expect(model.output.categories.contains { $0.id == food.id })
+        #expect(model.output.selectedCategory?.id == food.id)
     }
 
     @Test
     func keepsSelectionWhenUndoingHiddenOtherCategory() async throws {
         let model = try await Self.newModel()
-        let food = try #require(model.selectedCategory)
-        let other = try #require(model.categories.last)
+        let food = try #require(model.output.selectedCategory)
+        let other = try #require(model.output.categories.last)
 
         let hidden = try #require(await model.hideCategory(other))
         await model.showCategory(hidden)
 
         #expect(!hidden.wasSelected)
-        #expect(model.categories.contains { $0.id == other.id })
-        #expect(model.selectedCategory?.id == food.id)
+        #expect(model.output.categories.contains { $0.id == other.id })
+        #expect(model.output.selectedCategory?.id == food.id)
     }
 
     @Test
@@ -292,19 +302,19 @@ struct EntryModelTests {
         await model.reloadCategories(selecting: saved.id)
 
         #expect(editor.input.kind == .income)
-        #expect(model.categoryId == saved.id)
-        #expect(model.categories.last?.name == "配当")
+        #expect(model.state.category.id == saved.id)
+        #expect(model.output.categories.last?.name == "配当")
     }
 
     @Test
     func labelsSaveButtonByState() async throws {
         let model = try await Self.newModel()
 
-        let empty = model.saveTitle
-        model.press(.digit(9))
-        model.press(.digit(8))
-        model.press(.digit(0))
-        let recorded = model.saveTitle
+        let empty = model.output.saveTitle
+        model.state.press(.digit(9))
+        model.state.press(.digit(8))
+        model.state.press(.digit(0))
+        let recorded = model.output.saveTitle
 
         #expect(empty == "金額を入れてください")
         #expect(recorded == "記録する")
@@ -314,7 +324,12 @@ struct EntryModelTests {
     func deletesExistingEntry() async throws {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
         await model.load()
 
         let deleted = await model.delete()
@@ -327,26 +342,26 @@ struct EntryModelTests {
     @Test
     func startsNextEntryKeepingChoices() async throws {
         let model = try await Self.newModel()
-        model.press(.digit(5))
-        model.memo = "ランチ"
-        let category = model.categoryId
-        let wallet = model.walletId
+        model.state.press(.digit(5))
+        model.state.memo = "ランチ"
+        let category = model.state.category.id
+        let wallet = model.state.payment.walletId
 
         _ = await model.save()
         await model.startNext()
 
-        #expect(model.amount == 0)
-        #expect(model.memo.isEmpty)
-        #expect(model.categoryId == category)
-        #expect(model.walletId == wallet)
-        #expect(!model.isChanged)
+        #expect(model.output.amount == 0)
+        #expect(model.state.memo.isEmpty)
+        #expect(model.state.category.id == category)
+        #expect(model.state.payment.walletId == wallet)
+        #expect(!model.output.isChanged)
     }
 }
 
 extension EntryModelTests {
     static func newModel() async throws -> EntryModel {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
 
         await model.load()
 

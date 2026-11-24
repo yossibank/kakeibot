@@ -9,16 +9,16 @@ extension EntryModelTests {
     func movesCardUsageToLaterBill() async throws {
         let setup = try await Setup()
         let card = try await setup.cardWithBill()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.press(.digit(5))
-        model.walletId = card.id
+        model.state.press(.digit(5))
+        model.setWallet(card.id)
 
-        let dates = model.billChoices.map(\.date.description)
-        let later = try #require(model.billChoices.last?.date)
+        let dates = model.output.billChoices.map(\.date.description)
+        let later = try #require(model.output.billChoices.last?.date)
         model.selectBill(later)
-        let name = model.walletName
-        let bill = model.billText
+        let name = model.output.walletName
+        let bill = model.output.billText
         let change = await model.save()
 
         #expect(dates == ["2026-11-27", "2026-12-27", "2027-01-27"])
@@ -26,9 +26,9 @@ extension EntryModelTests {
         #expect(bill == "1/27払い")
         #expect(change?.entry.billMonth == later.yearMonth)
 
-        model.date = try #require(LocalDate("2026-10-13"))
+        try model.state.setDate(#require(LocalDate("2026-10-13")))
 
-        #expect(model.billMonth == nil)
+        #expect(model.state.payment.billMonth == nil)
     }
 
     @Test
@@ -57,23 +57,23 @@ extension EntryModelTests {
 
         try await setup.database.saveEntry(income, at: Date())
         try await setup.database.saveEntry(future, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
 
         await model.load()
 
-        #expect(model.balance(of: cash) == 1000)
+        #expect(model.output.balance(of: cash) == 1000)
     }
 
     @Test
     func startsWithFirstWalletWithoutEntries() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
 
         await model.load()
 
-        #expect(model.walletId == options.wallets[0].id)
-        #expect(model.isUsualWallet)
+        #expect(model.state.payment.walletId == options.wallets[0].id)
+        #expect(model.output.isUsualWallet)
     }
 
     @Test
@@ -84,16 +84,16 @@ extension EntryModelTests {
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[0].id, at: 1)
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 2)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
 
         await model.load()
-        let first = model.walletId
-        model.categoryId = categories[1].id
-        let second = model.walletId
+        let first = model.state.payment.walletId
+        model.state.setCategory(categories[1].id)
+        let second = model.state.payment.walletId
 
         #expect(first == wallets[1].id)
         #expect(second == wallets[1].id)
-        #expect(model.isUsualWallet)
+        #expect(model.output.isUsualWallet)
     }
 
     @Test
@@ -103,16 +103,16 @@ extension EntryModelTests {
         let categories = options.expenseCategories
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 1)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         model.select(.income)
 
-        #expect(model.walletId == wallets[0].id)
+        #expect(model.state.payment.walletId == wallets[0].id)
 
         model.select(.expense)
 
-        #expect(model.walletId == wallets[1].id)
+        #expect(model.state.payment.walletId == wallets[1].id)
     }
 
     @Test
@@ -122,14 +122,14 @@ extension EntryModelTests {
         let categories = options.expenseCategories
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[1].id, wallet: wallets[0].id, at: 1)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        model.categoryId = categories[1].id
-        model.walletId = wallets[1].id
-        model.categoryId = categories[2].id
+        model.state.setCategory(categories[1].id)
+        model.setWallet(wallets[1].id)
+        model.state.setCategory(categories[2].id)
 
-        #expect(model.walletId == wallets[1].id)
+        #expect(model.state.payment.walletId == wallets[1].id)
     }
 
     @Test
@@ -138,16 +138,16 @@ extension EntryModelTests {
         let options = try await setup.database.entryOptions()
         let shared = options.wallets[1]
         try await setup.database.startSharing(shared.id)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        let own = model.selectedCategory
+        let own = model.output.selectedCategory
 
-        model.walletId = shared.id
-        let sharedCategory = model.selectedCategory
-        let walletIDs = Set(model.categories.map(\.walletId))
+        model.setWallet(shared.id)
+        let sharedCategory = model.output.selectedCategory
+        let walletIDs = Set(model.output.categories.map(\.walletId))
 
-        model.walletId = options.wallets[0].id
-        let back = model.selectedCategory
+        model.setWallet(options.wallets[0].id)
+        let back = model.output.selectedCategory
 
         #expect(sharedCategory?.name == own?.name)
         #expect(sharedCategory?.walletId == shared.id)

@@ -44,11 +44,11 @@ extension EntrySheet {
 
 extension EntrySheet {
     func show(_ next: EntryDeck) {
-        let type = model.type
+        let type = model.state.type
         let target: AmountTarget = next == .fee ? .fee : .amount
 
         if next != .amount,
-           voice.step == .listening {
+           voice.state.step == .listening {
             cancelVoice()
         }
 
@@ -58,13 +58,13 @@ extension EntrySheet {
 
         withAnimation(.snappy) {
             deck = next
-            model.enter(target)
+            model.state.enter(target)
         }
     }
 
     func resetDeck() {
-        deck = EntryDeck.start(for: model.type)
-        model.enter(.amount)
+        deck = EntryDeck.start(for: model.state.type)
+        model.state.enter(.amount)
     }
 
     func useRecent(_ entry: Entry) {
@@ -87,13 +87,13 @@ extension EntrySheet {
     ) {
         switch role {
         case .source:
-            model.walletId = wallet.id
+            model.setWallet(wallet.id)
 
         case .destination:
-            model.toWalletId = wallet.id
+            model.state.setDestination(wallet.id)
         }
 
-        if model.type == .transfer {
+        if model.state.type == .transfer {
             show(.transfer)
         }
     }
@@ -151,11 +151,11 @@ private extension EntrySheet {
     var dateBinding: Binding<LocalDate> {
         Binding(
             get: {
-                model.date
+                model.state.payment.date
             },
             set: { date in
                 withAnimation(.snappy) {
-                    model.date = date
+                    model.state.setDate(date)
                 }
             }
         )
@@ -210,12 +210,12 @@ private extension EntrySheet {
         VStack(spacing: 12) {
             if deck == .fee {
                 FeeChoiceRow(
-                    choices: model.feeChoices,
-                    selection: model.fee
+                    choices: model.output.feeChoices,
+                    selection: model.output.fee
                 ) { amount in
-                    model.setFee(amount)
+                    model.state.setFee(amount)
                 }
-            } else if !voice.isActive {
+            } else if !voice.output.isActive {
                 HStack(spacing: 8) {
                     Text("金額を入力")
                         .textFont(.caption2, weight: .bold)
@@ -223,7 +223,7 @@ private extension EntrySheet {
 
                     Spacer(minLength: 0)
 
-                    if model.showsItems {
+                    if model.output.showsItems {
                         itemPill
                     }
                 }
@@ -231,20 +231,20 @@ private extension EntrySheet {
             }
 
             EntryLiveSlot {
-                if voice.isActive {
+                if voice.output.isActive {
                     voiceCard
                         .transition(.opacity)
                 } else {
                     Keypad(
-                        calculator: model.activeCalculator,
+                        calculator: model.output.activeCalculator,
                         maxKeyHeight: Self.maxKeyHeight
                     ) { key in
-                        model.press(key)
+                        model.state.press(key)
                     }
                 }
             }
         }
-        .animation(.snappy, value: voice.isActive)
+        .animation(.snappy, value: voice.output.isActive)
     }
 
     var itemPill: some View {
@@ -281,7 +281,7 @@ private extension EntrySheet {
                 ForEach(Self.quickDays, id: \.offset) { quickDay in
                     let date = today.adding(days: quickDay.offset)
 
-                    ChipButton(quickDay.title, isSelected: model.date == date) {
+                    ChipButton(quickDay.title, isSelected: model.state.payment.date == date) {
                         dateBinding.wrappedValue = date
                     }
                 }
@@ -292,7 +292,7 @@ private extension EntrySheet {
             MonthCalendar(
                 selection: dateBinding,
                 today: today,
-                weekStart: model.weekStart,
+                weekStart: model.input.weekStart,
                 isCompact: true
             )
         }

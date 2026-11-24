@@ -49,8 +49,8 @@ struct EntryTransferPanel: View {
 
             card(.destination)
         }
-        .sharesTextScale(id: [model.walletId, model.toWalletId])
-        .haptic(.selection, trigger: model.toWalletId)
+        .sharesTextScale(id: [model.state.payment.walletId, model.state.payment.toWalletId])
+        .haptic(.selection, trigger: model.state.payment.toWalletId)
     }
 }
 
@@ -62,8 +62,8 @@ private extension EntryTransferPanel {
             Image(systemName: "arrow.down")
                 .sansFont(.micro, weight: .heavy)
 
-            if model.amount > 0 {
-                AmountText(model.amount, font: .style(.caption), color: Palette.accentStrong)
+            if model.output.amount > 0 {
+                AmountText(model.output.amount, font: .style(.caption), color: Palette.accentStrong)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .contentTransition(.numericText())
@@ -73,27 +73,27 @@ private extension EntryTransferPanel {
         .padding(.horizontal, 8)
         .frame(height: 24)
         .background(Palette.accent.opacity(.subtle), in: .capsule)
-        .animation(.snappy, value: model.amount)
+        .animation(.snappy, value: model.output.amount)
     }
 
     func card(_ role: EntryWalletDeck.Role) -> some View {
-        let id = role == .source ? model.walletId : model.toWalletId
-        let wallet = model.wallet(id)
-        let icon = wallet.flatMap { model.icon(for: $0) }
-        let isOver = role == .source && model.isOverSourceBalance
+        let id = role == .source ? model.state.payment.walletId : model.state.payment.toWalletId
+        let wallet = model.output.wallet(id)
+        let icon = wallet.flatMap { model.output.icon(for: $0) }
+        let isOver = role == .source && model.output.isOverSourceBalance
         let balanceColor = isOver ? Palette.rose : Palette.subtext
-        let current = wallet.flatMap(model.currentLine)
+        let current = wallet.flatMap(model.output.currentLine)
         let nameColor = wallet == nil ? Palette.hint : Palette.text
         let iconShape = RoundedRectangle(cornerRadius: corner.radius(12))
         let shape = RoundedRectangle(cornerRadius: corner.radius(20))
         let tint = icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
 
         let after = wallet.flatMap { wallet in
-            model.afterLine(of: wallet, isSource: role == .source)
+            model.output.afterLine(of: wallet, isSource: role == .source)
         }
 
         let idleAfter = wallet.flatMap { wallet in
-            model.idleAfterLine(of: wallet, isSource: role == .source)
+            model.output.idleAfterLine(of: wallet, isSource: role == .source)
         }
 
         let info = VStack(alignment: .leading, spacing: 4) {
@@ -217,7 +217,7 @@ private extension EntryTransferPanel {
 private extension EntryTransferPanel {
     func title(_ role: EntryWalletDeck.Role) -> String {
         switch role {
-        case .source: model.walletTitle
+        case .source: model.output.walletTitle
         case .destination: EntryModel.destinationTitle
         }
     }

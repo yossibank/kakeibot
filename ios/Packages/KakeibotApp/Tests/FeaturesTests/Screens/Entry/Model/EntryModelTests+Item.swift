@@ -8,9 +8,9 @@ extension EntryModelTests {
     @Test
     func savesItemsWithEntry() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.addItem(name: "牛乳", amount: 400)
+        model.state.addItem(name: "牛乳", amount: 400)
 
         let change = await model.save()
         let entryId = try #require(change?.entry.id)
@@ -24,44 +24,44 @@ extension EntryModelTests {
     @Test
     func followsItemTotalWhileNoDifference() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        model.addItem(name: "牛乳", amount: 396)
-        model.addItem(name: "パン", amount: 250)
-        let followed = model.amount
-        model.updateItem(at: 1, name: "パン", amount: 200)
-        let updated = model.amount
+        model.state.addItem(name: "牛乳", amount: 396)
+        model.state.addItem(name: "パン", amount: 250)
+        let followed = model.output.amount
+        model.state.updateItem(at: 1, name: "パン", amount: 200)
+        let updated = model.output.amount
 
         #expect(followed == 646)
         #expect(updated == 596)
 
-        model.press(.digit(9))
-        model.addItem(name: "卵", amount: 100)
+        model.state.press(.digit(9))
+        model.state.addItem(name: "卵", amount: 100)
 
-        #expect(model.amount == 9)
-        #expect(model.itemAdjustment == -687)
+        #expect(model.output.amount == 9)
+        #expect(model.output.itemAdjustment == -687)
 
-        model.adjustToItems()
+        model.state.adjustToItems()
 
-        #expect(model.amount == 696)
+        #expect(model.output.amount == 696)
     }
 
     @Test
     func restoresRemovedItemInPlace() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.addItem(name: "牛乳", amount: 396)
-        model.addItem(name: "パン", amount: 250)
+        model.state.addItem(name: "牛乳", amount: 396)
+        model.state.addItem(name: "パン", amount: 250)
 
-        let removed = try #require(model.removeItem(at: 0))
-        let afterRemove = model.amount
-        model.restoreItem(removed)
+        let removed = try #require(model.state.removeItem(at: 0))
+        let afterRemove = model.output.amount
+        model.state.restoreItem(removed)
 
         #expect(afterRemove == 250)
-        #expect(model.items.map(\.name) == ["牛乳", "パン"])
-        #expect(model.amount == 646)
+        #expect(model.state.items.list.map(\.name) == ["牛乳", "パン"])
+        #expect(model.output.amount == 646)
     }
 
     @Test
@@ -72,81 +72,86 @@ extension EntryModelTests {
         var edited = EntryDraft(entry)
         edited.items = [draft]
         try await setup.database.saveEntry(edited, editing: entry.id, at: Date())
-        let model = EntryModel(database: setup.database, editing: entry.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: entry.id,
+            date: setup.date
+        )
 
         await model.load()
-        let loaded = model.items
-        let unchanged = model.isChanged
-        _ = model.removeItem(at: 0)
+        let loaded = model.state.items.list
+        let unchanged = model.output.isChanged
+        _ = model.state.removeItem(at: 0)
 
         #expect(loaded == [draft])
         #expect(!unchanged)
-        #expect(model.isChanged)
-        #expect(model.amount == 500)
+        #expect(model.output.isChanged)
+        #expect(model.output.amount == 500)
     }
 
     @Test
     func followsItemTotalWithTax() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        model.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
-        model.addItem(name: "食パン", amount: 250, taxRate: .reduced)
-        model.addItem(name: "洗剤", amount: 398, taxRate: .standard)
-        model.addItem(name: "弁当", amount: 540)
+        model.state.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
+        model.state.addItem(name: "食パン", amount: 250, taxRate: .reduced)
+        model.state.addItem(name: "洗剤", amount: 398, taxRate: .standard)
+        model.state.addItem(name: "弁当", amount: 540)
 
-        #expect(model.itemTotals.subtotal == 1584)
-        #expect(model.itemTotals.taxes.map(\.amount) == [51, 39])
-        #expect(model.amount == 1674)
-        #expect(model.itemAdjustment == 0)
+        #expect(model.output.itemTotals.subtotal == 1584)
+        #expect(model.output.itemTotals.taxes.map(\.amount) == [51, 39])
+        #expect(model.output.amount == 1674)
+        #expect(model.output.itemAdjustment == 0)
     }
 
     @Test
     func keepsAmountWhenItemTotalIsNegative() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.press(.digit(5))
-        model.addItem(name: "値引", amount: -30)
+        model.state.press(.digit(5))
+        model.state.addItem(name: "値引", amount: -30)
 
-        model.adjustToItems()
+        model.state.adjustToItems()
 
-        #expect(!model.canAdjustToItems)
-        #expect(model.amount == 5)
+        #expect(!model.output.canAdjustToItems)
+        #expect(model.output.amount == 5)
     }
 
     @Test
     func countsItemsWithQuantity() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.addItem(name: "牛乳", quantity: 2, amount: 396)
-        model.addItem(name: "パン", amount: 250)
+        model.state.addItem(name: "牛乳", quantity: 2, amount: 396)
+        model.state.addItem(name: "パン", amount: 250)
 
-        let matched = model.hasItemAdjustment
-        model.press(.digit(9))
+        let matched = model.output.hasItemAdjustment
+        model.state.press(.digit(9))
 
-        #expect(model.itemCount == 3)
+        #expect(model.output.itemCount == 3)
         #expect(!matched)
-        #expect(model.hasItemAdjustment)
+        #expect(model.output.hasItemAdjustment)
     }
 
     @Test
     func editsStoreAsFirstMemoLine() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        model.store = "青葉"
-        let added = model.memo
+        model.state.store = "青葉"
+        let added = model.state.memo
 
-        model.memo = "若葉\n特売"
-        model.store = "青葉\n本店"
+        model.state.memo = "若葉\n特売"
+        model.state.store = "青葉\n本店"
 
         #expect(added == "青葉")
-        #expect(model.memo == "青葉 本店\n特売")
-        #expect(model.store == "青葉 本店")
+        #expect(model.state.memo == "青葉 本店\n特売")
+        #expect(model.state.store == "青葉 本店")
     }
 
     @Test
@@ -160,12 +165,12 @@ extension EntryModelTests {
             EntryItem.Draft(name: "パン", amount: 100)
         ]
         try await setup.database.saveEntry(edited, editing: entry.id, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        let all = model.itemNameSuggestions(for: " ")
-        let milk = model.itemNameSuggestions(for: "乳")
-        let exact = model.itemNameSuggestions(for: "パン")
+        let all = model.output.itemNameSuggestions(for: " ")
+        let milk = model.output.itemNameSuggestions(for: "乳")
+        let exact = model.output.itemNameSuggestions(for: "パン")
 
         #expect(Set(all) == ["牛乳", "低脂肪乳", "パン"])
         #expect(Set(milk) == ["牛乳", "低脂肪乳"])

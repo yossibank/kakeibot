@@ -80,7 +80,12 @@ private extension SnapshotTests {
 
         try database.insertDefaultsIfEmpty(at: now)
 
-        let model = EntryModel(database: database, date: date, type: .expense)
+        let model = EntryModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            date: date,
+            type: .expense
+        )
 
         await model.load()
 

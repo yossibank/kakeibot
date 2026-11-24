@@ -6,30 +6,6 @@ public extension EntryModel {
     static let receiptCountFailedMessage = "記録は保存しましたが、レシートの回数を数えられませんでした"
     static let itemNameFailedMessage = "記録は保存しましたが、直した品名を覚えられませんでした"
 
-    var showsReceipt: Bool {
-        showsItems && keypadTarget == .amount
-    }
-
-    var showsReceiptGuide: Bool {
-        !receiptGuideHidden
-    }
-
-    var freeReceiptsLeft: Int {
-        max(Self.freeReceiptLimit - receiptSavedCount, 0)
-    }
-
-    var suspectItemIndices: Set<Int> {
-        guard items.contains(where: { $0.readName != nil }) else {
-            return []
-        }
-
-        return Set(ReceiptSuspect.indices(of: items, difference: itemAdjustment))
-    }
-
-    func canReadReceipt(isPro: Bool) -> Bool {
-        isPro || receiptSavedCount < Self.freeReceiptLimit
-    }
-
     @discardableResult
     func apply(_ reading: ReceiptReading) async -> Bool {
         let store = reading.store?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -38,33 +14,33 @@ public extension EntryModel {
         var setsAmount = false
 
         if renamed.items.isEmpty {
-            forgetReadNames()
+            state.items.forgetReadNames()
         } else {
-            items = renamed.items
-            taxIncluded = renamed.taxIncluded
+            state.items.list = renamed.items
+            state.items.taxIncluded = renamed.taxIncluded
         }
 
-        let adjusts = !renamed.items.isEmpty && canAdjustToItems
+        let adjusts = !renamed.items.isEmpty && state.items.canAdjust
 
         if let total = renamed.total,
            (1...AmountCalculator.maxValue).contains(total) {
-            calculator = AmountCalculator(amount: total)
+            state.keypad.setAmount(total)
             setsAmount = true
         } else if adjusts {
-            adjustToItems()
-            setsAmount = itemTotal > 0
+            state.adjustToItems()
+            setsAmount = output.itemTotal > 0
         }
 
         if let date = renamed.date {
-            self.date = date
+            state.setDate(date)
         }
 
         if !store.isEmpty {
-            self.store = store
+            state.store = store
         }
 
-        receiptStore = store.isEmpty ? nil : store
-        isReceiptRead = true
+        state.items.receiptStore = store.isEmpty ? nil : store
+        state.items.isReceiptRead = true
 
         return setsAmount
     }
@@ -73,32 +49,32 @@ public extension EntryModel {
 extension EntryModel {
     func hideReceiptGuide() async {
         do {
-            try await database.setSetting(.receiptGuideHidden, to: true)
-            receiptGuideHidden = true
+            try await dependencies.database.setSetting(.receiptGuideHidden, to: true)
+            input.receiptGuideHidden = true
         } catch {
             report(error)
         }
     }
 
     func finishReceipt() async {
-        guard showsItems else {
-            isReceiptRead = false
+        guard output.showsItems else {
+            state.items.isReceiptRead = false
             return
         }
 
         await rememberItemNames()
 
-        guard isReceiptRead else {
+        guard state.items.isReceiptRead else {
             return
         }
 
-        isReceiptRead = false
+        state.items.isReceiptRead = false
 
         do {
-            try await database.countReceiptSave()
-            receiptSavedCount += 1
+            try await dependencies.database.countReceiptSave()
+            input.receiptSavedCount += 1
         } catch {
-            errorNotice.show(Self.receiptCountFailedMessage)
+            state.errorNotice.show(Self.receiptCountFailedMessage)
         }
     }
 }
@@ -110,7 +86,7 @@ private extension EntryModel {
         }
 
         do {
-            return try await database.itemNames(at: store)
+            return try await dependencies.database.itemNames(at: store)
         } catch {
             report(error)
             return [:]
@@ -118,22 +94,22 @@ private extension EntryModel {
     }
 
     func rememberItemNames() async {
-        guard let store = receiptStore else {
+        guard let store = state.items.receiptStore else {
             return
         }
 
-        let now = Date()
+        let now = dependencies.clock.now
 
-        for item in items {
+        for item in state.items.list {
             guard let read = item.readName else {
                 continue
             }
 
             do {
                 if item.trimmedName == read {
-                    try await database.forgetItemName(for: read, at: store)
+                    try await dependencies.database.forgetItemName(for: read, at: store)
                 } else {
-                    try await database.rememberItemName(
+                    try await dependencies.database.rememberItemName(
                         item.trimmedName,
                         for: read,
                         at: store,
@@ -141,15 +117,9 @@ private extension EntryModel {
                     )
                 }
             } catch {
-                errorNotice.show(Self.itemNameFailedMessage)
+                state.errorNotice.show(Self.itemNameFailedMessage)
                 return
             }
-        }
-    }
-
-    func forgetReadNames() {
-        for index in items.indices {
-            items[index].readName = nil
         }
     }
 }

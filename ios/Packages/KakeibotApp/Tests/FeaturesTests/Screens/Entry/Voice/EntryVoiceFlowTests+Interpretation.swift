@@ -9,7 +9,7 @@ extension EntryVoiceFlowTests {
     func usesTheModelChoiceForCategory() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
-        let category = try #require(model.categories.last)
+        let category = try #require(model.output.categories.last)
         var dependencies = EntryVoiceFlow.Dependencies.fake(FakeVoiceSource())
         let source = FakeVoiceSource()
         dependencies.makeSource = { source }
@@ -22,7 +22,7 @@ extension EntryVoiceFlowTests {
         source.say("1200円")
         await flow.finish()
 
-        #expect(model.categoryId == category.id)
+        #expect(model.state.category.id == category.id)
     }
 
     @Test
@@ -31,8 +31,8 @@ extension EntryVoiceFlowTests {
         let model = try await loadedModel(setup)
         let source = FakeVoiceSource()
         let flow = EntryVoiceFlow(dependencies: .fake(source))
-        let category = try #require(model.categories.first)
-        let wallet = try #require(model.wallets.first)
+        let category = try #require(model.output.categories.first)
+        let wallet = try #require(model.output.wallets.first)
 
         await flow.start(for: model, today: setup.date) {}
 
@@ -52,8 +52,8 @@ extension EntryVoiceFlowTests {
         source.say("ランチ休憩", alternatives: ["ランチ990円"])
         await flow.finish()
 
-        #expect(model.amount == 990)
-        #expect(flow.notice?.text == "ランチ990円")
+        #expect(model.output.amount == 990)
+        #expect(flow.state.notice?.text == "ランチ990円")
     }
 
     @Test
@@ -105,8 +105,8 @@ extension EntryVoiceFlowTests {
         }
         try await waitForHistory(model)
 
-        let similar = model.voiceExamples(for: "iPhoneの支払い 4800円")
-        let recent = model.voiceExamples(for: "コーヒー 450円")
+        let similar = model.output.voiceExamples(for: "iPhoneの支払い 4800円")
+        let recent = model.output.voiceExamples(for: "コーヒー 450円")
 
         #expect(similar.first?.hasPrefix("iPhone → カテゴリ：") == true)
         #expect(similar.count == 8)
@@ -120,12 +120,12 @@ extension EntryVoiceFlowTests {
         let model = try await loadedModel(setup)
 
         model.apply(VoiceReading(amount: 300, date: setup.date.adding(days: -1), memo: "本屋"))
-        let fromVoice = model.isDateFromVoice
-        model.date = setup.date
+        let fromVoice = model.output.isDateFromVoice
+        model.state.setDate(setup.date)
 
         #expect(fromVoice)
-        #expect(!model.isDateFromVoice)
-        #expect(model.isMemoFromVoice)
+        #expect(!model.output.isDateFromVoice)
+        #expect(model.output.isMemoFromVoice)
     }
 
     @Test
@@ -148,7 +148,7 @@ extension EntryVoiceFlowTests {
         source.releaseStart()
         await starting.value
 
-        #expect(flow.step == nil)
+        #expect(flow.state.step == nil)
         #expect(source.log.last == "cancel")
     }
 
@@ -167,19 +167,19 @@ extension EntryVoiceFlowTests {
         source.say("コンビニで")
         await flow.finish()
 
-        #expect(model.amount == 980)
-        #expect(flow.notice?.outcome == .applied)
+        #expect(model.output.amount == 980)
+        #expect(flow.state.notice?.outcome == .applied)
     }
 
     @Test
     func hidesVoiceForTransfers() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
-        let expense = model.showsVoice
+        let expense = model.output.showsVoice
 
         model.select(.transfer)
 
         #expect(expense)
-        #expect(!model.showsVoice)
+        #expect(!model.output.showsVoice)
     }
 }

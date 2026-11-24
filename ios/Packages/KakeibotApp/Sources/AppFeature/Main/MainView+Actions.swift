@@ -76,7 +76,7 @@ extension MainView {
     }
 
     func addEntry(on date: LocalDate) {
-        draft.date = date
+        draft.state.setDate(date)
         sheet = .new
     }
 
@@ -108,7 +108,7 @@ extension MainView {
 
             case let .entry(date):
                 tab = .home
-                draft.date = date
+                draft.state.setDate(date)
                 sheet = .new
 
             case let .recurring(id):
@@ -124,7 +124,7 @@ extension MainView {
 
             case .receipt:
                 tab = .home
-                draft.date = today
+                draft.state.setDate(today)
                 startsReceipt = true
                 sheet = .new
             }
@@ -195,7 +195,7 @@ extension MainView {
     }
 
     func prepareDraft() {
-        let model = EntryModel(database: database, date: today)
+        let model = EntryModel(database: database, clock: clock, date: today)
 
         startsReceipt = false
 

@@ -1,6 +1,0 @@
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Model/EntryModel.swift: EntryModel の Bool の保存プロパティは 3 個までにする（今は 5 個）。両立しない状態は enum にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Model/EntryModel.swift: EntryModel の didSet と willSet は 2 個までにする（今は 4 個）。派生する値は計算で出すか、入力を 1 つの型にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Model/EntryModel.swift: EntryModel の保存プロパティの var は 12 個までにする（今は 42 個）。一緒に動く値を struct か enum にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swift: EntryVoiceFlow の保存プロパティの var は 12 個までにする（今は 16 個）。一緒に動く値を struct か enum にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swift: dependencies を持つモデルで、今の時刻を作らない。dependencies の時計から受け取る
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swift: dependencies を持つモデルで、今の時刻を作らない。dependencies の時計から受け取る

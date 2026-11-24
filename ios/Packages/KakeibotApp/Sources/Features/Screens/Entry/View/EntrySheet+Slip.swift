@@ -13,8 +13,8 @@ extension EntrySheet {
             deck: deck,
             today: today,
             isMemoActive: isEditingMemo,
-            listening: voice.step == .listening ? voice : nil,
-            preview: voice.preview,
+            listening: voice.state.step == .listening ? voice : nil,
+            preview: voice.input.preview,
             growth: slipGrowth,
             onSelect: { next in
                 show(next)
@@ -33,13 +33,13 @@ extension EntrySheet {
 
 private extension EntrySheet {
     var isBlankEntry: Bool {
-        !model.isEditing && model.amount <= 0
+        !model.output.isEditing && model.output.amount <= 0
     }
 
     var quickReceipt: (() -> Void)? {
         guard
             showsReceiptButton,
-            !voice.isActive
+            !voice.output.isActive
         else {
             return nil
         }
@@ -50,7 +50,7 @@ private extension EntrySheet {
     var quickVoice: (() -> Void)? {
         guard
             showsVoiceButton,
-            !voice.isActive
+            !voice.output.isActive
         else {
             return nil
         }

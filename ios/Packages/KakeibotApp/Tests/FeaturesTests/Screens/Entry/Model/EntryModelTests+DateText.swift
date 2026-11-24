@@ -62,8 +62,8 @@ extension EntryModelTests {
     func switchesQuickDate(text: String, expected: String) async throws {
         let model = try await Self.newModel()
         let today = try #require(LocalDate("2026-10-12"))
-        model.date = try #require(LocalDate(text))
-        let quick = model.quickDate(today: today)
+        try model.state.setDate(#require(LocalDate(text)))
+        let quick = model.output.quickDate(today: today)
         #expect(quick == LocalDate(expected))
     }
 }

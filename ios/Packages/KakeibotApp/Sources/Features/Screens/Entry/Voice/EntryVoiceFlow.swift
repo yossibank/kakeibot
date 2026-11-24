@@ -5,27 +5,18 @@ import Observation
 @MainActor
 @Observable
 final class EntryVoiceFlow {
-    private(set) var isAvailable = false
-    private(set) var step: Step?
-    private(set) var transcript = EntryVoiceTranscript()
-    private(set) var preview: VoiceReading?
-    private(set) var levels = EntryVoiceFlow.quietLevels
-    private(set) var silenceStart: Date?
-    private(set) var notice: Notice?
-    private(set) var startCount = 0
-    private(set) var endCount = 0
+    let state: State
+    let input: Input
+    let output: Output
+    let dependencies: Dependencies
 
-    @ObservationIgnored private var source: (any EntryVoiceSource)?
-    @ObservationIgnored private var silenceTask: Task<Void, Never>?
-    @ObservationIgnored private var lastVoice: Date?
-    @ObservationIgnored private var noticeTask: Task<Void, Never>?
-    @ObservationIgnored private var session: Session?
-    @ObservationIgnored private var undo: EntryModel.VoiceUndo?
-    @ObservationIgnored private var isStarting = false
+    init(dependencies: Dependencies) {
+        let state = State()
+        let input = Input(silenceDuration: dependencies.silence / .seconds(1))
 
-    private let dependencies: Dependencies
-
-    init(dependencies: Dependencies = .live) {
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
         self.dependencies = dependencies
     }
 }
@@ -43,35 +34,18 @@ extension EntryVoiceFlow {
         case unheard
     }
 
-    struct Notice: Equatable, Identifiable {
-        let id = UUID()
-        let outcome: Outcome
-        let count: Int
-        let text: String
-
-        var title: String {
-            switch outcome {
-            case .applied: "声から \(count) つ入れました"
-            case .missingAmount: "金額が聞き取れませんでした"
-            case .unheard: text.isEmpty ? "聞き取れませんでした" : "入れられる項目がありませんでした"
-            }
-        }
-
-        var message: String? {
-            text.isEmpty ? nil : "「\(text)」"
-        }
-
-        var hint: String? {
-            outcome == .applied ? nil : "もう一度「声」を押して話すか、テンキーで入れてください"
-        }
-
-        var canUndo: Bool {
-            outcome == .applied
-        }
-    }
-
     struct Dependencies {
-        static var live: Dependencies {
+        var isAvailable: () async -> Bool
+        var isDenied: () -> Bool
+        var requestPermission: () async -> Bool
+        var makeSource: @MainActor () -> (any EntryVoiceSource)?
+        var prepare: @MainActor () -> Void
+        var choose: @MainActor (EntryVoiceQuestion) async -> VoiceReading.Choice?
+        var clock: ScreenClock
+        var silence: Duration
+        var noticeDuration: Duration
+
+        static func live(clock: ScreenClock) -> Dependencies {
             Dependencies(
                 isAvailable: EntryVoiceReader.isAvailable,
                 isDenied: EntryVoiceReader.isDenied,
@@ -79,34 +53,19 @@ extension EntryVoiceFlow {
                 makeSource: EntryVoiceReader.makeSource,
                 prepare: EntryVoiceReader.prepare,
                 choose: EntryVoiceReader.choose,
+                clock: clock,
                 silence: .seconds(1),
                 noticeDuration: .seconds(4)
             )
         }
-
-        var isAvailable: () async -> Bool
-        var isDenied: () -> Bool
-        var requestPermission: () async -> Bool
-        var makeSource: @MainActor () -> (any EntryVoiceSource)?
-        var prepare: @MainActor () -> Void
-        var choose: @MainActor (EntryVoiceQuestion) async -> VoiceReading.Choice?
-        var silence: Duration
-        var noticeDuration: Duration
     }
 
     static let failedMessage = "声を聞き取れませんでした。もう一度押してください"
     static let levelCount = 16
-
-    var silenceDuration: TimeInterval {
-        dependencies.silence / .seconds(1)
-    }
-
-    var isActive: Bool {
-        step != nil
-    }
+    static let quietLevels = [Double](repeating: 0, count: levelCount)
 
     func checkAvailability() async {
-        isAvailable = await dependencies.isAvailable()
+        input.isAvailable = await dependencies.isAvailable()
     }
 
     func start(
@@ -114,20 +73,20 @@ extension EntryVoiceFlow {
         today: LocalDate,
         onApplied: @escaping @MainActor () -> Void
     ) async {
-        guard step == nil, !isStarting else {
+        guard state.step == nil, !input.isStarting else {
             return
         }
 
-        isStarting = true
+        input.isStarting = true
 
         defer {
-            isStarting = false
+            input.isStarting = false
         }
 
         clearNotice()
 
         guard await dependencies.requestPermission() else {
-            step = dependencies.isDenied() ? .denied : nil
+            state.step = dependencies.isDenied() ? .denied : nil
             return
         }
 
@@ -135,31 +94,31 @@ extension EntryVoiceFlow {
             return
         }
 
-        self.source = source
-        session = Session(model: model, today: today, onApplied: onApplied)
-        transcript = EntryVoiceTranscript()
-        preview = nil
-        step = .listening
-        startCount += 1
+        input.source = source
+        input.session = Session(model: model, today: today, onApplied: onApplied)
+        input.transcript = EntryVoiceTranscript()
+        input.preview = nil
+        state.step = .listening
+        state.startCount += 1
 
         do {
-            try await source.start(hints: model.voiceHints) { [weak self] event in
+            try await source.start(hints: model.output.voiceHints) { [weak self] event in
                 self?.receive(event)
             }
         } catch {
             await source.cancel()
 
-            guard self.source === source else {
+            guard input.source === source else {
                 return
             }
 
             reset()
-            endCount += 1
-            model.errorNotice.show(Self.failedMessage)
+            state.endCount += 1
+            model.state.errorNotice.show(Self.failedMessage)
             return
         }
 
-        guard self.source === source, step == .listening else {
+        guard input.source === source, state.step == .listening else {
             await source.cancel()
             return
         }
@@ -168,42 +127,43 @@ extension EntryVoiceFlow {
     }
 
     func finish() async {
-        guard step == .listening, let source, let session else {
+        guard state.step == .listening, let source = input.source,
+              let session = input.session else {
             return
         }
 
-        silenceTask?.cancel()
-        silenceStart = nil
-        levels = Self.quietLevels
-        step = .reading
-        endCount += 1
+        input.silenceTask?.cancel()
+        state.silenceStart = nil
+        input.levels = Self.quietLevels
+        state.step = .reading
+        state.endCount += 1
 
         await source.finish()
 
-        await read(transcript, in: session)
+        await read(input.transcript, in: session)
         reset()
     }
 
     func cancel() async {
-        guard let source else {
-            step = nil
+        guard let source = input.source else {
+            state.step = nil
             return
         }
 
-        silenceTask?.cancel()
-        endCount += 1
+        input.silenceTask?.cancel()
+        state.endCount += 1
         await source.cancel()
         reset()
     }
 
     func closeDenied() {
-        if step == .denied {
-            step = nil
+        if state.step == .denied {
+            state.step = nil
         }
     }
 
     func undoLast(in model: EntryModel) {
-        if let undo {
+        if let undo = state.undo {
             model.undo(undo)
         }
 
@@ -211,20 +171,12 @@ extension EntryVoiceFlow {
     }
 
     func clearNotice() {
-        noticeTask?.cancel()
-        notice = nil
-        undo = nil
+        input.noticeTask?.cancel()
+        state.clearNotice()
     }
 }
 
 private extension EntryVoiceFlow {
-    struct Session {
-        let model: EntryModel
-        let today: LocalDate
-        let onApplied: @MainActor () -> Void
-    }
-
-    static let quietLevels = [Double](repeating: 0, count: levelCount)
     static let voiceLevel = 0.2
 
     static func spokenText(
@@ -235,7 +187,7 @@ private extension EntryVoiceFlow {
         let candidates = [primary] + transcript.alternatives
 
         let withAmount = candidates.first { candidate in
-            session.model.voiceReading(from: candidate, today: session.today, choice: nil)
+            session.model.output.voiceReading(from: candidate, today: session.today, choice: nil)
                 .amount != nil
         }
 
@@ -243,60 +195,60 @@ private extension EntryVoiceFlow {
     }
 
     func receive(_ event: EntryVoiceEvent) {
-        if step == .reading, case let .transcript(transcript) = event {
-            self.transcript = transcript
+        if state.step == .reading, case let .transcript(transcript) = event {
+            input.transcript = transcript
             return
         }
 
-        guard step == .listening else {
+        guard state.step == .listening else {
             return
         }
 
         switch event {
         case let .transcript(transcript):
-            self.transcript = transcript
+            input.transcript = transcript
 
-            if let session {
-                preview = session.model.voiceReading(
+            if let session = input.session {
+                input.preview = session.model.output.voiceReading(
                     from: transcript.text,
                     today: session.today,
                     choice: nil
                 )
             }
 
-            if !transcript.isEmpty, lastVoice == nil {
+            if !transcript.isEmpty, input.lastVoice == nil {
                 waitForSilence()
             }
 
         case let .level(level):
-            levels = [level] + levels.dropLast()
+            input.levels = [level] + input.levels.dropLast()
             follow(level)
         }
     }
 
     func follow(_ level: Double) {
         guard level < Self.voiceLevel else {
-            lastVoice = Date()
-            silenceTask?.cancel()
-            silenceTask = nil
-            silenceStart = nil
+            input.lastVoice = dependencies.clock.now
+            input.silenceTask?.cancel()
+            input.silenceTask = nil
+            state.silenceStart = nil
             return
         }
 
-        if lastVoice != nil {
+        if input.lastVoice != nil {
             waitForSilence()
         }
     }
 
     func waitForSilence() {
-        guard silenceTask == nil else {
+        guard input.silenceTask == nil else {
             return
         }
 
         let silence = dependencies.silence
-        silenceStart = Date()
+        state.silenceStart = dependencies.clock.now
 
-        silenceTask = Task { [weak self] in
+        input.silenceTask = Task { [weak self] in
             try? await Task.sleep(for: silence)
 
             guard !Task.isCancelled else {
@@ -321,13 +273,13 @@ private extension EntryVoiceFlow {
 
         let question = EntryVoiceQuestion(
             text: text,
-            categories: model.categories.map(\.name),
-            wallets: model.wallets.map(\.name),
-            examples: model.voiceExamples(for: text)
+            categories: model.output.categories.map(\.name),
+            wallets: model.output.wallets.map(\.name),
+            examples: model.output.voiceExamples(for: text)
         )
 
         let choice = await dependencies.choose(question)
-        let reading = model.voiceReading(from: text, today: session.today, choice: choice)
+        let reading = model.output.voiceReading(from: text, today: session.today, choice: choice)
 
         guard !reading.isEmpty else {
             show(Notice(outcome: .unheard, count: 0, text: text))
@@ -341,39 +293,40 @@ private extension EntryVoiceFlow {
             return
         }
 
-        show(Notice(outcome: .applied, count: reading.count, text: text))
-        self.undo = undo
+        show(Notice(outcome: .applied, count: reading.count, text: text), undo: undo)
         session.onApplied()
     }
 
-    func show(_ notice: Notice) {
-        noticeTask?.cancel()
-        self.notice = notice
+    func show(
+        _ notice: Notice,
+        undo: EntryModel.VoiceUndo? = nil
+    ) {
+        input.noticeTask?.cancel()
+        state.show(notice, undo: undo)
 
         let duration = dependencies.noticeDuration
         let id = notice.id
 
-        noticeTask = Task { [weak self] in
+        input.noticeTask = Task { [weak self] in
             try? await Task.sleep(for: duration)
 
-            guard !Task.isCancelled, self?.notice?.id == id else {
+            guard !Task.isCancelled, self?.state.notice?.id == id else {
                 return
             }
 
-            self?.notice = nil
-            self?.undo = nil
+            self?.state.clearNotice()
         }
     }
 
     func reset() {
-        silenceTask?.cancel()
-        silenceTask = nil
-        silenceStart = nil
-        lastVoice = nil
-        levels = Self.quietLevels
-        source = nil
-        session = nil
-        step = nil
-        preview = nil
+        input.silenceTask?.cancel()
+        input.silenceTask = nil
+        state.silenceStart = nil
+        input.lastVoice = nil
+        input.levels = Self.quietLevels
+        input.source = nil
+        input.session = nil
+        state.step = nil
+        input.preview = nil
     }
 }

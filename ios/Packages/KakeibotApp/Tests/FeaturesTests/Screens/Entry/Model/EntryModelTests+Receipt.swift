@@ -8,9 +8,9 @@ extension EntryModelTests {
     @Test
     func appliesReceiptReading() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        let categoryId = model.categoryId
+        let categoryId = model.state.category.id
         let date = try #require(LocalDate("2026-10-03"))
 
         await model.apply(
@@ -25,18 +25,18 @@ extension EntryModelTests {
             )
         )
 
-        #expect(model.amount == 911)
-        #expect(model.date == date)
-        #expect(model.store == "スーパー青葉")
-        #expect(model.items.map(\.name) == ["牛乳", "食パン"])
-        #expect(model.categoryId == categoryId)
-        #expect(model.hasItemAdjustment)
+        #expect(model.output.amount == 911)
+        #expect(model.state.payment.date == date)
+        #expect(model.state.store == "スーパー青葉")
+        #expect(model.state.items.list.map(\.name) == ["牛乳", "食パン"])
+        #expect(model.state.category.id == categoryId)
+        #expect(model.output.hasItemAdjustment)
     }
 
     @Test
     func appliesIncludedTaxFromReceipt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         await model.apply(
@@ -50,36 +50,36 @@ extension EntryModelTests {
             )
         )
 
-        #expect(model.taxIncluded)
-        #expect(model.itemTotal == 3170)
-        #expect(!model.hasItemAdjustment)
+        #expect(model.state.items.taxIncluded)
+        #expect(model.output.itemTotal == 3170)
+        #expect(!model.output.hasItemAdjustment)
 
-        model.setTaxIncluded(false)
+        model.state.setTaxIncluded(false)
 
-        #expect(model.itemTotal == 3423)
-        #expect(model.amount == 3423)
+        #expect(model.output.itemTotal == 3423)
+        #expect(model.output.amount == 3423)
     }
 
     @Test
     func keepsUnreadValuesFromReceipt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.memo = "店名\n2 行目"
-        model.press(.digit(5))
+        model.state.memo = "店名\n2 行目"
+        model.state.press(.digit(5))
 
         await model.apply(ReceiptReading(total: 0))
 
-        #expect(model.amount == 5)
-        #expect(model.date == setup.date)
-        #expect(model.memo == "店名\n2 行目")
-        #expect(model.items.isEmpty)
+        #expect(model.output.amount == 5)
+        #expect(model.state.payment.date == setup.date)
+        #expect(model.state.memo == "店名\n2 行目")
+        #expect(model.state.items.list.isEmpty)
     }
 
     @Test
     func followsItemTotalWhenReceiptTotalIsUnread() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         await model.apply(
@@ -91,23 +91,23 @@ extension EntryModelTests {
             )
         )
 
-        #expect(model.amount == 616)
-        #expect(!model.hasItemAdjustment)
+        #expect(model.output.amount == 616)
+        #expect(!model.output.hasItemAdjustment)
     }
 
     @Test
     func marksSuspectItemsOnlyForReadItems() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        model.press(.digit(6))
-        model.press(.digit(1))
-        model.press(.digit(6))
-        model.addItem(name: "牛乳", amount: 396)
-        model.addItem(name: "食パン", amount: 220)
-        model.addItem(name: "食パン", amount: 220)
-        let typed = model.suspectItemIndices
+        model.state.press(.digit(6))
+        model.state.press(.digit(1))
+        model.state.press(.digit(6))
+        model.state.addItem(name: "牛乳", amount: 396)
+        model.state.addItem(name: "食パン", amount: 220)
+        model.state.addItem(name: "食パン", amount: 220)
+        let typed = model.output.suspectItemIndices
 
         await model.apply(
             ReceiptReading(
@@ -121,23 +121,23 @@ extension EntryModelTests {
         )
 
         #expect(typed.isEmpty)
-        #expect(model.suspectItemIndices == [1, 2])
+        #expect(model.output.suspectItemIndices == [1, 2])
     }
 
     @Test
     func countsFreeReceiptsLeft() async throws {
         let setup = try await Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: 2)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        #expect(model.freeReceiptsLeft == 1)
+        #expect(model.output.freeReceiptsLeft == 1)
     }
 
     @Test
     func remembersNamesUnderReadStore() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         await model.apply(
@@ -147,8 +147,8 @@ extension EntryModelTests {
                 items: [EntryItem.Draft(name: "ギユウニユウ", amount: 396)]
             )
         )
-        model.store = "セブン"
-        model.updateItem(at: 0, name: "牛乳", amount: 396)
+        model.state.store = "セブン"
+        model.state.updateItem(at: 0, name: "牛乳", amount: 396)
         _ = await model.save()
         let read = try await setup.database.itemNames(at: "セブン新宿店")
         let edited = try await setup.database.itemNames(at: "セブン")
@@ -160,7 +160,7 @@ extension EntryModelTests {
     @Test
     func forgetsEarlierNamesWhenOnlyTotalIsRead() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         await model.apply(
@@ -169,7 +169,7 @@ extension EntryModelTests {
                 items: [EntryItem.Draft(name: "ギユウニユウ", amount: 396)]
             )
         )
-        model.updateItem(at: 0, name: "牛乳", amount: 396)
+        model.state.updateItem(at: 0, name: "牛乳", amount: 396)
         await model.apply(ReceiptReading(store: "ドラッグ若葉", total: 500))
         _ = await model.save()
         let first = try await setup.database.itemNames(at: "スーパー青葉")
@@ -177,15 +177,15 @@ extension EntryModelTests {
 
         #expect(first.isEmpty)
         #expect(second.isEmpty)
-        #expect(model.items.allSatisfy { $0.readName == nil })
+        #expect(model.state.items.list.allSatisfy { $0.readName == nil })
     }
 
     @Test
     func reportsAmountOnlyWhenReceiptSetsIt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
-        model.press(.digit(5))
+        model.state.press(.digit(5))
 
         let storeOnly = await model.apply(ReceiptReading(store: "スーパー青葉"))
         let total = await model.apply(ReceiptReading(total: 911))
@@ -197,7 +197,7 @@ extension EntryModelTests {
     @Test
     func skipsCountWhenSavedAsTransfer() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         await model.apply(ReceiptReading(total: 911))
@@ -211,10 +211,10 @@ extension EntryModelTests {
     @Test
     func countsOnlySavesFromReceipt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        model.press(.digit(5))
+        model.state.press(.digit(5))
         _ = await model.save()
         await model.startNext()
         let manual = try await setup.database.setting(.receiptSavedCount)
@@ -226,25 +226,25 @@ extension EntryModelTests {
 
         #expect(manual == 0)
         #expect(read == 1)
-        #expect(model.receiptSavedCount == 1)
-        #expect(model.showsReceiptGuide)
+        #expect(model.input.receiptSavedCount == 1)
+        #expect(model.output.showsReceiptGuide)
     }
 
     @Test
     func limitsFreeReceiptSaves() async throws {
         let setup = try await Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: EntryModel.freeReceiptLimit)
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
-        #expect(!model.canReadReceipt(isPro: false))
-        #expect(model.canReadReceipt(isPro: true))
+        #expect(!model.output.canReadReceipt(isPro: false))
+        #expect(model.output.canReadReceipt(isPro: true))
     }
 
     @Test
     func remembersCorrectedItemNamesByStore() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
         let reading = ReceiptReading(
             store: "スーパー青葉",
@@ -256,20 +256,20 @@ extension EntryModelTests {
         )
 
         await model.apply(reading)
-        model.updateItem(at: 0, name: "牛乳", amount: 396)
+        model.state.updateItem(at: 0, name: "牛乳", amount: 396)
         _ = await model.save()
         await model.startNext()
         let names = try await setup.database.itemNames(at: "スーパー青葉")
         await model.apply(reading)
 
         #expect(names == ["ギユウニユウ": "牛乳"])
-        #expect(model.items.map(\.name) == ["牛乳", "食パン"])
+        #expect(model.state.items.list.map(\.name) == ["牛乳", "食パン"])
     }
 
     @Test
     func forgetsNameRestoredToTheReadText() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
         let reading = ReceiptReading(
             store: "スーパー青葉",
@@ -278,24 +278,24 @@ extension EntryModelTests {
         )
 
         await model.apply(reading)
-        model.updateItem(at: 0, name: "低脂肪乳", amount: 396)
+        model.state.updateItem(at: 0, name: "低脂肪乳", amount: 396)
         _ = await model.save()
         await model.startNext()
         await model.apply(reading)
-        model.updateItem(at: 0, name: "ギユウニユウ", amount: 396)
+        model.state.updateItem(at: 0, name: "ギユウニユウ", amount: 396)
         _ = await model.save()
         await model.startNext()
         let names = try await setup.database.itemNames(at: "スーパー青葉")
         await model.apply(reading)
 
         #expect(names.isEmpty)
-        #expect(model.items.map(\.name) == ["ギユウニユウ"])
+        #expect(model.state.items.list.map(\.name) == ["ギユウニユウ"])
     }
 
     @Test
     func keepsItemSourcesAlignedWithItems() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date)
+        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
         await model.load()
 
         await model.apply(
@@ -307,11 +307,11 @@ extension EntryModelTests {
                 ]
             )
         )
-        let removed = try #require(model.removeItem(at: 0))
-        model.addItem(name: "卵", amount: 258)
-        model.restoreItem(removed)
-        model.updateItem(at: 0, name: "牛乳", amount: 396)
-        model.updateItem(at: 2, name: "たまご", amount: 258)
+        let removed = try #require(model.state.removeItem(at: 0))
+        model.state.addItem(name: "卵", amount: 258)
+        model.state.restoreItem(removed)
+        model.state.updateItem(at: 0, name: "牛乳", amount: 396)
+        model.state.updateItem(at: 2, name: "たまご", amount: 258)
         _ = await model.save()
         let names = try await setup.database.itemNames(at: "スーパー青葉")
 

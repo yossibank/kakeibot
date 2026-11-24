@@ -20,7 +20,7 @@ public struct EntrySheet: View {
     @State var deletion: Deletion?
     @State var hiddenCategory: EntryModel.HiddenCategory?
     @State var receipt = EntryReceiptFlow()
-    @State var voice = EntryVoiceFlow()
+    @State var voice: EntryVoiceFlow
 
     @Environment(\.themeStyle.corner) var corner
     @Environment(\.isPro) var isPro
@@ -43,8 +43,9 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
-        _deck = State(initialValue: EntryDeck.start(for: model.type))
-        _notice = State(initialValue: EntryNoticeModel(database: model.database))
+        _deck = State(initialValue: EntryDeck.start(for: model.state.type))
+        _notice = State(initialValue: model.newNoticeModel())
+        _voice = State(initialValue: model.newVoiceFlow())
 
         self.onChange = onChange
         self.startsReceipt = startsReceipt
@@ -87,18 +88,18 @@ public struct EntrySheet: View {
             ) { _, menu in
                 menu != nil
             }
-            .onChange(of: voice.isActive) {
-                if voice.isActive {
+            .onChange(of: voice.output.isActive) {
+                if voice.output.isActive {
                     show(.amount)
                 }
             }
-            .haptic(.impact(weight: .light), trigger: voice.startCount)
-            .haptic(.impact(weight: .light), trigger: voice.endCount)
+            .haptic(.impact(weight: .light), trigger: voice.state.startCount)
+            .haptic(.impact(weight: .light), trigger: voice.state.endCount)
             .errorBanner(
-                model.errorNotice,
+                model.state.errorNotice,
                 bottom: bannerBottom
             ) {
-                model.errorNotice.clear()
+                model.state.errorNotice.clear()
             }
             .deletionNotice($deletion, bottom: bannerBottom) { deletion in
                 Task {
@@ -124,7 +125,7 @@ public struct EntrySheet: View {
                     }
                 }
             }
-            .proOffer(receipt.offer, presentsInSheet: true) {
+            .proOffer(receipt.state.offer, presentsInSheet: true) {
                 receipt.closeOffer()
             } onUnlock: {
                 receipt.closeOffer()
@@ -159,6 +160,7 @@ public struct EntrySheet: View {
             .task {
                 await voice.checkAvailability()
             }
+            .modifier(EntryTodayFollower(model: model))
             .onDisappear {
                 Task {
                     await voice.cancel()
@@ -172,7 +174,7 @@ extension EntrySheet {
     var saveButtons: some View {
         EntryLiveSlot {
             HStack(spacing: 8) {
-                PrimaryButton(model.saveTitle) {
+                PrimaryButton(model.output.saveTitle) {
                     guard !opensKeypadOnSave else {
                         show(.amount)
                         return
@@ -182,9 +184,9 @@ extension EntrySheet {
                         await save()
                     }
                 }
-                .disabled(!model.canSave && !opensKeypadOnSave)
+                .disabled(!model.output.canSave && !opensKeypadOnSave)
 
-                if model.isEditing {
+                if model.output.isEditing {
                     sideButton(
                         "もう一度",
                         systemImage: "doc.on.doc",
@@ -198,7 +200,7 @@ extension EntrySheet {
                     sideButton(
                         "続けて",
                         systemImage: "plus.square.on.square",
-                        isEnabled: model.canSave
+                        isEnabled: model.output.canSave
                     ) {
                         Task {
                             await saveAndContinue()
@@ -220,7 +222,7 @@ extension EntrySheet {
     }
 
     func close() {
-        if model.isChanged {
+        if model.output.isChanged {
             isConfirmingDiscard = true
         } else {
             dismiss()
@@ -232,7 +234,7 @@ extension EntrySheet {
             return
         }
 
-        model.isClosing = true
+        model.state.isClosing = true
         onChange(change)
         dismiss()
     }
@@ -250,7 +252,7 @@ extension EntrySheet {
     }
 
     var today: LocalDate {
-        LocalDate(Date(), in: .current)
+        model.state.today
     }
 
     init(
@@ -348,14 +350,14 @@ private extension EntrySheet {
     }
 
     var opensKeypadOnSave: Bool {
-        deck != .amount && !model.isEditing && model.amount <= 0
+        deck != .amount && !model.output.isEditing && model.output.amount <= 0
     }
 
     func load() async {
-        if !model.isLoaded {
+        if !model.output.isLoaded {
             await model.load()
 
-            deck = EntryDeck.start(for: model.type)
+            deck = EntryDeck.start(for: model.state.type)
         }
 
         showSelectedCategory()
@@ -366,7 +368,7 @@ private extension EntrySheet {
             return
         }
 
-        model.isClosing = true
+        model.state.isClosing = true
         onChange(change)
         dismiss()
     }
@@ -378,7 +380,7 @@ private extension EntrySheet {
 
         await model.startNext()
         notice.show(change)
-        show(EntryDeck.start(for: model.type))
+        show(EntryDeck.start(for: model.state.type))
     }
 }
 
@@ -389,6 +391,6 @@ private extension EntrySheet {
     if let database {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
 
-        EntrySheet(model: EntryModel(database: database, date: today))
+        EntrySheet(model: EntryModel(database: database, clock: .system, date: today))
     }
 }

@@ -8,21 +8,26 @@ extension EntryModelTransferTests {
     @Test
     func savesFeeTypedOnKeypad() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.press(.digit(5))
-        model.press(.doubleZero)
-        model.press(.digit(0))
-        model.enter(.fee)
-        model.press(.digit(1))
-        model.press(.digit(1))
-        model.press(.digit(0))
+        model.state.press(.digit(5))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
+        model.state.enter(.fee)
+        model.state.press(.digit(1))
+        model.state.press(.digit(1))
+        model.state.press(.digit(0))
 
         let saved = await model.save()
         let fee = try #require(saved?.fee)
 
-        #expect(model.amount == 5000)
+        #expect(model.output.amount == 5000)
         #expect(fee.amount == 110)
         #expect(fee.walletId == setup.cash)
         #expect(fee.transferId == saved?.entry.id)
@@ -43,11 +48,16 @@ extension EntryModelTransferTests {
         )
 
         try await setup.database.saveEntry(draft, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
 
-        #expect(model.feeChoices == [165, 110, 220, 330])
+        #expect(model.output.feeChoices == [165, 110, 220, 330])
     }
 
     @Test
@@ -64,15 +74,20 @@ extension EntryModelTransferTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-        let model = EntryModel(database: setup.database, date: setup.date, type: .transfer)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            date: setup.date,
+            type: .transfer
+        )
 
         await model.load()
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.digit(0))
-        model.setFee(110)
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
+        model.state.setFee(110)
 
-        #expect(model.isOverSourceBalance)
+        #expect(model.output.isOverSourceBalance)
     }
 
     @Test
@@ -91,15 +106,23 @@ extension EntryModelTransferTests {
 
         let transfer = try await setup.database.saveEntry(draft, at: Date())
         let fee = try #require(try await setup.database.fee(of: transfer.id))
-        let model = EntryModel(database: setup.database, editing: fee.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: fee.id,
+            date: setup.date
+        )
 
         await model.load()
-        let after = model.wallet(setup.bank).flatMap { model.afterLine(of: $0, isSource: true) }
-        model.setFee(330)
+        let after = model.output.wallet(setup.bank).flatMap { model.output.afterLine(
+            of: $0,
+            isSource: true
+        ) }
+        model.state.setFee(330)
         let saved = await model.save()
 
-        #expect(model.type == .transfer)
-        #expect(model.amount == 10000)
+        #expect(model.state.type == .transfer)
+        #expect(model.output.amount == 10000)
         #expect(saved?.entry.id == transfer.id)
         #expect(saved?.fee?.id == fee.id)
         #expect(saved?.fee?.amount == 330)
@@ -121,7 +144,12 @@ extension EntryModelTransferTests {
         )
 
         let transfer = try await setup.database.saveEntry(draft, at: Date())
-        let model = EntryModel(database: setup.database, editing: transfer.id, date: setup.date)
+        let model = EntryModel(
+            database: setup.database,
+            clock: .system,
+            editing: transfer.id,
+            date: setup.date
+        )
         await model.load()
 
         await model.recordAgain()
