@@ -51,11 +51,8 @@ extension EntrySheet {
 
         case .categories:
             NavigationStack {
-                CategoryListView(
-                    database: model.dependencies.database,
-                    kind: model.state.type == .income ? .income : .expense
-                )
-                .toolbar(.hidden, for: .navigationBar)
+                SettingsBoardPage(model.categoryBoard())
+                    .toolbar(.hidden, for: .navigationBar)
             }
         }
     }

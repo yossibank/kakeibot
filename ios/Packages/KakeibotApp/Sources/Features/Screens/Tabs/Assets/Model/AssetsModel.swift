@@ -68,6 +68,14 @@ public extension AssetsModel {
         refreshLater()
     }
 
+    func newWalletModel(kind: Wallet.Kind) -> WalletEditModel {
+        WalletEditModel(
+            database: dependencies.database,
+            clock: dependencies.clock,
+            kind: kind
+        )
+    }
+
     func adjustModel(for row: WalletRow) -> AssetsAdjustmentModel {
         AssetsAdjustmentModel(
             database: dependencies.database,

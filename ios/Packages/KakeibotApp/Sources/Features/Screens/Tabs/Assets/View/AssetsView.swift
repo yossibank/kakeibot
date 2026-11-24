@@ -77,13 +77,7 @@ public struct AssetsView: View {
             AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: nil))
         }
         .sheet(isPresented: $isAddingWallet) {
-            WalletEditSheet(
-                model: WalletEditModel(
-                    database: model.dependencies.database,
-                    clock: .system,
-                    kind: addingKind
-                )
-            )
+            WalletEditSheet(model: model.newWalletModel(kind: addingKind))
         }
         .sheet(item: $adjusting) { row in
             AssetsAdjustmentSheet(model: model.adjustModel(for: row))
