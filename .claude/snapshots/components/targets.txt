@@ -1,4 +1,5 @@
 DesignSystem
+FeatureModels
 Features
 Core:KakeibotKit
 Store:KakeibotKit

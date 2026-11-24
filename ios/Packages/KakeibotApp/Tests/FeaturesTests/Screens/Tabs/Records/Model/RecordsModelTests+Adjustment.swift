@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import Features
 import Foundation
 import Store

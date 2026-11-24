@@ -1,4 +1,5 @@
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 public struct SetupList: View {

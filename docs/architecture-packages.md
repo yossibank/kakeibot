@@ -6,11 +6,12 @@
 
 ## 📦 パッケージ
 
-2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。
+2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。画面のモデルは、`Features` から `FeatureModels` に分けている。
 
-依存の向きは、共通の形に次の 2 本を足したものである。
+依存の向きは、共通の形に次の 3 本を足したものである。
 
 - `AppFeature --> Sync --> Store`
+- `AppFeature・Features --> FeatureModels`
 - `AppFeatureTests・FeaturesTests --> TestSupport`
 
 テストのターゲットを除いた依存は、次の図のとおりである。
@@ -19,6 +20,9 @@
 flowchart TD
     subgraph app["KakeibotApp"]
         AppFeature --> Features
+        AppFeature --> FeatureModels
+        Features --> FeatureModels
+        FeatureModels --> DesignSystem
         AppFeature --> Notifications
         AppFeature --> Sync
         AppFeature --> DesignSystem
@@ -32,10 +36,12 @@ flowchart TD
     AppFeature --> Store
     AppWidget --> Store
     Features --> Store
+    FeatureModels --> Store
     Sync --> Store
     AppFeature --> Core
     AppWidget --> Core
     Features --> Core
+    FeatureModels --> Core
     Notifications --> Core
     DesignSystem --> Core
     Store --> GRDB
@@ -140,6 +146,9 @@ KakeibotApp/
 │   ├── DesignSystem/
 │   │   ├── Components/
 │   │   └── Theme/
+│   ├── FeatureModels/
+│   │   ├── Screens/
+│   │   └── Shared/
 │   ├── Features/
 │   │   ├── Screens/
 │   │   │   ├── Entry/
@@ -153,7 +162,6 @@ KakeibotApp/
 │   │       ├── DateChoice/
 │   │       ├── EntryList/
 │   │       ├── FeatureArt/
-│   │       ├── Model/
 │   │       ├── Notice/
 │   │       ├── Notification/
 │   │       ├── Period/
@@ -178,6 +186,7 @@ KakeibotApp/
 | `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `AppWidget/Shared/` | ウィジェットをまたいで使う読み出し・書体・テーマ・タイムライン |
 | `AppWidget/Widgets/` | ウィジェットごとのフォルダ。コントロールの「記録する」は `EntryControl/` |
+| `FeatureModels/` | 画面のモデルと、モデルが使う値の型・文言・読み取り。フォルダは `Features/` と同じ形にする |
 | `Features/Screens/Entry/` | 記録の入力シート |
 | `Features/Screens/Entry/Receipt/` | レシートを VisionKit で撮り、Vision と Foundation Models で読む |
 | `Features/Screens/Entry/Voice/` | 声を SpeechAnalyzer で聞き、Foundation Models でカテゴリと口座を選ぶ |
@@ -190,7 +199,7 @@ KakeibotApp/
 | `Features/Shared/DateChoice/` | 月の始まりの日・休日のずらし・曜日を選ぶ部品と、その表示の名前 |
 | `Features/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
-| `Features/Shared/Model/` | 画面のモデルの見張り（失敗で見張り直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、`ScreenClock`、値を覚える `Derived`・`DerivedTable` も置く |
+| `FeatureModels/Shared/Model/` | 画面のモデルの見張り（失敗で見張り直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、`ScreenClock`、値を覚える `Derived`・`DerivedTable` も置く |
 | `Features/Shared/Notice/` | 記録・削除の知らせと取り消し、保存の失敗が空き容量不足かの見分け。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可の窓口と、許可が無いときの帯 |
 | `Features/Shared/Period/` | 期間の範囲と月の始まり、期間を送る行と今に戻るボタン |

@@ -1,5 +1,6 @@
 import Core
 import CoreGraphics
+import FeatureModels
 import Store
 import SwiftUI
 

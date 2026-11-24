@@ -1,4 +1,5 @@
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import Testing

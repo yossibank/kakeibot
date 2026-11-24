@@ -1,4 +1,5 @@
 import CloudKit
+import FeatureModels
 import Features
 
 extension SyncParticipant {
