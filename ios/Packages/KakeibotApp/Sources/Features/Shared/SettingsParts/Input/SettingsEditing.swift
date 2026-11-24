@@ -1,5 +1,4 @@
 import Core
-import Store
 
 @MainActor
 protocol SettingsEditing: AnyObject {

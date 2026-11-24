@@ -1,7 +1,6 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct SettingsMenuSheet: View {
@@ -38,7 +37,7 @@ public struct SettingsMenuSheet: View {
 
         _model = State(initialValue: model)
         _weekStart = State(initialValue: model.weekStartModel())
-        _recordReset = State(initialValue: model.resetModel())
+        _recordReset = State(initialValue: SettingsMenuResetModel(parts: parts))
 
         self.parts = parts
         self.today = today

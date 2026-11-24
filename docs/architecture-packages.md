@@ -16,6 +16,10 @@ Android も同じ分け方で、画面のモデルを `:featuremodels` に置く
 - `AppFeature・Features --> FeatureModels`
 - `AppFeatureTests・FeaturesTests --> TestSupport`
 
+`Features` は `Store` に依存しない。DB は `ScreenParts` に包んで受け取り、`FeatureModels` のモデルだけが開く。
+
+`Features` には `MemberImportVisibility` を付ける。import していないモジュールの関数は呼べない。`import Store` を書いていないことは、`make verify` が確かめる。
+
 テストのターゲットを除いた依存は、次の図のとおりである。
 
 ```mermaid
@@ -37,7 +41,6 @@ flowchart TD
     end
     AppFeature --> Store
     AppWidget --> Store
-    Features --> Store
     FeatureModels --> Store
     Sync --> Store
     AppFeature --> Core

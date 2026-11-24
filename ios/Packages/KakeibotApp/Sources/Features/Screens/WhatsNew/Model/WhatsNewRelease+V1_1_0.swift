@@ -1,3 +1,5 @@
+import FeatureModels
+
 extension WhatsNewRelease {
     static let v1_1_0 = WhatsNewRelease(
         version: "1.1.0",

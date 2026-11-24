@@ -55,8 +55,10 @@ let package = Package(
             dependencies: [
                 "DesignSystem",
                 "FeatureModels",
-                .product(name: "Core", package: "KakeibotKit"),
-                .product(name: "Store", package: "KakeibotKit")
+                .product(name: "Core", package: "KakeibotKit")
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(

@@ -1,6 +1,6 @@
 import Core
 import DesignSystem
-import Store
+import FeatureModels
 import SwiftUI
 
 struct SettingsMenuSyncRow: View {

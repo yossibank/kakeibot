@@ -84,10 +84,6 @@ public extension SettingsMenuModel {
         SettingsMenuValueModel(parts: dependencies, key: .weekStart)
     }
 
-    func resetModel() -> SettingsMenuResetModel {
-        SettingsMenuResetModel(parts: dependencies)
-    }
-
     func backupText() -> String? {
         guard !input.syncStatus.isEnabled else {
             return nil

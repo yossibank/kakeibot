@@ -1,5 +1,6 @@
 #if DEBUG
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 extension SettingsMenuSheet {

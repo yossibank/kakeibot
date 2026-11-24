@@ -1,5 +1,5 @@
 import Core
-import Store
+import DesignSystem
 import SwiftUI
 
 @MainActor

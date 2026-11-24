@@ -1,6 +1,5 @@
 import Core
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct WalletListView: View {

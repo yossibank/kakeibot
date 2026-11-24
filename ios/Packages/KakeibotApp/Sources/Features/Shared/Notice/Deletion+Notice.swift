@@ -1,6 +1,5 @@
 import Core
 import DesignSystem
-import Store
 import SwiftUI
 
 public extension View {
