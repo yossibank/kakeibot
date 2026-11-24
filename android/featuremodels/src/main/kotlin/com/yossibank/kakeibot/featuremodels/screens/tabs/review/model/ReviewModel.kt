@@ -212,7 +212,10 @@ class ReviewModel(
 
         ModelTask.quiet {
             input.scale = database.setting(SettingKey.reviewScale)
-            input.kind = database.setting(SettingKey.reviewKind)
+            input.kind = when (val kind = database.setting(SettingKey.reviewKind)) {
+                ReviewKind.balance -> ReviewKind.expense
+                else -> kind
+            }
         }
     }
 

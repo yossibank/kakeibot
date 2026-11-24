@@ -187,6 +187,19 @@ class ReviewModelTest {
     }
 
     @Test
+    fun startsWithExpenseWhenBalanceWasSaved() = modelTest(today = "2026-10-17") { setup ->
+        setup.database.setSetting(
+            key = SettingKey.reviewKind,
+            to = ReviewKind.balance,
+        )
+        val model = setup.reviewModel()
+
+        model.loadSelection()
+
+        assertEquals(ReviewKind.expense, model.input.kind)
+    }
+
+    @Test
     fun keepsSelectionOnlyAfterSaving() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.reviewModel()
 
