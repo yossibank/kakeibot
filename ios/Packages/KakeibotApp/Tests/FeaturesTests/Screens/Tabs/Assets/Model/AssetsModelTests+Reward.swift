@@ -15,15 +15,15 @@ extension AssetsModelTests {
         try await setup.achieve(rule, on: "2026-10-02")
 
         let model = try await setup.runningModel()
-        let history = model.rewardHistory
+        let history = model.output.rewardHistory
 
         #expect(history.map(\.month) == [
             YearMonth(year: 2026, month: 10),
             YearMonth(year: 2026, month: 9)
         ])
         #expect(history.map(\.logs.count) == [2, 1])
-        #expect(model.rewardBalance == 1500)
-        #expect(model.recentRewards.count == 3)
+        #expect(model.output.rewardBalance == 1500)
+        #expect(model.output.recentRewards.count == 3)
     }
 
     @Test
@@ -34,11 +34,11 @@ extension AssetsModelTests {
         try await setup.saveGoal(target: 1000)
 
         let model = try await setup.runningModel()
-        let goal = try #require(model.rewardGoal)
+        let goal = try #require(model.output.rewardGoal)
 
-        #expect(model.remaining(to: goal) == 0)
-        #expect(model.percent(to: goal) == 100)
-        #expect(model.isRewardGoalReached)
+        #expect(model.output.remaining(to: goal) == 0)
+        #expect(model.output.percent(to: goal) == 100)
+        #expect(model.output.isRewardGoalReached)
     }
 
     @Test
@@ -47,27 +47,27 @@ extension AssetsModelTests {
         let rule = try await setup.saveRule(amount: 1000)
         try await setup.achieve(rule, on: "2026-10-01")
         let goal = try await setup.saveGoal(target: 1000)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         try await setup.database.failWrites(to: "reward_goal")
 
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
 
         #expect(isSaved == false)
-        #expect(model.errorNotice.message == "目標を保存できませんでした")
+        #expect(model.state.errorNotice.message == "目標を保存できませんでした")
     }
 
     @Test
     func refusesPurchaseShortOfBalance() async throws {
         let setup = try await Setup()
         let goal = try await setup.saveGoal(target: 1000)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
 
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
         let bank = try await setup.database.rewardBank()
         let saved = try #require(bank.goals.first { $0.id == goal.id })
 
         #expect(isSaved == false)
-        #expect(model.errorNotice.message == "目標を保存できませんでした")
+        #expect(model.state.errorNotice.message == "目標を保存できませんでした")
         #expect(saved.purchasedAt == nil)
         #expect(bank.waitingGoals.map(\.id) == [goal.id])
     }
@@ -79,11 +79,11 @@ extension AssetsModelTests {
         let overpaid = try await setup.saveLoan("車", balance: -50000)
         try await setup.save(.transfer, 60000, on: "2026-10-10", from: setup.bank, to: overpaid)
 
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        let freshRow = try #require(model.rows.first { $0.wallet.id == fresh })
-        let overpaidRow = try #require(model.rows.first { $0.wallet.id == overpaid })
-        let cashRow = try #require(model.rows.first { $0.wallet.id == setup.cash })
+        let freshRow = try #require(model.output.rows.first { $0.wallet.id == fresh })
+        let overpaidRow = try #require(model.output.rows.first { $0.wallet.id == overpaid })
+        let cashRow = try #require(model.output.rows.first { $0.wallet.id == setup.cash })
 
         #expect(freshRow.repaidPercent == 0)
         #expect(overpaidRow.balance == 10000)
@@ -133,14 +133,14 @@ extension AssetsModelTests.Setup {
     func runningModel(
         sourceLocation: SourceLocation = #_sourceLocation
     ) async throws -> AssetsModel {
-        let model = AssetsModel(database: database, today: today)
+        let model = AssetsModel(database: database, clock: .system, today: today)
 
         let task = Task {
             await model.run()
         }
 
         await ObservationWait.until(sourceLocation: sourceLocation) {
-            model.rewardBank != nil && model.list != nil
+            model.input.rewardBank != nil && model.output.list != nil
         }
 
         task.cancel()

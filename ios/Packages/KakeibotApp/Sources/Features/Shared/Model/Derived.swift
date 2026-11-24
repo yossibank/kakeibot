@@ -5,7 +5,13 @@ import Observation
 final class Derived<Value> {
     @ObservationIgnored private var cached: Value?
 
+    @ObservationIgnored private let onInvalidate: (() -> Void)?
+
     private var stamp = 0
+
+    init(onInvalidate: (() -> Void)? = nil) {
+        self.onInvalidate = onInvalidate
+    }
 }
 
 extension Derived {
@@ -32,5 +38,6 @@ private extension Derived {
     func invalidate() {
         cached = nil
         stamp &+= 1
+        onInvalidate?()
     }
 }

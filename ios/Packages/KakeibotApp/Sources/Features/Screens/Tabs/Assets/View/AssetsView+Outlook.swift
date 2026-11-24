@@ -68,9 +68,9 @@ private extension AssetsView {
             Spacer(minLength: 8)
 
             AmountText(
-                model.outlook.total,
+                model.output.outlook.total,
                 font: .size(.headline),
-                color: model.outlook.total < 0 ? Palette.rose : Palette.accentStrong
+                color: model.output.outlook.total < 0 ? Palette.rose : Palette.accentStrong
             )
             .lineLimit(1)
             .minimumScaleFactor(0.5)
@@ -110,7 +110,7 @@ private extension AssetsView {
 
 private extension AssetsView {
     var outlookLines: [OutlookLine] {
-        let outlook = model.outlook
+        let outlook = model.output.outlook
         let incomes = outlook.incomes
         let recurrings = outlook.recurringExpenses
         let plans = outlook.planExpenses
@@ -145,7 +145,7 @@ private extension AssetsView {
     }
 
     var outlookNote: OutlookNote? {
-        let outlook = model.outlook
+        let outlook = model.output.outlook
 
         if let lowest = outlook.lowest {
             return Self.note(of: lowest)

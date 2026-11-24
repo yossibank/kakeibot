@@ -143,7 +143,7 @@ private extension AssetsView {
                 .foregroundStyle(Palette.text)
                 .sharedTextScale()
 
-            if model.list?.isShared(row.wallet) == true {
+            if model.output.list?.isShared(row.wallet) == true {
                 SharedMark()
             }
         }

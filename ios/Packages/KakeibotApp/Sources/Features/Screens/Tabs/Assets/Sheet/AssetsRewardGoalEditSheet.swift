@@ -14,7 +14,7 @@ struct AssetsRewardGoalEditSheet: View {
 
     init(model: AssetsRewardGoalEditModel) {
         _model = State(initialValue: model)
-        _panel = State(initialValue: model.isEditing ? nil : .amount)
+        _panel = State(initialValue: model.output.isEditing ? nil : .amount)
     }
 
     var body: some View {
@@ -26,8 +26,8 @@ struct AssetsRewardGoalEditSheet: View {
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
-                    title: model.isEditing ? "目標を編集" : "目標を決める",
-                    isEditing: model.isEditing,
+                    title: model.output.isEditing ? "目標を編集" : "目標を決める",
+                    isEditing: model.output.isEditing,
                     isHidden: false,
                     canHide: false
                 ) {
@@ -45,9 +45,9 @@ struct AssetsRewardGoalEditSheet: View {
                         focus = nil
                     }
             }
-            .errorBanner($model.errorNotice)
+            .errorBanner(Bindable(model.state).errorNotice)
             .confirmsDiscard(
-                when: model.isChanged,
+                when: model.output.isChanged,
                 isPresented: $isConfirmingDiscard
             ) {
                 dismiss()
@@ -82,16 +82,16 @@ private extension AssetsRewardGoalEditSheet {
             ScrollView {
                 VStack(spacing: SettingsSpacing.form) {
                     AssetsRewardGoalCard(
-                        name: model.name.isEmpty ? "欲しい物" : model.name,
-                        targetAmount: model.calculator.amount,
-                        remaining: model.remaining,
-                        progress: model.progress
+                        name: model.state.name.isEmpty ? "欲しい物" : model.state.name,
+                        targetAmount: model.state.calculator.amount,
+                        remaining: model.output.remaining,
+                        progress: model.output.progress
                     )
-                    .sharesTextScale(id: model.name)
+                    .sharesTextScale(id: model.state.name)
 
                     SettingsField(
                         "欲しい物（例：新しい靴）",
-                        text: $model.name,
+                        text: Bindable(model.state).name,
                         focus: $focus,
                         field: .name
                     )
@@ -116,12 +116,12 @@ private extension AssetsRewardGoalEditSheet {
     }
 
     var saveButton: some View {
-        PrimaryButton(model.saveTitle) {
+        PrimaryButton(model.output.saveTitle) {
             Task {
                 await save()
             }
         }
-        .disabled(!model.canSave)
+        .disabled(!model.output.canSave)
     }
 
     func drawerView(_ panel: Panel) -> some View {
@@ -129,10 +129,10 @@ private extension AssetsRewardGoalEditSheet {
             closePanel()
         } content: {
             VStack(spacing: 12) {
-                Keypad(calculator: model.calculator) {
+                Keypad(calculator: model.state.calculator) {
                     closePanel()
                 } onKey: { key in
-                    model.press(key)
+                    model.state.press(key)
                 }
 
                 saveButton
@@ -158,8 +158,8 @@ private extension AssetsRewardGoalEditSheet {
                 panel: .amount,
                 systemImage: "yensign",
                 title: "目標の額",
-                value: Yen.text(model.calculator.amount),
-                isEmpty: model.calculator.amount == 0,
+                value: Yen.text(model.state.calculator.amount),
+                isEmpty: model.state.calculator.amount == 0,
                 isAmount: true
             )
         ]
@@ -187,7 +187,7 @@ private extension AssetsRewardGoalEditSheet {
     func close() {
         closePanel()
 
-        if model.isChanged {
+        if model.output.isChanged {
             isConfirmingDiscard = true
         } else {
             dismiss()

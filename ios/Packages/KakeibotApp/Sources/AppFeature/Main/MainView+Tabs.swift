@@ -87,7 +87,7 @@ extension MainView {
                 onAddEntry: addEntry(on:),
                 onOpenRecurrings: openRecurrings
             )
-            .loadFailed(review.isListFailed, onRetry: retry)
+            .loadFailed(review.input.isListFailed, onRetry: retry)
             .tabContent()
         }
     }
@@ -106,7 +106,7 @@ extension MainView {
                     sheet = .reward
                 }
             )
-            .loadFailed(assets.isListFailed, onRetry: retry)
+            .loadFailed(assets.input.isListFailed, onRetry: retry)
             .tabContent()
         }
     }

@@ -12,7 +12,7 @@ extension AssetsView {
             }
             .buttonStyle(.plain)
 
-            if model.rewardGoal == nil {
+            if model.output.rewardGoal == nil {
                 AddButton("欲しい物を目標にする") {
                     isAddingGoal = true
                 }
@@ -35,7 +35,7 @@ extension AssetsView {
         .padding(.bottom, 16)
         .card()
         .overlay {
-            if model.isRewardGoalReached {
+            if model.output.isRewardGoalReached {
                 RoundedRectangle(cornerRadius: corner.radius(24))
                     .strokeBorder(Palette.accent, lineWidth: 1.5)
                     .glow(Palette.accent, radius: 10)
@@ -57,7 +57,7 @@ private extension AssetsView {
     var rewardCardBody: some View {
         VStack(alignment: .leading, spacing: 0) {
             CardHeader("ごほうび貯金箱", systemImage: "gift.fill") {
-                if model.isRewardGoalReached {
+                if model.output.isRewardGoalReached {
                     Text("目標に届きました")
                         .textFont(.caption2, weight: .semibold)
                         .foregroundStyle(Palette.background)
@@ -79,9 +79,13 @@ private extension AssetsView {
     var rewardContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                AmountText(model.rewardBalance, font: .size(.title), color: Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                AmountText(
+                    model.output.rewardBalance,
+                    font: .size(.title),
+                    color: Palette.accentStrong
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
 
                 Text("我慢できた日に決めた額を貯めていきます")
                     .textFont(.caption)
@@ -92,13 +96,13 @@ private extension AssetsView {
                     .foregroundStyle(Palette.hint)
             }
 
-            if let goal = model.rewardGoal {
+            if let goal = model.output.rewardGoal {
                 goalLine(goal)
             }
 
-            if !model.recentRewards.isEmpty {
+            if !model.output.recentRewards.isEmpty {
                 VStack(spacing: 8) {
-                    ForEach(model.recentRewards) { log in
+                    ForEach(model.output.recentRewards) { log in
                         rewardRow(log)
                     }
                 }
@@ -107,8 +111,8 @@ private extension AssetsView {
     }
 
     func goalLine(_ goal: RewardGoal) -> some View {
-        let remaining = model.remaining(to: goal)
-        let progress = model.progress(to: goal)
+        let remaining = model.output.remaining(to: goal)
+        let progress = model.output.progress(to: goal)
         let note = remaining > 0 ? "あと \(Yen.text(remaining))" : "届きました"
 
         return VStack(alignment: .leading, spacing: 8) {
@@ -138,8 +142,8 @@ private extension AssetsView {
     }
 
     func rewardRow(_ log: RewardLog) -> some View {
-        let rule = model.rewardRule(for: log)
-        let icon = rule.flatMap { model.rewardIcon(for: $0) }
+        let rule = model.output.rewardRule(for: log)
+        let icon = rule.flatMap { model.output.rewardIcon(for: $0) }
 
         return HStack(spacing: 12) {
             IconBadge(icon, size: 26)

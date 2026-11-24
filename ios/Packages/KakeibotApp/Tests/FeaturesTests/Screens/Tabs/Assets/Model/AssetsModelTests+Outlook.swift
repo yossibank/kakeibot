@@ -13,18 +13,18 @@ extension AssetsModelTests {
         try await setup.save(.expense, 100, on: "2026-11-05", from: setup.cash)
         try await setup.saveRecurring(.income, 5000, day: 26, from: setup.bank)
         try await setup.saveRecurring(.expense, 300, day: 27, from: setup.bank)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
 
-        #expect(model.outlook.end == LocalDate("2026-10-31"))
-        #expect(model.outlook.items.map(\.change) == [-400, 5000, -300])
-        #expect(model.outlook.items.map(\.balance) == [600, 5600, 5300])
-        #expect(model.outlook.items.map(\.isRecurring) == [false, true, true])
-        #expect(model.outlook.total == 5300)
-        #expect(model.outlook.lowest?.balance == 600)
-        #expect(model.outlook.later.map(\.change) == [-100])
-        #expect(model.total == 1000)
+        #expect(model.output.outlook.end == LocalDate("2026-10-31"))
+        #expect(model.output.outlook.items.map(\.change) == [-400, 5000, -300])
+        #expect(model.output.outlook.items.map(\.balance) == [600, 5600, 5300])
+        #expect(model.output.outlook.items.map(\.isRecurring) == [false, true, true])
+        #expect(model.output.outlook.total == 5300)
+        #expect(model.output.outlook.lowest?.balance == 600)
+        #expect(model.output.outlook.later.map(\.change) == [-100])
+        #expect(model.output.total == 1000)
     }
 
     @Test
@@ -42,12 +42,12 @@ extension AssetsModelTests {
         let card = try await setup.database.save(wallet, at: Date())
         try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
         try await setup.saveRecurring(.transfer, 0, day: 27, from: setup.bank, to: card.id)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
 
-        #expect(model.outlook.items.isEmpty)
-        #expect(!model.outlook.isShown)
+        #expect(model.output.outlook.items.isEmpty)
+        #expect(!model.output.outlook.isShown)
     }
 
     @Test
@@ -56,13 +56,13 @@ extension AssetsModelTests {
         try await setup.save(.income, 1000, on: "2026-10-10", from: setup.cash)
         try await setup.saveRecurring(.expense, 3000, day: 27, from: setup.bank)
         try await setup.saveRecurring(.income, 5000, day: 28, from: setup.bank)
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
 
-        #expect(model.outlook.lowest?.date == LocalDate("2026-10-27"))
-        #expect(model.outlook.lowest?.balance == -2000)
-        #expect(model.outlook.total == 3000)
+        #expect(model.output.outlook.lowest?.date == LocalDate("2026-10-27"))
+        #expect(model.output.outlook.lowest?.balance == -2000)
+        #expect(model.output.outlook.total == 3000)
     }
 }
 

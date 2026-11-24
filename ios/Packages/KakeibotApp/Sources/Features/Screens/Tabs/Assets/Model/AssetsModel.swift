@@ -7,128 +7,83 @@ import Store
 @MainActor
 @Observable
 public final class AssetsModel: ScreenModel {
-    public var billPage = 0
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public private(set) var isListFailed = false
-    public private(set) var rewardBank: RewardBank?
-
-    public internal(set) var errorNotice = ErrorNotice()
-
-    let database: AppDatabase
-
-    private var summary: AssetsSummary
-
-    @ObservationIgnored private var latestInput: AssetsSummary.Input
-    @ObservationIgnored private var isRefreshing = false
-    @ObservationIgnored private var needsRefresh = false
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate
     ) {
-        let input = AssetsSummary.Input(today: today)
+        let state = State()
+        let input = Input(today: today)
 
-        self.database = database
-        self.latestInput = input
-        self.summary = AssetsSummary(input)
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension AssetsModel {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public var billPage = 0
+    }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var isListFailed = false
+        public internal(set) var rewardBank: RewardBank?
+
+        var summary: AssetsSummary
+
+        @ObservationIgnored var latest: AssetsSummary.Input
+        @ObservationIgnored var isRefreshing = false
+        @ObservationIgnored var needsRefresh = false
+
+        init(today: LocalDate) {
+            let latest = AssetsSummary.Input(today: today)
+
+            self.latest = latest
+            self.summary = AssetsSummary(latest)
+        }
+    }
+
     static let monthCount = AssetsSummary.Input.monthCount
 
-    var today: LocalDate {
+    internal(set) var errorNotice: ErrorNotice {
         get {
-            summary.input.today
+            state.errorNotice
         }
         set {
-            guard newValue != latestInput.today else {
-                return
-            }
-
-            latestInput.today = newValue
-            refreshLater()
+            state.errorNotice = newValue
         }
     }
 
-    var list: EntryList? {
-        summary.input.list
-    }
+    func setToday(_ today: LocalDate) {
+        guard today != input.latest.today else {
+            return
+        }
 
-    var monthStartDay: MonthStartDay {
-        summary.input.monthStartDay
-    }
-
-    var holdings: Holdings {
-        summary.holdings
-    }
-
-    var outlook: Outlook {
-        summary.outlook
-    }
-
-    var changeFromLastMonth: Int {
-        summary.changeFromLastMonth
-    }
-
-    var rows: [WalletRow] {
-        summary.rows
-    }
-
-    var sections: [WalletSection] {
-        summary.sections
-    }
-
-    var upcomingBills: [UpcomingBill] {
-        summary.upcomingBills
-    }
-
-    var billPages: [BillPage] {
-        summary.billPages
-    }
-
-    var monthTotals: [MonthTotal] {
-        summary.monthTotals
-    }
-
-    var plans: [Plan] {
-        summary.plans
-    }
-
-    var currentMonth: YearMonth {
-        today.periodMonth(startingOn: monthStartDay)
-    }
-
-    var total: Int {
-        holdings.available
-    }
-
-    var showsNetWorth: Bool {
-        summary.wallets.contains { [.investment, .loan].contains($0.kind.role) }
-    }
-
-    var shownBillPage: BillPage? {
-        BillPage.page(billPage, in: billPages)
-    }
-
-    var shownUpcomingBills: [UpcomingBill] {
-        shownBillPage.map { upcomingBills(in: $0.month) } ?? []
-    }
-
-    var upcomingBillTotal: Int {
-        shownBillPage?.total ?? 0
-    }
-
-    func upcomingBills(in month: YearMonth) -> [UpcomingBill] {
-        upcomingBills.filter { $0.bill.month == month }
+        input.latest.today = today
+        refreshLater()
     }
 
     func adjustModel(for row: WalletRow) -> AssetsAdjustmentModel {
         AssetsAdjustmentModel(
-            database: database,
+            database: dependencies.database,
+            clock: dependencies.clock,
             wallet: row.wallet,
             balance: row.balance,
-            today: today
+            today: output.today
         )
     }
 
@@ -144,17 +99,20 @@ public extension AssetsModel {
                 await self.observeRecurrings()
             },
             {
-                await self.observe(self.database.rewardBankUpdates(), into: \.rewardBank)
+                await self.observe(
+                    self.dependencies.database.rewardBankUpdates(),
+                    into: \.input.rewardBank
+                )
             }
         ])
     }
 
     func load() async {
         do {
-            latestInput.list = try await database.entryList()
-            latestInput.recurrings = try await database.recurrings()
+            input.latest.list = try await dependencies.database.entryList()
+            input.latest.recurrings = try await dependencies.database.recurrings()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
 
         await refresh()
@@ -162,6 +120,11 @@ public extension AssetsModel {
 }
 
 extension AssetsModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+    }
+
     static let loadFailedMessage = "残高を読めませんでした"
 }
 
@@ -173,56 +136,56 @@ private extension AssetsModel {
     }
 
     func refresh() async {
-        needsRefresh = true
+        input.needsRefresh = true
 
-        guard !isRefreshing else {
+        guard !input.isRefreshing else {
             return
         }
 
-        isRefreshing = true
+        input.isRefreshing = true
 
         defer {
-            isRefreshing = false
+            input.isRefreshing = false
         }
 
-        while needsRefresh {
-            needsRefresh = false
+        while input.needsRefresh {
+            input.needsRefresh = false
 
-            let summary = await AssetsSummary.make(latestInput)
+            let summary = await AssetsSummary.make(input.latest)
 
-            self.summary = summary
-            billPage = BillPage.clamped(billPage, in: summary.billPages)
+            input.summary = summary
+            state.billPage = BillPage.clamped(state.billPage, in: summary.billPages)
         }
     }
 
     func observe() async {
-        isListFailed = false
+        input.isListFailed = false
 
-        isListFailed = await observe(
-            database.entryListUpdates(),
+        input.isListFailed = await observe(
+            dependencies.database.entryListUpdates(),
             failure: Self.loadFailedMessage
         ) { list in
-            latestInput.list = list
+            input.latest.list = list
             refreshLater()
         }
     }
 
     func observeRecurrings() async {
         await observe(
-            database.recurringUpdates(),
+            dependencies.database.recurringUpdates(),
             failure: Self.loadFailedMessage
         ) { recurrings in
-            latestInput.recurrings = recurrings
+            input.latest.recurrings = recurrings
             refreshLater()
         }
     }
 
     func observeMonthStartDay() async {
         await observe(
-            database.settingUpdates(.monthStartDay),
+            dependencies.database.settingUpdates(.monthStartDay),
             failure: Self.loadFailedMessage
         ) { startDay in
-            latestInput.monthStartDay = startDay
+            input.latest.monthStartDay = startDay
             refreshLater()
         }
     }

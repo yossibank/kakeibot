@@ -10,35 +10,35 @@ extension AssetsRewardSheet {
 
                 Spacer()
 
-                if !model.waitingGoals.isEmpty {
+                if !model.output.waitingGoals.isEmpty {
                     ToolButton(systemImage: "plus") {
                         goalTarget = GoalTarget(goal: nil)
                     }
                 }
             }
 
-            if model.waitingGoals.isEmpty {
+            if model.output.waitingGoals.isEmpty {
                 AddButton("欲しい物を目標にする") {
                     goalTarget = GoalTarget(goal: nil)
                 }
             } else {
-                ForEach(model.waitingGoals) { goal in
+                ForEach(model.output.waitingGoals) { goal in
                     goalRow(goal)
                 }
             }
         }
-        .sharesTextScale(id: model.waitingGoals.map(\.name))
+        .sharesTextScale(id: model.output.waitingGoals.map(\.name))
     }
 
     var boughtSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionTitle("買ったもの")
 
-            ForEach(model.boughtGoals) { goal in
+            ForEach(model.output.boughtGoals) { goal in
                 boughtRow(goal)
             }
         }
-        .sharesTextScale(id: model.boughtGoals.map(\.name))
+        .sharesTextScale(id: model.output.boughtGoals.map(\.name))
     }
 }
 
@@ -47,8 +47,8 @@ private extension AssetsRewardSheet {
         AssetsRewardGoalCard(
             name: goal.name,
             targetAmount: goal.targetAmount,
-            remaining: model.remaining(to: goal),
-            progress: model.progress(to: goal),
+            remaining: model.output.remaining(to: goal),
+            progress: model.output.progress(to: goal),
             onBuy: {
                 Task {
                     await buy(goal)

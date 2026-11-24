@@ -6,5 +6,3 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swi
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swift: dependencies を持つモデルで、今の時刻を作らない。dependencies の時計から受け取る
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Model/RecordsModel.swift: RecordsModel の didSet と willSet は 2 個までにする（今は 3 個）。派生する値は計算で出すか、入力を 1 つの型にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Model/RecordsModel.swift: RecordsModel の保存プロパティの var は 12 個までにする（今は 25 個）。一緒に動く値を struct か enum にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Model/ReviewModel.swift: ReviewModel の didSet と willSet は 2 個までにする（今は 5 個）。派生する値は計算で出すか、入力を 1 つの型にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Model/ReviewModel.swift: ReviewModel の保存プロパティの var は 12 個までにする（今は 24 個）。一緒に動く値を struct か enum にまとめる

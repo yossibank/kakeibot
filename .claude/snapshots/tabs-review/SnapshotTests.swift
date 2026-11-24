@@ -21,7 +21,7 @@ struct SnapshotTests {
         }
 
         try await Self.wait {
-            model.list != nil
+            model.input.list != nil
         }
 
         await model.refreshStoreReviewCard()

@@ -9,7 +9,7 @@ extension ReviewView {
         tapOutsets: EdgeInsets,
         minHeight: CGFloat?
     ) -> some View {
-        if model.scale == .month {
+        if model.state.scale == .month {
             Button(action: onOpenRecurrings) {
                 HStack(spacing: 4) {
                     upcomingLabel(upcoming)
@@ -56,8 +56,8 @@ private extension ReviewView {
     }
 
     func outlookText(_ upcoming: Int) -> String {
-        let total = model.total(of: model.kind) + upcoming
-        return "\(Self.outlookName(of: model.scale)) \(Yen.text(total))"
+        let total = model.output.total(of: model.state.kind) + upcoming
+        return "\(Self.outlookName(of: model.state.scale)) \(Yen.text(total))"
     }
 }
 

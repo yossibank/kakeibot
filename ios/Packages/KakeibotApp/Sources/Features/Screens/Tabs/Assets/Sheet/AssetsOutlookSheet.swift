@@ -26,19 +26,19 @@ extension AssetsOutlookSheet {
                     .textFont(.subheadline, weight: .semibold)
                     .foregroundStyle(Palette.subtext)
 
-                Text("\(model.outlook.end.monthDayText) までの、固定費のこれからの回と、日付が明日以降の記録です。")
+                Text("\(model.output.outlook.end.monthDayText) までの、固定費のこれからの回と、日付が明日以降の記録です。")
                     .textFont(.caption)
                     .foregroundStyle(Palette.subtext)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            if !model.outlook.items.isEmpty {
+            if !model.output.outlook.items.isEmpty {
                 itemList
             }
 
             total
 
-            if !model.outlook.later.isEmpty {
+            if !model.output.outlook.later.isEmpty {
                 laterList
             }
         }
@@ -48,7 +48,7 @@ extension AssetsOutlookSheet {
 private extension AssetsOutlookSheet {
     var itemList: some View {
         VStack(spacing: 0) {
-            ForEach(model.outlook.items) { item in
+            ForEach(model.output.outlook.items) { item in
                 Button {
                     open(item)
                 } label: {
@@ -63,7 +63,7 @@ private extension AssetsOutlookSheet {
                 }
                 .buttonStyle(.plain)
                 .overlay(alignment: .top) {
-                    if item.id != model.outlook.items.first?.id {
+                    if item.id != model.output.outlook.items.first?.id {
                         Hairline()
                     }
                 }
@@ -71,7 +71,7 @@ private extension AssetsOutlookSheet {
         }
         .padding(.horizontal, 16)
         .card()
-        .sharesTextScale(id: model.outlook.items)
+        .sharesTextScale(id: model.output.outlook.items)
     }
 
     var laterList: some View {
@@ -81,7 +81,7 @@ private extension AssetsOutlookSheet {
                 .foregroundStyle(Palette.subtext)
 
             VStack(spacing: 0) {
-                ForEach(model.outlook.later) { plan in
+                ForEach(model.output.outlook.later) { plan in
                     Button {
                         onOpen(plan.id)
                         dismiss()
@@ -97,7 +97,7 @@ private extension AssetsOutlookSheet {
                     }
                     .buttonStyle(.plain)
                     .overlay(alignment: .top) {
-                        if plan.id != model.outlook.later.first?.id {
+                        if plan.id != model.output.outlook.later.first?.id {
                             Hairline()
                         }
                     }
@@ -105,12 +105,12 @@ private extension AssetsOutlookSheet {
             }
             .padding(.horizontal, 16)
             .card()
-            .sharesTextScale(id: model.outlook.later)
+            .sharesTextScale(id: model.output.outlook.later)
         }
     }
 
     var before: some View {
-        Text("\(Yen.text(model.total)) →")
+        Text("\(Yen.text(model.output.total)) →")
             .textFont(.caption)
             .monospacedDigit()
             .foregroundStyle(Palette.subtext)
@@ -125,9 +125,9 @@ private extension AssetsOutlookSheet {
                 .fixedSize()
 
             AmountText(
-                model.outlook.total,
+                model.output.outlook.total,
                 font: .size(.headline, weight: .bold),
-                color: model.outlook.total < 0 ? Palette.rose : Palette.accentStrong
+                color: model.output.outlook.total < 0 ? Palette.rose : Palette.accentStrong
             )
             .lineLimit(1)
             .minimumScaleFactor(0.5)
@@ -239,7 +239,7 @@ private extension AssetsOutlookSheet {
         on date: LocalDate,
         wallet: String?
     ) -> String {
-        let days = BillText.days(until: date, today: model.today)
+        let days = BillText.days(until: date, today: model.output.today)
 
         guard let wallet else {
             return days

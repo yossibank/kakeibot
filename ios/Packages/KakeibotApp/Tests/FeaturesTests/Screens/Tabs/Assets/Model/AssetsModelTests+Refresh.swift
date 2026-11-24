@@ -16,7 +16,7 @@ extension AssetsModelTests {
             try await setup.save(.income, 1, on: "2026-10-01", from: setup.cash)
         }
 
-        let model = AssetsModel(database: setup.database, today: setup.today)
+        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
         let later = setup.today.adding(days: Self.quickChangeCount)
 
         let task = Task {
@@ -24,23 +24,24 @@ extension AssetsModelTests {
         }
 
         await ObservationWait.until {
-            model.list != nil
+            model.output.list != nil
         }
 
         for offset in 1...Self.quickChangeCount {
-            model.today = setup.today.adding(days: offset)
+            model.setToday(setup.today.adding(days: offset))
             await Task.yield()
         }
 
         await ObservationWait.until {
-            model.today == later
+            model.output.today == later
         }
 
         task.cancel()
 
-        #expect(model.plans.isEmpty)
-        #expect(model.total == 600 + Self.entryCount)
-        #expect(model.rows.first { $0.wallet.id == setup.cash }?.balance == 600 + Self.entryCount)
+        #expect(model.output.plans.isEmpty)
+        #expect(model.output.total == 600 + Self.entryCount)
+        #expect(model.output.rows.first { $0.wallet.id == setup.cash }?.balance == 600 + Self
+            .entryCount)
     }
 }
 

@@ -5,30 +5,33 @@ import SwiftUI
 extension AssetsView {
     var billCard: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CardHeader(Self.billTitle, note: BillText.note(of: model.billPages))
+            CardHeader(Self.billTitle, note: BillText.note(of: model.output.billPages))
 
-            if !model.billPages.isEmpty {
-                if model.billPages.count > 1 {
-                    BillTabs(pages: model.billPages, current: model.billPage) { index in
-                        model.billPage = index
+            if !model.output.billPages.isEmpty {
+                if model.output.billPages.count > 1 {
+                    BillTabs(
+                        pages: model.output.billPages,
+                        current: model.state.billPage
+                    ) { index in
+                        model.state.billPage = index
                     }
                     .padding(.bottom, 12)
                 }
 
                 BillPager(
-                    current: $model.billPage,
-                    pages: model.billPages,
+                    current: Bindable(model.state).billPage,
+                    pages: model.output.billPages,
                     inset: Self.billInset
                 ) { page in
                     billList(page)
                 }
-                .sharesTextScale(id: model.upcomingBills.map(\.source))
+                .sharesTextScale(id: model.output.upcomingBills.map(\.source))
             }
         }
         .padding(.horizontal, Self.billInset)
         .padding(.bottom, 16)
         .card()
-        .haptic(.selection, trigger: model.billPage)
+        .haptic(.selection, trigger: model.state.billPage)
     }
 }
 
@@ -49,7 +52,7 @@ private extension AssetsView {
 private extension AssetsView {
     func billList(_ page: BillPage) -> some View {
         VStack(spacing: 12) {
-            ForEach(model.upcomingBills(in: page.month)) { row in
+            ForEach(model.output.upcomingBills(in: page.month)) { row in
                 Button {
                     onOpenRecurring(row.id)
                 } label: {
@@ -65,7 +68,7 @@ private extension AssetsView {
             row.bill,
             title: row.title,
             source: row.source,
-            today: model.today,
+            today: model.output.today,
             style: .detailed
         ) {
             if let moves = Self.movesText(of: row) {

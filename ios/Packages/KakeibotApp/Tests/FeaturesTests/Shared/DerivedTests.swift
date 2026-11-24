@@ -77,6 +77,25 @@ struct DerivedTests {
         #expect(before == 0)
         #expect(changes == 1)
     }
+
+    @Test
+    func tableDropsCellWhenReadValueChanges() {
+        let source = Source()
+        let table = DerivedTable<Int, Int>()
+
+        let first = table.value(for: 1) { source.count }
+        _ = table.value(for: 2) { source.count * 2 }
+
+        source.count = 3
+
+        let countAfterChange = table.count
+        let second = table.value(for: 1) { source.count }
+
+        #expect(first == 1)
+        #expect(countAfterChange == 0)
+        #expect(second == 3)
+        #expect(table.count == 1)
+    }
 }
 
 @MainActor

@@ -28,7 +28,7 @@ struct AssetsRewardSheet: View {
 
                         ruleSection
 
-                        if !model.boughtGoals.isEmpty {
+                        if !model.output.boughtGoals.isEmpty {
                             boughtSection
                         }
 
@@ -43,7 +43,7 @@ struct AssetsRewardSheet: View {
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $isEditingRules) {
-                RewardRuleListView(database: model.database)
+                RewardRuleListView(database: model.dependencies.database)
             }
         }
         .sheet(item: $goalTarget) { target in
@@ -70,7 +70,7 @@ extension AssetsRewardSheet {
 
 private extension AssetsRewardSheet {
     var isSetUp: Bool {
-        !model.rewardRules.isEmpty && model.rewardGoal != nil
+        !model.output.rewardRules.isEmpty && model.output.rewardGoal != nil
     }
 
     var header: some View {
@@ -83,7 +83,7 @@ private extension AssetsRewardSheet {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline) {
                 AmountText(
-                    model.rewardBalance,
+                    model.output.rewardBalance,
                     font: .size(.largeTitle),
                     color: Palette.accentStrong
                 )
@@ -97,7 +97,7 @@ private extension AssetsRewardSheet {
                     .foregroundStyle(Palette.accent)
             }
 
-            if let goal = model.rewardGoal {
+            if let goal = model.output.rewardGoal {
                 nearestGoal(goal)
             } else {
                 VStack(alignment: .leading, spacing: 4) {
@@ -184,27 +184,27 @@ private extension AssetsRewardSheet {
                 }
             }
 
-            if model.rewardRules.isEmpty {
+            if model.output.rewardRules.isEmpty {
                 AddButton("決まりを追加") {
                     isEditingRules = true
                 }
             } else {
                 VStack(spacing: 12) {
-                    ForEach(model.rewardRules, id: \.id) { rule in
+                    ForEach(model.output.rewardRules, id: \.id) { rule in
                         ruleRow(rule)
                     }
                 }
                 .padding(16)
                 .card()
-                .sharesTextScale(id: model.rewardRules.map(\.name))
+                .sharesTextScale(id: model.output.rewardRules.map(\.name))
             }
         }
     }
 
     func nearestGoal(_ goal: RewardGoal) -> some View {
-        let remaining = model.remaining(to: goal)
-        let progress = model.progress(to: goal)
-        let percent = model.percent(to: goal)
+        let remaining = model.output.remaining(to: goal)
+        let progress = model.output.progress(to: goal)
+        let percent = model.output.percent(to: goal)
         let note = remaining > 0 ? "あと \(Yen.text(remaining))" : "届きました"
 
         return VStack(alignment: .leading, spacing: 8) {
@@ -264,7 +264,7 @@ private extension AssetsRewardSheet {
 
     func ruleRow(_ rule: RewardRule) -> some View {
         HStack(spacing: 12) {
-            IconBadge(model.rewardIcon(for: rule), size: 36)
+            IconBadge(model.output.rewardIcon(for: rule), size: 36)
 
             Text(rule.name)
                 .textFont(.footnote)

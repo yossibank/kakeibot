@@ -6,8 +6,8 @@ extension ReviewView {
     var detailCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
-                if model.hasPreviousEntries {
-                    Image(systemName: Self.changeImage(model.change))
+                if model.output.hasPreviousEntries {
+                    Image(systemName: Self.changeImage(model.output.change))
                         .sansFont(.caption)
                         .foregroundStyle(selectedChangeColor)
                 }
@@ -19,9 +19,9 @@ extension ReviewView {
 
             if hasRecurringRow || hasUpcomingRow || showsMoveRow {
                 VStack(alignment: .leading, spacing: 0) {
-                    if let recurring = model.recurringTotal {
+                    if let recurring = model.output.recurringTotal {
                         Button {
-                            openShare = model.recurringShare
+                            openShare = model.output.recurringShare
                         } label: {
                             HStack(spacing: 4) {
                                 Label(recurringText(recurring), systemImage: "repeat")
@@ -41,7 +41,7 @@ extension ReviewView {
                         .buttonStyle(.plain)
                     }
 
-                    if let upcoming = model.upcomingRecurringTotal {
+                    if let upcoming = model.output.upcomingRecurringTotal {
                         let outsets = Self.rowTapOutsets(
                             top: isFirstRow(.upcoming),
                             bottom: isLastRow(.upcoming)
@@ -78,24 +78,24 @@ extension ReviewView {
                 }
             }
 
-            if model.kind == .balance {
+            if model.state.kind == .balance {
                 VStack(spacing: 12) {
                     balanceBar(
                         "収入",
-                        amount: model.summary.income.total,
+                        amount: model.output.summary.income.total,
                         type: .income
                     )
 
                     balanceBar(
                         "支出",
-                        amount: model.summary.expense.total,
+                        amount: model.output.summary.expense.total,
                         type: .expense
                     )
                 }
                 .padding(.top, 8)
             }
 
-            if let usage = model.budgetUsage {
+            if let usage = model.output.budgetUsage {
                 VStack(spacing: 8) {
                     HStack {
                         Text(usage.budgetText)
@@ -156,15 +156,15 @@ private extension ReviewView {
     }
 
     var hasRecurringRow: Bool {
-        model.recurringTotal != nil
+        model.output.recurringTotal != nil
     }
 
     var hasUpcomingRow: Bool {
-        model.upcomingRecurringTotal != nil
+        model.output.upcomingRecurringTotal != nil
     }
 
     var showsMoveRow: Bool {
-        model.kind == .expense && !model.moves.isEmpty
+        model.state.kind == .expense && !model.output.moves.isEmpty
     }
 
     var detailRows: [DetailRow] {
@@ -179,24 +179,24 @@ private extension ReviewView {
     }
 
     var selectedChangeColor: Color {
-        Self.changeColor(model.change, of: model.kind)
+        Self.changeColor(model.output.change, of: model.state.kind)
     }
 
     var moveText: String {
-        let total = ReviewModel.total(of: model.moves)
+        let total = ReviewModel.total(of: model.output.moves)
         return "ほかに返済と積立 \(Yen.text(total))"
     }
 
     var comparisonText: String {
-        guard model.hasPreviousEntries else {
+        guard model.output.hasPreviousEntries else {
             return "比べる記録がまだありません"
         }
 
-        let previous = model.isComparingPartially
-            ? Self.partialName(of: model.scale)
-            : Self.previousName(of: model.scale)
+        let previous = model.output.isComparingPartially
+            ? Self.partialName(of: model.state.scale)
+            : Self.previousName(of: model.state.scale)
 
-        let change = model.change
+        let change = model.output.change
         let amount = Yen.text(abs(change))
 
         if change > 0 {
@@ -239,7 +239,7 @@ private extension ReviewView {
     }
 
     func recurringText(_ recurring: Int) -> String {
-        let other = model.total(of: model.kind) - recurring
+        let other = model.output.total(of: model.state.kind) - recurring
         let fixed = "固定費 \(Yen.text(recurring))"
         return "\(fixed)・それ以外 \(Yen.text(other))"
     }
@@ -253,8 +253,8 @@ private extension ReviewView {
     }
 
     func balanceRatio(of amount: Int) -> Double {
-        let income = model.summary.income.total
-        let expense = model.summary.expense.total
+        let income = model.output.summary.income.total
+        let expense = model.output.summary.expense.total
         let largest = max(income, expense)
         return largest > 0 ? Double(amount) / Double(largest) : 0
     }

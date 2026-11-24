@@ -5,7 +5,7 @@ import SwiftUI
 extension ReviewView {
     func moveCard(_ moves: [ReviewModel.Move]) -> some View {
         let total = ReviewModel.total(of: moves)
-        let ratio = model.repaymentRatio(in: moves)
+        let ratio = model.output.repaymentRatio(in: moves)
         let repaidPercent = Int((ratio * 100).rounded())
 
         return VStack(alignment: .leading, spacing: 12) {
@@ -48,7 +48,7 @@ extension ReviewView {
             VStack(spacing: 0) {
                 ForEach(moves) { move in
                     Button {
-                        openShare = model.share(of: move)
+                        openShare = model.output.share(of: move)
                     } label: {
                         moveRow(move)
                     }

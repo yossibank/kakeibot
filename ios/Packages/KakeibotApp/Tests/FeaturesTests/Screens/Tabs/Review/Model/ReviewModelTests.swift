@@ -20,14 +20,14 @@ struct ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            model.list != nil
+            model.input.list != nil
         }
 
-        let expense = model.total
-        let expenseChange = model.change
-        let incomeChange = model.change(of: .income)
+        let expense = model.output.total
+        let expenseChange = model.output.change
+        let incomeChange = model.output.change(of: .income)
         model.setKind(.balance)
-        let balance = model.total
+        let balance = model.output.total
 
         #expect(expense == 3980)
         #expect(expenseChange == -1020)
@@ -43,13 +43,13 @@ struct ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            model.list != nil
+            model.input.list != nil
         }
 
         model.move(by: -1)
 
-        #expect(!model.isComparingPartially)
-        #expect(model.change == 7000 + 3000)
+        #expect(!model.output.isComparingPartially)
+        #expect(model.output.change == 7000 + 3000)
     }
 
     @Test
@@ -60,12 +60,12 @@ struct ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            model.list != nil
+            model.input.list != nil
         }
 
-        let hasPreviousNow = model.hasPreviousEntries
+        let hasPreviousNow = model.output.hasPreviousEntries
         model.move(by: -1)
-        let hasPreviousLastMonth = model.hasPreviousEntries
+        let hasPreviousLastMonth = model.output.hasPreviousEntries
 
         #expect(hasPreviousNow)
         #expect(!hasPreviousLastMonth)
@@ -101,13 +101,13 @@ struct ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            model.list != nil
+            model.input.list != nil
         }
 
         model.move(by: -1)
 
-        #expect(ReviewModel.total(of: model.moves) == 30000)
-        #expect(model.moves.map(\.wallet.id) == [loan.id])
+        #expect(ReviewModel.total(of: model.output.moves) == 30000)
+        #expect(model.output.moves.map(\.wallet.id) == [loan.id])
     }
 
     @Test
@@ -156,10 +156,10 @@ struct ReviewModelTests {
         let model = ReviewModel(database: setup.database, today: setup.today)
 
         try await observe(model) {
-            model.list != nil && !model.moves.isEmpty
+            model.input.list != nil && !model.output.moves.isEmpty
         }
 
-        let move = try #require(model.moves.first)
+        let move = try #require(model.output.moves.first)
 
         #expect(move.balance == -70000)
     }
@@ -211,12 +211,12 @@ struct ReviewModelTests {
         }
 
         await ObservationWait.until {
-            !model.moves.isEmpty
+            !model.output.moves.isEmpty
         }
-        #expect(model.moves.first?.payoff == nil)
+        #expect(model.output.moves.first?.payoff == nil)
 
         withObservationTracking {
-            _ = model.moves
+            _ = model.output.moves
         } onChange: {
             notified.withLock { $0 = true }
         }
@@ -224,14 +224,14 @@ struct ReviewModelTests {
         try await setup.database.saveRecurring(recurring, today: setup.today, at: now)
 
         await ObservationWait.until {
-            _ = model.moves
+            _ = model.output.moves
 
             return notified.withLock { $0 }
         }
 
         task.cancel()
 
-        #expect(model.moves.first?.payoff != nil)
+        #expect(model.output.moves.first?.payoff != nil)
     }
 }
 
