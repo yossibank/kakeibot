@@ -135,6 +135,51 @@ struct SyncRouteTests {
     }
 
     @Test
+    func sendsDeletionToOwnZoneWhenNoZoneIsRecorded() {
+        let route = Self.route(isSyncEnabled: true)
+        let change = Self.change(saveZone: nil, deleteZones: [])
+
+        #expect(route.unsentDeletionZone(of: change) == SyncZone.own)
+    }
+
+    @Test
+    func leavesUnrecordedDeletionUnsentWhenItCannotReachOwnZone() {
+        let change = Self.change(saveZone: nil, deleteZones: [])
+        let off = Self.route(isSyncEnabled: false)
+        let shared = Self.route(isShared: true, isSyncEnabled: true)
+
+        #expect(off.unsentDeletionZone(of: change) == nil)
+        #expect(shared.unsentDeletionZone(of: change) == nil)
+        #expect(off.drops(change))
+        #expect(!shared.drops(change))
+    }
+
+    @Test
+    func sendsRecordedDeletionOnlyToItsZones() {
+        let route = Self.route(isSyncEnabled: true)
+        let recorded = Self.change(saveZone: nil, deleteZones: [Self.ownWallet])
+        let saving = Self.change(saveZone: SyncZone.own, deleteZones: [])
+
+        #expect(route.unsentDeletionZone(of: recorded) == nil)
+        #expect(route.unsentDeletionZone(of: saving) == nil)
+    }
+
+    @Test
+    func finishesUnrecordedDeletionWhenOwnZoneHasNoRecord() {
+        let route = Self.route(isSyncEnabled: true)
+        let change = Self.change(saveZone: nil, deleteZones: [])
+        let gone = SyncRecordID(key: change.key, zoneName: SyncZone.own)
+
+        let result = route.finish(
+            sending: [change.key: change],
+            saved: [],
+            deleted: [gone]
+        )
+
+        #expect(result.finished == [change])
+    }
+
+    @Test
     func ignoresChangesThatAreNotSending() {
         let route = Self.route(isSyncEnabled: true)
         let key = SyncKey(table: .wallet, id: "w")

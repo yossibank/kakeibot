@@ -256,8 +256,13 @@ extension SyncEngine: CKSyncEngineDelegate {
             sending[change.key] = change
         }
 
-        return await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: changes) { recordID in
+        let batch = await CKSyncEngine.RecordZoneChangeBatch(pendingChanges: changes) { recordID in
             await self.record(for: recordID)
         }
+
+        let saves = batch?.recordsToSave.compactMap { SyncRecordID($0.recordID) } ?? []
+        try? await database.noteSyncSends(saves)
+
+        return batch
     }
 }

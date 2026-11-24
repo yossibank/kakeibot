@@ -33,4 +33,35 @@ struct SyncDeletionTests {
         #expect(try await device.database.syncRecord(for: recurring) == nil)
         #expect(try await device.pendingKeys() == [])
     }
+
+    @Test
+    func deletionKnowsTheZoneOfSendThatWasNeverConfirmed() async throws {
+        let device = try await SyncTests.Setup()
+        let walletID = try await device.walletID()
+        let entry = try await device.insertRecurringEntry(wallet: walletID)
+
+        try await device.database.noteSyncSends([entry.own])
+        try await device.execute("DELETE FROM entry WHERE id = '\(entry.id)'")
+
+        let change = try await device.database.pendingSyncChanges().first { $0.key == entry }
+
+        #expect(change?.isDeletion == true)
+        #expect(change?.deleteZones == [SyncZone.own])
+    }
+
+    @Test
+    func notedSendKeepsConfirmedFieldsAndHasNoneBefore() async throws {
+        let device = try await SyncTests.Setup()
+        let key = SyncKey(table: .entry, id: "e")
+
+        try await device.database.noteSyncSends([key.own])
+        let noted = try await device.database.syncSystemFields(for: key.own)
+
+        try await device.database.saveSyncSystemFields([key.own: Data([1])])
+        try await device.database.noteSyncSends([key.own])
+        let confirmed = try await device.database.syncSystemFields(for: key.own)
+
+        #expect(noted == nil)
+        #expect(confirmed == Data([1]))
+    }
 }

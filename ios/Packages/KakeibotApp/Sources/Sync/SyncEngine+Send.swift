@@ -106,13 +106,15 @@ private extension SyncEngine {
         let route = route
 
         for change in changes {
-            let targets = pendingTargets(of: change)
+            var targets = pendingTargets(of: change)
 
             if targets.isEmpty,
-               !isShared,
-               !saving.contains(change.key),
-               !change.zones.contains(where: route.isForeign) {
-                dropped.append(change)
+               !saving.contains(change.key) {
+                if let zone = route.unsentDeletionZone(of: change) {
+                    targets = [deletion(of: change.key, in: zone)]
+                } else if route.drops(change) {
+                    dropped.append(change)
+                }
             }
 
             for (wanted, opposite) in targets where !pending.contains(wanted) {
@@ -148,12 +150,22 @@ private extension SyncEngine {
         }
 
         for zone in change.deleteZones where route.sends(to: zone) {
-            let syncID = SyncRecordID(key: change.key, zoneName: zone)
-            let id = recordID(of: syncID)
-            targets.append((.deleteRecord(id), .saveRecord(id)))
+            targets.append(deletion(of: change.key, in: zone))
         }
 
         return targets
+    }
+
+    func deletion(
+        of key: SyncKey,
+        in zone: String
+    ) -> (
+        wanted: CKSyncEngine.PendingRecordZoneChange,
+        opposite: CKSyncEngine.PendingRecordZoneChange
+    ) {
+        let syncID = SyncRecordID(key: key, zoneName: zone)
+        let id = recordID(of: syncID)
+        return (.deleteRecord(id), .saveRecord(id))
     }
 
     func finishChanges(
