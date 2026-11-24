@@ -1,6 +1,8 @@
 package com.yossibank.kakeibot.features.support
 
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
+import com.yossibank.kakeibot.core.concepts.category.EntryTag
+import com.yossibank.kakeibot.core.concepts.category.EntryTagDraft
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
@@ -19,6 +21,7 @@ import com.yossibank.kakeibot.store.queries.types.EntryOptions
 import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.saveRecurring
+import com.yossibank.kakeibot.store.writes.methods.saveTags
 import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -129,6 +132,35 @@ class ModelTestSetup(
         )
 
         return database.save(WalletTable, draft, at = now)
+    }
+
+    suspend fun addTags(
+        categoryId: Identifier<EntryCategory>,
+        names: List<String>,
+    ): List<EntryTag> = database.saveTags(
+        drafts = names.map { EntryTagDraft(name = it) },
+        categoryId = categoryId,
+        at = now,
+    )
+
+    suspend fun addCardBill(
+        card: Identifier<Wallet>,
+        paidFrom: Identifier<Wallet>,
+    ): Recurring {
+        val draft = RecurringDraft(
+            type = Entry.Kind.transfer,
+            amount = 0,
+            categoryId = null,
+            walletId = paidFrom,
+            toWalletId = card,
+            frequency = Recurring.Frequency.monthly,
+            month = 1,
+            day = 26,
+            closingDay = 15,
+            startDate = date("2026-10-01"),
+        )
+
+        return database.saveRecurring(draft, today = today, at = now)
     }
 
     companion object {
