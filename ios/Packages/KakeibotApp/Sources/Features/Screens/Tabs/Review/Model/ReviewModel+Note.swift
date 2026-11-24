@@ -11,7 +11,7 @@ extension ReviewModel {
     func refreshNotes() async {
         let now = dependencies.clock.now
         let key = Self.summaryKey(output.period.commentKey)
-        let facts = output.closingFacts(now: now)
+        let facts = output.closingFacts
         let basis = facts.basis
         let request = "\(key)\n\(basis)"
 
@@ -82,8 +82,8 @@ extension ReviewModel.Output {
         )
     }
 
-    func noteTrigger(now: Date) -> ReviewModel.NoteTrigger {
-        let basis = input.list == nil ? nil : closingFacts(now: now).basis
+    var noteTrigger: ReviewModel.NoteTrigger {
+        let basis = input.list == nil ? nil : closingFacts.basis
         return ReviewModel.NoteTrigger(period: period.commentKey, basis: basis)
     }
 }
@@ -127,7 +127,7 @@ private extension ReviewModel {
 }
 
 private extension ReviewModel.Output {
-    func closingFacts(now: Date) -> ReviewClosingFacts {
+    var closingFacts: ReviewClosingFacts {
         let content = closingContent
         let range = content.range
         let totalDays = range.lowerBound.days(until: range.upperBound) + 1
@@ -137,7 +137,7 @@ private extension ReviewModel.Output {
             verdict: ReviewModel.verdict(of: content.pace),
             more: content.rows.filter { $0.row.tone == .more }.map(\.name),
             less: content.rows.filter { $0.row.tone == .less }.map(\.name),
-            isGoalAchieved: closingGoals(now: now).answer?.goal.isAchieved,
+            isGoalAchieved: closingGoals.answer?.goal.isAchieved,
             recordsDaily: recorded >= ReviewModel.dailyRatio
         )
     }

@@ -120,7 +120,7 @@ extension ReviewView {
         .task(id: model.output.reasonTrigger) {
             await model.refreshReason()
         }
-        .task(id: model.output.noteTrigger(now: model.goalCheckTime())) {
+        .task(id: model.output.noteTrigger) {
             await model.refreshNotes()
         }
         .sheet(item: $analysisShare) { share in
@@ -139,7 +139,7 @@ private extension ReviewView {
         } else {
             ReviewClosingView(
                 content: model.output.closingContent,
-                goals: model.output.closingGoals(now: model.goalCheckTime()),
+                goals: model.output.closingGoals,
                 notes: model.output.closingNotes,
                 name: analysisName,
                 previousName: model.output.period.previous.displayName,

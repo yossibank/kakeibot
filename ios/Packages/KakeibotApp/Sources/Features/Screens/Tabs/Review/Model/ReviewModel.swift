@@ -18,7 +18,7 @@ public final class ReviewModel: ScreenModel {
         clock: ScreenClock,
         today: LocalDate
     ) {
-        let state = State(today: today)
+        let state = State(today: today, checkTime: clock.now)
         let input = Input()
 
         self.state = state
@@ -36,6 +36,8 @@ public extension ReviewModel {
 
         public var today: LocalDate
 
+        public internal(set) var checkTime: Date
+
         public private(set) var scale: ReviewPeriod.Scale = .month
         public private(set) var offset = 0
         public private(set) var isMovingForward = true
@@ -44,8 +46,12 @@ public extension ReviewModel {
         public internal(set) var showsStoreReviewCard = false
         public internal(set) var newReportKey: String?
 
-        init(today: LocalDate) {
+        init(
+            today: LocalDate,
+            checkTime: Date
+        ) {
             self.today = today
+            self.checkTime = checkTime
         }
     }
 
