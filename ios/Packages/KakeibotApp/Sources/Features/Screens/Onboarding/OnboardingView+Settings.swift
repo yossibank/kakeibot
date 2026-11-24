@@ -56,7 +56,7 @@ extension OnboardingView {
                 }
             } label: {
                 VStack(spacing: 8) {
-                    Text("\(model.budget.month.month)月の予算")
+                    Text("\(model.budget.input.month.month)月の予算")
                         .textFont(.caption2)
                         .tracking(3)
                         .foregroundStyle(Palette.accent)
@@ -137,11 +137,11 @@ private extension OnboardingView {
 
 private extension OnboardingView {
     var budgetText: String {
-        model.budget.totalAmount.map { Yen.text($0) } ?? "なし"
+        model.budget.output.totalAmount.map { Yen.text($0) } ?? "なし"
     }
 
     var budgetColor: Color {
-        model.budget.totalAmount == nil ? Palette.hint : Palette.accentStrong
+        model.budget.output.totalAmount == nil ? Palette.hint : Palette.accentStrong
     }
 
     var weekStartBinding: Binding<Weekday> {

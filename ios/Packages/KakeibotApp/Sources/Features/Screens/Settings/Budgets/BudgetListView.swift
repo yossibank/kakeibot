@@ -18,10 +18,10 @@ public struct BudgetListView: View {
 
     public var body: some View {
         content
-            .errorBanner($model.errorNotice)
+            .errorBanner(Bindable(model.state).errorNotice)
             .budgetKeypad(model, cleared: $cleared)
             .toolbar(.hidden, for: .navigationBar)
-            .haptic(.selection, trigger: model.budgets)
+            .haptic(.selection, trigger: model.input.budgets)
             .task {
                 await model.load()
             }
@@ -51,7 +51,7 @@ private extension BudgetListView {
                         title: "残りを繰り越す",
                         detail: "使いすぎた分は、次の月の予算から引きます",
                         systemImage: "arrow.turn.down.right",
-                        isOn: model.isCarryoverOn
+                        isOn: model.output.isCarryoverOn
                     ) { isOn in
                         await model.setCarryover(isOn)
                     }
@@ -63,7 +63,7 @@ private extension BudgetListView {
 
                                 Spacer()
 
-                                Text("合計 \(Yen.text(model.categoriesTotal))")
+                                Text("合計 \(Yen.text(model.output.categoriesTotal))")
                                     .textFont(.caption2)
                                     .monospacedDigit()
                                     .foregroundStyle(Palette.subtext)
@@ -138,11 +138,11 @@ private extension BudgetListView {
                         .minimumScaleFactor(0.8)
                 }
 
-                amountValue(model.totalAmount, size: .largeTitle, weight: .bold)
+                amountValue(model.output.totalAmount, size: .largeTitle, weight: .bold)
                     .editBadge()
 
-                if model.isCarryoverOn,
-                   let usage = model.usage(for: nil) {
+                if model.output.isCarryoverOn,
+                   let usage = model.output.usage(for: nil) {
                     HStack(spacing: 8) {
                         Text(usage.carryoverText)
                             .textFont(.caption)
@@ -169,13 +169,13 @@ private extension BudgetListView {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
-                if let usage = model.usage(for: nil) {
+                if let usage = model.output.usage(for: nil) {
                     usageLine(usage)
                         .padding(.horizontal, 24)
                         .padding(.top, 4)
                 }
 
-                if model.recurringExpense > 0 {
+                if model.output.recurringExpense > 0 {
                     Label(recurringText, systemImage: "repeat")
                         .textFont(.caption2)
                         .monospacedDigit()
@@ -190,22 +190,22 @@ private extension BudgetListView {
             .padding(.vertical, 20)
             .card()
             .contentShape(.rect)
-            .animation(.snappy, value: model.carryoverFrom)
+            .animation(.snappy, value: model.input.carryoverFrom)
         }
         .buttonStyle(.plain)
     }
 
     func categoryRow(_ category: EntryCategory) -> some View {
-        let amount = model.amount(for: category.id)
-        let usage = model.usage(for: category.id)
-        let spent = model.spent(for: category.id)
+        let amount = model.output.amount(for: category.id)
+        let usage = model.output.usage(for: category.id)
+        let spent = model.output.spent(for: category.id)
 
         return Button {
             openDrawer(.category(category))
         } label: {
             VStack(spacing: 8) {
                 HStack(spacing: 12) {
-                    IconBadge(model.icon(for: category), size: 28)
+                    IconBadge(model.output.icon(for: category), size: 28)
 
                     Text(category.name)
                         .textFont(.subheadline)
@@ -238,13 +238,13 @@ private extension BudgetListView {
     }
 
     func plainRow(_ category: EntryCategory) -> some View {
-        let spent = model.spent(for: category.id)
+        let spent = model.output.spent(for: category.id)
 
         return Button {
             openDrawer(.category(category))
         } label: {
             HStack(spacing: 12) {
-                IconBadge(model.icon(for: category), size: 28)
+                IconBadge(model.output.icon(for: category), size: 28)
 
                 Text(category.name)
                     .textFont(.footnote)
@@ -327,13 +327,16 @@ private extension BudgetListView {
 
 private extension BudgetListView {
     var budgeted: [EntryCategory] {
-        model.categories.filter { model.amount(for: $0.id) != nil }
+        model.output.categories.filter { model.output.amount(for: $0.id) != nil }
     }
 
     var unbudgeted: [EntryCategory] {
-        let rest = model.categories.filter { model.amount(for: $0.id) == nil }
+        let rest = model.output.categories.filter { model.output.amount(for: $0.id) == nil }
         let order = rest.enumerated().sorted { lhs, rhs in
-            let spent = (model.spent(for: lhs.element.id), model.spent(for: rhs.element.id))
+            let spent = (
+                model.output.spent(for: lhs.element.id),
+                model.output.spent(for: rhs.element.id)
+            )
             return spent.0 == spent.1 ? lhs.offset < rhs.offset : spent.0 > spent.1
         }
 
@@ -341,11 +344,11 @@ private extension BudgetListView {
     }
 
     var periodText: String {
-        "\(model.month.month)月（\(model.periodText)）から使う額"
+        "\(model.input.month.month)月（\(model.output.periodText)）から使う額"
     }
 
     var recurringText: String {
-        "この月の固定費は \(Yen.text(model.recurringExpense))。予算の目安にできます"
+        "この月の固定費は \(Yen.text(model.output.recurringExpense))。予算の目安にできます"
     }
 
     var clearedMessage: String {
