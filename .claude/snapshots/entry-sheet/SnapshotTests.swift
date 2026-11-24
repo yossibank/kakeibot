@@ -717,10 +717,14 @@ private extension SnapshotTests {
             _ = try await database.saveTemplate(template, at: now)
         }
 
-        for (amount, memo, offset) in [(980, "ランチ", -1), (220, "", -1), (1540, "ドラッグストア", -2)] {
+        let entries = [(980, "ランチ", -1), (220, "", -1), (1540, "ドラッグストア", -2)]
+
+        for (index, (amount, memo, offset)) in entries.enumerated() {
+            let savedAt = snapshotNow.addingTimeInterval(TimeInterval(index - entries.count))
+
             let draft = EntryModel(
                 database: database,
-                clock: .fixed(snapshotNow),
+                clock: .fixed(savedAt),
                 date: date.adding(days: offset)
             )
 

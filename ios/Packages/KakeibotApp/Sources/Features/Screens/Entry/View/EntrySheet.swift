@@ -160,6 +160,7 @@ public struct EntrySheet: View {
             .task {
                 await voice.checkAvailability()
             }
+            .modifier(EntryTodayFollower(model: model))
             .onDisappear {
                 Task {
                     await voice.cancel()
