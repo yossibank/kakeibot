@@ -7,19 +7,11 @@ import Store
 @MainActor
 @Observable
 public final class ReminderModel {
-    public private(set) var time: ReminderTime?
-    public private(set) var authorization: NotificationAuthorization = .allowed
-    public private(set) var isLoaded = false
-    public private(set) var previewDay: Weekday
+    public let state: State
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private var lastTime: ReminderTime = .evening
-    private var input: NotificationInput?
-
-    private let database: AppDatabase
-    private let today: LocalDate
-    private let permission: NotificationPermission
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
@@ -28,60 +20,69 @@ public final class ReminderModel {
         authorization: NotificationAuthorization = .allowed,
         permission: NotificationPermission
     ) {
-        self.database = database
-        self.today = today
-        self.time = time
-        self.lastTime = time ?? .evening
-        self.authorization = authorization
-        self.previewDay = today.weekday
-        self.permission = permission
+        let state = State(previewDay: today.weekday)
+        let input = Input(today: today, time: time, authorization: authorization)
+
+        self.state = state
+        self.input = input
+        self.output = Output(input: input, state: state)
+        self.dependencies = Dependencies(database: database, permission: permission)
     }
 }
 
 public extension ReminderModel {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public internal(set) var previewDay: Weekday
+
+        init(previewDay: Weekday) {
+            self.previewDay = previewDay
+        }
+    }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var time: ReminderTime?
+        public internal(set) var authorization: NotificationAuthorization
+        public internal(set) var isLoaded = false
+
+        var lastTime: ReminderTime
+        var notifications: NotificationInput?
+
+        let today: LocalDate
+
+        init(
+            today: LocalDate,
+            time: ReminderTime?,
+            authorization: NotificationAuthorization
+        ) {
+            self.today = today
+            self.time = time
+            self.lastTime = time ?? .evening
+            self.authorization = authorization
+        }
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+        let state: State
+
+        init(
+            input: Input,
+            state: State
+        ) {
+            self.input = input
+            self.state = state
+        }
+    }
+
     static let presets: [ReminderTime] = [19, 20, 21, 22, 23]
         .compactMap { ReminderTime(hour: $0, minute: 0) }
-
-    var isOn: Bool {
-        time != nil
-    }
-
-    var isDenied: Bool {
-        isOn && authorization == .denied
-    }
-
-    var upcomingNotices: [PlannedNotification] {
-        guard let input else {
-            return []
-        }
-
-        let plan = NotificationPlan.notifications(
-            today: today,
-            reminderTime: time,
-            recordedDates: input.recordedDates,
-            recurrings: input.recurrings,
-            names: input.names,
-            shortages: input.shortages
-        )
-
-        let notices = plan.filter { notification in
-            if case .recurring = notification.route {
-                true
-            } else {
-                false
-            }
-        }
-
-        return Array(notices.prefix(Self.noticeCount))
-    }
-
-    var isCustom: Bool {
-        time.map { !Self.presets.contains($0) } ?? false
-    }
-
-    var previewMessage: ReminderMessage {
-        ReminderMessage(on: previewDay)
-    }
 
     static func rowText(
         time: ReminderTime?,
@@ -95,66 +96,116 @@ public extension ReminderModel {
     }
 
     func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.reminder, in: database)
+        .closedHint(.reminder, in: dependencies.database)
     }
 
     func showPreview(on day: Weekday) {
-        previewDay = day
+        state.previewDay = day
     }
 
     func load() async {
         let loaded: (ReminderTime?, NotificationInput)?
 
         do {
-            let time = try await database.setting(.reminderTime)
-            let input = try await database.notificationInput(from: today)
+            let time = try await dependencies.database.setting(.reminderTime)
+            let notifications = try await dependencies.database.notificationInput(from: input.today)
 
-            loaded = (time, input)
+            loaded = (time, notifications)
         } catch {
             loaded = nil
         }
 
-        let authorization = await permission.authorization()
+        let authorization = await dependencies.permission.authorization()
 
-        if let (time, input) = loaded {
-            self.time = time
-            self.input = input
-            lastTime = time ?? lastTime
+        if let (time, notifications) = loaded {
+            input.time = time
+            input.notifications = notifications
+            input.lastTime = time ?? input.lastTime
         } else {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
 
-        self.authorization = authorization
-        isLoaded = true
+        input.authorization = authorization
+        input.isLoaded = true
     }
 
     func setOn(_ isOn: Bool) async {
-        await choose(isOn ? lastTime : nil)
+        await choose(isOn ? input.lastTime : nil)
     }
 
     func choose(_ time: ReminderTime?) async {
-        self.time = time
-        lastTime = time ?? lastTime
+        input.time = time
+        input.lastTime = time ?? input.lastTime
 
-        errorNotice.clear()
+        state.errorNotice.clear()
 
         do {
-            try await database.setSetting(.reminderTime, to: time)
+            try await dependencies.database.setSetting(.reminderTime, to: time)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
 
         guard time != nil else {
             return
         }
 
-        await permission.requestIfUndecided()
+        await dependencies.permission.requestIfUndecided()
 
-        authorization = await permission.authorization()
+        input.authorization = await dependencies.permission.authorization()
     }
 
     func refreshAuthorization() async {
-        authorization = await permission.authorization()
+        input.authorization = await dependencies.permission.authorization()
+    }
+}
+
+public extension ReminderModel.Output {
+    var isOn: Bool {
+        input.time != nil
+    }
+
+    var isDenied: Bool {
+        isOn && input.authorization == .denied
+    }
+
+    var upcomingNotices: [PlannedNotification] {
+        guard let notifications = input.notifications else {
+            return []
+        }
+
+        let plan = NotificationPlan.notifications(
+            today: input.today,
+            reminderTime: input.time,
+            recordedDates: notifications.recordedDates,
+            recurrings: notifications.recurrings,
+            names: notifications.names,
+            shortages: notifications.shortages
+        )
+
+        let notices = plan.filter { notification in
+            if case .recurring = notification.route {
+                true
+            } else {
+                false
+            }
+        }
+
+        return Array(notices.prefix(ReminderModel.noticeCount))
+    }
+
+    var isCustom: Bool {
+        input.time.map { !ReminderModel.presets.contains($0) } ?? false
+    }
+
+    var previewMessage: ReminderMessage {
+        ReminderMessage(on: state.previewDay)
+    }
+}
+
+extension ReminderModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let permission: NotificationPermission
     }
 }
 

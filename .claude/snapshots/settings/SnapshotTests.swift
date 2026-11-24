@@ -235,7 +235,7 @@ struct SnapshotTests {
         let savedTemplate = try await database.templates().first
         let templateEditing = TemplateEditModel(
             database: database,
-            clock: .system,
+            clock: .fixed(snapshotNow),
             type: .expense,
             editing: savedTemplate?.id
         )

@@ -18,7 +18,7 @@ public struct ReminderView: View {
 
         _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
-        _isPickingTime = State(initialValue: model.isCustom)
+        _isPickingTime = State(initialValue: model.output.isCustom)
     }
 
     public var body: some View {
@@ -40,13 +40,13 @@ public struct ReminderView: View {
                     VStack(spacing: 12) {
                         hero
 
-                        if model.isDenied {
+                        if model.output.isDenied {
                             NotificationDeniedBanner()
                                 .transition(.opacity)
                         }
                     }
 
-                    if model.isOn {
+                    if model.output.isOn {
                         timeSection
                             .transition(.opacity)
 
@@ -54,7 +54,7 @@ public struct ReminderView: View {
                             .transition(.opacity)
                     }
 
-                    if !model.upcomingNotices.isEmpty {
+                    if !model.output.upcomingNotices.isEmpty {
                         recurringSection
                     }
                 }
@@ -62,16 +62,16 @@ public struct ReminderView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .settingsScreen(errorNotice: $model.errorNotice)
-        .animation(.snappy, value: model.time)
-        .animation(.snappy, value: model.isDenied)
+        .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
+        .animation(.snappy, value: model.input.time)
+        .animation(.snappy, value: model.output.isDenied)
         .animation(.snappy, value: isPickingTime)
-        .animation(.snappy, value: model.previewDay)
-        .transaction(value: model.isLoaded) { transaction in
+        .animation(.snappy, value: model.state.previewDay)
+        .transaction(value: model.input.isLoaded) { transaction in
             transaction.disablesAnimations = true
         }
-        .haptic(.selection, trigger: model.time)
-        .haptic(.selection, trigger: model.previewDay)
+        .haptic(.selection, trigger: model.input.time)
+        .haptic(.selection, trigger: model.state.previewDay)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
                 Task {
@@ -87,7 +87,7 @@ public struct ReminderView: View {
 
 extension ReminderView {
     var timeText: String {
-        model.time?.description ?? "オフ"
+        model.input.time?.description ?? "オフ"
     }
 }
 
@@ -103,7 +103,7 @@ private extension ReminderView {
                 .symbolEffect(
                     .wiggle,
                     options: .repeat(.periodic(delay: 4)),
-                    isActive: model.isOn
+                    isActive: model.output.isOn
                 )
 
             Text(timeText)
@@ -136,7 +136,7 @@ private extension ReminderView {
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     ForEach(ReminderModel.presets, id: \.self) { time in
-                        let isSelected = !isPickingTime && model.time == time
+                        let isSelected = !isPickingTime && model.input.time == time
 
                         timeButton("\(time.hour)", isSelected: isSelected) {
                             isPickingTime = false
@@ -205,20 +205,20 @@ private extension ReminderView {
     ]
 
     var bellImage: String {
-        model.isOn ? "bell.badge" : "bell.slash"
+        model.output.isOn ? "bell.badge" : "bell.slash"
     }
 
     var timeColor: Color {
-        model.isOn ? Palette.accentStrong : Palette.hint
+        model.output.isOn ? Palette.accentStrong : Palette.hint
     }
 
     var summaryText: String {
-        model.isOn ? "記録のない日に届きます" : "通知は届きません"
+        model.output.isOn ? "記録のない日に届きます" : "通知は届きません"
     }
 
     var onBinding: Binding<Bool> {
         Binding {
-            model.isOn
+            model.output.isOn
         } set: { isOn in
             Task {
                 await model.setOn(isOn)
@@ -228,7 +228,7 @@ private extension ReminderView {
 
     var dateBinding: Binding<Date> {
         Binding {
-            let time = model.time ?? .evening
+            let time = model.input.time ?? .evening
 
             let components = DateComponents(
                 hour: time.hour,
