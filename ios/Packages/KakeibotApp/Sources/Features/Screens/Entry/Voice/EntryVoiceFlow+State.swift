@@ -33,10 +33,10 @@ extension EntryVoiceFlow {
     @MainActor
     @Observable
     final class State {
-        var step: Step?
-        var silenceStart: Date?
-        var startCount = 0
-        var endCount = 0
+        private(set) var step: Step?
+        private(set) var silenceStart: Date?
+        private(set) var startCount = 0
+        private(set) var endCount = 0
 
         private(set) var notice: Notice?
         private(set) var undo: EntryModel.VoiceUndo?
@@ -52,6 +52,44 @@ extension EntryVoiceFlow {
         func clearNotice() {
             notice = nil
             undo = nil
+        }
+
+        func setDenied(_ isDenied: Bool) {
+            step = isDenied ? .denied : nil
+        }
+
+        func closeDenied() {
+            if step == .denied {
+                step = nil
+            }
+        }
+
+        func startListening() {
+            step = .listening
+            startCount += 1
+        }
+
+        func startSilence(at date: Date) {
+            silenceStart = date
+        }
+
+        func clearSilence() {
+            silenceStart = nil
+        }
+
+        func finish() {
+            silenceStart = nil
+            step = .reading
+            endCount += 1
+        }
+
+        func countEnd() {
+            endCount += 1
+        }
+
+        func reset() {
+            silenceStart = nil
+            step = nil
         }
     }
 

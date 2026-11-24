@@ -86,7 +86,7 @@ extension EntryVoiceFlow {
         clearNotice()
 
         guard await dependencies.requestPermission() else {
-            state.step = dependencies.isDenied() ? .denied : nil
+            state.setDenied(dependencies.isDenied())
             return
         }
 
@@ -98,8 +98,7 @@ extension EntryVoiceFlow {
         input.session = Session(model: model, today: today, onApplied: onApplied)
         input.transcript = EntryVoiceTranscript()
         input.preview = nil
-        state.step = .listening
-        state.startCount += 1
+        state.startListening()
 
         do {
             try await source.start(hints: model.output.voiceHints) { [weak self] event in
@@ -113,7 +112,7 @@ extension EntryVoiceFlow {
             }
 
             reset()
-            state.endCount += 1
+            state.countEnd()
             model.state.errorNotice.show(Self.failedMessage)
             return
         }
@@ -133,10 +132,8 @@ extension EntryVoiceFlow {
         }
 
         input.silenceTask?.cancel()
-        state.silenceStart = nil
         input.levels = Self.quietLevels
-        state.step = .reading
-        state.endCount += 1
+        state.finish()
 
         await source.finish()
 
@@ -146,20 +143,18 @@ extension EntryVoiceFlow {
 
     func cancel() async {
         guard let source = input.source else {
-            state.step = nil
+            state.reset()
             return
         }
 
         input.silenceTask?.cancel()
-        state.endCount += 1
+        state.countEnd()
         await source.cancel()
         reset()
     }
 
     func closeDenied() {
-        if state.step == .denied {
-            state.step = nil
-        }
+        state.closeDenied()
     }
 
     func undoLast(in model: EntryModel) {
@@ -231,7 +226,7 @@ private extension EntryVoiceFlow {
             input.lastVoice = dependencies.clock.now
             input.silenceTask?.cancel()
             input.silenceTask = nil
-            state.silenceStart = nil
+            state.clearSilence()
             return
         }
 
@@ -246,7 +241,7 @@ private extension EntryVoiceFlow {
         }
 
         let silence = dependencies.silence
-        state.silenceStart = dependencies.clock.now
+        state.startSilence(at: dependencies.clock.now)
 
         input.silenceTask = Task { [weak self] in
             try? await Task.sleep(for: silence)
@@ -321,12 +316,11 @@ private extension EntryVoiceFlow {
     func reset() {
         input.silenceTask?.cancel()
         input.silenceTask = nil
-        state.silenceStart = nil
         input.lastVoice = nil
         input.levels = Self.quietLevels
         input.source = nil
         input.session = nil
-        state.step = nil
+        state.reset()
         input.preview = nil
     }
 }

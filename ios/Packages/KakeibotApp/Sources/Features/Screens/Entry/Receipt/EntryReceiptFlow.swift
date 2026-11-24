@@ -37,8 +37,35 @@ extension EntryReceiptFlow {
     @Observable
     final class State {
         var hidesGuide = false
-        var step: Step?
-        var offer: String?
+
+        private(set) var step: Step?
+        private(set) var offer: String?
+
+        func showOffer(_ feature: String) {
+            offer = feature
+        }
+
+        func closeOffer() {
+            offer = nil
+        }
+
+        func open(showsGuide: Bool) {
+            offer = nil
+            hidesGuide = false
+            step = showsGuide ? .guide : .camera
+        }
+
+        func openCamera() {
+            step = .camera
+        }
+
+        func startReading() {
+            step = .reading
+        }
+
+        func close() {
+            step = nil
+        }
     }
 
     @MainActor
@@ -64,23 +91,21 @@ extension EntryReceiptFlow {
         isPro: Bool
     ) {
         guard model.output.canReadReceipt(isPro: isPro) else {
-            state.offer = Self.offerFeature
+            state.showOffer(Self.offerFeature)
             return
         }
 
-        state.offer = nil
-        state.hidesGuide = false
         dependencies.prepare()
-        state.step = model.output.showsReceiptGuide ? .guide : .camera
+        state.open(showsGuide: model.output.showsReceiptGuide)
     }
 
     func confirmGuide() {
         dependencies.prepare()
-        state.step = .camera
+        state.openCamera()
     }
 
     func cancel() {
-        state.step = nil
+        state.close()
     }
 
     func saveGuideChoice(for model: EntryModel) async {
@@ -92,18 +117,18 @@ extension EntryReceiptFlow {
     }
 
     func closeOffer() {
-        state.offer = nil
+        state.closeOffer()
     }
 
     func scan(
         _ pages: [CGImage],
         into model: EntryModel
     ) async -> Outcome {
-        state.step = .reading
+        state.startReading()
 
         let reading = await dependencies.read(pages)
 
-        state.step = nil
+        state.close()
 
         guard !reading.isEmpty else {
             model.state.errorNotice.show(Self.unreadMessage)
