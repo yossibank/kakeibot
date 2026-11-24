@@ -36,7 +36,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | 端末の中のモデルの正しさ（声の入力・一手の理由・総評）。`make test` では走らず、合格の数と文を出す | `make test-model` |
 | 画面の部品を PNG に描く（下の注） | `make snapshot SNAPSHOT=widget` |
 | Android のビルド（デバッグの APK） | `make android-build` |
-| Android の Core と Store のテスト | `make android-test` |
+| Android の Core・Store・画面のモデルのテスト | `make android-test` |
 | Swift・Kotlin・JSON の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
