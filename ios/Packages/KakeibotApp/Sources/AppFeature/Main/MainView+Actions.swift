@@ -5,7 +5,7 @@ import SwiftUI
 
 extension MainView {
     var isLoaded: Bool {
-        let isHomeLoaded = home.input.list != nil || home.errorNotice.message != nil
+        let isHomeLoaded = home.input.list != nil || home.state.errorNotice.message != nil
         let isSetupLoaded = setup.output.isLoaded || setup.state.errorNotice.message != nil
         return isHomeLoaded && isSetupLoaded && launchScreen != nil && areTabsLoaded
     }
@@ -185,7 +185,7 @@ extension MainView {
         notice.show(change)
 
         Task {
-            guard await request.shouldAsk(after: change, at: Date()) else {
+            guard await request.shouldAsk(after: change, at: clock.now) else {
                 return
             }
 

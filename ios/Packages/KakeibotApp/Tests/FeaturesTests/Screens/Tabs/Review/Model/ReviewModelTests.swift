@@ -17,7 +17,7 @@ struct ReviewModelTests {
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
         try await setup.save(.expense, amount: 5000, on: "2026-09-10")
         try await setup.save(.expense, amount: 7000, on: "2026-09-20")
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         try await observe(model) {
             model.input.list != nil
@@ -40,7 +40,7 @@ struct ReviewModelTests {
         let setup = try await RecordsModelTests.Setup()
         try await setup.save(.expense, amount: 3000, on: "2026-09-05")
         try await setup.save(.expense, amount: 7000, on: "2026-09-20")
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         try await observe(model) {
             model.input.list != nil
@@ -57,7 +57,7 @@ struct ReviewModelTests {
         let setup = try await RecordsModelTests.Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-05")
         try await setup.save(.income, amount: 3000, on: "2026-09-03")
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         try await observe(model) {
             model.input.list != nil
@@ -98,7 +98,7 @@ struct ReviewModelTests {
 
         try await setup.database.saveEntry(draft, at: now)
         try await setup.database.setHidden(loan.id, isHidden: true, at: now)
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         try await observe(model) {
             model.input.list != nil
@@ -153,7 +153,7 @@ struct ReviewModelTests {
 
         try await setup.database.saveRecurring(recurring, today: setup.today, at: now)
 
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         try await observe(model) {
             model.input.list != nil && !model.output.moves.isEmpty
@@ -204,7 +204,7 @@ struct ReviewModelTests {
             startDate: #require(LocalDate("2027-01-01"))
         )
 
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         let task = Task {
             await model.run()

@@ -33,7 +33,7 @@ private struct EntryNoticeBanner: ViewModifier {
                 including: tapMask
             )
             .overlay(alignment: .bottom) {
-                if let notice = model.notice {
+                if let notice = model.state.notice {
                     banner(notice)
                         .padding(.horizontal, NoticeBanner.sideMargin)
                         .padding(.bottom, bottom)
@@ -43,11 +43,11 @@ private struct EntryNoticeBanner: ViewModifier {
                         .transition(Self.transition)
                 }
             }
-            .animation(.snappy, value: model.notice)
-            .haptic(.success, trigger: model.change) { _, new in
+            .animation(.snappy, value: model.state.notice)
+            .haptic(.success, trigger: model.output.change) { _, new in
                 new != nil
             }
-            .task(id: model.notice) {
+            .task(id: model.state.notice) {
                 await clearLater()
             }
     }
@@ -104,7 +104,7 @@ private extension EntryNoticeBanner {
     }
 
     func clearLater() async {
-        guard let notice = model.notice else {
+        guard let notice = model.state.notice else {
             return
         }
 

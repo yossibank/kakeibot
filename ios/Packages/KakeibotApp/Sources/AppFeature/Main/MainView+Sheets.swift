@@ -44,6 +44,7 @@ extension MainView {
         case .settings:
             SettingsMenuSheet(
                 database: database,
+                clock: clock,
                 today: today,
                 appIcon: appIcon
             )

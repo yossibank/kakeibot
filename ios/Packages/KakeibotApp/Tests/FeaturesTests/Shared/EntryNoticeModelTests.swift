@@ -20,8 +20,8 @@ struct EntryNoticeModelTests {
 
         #expect(change.message == "食費 ¥500 を記録しました")
         #expect(entries.isEmpty)
-        #expect(setup.notice.notice == .undone)
-        #expect(setup.notice.notice?.message == "取り消しました")
+        #expect(setup.notice.state.notice == .undone)
+        #expect(setup.notice.state.notice?.message == "取り消しました")
     }
 
     @Test
@@ -94,7 +94,7 @@ struct EntryNoticeModelTests {
         let list = try await setup.database.entryList()
 
         await setup.notice.delete(saved.id, in: list)
-        let message = setup.notice.notice?.message
+        let message = setup.notice.state.notice?.message
         let deleted = try setup.database.snapshot().entries
         await setup.notice.undo()
         let restored = try setup.database.snapshot().entries
@@ -111,7 +111,7 @@ struct EntryNoticeModelTests {
         let list = try await setup.database.entryList()
 
         await setup.notice.delete(saved.id, in: list)
-        let change = setup.notice.change
+        let change = setup.notice.output.change
 
         #expect(change?.subject == "ランチ")
         #expect(change?.amountText == "¥980")
@@ -137,11 +137,11 @@ struct EntryNoticeModelTests {
 
         await setup.notice.delete(saved.id, in: list)
         setup.notice.clearOnTap()
-        let notice = setup.notice.notice
+        let notice = setup.notice.state.notice
 
         #expect(notice?.seconds == 4)
         #expect(notice?.dismissesOnTap == false)
-        #expect(setup.notice.change?.isDeletion == true)
+        #expect(setup.notice.output.change?.isDeletion == true)
     }
 
     @Test
@@ -165,11 +165,11 @@ struct EntryNoticeModelTests {
 
         let change = try #require(await model.save())
         setup.notice.show(change)
-        let shown = setup.notice.notice
+        let shown = setup.notice.state.notice
         setup.notice.clear()
 
         #expect(shown == .changed(change))
-        #expect(setup.notice.notice == nil)
+        #expect(setup.notice.state.notice == nil)
     }
 
     @Test
@@ -180,7 +180,7 @@ struct EntryNoticeModelTests {
         let other = options.expenseCategories[1]
 
         await setup.notice.changeEntries([saved.id], to: .category(other.id))
-        let message = setup.notice.notice?.message
+        let message = setup.notice.state.notice?.message
         let changed = try setup.database.snapshot().entries
         await setup.notice.undo()
         let restored = try setup.database.snapshot().entries
@@ -197,7 +197,7 @@ struct EntryNoticeModelTests {
         let second = try await setup.saveEntry()
 
         await setup.notice.deleteEntries([first.id, second.id])
-        let message = setup.notice.notice?.message
+        let message = setup.notice.state.notice?.message
         let deleted = try setup.database.snapshot().entries
         await setup.notice.undo()
         let restored = try setup.database.snapshot().entries
@@ -215,7 +215,7 @@ struct EntryNoticeModelTests {
 
         await setup.notice.deleteEntries([first.id, second.id])
         setup.notice.clearOnTap()
-        let batch = setup.notice.notice
+        let batch = setup.notice.state.notice
 
         let change = EntryChange(kind: .recorded, entry: first, label: "食費")
         setup.notice.show(change)
@@ -223,7 +223,7 @@ struct EntryNoticeModelTests {
 
         #expect(batch?.seconds == 8)
         #expect(batch != nil)
-        #expect(setup.notice.notice == nil)
+        #expect(setup.notice.state.notice == nil)
         #expect(EntryNoticeModel.Notice.failed("x").seconds == 4)
         #expect(EntryNoticeModel.Notice.undone.seconds == 2)
     }
@@ -273,7 +273,7 @@ extension EntryNoticeModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let date = try #require(LocalDate("2026-10-12"))
-        let notice = EntryNoticeModel(database: database)
+        let notice = EntryNoticeModel(database: database, clock: .system)
 
         try database.insertDefaultsIfEmpty(at: Date())
         self.init(database: database, date: date, notice: notice)

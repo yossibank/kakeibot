@@ -101,7 +101,7 @@ public struct HomeView: View {
             .animation(.snappy, value: setup.output.showsCard)
             .animation(.snappy, value: model.output.homeLayout)
         }
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
             StampDaysSheet(
                 tally: tally,

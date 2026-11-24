@@ -59,15 +59,6 @@ public extension AssetsModel {
 
     static let monthCount = AssetsSummary.Input.monthCount
 
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     func setToday(_ today: LocalDate) {
         guard today != input.latest.today else {
             return
@@ -75,6 +66,14 @@ public extension AssetsModel {
 
         input.latest.today = today
         refreshLater()
+    }
+
+    func newWalletModel(kind: Wallet.Kind) -> WalletEditModel {
+        WalletEditModel(
+            database: dependencies.database,
+            clock: dependencies.clock,
+            kind: kind
+        )
     }
 
     func adjustModel(for row: WalletRow) -> AssetsAdjustmentModel {

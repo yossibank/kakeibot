@@ -74,7 +74,7 @@ public extension HomeModel {
             input.list = try await dependencies.database.entryList()
             input.recurrings = try await dependencies.database.recurrings()
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -82,7 +82,7 @@ public extension HomeModel {
         do {
             input.templateOrder = try await dependencies.database.setting(.templateOrder)
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
@@ -92,7 +92,7 @@ public extension HomeModel {
         do {
             try await dependencies.database.setSetting(.templateOrder, to: order)
         } catch {
-            errorNotice.show(Self.orderSaveFailedMessage, for: error)
+            state.errorNotice.show(Self.orderSaveFailedMessage, for: error)
         }
     }
 
@@ -108,7 +108,7 @@ public extension HomeModel {
             try await dependencies.database.setSetting(.homeSections, to: layout.order)
             try await dependencies.database.setSetting(.homeHiddenSections, to: layout.hidden)
         } catch {
-            errorNotice.show(Self.layoutSaveFailedMessage, for: error)
+            state.errorNotice.show(Self.layoutSaveFailedMessage, for: error)
         }
     }
 
@@ -120,7 +120,7 @@ public extension HomeModel {
                 at: dependencies.clock.now
             )
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -147,7 +147,7 @@ public extension HomeModel {
                 clearedNoSpendDays: saved.clearedNoSpendDays
             )
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -163,7 +163,7 @@ private extension HomeModel {
             input.homeSections = try await dependencies.database.setting(.homeSections)
             input.homeHiddenSections = try await dependencies.database.setting(.homeHiddenSections)
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 

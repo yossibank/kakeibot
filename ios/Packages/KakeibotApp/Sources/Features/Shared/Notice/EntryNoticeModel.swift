@@ -6,12 +6,20 @@ import Store
 @MainActor
 @Observable
 public final class EntryNoticeModel {
-    public private(set) var notice: Notice?
+    public let state: State
+    public let output: Output
 
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
-    public init(database: AppDatabase) {
-        self.database = database
+    public init(
+        database: AppDatabase,
+        clock: ScreenClock
+    ) {
+        let state = State()
+
+        self.state = state
+        self.output = Output(state: state)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
@@ -23,22 +31,37 @@ public extension EntryNoticeModel {
         case failed(String)
     }
 
-    var change: EntryChange? {
-        if case let .changed(change) = notice {
-            change
-        } else {
-            nil
+    @MainActor
+    @Observable
+    final class State {
+        public internal(set) var notice: Notice?
+    }
+
+    @MainActor
+    final class Output {
+        let state: State
+
+        public var change: EntryChange? {
+            if case let .changed(change) = state.notice {
+                change
+            } else {
+                nil
+            }
+        }
+
+        init(state: State) {
+            self.state = state
         }
     }
 
     func show(_ change: EntryChange) {
-        notice = .changed(change)
+        state.notice = .changed(change)
     }
 
     func undo() async {
-        let undone = notice
+        let undone = state.notice
 
-        notice = nil
+        state.notice = nil
 
         do {
             switch undone {
@@ -47,15 +70,19 @@ public extension EntryNoticeModel {
 
             case let .batch(batch):
                 let items = batch.kind == .deleted ? batch.items : nil
-                try await database.restoreEntries(batch.previous, items: items, at: Date())
+                try await dependencies.database.restoreEntries(
+                    batch.previous,
+                    items: items,
+                    at: dependencies.clock.now
+                )
 
             case .undone, .failed, nil:
                 return
             }
 
-            notice = .undone
+            state.notice = .undone
         } catch {
-            notice = .failed(Self.undoFailedMessage)
+            state.notice = .failed(Self.undoFailedMessage)
         }
     }
 
@@ -69,28 +96,31 @@ public extension EntryNoticeModel {
         }
 
         do {
-            let previous = try await database.changeEntries(
+            let previous = try await dependencies.database.changeEntries(
                 ids,
                 to: change,
-                at: Date()
+                at: dependencies.clock.now
             )
 
             let batch = EntryBatch(kind: kind, previous: previous)
 
-            notice = .batch(batch)
+            state.notice = .batch(batch)
         } catch {
-            notice = .failed(Self.changeFailedMessage(of: kind))
+            state.notice = .failed(Self.changeFailedMessage(of: kind))
         }
     }
 
     func deleteEntries(_ ids: [Entry.ID]) async {
         do {
-            let items = try await database.entryItems(of: ids)
-            let previous = try await database.deleteEntries(ids, at: Date())
+            let items = try await dependencies.database.entryItems(of: ids)
+            let previous = try await dependencies.database.deleteEntries(
+                ids,
+                at: dependencies.clock.now
+            )
             let batch = EntryBatch(kind: .deleted, previous: previous, items: items)
-            notice = .batch(batch)
+            state.notice = .batch(batch)
         } catch {
-            notice = .failed(Self.deleteFailedMessage)
+            state.notice = .failed(Self.deleteFailedMessage)
         }
     }
 
@@ -108,8 +138,11 @@ public extension EntryNoticeModel {
         }
 
         do {
-            let items = try await database.entryItems(of: id)
-            let deleted = try await database.deleteEntry(id, at: Date())
+            let items = try await dependencies.database.entryItems(of: id)
+            let deleted = try await dependencies.database.deleteEntry(
+                id,
+                at: dependencies.clock.now
+            )
 
             let label = EntryChange.label(for: entry) { id in
                 list.categories[id]
@@ -129,20 +162,20 @@ public extension EntryNoticeModel {
 
             show(change)
         } catch {
-            notice = .failed(Self.deleteFailedMessage)
+            state.notice = .failed(Self.deleteFailedMessage)
         }
     }
 
     func clear() {
-        notice = nil
+        state.notice = nil
     }
 
     func clearOnTap() {
-        guard notice?.dismissesOnTap == true else {
+        guard state.notice?.dismissesOnTap == true else {
             return
         }
 
-        notice = nil
+        state.notice = nil
     }
 }
 
@@ -175,6 +208,13 @@ public extension EntryNoticeModel.Notice {
     }
 }
 
+extension EntryNoticeModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+    }
+}
+
 private extension EntryNoticeModel {
     static let undoFailedMessage = "取り消せませんでした"
     static let deleteFailedMessage = "削除できませんでした"
@@ -190,26 +230,26 @@ private extension EntryNoticeModel {
     func undo(_ change: EntryChange) async throws {
         switch change.kind {
         case .recorded:
-            try await database.deleteEntry(
+            try await dependencies.database.deleteEntry(
                 change.entry.id,
                 restoringNoSpend: change.clearedNoSpendDays,
-                at: Date()
+                at: dependencies.clock.now
             )
 
         case let .edited(previous, previousFee):
-            try await database.restoreEntry(
+            try await dependencies.database.restoreEntry(
                 previous,
                 fee: previousFee,
                 restoringNoSpend: change.clearedNoSpendDays,
-                at: Date()
+                at: dependencies.clock.now
             )
 
         case .deleted:
-            try await database.restoreEntry(
+            try await dependencies.database.restoreEntry(
                 change.entry,
                 fee: change.fee,
                 items: change.items,
-                at: Date()
+                at: dependencies.clock.now
             )
         }
     }

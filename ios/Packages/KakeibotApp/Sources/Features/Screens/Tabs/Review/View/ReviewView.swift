@@ -64,7 +64,7 @@ public struct ReviewView: View {
         .haptic(.selection, trigger: model.output.period)
         .haptic(.selection, trigger: model.state.kind)
         .task(id: model.output.goalTrigger) {
-            await model.refreshGoals(now: Date())
+            await model.refreshGoals()
         }
         .task(id: model.input.list?.entries.count) {
             await model.refreshStoreReviewCard()

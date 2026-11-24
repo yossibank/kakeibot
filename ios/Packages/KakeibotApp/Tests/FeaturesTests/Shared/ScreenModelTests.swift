@@ -21,7 +21,7 @@ struct ScreenModelTests {
         #expect(!isFailed)
         #expect(counter.attempts == 3)
         #expect(received == [1])
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 
     @Test
@@ -37,7 +37,7 @@ struct ScreenModelTests {
 
         #expect(isFailed)
         #expect(counter.attempts == 4)
-        #expect(model.errorNotice.message == "失敗")
+        #expect(model.state.errorNotice.message == "失敗")
     }
 
     @Test
@@ -71,7 +71,7 @@ struct ScreenModelTests {
 
         #expect(!isFailed)
         #expect(counter.attempts <= 1)
-        #expect(model.errorNotice.message == nil)
+        #expect(model.state.errorNotice.message == nil)
     }
 }
 
@@ -86,7 +86,7 @@ extension ScreenModelTests {
     final class Model: ScreenModel {
         static let loadFailedMessage = "読めませんでした"
 
-        var errorNotice = ErrorNotice()
+        let state = NoticeState()
     }
 }
 

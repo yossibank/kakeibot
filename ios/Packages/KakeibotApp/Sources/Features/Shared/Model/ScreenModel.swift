@@ -2,9 +2,11 @@ import DesignSystem
 
 @MainActor
 protocol ScreenModel: AnyObject {
+    associatedtype State: NoticeHolding
+
     static var loadFailedMessage: String { get }
 
-    var errorNotice: ErrorNotice { get set }
+    var state: State { get }
 }
 
 extension ScreenModel {
@@ -22,7 +24,7 @@ extension ScreenModel {
         )
 
         if isFailed {
-            errorNotice.show(message)
+            state.errorNotice.show(message)
         }
 
         return isFailed

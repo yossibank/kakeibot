@@ -7,7 +7,7 @@ extension ReviewModelTests {
     @Test
     func showsStoreReviewCardAfterTenEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         for _ in 0..<9 {
             try await setup.save(.expense, amount: 980, on: "2026-10-12")
@@ -27,7 +27,7 @@ extension ReviewModelTests {
     @Test
     func hidesStoreReviewCardAfterClosing() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         for _ in 0..<10 {
             try await setup.save(.expense, amount: 980, on: "2026-10-12")
@@ -46,7 +46,7 @@ extension ReviewModelTests {
     @Test
     func marksStoreReviewOpened() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.openStoreReview()
         let closed = try await setup.database.setting(.storeReviewCardClosed)
@@ -59,7 +59,7 @@ extension ReviewModelTests {
     @Test
     func keepsStoreReviewUnopenedAfterClosing() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = ReviewModel(database: setup.database, today: setup.today)
+        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.closeStoreReviewCard()
         let opened = try await setup.database.setting(.storeReviewOpened)

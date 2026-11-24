@@ -33,6 +33,7 @@ struct SnapshotTests {
 
                 let sheet = SettingsMenuSheet(
                     database: database,
+                    clock: .fixed(snapshotNow),
                     today: today,
                     appIcon: AppIconListModel()
                 )

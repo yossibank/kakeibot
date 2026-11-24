@@ -15,15 +15,16 @@ public final class ReviewModel: ScreenModel {
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate
     ) {
-        let state = State(today: today)
+        let state = State(today: today, checkTime: clock.now)
         let input = Input()
 
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
@@ -35,6 +36,8 @@ public extension ReviewModel {
 
         public var today: LocalDate
 
+        public internal(set) var checkTime: Date
+
         public private(set) var scale: ReviewPeriod.Scale = .month
         public private(set) var offset = 0
         public private(set) var isMovingForward = true
@@ -43,8 +46,12 @@ public extension ReviewModel {
         public internal(set) var showsStoreReviewCard = false
         public internal(set) var newReportKey: String?
 
-        init(today: LocalDate) {
+        init(
+            today: LocalDate,
+            checkTime: Date
+        ) {
             self.today = today
+            self.checkTime = checkTime
         }
     }
 
@@ -88,15 +95,6 @@ public extension ReviewModel {
         ) {
             self.input = input
             self.state = state
-        }
-    }
-
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
         }
     }
 
@@ -217,6 +215,7 @@ extension ReviewModel.State {
 extension ReviewModel {
     struct Dependencies {
         let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 

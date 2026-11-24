@@ -37,6 +37,12 @@ public extension AssetsModel {
     }
 }
 
+extension AssetsModel {
+    func rewardRuleBoard() -> RewardRuleBoard {
+        RewardRuleBoard(database: dependencies.database)
+    }
+}
+
 private extension AssetsModel {
     static let goalFailedMessage = "目標を保存できませんでした"
 }

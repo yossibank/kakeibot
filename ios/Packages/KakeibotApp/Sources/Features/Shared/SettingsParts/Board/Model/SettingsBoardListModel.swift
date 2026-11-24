@@ -16,15 +16,6 @@ protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel {
 }
 
 extension SettingsBoardListModel {
-    var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     func load() async {
         do {
             input.snapshot = try await read()

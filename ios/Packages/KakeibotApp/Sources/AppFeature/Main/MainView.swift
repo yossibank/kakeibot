@@ -68,6 +68,7 @@ struct MainView: View {
         _review = State(
             initialValue: ReviewModel(
                 database: database,
+                clock: clock,
                 today: today
             )
         )
@@ -90,7 +91,7 @@ struct MainView: View {
             )
         )
 
-        _notice = State(initialValue: EntryNoticeModel(database: database))
+        _notice = State(initialValue: EntryNoticeModel(database: database, clock: clock))
 
         _undo = State(initialValue: DeletionUndo(database: database))
 
@@ -261,7 +262,7 @@ private extension MainView {
             .errorBanner(undo.errorNotice, bottom: noticeBottom) {
                 undo.errorNotice.clear()
             }
-            .onChange(of: notice.notice) { _, new in
+            .onChange(of: notice.state.notice) { _, new in
                 if new != nil {
                     replaceNotices(with: .entry)
                 }
@@ -301,7 +302,7 @@ private extension MainView {
 
     var tabErrorCounts: [Int] {
         [
-            home.errorNotice.count,
+            home.state.errorNotice.count,
             records.state.errorNotice.count,
             review.state.errorNotice.count,
             assets.state.errorNotice.count

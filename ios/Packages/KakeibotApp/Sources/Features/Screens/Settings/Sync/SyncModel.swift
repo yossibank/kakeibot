@@ -59,15 +59,6 @@ public extension SyncModel {
         var pending: Loadable<Int> = .loading
     }
 
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
-
     func hintFlag() -> SettingsScreenFlag {
         .closedHint(.sync, in: dependencies.database)
     }

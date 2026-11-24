@@ -16,7 +16,7 @@ public extension RecordsModel {
         do {
             return try await dependencies.database.deleteAdjustment(id)
         } catch {
-            errorNotice.show(Self.deleteAdjustmentFailedMessage, for: error)
+            state.errorNotice.show(Self.deleteAdjustmentFailedMessage, for: error)
             return nil
         }
     }

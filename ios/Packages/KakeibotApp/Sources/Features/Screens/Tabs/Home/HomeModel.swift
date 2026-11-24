@@ -29,15 +29,6 @@ public final class HomeModel: ScreenModel {
 
 public extension HomeModel {
     static let recentLimit = 5
-
-    internal(set) var errorNotice: ErrorNotice {
-        get {
-            state.errorNotice
-        }
-        set {
-            state.errorNotice = newValue
-        }
-    }
 }
 
 extension HomeModel {

@@ -242,7 +242,7 @@ public extension EntryModel {
     }
 
     func newNoticeModel() -> EntryNoticeModel {
-        EntryNoticeModel(database: dependencies.database)
+        EntryNoticeModel(database: dependencies.database, clock: dependencies.clock)
     }
 }
 

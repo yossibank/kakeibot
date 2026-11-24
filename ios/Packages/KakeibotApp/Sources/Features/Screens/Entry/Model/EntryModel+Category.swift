@@ -161,6 +161,13 @@ extension EntryModel {
     static func filledMemo(of template: EntryTemplate) -> String? {
         template.memo.flatMap { $0.isEmpty ? nil : $0 }
     }
+
+    func categoryBoard() -> CategoryBoard {
+        CategoryBoard(
+            database: dependencies.database,
+            kind: state.type == .income ? .income : .expense
+        )
+    }
 }
 
 private extension EntryModel {

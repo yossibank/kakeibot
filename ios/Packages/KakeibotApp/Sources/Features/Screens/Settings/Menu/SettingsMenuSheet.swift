@@ -33,11 +33,13 @@ public struct SettingsMenuSheet: View {
     @Environment(\.themeStyle) var themeStyle
 
     let database: AppDatabase
+    let clock: ScreenClock
     let today: LocalDate
     let appIcon: AppIconListModel
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         today: LocalDate,
         appIcon: AppIconListModel
     ) {
@@ -50,10 +52,11 @@ public struct SettingsMenuSheet: View {
 
         _recordReset = State(initialValue: SettingsMenuResetModel(
             database: database,
-            clock: .system
+            clock: clock
         ))
 
         self.database = database
+        self.clock = clock
         self.today = today
         self.appIcon = appIcon
     }
@@ -245,6 +248,11 @@ private extension SettingsMenuSheet {
         let _ = try? database.insertDefaultsIfEmpty(at: Date())
         let today = LocalDate(Date(), in: .current)
 
-        SettingsMenuSheet(database: database, today: today, appIcon: AppIconListModel())
+        SettingsMenuSheet(
+            database: database,
+            clock: .system,
+            today: today,
+            appIcon: AppIconListModel()
+        )
     }
 }

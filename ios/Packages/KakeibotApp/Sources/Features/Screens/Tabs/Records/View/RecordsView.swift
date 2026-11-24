@@ -98,7 +98,7 @@ public struct RecordsView: View {
         }
         .monthSwipe(following: swipeSlide, perform: moveMonth)
         .scrollDismissesKeyboard(.interactively)
-        .errorBanner($model.errorNotice)
+        .errorBanner(Bindable(model.state).errorNotice)
         .safeAreaInset(edge: .bottom) {
             if let selection {
                 selectionBar(selection)

@@ -8,10 +8,13 @@ extension ReviewModel {
         let isLoaded: Bool
     }
 
-    func refreshGoals(now: Date) async {
+    func refreshGoals() async {
         guard input.list != nil else {
             return
         }
+
+        let now = dependencies.clock.now
+        state.checkTime = now
 
         let current = output.currentPeriod
         let closed = current.previous
@@ -76,10 +79,10 @@ extension ReviewModel.Output {
         isCurrentPeriod && state.newReportKey != nil
     }
 
-    func closingGoals(now: Date) -> ReviewClosingView.Goals {
+    var closingGoals: ReviewClosingView.Goals {
         let next = period.adding(1)
         let answer = input.goals.first { $0.period == period.commentKey }
-        let checked = answer.map { answered($0, now: now) }
+        let checked = answer.map { answered($0, now: state.checkTime) }
         let nextGoal = input.goals.first { $0.period == next.commentKey }
         let nextItem = nextGoal.flatMap { goalItem($0, in: next) }
         let count = entryCount(in: period.range)

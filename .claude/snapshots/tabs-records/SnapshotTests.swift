@@ -83,7 +83,7 @@ struct SnapshotTests {
 
         for (name, change) in deletions {
             for variant in Self.variants {
-                let notice = EntryNoticeModel(database: database)
+                let notice = EntryNoticeModel(database: database, clock: .fixed(snapshotNow))
                 notice.show(change)
 
                 let view = Color.clear
