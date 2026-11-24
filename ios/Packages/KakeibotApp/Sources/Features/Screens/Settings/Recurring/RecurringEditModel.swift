@@ -81,20 +81,7 @@ public extension RecurringEditModel {
     }
 
     func choose(_ shift: HolidayShift) {
-        state.schedule.holidayShift = shift
-        state.schedule.isHolidayShiftChosen = true
-    }
-
-    func press(_ key: AmountCalculator.Key) {
-        state.calculator.press(key)
-    }
-
-    func pressFee(_ key: AmountCalculator.Key) {
-        state.feeCalculator.press(key)
-    }
-
-    func setFee(_ amount: Int) {
-        state.feeCalculator = AmountCalculator(amount: amount)
+        state.schedule.choose(shift)
     }
 
     func refreshAuthorization(_ permission: NotificationPermission) async {
@@ -142,7 +129,7 @@ private extension RecurringEditModel {
     }
 }
 
-extension RecurringEditModel: SettingsEditGroups, SettingsEditRemoving {
+extension RecurringEditModel: SettingsEditRemoving {
     static let deleteFailedMessage = SettingsEditMessage.saveFailed
 
     var edited: RecurringDraft {

@@ -18,17 +18,17 @@ struct BudgetListModelTests {
         let emptyTitle = model.output.saveTitle
 
         model.startEditing(.total)
-        model.press(.digit(1))
-        model.press(.digit(2))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
+        model.state.press(.digit(1))
+        model.state.press(.digit(2))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
         let title = model.output.saveTitle
         await model.save()
 
         model.startEditing(.category(food))
-        model.press(.digit(3))
-        model.press(.doubleZero)
-        model.press(.doubleZero)
+        model.state.press(.digit(3))
+        model.state.press(.doubleZero)
+        model.state.press(.doubleZero)
         await model.save()
         let budgets = try await setup.database.budgets()
 
@@ -93,10 +93,10 @@ struct BudgetListModelTests {
         await model.load()
         let food = try #require(model.output.categories.first)
         model.startEditing(.category(food))
-        model.press(.digit(1))
-        model.press(.digit(0))
-        model.press(.doubleZero)
-        model.press(.digit(0))
+        model.state.press(.digit(1))
+        model.state.press(.digit(0))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
         await model.finishEditing()
         let usage = try #require(model.output.usage(for: food.id))
 
@@ -124,7 +124,7 @@ struct BudgetListModelTests {
         model.startEditing(.total)
         let opened = model.output.isChanged
 
-        model.press(.digit(1))
+        model.state.press(.digit(1))
         let changed = model.output.isChanged
 
         model.cancelEditing()
@@ -233,7 +233,7 @@ struct BudgetListModelTests {
         model.startEditing(.category(food))
         let category = model.output.suggestions
         let average = try #require(category.last)
-        model.choose(average)
+        model.state.choose(average)
 
         #expect(closed.isEmpty)
         #expect(total.map(\.title) == ["先月", "3 か月の平均", "固定費"])

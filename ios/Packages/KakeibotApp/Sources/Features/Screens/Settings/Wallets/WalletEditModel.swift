@@ -64,7 +64,7 @@ extension WalletEditModel {
     }
 }
 
-extension WalletEditModel: SettingsEditGroups {
+extension WalletEditModel: SettingsEditModel {
     var edited: WalletDraft {
         output.draft
     }

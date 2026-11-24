@@ -105,7 +105,7 @@ private extension StampEditModel {
     static let loadFailedMessage = "スタンプを読めませんでした"
 }
 
-extension StampEditModel: SettingsEditGroups, SettingsEditRemoving {
+extension StampEditModel: SettingsEditRemoving {
     var edited: IconDraft {
         state.icon.draft
     }

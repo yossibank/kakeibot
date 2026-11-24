@@ -159,7 +159,7 @@ extension CategoryEditModel.EditingTag {
     }
 }
 
-extension CategoryEditModel: SettingsEditGroups, SettingsEditRemoving {
+extension CategoryEditModel: SettingsEditRemoving {
     var edited: Snapshot {
         output.snapshot
     }

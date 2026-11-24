@@ -12,16 +12,52 @@ public extension RecurringEditModel {
         public var endDate: LocalDate?
         public var remindDaysBefore: Int?
 
-        public internal(set) var holidayShift: HolidayShift = .none
+        public private(set) var holidayShift: HolidayShift = .none
 
-        var isHolidayShiftChosen = false
+        private(set) var isHolidayShiftChosen = false
+
+        mutating func choose(_ shift: HolidayShift) {
+            holidayShift = shift
+            isHolidayShiftChosen = true
+        }
+
+        mutating func suggest(_ shift: HolidayShift) {
+            guard !isHolidayShiftChosen else {
+                return
+            }
+
+            holidayShift = shift
+        }
+
+        mutating func load(_ shift: HolidayShift) {
+            holidayShift = shift
+        }
     }
 
     struct Repayment {
         public internal(set) var countCalculator = AmountCalculator()
-        public internal(set) var isCountAuto = true
 
-        var manualFinal: Int?
+        public private(set) var isCountAuto = true
+
+        private(set) var manualFinal: Int?
+
+        mutating func useAutoCount() {
+            isCountAuto = true
+            manualFinal = nil
+        }
+
+        mutating func useManualCount(final amount: Int?) {
+            isCountAuto = false
+            manualFinal = amount
+        }
+
+        mutating func load(
+            isCountAuto: Bool,
+            final amount: Int?
+        ) {
+            self.isCountAuto = isCountAuto
+            manualFinal = amount
+        }
     }
 
     @MainActor
@@ -37,10 +73,10 @@ public extension RecurringEditModel {
         public var schedule: Schedule
 
         public private(set) var walletId: Wallet.ID?
+        public private(set) var calculator = AmountCalculator()
+        public private(set) var feeCalculator = AmountCalculator()
 
         public internal(set) var type: Entry.Kind
-        public internal(set) var calculator = AmountCalculator()
-        public internal(set) var feeCalculator = AmountCalculator()
         public internal(set) var repayment = Repayment()
 
         init(
@@ -64,6 +100,18 @@ public extension RecurringEditModel.State {
         walletId = id
         billShift = 0
     }
+
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
+    }
+
+    func pressFee(_ key: AmountCalculator.Key) {
+        feeCalculator.press(key)
+    }
+
+    func setFee(_ amount: Int) {
+        feeCalculator = AmountCalculator(amount: amount)
+    }
 }
 
 extension RecurringEditModel.State {
@@ -77,7 +125,7 @@ extension RecurringEditModel.State {
         schedule.frequency = draft.frequency
         schedule.month = draft.month
         schedule.day = draft.day
-        schedule.holidayShift = draft.holidayShift
+        schedule.load(draft.holidayShift)
         schedule.closingDay = draft.closingDay
         feeCalculator = AmountCalculator(amount: draft.fee)
         billShift = draft.billShift

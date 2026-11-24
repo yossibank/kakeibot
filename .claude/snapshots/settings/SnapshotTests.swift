@@ -220,7 +220,7 @@ struct SnapshotTests {
         await loanEdit.load()
 
         for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
-            loanEdit.press(key)
+            loanEdit.state.press(key)
         }
 
         for variant in Self.variants {

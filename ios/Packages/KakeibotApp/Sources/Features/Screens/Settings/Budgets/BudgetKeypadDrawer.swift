@@ -67,7 +67,7 @@ private extension BudgetKeypadDrawer {
                         await model.finishEditing()
                     }
                 } onKey: { key in
-                    model.press(key)
+                    model.state.press(key)
                 }
 
                 PrimaryButton(model.output.saveTitle) {
@@ -111,7 +111,7 @@ private extension BudgetKeypadDrawer {
             isSelected: model.state.calculator.amount == suggestion.amount,
             width: .fill
         ) {
-            model.choose(suggestion)
+            model.state.choose(suggestion)
         } content: {
             VStack(spacing: 0) {
                 Text(suggestion.title)

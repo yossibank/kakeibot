@@ -95,10 +95,10 @@ struct RecurringEditModelTests {
         let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
 
         await model.load()
-        model.press(.digit(7))
-        model.press(.digit(8))
-        model.press(.doubleZero)
-        model.press(.digit(0))
+        model.state.press(.digit(7))
+        model.state.press(.digit(8))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
         model.state.memo = "家賃"
         model.state.schedule.day = 27
         model.state.schedule.startDate = start
@@ -122,7 +122,7 @@ struct RecurringEditModelTests {
             today: setup.today
         )
         await without.load()
-        without.press(.digit(5))
+        without.state.press(.digit(5))
         without.state.memo = "家賃"
 
         _ = await without.save(permission: client.permission)
@@ -130,7 +130,7 @@ struct RecurringEditModelTests {
 
         let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
         await model.load()
-        model.press(.digit(5))
+        model.state.press(.digit(5))
         model.state.memo = "保険"
         model.state.schedule.remindDaysBefore = 1
 
@@ -286,10 +286,10 @@ struct RecurringEditModelTests {
 
         await model.load()
         model.select(.transfer)
-        model.press(.digit(3))
-        model.press(.digit(0))
-        model.press(.doubleZero)
-        model.press(.digit(0))
+        model.state.press(.digit(3))
+        model.state.press(.digit(0))
+        model.state.press(.doubleZero)
+        model.state.press(.digit(0))
         model.state.schedule.day = 26
         model.state.schedule.startDate = start
         let saved = await model.save()
@@ -310,7 +310,7 @@ struct RecurringEditModelTests {
 
         await model.load()
         model.select(.transfer)
-        model.press(.digit(5))
+        model.state.press(.digit(5))
         model.state.toWalletId = model.state.walletId
         let saved = await model.save()
 
@@ -358,7 +358,7 @@ private extension RecurringEditModelTests {
         model.choose(.none)
 
         for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
-            model.press(key)
+            model.state.press(key)
         }
 
         return model

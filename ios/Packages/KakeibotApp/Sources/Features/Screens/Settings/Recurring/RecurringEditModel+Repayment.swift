@@ -24,21 +24,22 @@ public extension RecurringEditModel {
     }
 
     func setEnd(_ date: LocalDate?) {
-        state.repayment.isCountAuto = false
+        state.repayment.useManualCount(final: state.repayment.manualFinal)
         state.schedule.endDate = date
-        state.repayment.manualFinal = output.manualFinalAmount(through: date)
+        state.repayment.useManualCount(final: output.manualFinalAmount(through: date))
     }
 
     func useAutoCount() {
-        state.repayment.isCountAuto = true
-        state.repayment.manualFinal = nil
+        state.repayment.useAutoCount()
     }
 }
 
 extension RecurringEditModel {
     func chooseCountMode() {
+        let manualFinal = state.repayment.manualFinal
+
         guard output.isEditing else {
-            state.repayment.isCountAuto = true
+            state.repayment.load(isCountAuto: true, final: manualFinal)
             return
         }
 
@@ -46,14 +47,14 @@ extension RecurringEditModel {
             let plan = output.autoPlan,
             let end = state.schedule.endDate
         else {
-            state.repayment.isCountAuto = false
+            state.repayment.load(isCountAuto: false, final: manualFinal)
             return
         }
 
         let endsAsPlanned = output.autoEndDate(of: plan) == end
-        let finalsAsPlanned = plan.finalAmount == state.repayment.manualFinal
+        let finalsAsPlanned = plan.finalAmount == manualFinal
 
-        state.repayment.isCountAuto = endsAsPlanned && finalsAsPlanned
+        state.repayment.load(isCountAuto: endsAsPlanned && finalsAsPlanned, final: manualFinal)
     }
 
     func loadLoanBalances() async throws {

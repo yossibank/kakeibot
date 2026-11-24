@@ -151,7 +151,7 @@ private extension TemplateEditModel {
     }
 }
 
-extension TemplateEditModel: SettingsEditGroups, SettingsEditRemoving {
+extension TemplateEditModel: SettingsEditRemoving {
     static let deleteFailedMessage = SettingsEditMessage.saveFailed
 
     var edited: EntryTemplateDraft {

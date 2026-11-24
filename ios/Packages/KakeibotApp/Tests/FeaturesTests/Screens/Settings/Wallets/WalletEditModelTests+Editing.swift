@@ -138,6 +138,6 @@ extension WalletEditModelTests {
 
         #expect(hid)
         #expect(!refused)
-        #expect(cashModel.errorNotice.message == "最後の 1 つの口座は非表示にできません")
+        #expect(cashModel.state.errorNotice.message == "最後の 1 つの口座は非表示にできません")
     }
 }

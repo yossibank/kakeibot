@@ -69,6 +69,14 @@ public extension BudgetListModel {
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
+
+        public func choose(_ suggestion: Suggestion) {
+            calculator = AmountCalculator(amount: suggestion.amount)
+        }
+
+        public func press(_ key: AmountCalculator.Key) {
+            calculator.press(key)
+        }
     }
 
     @MainActor
@@ -139,14 +147,6 @@ public extension BudgetListModel {
 
     func cancelEditing() {
         state.editing = nil
-    }
-
-    func choose(_ suggestion: Suggestion) {
-        state.calculator = AmountCalculator(amount: suggestion.amount)
-    }
-
-    func press(_ key: AmountCalculator.Key) {
-        state.calculator.press(key)
     }
 
     func save() async {

@@ -148,7 +148,7 @@ private extension RewardRuleEditModel {
     static let loadFailedMessage = "決まりを読めませんでした"
 }
 
-extension RewardRuleEditModel: SettingsEditGroups, SettingsEditRemoving {
+extension RewardRuleEditModel: SettingsEditRemoving {
     var edited: RewardRuleDraft {
         output.draft
     }

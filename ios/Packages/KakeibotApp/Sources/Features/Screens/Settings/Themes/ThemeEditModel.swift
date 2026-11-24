@@ -271,7 +271,7 @@ private extension ThemeEditModel {
     }
 }
 
-extension ThemeEditModel: SettingsEditGroups {
+extension ThemeEditModel: SettingsEditModel {
     var edited: ThemeDraft {
         state.draft
     }

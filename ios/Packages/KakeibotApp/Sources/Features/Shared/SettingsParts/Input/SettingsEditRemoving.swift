@@ -2,17 +2,14 @@ import DesignSystem
 import Store
 
 @MainActor
-protocol SettingsEditRemoving: SettingsEditModel {
+protocol SettingsEditRemoving: SettingsEditModel where Input: SettingsEditHidingInput {
     static var deleteFailedMessage: String { get }
 
-    var isHidden: Bool { get set }
-    var errorNotice: ErrorNotice { get set }
-
-    func remove(_ id: EditingID) async throws -> Deletion
+    func remove(_ id: Input.EditingID) async throws -> Deletion
     func deleteFailedMessage(for error: any Error) -> String?
 
     func saveHidden(
-        _ id: EditingID,
+        _ id: Input.EditingID,
         isHidden: Bool
     ) async throws
 }
@@ -22,29 +19,33 @@ extension SettingsEditRemoving {
         SettingsEditMessage.deleteFailed
     }
 
+    var isHidden: Bool {
+        input.isHidden
+    }
+
     func deleteFailedMessage(for _: any Error) -> String? {
         nil
     }
 
     func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return false
         }
 
         do {
             try await saveHidden(editingId, isHidden: isHidden)
 
-            self.isHidden = isHidden
+            input.isHidden = isHidden
 
             return true
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
 
     func delete() async -> Deletion? {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return nil
         }
 
@@ -52,9 +53,9 @@ extension SettingsEditRemoving {
             return try await remove(editingId)
         } catch {
             if let message = deleteFailedMessage(for: error) {
-                errorNotice.show(message)
+                state.errorNotice.show(message)
             } else {
-                errorNotice.show(Self.deleteFailedMessage, for: error)
+                state.errorNotice.show(Self.deleteFailedMessage, for: error)
             }
 
             return nil

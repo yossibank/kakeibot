@@ -79,14 +79,11 @@ extension RecurringEditModel {
     }
 
     func suggestHolidayShift() {
-        guard
-            !output.isEditing,
-            !state.schedule.isHolidayShiftChosen
-        else {
+        guard !output.isEditing else {
             return
         }
 
-        state.schedule.holidayShift = output.suggestedHolidayShift
+        state.schedule.suggest(output.suggestedHolidayShift)
     }
 
     func loadRecurring() async throws {
@@ -105,6 +102,6 @@ extension RecurringEditModel {
         input.generatedUntil = recurring.generatedUntil
 
         state.apply(RecurringDraft(recurring))
-        state.repayment.manualFinal = recurring.finalAmount
+        state.repayment.load(isCountAuto: state.repayment.isCountAuto, final: recurring.finalAmount)
     }
 }

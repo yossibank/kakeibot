@@ -14,7 +14,7 @@ extension RecurringEditSheet {
                 Keypad(calculator: model.state.calculator) {
                     closePanel()
                 } onKey: { key in
-                    model.press(key)
+                    model.state.press(key)
                 }
             }
 
@@ -41,13 +41,13 @@ extension RecurringEditSheet {
                     choices: FeeChoiceRow.defaultChoices,
                     selection: model.output.fee
                 ) { amount in
-                    model.setFee(amount)
+                    model.state.setFee(amount)
                 }
 
                 Keypad(calculator: model.state.feeCalculator) {
                     closePanel()
                 } onKey: { key in
-                    model.pressFee(key)
+                    model.state.pressFee(key)
                 }
             }
 
