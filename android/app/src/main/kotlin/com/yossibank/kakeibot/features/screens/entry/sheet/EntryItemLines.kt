@@ -235,7 +235,7 @@ internal fun AdjustmentLine(model: EntryModel) {
             style = textFont(size = FontSize.Small),
         )
 
-        if (model.canAdjustToItems) {
+        if (model.output.canAdjustToItems) {
             Box(
                 modifier = Modifier
                     .height(32.dp)
@@ -262,7 +262,7 @@ internal fun AdjustmentLine(model: EntryModel) {
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = AmountText.text(model.itemAdjustment.toInt()),
+            text = AmountText.text(model.output.itemAdjustment.toInt()),
             color = Palette.amber,
             style = textFont(size = FontSize.Small),
         )

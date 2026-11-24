@@ -50,9 +50,12 @@ import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.apply
 import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
 import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categories
+import com.yossibank.kakeibot.features.screens.entry.model.category
 import com.yossibank.kakeibot.features.screens.entry.model.categoryText
 import com.yossibank.kakeibot.features.screens.entry.model.dateText
 import com.yossibank.kakeibot.features.screens.entry.model.expressionText
+import com.yossibank.kakeibot.features.screens.entry.model.icon
 import com.yossibank.kakeibot.features.screens.entry.model.isDateFromVoice
 import com.yossibank.kakeibot.features.screens.entry.model.isMemoFromVoice
 import com.yossibank.kakeibot.features.screens.entry.model.isWalletFromVoice
@@ -61,6 +64,7 @@ import com.yossibank.kakeibot.features.screens.entry.model.itemTotal
 import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.routeText
 import com.yossibank.kakeibot.features.screens.entry.model.showsItems
+import com.yossibank.kakeibot.features.screens.entry.model.wallet
 import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceWave
@@ -76,17 +80,17 @@ fun EntrySlip(
     val preview = listening?.preview
 
     Column(modifier = modifier.card()) {
-        if (model.form.type != Entry.Kind.transfer) {
+        if (model.state.form.type != Entry.Kind.transfer) {
             SlipRow(
                 title = "カテゴリ",
                 value = preview?.categoryId
-                    ?.let { id -> model.categories.firstOrNull { it.id == id }?.name }
-                    ?: model.categoryText,
-                isActive = model.field == EntryModel.Field.Category,
-                onSelect = { model.focus(EntryModel.Field.Category) },
+                    ?.let { id -> model.output.categories.firstOrNull { it.id == id }?.name }
+                    ?: model.output.categoryText,
+                isActive = model.state.field == EntryModel.Field.Category,
+                onSelect = { model.state.focus(EntryModel.Field.Category) },
             ) {
                 IconTile(
-                    icon = model.category?.let { model.icon(of = it.iconId) },
+                    icon = model.output.category?.let { model.output.icon(of = it.iconId) },
                     size = 30.dp,
                 )
             }
@@ -94,25 +98,25 @@ fun EntrySlip(
             Hairline()
 
             SlipRow(
-                title = model.walletTitle,
-                value = model.wallet?.name ?: "選ぶ",
-                isFromVoice = model.isWalletFromVoice,
-                isActive = model.field == EntryModel.Field.Wallet,
-                onSelect = { model.focus(EntryModel.Field.Wallet) },
+                title = model.output.walletTitle,
+                value = model.output.wallet?.name ?: "選ぶ",
+                isFromVoice = model.output.isWalletFromVoice,
+                isActive = model.state.field == EntryModel.Field.Wallet,
+                onSelect = { model.state.focus(EntryModel.Field.Wallet) },
             ) {
                 IconTile(
-                    icon = model.wallet?.let { model.icon(of = it.iconId) },
+                    icon = model.output.wallet?.let { model.output.icon(of = it.iconId) },
                     size = 30.dp,
                 )
             }
         }
 
-        if (model.form.type == Entry.Kind.transfer) {
+        if (model.state.form.type == Entry.Kind.transfer) {
             SlipRow(
                 title = "振替",
-                value = model.routeText,
-                isActive = model.field in transferFields,
-                onSelect = { model.focus(EntryModel.Field.Transfer) },
+                value = model.output.routeText,
+                isActive = model.state.field in transferFields,
+                onSelect = { model.state.focus(EntryModel.Field.Transfer) },
             ) {
                 SymbolTile(icon = R.drawable.ic_swap)
             }
@@ -121,9 +125,9 @@ fun EntrySlip(
 
             SlipRow(
                 title = "手数料",
-                value = if (model.fee > 0) AmountText.text(model.fee) else "なし",
-                isActive = model.field == EntryModel.Field.Fee,
-                onSelect = { model.focus(EntryModel.Field.Fee) },
+                value = if (model.output.fee > 0) AmountText.text(model.output.fee) else "なし",
+                isActive = model.state.field == EntryModel.Field.Fee,
+                onSelect = { model.state.focus(EntryModel.Field.Fee) },
             ) {
                 SymbolTile(icon = R.drawable.ic_bank)
             }
@@ -133,12 +137,12 @@ fun EntrySlip(
 
         SlipRow(
             title = "日付",
-            value = model.dateText,
-            isFromVoice = model.isDateFromVoice,
-            isActive = model.field == EntryModel.Field.Date,
-            onSelect = { model.focus(EntryModel.Field.Date) },
+            value = model.output.dateText,
+            isFromVoice = model.output.isDateFromVoice,
+            isActive = model.state.field == EntryModel.Field.Date,
+            onSelect = { model.state.focus(EntryModel.Field.Date) },
         ) {
-            DayTile(day = model.form.date.day)
+            DayTile(day = model.state.form.date.day)
         }
 
         Hairline()
@@ -210,13 +214,13 @@ private fun AmountRow(
     model: EntryModel,
     listening: EntryVoiceFlow.Phase.Listening?,
 ) {
-    val isActive = model.field == EntryModel.Field.Amount
+    val isActive = model.state.field == EntryModel.Field.Amount
 
     EntrySlipActiveRow(
         isActive = isActive,
         modifier = Modifier
             .height(80.dp)
-            .clickable { model.focus(EntryModel.Field.Amount) },
+            .clickable { model.state.focus(EntryModel.Field.Amount) },
     ) {
         Box(
             modifier = Modifier
@@ -246,7 +250,8 @@ private fun AmountRow(
             ),
         )
 
-        val expression = if (model.field == EntryModel.Field.Fee) null else model.expressionText
+        val isFee = model.state.field == EntryModel.Field.Fee
+        val expression = if (isFee) null else model.output.expressionText
 
         if (listening != null) {
             EntryVoiceWave(
@@ -264,7 +269,7 @@ private fun AmountRow(
             )
         }
 
-        val amount = listening?.preview?.amount ?: model.amount
+        val amount = listening?.preview?.amount ?: model.output.amount
 
         AmountText(
             amount = amount,

@@ -3,8 +3,6 @@ package com.yossibank.kakeibot.features.screens.entry.voice
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Bundle
-import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.compose.runtime.getValue
@@ -20,16 +18,23 @@ import com.yossibank.kakeibot.features.screens.entry.model.undo
 import com.yossibank.kakeibot.features.screens.entry.model.voiceHints
 import com.yossibank.kakeibot.features.screens.entry.model.voiceReading
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceResult.Outcome
+import com.yossibank.kakeibot.features.shared.model.ScreenClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class EntryVoiceFlow(
-    private val context: Context,
-    private val scope: CoroutineScope,
+    context: Context,
+    scope: CoroutineScope,
+    clock: ScreenClock,
 ) {
+    val state = State()
+    val input = Input(isAvailable = isOnDeviceAvailable(context))
+    val output = Output(state)
+
+    private val dependencies = Dependencies(context, scope, clock)
+
     sealed interface Phase {
         data object Idle : Phase
 
@@ -48,200 +53,155 @@ class EntryVoiceFlow(
         ) : Phase
     }
 
-    val isAvailable: Boolean = isOnDeviceAvailable(context)
+    class State {
+        var phase: Phase by mutableStateOf(Phase.Idle)
+            private set
 
-    var phase: Phase by mutableStateOf(Phase.Idle)
-        private set
+        var notice: EntryVoiceResult? by mutableStateOf(null)
+            private set
 
-    var notice: EntryVoiceResult? by mutableStateOf(null)
-        private set
+        var startCount: Int by mutableStateOf(0)
+            private set
 
-    var startCount: Int by mutableStateOf(0)
-        private set
+        var endCount: Int by mutableStateOf(0)
+            private set
 
-    var endCount: Int by mutableStateOf(0)
-        private set
+        var undo: VoiceUndo? = null
+            private set
 
-    val isActive: Boolean
-        get() = phase != Phase.Idle
+        fun start() {
+            phase = Phase.Listening()
+            startCount += 1
+        }
 
-    val listening: Phase.Listening?
-        get() = phase as? Phase.Listening
+        fun finish(transcript: String) {
+            phase = Phase.Reading(transcript = transcript)
+            endCount += 1
+        }
 
-    val silenceMillis: Long
-        get() = SILENCE_MILLIS
+        fun countEnd() {
+            endCount += 1
+        }
 
-    private var recognizer: SpeechRecognizer? = null
-    private var session: Session? = null
-    private var undo: VoiceUndo? = null
-    private var noticeJob: Job? = null
-    private var silenceJob: Job? = null
+        fun move(to: Phase) {
+            phase = to
+        }
+
+        fun show(notice: EntryVoiceResult) {
+            this.notice = notice
+        }
+
+        fun remember(undo: VoiceUndo) {
+            this.undo = undo
+        }
+
+        fun clearNotice() {
+            notice = null
+            undo = null
+        }
+    }
+
+    class Input(
+        val isAvailable: Boolean,
+    ) {
+        val silenceMillis: Long = SILENCE_MILLIS
+
+        internal var recognizer: SpeechRecognizer? = null
+        internal var session: Session? = null
+        internal var noticeJob: Job? = null
+        internal var silenceJob: Job? = null
+    }
+
+    class Output(
+        private val state: State,
+    ) {
+        val isActive: Boolean
+            get() = state.phase != Phase.Idle
+
+        val listening: Phase.Listening?
+            get() = state.phase as? Phase.Listening
+    }
+
+    private class Dependencies(
+        val context: Context,
+        val scope: CoroutineScope,
+        val clock: ScreenClock,
+    )
 
     fun start(
         model: EntryModel,
         today: LocalDate,
     ) {
-        if (isActive || !isAvailable || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+        if (output.isActive || !input.isAvailable ||
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+        ) {
             return
         }
 
         clearNotice()
-        model.focus(EntryModel.Field.Amount)
+        model.state.focus(EntryModel.Field.Amount)
 
-        val recognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
+        val recognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(dependencies.context)
 
-        this.recognizer = recognizer
-        session = Session(
+        input.recognizer = recognizer
+        input.session = Session(
             model = model,
             today = today,
         )
-        phase = Phase.Listening()
-        startCount += 1
+        state.start()
 
-        recognizer.setRecognitionListener(Listener())
-        recognizer.startListening(intent(hints = model.voiceHints))
+        recognizer.setRecognitionListener(EntryVoiceListener(flow = this))
+        recognizer.startListening(intent(hints = model.output.voiceHints))
     }
 
     fun deny() {
-        phase = Phase.Denied
+        state.move(to = Phase.Denied)
     }
 
     fun finish() {
-        val listening = listening ?: return
+        val listening = output.listening ?: return
 
-        silenceJob?.cancel()
-        phase = Phase.Reading(transcript = listening.transcript)
-        endCount += 1
-        recognizer?.stopListening()
+        input.silenceJob?.cancel()
+        state.finish(transcript = listening.transcript)
+        input.recognizer?.stopListening()
     }
 
     fun cancel() {
-        if (phase == Phase.Denied) {
-            phase = Phase.Idle
+        if (state.phase == Phase.Denied) {
+            state.move(to = Phase.Idle)
             return
         }
 
-        if (phase is Phase.Listening) {
-            endCount += 1
+        if (state.phase is Phase.Listening) {
+            state.countEnd()
         }
 
-        recognizer?.cancel()
+        input.recognizer?.cancel()
         reset()
     }
 
     fun undoLast(model: EntryModel) {
-        undo?.let(model::undo)
+        state.undo?.let(model.state::undo)
         clearNotice()
     }
 
     fun clearNotice() {
-        noticeJob?.cancel()
-        notice = null
-        undo = null
+        input.noticeJob?.cancel()
+        state.clearNotice()
     }
 
     fun close() {
-        recognizer?.cancel()
+        input.recognizer?.cancel()
         reset()
         clearNotice()
     }
 
-    private data class Session(
+    internal data class Session(
         val model: EntryModel,
         val today: LocalDate,
     )
 
-    private inner class Listener : RecognitionListener {
-        override fun onReadyForSpeech(params: Bundle?) = Unit
-
-        override fun onBeginningOfSpeech() = Unit
-
-        override fun onRmsChanged(rmsdB: Float) {
-            val listening = listening ?: return
-            val level = ((rmsdB - MIN_RMS) / (MAX_RMS - MIN_RMS)).coerceIn(0f, 1f)
-
-            phase = listening.copy(levels = listOf(level) + listening.levels.dropLast(1))
-            follow(level)
-        }
-
-        override fun onBufferReceived(buffer: ByteArray?) = Unit
-
-        override fun onEndOfSpeech() {
-            finish()
-        }
-
-        override fun onError(error: Int) {
-            val outcome = when (error) {
-                SpeechRecognizer.ERROR_NO_MATCH,
-                SpeechRecognizer.ERROR_SPEECH_TIMEOUT,
-                -> Outcome.Unheard
-
-                SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> download()
-
-                SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED -> Outcome.Unsupported
-
-                SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> null
-
-                else -> Outcome.Failed
-            }
-
-            reset()
-
-            if (outcome == null) {
-                deny()
-            } else {
-                show(EntryVoiceResult(outcome = outcome, count = 0, text = ""))
-            }
-        }
-
-        override fun onResults(results: Bundle?) {
-            val session = session
-            val candidates = results?.getStringArrayList(
-                SpeechRecognizer.RESULTS_RECOGNITION,
-            ).orEmpty()
-
-            reset()
-
-            if (session != null) {
-                read(candidates = candidates, session = session)
-            }
-        }
-
-        override fun onPartialResults(partialResults: Bundle?) {
-            val text = partialResults
-                ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                ?.firstOrNull()
-                ?: return
-
-            when (val current = phase) {
-                is Phase.Listening -> {
-                    phase = current.copy(
-                        transcript = text,
-                        preview = session?.let {
-                            it.model.voiceReading(text = text, today = it.today)
-                        },
-                    )
-
-                    if (text.isNotBlank() && !current.hasVoice) {
-                        waitForSilence()
-                    }
-                }
-
-                is Phase.Reading -> {
-                    phase = Phase.Reading(transcript = text)
-                }
-
-                Phase.Idle, Phase.Denied -> {}
-            }
-        }
-
-        override fun onEvent(
-            eventType: Int,
-            params: Bundle?,
-        ) = Unit
-    }
-
-    private fun read(
+    internal fun read(
         candidates: List<String>,
         session: Session,
     ) {
@@ -250,7 +210,10 @@ class EntryVoiceFlow(
 
         val text = candidates
             .map { it.trim() }
-            .firstOrNull { model.voiceReading(text = it, today = session.today).amount != null }
+            .firstOrNull {
+                model.output.voiceReading(text = it, today = session.today).amount !=
+                    null
+            }
             ?: primary
 
         if (text.isEmpty()) {
@@ -258,7 +221,7 @@ class EntryVoiceFlow(
             return
         }
 
-        val reading = model.voiceReading(text = text, today = session.today)
+        val reading = model.output.voiceReading(text = text, today = session.today)
 
         if (reading.isEmpty) {
             show(
@@ -291,11 +254,11 @@ class EntryVoiceFlow(
                 text = text,
             ),
         )
-        this.undo = undo
+        state.remember(undo)
     }
 
-    private fun download(): Outcome {
-        val recognizer = recognizer
+    internal fun download(): Outcome {
+        val recognizer = input.recognizer
 
         if (recognizer == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return Outcome.Unsupported
@@ -306,30 +269,31 @@ class EntryVoiceFlow(
         return Outcome.Downloading
     }
 
-    private fun show(notice: EntryVoiceResult) {
-        noticeJob?.cancel()
-        this.notice = notice
+    internal fun show(notice: EntryVoiceResult) {
+        input.noticeJob?.cancel()
+        state.show(notice)
 
-        noticeJob = scope.launch {
+        input.noticeJob = dependencies.scope.launch {
             delay(UndoNoticeState.MILLIS)
 
-            if (this@EntryVoiceFlow.notice?.id == notice.id) {
-                this@EntryVoiceFlow.notice = null
-                undo = null
+            if (state.notice?.id == notice.id) {
+                state.clearNotice()
             }
         }
     }
 
-    private fun follow(level: Float) {
-        val listening = listening ?: return
+    internal fun follow(level: Float) {
+        val listening = output.listening ?: return
 
         if (level >= VOICE_LEVEL) {
-            silenceJob?.cancel()
-            silenceJob = null
+            input.silenceJob?.cancel()
+            input.silenceJob = null
 
-            phase = listening.copy(
-                silenceStart = null,
-                hasVoice = true,
+            state.move(
+                to = listening.copy(
+                    silenceStart = null,
+                    hasVoice = true,
+                ),
             )
 
             return
@@ -340,29 +304,29 @@ class EntryVoiceFlow(
         }
     }
 
-    private fun waitForSilence() {
-        val listening = listening
+    internal fun waitForSilence() {
+        val listening = output.listening
 
-        if (silenceJob != null || listening == null) {
+        if (input.silenceJob != null || listening == null) {
             return
         }
 
-        phase = listening.copy(silenceStart = System.currentTimeMillis())
+        state.move(to = listening.copy(silenceStart = dependencies.clock.now.toEpochMilli()))
 
-        silenceJob = scope.launch {
+        input.silenceJob = dependencies.scope.launch {
             delay(SILENCE_MILLIS)
-            silenceJob = null
+            input.silenceJob = null
             finish()
         }
     }
 
-    private fun reset() {
-        silenceJob?.cancel()
-        silenceJob = null
-        recognizer?.destroy()
-        recognizer = null
-        session = null
-        phase = Phase.Idle
+    internal fun reset() {
+        input.silenceJob?.cancel()
+        input.silenceJob = null
+        input.recognizer?.destroy()
+        input.recognizer = null
+        input.session = null
+        state.move(to = Phase.Idle)
     }
 
     private fun intent(hints: List<String>): Intent =
@@ -386,8 +350,6 @@ class EntryVoiceFlow(
         const val MAX_RESULTS = 5
         const val SILENCE_MILLIS = 1_000L
         const val VOICE_LEVEL = 0.2f
-        const val MIN_RMS = -2f
-        const val MAX_RMS = 10f
         const val LEVEL_COUNT = 16
 
         val quietLevels: List<Float> = List(LEVEL_COUNT) { 0f }

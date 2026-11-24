@@ -75,6 +75,7 @@ import com.yossibank.kakeibot.features.screens.entry.model.feeChoices
 import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.routeText
 import com.yossibank.kakeibot.features.screens.entry.model.showsItems
+import com.yossibank.kakeibot.features.screens.entry.model.tags
 import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
@@ -97,9 +98,9 @@ fun EntryDeck(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             DeckTitle(
-                text = when (model.field) {
+                text = when (model.state.field) {
                     EntryModel.Field.Category -> "カテゴリを選ぶ"
-                    EntryModel.Field.Wallet -> "${model.walletTitle}を選ぶ"
+                    EntryModel.Field.Wallet -> "${model.output.walletTitle}を選ぶ"
                     EntryModel.Field.ToWallet -> "振替先を選ぶ"
                     EntryModel.Field.Date -> "日付を選ぶ"
                     EntryModel.Field.Amount -> "金額を入力"
@@ -110,13 +111,13 @@ fun EntryDeck(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (model.field == EntryModel.Field.Amount && model.showsItems) {
+            if (model.state.field == EntryModel.Field.Amount && model.output.showsItems) {
                 ItemPill(onOpen = onOpenItems)
             }
         }
 
         Box(modifier = Modifier.weight(1f)) {
-            when (model.field) {
+            when (model.state.field) {
                 EntryModel.Field.Category -> CategoryArea(
                     model = model,
                     onSaveTemplate = onSaveTemplate,
@@ -124,14 +125,14 @@ fun EntryDeck(
 
                 EntryModel.Field.Wallet -> WalletList(
                     model = model,
-                    selection = model.form.walletId,
-                    onSelect = model::select,
+                    selection = model.state.form.walletId,
+                    onSelect = model.state::select,
                 )
 
                 EntryModel.Field.ToWallet -> WalletList(
                     model = model,
-                    selection = model.form.toWalletId,
-                    onSelect = model::selectDestination,
+                    selection = model.state.form.toWalletId,
+                    onSelect = model.state::selectDestination,
                 )
 
                 EntryModel.Field.Date -> DateCalendar(model = model)
@@ -142,9 +143,9 @@ fun EntryDeck(
 
                 EntryModel.Field.Fee -> Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     FeeChoiceRow(
-                        choices = model.feeChoices,
-                        selection = model.fee,
-                        onSelect = model::setFee,
+                        choices = model.output.feeChoices,
+                        selection = model.output.fee,
+                        onSelect = model.state::setFee,
                     )
 
                     Box(modifier = Modifier.weight(1f)) {
@@ -220,8 +221,8 @@ private fun AmountKeypad(model: EntryModel) {
         val height = ((maxHeight - spacing) / KEY_ROWS).coerceIn(minKeyHeight, maxKeyHeight)
 
         Keypad(
-            calculator = model.activeCalculator,
-            onKey = model::press,
+            calculator = model.output.activeCalculator,
+            onKey = model.state::press,
             keyHeight = height,
         )
     }
@@ -238,17 +239,17 @@ private fun CategoryArea(
             modifier = Modifier.weight(1f),
         )
 
-        val tags = model.tags
+        val tags = model.output.tags
 
         if (tags.isNotEmpty()) {
             TagLine(
                 tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                selection = model.form.tagId,
-                onSelect = model::toggleTag,
+                selection = model.state.form.tagId,
+                onSelect = model.state::toggleTag,
             )
         }
 
-        if (model.amount > 0) {
+        if (model.output.amount > 0) {
             SaveTemplateChip(onSelect = onSaveTemplate)
         }
     }
@@ -299,9 +300,9 @@ private fun SaveTemplateChip(onSelect: () -> Unit) {
 @Composable
 private fun DateCalendar(model: EntryModel) {
     MonthCalendar(
-        selection = model.form.date,
-        today = model.today,
-        onSelect = model::select,
+        selection = model.state.form.date,
+        today = model.state.today,
+        onSelect = model.state::select,
     )
 }
 

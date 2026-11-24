@@ -68,14 +68,17 @@ import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.apply
 import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
 import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.categories
 import com.yossibank.kakeibot.features.screens.entry.model.categoryText
 import com.yossibank.kakeibot.features.screens.entry.model.dateText
 import com.yossibank.kakeibot.features.screens.entry.model.expressionText
 import com.yossibank.kakeibot.features.screens.entry.model.feeChoices
+import com.yossibank.kakeibot.features.screens.entry.model.icon
 import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.routeText
 import com.yossibank.kakeibot.features.screens.entry.model.showsItems
 import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
+import com.yossibank.kakeibot.features.screens.entry.model.wallets
 import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
@@ -91,14 +94,14 @@ internal fun CategoryGrid(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(
-            items = model.categories,
+            items = model.output.categories,
             key = { it.id.toString() },
         ) { category ->
             ChoiceCell(
-                icon = model.icon(of = category.iconId),
+                icon = model.output.icon(of = category.iconId),
                 name = category.name,
-                isSelected = category.id == model.form.categoryId,
-                onSelect = { model.select(category) },
+                isSelected = category.id == model.state.form.categoryId,
+                onSelect = { model.state.select(category) },
             )
         }
     }
@@ -115,7 +118,7 @@ internal fun WalletList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(
-            items = model.wallets,
+            items = model.output.wallets,
             key = { it.id.toString() },
         ) { wallet ->
             val isSelected = wallet.id == selection
@@ -133,7 +136,7 @@ internal fun WalletList(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconTile(
-                    icon = model.icon(of = wallet.iconId),
+                    icon = model.output.icon(of = wallet.iconId),
                     size = 36.dp,
                 )
 

@@ -1,59 +1,19 @@
 package com.yossibank.kakeibot.features.screens.entry.model
 
-import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
-import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
-import com.yossibank.kakeibot.core.concepts.entry.EntryItemTotal
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 
 const val RECENT_ITEM_NAME_LIMIT = 50
-const val ITEM_SUGGESTION_LIMIT = 8
 
-val EntryModel.showsItems: Boolean
-    get() = form.type != Entry.Kind.transfer
-
-val EntryModel.itemTotals: EntryItemTotal
-    get() = EntryItemTotal(
-        items = form.items,
-        taxIncluded = form.taxIncluded,
-    )
-
-val EntryModel.itemTotal: Long
-    get() = itemTotals.total
-
-val EntryModel.itemAdjustment: Long
-    get() = amount - itemTotal
-
-val EntryModel.itemCount: Int
-    get() = form.items.sumOf { it.quantity }
-
-val EntryModel.hasItemAdjustment: Boolean
-    get() = form.items.isNotEmpty() && itemAdjustment != 0L
-
-val EntryModel.canAdjustToItems: Boolean
-    get() = itemTotal in 0..AmountCalculator.maxValue.toLong()
-
-var EntryModel.store: String
+var EntryModel.State.store: String
     get() = form.store
     set(value) {
         update { withStore(value) }
     }
 
-fun EntryModel.itemNameSuggestions(text: String): List<String> {
-    val trimmed = text.trim()
-
-    val names = if (trimmed.isEmpty()) {
-        recentItemNames
-    } else {
-        recentItemNames.filter { it != trimmed && it.contains(trimmed, ignoreCase = true) }
-    }
-
-    return names.take(ITEM_SUGGESTION_LIMIT)
-}
-
 fun EntryModel.addItem(item: EntryItem.Draft) {
     changeItems {
-        update { copy(items = items + item) }
+        state.update { copy(items = items + item) }
     }
 }
 
@@ -61,20 +21,20 @@ fun EntryModel.updateItem(
     index: Int,
     item: EntryItem.Draft,
 ) {
-    if (index !in form.items.indices) {
+    if (index !in state.form.items.indices) {
         return
     }
 
     changeItems {
-        update { copy(items = items.toMutableList().also { it[index] = item }) }
+        state.update { copy(items = items.toMutableList().also { it[index] = item }) }
     }
 }
 
 fun EntryModel.removeItem(index: Int): RemovedItem? {
-    val item = form.items.getOrNull(index) ?: return null
+    val item = state.form.items.getOrNull(index) ?: return null
 
     changeItems {
-        update { copy(items = items.toMutableList().also { it.removeAt(index) }) }
+        state.update { copy(items = items.toMutableList().also { it.removeAt(index) }) }
     }
 
     return RemovedItem(
@@ -85,7 +45,7 @@ fun EntryModel.removeItem(index: Int): RemovedItem? {
 
 fun EntryModel.restoreItem(removed: RemovedItem) {
     changeItems {
-        update {
+        state.update {
             val restored = items.toMutableList()
             restored.add(minOf(removed.index, restored.size), removed.item)
             copy(items = restored)
@@ -95,16 +55,16 @@ fun EntryModel.restoreItem(removed: RemovedItem) {
 
 fun EntryModel.setTaxIncluded(isIncluded: Boolean) {
     changeItems {
-        update { copy(taxIncluded = isIncluded) }
+        state.update { copy(taxIncluded = isIncluded) }
     }
 }
 
 fun EntryModel.adjustToItems() {
-    if (!canAdjustToItems) {
+    if (!output.canAdjustToItems) {
         return
     }
 
-    setAmount(itemTotal.toInt())
+    state.setAmount(output.itemTotal.toInt())
 }
 
 fun EntryItem.Draft.quantityText(): String? {
@@ -130,7 +90,7 @@ fun EntryItem.Draft.unitPrice(): Pair<Int, Int> {
 }
 
 private fun EntryModel.changeItems(change: () -> Unit) {
-    val follows = amount == 0 || itemAdjustment == 0L
+    val follows = output.amount == 0 || output.itemAdjustment == 0L
 
     change()
 

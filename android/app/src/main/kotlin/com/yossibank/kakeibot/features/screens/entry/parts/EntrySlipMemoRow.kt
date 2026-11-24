@@ -76,16 +76,16 @@ fun EntrySlipMemoRow(
         )
 
         PlaceholderTextField(
-            value = model.form.memo,
-            onChange = { memo -> model.update { copy(memo = memo) } },
+            value = model.state.form.memo,
+            onChange = { memo -> model.state.update { copy(memo = memo) } },
             placeholder = "店名や買ったものをメモ",
             style = textFont(size = FontSize.Body),
             modifier = Modifier
                 .weight(1f)
-                .voiceUnderline(model.isMemoFromVoice),
+                .voiceUnderline(model.output.isMemoFromVoice),
         )
 
-        if (model.showsItems && model.form.items.isNotEmpty()) {
+        if (model.output.showsItems && model.state.form.items.isNotEmpty()) {
             ItemButton(
                 model = model,
                 onOpen = onOpenItems,
@@ -120,7 +120,7 @@ private fun ItemButton(
     model: EntryModel,
     onOpen: () -> Unit,
 ) {
-    val adjustment = model.itemAdjustment
+    val adjustment = model.output.itemAdjustment
     val tint = if (adjustment == 0L) Palette.accent else Palette.amber
     val fill = tint.opacity(Emphasis.Subtle)
 
@@ -140,13 +140,13 @@ private fun ItemButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "品目 ${model.form.items.size}件",
+            text = "品目 ${model.state.form.items.size}件",
             color = Palette.accentStrong,
             style = style,
         )
 
         Text(
-            text = AmountText.text(model.itemTotal.toInt()),
+            text = AmountText.text(model.output.itemTotal.toInt()),
             color = Palette.text,
             style = style,
         )

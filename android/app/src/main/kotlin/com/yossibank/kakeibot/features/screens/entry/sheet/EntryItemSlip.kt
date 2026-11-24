@@ -138,7 +138,7 @@ fun EntryItemSlip(
 
         NameField(input = input)
 
-        val suggestions = model.itemNameSuggestions(input.name)
+        val suggestions = model.output.itemNameSuggestions(input.name)
 
         if (suggestions.isNotEmpty()) {
             Row(

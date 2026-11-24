@@ -114,7 +114,7 @@ class EntryItemInput {
         target = Target.Unit
         editingIndex = null
         editingItem = null
-        taxRate = model.form.items.lastOrNull()?.taxRate
+        taxRate = model.state.form.items.lastOrNull()?.taxRate
         isDiscount = false
     }
 

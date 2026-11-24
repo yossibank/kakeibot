@@ -71,12 +71,13 @@ import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.payOffLoan
 import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
 import com.yossibank.kakeibot.features.screens.entry.model.routeText
+import com.yossibank.kakeibot.features.screens.entry.model.wallet
 import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 
 @Composable
 internal fun EntryTransferRoutes(model: EntryModel) {
-    val routes = model.frequentRoutes
+    val routes = model.output.frequentRoutes
 
     if (routes.isEmpty()) {
         return
@@ -103,7 +104,8 @@ private fun RouteChip(
     route: TransferRoute,
 ) {
     val isApplied =
-        model.form.walletId == route.walletId && model.form.toWalletId == route.toWalletId
+        model.state.form.walletId == route.walletId &&
+            model.state.form.toWalletId == route.toWalletId
     val fill = if (isApplied) Palette.accent.opacity(Emphasis.Soft) else Color.Transparent
     val rim = if (isApplied) Palette.accent else Palette.accent.opacity(Emphasis.Muted)
     val style = textFont(size = FontSize.Caption)
@@ -117,13 +119,13 @@ private fun RouteChip(
                 width = 1.dp,
                 color = rim,
                 shape = CircleShape,
-            ).clickable { model.applyRoute(route) }
+            ).clickable { model.state.applyRoute(route) }
             .padding(horizontal = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = model.wallet(of = route.walletId)?.name ?: "",
+            text = model.output.wallet(of = route.walletId)?.name ?: "",
             color = Palette.text,
             style = style,
         )
@@ -136,7 +138,7 @@ private fun RouteChip(
         )
 
         Text(
-            text = model.wallet(of = route.toWalletId)?.name ?: "",
+            text = model.output.wallet(of = route.toWalletId)?.name ?: "",
             color = Palette.text,
             style = style,
         )

@@ -158,11 +158,21 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 | 対象 | 決まり |
 | --- | --- |
-| 入力の下書き | 1 つの `data class` にまとめ、モデルの `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
+| モデルの形 | `state`・`input`・`output` の `val` と、`private val dependencies` だけを持つ。使わないまとまりは書かない |
+| `State` | 人の操作で変わる値と、進み具合・知らせを持つ。`mutableStateOf` は 12 個まで、Boolean は 3 個までである |
+| `Input` | DB から読んだ値と、最初に渡された値を持つ。setter を `internal set` にし、モデルの関数だけが書く |
+| `Output` | `input` と `state` から出す値を持つ。`derivedStateOf` はここに置き、DB と `dependencies` を使わない |
+| `Dependencies` | DB・時計・外から渡される `Flow` を持つ。`private class` にし、モデルの関数だけが使う |
+| 連動する値 | `private set` にして、`State` の関数で一緒に書き換える |
+| 操作の置き場所 | 状態だけを変える操作は `State` の関数に置く。DB や `output` が要る操作は、モデルの関数に置く |
+| 分けたファイル | `Output` の計算は、`EntryModelOutputText.kt` のように拡張プロパティのファイルへ出す |
+| 画面からの読み方 | `model.state.x`・`model.input.x`・`model.output.x` の形で読む。モデルに転送のプロパティを足さない |
+| 入力の下書き | 1 つの `data class` にまとめ、`State` の `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
 | 下書きの決まり | 口座・カテゴリ・日付を変えたときの消し込みは、下書きの型の関数に置く |
-| 保存と読み込みの失敗 | `features/shared/model/` の `ModelTask` に通す。失敗の文と、実行中かどうかを持つ |
-| 今日の日付 | モデルの `today` に持ち、画面が `SideEffect` で入れる |
-| 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を受け取る |
+| 保存と読み込みの失敗 | `features/shared/model/` の `ModelTask` に通し、`State` の `task` に置く。失敗の文と、実行中かどうかを持つ |
+| 今の時刻 | `features/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
+| 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる |
+| 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
 
 複数の画面で使う部品は、次の場所に置く。
