@@ -68,7 +68,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryItemInput
+import com.yossibank.kakeibot.features.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.RemovedItem
 import com.yossibank.kakeibot.features.screens.entry.model.addItem

@@ -68,7 +68,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryItemInput
+import com.yossibank.kakeibot.features.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.RemovedItem
 import com.yossibank.kakeibot.features.screens.entry.model.addItem
@@ -91,7 +91,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun EntryItemSlip(
     model: EntryModel,
-    input: EntryItemInput,
+    editor: EntryItemEditor,
 ) {
     val focus = LocalFocusManager.current
 
@@ -117,7 +117,7 @@ fun EntryItemSlip(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = input.editingIndex?.let { "品目 ${it + 1} を変更" } ?: "品目を追加",
+                text = editor.editingIndex?.let { "品目 ${it + 1} を変更" } ?: "品目を追加",
                 modifier = Modifier.weight(1f),
                 color = Palette.text,
                 style = textFont(
@@ -128,7 +128,7 @@ fun EntryItemSlip(
 
             CircleIconButton(
                 icon = R.drawable.ic_close,
-                onClick = input::close,
+                onClick = editor::close,
                 size = 36.dp,
                 iconSize = 20.dp,
                 fill = SolidColor(Color.Transparent),
@@ -136,9 +136,9 @@ fun EntryItemSlip(
             )
         }
 
-        NameField(input = input)
+        NameField(editor = editor)
 
-        val suggestions = model.output.itemNameSuggestions(input.name)
+        val suggestions = model.output.itemNameSuggestions(editor.name)
 
         if (suggestions.isNotEmpty()) {
             Row(
@@ -151,14 +151,14 @@ fun EntryItemSlip(
                         isSelected = false,
                         onSelect = {
                             focus.clearFocus()
-                            input.name = suggestion
+                            editor.name = suggestion
                         },
                     )
                 }
             }
         }
 
-        Equation(input = input)
+        Equation(editor = editor)
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
@@ -168,8 +168,8 @@ fun EntryItemSlip(
             ).forEach { (rate, title) ->
                 EntryItemChip(
                     title = title,
-                    isSelected = input.taxRate == rate,
-                    onSelect = { input.taxRate = rate },
+                    isSelected = editor.taxRate == rate,
+                    onSelect = { editor.taxRate = rate },
                 )
             }
 
@@ -177,22 +177,22 @@ fun EntryItemSlip(
 
             EntryItemChip(
                 title = "値引",
-                isSelected = input.isDiscount,
-                onSelect = { input.isDiscount = !input.isDiscount },
+                isSelected = editor.isDiscount,
+                onSelect = { editor.isDiscount = !editor.isDiscount },
             )
 
             EntryItemChip(
                 title = "半額",
                 isSelected = false,
-                onSelect = input::halveUnit,
+                onSelect = editor::halveUnit,
             )
         }
 
         Keypad(
-            calculator = input.activeCalculator,
+            calculator = editor.activeCalculator,
             onKey = { key ->
                 focus.clearFocus()
-                input.press(key)
+                editor.press(key)
             },
             keyHeight = 44.dp,
         )
@@ -203,16 +203,22 @@ fun EntryItemSlip(
                 .height(48.dp)
                 .clip(CircleShape)
                 .background(
-                    if (input.canSubmit) Palette.accent else Palette.accent.opacity(Emphasis.Muted),
+                    if (editor.canSubmit) {
+                        Palette.accent
+                    } else {
+                        Palette.accent.opacity(
+                            Emphasis.Muted,
+                        )
+                    },
                 )
-                .clickable(enabled = input.canSubmit) {
+                .clickable(enabled = editor.canSubmit) {
                     focus.clearFocus()
-                    input.submit(model)
+                    editor.submit(model)
                 },
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = if (input.editingIndex == null) "追加" else "変更",
+                text = if (editor.editingIndex == null) "追加" else "変更",
                 color = Palette.backgroundTop,
                 style = textFont(
                     size = FontSize.Body,
@@ -224,13 +230,13 @@ fun EntryItemSlip(
 }
 
 @Composable
-private fun NameField(input: EntryItemInput) {
+private fun NameField(editor: EntryItemEditor) {
     val focus = LocalFocusManager.current
     val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(12.dp))
 
     PlaceholderTextField(
-        value = input.name,
-        onChange = { input.name = it },
+        value = editor.name,
+        onChange = { editor.name = it },
         placeholder = "品名",
         style = textFont(size = FontSize.Body),
         modifier = Modifier
@@ -250,25 +256,25 @@ private fun NameField(input: EntryItemInput) {
 }
 
 @Composable
-private fun Equation(input: EntryItemInput) {
+private fun Equation(editor: EntryItemEditor) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Token(
             label = "単価",
-            value = AmountText.text(input.unit.amount),
-            isSelected = input.target == EntryItemInput.Target.Unit,
-            onSelect = { input.target = EntryItemInput.Target.Unit },
+            value = AmountText.text(editor.unit.amount),
+            isSelected = editor.target == EntryItemEditor.Target.Unit,
+            onSelect = { editor.target = EntryItemEditor.Target.Unit },
         )
 
         Operator(text = "×")
 
         Token(
             label = "数量",
-            value = input.quantityValue.toString(),
-            isSelected = input.target == EntryItemInput.Target.Quantity,
-            onSelect = { input.target = EntryItemInput.Target.Quantity },
+            value = editor.quantityValue.toString(),
+            isSelected = editor.target == EntryItemEditor.Target.Quantity,
+            onSelect = { editor.target = EntryItemEditor.Target.Quantity },
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -276,8 +282,8 @@ private fun Equation(input: EntryItemInput) {
         Operator(text = "=")
 
         FittedText(
-            text = AmountText.text(input.lineAmount.toInt()),
-            color = if (input.isDiscount) Palette.rose else Palette.accentStrong,
+            text = AmountText.text(editor.lineAmount.toInt()),
+            color = if (editor.isDiscount) Palette.rose else Palette.accentStrong,
             style = displayFont(
                 size = FontSize.Body,
                 weight = FontWeight.Bold,

@@ -68,7 +68,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryItemInput
+import com.yossibank.kakeibot.features.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.RemovedItem
 import com.yossibank.kakeibot.features.screens.entry.model.addItem
@@ -92,7 +92,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun EntryItemReceipt(
     model: EntryModel,
-    input: EntryItemInput,
+    editor: EntryItemEditor,
 ) {
     val totals = model.output.itemTotals
     val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(8.dp))
@@ -156,10 +156,10 @@ fun EntryItemReceipt(
                     key(index, item) {
                         ItemRow(
                             item = item,
-                            isEditing = input.isOpen && input.editingIndex == index,
+                            isEditing = editor.isOpen && editor.editingIndex == index,
                             showsRate = model.state.form.items.map { it.taxRate }.toSet().size > 1,
-                            onSelect = { input.edit(index, item) },
-                            onRemove = { input.remove(model, index) },
+                            onSelect = { editor.edit(index, item) },
+                            onRemove = { editor.remove(model, index) },
                         )
                     }
                 }

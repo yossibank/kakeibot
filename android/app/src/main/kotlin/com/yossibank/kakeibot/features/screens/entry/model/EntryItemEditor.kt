@@ -8,7 +8,7 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.designsystem.components.modal.UndoNoticeState
 import kotlin.math.abs
 
-class EntryItemInput {
+class EntryItemEditor {
     enum class Target {
         Unit,
         Quantity,
