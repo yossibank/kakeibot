@@ -76,10 +76,10 @@ extension TemplateBoard: SettingsBoardSpec {
     func editModel(for destination: Destination) -> TemplateEditModel {
         switch destination {
         case let .new(type):
-            TemplateEditModel(database: database, type: type)
+            TemplateEditModel(database: database, clock: clock, type: type)
 
         case let .edit(type, id):
-            TemplateEditModel(database: database, type: type, editing: id)
+            TemplateEditModel(database: database, clock: clock, type: type, editing: id)
         }
     }
 

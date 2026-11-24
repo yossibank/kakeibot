@@ -53,9 +53,13 @@ struct SnapshotTests {
         let walletSheet = WalletEditSheet(model: walletEdit)
             .frame(height: 1000)
 
-        let categoryEdit = CategoryEditModel(database: database, clock: .system, kind: .expense)
-        let stampEdit = StampEditModel(database: database, clock: .system)
-        let ruleEdit = RewardRuleEditModel(database: database, clock: .system)
+        let categoryEdit = CategoryEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            kind: .expense
+        )
+        let stampEdit = StampEditModel(database: database, clock: .fixed(snapshotNow))
+        let ruleEdit = RewardRuleEditModel(database: database, clock: .fixed(snapshotNow))
 
         await categoryEdit.load()
         await stampEdit.load()
@@ -94,7 +98,11 @@ struct SnapshotTests {
 
         try await database.setSetting(.backupExportedAt, to: exportedAt)
 
-        let recurring = RecurringListModel(database: database, clock: .system, today: today)
+        let recurring = RecurringListModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            today: today
+        )
 
         let observing = Task {
             await recurring.observe()
@@ -119,7 +127,11 @@ struct SnapshotTests {
 
         observing.cancel()
 
-        let templateEdit = TemplateEditModel(database: database, type: .expense)
+        let templateEdit = TemplateEditModel(
+            database: database,
+            clock: .fixed(snapshotNow),
+            type: .expense
+        )
         let recurringEdit = RecurringEditModel(database: database, today: today)
 
         await templateEdit.load()
@@ -205,6 +217,7 @@ struct SnapshotTests {
         let savedTemplate = try await database.templates().first
         let templateEditing = TemplateEditModel(
             database: database,
+            clock: .system,
             type: .expense,
             editing: savedTemplate?.id
         )
@@ -243,7 +256,7 @@ struct SnapshotTests {
             )
         }
 
-        templateEdit.walletId = card?.id
+        templateEdit.state.setWallet(card?.id)
         recurringEdit.walletId = card?.id
 
         for variant in Self.variants {

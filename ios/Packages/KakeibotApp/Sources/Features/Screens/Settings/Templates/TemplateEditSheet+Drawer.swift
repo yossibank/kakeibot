@@ -9,10 +9,10 @@ extension TemplateEditSheet {
         switch panel {
         case .amount:
             VStack(spacing: 12) {
-                Keypad(calculator: model.calculator) {
+                Keypad(calculator: model.state.calculator) {
                     closePanel()
                 } onKey: { key in
-                    model.press(key)
+                    model.state.press(key)
                 }
             }
 
@@ -30,12 +30,12 @@ private extension TemplateEditSheet {
     var tagChooser: some View {
         TagLine(
             tagItems,
-            selection: model.tagId,
+            selection: model.state.tagId,
             onSelect: { id in
-                model.toggleTag(id)
+                model.state.toggleTag(id)
             },
             onAdd: {
-                tagCategory = model.selectedCategory
+                tagCategory = model.output.selectedCategory
             }
         )
     }
@@ -43,6 +43,6 @@ private extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     var tagItems: [TagLine<EntryTag.ID>.Item] {
-        model.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
+        model.output.tags.map { TagLine.Item(id: $0.id, name: $0.name) }
     }
 }

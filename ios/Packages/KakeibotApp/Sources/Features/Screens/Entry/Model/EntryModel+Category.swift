@@ -140,7 +140,7 @@ public extension EntryModel {
             memo: memo
         )
 
-        return TemplateEditModel(database: database, draft: draft)
+        return TemplateEditModel(database: database, clock: .system, draft: draft)
     }
 
     func newCategoryModel() -> CategoryEditModel {

@@ -56,8 +56,8 @@ public struct TemplateEditSheet: View {
                     SettingsEditHeader(
                         title: title,
                         isEditing: model.isEditing,
-                        isHidden: model.isHidden,
-                        subtitle: model.typeName
+                        isHidden: model.input.isHidden,
+                        subtitle: model.output.typeName
                     ) {
                         edit.close()
                     } onHide: {
@@ -68,7 +68,7 @@ public struct TemplateEditSheet: View {
                     .padding(.horizontal, SettingsSpacing.side)
                     .padding(.top, SettingsSpacing.top)
                 }
-                .errorBanner($model.errorNotice)
+                .errorBanner(Bindable(model.state).errorNotice)
                 .background {
                     Backdrop()
                         .ignoresSafeArea()
@@ -76,8 +76,8 @@ public struct TemplateEditSheet: View {
                             focus = nil
                         }
                 }
-                .haptic(.selection, trigger: model.categoryId)
-                .haptic(.selection, trigger: model.walletId)
+                .haptic(.selection, trigger: model.state.categoryId)
+                .haptic(.selection, trigger: model.state.walletId)
                 .settingsEditConfirmations(edit)
                 .confirmation(
                     isPresented: $isConfirmingDelete,
@@ -205,7 +205,7 @@ private extension TemplateEditSheet {
     }
 
     var memoValue: String {
-        model.memo.isEmpty ? "なし" : model.memo
+        model.state.memo.isEmpty ? "なし" : model.state.memo
     }
 
     var detailItems: [SettingsRowList<Panel>.Item] {
@@ -214,15 +214,15 @@ private extension TemplateEditSheet {
                 panel: .tag,
                 systemImage: "tag",
                 title: "タグ",
-                value: model.selectedTag?.name ?? "なし",
-                isEmpty: model.selectedTag == nil
+                value: model.output.selectedTag?.name ?? "なし",
+                isEmpty: model.output.selectedTag == nil
             ),
             .init(
                 panel: .memo,
                 systemImage: "square.and.pencil",
                 title: "メモ",
                 value: memoValue,
-                isEmpty: model.memo.isEmpty
+                isEmpty: model.state.memo.isEmpty
             )
         ]
     }
@@ -261,6 +261,7 @@ extension TemplateEditModel: SettingsEditing {}
         TemplateEditSheet(
             model: TemplateEditModel(
                 database: database,
+                clock: .system,
                 type: .expense
             )
         )

@@ -158,9 +158,9 @@ extension EntryModelTests {
 
         let editor = model.newTemplateModel()
 
-        #expect(editor.amount == 450)
-        #expect(editor.memo == "カフェ")
-        #expect(editor.categoryId == model.categoryId)
-        #expect(editor.name.isEmpty)
+        #expect(editor.output.amount == 450)
+        #expect(editor.state.memo == "カフェ")
+        #expect(editor.state.categoryId == model.categoryId)
+        #expect(editor.state.name.isEmpty)
     }
 }

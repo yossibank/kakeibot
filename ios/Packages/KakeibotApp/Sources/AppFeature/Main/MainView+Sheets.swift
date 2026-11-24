@@ -71,6 +71,7 @@ extension MainView {
             TemplateEditSheet(
                 model: TemplateEditModel(
                     database: database,
+                    clock: clock,
                     type: home.state.templateType
                 )
             )

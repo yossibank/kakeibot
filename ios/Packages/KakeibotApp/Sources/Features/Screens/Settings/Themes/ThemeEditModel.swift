@@ -43,6 +43,7 @@ public extension ThemeEditModel {
     }
 
     @MainActor
+    @Observable
     final class Input: SettingsEditInput {
         let baseline: ThemeDraft?
         let editingId: Theme.ID?
@@ -237,7 +238,7 @@ public extension ThemeEditModel.Slot {
     }
 }
 
-extension ThemeEditModel {
+private extension ThemeEditModel {
     static func isLight(_ hex: String) -> Bool {
         let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
         let onBlack = ThemePalette.contrast(rgb, 0x000000)
