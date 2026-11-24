@@ -7,7 +7,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
-import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
 
 @Composable
 fun rememberVoiceStarter(

@@ -48,9 +48,7 @@ import com.yossibank.kakeibot.designsystem.components.budget.carryoverText
 import com.yossibank.kakeibot.designsystem.components.budget.remainingText
 import com.yossibank.kakeibot.designsystem.components.budget.tint
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
-import com.yossibank.kakeibot.designsystem.components.modal.UndoNoticeState
 import com.yossibank.kakeibot.designsystem.components.surface.card
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -60,12 +58,12 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNote
-import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsScreenFlag
 import com.yossibank.kakeibot.features.shared.settingsparts.input.SettingsSwitch
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider

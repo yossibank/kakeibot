@@ -14,12 +14,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
-import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.autoPlan
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.balanceGap
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.finalAmount
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.loanOwed
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.plannedTotal
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.scheduledEndDate
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.usesAutoCount
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
+import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import kotlin.math.abs
 
 @Composable

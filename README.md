@@ -57,6 +57,7 @@ flowchart LR
 | パッケージの依存とフォルダ | [docs/architecture-packages.md](docs/architecture-packages.md) |
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
+| Android の画面とモデル | [docs/architecture-android-app.md](docs/architecture-android-app.md) |
 | 画面の組み立て・見張り・通知とウィジェット | [docs/architecture-screens.md](docs/architecture-screens.md) |
 | 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | データの形 | [docs/data.md](docs/data.md) |

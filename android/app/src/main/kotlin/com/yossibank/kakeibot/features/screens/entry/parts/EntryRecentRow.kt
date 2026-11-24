@@ -28,7 +28,6 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -38,23 +37,17 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
-import com.yossibank.kakeibot.features.screens.entry.model.apply
-import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
-import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
-import com.yossibank.kakeibot.features.screens.entry.model.category
-import com.yossibank.kakeibot.features.screens.entry.model.categoryText
-import com.yossibank.kakeibot.features.screens.entry.model.dateText
-import com.yossibank.kakeibot.features.screens.entry.model.expressionText
-import com.yossibank.kakeibot.features.screens.entry.model.icon
-import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
-import com.yossibank.kakeibot.features.screens.entry.model.recentEntries
-import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
-import com.yossibank.kakeibot.features.screens.entry.model.routeText
-import com.yossibank.kakeibot.features.screens.entry.model.templates
-import com.yossibank.kakeibot.features.screens.entry.model.wallet
-import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
-import com.yossibank.kakeibot.features.shared.entrylist.EntryText
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.apply
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.applyRecent
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.category
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.icon
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.recentEntries
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.recentTransfers
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.templates
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallet
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
 @Composable

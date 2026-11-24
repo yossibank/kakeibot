@@ -54,11 +54,9 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
-import com.yossibank.kakeibot.designsystem.components.date.shortName
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
 import com.yossibank.kakeibot.designsystem.components.modal.UndoNotice
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
@@ -68,24 +66,8 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryItemEditor
-import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
-import com.yossibank.kakeibot.features.screens.entry.model.RemovedItem
-import com.yossibank.kakeibot.features.screens.entry.model.addItem
-import com.yossibank.kakeibot.features.screens.entry.model.adjustToItems
-import com.yossibank.kakeibot.features.screens.entry.model.canAdjustToItems
-import com.yossibank.kakeibot.features.screens.entry.model.hasItemAdjustment
-import com.yossibank.kakeibot.features.screens.entry.model.itemAdjustment
-import com.yossibank.kakeibot.features.screens.entry.model.itemCount
-import com.yossibank.kakeibot.features.screens.entry.model.itemNameSuggestions
-import com.yossibank.kakeibot.features.screens.entry.model.itemTotals
-import com.yossibank.kakeibot.features.screens.entry.model.quantityText
-import com.yossibank.kakeibot.features.screens.entry.model.removeItem
-import com.yossibank.kakeibot.features.screens.entry.model.restoreItem
-import com.yossibank.kakeibot.features.screens.entry.model.setTaxIncluded
-import com.yossibank.kakeibot.features.screens.entry.model.store
-import com.yossibank.kakeibot.features.screens.entry.model.unitPrice
-import com.yossibank.kakeibot.features.screens.entry.model.updateItem
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryItemEditor
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import kotlinx.coroutines.delay
 
 @Composable

@@ -74,7 +74,6 @@ import com.yossibank.kakeibot.designsystem.components.modal.BottomDrawer
 import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
 import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.surface.card
-import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
@@ -83,7 +82,6 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
-import com.yossibank.kakeibot.features.shared.period.title
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider

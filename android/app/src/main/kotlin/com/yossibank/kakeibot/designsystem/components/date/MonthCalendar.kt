@@ -35,6 +35,7 @@ import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.shared.datechoice.shortName
 
 private val dayCellSize: Dp = 36.dp
 

@@ -35,6 +35,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.shared.amount.symbol
 
 private val rows: List<List<AmountCalculator.Key>> = listOf(
     listOf(
@@ -68,14 +69,6 @@ private val rows: List<List<AmountCalculator.Key>> = listOf(
         AmountCalculator.Key.Equals,
     ),
 )
-
-val AmountCalculator.Operation.symbol: String
-    get() = when (this) {
-        AmountCalculator.Operation.add -> "＋"
-        AmountCalculator.Operation.subtract -> "−"
-        AmountCalculator.Operation.multiply -> "×"
-        AmountCalculator.Operation.divide -> "÷"
-    }
 
 @Composable
 fun Keypad(

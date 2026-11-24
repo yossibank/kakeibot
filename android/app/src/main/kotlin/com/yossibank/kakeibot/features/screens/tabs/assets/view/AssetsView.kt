@@ -26,14 +26,14 @@ import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
-import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.settings.wallets.title
-import com.yossibank.kakeibot.features.screens.tabs.assets.model.AssetsModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.wallets.title
+import com.yossibank.kakeibot.featuremodels.screens.tabs.assets.model.AssetsModel
+import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.store.database.AppDatabase
 

@@ -24,8 +24,8 @@ import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.shared.period.PeriodText
-import com.yossibank.kakeibot.features.shared.period.title
+import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
+import com.yossibank.kakeibot.featuremodels.shared.period.title
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 
 val MonthStartDay.title: String

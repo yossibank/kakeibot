@@ -2,6 +2,7 @@
 
 > [!NOTE]
 > Android のモジュールと、ビルドの設定が分かる。
+> 画面とそのモデルのモジュールは [architecture-android-app](architecture-android-app.md) にある。
 > 両 OS の分け方は [architecture](architecture.md) にある。
 
 ## 🛠️ 使う技術
@@ -24,7 +25,8 @@ Android は、次の技術を使う。
 | --- | --- |
 | `:core` | Kotlin だけで書く Core。テストは `spec/fixtures` を読み、iOS と同じ結果を確かめる |
 | `:store` | Room の DB。Kotlin Multiplatform のモジュールで、テストは JVM の SQLite で走る |
-| `:app` | Jetpack Compose のアプリ。iOS の KakeibotApp のターゲットを、パッケージで分ける |
+| `:featuremodels` | 画面のモデル。iOS の FeatureModels に当たり、テストは JVM で走る |
+| `:app` | Jetpack Compose のアプリ。iOS の KakeibotApp の残りのターゲットを、パッケージで分ける |
 
 `:core` は、iOS の Core のファイルと 1 対 1 に対応させる。次のものは、1 対 1 から外れる。
 
@@ -126,80 +128,7 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | WHERE 付きの一意インデックス | 表を作るときに足すトリガー |
 | BOOLEAN の列 | INTEGER の列。入る値は 0 と 1 で同じ |
 
-`:app` は、iOS のターゲットをパッケージにし、その下のフォルダも iOS に合わせる。
-
-| iOS | Android |
-| --- | --- |
-| `AppFeature/<フォルダ>/X.swift` | `appfeature/<フォルダ>/X.kt` |
-| `DesignSystem/<フォルダ>/X.swift` | `designsystem/<フォルダ>/X.kt` |
-| `Features/<フォルダ>/X.swift` | `features/<フォルダ>/X.kt` |
-| `Notifications/X.swift` | `notifications/X.kt`。予約・届いた通知・再起動の受け口を置く |
-| `View+Topic.swift` | `ViewTopic.kt` |
-| SF Symbols の絵 | `res/drawable/` の `ic_<名前>.xml` |
-| アイコンの絵柄（`Icon.Glyph`） | `res/drawable/` の `ic_glyph_<名前>.xml`。Material Symbols の絵を使う |
-
-画面の部品は、iOS と同じ名前の Composable で書く。Compose で同じに書けないものは、次のようにする。
-
-| iOS | Android |
-| --- | --- |
-| `@Observable` のモデル | Compose の状態を持つクラス。`AppModel` だけは ViewModel にする |
-| `@Environment` の値 | `Local<名前>` の CompositionLocal |
-| `Palette.accent` などの色 | `Palette` の Composable のプロパティ。`LocalPalette` のテーマから読む |
-| フォントを付けるモディファイア | `TextStyle` を返す `displayFont`・`textFont`・`sansFont` |
-| 大きさを固定したフォント | dp から直した sp。端末の文字の大きさに合わせない |
-| 見た目の明暗の上書き | `PaletteScene` がテーマを配り、バーのアイコンの色を合わせる |
-| ガラスの効果 | 背景の色を濃く敷く |
-| 同梱のフォント | 入れない。明朝は端末の serif、ほかは端末の既定で出す |
-| シート（`.sheet`） | 画面の上に、下からせり上がる全画面の層で出す。戻る操作で閉じる |
-
-アイコンの絵柄は、すべてに Material Symbols の絵を用意している。
-
-画面のモデルは、次の決まりで書く。
-
-| 対象 | 決まり |
-| --- | --- |
-| モデルの形 | `state`・`input`・`output` の `val` と、`private val dependencies` を持つ。使わないまとまりは書かない |
-| `State` | 人の操作で変わる値と、進み具合・知らせを持つ。`mutableStateOf` は 12 個まで、Boolean は 3 個までである |
-| `Input` | DB から読んだ値と、最初に渡された値を持つ。setter を `internal set` にし、モデルの関数だけが書く |
-| `Output` | `input` と `state` から出す値を持つ。`derivedStateOf` はここに置き、DB と `dependencies` を使わない |
-| `Dependencies` | DB・時計・`Flow`・`Context`・`CoroutineScope` のような外の口を持つ。`private class` にし、モデルの関数だけが使う |
-| 動いている間の持ち物 | 認識の部品や `Job` は、`private val` の入れ物に置く。`EntryVoiceFlow` の `Runtime` が当たり、`mutableStateOf` を使わない |
-| 連動する値 | `private set` にして、`State` の関数で一緒に書き換える |
-| 操作の置き場所 | 状態だけを変える操作は `State` の関数に置く。DB や `output` が要る操作は、モデルの関数に置く |
-| 分けたファイル | `Output` の計算は、`EntryModelOutputText.kt` のように拡張プロパティのファイルへ出す |
-| 画面からの読み方 | `model.state.x`・`model.input.x`・`model.output.x` の形で読む。モデルに転送のプロパティを足さない |
-| 入力の下書き | 1 つの `data class` にまとめ、`State` の `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
-| 下書きの決まり | 口座・カテゴリ・日付を変えたときの消し込みは、下書きの型の関数に置く |
-| 保存と読み込みの失敗 | `features/shared/model/` の `ModelTask` に通し、`State` の `task` に置く。失敗の文と、実行中かどうかを持つ |
-| 今の時刻 | `features/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
-| 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる |
-| 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
-| 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
-
-モデルのテストは `app/src/test/` に置く。`modelTest` が DB をメモリに開き、`ModelWait` が値を待つ。iOS と違う動きは `@Ignore` の理由に書く。
-
-複数の画面で使う部品は、次の場所に置く。
-
-| 部品 | 置き場所 |
-| --- | --- |
-| 主ボタン・丸いアイコンのボタン | `designsystem/components/button/` |
-| 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
-| 1 行に収めて縮める文字 | `designsystem/components/text/` の `FittedText` |
-| 横線・縦の区切り | `designsystem/components/surface/` |
-| 置き文字付きの入力欄 | `designsystem/components/input/` の `PlaceholderTextField` |
-| ボタンの高さなどの寸法 | `designsystem/theme/` の `Metrics` |
-| 設定の画面の枠 | `features/shared/settingsparts/layout/` の `SettingsFrame` |
-| 期間を前後に送る見出し | `features/shared/period/` の `PeriodStepper` |
-| 通知の許可 | `features/shared/notification/` |
-
-画面のフォルダとファイルで、iOS と違う所は次のとおりである。
-
-| Android | iOS との違い |
-| --- | --- |
-| `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
-| `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
-| `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
-| `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |
+`:featuremodels` と `:app` の中身は、[architecture-android-app](architecture-android-app.md) にある。
 
 ## 🔧 設定
 
@@ -215,7 +144,7 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 ## 🧪 確認
 
-`make android-test` は `:core`・`:store`・`:app` のテストを走らせる。`make android-build` はデバッグの APK を作る。どちらも `make verify` に含まれる。
+`make android-test` は `:core`・`:store`・`:featuremodels` のテストを走らせる。`make android-build` はデバッグの APK を作る。どちらも `make verify` に含まれる。
 
 JDK と SDK の場所は、Makefile の次の変数で変えられる。
 

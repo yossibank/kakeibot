@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.theme.ThemeLook
 import com.yossibank.kakeibot.core.concepts.theme.ThemeStyle
-import com.yossibank.kakeibot.features.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.notifications.NotificationScheduler
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.notificationInputUpdates
