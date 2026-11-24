@@ -8,6 +8,8 @@
 
 2 つのパッケージの中身は、次のとおりである。共通の形に無い `Store/Snapshot/`・`Store/Sync/`・`Sync`・`TestSupport` を足している。画面のモデルは、`Features` から `FeatureModels` に分けている。
 
+Android も同じ分け方で、画面のモデルを `:featuremodels` に置く。中身は [architecture-android-app](architecture-android-app.md) にある。
+
 依存の向きは、共通の形に次の 3 本を足したものである。
 
 - `AppFeature --> Sync --> Store`

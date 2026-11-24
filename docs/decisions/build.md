@@ -59,9 +59,24 @@
 > [!IMPORTANT]
 > JVM だけのモジュールは、アプリの実行時に Room の Android 版が選ばれ、DB を開く所で落ちる。エミュレーターで確かめた。
 
+### 画面のモデルのモジュール
+
+**決定：画面のモデルは、Android のライブラリの `:featuremodels` に分ける。**
+
+| 項目 | 内容 |
+| --- | --- |
+| 理由 | `internal` がモジュールの境界で効く。画面から `input` に書く所と、`dependencies` を読む所が、コンパイルで止まる |
+| 理由 | iOS の FeatureModels と対になり、どこに当たるかを追いやすい |
+| 却下 | `:app` の中でパッケージだけを分ける。`internal` が画面から見えてしまう |
+| 却下 | `designsystem` も別のモジュールに出す。絵と色を `:app` から移すことになり、大きい |
+
+> [!IMPORTANT]
+> - Compose は runtime とコンパイラのプラグインだけを使う。UI の部品には頼らない。
+> - モデルが使う金額の文字などは、`designsystem` から `:featuremodels` に移した。`designsystem` は `:app` にあり、`:featuremodels` から読めないためである。
+
 ### アプリのモデルのテスト
 
-**決定：画面のモデルは、`:app` の JVM のテストで確かめる。**
+**決定：画面のモデルは、`:featuremodels` の JVM のテストで確かめる。**
 
 | 項目 | 内容 |
 | --- | --- |
