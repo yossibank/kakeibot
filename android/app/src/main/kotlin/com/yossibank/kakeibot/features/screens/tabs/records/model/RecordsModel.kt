@@ -18,7 +18,6 @@ import com.yossibank.kakeibot.features.shared.entrylist.EntryRowItem
 import com.yossibank.kakeibot.features.shared.model.ModelTask
 import com.yossibank.kakeibot.features.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
@@ -26,137 +25,170 @@ import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.records.settingkeys.recordsLayout
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class RecordsModel(
-    private val database: AppDatabase,
-    private val entryList: Flow<EntryList>,
+    database: AppDatabase,
+    entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
-    var today: LocalDate by mutableStateOf(today)
+    val state = State(today)
+    val input = Input()
+    val output = Output(input, state)
 
-    var month: YearMonth? by mutableStateOf(null)
-        private set
+    private val dependencies = Dependencies(database, entryList)
 
-    var isLoaded: Boolean by mutableStateOf(false)
-        private set
+    class State(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
 
-    private var list: EntryList? by mutableStateOf(null)
+        var month: YearMonth? by mutableStateOf(null)
+            private set
 
-    private var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
+        var selected: LocalDate? by mutableStateOf(null)
+            private set
 
-    private var weekStart: Weekday by mutableStateOf(Weekday.monday)
-
-    private var selected: LocalDate? by mutableStateOf(null)
-
-    var layout: RecordsLayout by mutableStateOf(RecordsLayout.calendar)
-        private set
-
-    val weekdays: List<Weekday>
-        get() = Weekday.week(startingOn = weekStart)
-
-    val weeks: List<List<LocalDate?>>
-        get() = period.weeks(startingOn = weekStart)
-
-    val selectedDate: LocalDate
-        get() {
-            val period = period
-            val date = selected
-
-            return when {
-                date != null && date in period -> date
-                today in period -> today
-                else -> period.start
-            }
+        fun move(to: YearMonth) {
+            month = to
+            selected = null
         }
 
-    val shownMonth: YearMonth
-        get() = month ?: today.periodMonth(startingOn = monthStartDay)
-
-    val period: ClosedRange<LocalDate>
-        get() = shownMonth.period(startingOn = monthStartDay)
-
-    val monthTitle: String
-        get() = "${shownMonth.year}年 ${shownMonth.month}月"
-
-    val periodText: String
-        get() = PeriodText.range(period)
-
-    val days: List<EntryDay> by derivedStateOf {
-        list?.days?.within(period) ?: emptyList()
+        fun select(date: LocalDate) {
+            selected = date
+        }
     }
 
-    private val daysByDate: Map<LocalDate, EntryDay> by derivedStateOf {
-        days.associateBy { it.date }
+    class Input {
+        var list: EntryList? by mutableStateOf(null)
+            internal set
+
+        var isLoaded: Boolean by mutableStateOf(false)
+            internal set
+
+        var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
+            internal set
+
+        var weekStart: Weekday by mutableStateOf(Weekday.monday)
+            internal set
+
+        var layout: RecordsLayout by mutableStateOf(RecordsLayout.calendar)
+            internal set
     }
 
-    val expenseTotal: Long
-        get() = days.expenseTotal
+    class Output(
+        private val input: Input,
+        private val state: State,
+    ) {
+        val weekdays: List<Weekday>
+            get() = Weekday.week(startingOn = input.weekStart)
 
-    val incomeTotal: Long
-        get() = days.incomeTotal
+        val weeks: List<List<LocalDate?>>
+            get() = period.weeks(startingOn = input.weekStart)
 
-    val balance: Long
-        get() = incomeTotal - expenseTotal
+        val selectedDate: LocalDate
+            get() {
+                val period = period
+                val date = state.selected
 
-    val balanceTitle: String
-        get() = if (balance < 0) "収支 · 赤字" else "収支 · 黒字"
+                return when {
+                    date != null && date in period -> date
+                    state.today in period -> state.today
+                    else -> period.start
+                }
+            }
+
+        val shownMonth: YearMonth
+            get() = state.month ?: state.today.periodMonth(startingOn = input.monthStartDay)
+
+        val period: ClosedRange<LocalDate>
+            get() = shownMonth.period(startingOn = input.monthStartDay)
+
+        val monthTitle: String
+            get() = "${shownMonth.year}年 ${shownMonth.month}月"
+
+        val periodText: String
+            get() = PeriodText.range(period)
+
+        val days: List<EntryDay> by derivedStateOf {
+            input.list?.days?.within(period) ?: emptyList()
+        }
+
+        private val daysByDate: Map<LocalDate, EntryDay> by derivedStateOf {
+            days.associateBy { it.date }
+        }
+
+        val expenseTotal: Long
+            get() = days.expenseTotal
+
+        val incomeTotal: Long
+            get() = days.incomeTotal
+
+        val balance: Long
+            get() = incomeTotal - expenseTotal
+
+        val balanceTitle: String
+            get() = if (balance < 0) "収支 · 赤字" else "収支 · 黒字"
+
+        fun day(on: LocalDate): EntryDay? = daysByDate[on]
+
+        fun rows(of: EntryDay): List<EntryRowItem> {
+            val list = input.list ?: return emptyList()
+
+            return of.entries.map { entry ->
+                EntryRowItem.of(
+                    entry = entry,
+                    list = list,
+                )
+            }
+        }
+    }
+
+    private class Dependencies(
+        val database: AppDatabase,
+        val entryList: Flow<EntryList>,
+    )
 
     suspend fun observe() {
+        val database = dependencies.database
+
         coroutineScope {
             launch {
-                database.settingUpdates(SettingKey.monthStartDay).collect { monthStartDay = it }
+                database.settingUpdates(SettingKey.monthStartDay).collect {
+                    input.monthStartDay = it
+                }
             }
 
             launch {
-                database.settingUpdates(SettingKey.weekStart).collect { weekStart = it }
+                database.settingUpdates(SettingKey.weekStart).collect { input.weekStart = it }
             }
 
             launch {
-                database.settingUpdates(SettingKey.recordsLayout).collect { layout = it }
+                database.settingUpdates(SettingKey.recordsLayout).collect { input.layout = it }
             }
 
             launch {
-                entryList.collect {
-                    list = it
-                    isLoaded = true
+                dependencies.entryList.collect {
+                    input.list = it
+                    input.isLoaded = true
                 }
             }
         }
     }
 
     fun move(months: Int) {
-        month = shownMonth.adding(months = months)
-        selected = null
+        state.move(to = output.shownMonth.adding(months = months))
     }
-
-    fun select(date: LocalDate) {
-        selected = date
-    }
-
-    fun day(on: LocalDate): EntryDay? = daysByDate[on]
 
     suspend fun select(layout: RecordsLayout) {
-        this.layout = layout
+        input.layout = layout
 
         ModelTask.quiet {
-            database.setSetting(
+            dependencies.database.setSetting(
                 key = SettingKey.recordsLayout,
                 to = layout,
-            )
-        }
-    }
-
-    fun rows(of: EntryDay): List<EntryRowItem> {
-        val list = list ?: return emptyList()
-
-        return of.entries.map { entry ->
-            EntryRowItem.of(
-                entry = entry,
-                list = list,
             )
         }
     }

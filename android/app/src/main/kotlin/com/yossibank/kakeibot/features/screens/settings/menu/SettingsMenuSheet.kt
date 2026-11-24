@@ -124,7 +124,7 @@ fun SettingsMenuSheet(
 
                     SettingsRow(
                         title = "固定費",
-                        value = "${model.recurringCount} 件",
+                        value = "${model.input.recurringCount} 件",
                         onSelect = { screen = Screen.Recurrings },
                     )
 
@@ -132,7 +132,7 @@ fun SettingsMenuSheet(
 
                     SettingsRow(
                         title = "月の始まり",
-                        value = model.monthStartDay.title,
+                        value = model.input.monthStartDay.title,
                         onSelect = { screen = Screen.MonthStart },
                     )
 
@@ -140,7 +140,7 @@ fun SettingsMenuSheet(
 
                     SettingsRow(
                         title = "週の始まり",
-                        value = model.weekStart.title,
+                        value = model.input.weekStart.title,
                         onSelect = { screen = Screen.WeekStart },
                     )
                 }
@@ -159,7 +159,7 @@ fun SettingsMenuSheet(
                 )
 
                 MonthStartDayView(
-                    selection = model.monthStartDay,
+                    selection = model.input.monthStartDay,
                     today = today,
                     onSelect = { day ->
                         scope.launch {
@@ -174,7 +174,7 @@ fun SettingsMenuSheet(
 
             Screen.WeekStart -> {
                 SettingsMenuWeekStart(
-                    selection = model.weekStart,
+                    selection = model.input.weekStart,
                     onSelect = { weekday ->
                         scope.launch {
                             model.store(

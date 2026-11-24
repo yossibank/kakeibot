@@ -42,23 +42,20 @@ import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.apply
 import com.yossibank.kakeibot.features.screens.entry.model.applyRecent
 import com.yossibank.kakeibot.features.screens.entry.model.applyTransfer
+import com.yossibank.kakeibot.features.screens.entry.model.category
 import com.yossibank.kakeibot.features.screens.entry.model.categoryText
 import com.yossibank.kakeibot.features.screens.entry.model.dateText
 import com.yossibank.kakeibot.features.screens.entry.model.expressionText
+import com.yossibank.kakeibot.features.screens.entry.model.icon
 import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.recentEntries
 import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
 import com.yossibank.kakeibot.features.screens.entry.model.routeText
+import com.yossibank.kakeibot.features.screens.entry.model.templates
+import com.yossibank.kakeibot.features.screens.entry.model.wallet
 import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
-
-val EntryModel.hasRecent: Boolean
-    get() = if (form.type == Entry.Kind.transfer) {
-        recentTransfers.isNotEmpty()
-    } else {
-        templates.isNotEmpty() || recentEntries.isNotEmpty()
-    }
 
 @Composable
 fun EntryRecentRow(
@@ -70,7 +67,7 @@ fun EntryRecentRow(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = if (model.form.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
+            text = if (model.state.form.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
             modifier = Modifier.padding(horizontal = 4.dp),
             color = Palette.subtext,
             style = textFont(
@@ -83,22 +80,22 @@ fun EntryRecentRow(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (model.form.type == Entry.Kind.transfer) {
-                model.recentTransfers.forEach { transfer ->
+            if (model.state.form.type == Entry.Kind.transfer) {
+                model.output.recentTransfers.forEach { transfer ->
                     TransferCard(
                         model = model,
                         transfer = transfer,
                     )
                 }
             } else {
-                model.templates.forEach { template ->
+                model.output.templates.forEach { template ->
                     TemplateCard(
                         model = model,
                         template = template,
                     )
                 }
 
-                model.recentEntries.forEach { entry ->
+                model.output.recentEntries.forEach { entry ->
                     EntryCard(
                         model = model,
                         entry = entry,
@@ -114,16 +111,16 @@ private fun TemplateCard(
     model: EntryModel,
     template: EntryTemplate,
 ) {
-    val category = model.category(of = template.categoryId)
+    val category = model.output.category(of = template.categoryId)
 
     RecentCard(
         title = template.name,
         amount = template.amount,
         detail = detail(
             category = category?.name,
-            wallet = model.wallet(of = template.walletId)?.name,
+            wallet = model.output.wallet(of = template.walletId)?.name,
         ),
-        icon = category?.let { model.icon(of = it.iconId) },
+        icon = category?.let { model.output.icon(of = it.iconId) },
         isPinned = true,
         onUse = { model.apply(template) },
     )
@@ -134,7 +131,7 @@ private fun EntryCard(
     model: EntryModel,
     entry: Entry,
 ) {
-    val category = model.category(of = entry.categoryId)
+    val category = model.output.category(of = entry.categoryId)
     val memo = entry.memo?.takeIf { it.isNotEmpty() }
 
     RecentCard(
@@ -142,9 +139,9 @@ private fun EntryCard(
         amount = entry.amount,
         detail = detail(
             category = if (memo == null) null else category?.name,
-            wallet = model.wallet(of = entry.walletId)?.name,
+            wallet = model.output.wallet(of = entry.walletId)?.name,
         ),
-        icon = category?.let { model.icon(of = it.iconId) },
+        icon = category?.let { model.output.icon(of = it.iconId) },
         isPinned = false,
         onUse = { model.applyRecent(entry) },
     )
@@ -155,13 +152,13 @@ private fun TransferCard(
     model: EntryModel,
     transfer: Entry,
 ) {
-    val source = model.wallet(of = transfer.walletId)
+    val source = model.output.wallet(of = transfer.walletId)
 
     RecentCard(
         title = source?.name ?: "",
         amount = transfer.amount,
-        detail = "→ ${model.wallet(of = transfer.toWalletId)?.name ?: ""}",
-        icon = source?.let { model.icon(of = it.iconId) },
+        detail = "→ ${model.output.wallet(of = transfer.toWalletId)?.name ?: ""}",
+        icon = source?.let { model.output.icon(of = it.iconId) },
         isPinned = false,
         onUse = { model.applyTransfer(transfer) },
     )

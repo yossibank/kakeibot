@@ -91,7 +91,7 @@ fun BudgetListView(
     }
 
     SideEffect {
-        model.today = today
+        model.state.today = today
     }
 
     val hint =
@@ -158,18 +158,18 @@ fun BudgetListView(
                 title = "残りを繰り越す",
                 detail = "使いすぎた分は、次の月の予算から引きます",
                 icon = R.drawable.ic_repeat,
-                isOn = model.isCarryoverOn,
+                isOn = model.output.isCarryoverOn,
                 onChange = { isOn ->
                     scope.launch { model.setCarryover(isOn) }
                 },
             )
 
-            if (model.budgeted.isNotEmpty()) {
+            if (model.output.budgeted.isNotEmpty()) {
                 Section(
                     title = "カテゴリごと",
-                    note = model.categoriesNote,
+                    note = model.output.categoriesNote,
                 ) {
-                    RowsCard(categories = model.budgeted) { category ->
+                    RowsCard(categories = model.output.budgeted) { category ->
                         BudgetCategoryRow(
                             model = model,
                             category = category,
@@ -178,12 +178,12 @@ fun BudgetListView(
                 }
             }
 
-            if (model.unbudgeted.isNotEmpty()) {
+            if (model.output.unbudgeted.isNotEmpty()) {
                 Section(
                     title = "予算なし",
-                    note = model.unbudgetedNote,
+                    note = model.output.unbudgetedNote,
                 ) {
-                    RowsCard(categories = model.unbudgeted) { category ->
+                    RowsCard(categories = model.output.unbudgeted) { category ->
                         BudgetPlainRow(
                             model = model,
                             category = category,
@@ -231,9 +231,9 @@ private fun BudgetNotices(
             )
         }
 
-        if (model.message.isNotEmpty() && model.editing == null) {
+        if (model.state.task.message.isNotEmpty() && model.state.editing == null) {
             Text(
-                text = model.message,
+                text = model.state.task.message,
                 modifier = Modifier
                     .fillMaxWidth()
                     .card()

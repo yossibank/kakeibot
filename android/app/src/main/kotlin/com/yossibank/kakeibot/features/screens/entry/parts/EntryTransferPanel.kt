@@ -64,6 +64,7 @@ import com.yossibank.kakeibot.features.screens.entry.model.currentLine
 import com.yossibank.kakeibot.features.screens.entry.model.dateText
 import com.yossibank.kakeibot.features.screens.entry.model.expressionText
 import com.yossibank.kakeibot.features.screens.entry.model.frequentRoutes
+import com.yossibank.kakeibot.features.screens.entry.model.icon
 import com.yossibank.kakeibot.features.screens.entry.model.idleAfterLine
 import com.yossibank.kakeibot.features.screens.entry.model.isOverSourceBalance
 import com.yossibank.kakeibot.features.screens.entry.model.loanRemaining
@@ -71,6 +72,8 @@ import com.yossibank.kakeibot.features.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.features.screens.entry.model.payOffLoan
 import com.yossibank.kakeibot.features.screens.entry.model.recentTransfers
 import com.yossibank.kakeibot.features.screens.entry.model.routeText
+import com.yossibank.kakeibot.features.screens.entry.model.toWallet
+import com.yossibank.kakeibot.features.screens.entry.model.wallet
 import com.yossibank.kakeibot.features.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 
@@ -88,7 +91,7 @@ fun EntryTransferArea(
 
         EntryTransferRoutes(model = model)
 
-        if (model.recentTransfers.isEmpty()) {
+        if (model.output.recentTransfers.isEmpty()) {
             Text(
                 text = "チャージ・カードの支払い・口座のあいだの移動",
                 color = Palette.subtext,
@@ -96,9 +99,9 @@ fun EntryTransferArea(
             )
         }
 
-        val remaining = model.loanRemaining
+        val remaining = model.output.loanRemaining
 
-        if (remaining != null && remaining != model.amount.toLong()) {
+        if (remaining != null && remaining != model.output.amount.toLong()) {
             PayOffButton(
                 remaining = remaining,
                 onSelect = model::payOffLoan,
@@ -140,7 +143,7 @@ private fun EntryTransferPanel(model: EntryModel) {
             }
 
             Flow(
-                amount = model.amount,
+                amount = model.output.amount,
                 modifier = Modifier.padding(start = 8.dp),
             )
 
@@ -156,7 +159,7 @@ private fun EntryTransferPanel(model: EntryModel) {
                         width = 1.dp,
                         color = Palette.accent.opacity(Emphasis.Medium),
                         shape = CircleShape,
-                    ).clickable(onClick = model::swapWallets),
+                    ).clickable(onClick = model.state::swapWallets),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -213,16 +216,16 @@ private fun WalletCard(
     model: EntryModel,
     isSource: Boolean,
 ) {
-    val wallet = if (isSource) model.wallet else model.toWallet
-    val icon = wallet?.let { model.icon(of = it.iconId) }
+    val wallet = if (isSource) model.output.wallet else model.output.toWallet
+    val icon = wallet?.let { model.output.icon(of = it.iconId) }
     val corner = LocalThemeStyle.current.corner
     val shape = RoundedCornerShape(corner.radius(20.dp))
     val iconShape = RoundedCornerShape(corner.radius(12.dp))
     val tint = icon?.let { colorOf(hex = it.color) } ?: Palette.accent
-    val isOver = isSource && model.isOverSourceBalance
-    val current = wallet?.let(model::currentLine)
-    val after = wallet?.let { model.afterLine(of = it, isSource = isSource) }
-    val idleAfter = wallet?.let { model.idleAfterLine(of = it, isSource = isSource) }
+    val isOver = isSource && model.output.isOverSourceBalance
+    val current = wallet?.let(model.output::currentLine)
+    val after = wallet?.let { model.output.afterLine(of = it, isSource = isSource) }
+    val idleAfter = wallet?.let { model.output.idleAfterLine(of = it, isSource = isSource) }
 
     Row(
         modifier = Modifier
@@ -234,7 +237,9 @@ private fun WalletCard(
                 color = Palette.accent.opacity(Emphasis.Medium),
                 shape = shape,
             ).clickable {
-                model.focus(if (isSource) EntryModel.Field.Wallet else EntryModel.Field.ToWallet)
+                model.state.focus(
+                    if (isSource) EntryModel.Field.Wallet else EntryModel.Field.ToWallet,
+                )
             }.padding(
                 start = 16.dp,
                 end = 12.dp,
@@ -269,7 +274,7 @@ private fun WalletCard(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             RoleTag(
-                title = if (isSource) model.walletTitle else EntryText.destinationTitle,
+                title = if (isSource) model.output.walletTitle else EntryText.destinationTitle,
                 isSource = isSource,
             )
 

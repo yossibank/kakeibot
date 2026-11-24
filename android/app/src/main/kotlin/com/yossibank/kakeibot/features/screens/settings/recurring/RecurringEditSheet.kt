@@ -82,6 +82,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.features.shared.model.ScreenClock
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
 import com.yossibank.kakeibot.features.shared.period.title
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
@@ -119,6 +120,7 @@ fun RecurringEditSheet(
     val model = remember(database, editingId) {
         RecurringEditModel(
             database = database,
+            clock = ScreenClock.system,
             today = today,
             type = type,
             editingId = editingId,
@@ -126,7 +128,7 @@ fun RecurringEditSheet(
     }
 
     SideEffect {
-        model.today = today
+        model.state.today = today
     }
 
     val focus = LocalFocusManager.current
@@ -153,7 +155,7 @@ fun RecurringEditSheet(
     fun close() {
         panel = null
 
-        if (model.isChanged) {
+        if (model.output.isChanged) {
             prompt = RecurringEditPrompt.Discard
         } else {
             onClose()
@@ -180,12 +182,12 @@ fun RecurringEditSheet(
                 return@launch
             }
 
-            if (model.form.remindDaysBefore != null) {
+            if (model.state.form.remindDaysBefore != null) {
                 permission.requestIfNeeded()
             }
 
             if (hiding) {
-                setHidden(!model.isHidden)
+                setHidden(!model.input.isHidden)
             } else {
                 onClose()
             }
@@ -201,20 +203,20 @@ fun RecurringEditSheet(
     }
 
     SettingsFrame(
-        title = if (model.isEditing) "固定費を編集" else "固定費を追加",
+        title = if (model.output.isEditing) "固定費を編集" else "固定費を追加",
         isRoot = false,
         onBack = ::close,
         followsKeyboard = true,
         trailing = {
-            if (model.isEditing) {
+            if (model.output.isEditing) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     HideButton(
-                        isHidden = model.isHidden,
+                        isHidden = model.input.isHidden,
                         onSelect = {
-                            if (model.isChanged) {
+                            if (model.output.isChanged) {
                                 prompt = RecurringEditPrompt.Hide
                             } else {
-                                setHidden(!model.isHidden)
+                                setHidden(!model.input.isHidden)
                             }
                         },
                     )
@@ -246,9 +248,9 @@ fun RecurringEditSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            if (!model.isEditing) {
+            if (!model.output.isEditing) {
                 SegmentSwitch(
-                    selection = model.form.type,
+                    selection = model.state.form.type,
                     options = typeOptions,
                     onSelect = model::select,
                     modifier = Modifier.fillMaxWidth(),
@@ -256,15 +258,15 @@ fun RecurringEditSheet(
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(previewSpacing)) {
-                RecurringRowCard(row = model.previewRow)
+                RecurringRowCard(row = model.output.previewRow)
 
                 SettingsCaption(text = "一覧では、このカードで並びます")
             }
 
             PlaceholderTextField(
-                value = model.form.memo,
-                onChange = { memo -> model.update { copy(memo = memo) } },
-                placeholder = RecurringText.namePrompt(model.form.type),
+                value = model.state.form.memo,
+                onChange = { memo -> model.state.update { copy(memo = memo) } },
+                placeholder = RecurringText.namePrompt(model.state.form.type),
                 style = textFont(style = FontTextStyle.Body),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -278,45 +280,45 @@ fun RecurringEditSheet(
             )
 
             RecurringDetailRows(
-                rows = model.detailRows,
+                rows = model.output.detailRows,
                 onOpen = ::open,
             )
 
-            if (model.isLoanRepayment &&
-                (model.plannedTotal != null || model.autoPlan != null)
+            if (model.output.isLoanRepayment &&
+                (model.output.plannedTotal != null || model.output.autoPlan != null)
             ) {
                 RecurringLoanPlan(
                     model = model,
-                    onMatch = model::useAutoCount,
+                    onMatch = model.state::useAutoCount,
                 )
             }
 
-            if (model.form.remindDaysBefore != null && !permission.isAllowed) {
+            if (model.state.form.remindDaysBefore != null && !permission.isAllowed) {
                 DeniedBanner(onOpen = permission::openSettings)
             }
         }
 
-        if (model.message.isNotEmpty()) {
+        if (model.state.task.message.isNotEmpty()) {
             Text(
-                text = model.message,
-                modifier = Modifier.clickable(onClick = model::clearMessage),
+                text = model.state.task.message,
+                modifier = Modifier.clickable(onClick = model.state.task::clear),
                 color = Palette.rose,
                 style = textFont(style = FontTextStyle.Caption),
             )
         }
 
         PrimaryButton(
-            title = model.saveTitle,
+            title = model.output.saveTitle,
             onClick = { save() },
             modifier = Modifier.fillMaxWidth(),
-            isEnabled = model.canSave,
+            isEnabled = model.output.canSave,
         )
     }
 
     RecurringEditDialogs(
         prompt = prompt,
-        isHidden = model.isHidden,
-        canSave = model.canSave,
+        isHidden = model.input.isHidden,
+        canSave = model.output.canSave,
         onDismiss = { prompt = null },
         onDiscard = onClose,
         onDelete = {
@@ -328,7 +330,7 @@ fun RecurringEditSheet(
             }
         },
         onSaveHiding = { save(hiding = true) },
-        onDiscardHiding = { setHidden(!model.isHidden) },
+        onDiscardHiding = { setHidden(!model.input.isHidden) },
     )
 }
 

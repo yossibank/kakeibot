@@ -68,7 +68,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryItemInput
+import com.yossibank.kakeibot.features.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.RemovedItem
 import com.yossibank.kakeibot.features.screens.entry.model.addItem
@@ -235,7 +235,7 @@ internal fun AdjustmentLine(model: EntryModel) {
             style = textFont(size = FontSize.Small),
         )
 
-        if (model.canAdjustToItems) {
+        if (model.output.canAdjustToItems) {
             Box(
                 modifier = Modifier
                     .height(32.dp)
@@ -262,7 +262,7 @@ internal fun AdjustmentLine(model: EntryModel) {
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = AmountText.text(model.itemAdjustment.toInt()),
+            text = AmountText.text(model.output.itemAdjustment.toInt()),
             color = Palette.amber,
             style = textFont(size = FontSize.Small),
         )

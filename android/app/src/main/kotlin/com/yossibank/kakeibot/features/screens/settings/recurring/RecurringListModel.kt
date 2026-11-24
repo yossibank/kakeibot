@@ -12,8 +12,8 @@ import com.yossibank.kakeibot.core.concepts.recurring.total
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.text.clamped
 import com.yossibank.kakeibot.features.shared.model.ModelTask
+import com.yossibank.kakeibot.features.shared.model.ScreenClock
 import com.yossibank.kakeibot.store.database.AppDatabase
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
 import com.yossibank.kakeibot.store.queries.types.EntryList
@@ -30,94 +30,185 @@ import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
 import com.yossibank.kakeibot.store.writes.types.Deletion
 import com.yossibank.kakeibot.store.writes.types.RecurringTable
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import java.time.Instant
 
 class RecurringListModel(
-    private val database: AppDatabase,
-    private val entryList: Flow<EntryList>,
+    database: AppDatabase,
+    clock: ScreenClock,
+    entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
-    var today: LocalDate by mutableStateOf(today)
+    val state = State(today)
+    val input = Input()
+    val output = Output(input, state)
 
-    var type: Entry.Kind by mutableStateOf(Entry.Kind.expense)
+    private val dependencies = Dependencies(database, clock, entryList)
 
-    var movingOrder: List<Identifier<Recurring>>? by mutableStateOf(null)
-        private set
+    class State(
+        today: LocalDate,
+    ) {
+        val task = ModelTask()
 
-    private var recurrings: List<Recurring> by mutableStateOf(emptyList())
-    private var list: EntryList? by mutableStateOf(null)
-    private var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
+        var today: LocalDate by mutableStateOf(today)
 
-    private val task = ModelTask()
+        var type: Entry.Kind by mutableStateOf(Entry.Kind.expense)
 
-    val message: String
-        get() = task.message
+        var movingOrder: List<Identifier<Recurring>>? by mutableStateOf(null)
+            private set
 
-    val visible: List<Recurring>
-        get() = recurrings(isHidden = false)
+        fun move(
+            id: Identifier<Recurring>,
+            to: Int,
+            among: List<Identifier<Recurring>>,
+        ) {
+            val order = (movingOrder ?: among).toMutableList()
+            val from = order.indexOf(id)
 
-    val hidden: List<Recurring>
-        get() = recurrings(isHidden = true)
+            if (from < 0) {
+                return
+            }
 
-    val rows: List<RecurringRow>
-        get() {
-            val list = list ?: return emptyList()
-            return shown.map { row(of = it, list = list) }
+            val target = to.coerceIn(0, order.lastIndex)
+
+            if (from == target) {
+                movingOrder = order
+                return
+            }
+
+            order.removeAt(from)
+            order.add(target, id)
+            movingOrder = order
         }
 
-    val hiddenRows: List<RecurringRow>
-        get() {
-            val list = list ?: return emptyList()
-            return hidden.map { row(of = it, list = list) }
+        fun cancelMoving() {
+            movingOrder = null
         }
+    }
 
-    val monthTotal: Long
-        get() {
-            val period = today
-                .periodMonth(startingOn = monthStartDay)
-                .period(startingOn = monthStartDay)
+    class Input {
+        var recurrings: List<Recurring> by mutableStateOf(emptyList())
+            internal set
 
-            val entries = list?.entries ?: return visible.total(
-                of = type,
-                range = period,
+        var list: EntryList? by mutableStateOf(null)
+            internal set
+
+        var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
+            internal set
+    }
+
+    class Output(
+        private val input: Input,
+        private val state: State,
+    ) {
+        val visible: List<Recurring>
+            get() = recurrings(isHidden = false)
+
+        val hidden: List<Recurring>
+            get() = recurrings(isHidden = true)
+
+        val rows: List<RecurringRow>
+            get() {
+                val list = input.list ?: return emptyList()
+                return shown.map { row(of = it, list = list) }
+            }
+
+        val hiddenRows: List<RecurringRow>
+            get() {
+                val list = input.list ?: return emptyList()
+                return hidden.map { row(of = it, list = list) }
+            }
+
+        val monthTotal: Long
+            get() {
+                val period = state.today
+                    .periodMonth(startingOn = input.monthStartDay)
+                    .period(startingOn = input.monthStartDay)
+
+                val entries = input.list?.entries ?: return visible.total(
+                    of = state.type,
+                    range = period,
+                )
+
+                return visible.total(
+                    of = state.type,
+                    range = period,
+                    entries = entries,
+                )
+            }
+
+        val emptyText: String
+            get() = when (state.type) {
+                Entry.Kind.expense -> "家賃やサブスクなどを足すと、ここに並びます"
+                Entry.Kind.income -> "給料や年金などを足すと、ここに並びます"
+                Entry.Kind.transfer -> "カードの引き落としや積立などを足すと、ここに並びます"
+            }
+
+        private val shown: List<Recurring>
+            get() {
+                val order = state.movingOrder ?: return visible
+                val byId = visible.associateBy { it.id }
+                return order.mapNotNull { byId[it] }
+            }
+
+        private fun recurrings(isHidden: Boolean): List<Recurring> =
+            input.recurrings.filter { recurring ->
+                recurring.type == state.type && (recurring.archivedAt != null) == isHidden
+            }
+
+        private fun row(
+            of: Recurring,
+            list: EntryList,
+        ): RecurringRow {
+            val schedule = RecurringText.schedule(
+                frequency = of.frequency,
+                month = of.month ?: of.startDate.month,
+                day = of.day,
             )
 
-            return visible.total(
-                of = type,
-                range = period,
-                entries = entries,
+            val next = of.nextDate(onOrAfter = state.today)
+
+            return RecurringRow(
+                id = of.id,
+                title = list.title(of = of) ?: title(of.type),
+                schedule = RecurringText.detail(
+                    schedule = schedule,
+                    holiday = RecurringText.holidayNote(of.holidayShift),
+                ),
+                place = list.place(of = of),
+                amount = list
+                    .amount(
+                        of = of,
+                        on = next ?: state.today,
+                    ).clamped,
+                type = of.type,
+                icon = list.icon(of = of),
+                next = next,
+                closing = of.closingDay?.let(RecurringText::closingNote),
             )
         }
+    }
 
-    val emptyText: String
-        get() = when (type) {
-            Entry.Kind.expense -> "家賃やサブスクなどを足すと、ここに並びます"
-            Entry.Kind.income -> "給料や年金などを足すと、ここに並びます"
-            Entry.Kind.transfer -> "カードの引き落としや積立などを足すと、ここに並びます"
-        }
-
-    private val shown: List<Recurring>
-        get() {
-            val order = movingOrder ?: return visible
-            val byId = visible.associateBy { it.id }
-            return order.mapNotNull { byId[it] }
-        }
+    private class Dependencies(
+        val database: AppDatabase,
+        val clock: ScreenClock,
+        val entryList: Flow<EntryList>,
+    )
 
     suspend fun observe() {
+        val database = dependencies.database
+
         coroutineScope {
             launch {
-                database.recurringUpdates(includingHidden = true).collect { recurrings = it }
+                database.recurringUpdates(includingHidden = true).collect { input.recurrings = it }
             }
 
             launch {
-                entryList.collect { list = it }
+                dependencies.entryList.collect { input.list = it }
             }
 
-            database.settingUpdates(SettingKey.monthStartDay).collect { monthStartDay = it }
+            database.settingUpdates(SettingKey.monthStartDay).collect { input.monthStartDay = it }
         }
     }
 
@@ -125,42 +216,26 @@ class RecurringListModel(
         id: Identifier<Recurring>,
         to: Int,
     ) {
-        val order = (movingOrder ?: visible.map { it.id }).toMutableList()
-        val from = order.indexOf(id)
-
-        if (from < 0) {
-            return
-        }
-
-        val target = to.coerceIn(0, order.lastIndex)
-
-        if (from == target) {
-            movingOrder = order
-            return
-        }
-
-        order.removeAt(from)
-        order.add(target, id)
-        movingOrder = order
-    }
-
-    fun cancelMoving() {
-        movingOrder = null
+        state.move(
+            id = id,
+            to = to,
+            among = output.visible.map { it.id },
+        )
     }
 
     suspend fun finishMoving() {
-        val order = movingOrder ?: return
-        val others = recurrings.map { it.id }.filter { it !in order }
+        val order = state.movingOrder ?: return
+        val others = input.recurrings.map { it.id }.filter { it !in order }
 
-        task.attempt(failure = ModelTask.saveFailed) {
-            database.reorder(
+        state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.reorder(
                 RecurringTable,
                 ids = order + others,
-                at = Instant.now(),
+                at = dependencies.clock.now,
             )
         }
 
-        movingOrder = null
+        state.cancelMoving()
     }
 
     suspend fun hide(id: Identifier<Recurring>): Boolean = setHidden(
@@ -174,88 +249,48 @@ class RecurringListModel(
     )
 
     suspend fun delete(id: Identifier<Recurring>): Deletion? =
-        task.attempt(failure = ModelTask.saveFailed) {
-            database.deleteRecurring(
+        state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.deleteRecurring(
                 id = id,
-                at = Instant.now(),
+                at = dependencies.clock.now,
             )
         }
 
     suspend fun deleteHidden(): Deletion? {
-        val ids = hidden.map { it.id }
+        val ids = output.hidden.map { it.id }
 
         if (ids.isEmpty()) {
             return null
         }
 
-        return task.attempt(failure = ModelTask.saveFailed) {
-            database.deleteRecurrings(
+        return state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.deleteRecurrings(
                 ids = ids,
-                at = Instant.now(),
+                at = dependencies.clock.now,
             )
         }
     }
 
     suspend fun restore(deletion: Deletion) {
-        task.attempt(failure = ModelTask.restoreFailed) {
-            database.restore(deletion)
+        state.task.attempt(failure = ModelTask.restoreFailed) {
+            dependencies.database.restore(deletion)
         }
-    }
-
-    fun clearMessage() {
-        task.clear()
     }
 
     private suspend fun setHidden(
         id: Identifier<Recurring>,
         isHidden: Boolean,
     ): Boolean {
-        val done = task.attempt(failure = ModelTask.saveFailed) {
-            database.setRecurringHidden(
+        val done = state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.setRecurringHidden(
                 id = id,
                 isHidden = isHidden,
-                today = today,
-                at = Instant.now(),
+                today = state.today,
+                at = dependencies.clock.now,
             )
         }
 
         return done != null
-    }
-
-    private fun recurrings(isHidden: Boolean): List<Recurring> = recurrings.filter { recurring ->
-        recurring.type == type && (recurring.archivedAt != null) == isHidden
-    }
-
-    private fun row(
-        of: Recurring,
-        list: EntryList,
-    ): RecurringRow {
-        val schedule = RecurringText.schedule(
-            frequency = of.frequency,
-            month = of.month ?: of.startDate.month,
-            day = of.day,
-        )
-
-        val next = of.nextDate(onOrAfter = today)
-
-        return RecurringRow(
-            id = of.id,
-            title = list.title(of = of) ?: title(of.type),
-            schedule = RecurringText.detail(
-                schedule = schedule,
-                holiday = RecurringText.holidayNote(of.holidayShift),
-            ),
-            place = list.place(of = of),
-            amount = list
-                .amount(
-                    of = of,
-                    on = next ?: today,
-                ).clamped,
-            type = of.type,
-            icon = list.icon(of = of),
-            next = next,
-            closing = of.closingDay?.let(RecurringText::closingNote),
-        )
     }
 
     companion object {

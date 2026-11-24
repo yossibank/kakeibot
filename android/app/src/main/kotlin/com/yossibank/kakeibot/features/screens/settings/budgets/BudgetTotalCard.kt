@@ -80,7 +80,7 @@ internal fun BudgetTotalCard(
     onEdit: () -> Unit,
     onReset: () -> Unit,
 ) {
-    val usage = model.usage(categoryId = null)
+    val usage = model.output.usage(categoryId = null)
 
     Column(
         modifier = Modifier
@@ -102,7 +102,7 @@ internal fun BudgetTotalCard(
             )
 
             FittedText(
-                text = model.startText,
+                text = model.output.startText,
                 color = Palette.subtext,
                 style = textFont(style = FontTextStyle.Caption),
             )
@@ -113,7 +113,7 @@ internal fun BudgetTotalCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AmountValue(
-                amount = model.totalAmount,
+                amount = model.output.totalAmount,
                 size = FontSize.LargeTitle,
                 weight = FontWeight.Bold,
             )
@@ -121,7 +121,7 @@ internal fun BudgetTotalCard(
             EditMark()
         }
 
-        AnimatedVisibility(visible = model.isCarryoverOn && usage != null) {
+        AnimatedVisibility(visible = model.output.isCarryoverOn && usage != null) {
             if (usage != null) {
                 Row(
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -167,7 +167,7 @@ internal fun BudgetTotalCard(
             )
         }
 
-        if (model.recurringExpense > 0) {
+        if (model.output.recurringExpense > 0) {
             Row(
                 modifier = Modifier.padding(
                     start = 16.dp,
@@ -185,7 +185,7 @@ internal fun BudgetTotalCard(
                 )
 
                 FittedText(
-                    text = model.recurringText,
+                    text = model.output.recurringText,
                     color = Palette.accent,
                     style = textFont(style = FontTextStyle.Caption2),
                 )

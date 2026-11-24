@@ -50,6 +50,8 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.features.screens.entry.model.categories
+import com.yossibank.kakeibot.features.screens.entry.model.wallet
 import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 
 @Composable
@@ -74,7 +76,7 @@ fun EntryVoiceCard(
             ).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        when (val phase = flow.phase) {
+        when (val phase = flow.state.phase) {
             EntryVoiceFlow.Phase.Denied -> {
                 Denied(
                     onCancel = flow::cancel,
@@ -144,7 +146,7 @@ private fun ColumnScope.Listening(
         Chip(
             label = "カテゴリ",
             value = reading?.categoryId?.let { id ->
-                model.categories.firstOrNull { it.id == id }?.name
+                model.output.categories.firstOrNull { it.id == id }?.name
             },
         )
     }
@@ -162,7 +164,7 @@ private fun ColumnScope.Listening(
 
         Chip(
             label = "口座",
-            value = reading?.walletId?.let { model.wallet(of = it)?.name },
+            value = reading?.walletId?.let { model.output.wallet(of = it)?.name },
         )
 
         Chip(
@@ -182,7 +184,8 @@ private fun ColumnScope.Listening(
 
         FinishButton(
             silenceStart = listening.silenceStart,
-            duration = flow.silenceMillis,
+            duration = flow.input.silenceMillis,
+            passed = flow::silencePassed,
             onSelect = flow::finish,
         )
     }
@@ -339,6 +342,7 @@ private fun RowScope.CardButton(
 private fun RowScope.FinishButton(
     silenceStart: Long?,
     duration: Long,
+    passed: (Long) -> Long,
     onSelect: () -> Unit,
 ) {
     val fill = remember { Animatable(0f) }
@@ -350,13 +354,13 @@ private fun RowScope.FinishButton(
             return@LaunchedEffect
         }
 
-        val passed = (System.currentTimeMillis() - silenceStart).coerceIn(0L, duration)
+        val start = passed(silenceStart)
 
-        fill.snapTo(passed.toFloat() / duration)
+        fill.snapTo(start.toFloat() / duration)
         fill.animateTo(
             targetValue = 1f,
             animationSpec = tween(
-                durationMillis = (duration - passed).toInt(),
+                durationMillis = (duration - start).toInt(),
                 easing = LinearEasing,
             ),
         )

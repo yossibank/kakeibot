@@ -65,7 +65,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 internal fun RecordsCalendarCard(model: RecordsModel) {
-    val selected = model.selectedDate
+    val selected = model.output.selectedDate
 
     Column(
         modifier = Modifier
@@ -78,7 +78,7 @@ internal fun RecordsCalendarCard(model: RecordsModel) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            model.weekdays.forEach { weekday ->
+            model.output.weekdays.forEach { weekday ->
                 Text(
                     text = weekday.shortName,
                     modifier = Modifier.weight(1f),
@@ -89,17 +89,17 @@ internal fun RecordsCalendarCard(model: RecordsModel) {
             }
         }
 
-        model.weeks.forEach { week ->
+        model.output.weeks.forEach { week ->
             Row(modifier = Modifier.fillMaxWidth()) {
                 week.forEach { date ->
                     Box(modifier = Modifier.weight(1f)) {
                         if (date != null) {
                             CalendarCell(
                                 date = date,
-                                day = model.day(on = date),
+                                day = model.output.day(on = date),
                                 isSelected = date == selected,
-                                isToday = date == model.today,
-                                onSelect = { model.select(date) },
+                                isToday = date == model.state.today,
+                                onSelect = { model.state.select(date) },
                             )
                         }
                     }

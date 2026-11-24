@@ -58,24 +58,25 @@ fun RecurringQuickCard(
             AmountButton(
                 model = model,
                 onSelect = {
-                    onOpen(if (model.isCardBill) RecurringPanel.Closing else RecurringPanel.Amount)
+                    val isCardBill = model.output.isCardBill
+                    onOpen(if (isCardBill) RecurringPanel.Closing else RecurringPanel.Amount)
                 },
             )
         }
 
-        if (model.form.type != Entry.Kind.transfer) {
+        if (model.state.form.type != Entry.Kind.transfer) {
             SettingsDivider()
 
             Section(title = "カテゴリ") {
                 Chips {
-                    model.categories.forEach { category ->
+                    model.output.categories.forEach { category ->
                         ChoiceChip(
                             title = category.name,
-                            isSelected = category.id == model.form.categoryId,
+                            isSelected = category.id == model.state.form.categoryId,
                             onSelect = { model.select(category = category.id) },
                         ) {
                             IconTile(
-                                icon = model.icon(of = category.iconId),
+                                icon = model.output.icon(of = category.iconId),
                                 size = 24.dp,
                             )
                         }
@@ -86,26 +87,26 @@ fun RecurringQuickCard(
 
         SettingsDivider()
 
-        Section(title = model.walletTitle) {
+        Section(title = model.output.walletTitle) {
             WalletChips(
                 model = model,
-                selection = model.form.walletId,
-                onSelect = { model.select(wallet = it) },
+                selection = model.state.form.walletId,
+                onSelect = { model.state.select(wallet = it) },
             )
 
-            if (model.billRecurring != null) {
+            if (model.output.billRecurring != null) {
                 BillShiftChips(model = model)
             }
         }
 
-        if (model.form.type == Entry.Kind.transfer) {
+        if (model.state.form.type == Entry.Kind.transfer) {
             SettingsDivider()
 
             Section(title = EntryText.destinationTitle) {
                 WalletChips(
                     model = model,
-                    selection = model.form.toWalletId,
-                    onSelect = { id -> model.update { copy(toWalletId = id) } },
+                    selection = model.state.form.toWalletId,
+                    onSelect = { id -> model.state.update { copy(toWalletId = id) } },
                 )
             }
         }
@@ -158,7 +159,7 @@ private fun AmountButton(
             .clickable(onClick = onSelect),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (model.isCardBill) {
+        if (model.output.isCardBill) {
             Text(
                 text = "カードの利用分",
                 modifier = Modifier.weight(1f),
@@ -167,13 +168,13 @@ private fun AmountButton(
             )
         } else {
             AmountText(
-                amount = model.amount,
+                amount = model.output.amount,
                 modifier = Modifier.weight(1f),
                 style = displayFont(
                     size = FontSize.Title,
                     weight = FontWeight.Bold,
                 ),
-                color = if (model.amount > 0) Palette.accentStrong else Palette.hint,
+                color = if (model.output.amount > 0) Palette.accentStrong else Palette.hint,
             )
         }
 
@@ -193,14 +194,14 @@ private fun WalletChips(
     onSelect: (Identifier<Wallet>) -> Unit,
 ) {
     Chips {
-        model.wallets.forEach { wallet ->
+        model.output.wallets.forEach { wallet ->
             ChoiceChip(
                 title = wallet.name,
                 isSelected = wallet.id == selection,
                 onSelect = { onSelect(wallet.id) },
             ) {
                 IconTile(
-                    icon = model.icon(of = wallet.iconId),
+                    icon = model.output.icon(of = wallet.iconId),
                     size = 24.dp,
                 )
             }
@@ -210,7 +211,7 @@ private fun WalletChips(
 
 @Composable
 private fun BillShiftChips(model: RecurringEditModel) {
-    val dates = model.billDates
+    val dates = model.output.billDates
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
@@ -225,8 +226,8 @@ private fun BillShiftChips(model: RecurringEditModel) {
 
                 ChoiceChip(
                     title = date?.let { "$title・${Recurring.billText(paidOn = it)}" } ?: title,
-                    isSelected = model.form.billShift == index,
-                    onSelect = { model.update { copy(billShift = index) } },
+                    isSelected = model.state.form.billShift == index,
+                    onSelect = { model.state.update { copy(billShift = index) } },
                 )
             }
         }
@@ -241,7 +242,7 @@ private fun Schedule(model: RecurringEditModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 44.dp)
-                .clickable { model.isScheduleOpen = !model.isScheduleOpen },
+                .clickable { model.state.isScheduleOpen = !model.state.isScheduleOpen },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -256,9 +257,9 @@ private fun Schedule(model: RecurringEditModel) {
 
             Text(
                 text = RecurringText.schedule(
-                    frequency = model.form.frequency,
-                    month = model.form.month,
-                    day = model.form.day,
+                    frequency = model.state.form.frequency,
+                    month = model.state.form.month,
+                    day = model.state.form.day,
                 ),
                 color = Palette.accentStrong,
                 style = textFont(style = FontTextStyle.Footnote),
@@ -270,20 +271,20 @@ private fun Schedule(model: RecurringEditModel) {
                 modifier = Modifier
                     .padding(start = 4.dp)
                     .size(16.dp)
-                    .rotate(if (model.isScheduleOpen) 270f else 90f),
+                    .rotate(if (model.state.isScheduleOpen) 270f else 90f),
                 tint = Palette.accentStrong,
             )
         }
 
-        if (model.isScheduleOpen) {
+        if (model.state.isScheduleOpen) {
             SegmentSwitch(
-                selection = model.form.frequency,
+                selection = model.state.form.frequency,
                 options = frequencies,
-                onSelect = { frequency -> model.update { copy(frequency = frequency) } },
+                onSelect = { frequency -> model.state.update { copy(frequency = frequency) } },
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            if (model.form.frequency == Recurring.Frequency.yearly) {
+            if (model.state.form.frequency == Recurring.Frequency.yearly) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -291,8 +292,8 @@ private fun Schedule(model: RecurringEditModel) {
                     (1..12).forEach { month ->
                         ChoiceChip(
                             title = "$month 月",
-                            isSelected = model.form.month == month,
-                            onSelect = { model.update { copy(month = month) } },
+                            isSelected = model.state.form.month == month,
+                            onSelect = { model.state.update { copy(month = month) } },
                             modifier = Modifier.widthIn(min = 64.dp),
                         )
                     }
@@ -300,8 +301,8 @@ private fun Schedule(model: RecurringEditModel) {
             }
 
             DayGrid(
-                selection = model.form.day,
-                onSelect = { day -> model.update { copy(day = day) } },
+                selection = model.state.form.day,
+                onSelect = { day -> model.state.update { copy(day = day) } },
             )
         }
     }

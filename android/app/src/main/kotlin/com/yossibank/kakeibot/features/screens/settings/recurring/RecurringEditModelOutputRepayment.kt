@@ -8,21 +8,21 @@ import com.yossibank.kakeibot.core.concepts.recurring.endDate
 import com.yossibank.kakeibot.core.concepts.recurring.scheduledAmount
 import com.yossibank.kakeibot.designsystem.components.text.clamped
 
-val RecurringEditModel.countCalculator: AmountCalculator
-    get() = loan.count
+val RecurringEditModel.Output.countCalculator: AmountCalculator
+    get() = state.loan.count
 
-val RecurringEditModel.loanOwed: Int?
+val RecurringEditModel.Output.loanOwed: Int?
     get() {
         if (!isLoanRepayment) {
             return null
         }
 
-        val balance = form.toWalletId?.let { loanBalances[it] } ?: return null
+        val balance = state.form.toWalletId?.let { input.loanBalances[it] } ?: return null
 
         return if (balance < 0) (-balance).clamped else null
     }
 
-val RecurringEditModel.autoPlan: RepaymentPlan?
+val RecurringEditModel.Output.autoPlan: RepaymentPlan?
     get() = loanOwed?.let {
         RepaymentPlan.of(
             owed = it,
@@ -30,36 +30,36 @@ val RecurringEditModel.autoPlan: RepaymentPlan?
         )
     }
 
-val RecurringEditModel.usesAutoCount: Boolean
-    get() = loan.isCountAuto && autoPlan != null
+val RecurringEditModel.Output.usesAutoCount: Boolean
+    get() = state.loan.isCountAuto && autoPlan != null
 
-val RecurringEditModel.repaymentStart: LocalDate
+val RecurringEditModel.Output.repaymentStart: LocalDate
     get() {
-        val next = generatedUntil?.adding(days = 1) ?: form.startDate
-        return maxOf(form.startDate, next)
+        val next = input.generatedUntil?.adding(days = 1) ?: state.form.startDate
+        return maxOf(state.form.startDate, next)
     }
 
-val RecurringEditModel.scheduledEndDate: LocalDate?
+val RecurringEditModel.Output.scheduledEndDate: LocalDate?
     get() {
         val plan = autoPlan
 
         if (!usesAutoCount || plan == null) {
-            return form.endDate
+            return state.form.endDate
         }
 
         return autoEndDate(plan)
     }
 
-val RecurringEditModel.finalAmount: Int?
+val RecurringEditModel.Output.finalAmount: Int?
     get() {
         if (!isLoanRepayment) {
             return null
         }
 
-        return if (usesAutoCount) autoPlan?.finalAmount else loan.manualFinal
+        return if (usesAutoCount) autoPlan?.finalAmount else state.loan.manualFinal
     }
 
-val RecurringEditModel.repaymentCount: Int?
+val RecurringEditModel.Output.repaymentCount: Int?
     get() {
         val end = scheduledEndDate ?: return null
 
@@ -72,7 +72,7 @@ val RecurringEditModel.repaymentCount: Int?
         ).size
     }
 
-val RecurringEditModel.plannedTotal: Long?
+val RecurringEditModel.Output.plannedTotal: Long?
     get() {
         val end = scheduledEndDate ?: return null
 
@@ -88,14 +88,14 @@ val RecurringEditModel.plannedTotal: Long?
             ).sumOf { planned.scheduledAmount(paidOn = it).toLong() }
     }
 
-val RecurringEditModel.balanceGap: Long?
+val RecurringEditModel.Output.balanceGap: Long?
     get() {
         val owed = loanOwed ?: return null
         val total = plannedTotal ?: return null
         return if (total != owed.toLong()) total - owed else null
     }
 
-internal fun RecurringEditModel.autoEndDate(plan: RepaymentPlan): LocalDate? = recurring(
+internal fun RecurringEditModel.Output.autoEndDate(plan: RepaymentPlan): LocalDate? = recurring(
     endDate = null,
     finalAmount = null,
 ).endDate(
@@ -103,7 +103,7 @@ internal fun RecurringEditModel.autoEndDate(plan: RepaymentPlan): LocalDate? = r
     from = repaymentStart,
 )
 
-internal fun RecurringEditModel.manualFinalAmount(through: LocalDate?): Int? {
+internal fun RecurringEditModel.Output.manualFinalAmount(through: LocalDate?): Int? {
     val end = through ?: return null
     val owed = loanOwed ?: return null
 

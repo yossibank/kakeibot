@@ -9,13 +9,13 @@ import com.yossibank.kakeibot.core.concepts.recurring.cardBill
 fun EntryModel.apply(template: EntryTemplate) {
     select(template.type)
 
-    val tagId = allTags.firstOrNull { it.id == template.tagId && it.archivedAt == null }?.id
+    val tagId = output.allTags.firstOrNull { it.id == template.tagId && it.archivedAt == null }?.id
 
-    val billMonth = cardBills
+    val billMonth = input.cardBills
         .cardBill(paidBy = template.walletId)
-        ?.billMonth(used = form.date, shift = template.billShift)
+        ?.billMonth(used = state.form.date, shift = template.billShift)
 
-    update {
+    state.update {
         copy(
             categoryId = template.categoryId,
             tagId = tagId,
@@ -26,21 +26,21 @@ fun EntryModel.apply(template: EntryTemplate) {
         )
     }
 
-    template.amount?.let(::setAmount)
+    template.amount?.let(state::setAmount)
 
-    focus(EntryModel.Field.Amount)
-    clearMessage()
+    state.focus(EntryModel.Field.Amount)
+    state.task.clear()
 }
 
 fun EntryModel.applyRecent(entry: Entry) {
-    wallet(of = entry.walletId)?.let { wallet ->
-        select(wallet = wallet)
+    output.wallet(of = entry.walletId)?.let { wallet ->
+        state.select(wallet = wallet)
     }
 
-    val hasCategory = categories.any { it.id == entry.categoryId }
-    val tagId = allTags.firstOrNull { it.id == entry.tagId && it.archivedAt == null }?.id
+    val hasCategory = output.categories.any { it.id == entry.categoryId }
+    val tagId = output.allTags.firstOrNull { it.id == entry.tagId && it.archivedAt == null }?.id
 
-    update {
+    state.update {
         copy(
             categoryId = if (hasCategory) entry.categoryId else categoryId,
             tagId = tagId,
@@ -48,13 +48,13 @@ fun EntryModel.applyRecent(entry: Entry) {
         )
     }
 
-    setAmount(entry.amount)
-    focus(EntryModel.Field.Amount)
-    clearMessage()
+    state.setAmount(entry.amount)
+    state.focus(EntryModel.Field.Amount)
+    state.task.clear()
 }
 
 fun EntryModel.applyTransfer(entry: Entry) {
-    update {
+    state.update {
         copy(
             walletId = entry.walletId,
             toWalletId = entry.toWalletId,
@@ -62,18 +62,18 @@ fun EntryModel.applyTransfer(entry: Entry) {
         )
     }
 
-    setAmount(entry.amount)
-    setFee(fee(of = entry))
-    focus(EntryModel.Field.Amount)
-    clearMessage()
+    state.setAmount(entry.amount)
+    state.setFee(output.fee(of = entry))
+    state.focus(EntryModel.Field.Amount)
+    state.task.clear()
 }
 
-fun EntryModel.newTemplateDraft(): EntryTemplateDraft = EntryTemplateDraft(
+fun EntryModel.Output.newTemplateDraft(): EntryTemplateDraft = EntryTemplateDraft(
     name = "",
-    type = if (form.type == Entry.Kind.income) Entry.Kind.income else Entry.Kind.expense,
+    type = if (state.form.type == Entry.Kind.income) Entry.Kind.income else Entry.Kind.expense,
     amount = amount.takeIf { it > 0 },
-    categoryId = form.categoryId,
-    tagId = form.tagId,
-    walletId = form.walletId,
-    memo = form.memo,
+    categoryId = state.form.categoryId,
+    tagId = state.form.tagId,
+    walletId = state.form.walletId,
+    memo = state.form.memo,
 )

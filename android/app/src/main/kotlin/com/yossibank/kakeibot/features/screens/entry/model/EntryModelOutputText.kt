@@ -5,16 +5,16 @@ import com.yossibank.kakeibot.designsystem.components.input.symbol
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.features.shared.entrylist.EntryText
 
-val EntryModel.walletTitle: String
-    get() = EntryText.walletTitle(form.type)
+val EntryModel.Output.walletTitle: String
+    get() = EntryText.walletTitle(state.form.type)
 
-val EntryModel.dateText: String
+val EntryModel.Output.dateText: String
     get() = EntryText.relativeDate(
-        date = form.date,
-        today = today,
+        date = state.form.date,
+        today = state.today,
     )
 
-val EntryModel.expressionText: String?
+val EntryModel.Output.expressionText: String?
     get() {
         val calculator = activeCalculator
         val note = calculator.taxNote
@@ -35,7 +35,7 @@ val EntryModel.expressionText: String?
         }
     }
 
-val EntryModel.routeText: String
+val EntryModel.Output.routeText: String
     get() {
         val source = wallet?.name
         val destination = toWallet?.name
@@ -47,9 +47,9 @@ val EntryModel.routeText: String
         return "$source → $destination"
     }
 
-val EntryModel.categoryText: String
+val EntryModel.Output.categoryText: String
     get() {
         val name = category?.name ?: return "選ぶ"
-        val tag = tags.firstOrNull { it.id == form.tagId }?.name ?: return name
+        val tag = tags.firstOrNull { it.id == state.form.tagId }?.name ?: return name
         return "$name・$tag"
     }

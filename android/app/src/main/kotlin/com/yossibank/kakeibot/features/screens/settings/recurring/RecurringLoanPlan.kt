@@ -34,8 +34,8 @@ fun RecurringLoanPlan(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        val total = model.plannedTotal
-        val end = model.scheduledEndDate
+        val total = model.output.plannedTotal
+        val end = model.output.scheduledEndDate
 
         if (total != null && end != null) {
             Row(verticalAlignment = Alignment.Bottom) {
@@ -43,7 +43,7 @@ fun RecurringLoanPlan(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Caption(text = if (model.isEditing) "これから返す額" else "返す総額")
+                    Caption(text = if (model.output.isEditing) "これから返す額" else "返す総額")
 
                     AmountText(
                         amount = total.clamped,
@@ -73,7 +73,7 @@ fun RecurringLoanPlan(
             }
         }
 
-        model.finalAmount?.let { finalAmount ->
+        model.output.finalAmount?.let { finalAmount ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Caption(
                     text = "最後の回",
@@ -99,11 +99,11 @@ fun RecurringLoanPlan(
                 Text(
                     text = note,
                     modifier = Modifier.weight(1f),
-                    color = if (model.balanceGap == null) Palette.subtext else Palette.amber,
+                    color = if (model.output.balanceGap == null) Palette.subtext else Palette.amber,
                     style = textFont(style = FontTextStyle.Caption),
                 )
 
-                if (!model.usesAutoCount && model.autoPlan != null) {
+                if (!model.output.usesAutoCount && model.output.autoPlan != null) {
                     Text(
                         text = "合わせる",
                         modifier = Modifier.clickable(onClick = onMatch),
@@ -133,17 +133,17 @@ private fun Caption(
 }
 
 private fun noteText(model: RecurringEditModel): String? {
-    val owed = model.loanOwed
+    val owed = model.output.loanOwed
 
-    if (model.usesAutoCount && owed != null) {
+    if (model.output.usesAutoCount && owed != null) {
         return "残高 ${AmountText.text(amount = owed)} から回数と最後の回を出しています"
     }
 
-    val plan = model.autoPlan ?: return null
+    val plan = model.output.autoPlan ?: return null
 
-    model.balanceGap?.let { gap ->
+    model.output.balanceGap?.let { gap ->
         return "残高と ${AmountText.text(amount = abs(gap).clamped)} ずれています"
     }
 
-    return if (model.plannedTotal == null) "残高から出すと、あと ${plan.count} 回で終わります" else null
+    return if (model.output.plannedTotal == null) "残高から出すと、あと ${plan.count} 回で終わります" else null
 }

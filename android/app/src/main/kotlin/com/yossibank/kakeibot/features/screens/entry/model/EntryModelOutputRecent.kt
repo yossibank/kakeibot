@@ -8,9 +8,9 @@ import com.yossibank.kakeibot.designsystem.components.row.FeeChoiceRow
 const val RECENT_ENTRY_LIMIT = 3
 const val RECENT_TRANSFER_LIMIT = 3
 
-val EntryModel.recentEntries: List<Entry>
+val EntryModel.Output.recentEntries: List<Entry>
     get() {
-        if (form.type == Entry.Kind.transfer) {
+        if (state.form.type == Entry.Kind.transfer) {
             return emptyList()
         }
 
@@ -20,9 +20,9 @@ val EntryModel.recentEntries: List<Entry>
             .map { recentKey(categoryId = it.categoryId, amount = it.amount, memo = it.memo) }
             .toMutableSet()
 
-        return (history?.entries ?: emptyList())
+        return (input.history?.entries ?: emptyList())
             .filter { entry ->
-                entry.type == form.type &&
+                entry.type == state.form.type &&
                     entry.recurringId == null &&
                     entry.transferId == null &&
                     entry.categoryId in shown
@@ -38,9 +38,9 @@ val EntryModel.recentEntries: List<Entry>
             }.take(RECENT_ENTRY_LIMIT)
     }
 
-val EntryModel.recentTransfers: List<Entry>
+val EntryModel.Output.recentTransfers: List<Entry>
     get() {
-        if (form.type != Entry.Kind.transfer) {
+        if (state.form.type != Entry.Kind.transfer) {
             return emptyList()
         }
 
@@ -48,7 +48,7 @@ val EntryModel.recentTransfers: List<Entry>
         val fees = feesByTransfer
         val seen = mutableSetOf<String>()
 
-        return (history?.entries ?: emptyList())
+        return (input.history?.entries ?: emptyList())
             .filter { entry ->
                 entry.type == Entry.Kind.transfer &&
                     entry.recurringId == null &&
@@ -62,9 +62,9 @@ val EntryModel.recentTransfers: List<Entry>
             }.take(RECENT_TRANSFER_LIMIT)
     }
 
-val EntryModel.feeChoices: List<Int>
+val EntryModel.Output.feeChoices: List<Int>
     get() {
-        val used = (history?.entries ?: emptyList())
+        val used = (input.history?.entries ?: emptyList())
             .filter { it.transferId != null }
             .sortedByDescending { it.createdAt }
             .map { it.amount }
@@ -74,12 +74,12 @@ val EntryModel.feeChoices: List<Int>
             .take(FeeChoiceRow.defaultChoices.size)
     }
 
-fun EntryModel.fee(of: Entry): Int = (history?.entries ?: emptyList())
+fun EntryModel.Output.fee(of: Entry): Int = (input.history?.entries ?: emptyList())
     .firstOrNull { it.transferId == of.id }
     ?.amount ?: 0
 
-private val EntryModel.feesByTransfer: Map<Identifier<Entry>, Int>
-    get() = (history?.entries ?: emptyList())
+private val EntryModel.Output.feesByTransfer: Map<Identifier<Entry>, Int>
+    get() = (input.history?.entries ?: emptyList())
         .mapNotNull { entry -> entry.transferId?.let { it to entry.amount } }
         .reversed()
         .toMap()
@@ -89,3 +89,10 @@ private fun recentKey(
     amount: Int?,
     memo: String?,
 ): String = "${categoryId ?: ""}>${amount ?: ""}>${memo ?: ""}"
+
+val EntryModel.Output.hasRecent: Boolean
+    get() = if (state.form.type == Entry.Kind.transfer) {
+        recentTransfers.isNotEmpty()
+    } else {
+        templates.isNotEmpty() || recentEntries.isNotEmpty()
+    }

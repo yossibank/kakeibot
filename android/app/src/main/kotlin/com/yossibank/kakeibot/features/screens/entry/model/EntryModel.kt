@@ -8,14 +8,13 @@ import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
-import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
-import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.features.shared.model.ModelTask
+import com.yossibank.kakeibot.features.shared.model.ScreenClock
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
 import com.yossibank.kakeibot.store.queries.methods.entry
@@ -33,13 +32,19 @@ import com.yossibank.kakeibot.store.writes.methods.entryItems
 import com.yossibank.kakeibot.store.writes.methods.fee
 import com.yossibank.kakeibot.store.writes.methods.recentItemNames
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
-import java.time.Instant
 
 class EntryModel(
-    private val database: AppDatabase,
+    database: AppDatabase,
+    clock: ScreenClock,
     today: LocalDate,
-    private var editing: Identifier<Entry>? = null,
+    editing: Identifier<Entry>? = null,
 ) {
+    val state = State(today)
+    val input = Input(editing)
+    val output = Output(input, state)
+
+    private val dependencies = Dependencies(database, clock)
+
     enum class Field {
         Category,
         Wallet,
@@ -50,218 +55,214 @@ class EntryModel(
         Transfer,
     }
 
-    var today: LocalDate by mutableStateOf(today)
+    class State(
+        today: LocalDate,
+    ) {
+        val task = ModelTask()
 
-    var form: EntryForm by mutableStateOf(EntryForm(date = today))
-        private set
+        var today: LocalDate by mutableStateOf(today)
 
-    var calculator: AmountCalculator by mutableStateOf(AmountCalculator())
-        private set
+        var form: EntryForm by mutableStateOf(EntryForm(date = today))
+            private set
 
-    var feeCalculator: AmountCalculator by mutableStateOf(AmountCalculator())
-        private set
+        var calculator: AmountCalculator by mutableStateOf(AmountCalculator())
+            private set
 
-    var field: Field by mutableStateOf(Field.Amount)
-        private set
+        var feeCalculator: AmountCalculator by mutableStateOf(AmountCalculator())
+            private set
 
-    var history: EntryList? by mutableStateOf(null)
-        private set
+        var field: Field by mutableStateOf(Field.Amount)
+            private set
 
-    var recentItemNames: List<String> by mutableStateOf(emptyList())
-        private set
+        var voiceFilled: VoiceFilled? by mutableStateOf(null)
+            private set
 
-    var recentMemos: List<String> by mutableStateOf(emptyList())
-        private set
-
-    var voiceFilled: VoiceFilled? by mutableStateOf(null)
-        private set
-
-    internal var cardBills: List<Recurring> = emptyList()
-        private set
-
-    private var options: EntryOptions? by mutableStateOf(null)
-    private var allTemplates: List<EntryTemplate> by mutableStateOf(emptyList())
-
-    private val task = ModelTask()
-
-    val message: String
-        get() = task.message
-
-    val isEditing: Boolean
-        get() = editing != null
-
-    val isBlank: Boolean
-        get() = !isEditing && amount <= 0
-
-    val startField: Field
-        get() = if (form.type == Entry.Kind.transfer) Field.Transfer else Field.Category
-
-    val showsRecent: Boolean
-        get() = isBlank && this.field == startField
-
-    val amount: Int
-        get() = calculator.amount
-
-    val fee: Int
-        get() = if (form.type == Entry.Kind.transfer) feeCalculator.amount else 0
-
-    val activeCalculator: AmountCalculator
-        get() = if (this.field == Field.Fee) feeCalculator else calculator
-
-    val templates: List<EntryTemplate>
-        get() = allTemplates.filter { it.type == form.type }
-
-    val tags: List<EntryTag>
-        get() = allTags.filter { tag ->
-            tag.categoryId == form.categoryId && (tag.archivedAt == null || tag.id == form.tagId)
+        fun update(change: EntryForm.() -> EntryForm) {
+            form = form.change()
         }
 
-    val categories: List<EntryCategory>
-        get() = when (form.type) {
-            Entry.Kind.expense -> options?.expenseCategories ?: emptyList()
-            Entry.Kind.income -> options?.incomeCategories ?: emptyList()
-            Entry.Kind.transfer -> emptyList()
+        fun focus(field: Field) {
+            val isTransferOnly = field == Field.Fee || field == Field.Transfer
+            this.field =
+                if (isTransferOnly && form.type != Entry.Kind.transfer) Field.Amount else field
         }
 
-    val wallets: List<Wallet>
-        get() = options?.wallets ?: emptyList()
+        fun select(category: EntryCategory) {
+            form = form.withCategory(category.id)
+            field = Field.Amount
 
-    val category: EntryCategory?
-        get() = categories.firstOrNull { it.id == form.categoryId }
+            task.clear()
+        }
 
-    val wallet: Wallet?
-        get() = wallets.firstOrNull { it.id == form.walletId }
+        fun toggleTag(id: Identifier<EntryTag>) {
+            form = form.copy(tagId = if (form.tagId == id) null else id)
+        }
 
-    val toWallet: Wallet?
-        get() = wallets.firstOrNull { it.id == form.toWalletId }
+        fun select(wallet: Wallet) {
+            form = form.withWallet(wallet.id)
+            field = if (form.type == Entry.Kind.transfer) Field.Transfer else Field.Amount
+        }
 
-    internal val editingId: Identifier<Entry>?
-        get() = editing
+        fun selectDestination(wallet: Wallet) {
+            form = form.copy(toWalletId = wallet.id)
+            field = Field.Transfer
 
-    internal val allTags: List<EntryTag>
-        get() = (options?.tags ?: emptyList()) + (options?.sharedTags ?: emptyList())
+            task.clear()
+        }
 
-    private val allCategories: List<EntryCategory>
-        get() = (options?.expenseCategories ?: emptyList()) +
-            (options?.incomeCategories ?: emptyList()) +
-            (options?.sharedCategories ?: emptyList())
+        fun swapWallets() {
+            form = form.copy(
+                walletId = form.toWalletId,
+                toWalletId = form.walletId,
+                billMonth = null,
+            )
 
-    private val draft: EntryDraft?
-        get() = form.draft(
-            amount = amount,
-            fee = fee,
-            templates = allTemplates,
-            includesItems = showsItems,
-        )
+            task.clear()
+        }
 
-    fun icon(of: Identifier<Icon>): Icon? = options?.icons?.get(of)
+        fun select(date: LocalDate) {
+            form = form.withDate(date)
+            field = Field.Amount
+        }
 
-    fun category(of: Identifier<EntryCategory>?): EntryCategory? =
-        allCategories.firstOrNull { it.id == of }
+        fun press(key: AmountCalculator.Key) {
+            if (field == Field.Fee) {
+                feeCalculator = feeCalculator.press(key)
+            } else {
+                calculator = calculator.press(key)
+            }
 
-    fun wallet(of: Identifier<Wallet>?): Wallet? = wallets.firstOrNull { it.id == of }
+            task.clear()
+        }
 
-    fun update(change: EntryForm.() -> EntryForm) {
-        form = form.change()
+        fun setAmount(amount: Int) {
+            calculator = AmountCalculator(amount = amount)
+        }
+
+        fun setFee(amount: Int) {
+            feeCalculator = AmountCalculator(amount = amount)
+        }
+
+        fun clear() {
+            form = form.cleared()
+            calculator = AmountCalculator()
+            feeCalculator = AmountCalculator()
+            voiceFilled = null
+        }
+
+        internal fun fill(
+            form: EntryForm,
+            calculator: AmountCalculator,
+            voiceFilled: VoiceFilled?,
+        ) {
+            this.form = form
+            this.calculator = calculator
+            this.voiceFilled = voiceFilled
+        }
+
+        internal fun load(
+            form: EntryForm,
+            amount: Int,
+        ) {
+            this.form = form
+            calculator = AmountCalculator(amount = amount)
+        }
     }
 
-    fun focus(field: Field) {
-        val isTransferOnly = field == Field.Fee || field == Field.Transfer
-        this.field = if (isTransferOnly && form.type != Entry.Kind.transfer) Field.Amount else field
+    class Input(
+        editingId: Identifier<Entry>?,
+    ) {
+        var editingId: Identifier<Entry>? by mutableStateOf(editingId)
+            internal set
+
+        var history: EntryList? by mutableStateOf(null)
+            internal set
+
+        var recentItemNames: List<String> by mutableStateOf(emptyList())
+            internal set
+
+        var recentMemos: List<String> by mutableStateOf(emptyList())
+            internal set
+
+        var cardBills: List<Recurring> = emptyList()
+            internal set
+
+        var options: EntryOptions? by mutableStateOf(null)
+            internal set
+
+        var allTemplates: List<EntryTemplate> by mutableStateOf(emptyList())
+            internal set
     }
 
-    fun clearMessage() {
-        task.clear()
+    class Output(
+        internal val input: Input,
+        internal val state: State,
+    ) {
+        val isEditing: Boolean
+            get() = input.editingId != null
+
+        val isBlank: Boolean
+            get() = !isEditing && amount <= 0
+
+        val startField: Field
+            get() = if (state.form.type == Entry.Kind.transfer) Field.Transfer else Field.Category
+
+        val showsRecent: Boolean
+            get() = isBlank && state.field == startField
+
+        val amount: Int
+            get() = state.calculator.amount
+
+        val fee: Int
+            get() = if (state.form.type == Entry.Kind.transfer) state.feeCalculator.amount else 0
+
+        val activeCalculator: AmountCalculator
+            get() = if (state.field == Field.Fee) state.feeCalculator else state.calculator
     }
+
+    private class Dependencies(
+        val database: AppDatabase,
+        val clock: ScreenClock,
+    )
 
     fun select(type: Entry.Kind) {
-        if (form.type == type) {
+        if (state.form.type == type) {
             return
         }
 
-        form = form.copy(type = type)
+        state.update { copy(type = type) }
+
+        val form = state.form
 
         val destination = if (type == Entry.Kind.transfer) {
-            form.toWalletId ?: wallets.firstOrNull { it.id != form.walletId }?.id
+            form.toWalletId ?: output.wallets.firstOrNull { it.id != form.walletId }?.id
         } else {
             null
         }
 
-        form = form.copy(
-            categoryId = categories.firstOrNull()?.id,
-            tagId = null,
-            toWalletId = destination,
-        )
-
-        field = startField
-
-        task.clear()
-    }
-
-    fun select(category: EntryCategory) {
-        form = form.withCategory(category.id)
-        field = Field.Amount
-
-        task.clear()
-    }
-
-    fun toggleTag(id: Identifier<EntryTag>) {
-        form = form.copy(tagId = if (form.tagId == id) null else id)
-    }
-
-    fun select(wallet: Wallet) {
-        form = form.withWallet(wallet.id)
-        field = if (form.type == Entry.Kind.transfer) Field.Transfer else Field.Amount
-    }
-
-    fun selectDestination(wallet: Wallet) {
-        form = form.copy(toWalletId = wallet.id)
-        field = Field.Transfer
-
-        task.clear()
-    }
-
-    fun swapWallets() {
-        form = form.copy(
-            walletId = form.toWalletId,
-            toWalletId = form.walletId,
-            billMonth = null,
-        )
-
-        task.clear()
-    }
-
-    fun select(date: LocalDate) {
-        form = form.withDate(date)
-        field = Field.Amount
-    }
-
-    fun press(key: AmountCalculator.Key) {
-        if (field == Field.Fee) {
-            feeCalculator = feeCalculator.press(key)
-        } else {
-            calculator = calculator.press(key)
+        state.update {
+            copy(
+                categoryId = output.categories.firstOrNull()?.id,
+                tagId = null,
+                toWalletId = destination,
+            )
         }
 
-        task.clear()
-    }
+        state.focus(output.startField)
 
-    fun setAmount(amount: Int) {
-        calculator = AmountCalculator(amount = amount)
-    }
-
-    fun setFee(amount: Int) {
-        feeCalculator = AmountCalculator(amount = amount)
+        state.task.clear()
     }
 
     suspend fun load() {
-        task.attempt(failure = ModelTask.loadFailed) {
-            database.insertDefaultsIfEmpty(at = Instant.now())
+        val database = dependencies.database
+
+        state.task.attempt(failure = ModelTask.loadFailed) {
+            database.insertDefaultsIfEmpty(at = dependencies.clock.now)
 
             val loaded = database.entryOptions()
 
-            allTemplates = database.templates()
-            cardBills = database.recurrings().filter { recurring ->
+            input.allTemplates = database.templates()
+            input.cardBills = database.recurrings().filter { recurring ->
                 recurring.type == Entry.Kind.transfer && recurring.closingDay != null
             }
 
@@ -269,47 +270,51 @@ class EntryModel(
 
             val entry = loadEntry()
 
-            options = loaded
+            input.options = loaded
 
             if (entry != null) {
                 val items = database.entryItems(of = entry.id).map { EntryItem.Draft(it) }
 
-                form = EntryForm.of(
-                    entry = entry,
-                    items = items,
+                state.load(
+                    form = EntryForm.of(
+                        entry = entry,
+                        items = items,
+                    ),
+                    amount = entry.amount,
                 )
-                calculator = AmountCalculator(amount = entry.amount)
-                feeCalculator = AmountCalculator(amount = database.fee(of = entry.id)?.amount ?: 0)
+                state.setFee(database.fee(of = entry.id)?.amount ?: 0)
             } else {
-                form = form.copy(
-                    categoryId = categories.firstOrNull()?.id,
-                    walletId = loaded.wallets.firstOrNull()?.id,
-                )
+                state.update {
+                    copy(
+                        categoryId = output.categories.firstOrNull()?.id,
+                        walletId = loaded.wallets.firstOrNull()?.id,
+                    )
+                }
             }
 
-            field = startField
+            state.focus(output.startField)
         }
     }
 
     suspend fun save(): Boolean {
-        val draft = draft
+        val draft = output.draft
 
-        if (draft == null || task.isRunning) {
+        if (draft == null || state.task.isRunning) {
             return false
         }
 
         val problem = draft.problems.firstOrNull()
 
         if (problem != null) {
-            task.show(message(of = problem))
+            state.task.show(output.message(of = problem))
             return false
         }
 
-        val saved = task.attempt(describe = ::saveFailure) {
-            database.saveEntry(
+        val saved = state.task.attempt(describe = ::saveFailure) {
+            dependencies.database.saveEntry(
                 draft = draft,
-                editing = editing,
-                at = Instant.now(),
+                editing = input.editingId,
+                at = dependencies.clock.now,
             )
         }
 
@@ -317,16 +322,16 @@ class EntryModel(
     }
 
     suspend fun delete(): Boolean {
-        val editing = editing
+        val editing = input.editingId
 
-        if (editing == null || task.isRunning) {
+        if (editing == null || state.task.isRunning) {
             return false
         }
 
-        val deleted = task.attempt(failure = "削除できませんでした") {
-            database.deleteEntry(
+        val deleted = state.task.attempt(failure = "削除できませんでした") {
+            dependencies.database.deleteEntry(
                 id = editing,
-                at = Instant.now(),
+                at = dependencies.clock.now,
             )
         }
 
@@ -334,45 +339,35 @@ class EntryModel(
     }
 
     suspend fun startNext() {
-        form = form.cleared()
-        calculator = AmountCalculator()
-        feeCalculator = AmountCalculator()
-        voiceFilled = null
-        field = startField
+        state.clear()
+        state.focus(output.startField)
 
-        task.attempt(failure = ModelTask.loadFailed) {
+        state.task.attempt(failure = ModelTask.loadFailed) {
             loadHistory()
         }
     }
 
     suspend fun reloadTemplates() {
-        task.attempt(failure = ModelTask.loadFailed) {
-            allTemplates = database.templates()
+        state.task.attempt(failure = ModelTask.loadFailed) {
+            input.allTemplates = dependencies.database.templates()
         }
     }
 
-    internal fun fill(
-        form: EntryForm,
-        calculator: AmountCalculator,
-        voiceFilled: VoiceFilled?,
-    ) {
-        this.form = form
-        this.calculator = calculator
-        this.voiceFilled = voiceFilled
-    }
-
     private suspend fun loadHistory() {
-        recentItemNames = database.recentItemNames(limit = RECENT_ITEM_NAME_LIMIT)
-        recentMemos = database.recentMemos(limit = RECENT_MEMO_LIMIT)
-        history = database.entryList()
+        val database = dependencies.database
+
+        input.recentItemNames = database.recentItemNames(limit = RECENT_ITEM_NAME_LIMIT)
+        input.recentMemos = database.recentMemos(limit = RECENT_MEMO_LIMIT)
+        input.history = database.entryList()
     }
 
     private suspend fun loadEntry(): Entry? {
-        val entry = editing?.let { database.entry(it) } ?: return null
+        val database = dependencies.database
+        val entry = input.editingId?.let { database.entry(it) } ?: return null
         val transferId = entry.transferId ?: return entry
         val transfer = database.entry(transferId) ?: return entry
 
-        editing = transfer.id
+        input.editingId = transfer.id
 
         return transfer
     }
@@ -380,13 +375,5 @@ class EntryModel(
     private fun saveFailure(error: Exception): String {
         val isMissing = (error as? EntryWriteException)?.error == EntryWriteError.entryNotFound
         return if (isMissing) "記録が見つかりませんでした" else ModelTask.saveFailed
-    }
-
-    private fun message(of: EntryDraft.Problem): String = when (of) {
-        EntryDraft.Problem.amountNotPositive -> "金額を入れてください"
-        EntryDraft.Problem.missingCategory -> "カテゴリを選んでください"
-        EntryDraft.Problem.missingDestination -> "振替先を選んでください"
-        EntryDraft.Problem.sameWallet -> "振替元と振替先を別にしてください"
-        else -> ModelTask.saveFailed
     }
 }

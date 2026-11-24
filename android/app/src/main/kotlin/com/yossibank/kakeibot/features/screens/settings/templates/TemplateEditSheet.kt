@@ -65,6 +65,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.features.shared.model.ScreenClock
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
@@ -84,6 +85,7 @@ fun TemplateEditSheet(
     val model = remember(database, draft) {
         TemplateEditModel(
             database = database,
+            clock = ScreenClock.system,
             draft = draft,
         )
     }
@@ -115,13 +117,13 @@ fun TemplateEditSheet(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 TemplateCard(
-                    icon = model.category?.let { model.icon(of = it.iconId) },
-                    detail = model.detail,
+                    icon = model.output.category?.let { model.output.icon(of = it.iconId) },
+                    detail = model.output.detail,
                     size = TemplateCardSize.Large,
                     name = {
                         PlaceholderTextField(
-                            value = model.form.name,
-                            onChange = { name -> model.update { copy(name = name) } },
+                            value = model.state.form.name,
+                            onChange = { name -> model.state.update { copy(name = name) } },
                             placeholder = "名前を入れる",
                             style = displayFont(
                                 size = FontSize.Headline,
@@ -134,7 +136,7 @@ fun TemplateEditSheet(
                     },
                     amount = {
                         TemplateCardAmount(
-                            amount = model.amount,
+                            amount = model.output.amount,
                             size = TemplateCardSize.Large,
                         )
                     },
@@ -149,8 +151,8 @@ fun TemplateEditSheet(
                     .card(),
             ) {
                 PlaceholderTextField(
-                    value = model.form.memo,
-                    onChange = { memo -> model.update { copy(memo = memo) } },
+                    value = model.state.form.memo,
+                    onChange = { memo -> model.state.update { copy(memo = memo) } },
                     placeholder = "メモを書く",
                     style = textFont(style = FontTextStyle.Body),
                     modifier = Modifier
@@ -168,66 +170,68 @@ fun TemplateEditSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                model.categories.forEach { category ->
+                model.output.categories.forEach { category ->
                     ChoiceChip(
                         title = category.name,
-                        isSelected = category.id == model.form.categoryId,
-                        onSelect = { model.select(category) },
+                        isSelected = category.id == model.state.form.categoryId,
+                        onSelect = { model.state.select(category) },
                     ) {
                         IconTile(
-                            icon = model.icon(of = category.iconId),
+                            icon = model.output.icon(of = category.iconId),
                             size = 24.dp,
                         )
                     }
                 }
             }
 
-            val tags = model.tags
+            val tags = model.output.tags
 
             if (tags.isNotEmpty()) {
                 SettingsCaption(text = "タグ")
 
                 TagLine(
                     tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                    selection = model.form.tagId,
-                    onSelect = model::toggleTag,
+                    selection = model.state.form.tagId,
+                    onSelect = model.state::toggleTag,
                 )
             }
 
-            SettingsCaption(text = model.walletTitle)
+            SettingsCaption(text = model.output.walletTitle)
 
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                model.wallets.forEach { wallet ->
+                model.output.wallets.forEach { wallet ->
                     ChoiceChip(
                         title = wallet.name,
-                        isSelected = wallet.id == model.form.walletId,
-                        onSelect = { model.select(wallet) },
+                        isSelected = wallet.id == model.state.form.walletId,
+                        onSelect = { model.state.select(wallet) },
                     ) {
                         IconTile(
-                            icon = model.icon(of = wallet.iconId),
+                            icon = model.output.icon(of = wallet.iconId),
                             size = 24.dp,
                         )
                     }
                 }
             }
 
-            if (model.billRecurring != null) {
+            if (model.output.billRecurring != null) {
                 SettingsCaption(text = "請求")
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Recurring.billShiftTitles.forEachIndexed { index, title ->
                         ChoiceChip(
                             title = title,
-                            isSelected = model.form.billShift == index,
-                            onSelect = { model.update { copy(billShift = index) } },
+                            isSelected = model.state.form.billShift == index,
+                            onSelect = { model.state.update { copy(billShift = index) } },
                         )
                     }
                 }
 
-                SettingsCaption(text = billNotes[model.form.billShift.coerceIn(billNotes.indices)])
+                SettingsCaption(
+                    text = billNotes[model.state.form.billShift.coerceIn(billNotes.indices)],
+                )
             }
 
             Column(
@@ -244,16 +248,16 @@ fun TemplateEditSheet(
         }
 
         Keypad(
-            calculator = model.calculator,
+            calculator = model.state.calculator,
             onKey = { key ->
                 focus.clearFocus()
-                model.press(key)
+                model.state.press(key)
             },
             keyHeight = 42.dp,
         )
 
         FittedText(
-            text = model.message,
+            text = model.state.task.message,
             color = Palette.rose,
             style = textFont(size = FontSize.Caption),
         )
@@ -291,20 +295,20 @@ private fun CapsulePreview(model: TemplateEditModel) {
     ) {
         CompositionLocalProvider(LocalContentColor provides Palette.accent) {
             IconImage(
-                icon = model.category?.let { model.icon(of = it.iconId) },
+                icon = model.output.category?.let { model.output.icon(of = it.iconId) },
                 size = 12.dp,
             )
         }
 
         FittedText(
-            text = model.form.name.ifEmpty { "名前" },
+            text = model.state.form.name.ifEmpty { "名前" },
             color = Palette.text,
             modifier = Modifier.weight(1f, fill = false),
             style = textFont(size = FontSize.Caption),
         )
 
         FittedText(
-            text = model.amount?.let { AmountText.text(it) } ?: "毎回入れる",
+            text = model.output.amount?.let { AmountText.text(it) } ?: "毎回入れる",
             color = Palette.accentStrong,
             style = displayFont(size = FontSize.Caption),
         )

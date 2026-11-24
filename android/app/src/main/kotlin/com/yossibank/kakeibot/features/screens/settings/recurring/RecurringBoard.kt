@@ -61,7 +61,7 @@ fun RecurringBoard(
     actions: RecurringRowActions,
     modifier: Modifier = Modifier,
 ) {
-    val rows = model.rows
+    val rows = model.output.rows
 
     Box(
         modifier = modifier
@@ -159,7 +159,7 @@ private fun BoardRow(
 
                         lift.start(
                             id = row.id,
-                            top = model.rows.indexOfFirst { it.id == row.id } * slot,
+                            top = model.output.rows.indexOfFirst { it.id == row.id } * slot,
                             touch = touch,
                         )
                     },
@@ -167,7 +167,7 @@ private fun BoardRow(
                         val hiding = lift.end()
 
                         if (hiding != null) {
-                            model.cancelMoving()
+                            model.state.cancelMoving()
                             actions.onHide(hiding)
                         } else {
                             scope.launch { model.finishMoving() }
@@ -175,7 +175,7 @@ private fun BoardRow(
                     },
                     onDragCancel = {
                         lift.cancel()
-                        model.cancelMoving()
+                        model.state.cancelMoving()
                     },
                 ) { change, amount ->
                     change.consume()

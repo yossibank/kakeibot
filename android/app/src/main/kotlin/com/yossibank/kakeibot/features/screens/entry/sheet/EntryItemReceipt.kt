@@ -68,7 +68,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryItemInput
+import com.yossibank.kakeibot.features.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.RemovedItem
 import com.yossibank.kakeibot.features.screens.entry.model.addItem
@@ -92,9 +92,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun EntryItemReceipt(
     model: EntryModel,
-    input: EntryItemInput,
+    editor: EntryItemEditor,
 ) {
-    val totals = model.itemTotals
+    val totals = model.output.itemTotals
     val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(8.dp))
 
     Column(
@@ -117,7 +117,7 @@ fun EntryItemReceipt(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            val date = model.form.date
+            val date = model.state.form.date
 
             Text(
                 text = "${date.year}/${PeriodText.weekdayDate(date)}",
@@ -130,7 +130,7 @@ fun EntryItemReceipt(
 
         Hairline(color = Palette.paperEdge)
 
-        if (model.form.items.isEmpty()) {
+        if (model.state.form.items.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -152,14 +152,14 @@ fun EntryItemReceipt(
             }
         } else {
             Column {
-                model.form.items.forEachIndexed { index, item ->
+                model.state.form.items.forEachIndexed { index, item ->
                     key(index, item) {
                         ItemRow(
                             item = item,
-                            isEditing = input.isOpen && input.editingIndex == index,
-                            showsRate = model.form.items.map { it.taxRate }.toSet().size > 1,
-                            onSelect = { input.edit(index, item) },
-                            onRemove = { input.remove(model, index) },
+                            isEditing = editor.isOpen && editor.editingIndex == index,
+                            showsRate = model.state.form.items.map { it.taxRate }.toSet().size > 1,
+                            onSelect = { editor.edit(index, item) },
+                            onRemove = { editor.remove(model, index) },
                         )
                     }
                 }
@@ -183,14 +183,14 @@ fun EntryItemReceipt(
                 )
 
                 SegmentSwitch(
-                    selection = model.form.taxIncluded,
+                    selection = model.state.form.taxIncluded,
                     options = listOf(false to "外税", true to "内税"),
                     onSelect = model::setTaxIncluded,
                 )
             }
 
             totals.taxes.forEach { tax ->
-                val title = if (model.form.taxIncluded) "内消費税" else "消費税"
+                val title = if (model.state.form.taxIncluded) "内消費税" else "消費税"
 
                 SummaryLine(
                     title = "${tax.rate.rawValue}%対象 ${AmountText.text(tax.base.toInt())}",
@@ -200,7 +200,7 @@ fun EntryItemReceipt(
             }
         }
 
-        if (model.hasItemAdjustment) {
+        if (model.output.hasItemAdjustment) {
             AdjustmentLine(model = model)
         }
 
@@ -218,7 +218,7 @@ fun EntryItemReceipt(
             )
 
             FittedText(
-                text = AmountText.text(model.amount),
+                text = AmountText.text(model.output.amount),
                 color = Palette.accentStrong,
                 style = displayFont(
                     size = FontSize.Display,
@@ -227,7 +227,7 @@ fun EntryItemReceipt(
             )
         }
 
-        if (model.form.items.isNotEmpty()) {
+        if (model.state.form.items.isNotEmpty()) {
             Row {
                 Text(
                     text = "お買上点数",
@@ -237,7 +237,7 @@ fun EntryItemReceipt(
                 )
 
                 Text(
-                    text = "${model.itemCount}点",
+                    text = "${model.output.itemCount}点",
                     color = Palette.subtext,
                     style = textFont(size = FontSize.Caption),
                 )
@@ -254,8 +254,8 @@ private fun StoreField(model: EntryModel) {
     ).copy(textAlign = TextAlign.Center)
 
     PlaceholderTextField(
-        value = model.store,
-        onChange = { model.store = it },
+        value = model.state.store,
+        onChange = { model.state.store = it },
         placeholder = "店名を入れる",
         style = style,
         modifier = Modifier.fillMaxWidth(),

@@ -68,7 +68,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.features.screens.entry.model.EntryItemInput
+import com.yossibank.kakeibot.features.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.features.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.features.screens.entry.model.RemovedItem
 import com.yossibank.kakeibot.features.screens.entry.model.addItem
@@ -93,17 +93,17 @@ fun EntryItemSheet(
     model: EntryModel,
     onClose: () -> Unit,
 ) {
-    val input = remember(model) { EntryItemInput() }
+    val editor = remember(model) { EntryItemEditor() }
 
     BackHandler {
-        if (input.isOpen) {
-            input.close()
+        if (editor.isOpen) {
+            editor.close()
         } else {
             onClose()
         }
     }
 
-    input.removed.Timer()
+    editor.removed.Timer()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -155,21 +155,21 @@ fun EntryItemSheet(
             ) {
                 EntryItemReceipt(
                     model = model,
-                    input = input,
+                    editor = editor,
                 )
             }
 
-            if (input.isOpen) {
+            if (editor.isOpen) {
                 EntryItemSlip(
                     model = model,
-                    input = input,
+                    editor = editor,
                 )
             } else {
-                AddBar(onAdd = { input.open(model) })
+                AddBar(onAdd = { editor.open(model) })
             }
         }
 
-        if (input.removed.current != null) {
+        if (editor.removed.current != null) {
             UndoNotice(
                 title = "品目を消しました",
                 icon = R.drawable.ic_trash,
@@ -181,7 +181,7 @@ fun EntryItemSheet(
                         end = 20.dp,
                         bottom = 76.dp,
                     ),
-                onUndo = { input.restore(model) },
+                onUndo = { editor.restore(model) },
             )
         }
     }
