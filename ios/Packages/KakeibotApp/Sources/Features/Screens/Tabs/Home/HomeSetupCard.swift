@@ -8,7 +8,7 @@ struct HomeSetupCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             CardHeader(
-                "あと \(model.cardItems.count) つで準備がそろいます",
+                "あと \(model.output.cardItems.count) つで準備がそろいます",
                 onClose: {
                     Task {
                         await model.closeCard()
@@ -16,11 +16,11 @@ struct HomeSetupCard: View {
                 }
             )
 
-            SetupList(model.cardItems, model: model, onOpen: onOpen)
+            SetupList(model.output.cardItems, model: model, onOpen: onOpen)
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
         .card()
-        .animation(.snappy, value: model.cardItems)
+        .animation(.snappy, value: model.output.cardItems)
     }
 }

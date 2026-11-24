@@ -6,7 +6,7 @@ import SwiftUI
 extension MainView {
     var isLoaded: Bool {
         let isHomeLoaded = home.input.list != nil || home.errorNotice.message != nil
-        let isSetupLoaded = setup.isLoaded || setup.errorNotice.message != nil
+        let isSetupLoaded = setup.output.isLoaded || setup.state.errorNotice.message != nil
         return isHomeLoaded && isSetupLoaded && launchScreen != nil && areTabsLoaded
     }
 
@@ -132,7 +132,7 @@ extension MainView {
     }
 
     func openNews() {
-        sheet = .whatsNew(seenVersion: setup.seenNewsVersion)
+        sheet = .whatsNew(seenVersion: setup.output.seenNewsVersion)
 
         Task {
             await setup.markNewsSeen()

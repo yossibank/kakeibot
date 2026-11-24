@@ -6,92 +6,83 @@ import Store
 @MainActor
 @Observable
 public final class SetupModel: ScreenModel {
-    public private(set) var progress: SetupProgress?
-    public private(set) var isEntryOpened = true
-    public private(set) var launchScreen: LaunchScreen = .home
-    public private(set) var theme: ThemeChoice = .system
-    public private(set) var customThemes: [Theme] = []
+    public let state = NoticeState()
+    public let input: Input
+    public let output: Output
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    private var cardClosed: Bool?
-    private var seenNews: Loadable<String?> = .loading
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(database: AppDatabase) {
-        self.database = database
+        let input = Input()
+
+        self.input = input
+        self.output = Output(input: input)
+        self.dependencies = Dependencies(database: database)
     }
 }
 
 public extension SetupModel {
-    var cardItems: [SetupItem] {
-        guard let progress else {
-            return []
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var progress: SetupProgress?
+        public internal(set) var isEntryOpened = true
+        public internal(set) var launchScreen: LaunchScreen = .home
+        public internal(set) var theme: ThemeChoice = .system
+        public internal(set) var customThemes: [Theme] = []
+
+        var cardClosed: Bool?
+        var seenNews: Loadable<String?> = .loading
+    }
+
+    @MainActor
+    final class Output {
+        let input: Input
+
+        init(input: Input) {
+            self.input = input
         }
-
-        return SetupItem.home.filter { !$0.isDone(in: progress) }
     }
 
-    var isCardClosed: Bool {
-        cardClosed ?? true
-    }
-
-    var seenNewsVersion: String? {
-        seenNews.value ?? nil
-    }
-
-    var isLoaded: Bool {
-        progress != nil && cardClosed != nil
-    }
-
-    var showsCard: Bool {
-        !isCardClosed && !cardItems.isEmpty
-    }
-
-    var themeTitle: String {
-        theme.title(in: customThemes)
-    }
-
-    var hasUnreadNews: Bool {
-        seenNews.isLoaded && AppVersion.isNewer(
-            WhatsNewRelease.latestVersion,
-            than: seenNewsVersion
-        )
-    }
-
-    func isDone(_ item: SetupItem) -> Bool {
-        progress.map(item.isDone) ?? false
+    internal(set) var errorNotice: ErrorNotice {
+        get {
+            state.errorNotice
+        }
+        set {
+            state.errorNotice = newValue
+        }
     }
 
     func run() async {
+        let database = dependencies.database
+
         await observeAll([
             {
-                await self.observe(self.database.setupProgressUpdates(), into: \.progress)
+                await self.observe(database.setupProgressUpdates(), into: \.input.progress)
             },
             {
                 await self.observe(
-                    self.database.settingUpdates(.setupCardClosed),
-                    into: \.cardClosed
+                    database.settingUpdates(.setupCardClosed),
+                    into: \.input.cardClosed
                 )
             },
             {
                 await self.observe(
-                    self.database.settingUpdates(.entryOpened),
-                    into: \.isEntryOpened
+                    database.settingUpdates(.entryOpened),
+                    into: \.input.isEntryOpened
                 )
             },
             {
                 await self.observe(
-                    self.database.settingUpdates(.launchScreen),
-                    into: \.launchScreen
+                    database.settingUpdates(.launchScreen),
+                    into: \.input.launchScreen
                 )
             },
             {
-                await self.observe(self.database.settingUpdates(.theme), into: \.theme)
+                await self.observe(database.settingUpdates(.theme), into: \.input.theme)
             },
             {
-                await self.observe(self.database.customThemeUpdates(), into: \.customThemes)
+                await self.observe(database.customThemeUpdates(), into: \.input.customThemes)
             },
             {
                 await self.observeSeenNews()
@@ -102,36 +93,81 @@ public extension SetupModel {
     func markNewsSeen() async {
         let version = WhatsNewRelease.latestVersion
 
-        guard AppVersion.isNewer(version, than: seenNewsVersion) else {
+        guard AppVersion.isNewer(version, than: output.seenNewsVersion) else {
             return
         }
 
-        seenNews = .loaded(version)
+        input.seenNews = .loaded(version)
 
         do {
-            try await database.setSetting(.whatsNewSeenVersion, to: version)
+            try await dependencies.database.setSetting(.whatsNewSeenVersion, to: version)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 
     func markEntryOpened() async {
-        guard !isEntryOpened else {
+        guard !input.isEntryOpened else {
             return
         }
 
-        isEntryOpened = true
+        input.isEntryOpened = true
 
         await save(.entryOpened, to: true)
     }
 
     func closeCard() async {
-        cardClosed = true
+        input.cardClosed = true
         await save(.setupCardClosed, to: true)
     }
 }
 
+public extension SetupModel.Output {
+    var cardItems: [SetupItem] {
+        guard let progress = input.progress else {
+            return []
+        }
+
+        return SetupItem.home.filter { !$0.isDone(in: progress) }
+    }
+
+    var isCardClosed: Bool {
+        input.cardClosed ?? true
+    }
+
+    var seenNewsVersion: String? {
+        input.seenNews.value ?? nil
+    }
+
+    var isLoaded: Bool {
+        input.progress != nil && input.cardClosed != nil
+    }
+
+    var showsCard: Bool {
+        !isCardClosed && !cardItems.isEmpty
+    }
+
+    var themeTitle: String {
+        input.theme.title(in: input.customThemes)
+    }
+
+    var hasUnreadNews: Bool {
+        input.seenNews.isLoaded && AppVersion.isNewer(
+            WhatsNewRelease.latestVersion,
+            than: seenNewsVersion
+        )
+    }
+
+    func isDone(_ item: SetupItem) -> Bool {
+        input.progress.map(item.isDone) ?? false
+    }
+}
+
 extension SetupModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+
     static let loadFailedMessage = "設定を読めませんでした"
 }
 
@@ -140,10 +176,10 @@ private extension SetupModel {
 
     func observeSeenNews() async {
         await observe(
-            database.settingUpdates(.whatsNewSeenVersion),
+            dependencies.database.settingUpdates(.whatsNewSeenVersion),
             failure: Self.loadFailedMessage
         ) { version in
-            seenNews = .loaded(version)
+            input.seenNews = .loaded(version)
         }
     }
 
@@ -152,9 +188,9 @@ private extension SetupModel {
         to value: Bool
     ) async {
         do {
-            try await database.setSetting(key, to: value)
+            try await dependencies.database.setSetting(key, to: value)
         } catch {
-            errorNotice.show(Self.saveFailedMessage, for: error)
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
     }
 }

@@ -119,8 +119,8 @@ private extension HomeCustomizeCard {
 
     func value(for item: SetupItem) -> String {
         switch item {
-        case .launchScreen: model.launchScreen.title
-        case .theme: model.themeTitle
+        case .launchScreen: model.input.launchScreen.title
+        case .theme: model.output.themeTitle
         case .appIcon: appIcon.input.current.title
         case .themeStyle: themeStyle.shortTextTitle
         case .themeLook: themeStyle.lookTitle
