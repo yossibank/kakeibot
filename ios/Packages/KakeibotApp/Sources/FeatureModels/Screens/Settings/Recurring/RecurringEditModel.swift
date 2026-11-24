@@ -11,11 +11,10 @@ public final class RecurringEditModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate,
         type: Entry.Kind = .expense,
         editing id: Recurring.ID? = nil,
@@ -27,7 +26,7 @@ public final class RecurringEditModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -107,13 +106,6 @@ public extension RecurringEditModel {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
-    }
-}
-
-extension RecurringEditModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

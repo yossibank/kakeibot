@@ -12,7 +12,7 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
         try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "コーヒー")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         model.state.searchText = "ランチ"
@@ -42,7 +42,7 @@ extension RecordsModelTests {
         ]
         try await setup.save(.expense, amount: 616, on: "2026-10-12", items: items)
         try await setup.save(.expense, amount: 500, on: "2026-10-11", memo: "コーヒー")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         model.state.searchText = "牛乳"
@@ -64,7 +64,7 @@ extension RecordsModelTests {
         ]
         try await setup.save(.expense, amount: 616, on: "2026-10-12", items: items)
         try await setup.save(.expense, amount: 500, on: "2026-10-12", memo: "コーヒー")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let day = try #require(model.output.days.first)
 
@@ -83,7 +83,7 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "ランチ")
         let options = try await setup.database.entryOptions()
         let food = try #require(options.expenseCategories.first)
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         model.state.searchText = "ランチ"
@@ -110,7 +110,7 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
         let options = try await setup.database.entryOptions()
         let salary = try #require(options.incomeCategories.first)
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         model.state.filter = EntryFilter(categoryIds: [salary.id])
@@ -139,7 +139,7 @@ extension RecordsModelTests {
     @Test
     func remembersSearchedWords() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.rememberSearch("ランチ")
         await model.rememberSearch("本")
@@ -154,7 +154,7 @@ extension RecordsModelTests {
     @Test
     func restoresClearedSearches() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.rememberSearch("ランチ")
         await model.rememberSearch("本")
         let words = model.input.recentSearches
@@ -173,7 +173,7 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "ランチ")
         let options = try await setup.database.entryOptions()
         let salary = try #require(options.incomeCategories.first)
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         model.state.searchText = "ランチ"
         let unfiltered = model.output.searchHiddenCount
@@ -198,7 +198,7 @@ extension RecordsModelTests {
         let options = try await setup.database.entryOptions()
         let food = try #require(options.expenseCategories.first)
         let salary = try #require(options.incomeCategories.first)
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let month = model.output.shownEntryCount
 

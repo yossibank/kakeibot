@@ -8,7 +8,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
         try await setup.database.failWrites(to: "sync_state")
 
@@ -26,7 +26,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
         try await setup.database.failWrites(to: "sync_state")
 

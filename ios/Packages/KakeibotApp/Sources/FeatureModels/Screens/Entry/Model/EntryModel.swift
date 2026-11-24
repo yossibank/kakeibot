@@ -11,23 +11,22 @@ public final class EntryModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         editing id: Entry.ID? = nil,
         date: LocalDate,
         type: Entry.Kind = .expense,
         template: EntryTemplate? = nil
     ) {
-        let state = State(type: type, date: date, today: clock.today)
+        let state = State(type: type, date: date, today: parts.clock.today)
         let input = Input(editingId: id, startingTemplate: template)
 
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -246,16 +245,11 @@ public extension EntryModel {
     }
 
     func newNoticeModel() -> EntryNoticeModel {
-        EntryNoticeModel(database: dependencies.database, clock: dependencies.clock)
+        EntryNoticeModel(parts: dependencies)
     }
 }
 
 extension EntryModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
-    }
-
     public func newVoiceFlow() -> EntryVoiceFlow {
         EntryVoiceFlow(dependencies: .live(clock: dependencies.clock))
     }

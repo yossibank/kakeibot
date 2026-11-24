@@ -9,7 +9,7 @@ extension WalletEditModelTests {
     @Test
     func startsWithCashByDefault() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
 
         #expect(model.state.kind == .cash)
         #expect(!model.state.isNegative)
@@ -19,10 +19,9 @@ extension WalletEditModelTests {
     @Test
     func startsWithGivenKind() async throws {
         let setup = try await Setup()
-        let card = WalletEditModel(database: setup.database, clock: .system, kind: .card)
+        let card = WalletEditModel(parts: .system(setup.database), kind: .card)
         let investment = WalletEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             kind: .investment
         )
 
@@ -38,7 +37,7 @@ extension WalletEditModelTests {
     @Test
     func followsKindFromGivenKind() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system, kind: .card)
+        let model = WalletEditModel(parts: .system(setup.database), kind: .card)
 
         model.state.setKind(.bank)
         let bank = model.state.isNegative
@@ -54,7 +53,7 @@ extension WalletEditModelTests {
     @Test
     func savesGivenKindWithNegativeBalance() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system, kind: .card)
+        let model = WalletEditModel(parts: .system(setup.database), kind: .card)
         model.state.name = "楽天カード"
         model.state.press(.digit(5))
         model.state.press(.doubleZero)

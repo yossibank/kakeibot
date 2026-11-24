@@ -6,7 +6,7 @@ extension EntryModelTests {
     @Test
     func tellsWhenIPhoneStorageIsFull() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(5))
         model.state.memo = String(repeating: "あ", count: 100_000)

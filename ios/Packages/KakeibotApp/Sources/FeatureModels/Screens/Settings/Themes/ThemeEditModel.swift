@@ -11,11 +11,10 @@ public final class ThemeEditModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         editing theme: Theme?,
         base palette: ThemePalette
     ) {
@@ -25,7 +24,7 @@ public final class ThemeEditModel {
         self.state = state
         self.input = Input(baseline: draft, editingId: theme?.id)
         self.output = Output(state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -83,13 +82,6 @@ public extension ThemeEditModel {
 
             return ThemeEditModel.isReadable(draft, slot)
         }
-    }
-}
-
-extension ThemeEditModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

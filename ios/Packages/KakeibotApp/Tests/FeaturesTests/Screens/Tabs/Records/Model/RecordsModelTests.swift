@@ -11,7 +11,7 @@ struct RecordsModelTests {
     @Test
     func showsNoRecordsOnlyAfterListArrives() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let before = model.output.showsNoRecords
 
         await model.load()
@@ -27,7 +27,7 @@ struct RecordsModelTests {
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
         try await setup.save(.expense, amount: 3980, on: "2026-10-10")
         try await setup.save(.expense, amount: 500, on: "2026-09-30")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let dates = model.output.days.map(\.date.description)
@@ -46,7 +46,7 @@ struct RecordsModelTests {
     @Test
     func keepsMonthWhenObservingAgain() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         let first = Task {
             await model.run()
@@ -96,7 +96,7 @@ struct RecordsModelTests {
         )
 
         _ = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let upcoming = model.output.upcomingRecurrings(on: future)
@@ -125,7 +125,7 @@ struct RecordsModelTests {
 
         _ = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -157,7 +157,7 @@ struct RecordsModelTests {
         )
 
         _ = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -173,7 +173,7 @@ struct RecordsModelTests {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
         try await setup.save(.expense, amount: 220, on: "2026-10-12", memo: "")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let day = try #require(model.output.days.first)
@@ -201,7 +201,7 @@ struct RecordsModelTests {
         )
 
         try await setup.database.saveEntry(draft, at: Date())
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let day = try #require(model.output.days.first)
@@ -217,7 +217,7 @@ struct RecordsModelTests {
     @Test
     func showsTodayUntilAnotherDayIsChosen() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let chosen = try #require(LocalDate("2026-10-03"))
 
         let initial = model.output.shownDate
@@ -236,7 +236,7 @@ struct RecordsModelTests {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.save(.income, amount: 3000, on: "2026-10-10")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let spent = try #require(LocalDate("2026-10-12"))
         let income = try #require(LocalDate("2026-10-10"))
         let future = setup.today.adding(days: 1)

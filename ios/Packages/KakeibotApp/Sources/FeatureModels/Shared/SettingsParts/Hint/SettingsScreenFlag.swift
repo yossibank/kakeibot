@@ -13,7 +13,7 @@ public final class SettingsScreenFlag {
     private let screen: SettingsScreen
     private let savesOn: Bool
 
-    public init(
+    init(
         database: AppDatabase,
         key: SettingKey<Set<SettingsScreen>>,
         screen: SettingsScreen,
@@ -31,22 +31,17 @@ public final class SettingsScreenFlag {
 public extension SettingsScreenFlag {
     static func closedHint(
         _ screen: SettingsScreen,
-        in database: AppDatabase
+        in parts: ScreenParts
     ) -> SettingsScreenFlag {
-        SettingsScreenFlag(
-            database: database,
-            key: .closedHints,
-            screen: screen,
-            isOn: true
-        )
+        closedHint(screen, in: parts.database)
     }
 
     static func openHiddenList(
         _ screen: SettingsScreen,
-        in database: AppDatabase
+        in parts: ScreenParts
     ) -> SettingsScreenFlag {
         SettingsScreenFlag(
-            database: database,
+            database: parts.database,
             key: .closedHiddenLists,
             screen: screen,
             isOn: true,
@@ -68,6 +63,20 @@ public extension SettingsScreenFlag {
         return Task {
             await save(isOn)
         }
+    }
+}
+
+extension SettingsScreenFlag {
+    static func closedHint(
+        _ screen: SettingsScreen,
+        in database: AppDatabase
+    ) -> SettingsScreenFlag {
+        SettingsScreenFlag(
+            database: database,
+            key: .closedHints,
+            screen: screen,
+            isOn: true
+        )
     }
 }
 

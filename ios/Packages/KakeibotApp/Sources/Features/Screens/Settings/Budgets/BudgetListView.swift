@@ -364,13 +364,11 @@ private extension BudgetListView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
-
+    if let parts = ScreenParts.preview() {
         NavigationStack {
             BudgetListView(
                 model: BudgetListModel(
-                    database: database,
+                    parts: parts,
                     today: LocalDate(Date(), in: .current)
                 )
             )

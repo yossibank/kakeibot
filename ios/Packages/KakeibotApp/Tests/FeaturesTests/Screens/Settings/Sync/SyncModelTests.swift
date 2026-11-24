@@ -12,7 +12,7 @@ struct SyncModelTests {
     func sendsLocalDataWhenCloudIsEmpty() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -25,7 +25,7 @@ struct SyncModelTests {
     func usesCloudDataWithoutAskingWhenNoEntries() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -39,7 +39,7 @@ struct SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -57,7 +57,7 @@ struct SyncModelTests {
     func staysOffWhenSignedOut() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(account: .noAccount, hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -79,7 +79,7 @@ struct SyncModelTests {
     ) async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(account: account, hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.load()
 
@@ -90,7 +90,7 @@ struct SyncModelTests {
     func checksICloudAgainWhenBack() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(account: .noAccount, hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.load()
         await cloud.signIn()
@@ -104,7 +104,7 @@ struct SyncModelTests {
     func turnsOff() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
         await model.setOn(false)
@@ -117,7 +117,7 @@ struct SyncModelTests {
     func showsWhySyncStoppedOnItsOwn() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         try await setup.database.turnOnSync()
 
         let task = Task {
@@ -144,7 +144,7 @@ struct SyncModelTests {
     func clearsWhySyncStoppedWhenTurnedOnAgain() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         try await setup.database.turnOnSync()
         try await setup.database.turnOffSync(because: .cloudReplaced)
 

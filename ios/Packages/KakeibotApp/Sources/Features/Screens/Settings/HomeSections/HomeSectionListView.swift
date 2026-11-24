@@ -17,9 +17,9 @@ public struct HomeSectionListView: View {
 
     public init(
         model: HomeSectionListModel,
-        database: AppDatabase
+        parts: ScreenParts
     ) {
-        let hintFlag = SettingsScreenFlag.closedHint(.homeSections, in: database)
+        let hintFlag = SettingsScreenFlag.closedHint(.homeSections, in: parts)
 
         _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
@@ -261,11 +261,11 @@ private extension HomeSectionListView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         NavigationStack {
             HomeSectionListView(
-                model: HomeSectionListModel(database: database),
-                database: database
+                model: HomeSectionListModel(parts: parts),
+                parts: parts
             )
         }
     }

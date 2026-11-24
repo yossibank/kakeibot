@@ -22,7 +22,7 @@ struct TemplateListModelTests {
         )
 
         let saved = try await database.saveTemplate(draft, at: Date())
-        let model = TemplateListModel(database: database, clock: .system)
+        let model = TemplateListModel(parts: .system(database))
         await model.load()
 
         await model.hide(saved.id)
@@ -45,7 +45,7 @@ struct TemplateListModelTests {
         try await setup.saveTemplate(name: "ランチ", amount: 980)
         try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
         let pass = try await setup.saveTemplate(name: "定期", amount: nil)
-        let model = TemplateListModel(database: setup.database, clock: .system)
+        let model = TemplateListModel(parts: .system(setup.database))
         await model.load()
         let first = try #require(model.output.shown.first)
         let detail = model.output.detail(for: first)

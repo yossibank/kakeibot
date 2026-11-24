@@ -11,7 +11,7 @@ struct HomeModelTests {
     @Test
     func showsNoRecordsOnlyAfterListArrives() async throws {
         let setup = try await Setup()
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
         let before = model.output.showsNoRecords
 
         await model.load()
@@ -28,7 +28,7 @@ struct HomeModelTests {
         try await setup.save(.expense, amount: 4500, daysAgo: 1)
         try await setup.save(.income, amount: 250_000, daysAgo: 2)
         try await setup.save(.expense, amount: 3000, daysAgo: 30)
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -44,7 +44,7 @@ struct HomeModelTests {
         let setup = try await Setup()
         try await setup.saveRecurring(amount: 4800, day: 5)
         try await setup.saveRecurring(amount: 78000, day: 27)
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -59,7 +59,7 @@ struct HomeModelTests {
         let setup = try await Setup()
         try await setup.saveRecurring(amount: 4800, day: 5)
         try await setup.saveRecurring(amount: 78000, day: 27)
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let entry = try #require(model.output.periodRecurrings.first?.entry)
 
@@ -84,7 +84,7 @@ struct HomeModelTests {
     func showsRemainingBudgetOfPeriod() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 45000, daysAgo: 0)
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
         let month = setup.today.yearMonth
         await model.load()
         let before = model.output.budgetUsage
@@ -110,7 +110,7 @@ struct HomeModelTests {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         try await setup.save(.expense, amount: 4500, daysAgo: 1)
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         #expect(model.output.budgetUsage == nil)
@@ -143,7 +143,7 @@ struct HomeModelTests {
             try await setup.save(.expense, amount: amount, daysAgo: daysAgo, memo: memo)
         }
 
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let rows = model.output.recentRows

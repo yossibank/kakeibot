@@ -15,14 +15,14 @@ struct ReminderModelTests {
         let declined = FakePermission(authorization: .notDetermined, grants: false)
 
         let allowed = ReminderModel(
-            database: database,
+            parts: .system(database),
             today: today,
             time: nil,
             permission: granted.permission
         )
 
         let refused = ReminderModel(
-            database: database,
+            parts: .system(database),
             today: today,
             time: nil,
             permission: declined.permission
@@ -55,7 +55,7 @@ struct ReminderModelTests {
         let client = FakePermission(authorization: .notDetermined)
 
         let model = ReminderModel(
-            database: database,
+            parts: .system(database),
             today: today,
             time: nil,
             permission: client.permission
@@ -80,7 +80,7 @@ struct ReminderModelTests {
         let client = FakePermission(authorization: .allowed)
 
         let model = ReminderModel(
-            database: database,
+            parts: .system(database),
             today: today,
             time: nil,
             permission: client.permission
@@ -106,7 +106,7 @@ struct ReminderModelTests {
         let client = FakePermission(authorization: .denied)
 
         let model = ReminderModel(
-            database: database,
+            parts: .system(database),
             today: today,
             time: nil,
             permission: client.permission
@@ -146,7 +146,7 @@ extension ReminderModelTests {
         try await database.saveRecurring(draft, today: today, at: Date())
 
         let model = ReminderModel(
-            database: database,
+            parts: .system(database),
             today: today,
             time: nil,
             permission: client.permission

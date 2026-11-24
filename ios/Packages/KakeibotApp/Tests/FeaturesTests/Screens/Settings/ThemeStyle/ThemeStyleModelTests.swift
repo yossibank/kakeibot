@@ -9,7 +9,7 @@ struct ThemeStyleModelTests {
     @Test
     func savesChosenStyle() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
 
         await model.choose(ThemeCorner.small)
@@ -52,7 +52,7 @@ struct ThemeStyleModelTests {
     @Test
     func turnsSwitchBackOn() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
 
         await model.choose(haptics: false)
@@ -65,7 +65,7 @@ struct ThemeStyleModelTests {
     @Test
     func previewChangesStyleWithoutSaving() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
 
         model.preview(displayFont: .gothic)
@@ -81,7 +81,7 @@ struct ThemeStyleModelTests {
     @Test
     func cancelPreviewRestoresStyle() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
 
         model.preview(displayFont: .gothic)
@@ -93,7 +93,7 @@ struct ThemeStyleModelTests {
     @Test
     func cancelPreviewAfterTwoPreviewsRestoresFirstStyle() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
 
         model.preview(displayFont: .gothic)
@@ -106,7 +106,7 @@ struct ThemeStyleModelTests {
     @Test
     func cancelWithoutPreviewKeepsStyle() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
         await model.choose(haptics: false)
 
@@ -118,7 +118,7 @@ struct ThemeStyleModelTests {
     @Test
     func chooseAfterPreviewSaves() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
 
         model.preview(displayFont: .gothic)
@@ -137,7 +137,7 @@ struct ThemeStyleModelTests {
     @Test
     func failedChooseAfterPreviewRestoresStyleBeforePreview() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = ThemeStyleModel(database: setup.database)
+        let model = ThemeStyleModel(parts: .system(setup.database))
         await model.load()
         try await setup.database.failWrites(to: "setting")
 

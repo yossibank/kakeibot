@@ -12,7 +12,7 @@ extension RecordsModelTests {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.adjust(-500, on: "2026-10-14")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let date = try #require(LocalDate("2026-10-14"))
@@ -30,7 +30,7 @@ extension RecordsModelTests {
         let setup = try await Setup()
         try await setup.adjust(700, on: "2026-10-14")
         let options = try await setup.database.entryOptions()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.state.filter.walletIds = [options.wallets[0].id]
@@ -44,7 +44,7 @@ extension RecordsModelTests {
     func deletesAdjustmentWithUndo() async throws {
         let setup = try await Setup()
         try await setup.adjust(700, on: "2026-10-14")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let date = try #require(LocalDate("2026-10-14"))
         let row = try #require(model.output.adjustmentRows(on: date).first)

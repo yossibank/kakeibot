@@ -6,7 +6,7 @@ import SwiftUI
 
 @MainActor
 struct StampBoard {
-    let database: AppDatabase
+    let parts: ScreenParts
 }
 
 extension StampBoard: SettingsBoardSpec {
@@ -54,7 +54,7 @@ extension StampBoard: SettingsBoardSpec {
     }
 
     func editModel(for destination: Destination) -> StampEditModel {
-        StampEditModel(database: database, clock: clock, editing: destination.editingID)
+        StampEditModel(parts: parts, editing: destination.editingID)
     }
 
     func intro(

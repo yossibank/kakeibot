@@ -14,8 +14,7 @@ protocol SettingsBoardSpec {
     associatedtype Tile: View
     associatedtype Editor: SettingsEditSheet
 
-    var database: AppDatabase { get }
-    var clock: ScreenClock { get }
+    var parts: ScreenParts { get }
     var screen: SettingsScreen { get }
     var title: String { get }
     var hiddenTitle: String { get }
@@ -65,10 +64,6 @@ protocol SettingsBoardSpec {
 }
 
 extension SettingsBoardSpec {
-    var clock: ScreenClock {
-        .system
-    }
-
     var layout: SettingsBoardLayout {
         .tiles
     }
@@ -112,7 +107,7 @@ extension SettingsBoardSpec {
 
 extension SettingsBoardSpec where Model: SettingsBoardDatabaseModel {
     func makeModel() -> Model {
-        Model(database: database, clock: clock)
+        Model(parts: parts)
     }
 }
 

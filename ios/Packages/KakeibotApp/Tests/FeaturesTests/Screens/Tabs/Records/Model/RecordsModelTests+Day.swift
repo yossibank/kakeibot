@@ -10,7 +10,7 @@ extension RecordsModelTests {
     @Test
     func refusesRewardOnFutureDay() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let future = setup.today.adding(days: 1)
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
@@ -28,7 +28,7 @@ extension RecordsModelTests {
     @Test
     func togglesNoSpendDay() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         let task = Task {
             await model.run()
@@ -57,12 +57,12 @@ extension RecordsModelTests {
     @Test
     func remembersLayout() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         model.chooseLayout(.list)
         await model.saveLayout()
 
-        let reopened = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let reopened = RecordsModel(parts: .system(setup.database), today: setup.today)
         await reopened.loadLayout()
 
         #expect(reopened.input.layout == .list)
@@ -73,7 +73,7 @@ extension RecordsModelTests {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
         let category = try #require(options.expenseCategories.first?.id)
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let date = try #require(LocalDate("2026-08-03"))
         model.chooseLayout(.list)
         model.state.isSearching = true
@@ -93,7 +93,7 @@ extension RecordsModelTests {
     @Test
     func opensCurrentMonthWithSearchClosed() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let selected = try #require(LocalDate("2026-07-03"))
         model.state.move(months: -3)
         model.state.selectedDate = selected
@@ -111,7 +111,7 @@ extension RecordsModelTests {
     @Test
     func tellsWhetherShownMonthIsCurrent() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let isCurrentAtFirst = model.output.isCurrentMonth
 
         model.state.move(months: -1)
@@ -129,7 +129,7 @@ extension RecordsModelTests {
         let hidden = try #require(shelf.shelfIcons.last)
         try await setup.database.setHidden(hidden.id, isHidden: true, at: Date())
         let today = setup.today
-        let model = RecordsModel(database: setup.database, clock: .system, today: today)
+        let model = RecordsModel(parts: .system(setup.database), today: today)
 
         let task = Task {
             await model.run()
@@ -164,7 +164,7 @@ extension RecordsModelTests {
     @Test
     func confirmsBatchDeleteOfTenOrMore() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let ids = (0..<10).map { _ in Entry.ID() }
         let firstNine = Array(ids.prefix(9))
         var deleted: [[Entry.ID]] = []

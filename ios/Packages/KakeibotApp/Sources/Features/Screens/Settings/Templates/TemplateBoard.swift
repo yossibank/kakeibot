@@ -6,7 +6,7 @@ import SwiftUI
 
 @MainActor
 struct TemplateBoard {
-    let database: AppDatabase
+    let parts: ScreenParts
 }
 
 extension TemplateBoard: SettingsBoardSpec {
@@ -77,10 +77,10 @@ extension TemplateBoard: SettingsBoardSpec {
     func editModel(for destination: Destination) -> TemplateEditModel {
         switch destination {
         case let .new(type):
-            TemplateEditModel(database: database, clock: clock, type: type)
+            TemplateEditModel(parts: parts, type: type)
 
         case let .edit(type, id):
-            TemplateEditModel(database: database, clock: clock, type: type, editing: id)
+            TemplateEditModel(parts: parts, type: type, editing: id)
         }
     }
 

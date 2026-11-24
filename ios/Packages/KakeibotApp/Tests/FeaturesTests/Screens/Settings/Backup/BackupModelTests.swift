@@ -11,8 +11,7 @@ struct BackupModelTests {
     func namesFileByDay() async throws {
         let setup = try Setup()
         let model = BackupModel(
-            database: setup.source,
-            clock: .fixed(setup.now),
+            parts: ScreenParts(database: setup.source, clock: .fixed(setup.now)),
             stash: setup.stash,
             appVersion: "1.2"
         )
@@ -43,7 +42,7 @@ struct BackupModelTests {
     func restoresAfterConfirming() async throws {
         let setup = try Setup()
         let source = setup.exporter()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         await source.makeFile(.json)
         let file = try #require(source.state.file)
 
@@ -62,7 +61,7 @@ struct BackupModelTests {
     func refusesRestoringWhileSyncing() async throws {
         let setup = try Setup()
         let source = setup.exporter()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         await source.makeFile(.json)
         let file = try #require(source.state.file)
         target.read(file.data)
@@ -84,7 +83,7 @@ struct BackupModelTests {
         let source = setup.exporter()
 
         let target = BackupModel(
-            database: setup.target, clock: .system,
+            parts: .system(setup.target),
             stash: setup.stash,
             permission: client.permission
         )
@@ -126,7 +125,7 @@ struct BackupModelTests {
         try await setup.source.saveRecurring(draft, today: today, at: setup.now)
 
         let target = BackupModel(
-            database: setup.target, clock: .system,
+            parts: .system(setup.target),
             stash: setup.stash,
             permission: client.permission
         )
@@ -148,7 +147,7 @@ struct BackupModelTests {
         let source = setup.exporter()
 
         let target = BackupModel(
-            database: setup.target, clock: .system,
+            parts: .system(setup.target),
             stash: setup.stash,
             permission: client.permission
         )
@@ -167,7 +166,7 @@ struct BackupModelTests {
     func keepsDataWhenCancelled() async throws {
         let setup = try Setup()
         let source = setup.exporter()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         await source.makeFile(.json)
         let file = try #require(source.state.file)
 
@@ -183,7 +182,7 @@ struct BackupModelTests {
     func stashesCurrentDataBeforeRestoring() async throws {
         let setup = try Setup()
         let source = setup.exporter()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let before = try setup.target.snapshot()
         await source.makeFile(.json)
@@ -206,7 +205,7 @@ struct BackupModelTests {
         let url = blocker.appending(path: "previous.json")
         let stash = BackupStash(urls: [url])
         let source = setup.exporter()
-        let target = BackupModel(database: setup.target, clock: .system, stash: stash)
+        let target = BackupModel(parts: .system(setup.target), stash: stash)
         await source.makeFile(.json)
         let file = try #require(source.state.file)
 
@@ -222,7 +221,7 @@ struct BackupModelTests {
     func readsStashedDataToGoBack() async throws {
         let setup = try Setup()
         let source = setup.exporter()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let before = try setup.target.snapshot()
         await source.makeFile(.json)
@@ -240,7 +239,7 @@ struct BackupModelTests {
     @Test
     func goesBackToFirstDataAfterTwoRestores() async throws {
         let setup = try Setup()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let first = try setup.target.snapshot()
 
@@ -260,7 +259,7 @@ struct BackupModelTests {
     @Test
     func dropsOldestStashAfterThreeRestores() async throws {
         let setup = try Setup()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let first = try setup.target.snapshot()
 
@@ -279,7 +278,7 @@ struct BackupModelTests {
     @Test
     func skipsBrokenStashRow() async throws {
         let setup = try Setup()
-        let model = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let model = BackupModel(parts: .system(setup.target), stash: setup.stash)
         let app = ExportV1.App(platform: .ios, version: "1.0")
         let valid = try await setup.source.backup(at: setup.now, app: app)
 
@@ -298,7 +297,7 @@ struct BackupModelTests {
     @Test
     func keepsRowForSecondStashWhenFirstIsMissing() async throws {
         let setup = try Setup()
-        let model = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let model = BackupModel(parts: .system(setup.target), stash: setup.stash)
         let app = ExportV1.App(platform: .ios, version: "1.0")
         let valid = try await setup.source.backup(at: setup.now, app: app)
 
@@ -343,7 +342,7 @@ struct BackupModelTests {
     @Test
     func rejectsOtherFiles() throws {
         let setup = try Setup()
-        let model = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let model = BackupModel(parts: .system(setup.target), stash: setup.stash)
         let other = Data(#"{"format":"other","version":1}"#.utf8)
         let newer = Data(#"{"format":"kakeibot-export","version":99}"#.utf8)
 

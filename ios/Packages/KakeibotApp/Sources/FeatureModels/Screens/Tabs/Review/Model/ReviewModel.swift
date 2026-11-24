@@ -11,20 +11,19 @@ public final class ReviewModel: ScreenModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State(today: today, checkTime: clock.now)
+        let state = State(today: today, checkTime: parts.clock.now)
         let input = Input()
 
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -203,13 +202,6 @@ extension ReviewModel.State {
 
         isMovingForward = true
         offset = 0
-    }
-}
-
-extension ReviewModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

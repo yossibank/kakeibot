@@ -12,7 +12,7 @@ extension SyncModelTests {
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloudSummary = SyncSummary(entryCount: 12, updatedAt: Date.distantFuture)
         let cloud = FakeCloud(hasData: true, cloudSummary: cloudSummary)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -27,7 +27,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -40,7 +40,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
 
         model.cancelChoice()
@@ -55,7 +55,7 @@ extension SyncModelTests {
     func showsOffWhenSignedOutOnTurningOn() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(account: .noAccount, hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -67,7 +67,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
 
         await model.useCloudData()
@@ -81,7 +81,7 @@ extension SyncModelTests {
     func showsOffWhenCheckingCloudFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: true, failsToSummarize: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         await model.setOn(true)
 
@@ -93,7 +93,7 @@ extension SyncModelTests {
     func showsOnWhenTurningOffFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
         try await setup.database.failWrites(to: "sync_state")
 
@@ -108,7 +108,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
         try await setup.database.failWrites(to: "sync_state")
 
@@ -123,7 +123,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true, failsToDeleteData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
 
         await model.useLocalData()
@@ -137,7 +137,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
 
         await model.useLocalData()
@@ -150,7 +150,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         await model.setOn(true)
 
         await model.useCloudData()
@@ -165,7 +165,7 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 980, daysAgo: 0)
         let cloud = FakeCloud(hasData: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         let first = model.request(true)
         let second = model.request(false)

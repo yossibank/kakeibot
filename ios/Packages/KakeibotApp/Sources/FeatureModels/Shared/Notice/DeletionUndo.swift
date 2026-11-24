@@ -1,6 +1,5 @@
 import Core
 import DesignSystem
-import FeatureModels
 import Observation
 import Store
 
@@ -11,9 +10,9 @@ public final class DeletionUndo {
 
     let dependencies: Dependencies
 
-    public init(database: AppDatabase) {
+    public init(parts: ScreenParts) {
         self.state = State()
-        self.dependencies = Dependencies(database: database)
+        self.dependencies = Dependencies(database: parts.database)
     }
 }
 

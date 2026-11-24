@@ -116,8 +116,8 @@ private extension StampEditSheet {
 extension StampEditModel: SettingsEditing {}
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        StampEditSheet(model: StampEditModel(database: database, clock: .system))
+    if let parts = ScreenParts.preview() {
+        StampEditSheet(model: StampEditModel(parts: parts))
     }
 }
 

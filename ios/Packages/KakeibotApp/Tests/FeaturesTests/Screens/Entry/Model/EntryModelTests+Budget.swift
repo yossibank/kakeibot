@@ -39,8 +39,7 @@ extension EntryModelTests {
         try await Self.saveBudgetAndEntry(setup, budget: 10000)
         let entry = try #require(try setup.database.snapshot().entries.first)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: entry.date
         )
@@ -62,8 +61,7 @@ extension EntryModelTests {
         try await Self.saveBudgetAndEntry(setup, budget: 400)
         let entry = try #require(try setup.database.snapshot().entries.first)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: entry.date
         )
@@ -88,7 +86,7 @@ private extension EntryModelTests {
         try await saveBudgetAndEntry(setup, budget: budget)
 
         let today = LocalDate(Date(), in: .current)
-        let model = EntryModel(database: setup.database, clock: .system, date: today)
+        let model = EntryModel(parts: .system(setup.database), date: today)
 
         await model.load()
 

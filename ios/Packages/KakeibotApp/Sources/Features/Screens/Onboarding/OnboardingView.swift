@@ -11,26 +11,24 @@ public struct OnboardingView: View {
     @State private var slide = PageSlide()
     @State private var appIcon = AppIconListModel()
 
-    private let database: AppDatabase
+    private let parts: ScreenParts
     private let today: LocalDate
     private let onFinish: () -> Void
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate,
         onFinish: @escaping () -> Void
     ) {
         let model = OnboardingModel(
-            database: database,
-            clock: clock,
+            parts: parts,
             today: today,
             newsVersion: WhatsNewRelease.latestVersion
         )
 
         _model = State(initialValue: model)
 
-        self.database = database
+        self.parts = parts
         self.today = today
         self.onFinish = onFinish
     }
@@ -42,7 +40,7 @@ public struct OnboardingView: View {
                 .navigationDestination(for: SetupItem.self) { item in
                     SetupDestination(
                         item,
-                        database: database,
+                        parts: parts,
                         today: today,
                         appIcon: appIcon
                     )

@@ -61,12 +61,6 @@ extension ScreenModel {
     }
 
     func observeAll(_ observations: [@MainActor @Sendable () async -> Void]) async {
-        await withDiscardingTaskGroup { group in
-            for observation in observations {
-                group.addTask {
-                    await observation()
-                }
-            }
-        }
+        await ScreenObservation.all(observations)
     }
 }

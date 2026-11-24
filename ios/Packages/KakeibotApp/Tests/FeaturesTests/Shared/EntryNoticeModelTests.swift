@@ -274,7 +274,7 @@ extension EntryNoticeModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let date = try #require(LocalDate("2026-10-12"))
-        let notice = EntryNoticeModel(database: database, clock: .system)
+        let notice = EntryNoticeModel(parts: .system(database))
 
         try database.insertDefaultsIfEmpty(at: Date())
         self.init(database: database, date: date, notice: notice)
@@ -285,8 +285,7 @@ extension EntryNoticeModelTests.Setup {
         type: Entry.Kind = .expense
     ) async throws -> EntryModel {
         let model = EntryModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             editing: id,
             date: date,
             type: type

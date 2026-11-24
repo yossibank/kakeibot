@@ -5,7 +5,7 @@ import Store
 
 public extension RecordsModel {
     func rewardRuleEditModel() -> RewardRuleEditModel {
-        RewardRuleEditModel(database: dependencies.database, clock: dependencies.clock)
+        RewardRuleEditModel(parts: dependencies)
     }
 
     func toggleReward(

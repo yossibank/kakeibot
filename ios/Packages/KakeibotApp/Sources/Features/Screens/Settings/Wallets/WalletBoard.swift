@@ -6,7 +6,7 @@ import SwiftUI
 
 @MainActor
 struct WalletBoard {
-    let database: AppDatabase
+    let parts: ScreenParts
 }
 
 extension WalletBoard: SettingsBoardSpec {
@@ -60,7 +60,7 @@ extension WalletBoard: SettingsBoardSpec {
             amount: model.balance(of: item),
             caption: item.kind.role.balanceLabel(model.output.balance(
                 of: item,
-                through: clock.today
+                through: parts.clock.today
             )),
             isShared: model.output.isShared(item)
         ) {
@@ -69,7 +69,7 @@ extension WalletBoard: SettingsBoardSpec {
     }
 
     func editModel(for destination: Destination) -> WalletEditModel {
-        WalletEditModel(database: database, clock: clock, editing: destination.editingID)
+        WalletEditModel(parts: parts, editing: destination.editingID)
     }
 
     func intro(

@@ -14,14 +14,14 @@ public final class MonthStartDayModel: SettingSaving {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         today: LocalDate
     ) {
         let input = Input(today: today)
 
         self.input = input
         self.output = Output(input: input)
-        self.dependencies = Dependencies(database: database)
+        self.dependencies = Dependencies(database: parts.database)
     }
 }
 

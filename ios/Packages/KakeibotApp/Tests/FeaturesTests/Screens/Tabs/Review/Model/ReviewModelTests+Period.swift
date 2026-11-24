@@ -28,7 +28,7 @@ extension ReviewModelTests {
 
         try await setup.database.saveRecurring(recurring, today: setup.today, at: Date())
 
-        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
+        let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
             model.input.list != nil && model.output.upcomingRecurringTotal != nil
@@ -57,7 +57,7 @@ extension ReviewModelTests {
         try await setup.saveDaily(amount: 6000, on: "2026-10-14")
         let month = try #require(YearMonth("2026-10"))
         try await setup.database.setBudget(4000, for: food.id, from: month)
-        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
+        let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
             model.input.list != nil && !model.input.budgets.isEmpty
@@ -83,7 +83,7 @@ extension ReviewModelTests {
     @Test
     func movesOnlyUpToCurrentPeriod() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
+        let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         model.move(by: 1)
         let current = model.output.period.range
@@ -101,7 +101,7 @@ extension ReviewModelTests {
     @Test
     func movesBackToCurrentPeriod() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
+        let model = ReviewModel(parts: .system(setup.database), today: setup.today)
         let isCurrentAtFirst = model.output.isCurrentPeriod
 
         model.move(by: -3)
@@ -119,12 +119,12 @@ extension ReviewModelTests {
     @Test
     func remembersSelection() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
+        let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         model.setScale(.week)
         model.setKind(.income)
         await model.saveSelection()
-        let reopened = ReviewModel(database: setup.database, clock: .system, today: setup.today)
+        let reopened = ReviewModel(parts: .system(setup.database), today: setup.today)
         await reopened.loadSelection()
 
         #expect(reopened.input.scale == .week)
@@ -151,7 +151,7 @@ extension ReviewModelTests {
             try await setup.database.stamp(icon, on: date, at: Date())
         }
 
-        let model = ReviewModel(database: setup.database, clock: .system, today: setup.today)
+        let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
             !model.output.stampTallies.isEmpty

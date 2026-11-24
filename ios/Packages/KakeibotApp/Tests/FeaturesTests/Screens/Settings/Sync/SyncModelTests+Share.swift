@@ -9,7 +9,7 @@ extension SyncModelTests {
     func asksBeforeSharingAWallet() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -24,7 +24,7 @@ extension SyncModelTests {
     func startsSharingAndShowsSheetAfterConfirming() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -42,7 +42,7 @@ extension SyncModelTests {
     func leavesWalletAloneWhenInvitationIsCancelled() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -61,7 +61,7 @@ extension SyncModelTests {
             SyncParticipant(name: "家族", state: .invited)
         ]
         let cloud = FakeCloud(hasData: false, participants: members)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
@@ -76,7 +76,7 @@ extension SyncModelTests {
     func tellsWhenMembersCannotBeLoaded() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToList: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
@@ -89,7 +89,7 @@ extension SyncModelTests {
     func invitesMoreWithoutCreatingAgain() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
@@ -103,7 +103,7 @@ extension SyncModelTests {
     func stopsSharingInICloudThenOnThisIPhone() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.stopSharing(item)
@@ -118,7 +118,7 @@ extension SyncModelTests {
     func endsSharingWhenSheetStops() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, stopsInSheet: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -133,7 +133,7 @@ extension SyncModelTests {
     func tellsWhenSheetCannotSaveInvitation() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsInSheet: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.open(item)
@@ -146,7 +146,7 @@ extension SyncModelTests {
     func keepsWalletUnsharedWhenCreatingFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToCreate: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
         await model.open(item)
@@ -162,7 +162,7 @@ extension SyncModelTests {
     func keepsSharingWhenDeletingCloudShareFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToDelete: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await sharedItem(in: setup.database)
 
         await model.stopSharing(item)

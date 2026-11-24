@@ -11,11 +11,10 @@ public final class AssetsRewardGoalEditModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         editing goal: RewardGoal? = nil,
         balance: Int = 0
     ) {
@@ -32,7 +31,7 @@ public final class AssetsRewardGoalEditModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -153,13 +152,6 @@ public extension AssetsRewardGoalEditModel {
             state.errorNotice.show(Self.deleteFailedMessage, for: error)
             return false
         }
-    }
-}
-
-extension AssetsRewardGoalEditModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

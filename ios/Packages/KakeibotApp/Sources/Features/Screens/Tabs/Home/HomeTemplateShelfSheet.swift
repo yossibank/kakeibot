@@ -14,16 +14,16 @@ public struct HomeTemplateShelfSheet: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    private let database: AppDatabase
+    private let parts: ScreenParts
     private let onUse: (EntryTemplate) -> Void
 
     public init(
         model: HomeModel,
-        database: AppDatabase,
+        parts: ScreenParts,
         onUse: @escaping (EntryTemplate) -> Void
     ) {
         self.model = model
-        self.database = database
+        self.parts = parts
         self.onUse = onUse
     }
 
@@ -70,7 +70,7 @@ public struct HomeTemplateShelfSheet: View {
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $isEditing) {
-                TemplateListView(database: database)
+                TemplateListView(parts: parts)
             }
         }
     }

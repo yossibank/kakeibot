@@ -11,8 +11,7 @@ struct EntryModelTransferTests {
     func startsWithTwoDifferentWallets() async throws {
         let setup = try await Setup()
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -30,12 +29,11 @@ struct EntryModelTransferTests {
     func loadedDraftSwitchedToTransferMatchesFreshTransfer() async throws {
         let setup = try await Setup()
         let fresh = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
-        let draft = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let draft = EntryModel(parts: .system(setup.database), date: setup.date)
 
         await fresh.load()
         await draft.load()
@@ -52,8 +50,7 @@ struct EntryModelTransferTests {
     func savesSwappedTransfer() async throws {
         let setup = try await Setup()
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -79,7 +76,7 @@ struct EntryModelTransferTests {
     @Test
     func keepsCategoryWhenComingBackFromTransfer() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let category = model.state.category.id
 
@@ -108,8 +105,7 @@ struct EntryModelTransferTests {
 
         try await setup.database.saveEntry(income, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -139,8 +135,7 @@ struct EntryModelTransferTests {
 
         try await setup.database.saveEntry(income, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -171,8 +166,7 @@ struct EntryModelTransferTests {
 
         let card = try await setup.database.save(wallet, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -200,8 +194,7 @@ struct EntryModelTransferTests {
 
         let loan = try await setup.database.save(wallet, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -230,8 +223,7 @@ struct EntryModelTransferTests {
     func reportsSameWallet() async throws {
         let setup = try await Setup()
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -251,8 +243,7 @@ struct EntryModelTransferTests {
         try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 3)
         try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 4)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -275,8 +266,7 @@ struct EntryModelTransferTests {
         try await setup.saveTransfer(5000, from: setup.bank, to: setup.cash, at: 2)
         try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 3)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -295,8 +285,7 @@ struct EntryModelTransferTests {
     func choosesAnotherSourceWhenHidden() async throws {
         let setup = try await Setup()
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -314,8 +303,7 @@ struct EntryModelTransferTests {
     func choosesAnotherDestinationWhenHidden() async throws {
         let setup = try await Setup()
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )

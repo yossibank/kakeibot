@@ -85,8 +85,7 @@ public extension EntryModel {
         )
 
         return TemplateEditModel(
-            database: dependencies.database,
-            clock: dependencies.clock,
+            parts: dependencies,
             draft: draft
         )
     }
@@ -95,16 +94,14 @@ public extension EntryModel {
         let kind: EntryCategory.Kind = state.type == .income ? .income : .expense
 
         return CategoryEditModel(
-            database: dependencies.database,
-            clock: dependencies.clock,
+            parts: dependencies,
             kind: kind
         )
     }
 
     func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
         CategoryEditModel(
-            database: dependencies.database,
-            clock: dependencies.clock,
+            parts: dependencies,
             kind: category.kind,
             editing: category.id
         )
@@ -162,8 +159,8 @@ extension EntryModel {
         template.memo.flatMap { $0.isEmpty ? nil : $0 }
     }
 
-    public func childDatabase() -> AppDatabase {
-        dependencies.database
+    public func childParts() -> ScreenParts {
+        dependencies
     }
 }
 

@@ -260,8 +260,8 @@ private extension RewardRuleEditSheet {
 extension RewardRuleEditModel: SettingsEditing {}
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        RewardRuleEditSheet(model: RewardRuleEditModel(database: database, clock: .system))
+    if let parts = ScreenParts.preview() {
+        RewardRuleEditSheet(model: RewardRuleEditModel(parts: parts))
     }
 }
 

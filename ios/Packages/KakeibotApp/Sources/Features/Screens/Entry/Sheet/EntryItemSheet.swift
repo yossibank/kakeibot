@@ -178,9 +178,9 @@ extension EntryItemSheet {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         let today = LocalDate(Date(), in: .current)
 
-        EntryItemSheet(model: EntryModel(database: database, clock: .system, date: today))
+        EntryItemSheet(model: EntryModel(parts: parts, date: today))
     }
 }

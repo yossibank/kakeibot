@@ -256,11 +256,11 @@ private extension ReminderView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         NavigationStack {
             ReminderView(
                 model: ReminderModel(
-                    database: database,
+                    parts: parts,
                     today: LocalDate(Date(), in: .current),
                     time: .evening,
                     permission: .allowed

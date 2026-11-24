@@ -1,4 +1,5 @@
 import Core
+import FeatureModels
 import Store
 import SwiftUI
 
@@ -6,10 +7,10 @@ public struct CategoryListView: View {
     private let board: CategoryBoard
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         kind: EntryCategory.Kind = .expense
     ) {
-        self.init(board: CategoryBoard(database: database, kind: kind))
+        self.init(board: CategoryBoard(parts: parts, kind: kind))
     }
 
     init(board: CategoryBoard) {
@@ -22,11 +23,9 @@ public struct CategoryListView: View {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
-
+    if let parts = ScreenParts.preview() {
         NavigationStack {
-            CategoryListView(database: database)
+            CategoryListView(parts: parts)
         }
     }
 }

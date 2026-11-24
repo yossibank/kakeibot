@@ -14,7 +14,7 @@ extension AssetsModelTests {
         try await setup.save(.expense, 100, on: "2026-11-05", from: setup.cash)
         try await setup.saveRecurring(.income, 5000, day: 26, from: setup.bank)
         try await setup.saveRecurring(.expense, 300, day: 27, from: setup.bank)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -43,7 +43,7 @@ extension AssetsModelTests {
         let card = try await setup.database.save(wallet, at: Date())
         try await setup.save(.expense, 12000, on: "2026-10-10", from: card.id)
         try await setup.saveRecurring(.transfer, 0, day: 27, from: setup.bank, to: card.id)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -57,7 +57,7 @@ extension AssetsModelTests {
         try await setup.save(.income, 1000, on: "2026-10-10", from: setup.cash)
         try await setup.saveRecurring(.expense, 3000, day: 27, from: setup.bank)
         try await setup.saveRecurring(.income, 5000, day: 28, from: setup.bank)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 

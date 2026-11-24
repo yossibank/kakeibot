@@ -12,7 +12,7 @@ struct SetupModelTests {
     func showsCardUntilClosed() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let model = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        let model = SetupModel(parts: .system(database), newsVersion: WhatsNewRelease.latestVersion)
         let task = Task {
             await model.run()
         }
@@ -35,7 +35,7 @@ struct SetupModelTests {
     @Test
     func marksEntryOpenedOnce() async throws {
         let database = try AppDatabase.inMemory()
-        let model = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        let model = SetupModel(parts: .system(database), newsVersion: WhatsNewRelease.latestVersion)
         let task = Task {
             await model.run()
         }
@@ -57,7 +57,7 @@ struct SetupModelTests {
     @Test
     func clearsUnreadNewsWhenSeen() async throws {
         let database = try AppDatabase.inMemory()
-        let model = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        let model = SetupModel(parts: .system(database), newsVersion: WhatsNewRelease.latestVersion)
         let task = Task {
             await model.run()
         }
@@ -79,7 +79,7 @@ struct SetupModelTests {
     func keepsNewsReadUpToLatestVersion() async throws {
         let database = try AppDatabase.inMemory()
         try await database.setSetting(.whatsNewSeenVersion, to: WhatsNewRelease.latestVersion)
-        let model = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        let model = SetupModel(parts: .system(database), newsVersion: WhatsNewRelease.latestVersion)
         let task = Task {
             await model.run()
         }
@@ -97,7 +97,7 @@ struct SetupModelTests {
     func keepsNewerSeenVersionFromOtherDevice() async throws {
         let database = try AppDatabase.inMemory()
         try await database.setSetting(.whatsNewSeenVersion, to: "999.0")
-        let model = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        let model = SetupModel(parts: .system(database), newsVersion: WhatsNewRelease.latestVersion)
         let task = Task {
             await model.run()
         }
@@ -117,7 +117,7 @@ struct SetupModelTests {
     @Test
     func tellsWhenClosingCardCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
-        let model = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        let model = SetupModel(parts: .system(database), newsVersion: WhatsNewRelease.latestVersion)
         try await database.failWrites(to: "setting")
 
         await model.closeCard()

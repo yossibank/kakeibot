@@ -9,7 +9,7 @@ struct HomeSectionListModelTests {
     @Test
     func loadsStandardLayout() async throws {
         let database = try AppDatabase.inMemory()
-        let model = HomeSectionListModel(database: database)
+        let model = HomeSectionListModel(parts: .system(database))
 
         await model.load()
 
@@ -20,13 +20,13 @@ struct HomeSectionListModelTests {
     @Test
     func savesMovedSection() async throws {
         let database = try AppDatabase.inMemory()
-        let model = HomeSectionListModel(database: database)
+        let model = HomeSectionListModel(parts: .system(database))
         await model.load()
 
         model.move(.recent, toSlot: 0)
         await model.save()
         let order = try await database.setting(.homeSections)
-        let reloaded = HomeSectionListModel(database: database)
+        let reloaded = HomeSectionListModel(parts: .system(database))
         await reloaded.load()
 
         #expect(order.first == .recent)
@@ -36,7 +36,7 @@ struct HomeSectionListModelTests {
     @Test
     func tellsWhenLayoutCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
-        let model = HomeSectionListModel(database: database)
+        let model = HomeSectionListModel(parts: .system(database))
         await model.load()
         model.move(.recent, toSlot: 0)
         try await database.failWrites(to: "setting")

@@ -61,8 +61,7 @@ private extension SnapshotTests {
 
         let card = withCard ? try await addCard(to: database, from: date) : nil
         let model = EntryModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             date: date,
             type: .expense
         )

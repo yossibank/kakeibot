@@ -25,8 +25,7 @@ extension EntryModelTransferTests {
         let entry = try await setup.database.saveEntry(draft, at: Date())
         try await setup.database.setHidden(setup.cash, isHidden: true, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -47,8 +46,7 @@ extension EntryModelTransferTests {
         let transfer = try #require(setup.database.snapshot().entries.first)
         try await setup.database.setHidden(setup.bank, isHidden: true, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: transfer.id,
             date: setup.date
         )
@@ -76,8 +74,7 @@ extension EntryModelTransferTests {
         let entry = try await setup.database.saveEntry(draft, at: Date())
         try await setup.database.setHidden(setup.salary, isHidden: true, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -105,8 +102,7 @@ extension EntryModelTransferTests {
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -136,8 +132,7 @@ extension EntryModelTransferTests {
 
         let entry = try await setup.database.saveEntry(draft, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -166,8 +161,7 @@ extension EntryModelTransferTests {
         let entry = try await setup.database.saveEntry(draft, at: Date())
         try await setup.database.setHidden(setup.salary, isHidden: true, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )

@@ -11,8 +11,8 @@ public final class HomeSectionListModel {
 
     let dependencies: Dependencies
 
-    public init(database: AppDatabase) {
-        self.dependencies = Dependencies(database: database)
+    public init(parts: ScreenParts) {
+        self.dependencies = Dependencies(database: parts.database)
     }
 }
 

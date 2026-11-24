@@ -11,11 +11,10 @@ public final class TemplateEditModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         type: Entry.Kind,
         editing id: EntryTemplate.ID? = nil
     ) {
@@ -25,12 +24,11 @@ public final class TemplateEditModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         draft: EntryTemplateDraft
     ) {
         let state = State(type: draft.type)
@@ -41,7 +39,7 @@ public final class TemplateEditModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -64,8 +62,7 @@ public extension TemplateEditModel {
 
     func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
         CategoryEditModel(
-            database: dependencies.database,
-            clock: dependencies.clock,
+            parts: dependencies,
             kind: category.kind,
             editing: category.id
         )
@@ -120,13 +117,6 @@ public extension TemplateEditModel {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
-    }
-}
-
-extension TemplateEditModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

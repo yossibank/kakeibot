@@ -14,8 +14,7 @@ public final class BackupModel {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         stash: BackupStash = .standard,
         appVersion: String = Bundle.main.shortVersion,
         permission: NotificationPermission = .allowed
@@ -26,8 +25,8 @@ public final class BackupModel {
         self.output = Output(state: state)
 
         self.dependencies = Dependencies(
-            database: database,
-            clock: clock,
+            database: parts.database,
+            clock: parts.clock,
             stash: stash,
             appVersion: appVersion,
             permission: permission

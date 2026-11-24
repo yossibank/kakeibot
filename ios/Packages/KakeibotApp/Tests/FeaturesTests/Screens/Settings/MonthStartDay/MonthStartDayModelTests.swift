@@ -12,7 +12,7 @@ struct MonthStartDayModelTests {
     func choosesAndSavesStartDay() async throws {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))
-        let model = MonthStartDayModel(database: setup.database, today: setup.today)
+        let model = MonthStartDayModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let initial = model.output.periodText
@@ -30,7 +30,7 @@ struct MonthStartDayModelTests {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))
         let earlier = try #require(MonthStartDay(20))
-        let model = MonthStartDayModel(database: setup.database, today: setup.today)
+        let model = MonthStartDayModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         await model.choose(payday)
@@ -57,7 +57,7 @@ struct MonthStartDayModelTests {
         try await setup.save(.expense, amount: 3000, daysAgo: 18)
         let startDay = try #require(MonthStartDay(25))
         try await setup.database.setSetting(.monthStartDay, to: startDay)
-        let model = HomeModel(database: setup.database, clock: .system, today: setup.today)
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
 
         let task = Task {
             await model.run()
@@ -80,7 +80,7 @@ struct MonthStartDayModelTests {
         try await setup.save(.expense, amount: 3000, daysAgo: 18)
         let startDay = try #require(MonthStartDay(10))
         try await setup.database.setSetting(.monthStartDay, to: startDay)
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         let task = Task {
             await model.run()
@@ -107,7 +107,7 @@ struct MonthStartDayModelTests {
         let setup = try await HomeModelTests.Setup()
         let startDay = try #require(MonthStartDay(10))
         try await setup.database.setSetting(.monthStartDay, to: startDay)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         let task = Task {
             await model.run()

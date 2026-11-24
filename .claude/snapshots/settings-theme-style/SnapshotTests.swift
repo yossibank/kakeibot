@@ -19,7 +19,7 @@ struct SnapshotTests {
 
         for state in Self.states {
             for variant in Self.variants {
-                let model = ThemeStyleModel(database: database)
+                let model = ThemeStyleModel(parts: .system(database))
                 let style = state.style(textSize: variant.textSize)
 
                 await model.choose(style.corner)
@@ -33,8 +33,7 @@ struct SnapshotTests {
                 await model.load()
 
                 let sheet = SettingsMenuSheet(
-                    database: database,
-                    clock: .fixed(snapshotNow),
+                    parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
                     today: today,
                     appIcon: AppIconListModel()
                 )
@@ -293,5 +292,11 @@ private extension SnapshotTests {
             title: title,
             variant: variant.label
         )
+    }
+}
+
+private extension ScreenParts {
+    static func system(_ database: AppDatabase) -> ScreenParts {
+        ScreenParts(database: database, clock: .system)
     }
 }

@@ -7,18 +7,18 @@ public struct SetupDestination: View {
     @Environment(\.notificationPermission) private var permission
 
     private let item: SetupItem
-    private let database: AppDatabase
+    private let parts: ScreenParts
     private let today: LocalDate
     private let appIcon: AppIconListModel
 
     public init(
         _ item: SetupItem,
-        database: AppDatabase,
+        parts: ScreenParts,
         today: LocalDate,
         appIcon: AppIconListModel
     ) {
         self.item = item
-        self.database = database
+        self.parts = parts
         self.today = today
         self.appIcon = appIcon
     }
@@ -28,7 +28,7 @@ public struct SetupDestination: View {
         case .budget:
             BudgetListView(
                 model: BudgetListModel(
-                    database: database,
+                    parts: parts,
                     today: today
                 )
             )
@@ -36,33 +36,32 @@ public struct SetupDestination: View {
         case .monthStart:
             MonthStartDayView(
                 model: MonthStartDayModel(
-                    database: database,
+                    parts: parts,
                     today: today
                 )
             )
 
         case .wallets:
-            WalletListView(database: database)
+            WalletListView(parts: parts)
 
         case .categories:
-            CategoryListView(database: database)
+            CategoryListView(parts: parts)
 
         case .recurrings:
             RecurringListView(
                 board: RecurringBoard(
-                    database: database,
-                    clock: .system,
+                    parts: parts,
                     today: today
                 )
             )
 
         case .templates:
-            TemplateListView(database: database)
+            TemplateListView(parts: parts)
 
         case .reminder:
             ReminderView(
                 model: ReminderModel(
-                    database: database,
+                    parts: parts,
                     today: today,
                     time: nil,
                     permission: permission
@@ -70,24 +69,24 @@ public struct SetupDestination: View {
             )
 
         case .launchScreen:
-            LaunchScreenView(model: LaunchScreenModel(database: database))
+            LaunchScreenView(model: LaunchScreenModel(parts: parts))
 
         case .theme:
-            ThemeListView(database: database, appIcon: appIcon)
+            ThemeListView(parts: parts, appIcon: appIcon)
 
         case .appIcon:
-            AppIconListView(model: appIcon, database: database)
+            AppIconListView(model: appIcon, parts: parts)
 
         case .themeStyle:
-            ThemeStyleTextView(model: ThemeStyleModel(database: database))
+            ThemeStyleTextView(model: ThemeStyleModel(parts: parts))
 
         case .themeLook:
-            ThemeStyleLookView(model: ThemeStyleModel(database: database))
+            ThemeStyleLookView(model: ThemeStyleModel(parts: parts))
 
         case .homeSections:
             HomeSectionListView(
-                model: HomeSectionListModel(database: database),
-                database: database
+                model: HomeSectionListModel(parts: parts),
+                parts: parts
             )
         }
     }

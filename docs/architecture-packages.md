@@ -212,11 +212,13 @@ KakeibotApp/
 | `FeatureModels/Screens/Entry/Receipt/` | レシートを Vision と Foundation Models で読む |
 | `FeatureModels/Screens/Entry/Voice/` | 声を SpeechAnalyzer で聞き、Foundation Models でカテゴリと口座を選ぶ |
 | `FeatureModels/Screens/Pro/` | Pro の購入のモデル |
+| `FeatureModels/Screens/Settings/Menu/` | 設定の入口のモデルと、確かめ用のテストデータ（`#if DEBUG`） |
 | `FeatureModels/Shared/Bill/` | これからの引き落としを月のページに分ける |
 | `FeatureModels/Shared/DateChoice/` | 休日のずらしと曜日の表示の名前 |
 | `FeatureModels/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
 | `FeatureModels/Shared/Model/` | 画面のモデルの見張り（失敗で見張り直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、`ScreenClock`、値を覚える `Derived`・`DerivedTable` も置く |
-| `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、保存の失敗が空き容量不足かの見分け |
+| `FeatureModels/Shared/Model/` の `ScreenParts` | DB と時計を包んで、画面からモデルへ渡す型。中の DB は `FeatureModels` だけが読む |
+| `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、削除の取り消し（`DeletionUndo`）。保存の失敗が空き容量不足かの見分けも置く |
 | `FeatureModels/Shared/Notification/` | 通知の許可の窓口 |
 | `FeatureModels/Shared/Period/` | 期間の範囲と月の始まりの文言 |
 | `FeatureModels/Shared/Pro/` | Pro を買ったかと、購入の窓口。StoreKit の中身は AppFeature が渡す |
@@ -228,7 +230,7 @@ KakeibotApp/
 | `Features/Screens/Entry/Voice/` | 声の入力のカード・波形・終わるボタン・知らせ |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Pro/` | Pro の画面 |
-| `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
+| `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口 |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート。`Model/` に版、`View/` にシートとカードとページ送り、`Parts/` に使い方のコマ |
 | `Features/Shared/Bill/` | これからの引き落としの行・月のページ送りとタブ・見込みと確定の印と、その言葉 |

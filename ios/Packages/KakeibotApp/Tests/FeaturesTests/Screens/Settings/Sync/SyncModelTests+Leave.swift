@@ -10,7 +10,7 @@ extension SyncModelTests {
     func leavesJoinedShareInICloudThenOnThisIPhone() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await joinShare(in: setup.database)
 
         await model.leave(item)
@@ -28,7 +28,10 @@ extension SyncModelTests {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
         let left = Date(timeIntervalSince1970: 1_792_000_000)
-        let model = SyncModel(database: setup.database, clock: .fixed(left), cloud: cloud.cloud)
+        let model = SyncModel(
+            parts: ScreenParts(database: setup.database, clock: .fixed(left)),
+            cloud: cloud.cloud
+        )
         let options = try await setup.database.entryOptions()
         let own = try #require(options.wallets.first)
         let shared = try #require(options.wallets.last)
@@ -57,7 +60,7 @@ extension SyncModelTests {
     func staysInShareWhenLeavingICloudFails() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false, failsToLeave: true)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await joinShare(in: setup.database)
 
         await model.leave(item)

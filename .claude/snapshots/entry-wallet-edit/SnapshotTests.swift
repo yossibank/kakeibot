@@ -30,8 +30,7 @@ struct SnapshotTests {
 
                 let sheet = WalletEditSheet(
                     model: WalletEditModel(
-                        database: database,
-                        clock: .fixed(snapshotNow),
+                        parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
                         kind: kind
                     )
                 )
@@ -82,8 +81,7 @@ private extension SnapshotTests {
         try database.insertDefaultsIfEmpty(at: now)
 
         let model = EntryModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             date: date,
             type: .expense
         )

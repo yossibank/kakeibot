@@ -342,12 +342,11 @@ private extension SyncView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         NavigationStack {
             SyncView(
                 model: SyncModel(
-                    database: database,
-                    clock: .system,
+                    parts: parts,
                     cloud: .unavailable
                 )
             )

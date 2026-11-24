@@ -290,13 +290,10 @@ private extension CategoryEditSheet {
 extension CategoryEditModel: SettingsEditing {}
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
-
+    if let parts = ScreenParts.preview() {
         CategoryEditSheet(
             model: CategoryEditModel(
-                database: database,
-                clock: .system,
+                parts: parts,
                 kind: .expense
             )
         )

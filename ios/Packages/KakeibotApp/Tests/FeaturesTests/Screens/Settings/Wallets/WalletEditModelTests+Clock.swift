@@ -24,10 +24,12 @@ extension WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(expense, at: noon)
-        let today = WalletEditModel(database: setup.database, clock: .fixed(noon), editing: bank.id)
+        let today = WalletEditModel(
+            parts: ScreenParts(database: setup.database, clock: .fixed(noon)),
+            editing: bank.id
+        )
         let nextDay = WalletEditModel(
-            database: setup.database,
-            clock: .fixed(nextNoon),
+            parts: ScreenParts(database: setup.database, clock: .fixed(nextNoon)),
             editing: bank.id
         )
 

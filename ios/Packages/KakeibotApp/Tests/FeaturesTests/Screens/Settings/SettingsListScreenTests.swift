@@ -18,19 +18,19 @@ struct SettingsListScreenTests {
 
         let depths = [
             "CategoryListView": SettingsMenuSheetTests
-                .depth(of: CategoryListView(database: database).body),
+                .depth(of: CategoryListView(parts: .system(database)).body),
             "StampListView": SettingsMenuSheetTests
-                .depth(of: StampListView(database: database).body),
+                .depth(of: StampListView(parts: .system(database)).body),
             "RewardRuleListView": SettingsMenuSheetTests
-                .depth(of: RewardRuleListView(database: database).body),
+                .depth(of: RewardRuleListView(parts: .system(database)).body),
             "WalletListView": SettingsMenuSheetTests
-                .depth(of: WalletListView(database: database).body),
+                .depth(of: WalletListView(parts: .system(database)).body),
             "RecurringListView": SettingsMenuSheetTests
                 .depth(of: RecurringListView(
-                    board: RecurringBoard(database: database, clock: .system, today: today)
+                    board: RecurringBoard(parts: .system(database), today: today)
                 ).body),
             "TemplateListView": SettingsMenuSheetTests
-                .depth(of: TemplateListView(database: database).body)
+                .depth(of: TemplateListView(parts: .system(database)).body)
         ]
 
         for (name, depth) in depths.sorted(by: { $0.key < $1.key }) {

@@ -14,7 +14,7 @@ public final class BudgetListModel {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         today: LocalDate
     ) {
         let state = State()
@@ -23,7 +23,7 @@ public final class BudgetListModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database)
+        self.dependencies = Dependencies(database: parts.database)
     }
 }
 

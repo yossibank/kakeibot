@@ -10,7 +10,7 @@ struct StampEditModelTests {
     @Test
     func addsShelfIcon() async throws {
         let database = try Self.database()
-        let model = StampEditModel(database: database, clock: .system)
+        let model = StampEditModel(parts: .system(database))
         model.state.icon.markKind = .emoji
         model.state.icon.inputEmoji("🎉")
 
@@ -26,7 +26,7 @@ struct StampEditModelTests {
     @Test
     func cannotSaveWithoutMark() throws {
         let database = try Self.database()
-        let model = StampEditModel(database: database, clock: .system)
+        let model = StampEditModel(parts: .system(database))
 
         model.state.icon.markKind = .text
 
@@ -38,7 +38,7 @@ struct StampEditModelTests {
     func editsExistingShelfIcon() async throws {
         let database = try Self.database()
         let first = try await Self.firstShelfIcon(in: database)
-        let model = StampEditModel(database: database, clock: .system, editing: first.id)
+        let model = StampEditModel(parts: .system(database), editing: first.id)
 
         await model.load()
         let loadedGlyph = model.state.icon.glyph
@@ -61,7 +61,7 @@ struct StampEditModelTests {
     func hidesStamp() async throws {
         let database = try Self.database()
         let first = try await Self.firstShelfIcon(in: database)
-        let model = StampEditModel(database: database, clock: .system, editing: first.id)
+        let model = StampEditModel(parts: .system(database), editing: first.id)
         await model.load()
 
         let isHidden = await model.setHidden(true)

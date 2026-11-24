@@ -12,14 +12,14 @@ public final class ThemeStyleModel: SettingSaving {
 
     let dependencies: Dependencies
 
-    public init(database: AppDatabase) {
+    public init(parts: ScreenParts) {
         let state = State()
         let input = Input()
 
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database)
+        self.dependencies = Dependencies(database: parts.database)
     }
 }
 

@@ -11,24 +11,23 @@ public final class OnboardingModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate,
         newsVersion: String
     ) {
         let state = State(
-            monthStart: MonthStartDayModel(database: database, today: today),
-            budget: BudgetListModel(database: database, today: today),
-            setup: SetupModel(database: database, newsVersion: newsVersion)
+            monthStart: MonthStartDayModel(parts: parts, today: today),
+            budget: BudgetListModel(parts: parts, today: today),
+            setup: SetupModel(parts: parts, newsVersion: newsVersion)
         )
 
         self.state = state
         self.input = Input()
         self.output = Output(state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -180,13 +179,6 @@ public extension OnboardingModel {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
-    }
-}
-
-extension OnboardingModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

@@ -16,7 +16,10 @@ struct SnapshotTests {
         let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = RecordsModel(database: database, clock: .fixed(snapshotNow), today: today)
+        let model = RecordsModel(
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
+            today: today
+        )
         let task = Task {
             await model.run()
         }
@@ -84,7 +87,10 @@ struct SnapshotTests {
 
         for (name, change) in deletions {
             for variant in Self.variants {
-                let notice = EntryNoticeModel(database: database, clock: .fixed(snapshotNow))
+                let notice = EntryNoticeModel(parts: ScreenParts(
+                    database: database,
+                    clock: .fixed(snapshotNow)
+                ))
                 notice.show(change)
 
                 let view = Color.clear

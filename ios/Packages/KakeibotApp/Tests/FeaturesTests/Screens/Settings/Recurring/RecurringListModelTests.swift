@@ -27,7 +27,7 @@ struct RecurringListModelTests {
         )
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecurringListModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringListModel(parts: .system(setup.database), today: setup.today)
 
         let task = Task {
             await model.observe()
@@ -73,7 +73,7 @@ struct RecurringListModelTests {
         )
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecurringListModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringListModel(parts: .system(setup.database), today: setup.today)
 
         let task = Task {
             await model.observe()
@@ -107,7 +107,7 @@ struct RecurringListModelTests {
         )
 
         let saved = try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
-        let model = RecurringListModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringListModel(parts: .system(setup.database), today: setup.today)
 
         let task = Task {
             await model.observe()

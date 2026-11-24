@@ -9,7 +9,7 @@ public protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel {
     associatedtype Updates: AsyncSequence where Updates.Element == Snapshot
 
     var input: Input { get }
-    var dependencies: SettingsBoardDependencies { get }
+    var dependencies: ScreenParts { get }
 
     func read() async throws -> Snapshot
     func updates() -> Updates

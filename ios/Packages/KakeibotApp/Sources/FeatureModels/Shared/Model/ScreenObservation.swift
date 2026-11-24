@@ -35,4 +35,15 @@ public enum ScreenObservation {
             }
         }
     }
+
+    @MainActor
+    static func all(_ observations: [@MainActor @Sendable () async -> Void]) async {
+        await withDiscardingTaskGroup { group in
+            for observation in observations {
+                group.addTask {
+                    await observation()
+                }
+            }
+        }
+    }
 }

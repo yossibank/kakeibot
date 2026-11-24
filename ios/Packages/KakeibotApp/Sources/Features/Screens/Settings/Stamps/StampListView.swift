@@ -1,25 +1,24 @@
 import Core
+import FeatureModels
 import Store
 import SwiftUI
 
 public struct StampListView: View {
-    private let database: AppDatabase
+    private let parts: ScreenParts
 
-    public init(database: AppDatabase) {
-        self.database = database
+    public init(parts: ScreenParts) {
+        self.parts = parts
     }
 
     public var body: some View {
-        SettingsBoardPage(StampBoard(database: database))
+        SettingsBoardPage(StampBoard(parts: parts))
     }
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertShelfIfEmpty(at: Date())
-
+    if let parts = ScreenParts.preview() {
         NavigationStack {
-            StampListView(database: database)
+            StampListView(parts: parts)
         }
     }
 }

@@ -98,8 +98,7 @@ private extension RootView {
 
         case let .onboarding(database):
             OnboardingView(
-                database: database,
-                clock: model.clock,
+                parts: ScreenParts(database: database, clock: model.clock),
                 today: model.today
             ) {
                 withAnimation(.snappy) {

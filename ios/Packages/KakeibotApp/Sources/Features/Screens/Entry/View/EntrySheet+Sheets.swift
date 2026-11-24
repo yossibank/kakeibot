@@ -52,7 +52,7 @@ extension EntrySheet {
         case .categories:
             NavigationStack {
                 CategoryListView(
-                    database: model.childDatabase(),
+                    parts: model.childParts(),
                     kind: model.output.categoryKind
                 )
                 .toolbar(.hidden, for: .navigationBar)

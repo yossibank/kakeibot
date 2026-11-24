@@ -11,11 +11,10 @@ public final class AssetsAdjustmentModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         wallet: Wallet,
         balance: Int,
         today: LocalDate
@@ -31,7 +30,7 @@ public final class AssetsAdjustmentModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -126,13 +125,6 @@ public extension AssetsAdjustmentModel {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
             return false
         }
-    }
-}
-
-extension AssetsAdjustmentModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

@@ -11,6 +11,8 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | 型 | 持つもの |
 | --- | --- |
 | AppModel | 最初の設定が済んでいなければ Onboarding を出す。今日は RootView が MainView と Onboarding に渡す |
+| DB と時計の受け渡し | AppFeature が `ScreenParts` に包んで画面に渡す。画面は、子の画面とモデルの init へそのまま渡す |
+| 子の画面に渡す `ScreenParts` | モデルから開く画面には、モデルの `childParts()` が返す |
 | MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが見張りを始め、全部を読み終えるまで起動画面を出す |
 | MainView のタブの切り替え | 開いたことのあるタブを重ねて持ち、見えるかどうかだけを切り替える。`TabView` は切り替えのたびに中身の大きさを測り直して重いため使わない |
 | MainView のタブの選択 | `MainTabSelection` が持ち、`MainTabLayer` とタブの帯（`MainTabBar`）だけが読む。MainView の `body` が読むと、切り替えのたびに 4 つのタブを組み直して重いため読まない |

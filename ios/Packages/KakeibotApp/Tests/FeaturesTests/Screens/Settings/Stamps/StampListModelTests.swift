@@ -10,7 +10,7 @@ struct StampListModelTests {
     @Test
     func showsShelfInOrder() async throws {
         let database = try Self.database()
-        let model = StampListModel(database: database, clock: .system)
+        let model = StampListModel(parts: .system(database))
 
         await model.load()
         let glyphs = model.output.shown.map { model.output.icon(for: $0)?.glyph }
@@ -23,7 +23,7 @@ struct StampListModelTests {
     @Test
     func savesMovedOrder() async throws {
         let database = try Self.database()
-        let model = StampListModel(database: database, clock: .system)
+        let model = StampListModel(parts: .system(database))
         await model.load()
         let first = try #require(model.output.shown.first)
 
@@ -38,7 +38,7 @@ struct StampListModelTests {
     @Test
     func cancelsMovedOrder() async throws {
         let database = try Self.database()
-        let model = StampListModel(database: database, clock: .system)
+        let model = StampListModel(parts: .system(database))
         await model.load()
         let ids = model.output.shown.map(\.id)
 
@@ -51,7 +51,7 @@ struct StampListModelTests {
     @Test
     func hidesAndShowsStamp() async throws {
         let database = try Self.database()
-        let model = StampListModel(database: database, clock: .system)
+        let model = StampListModel(parts: .system(database))
         await model.load()
         let first = try #require(model.output.shown.first)
 

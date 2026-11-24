@@ -14,8 +14,11 @@ struct SnapshotTests {
         let now = Date(timeIntervalSince1970: 1_791_774_000)
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = HomeModel(database: database, clock: .fixed(now), today: today)
-        let setup = SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+        let model = HomeModel(
+            parts: ScreenParts(database: database, clock: .fixed(now)),
+            today: today
+        )
+        let setup = SetupModel(parts: .system(database), newsVersion: WhatsNewRelease.latestVersion)
         let appIcon = AppIconListModel()
 
         let tasks = [
@@ -301,5 +304,11 @@ private extension SnapshotTests {
             title: title,
             variant: variant.label
         )
+    }
+}
+
+private extension ScreenParts {
+    static func system(_ database: AppDatabase) -> ScreenParts {
+        ScreenParts(database: database, clock: .system)
     }
 }

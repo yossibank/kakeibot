@@ -14,7 +14,7 @@ struct AssetsModelTests {
         try await setup.save(.expense, 980, on: "2026-10-01", from: setup.cash)
         try await setup.save(.transfer, 10000, on: "2026-10-02", from: setup.bank, to: setup.cash)
 
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let balances = model.output.rows.map(\.balance)
         let totals = model.output.monthTotals.map(\.total)
@@ -31,7 +31,7 @@ struct AssetsModelTests {
         let setup = try await Setup()
         try await setup.save(.income, 1000, on: "2026-10-10", from: setup.cash)
         try await setup.save(.expense, 400, on: "2026-10-20", from: setup.cash)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -46,7 +46,7 @@ struct AssetsModelTests {
         try await setup.save(.income, 5000, on: "2026-10-25", from: setup.bank)
         try await setup.save(.expense, 400, on: "2026-10-20", from: setup.cash)
         try await setup.save(.transfer, 300, on: "2026-10-18", from: setup.bank, to: setup.cash)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
 
@@ -115,7 +115,7 @@ struct AssetsModelTests {
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.upcomingBills.first)
         let bill = row.bill
@@ -165,7 +165,7 @@ struct AssetsModelTests {
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.rows.first { $0.wallet.id == loan.id })
         let lastDate = try #require(LocalDate("2027-01-27"))

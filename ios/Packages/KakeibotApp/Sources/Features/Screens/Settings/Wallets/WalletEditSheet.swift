@@ -159,10 +159,8 @@ public struct WalletEditSheet: View {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
-
-        WalletEditSheet(model: WalletEditModel(database: database, clock: .system))
+    if let parts = ScreenParts.preview() {
+        WalletEditSheet(model: WalletEditModel(parts: parts))
     }
 }
 

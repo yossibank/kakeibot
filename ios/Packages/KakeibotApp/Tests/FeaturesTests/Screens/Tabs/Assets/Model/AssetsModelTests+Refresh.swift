@@ -17,7 +17,7 @@ extension AssetsModelTests {
             try await setup.save(.income, 1, on: "2026-10-01", from: setup.cash)
         }
 
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         let later = setup.today.adding(days: Self.quickChangeCount)
 
         let task = Task {
