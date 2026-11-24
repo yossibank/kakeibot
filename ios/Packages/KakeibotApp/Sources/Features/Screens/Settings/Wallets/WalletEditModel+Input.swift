@@ -4,7 +4,7 @@ import Observation
 public extension WalletEditModel {
     @MainActor
     @Observable
-    final class Input {
+    final class Input: SettingsEditHidingInput {
         public internal(set) var balance = 0
         public internal(set) var totalBalance = 0
         public internal(set) var valuations: [Valuation] = []

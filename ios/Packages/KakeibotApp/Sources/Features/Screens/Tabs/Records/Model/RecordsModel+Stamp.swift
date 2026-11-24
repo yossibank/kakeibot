@@ -37,7 +37,7 @@ public extension RecordsModel {
     }
 
     func stampEditModel() -> StampEditModel {
-        StampEditModel(database: database)
+        StampEditModel(database: database, clock: .system)
     }
 
     func canMarkNoSpend(on date: LocalDate) -> Bool {

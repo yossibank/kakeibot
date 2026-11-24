@@ -9,11 +9,11 @@ struct RewardRuleEditModelTests {
     @Test
     func addsRule() async throws {
         let database = try AppDatabase.inMemory()
-        let model = RewardRuleEditModel(database: database)
-        model.name = "自炊した日"
-        model.press(.digit(5))
-        model.press(.digit(0))
-        model.press(.digit(0))
+        let model = RewardRuleEditModel(database: database, clock: .system)
+        model.state.name = "自炊した日"
+        model.state.press(.digit(5))
+        model.state.press(.digit(0))
+        model.state.press(.digit(0))
 
         let isSaved = await model.save()
         let list = try await database.rewardRuleList()
@@ -26,9 +26,9 @@ struct RewardRuleEditModelTests {
     @Test
     func cannotSaveWithoutAmount() throws {
         let database = try AppDatabase.inMemory()
-        let model = RewardRuleEditModel(database: database)
+        let model = RewardRuleEditModel(database: database, clock: .system)
 
-        model.name = "自炊した日"
+        model.state.name = "自炊した日"
 
         #expect(!model.canSave)
         #expect(model.saveTitle == "金額を入れてください")
@@ -40,44 +40,44 @@ struct RewardRuleEditModelTests {
         let icon = IconDraft(mark: .glyph(.giftbox), color: "#E07A5F")
         let draft = RewardRuleDraft(name: "自炊した日", amount: 500, icon: icon)
         let rule = try await database.save(draft, at: Date())
-        let model = RewardRuleEditModel(database: database, editing: rule.id)
+        let model = RewardRuleEditModel(database: database, clock: .system, editing: rule.id)
         await model.load()
 
-        let loaded = model.name
+        let loaded = model.state.name
         let isChanged = model.isChanged
-        model.name = "お弁当の日"
+        model.state.name = "お弁当の日"
 
         #expect(loaded == "自炊した日")
         #expect(!isChanged)
         #expect(model.isChanged)
-        #expect(model.amount == 500)
+        #expect(model.output.amount == 500)
     }
 
     @Test
     func tellsWhenRuleCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
-        let model = RewardRuleEditModel(database: database)
-        model.name = "自炊した日"
-        model.press(.digit(5))
+        let model = RewardRuleEditModel(database: database, clock: .system)
+        model.state.name = "自炊した日"
+        model.state.press(.digit(5))
         try await database.failWrites(to: "reward_rule")
 
         let isSaved = await model.save()
 
         #expect(isSaved == false)
-        #expect(model.errorNotice.message == "保存できませんでした")
+        #expect(model.state.errorNotice.message == "保存できませんでした")
     }
 
     @Test
     func deletesRuleWithoutLogs() async throws {
         let database = try AppDatabase.inMemory()
         let rule = try await Self.saveRule(in: database)
-        let model = RewardRuleEditModel(database: database, editing: rule.id)
+        let model = RewardRuleEditModel(database: database, clock: .system, editing: rule.id)
         await model.load()
 
         let deletion = await model.delete()
         let rules = try await database.rewardRuleList().rules
 
-        #expect(model.hasLogs == false)
+        #expect(model.input.hasLogs == false)
         #expect(deletion != nil)
         #expect(rules.isEmpty)
     }
@@ -88,15 +88,15 @@ struct RewardRuleEditModelTests {
         let rule = try await Self.saveRule(in: database)
         let day = try #require(LocalDate("2026-10-01"))
         try await database.setReward(rule.id, isAchieved: true, on: day, at: Date())
-        let model = RewardRuleEditModel(database: database, editing: rule.id)
+        let model = RewardRuleEditModel(database: database, clock: .system, editing: rule.id)
         await model.load()
 
         let deletion = await model.delete()
         let rules = try await database.rewardRuleList().rules
 
-        #expect(model.hasLogs)
+        #expect(model.input.hasLogs)
         #expect(deletion == nil)
-        #expect(model.errorNotice.message == "削除できませんでした")
+        #expect(model.state.errorNotice.message == "削除できませんでした")
         #expect(rules.map(\.id) == [rule.id])
     }
 
@@ -104,14 +104,14 @@ struct RewardRuleEditModelTests {
     func hidesRule() async throws {
         let database = try AppDatabase.inMemory()
         let rule = try await Self.saveRule(in: database)
-        let model = RewardRuleEditModel(database: database, editing: rule.id)
+        let model = RewardRuleEditModel(database: database, clock: .system, editing: rule.id)
         await model.load()
 
         let isHidden = await model.setHidden(true)
         let rules = try await database.rewardRuleList().rules
 
         #expect(isHidden)
-        #expect(model.isHidden)
+        #expect(model.input.isHidden)
         #expect(rules.first?.isActive == false)
     }
 }

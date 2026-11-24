@@ -54,8 +54,8 @@ struct SnapshotTests {
             .frame(height: 1000)
 
         let categoryEdit = CategoryEditModel(database: database, kind: .expense)
-        let stampEdit = StampEditModel(database: database)
-        let ruleEdit = RewardRuleEditModel(database: database)
+        let stampEdit = StampEditModel(database: database, clock: .system)
+        let ruleEdit = RewardRuleEditModel(database: database, clock: .system)
 
         await categoryEdit.load()
         await stampEdit.load()

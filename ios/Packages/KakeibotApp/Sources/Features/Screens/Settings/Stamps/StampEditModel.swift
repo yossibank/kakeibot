@@ -7,68 +7,97 @@ import Store
 @MainActor
 @Observable
 public final class StampEditModel {
-    public internal(set) var isHidden = false
+    public let state: State
+    public let input: Input
 
-    public internal(set) var errorNotice = ErrorNotice()
-
-    public let icon = SettingsIconEditorModel(glyph: .star)
-
-    private(set) var baseline: IconDraft?
-
-    let editingId: ShelfIcon.ID?
-
-    private let database: AppDatabase
+    let dependencies: Dependencies
 
     public init(
         database: AppDatabase,
+        clock: ScreenClock,
         editing id: ShelfIcon.ID? = nil
     ) {
-        self.database = database
-        self.editingId = id
-        self.baseline = icon.draft
+        let state = State()
+
+        self.state = state
+        self.input = Input(editingId: id, baseline: state.icon.draft)
+        self.dependencies = Dependencies(database: database, clock: clock)
     }
 }
 
 public extension StampEditModel {
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public internal(set) var errorNotice = ErrorNotice()
+
+        public let icon = SettingsIconEditorModel(glyph: .star)
+    }
+
+    @MainActor
+    @Observable
+    final class Input: SettingsEditHidingInput {
+        public internal(set) var isHidden = false
+
+        var baseline: IconDraft?
+
+        let editingId: ShelfIcon.ID?
+
+        init(
+            editingId: ShelfIcon.ID?,
+            baseline: IconDraft
+        ) {
+            self.editingId = editingId
+            self.baseline = baseline
+        }
+    }
+
     func load() async {
-        guard let editingId else {
+        guard let editingId = input.editingId else {
             return
         }
 
         do {
-            let shelf = try await database.shelfIconList()
+            let shelf = try await dependencies.database.shelfIconList()
             let shelfIcon = shelf.shelfIcons.first { $0.id == editingId }
 
             guard
                 let shelfIcon,
                 let saved = shelf.icons[shelfIcon.iconId]
             else {
-                errorNotice.show(Self.loadFailedMessage)
+                state.errorNotice.show(Self.loadFailedMessage)
                 return
             }
 
-            icon.apply(saved)
+            state.icon.apply(saved)
 
-            isHidden = shelfIcon.archivedAt != nil
-            baseline = icon.draft
+            input.isHidden = shelfIcon.archivedAt != nil
+            input.baseline = state.icon.draft
         } catch {
-            errorNotice.show(Self.loadFailedMessage)
+            state.errorNotice.show(Self.loadFailedMessage)
         }
     }
 
     func save() async -> Bool {
         do {
-            try await database.save(
-                icon.draft,
-                editing: editingId,
-                at: Date()
+            try await dependencies.database.save(
+                state.icon.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
             )
 
             return true
         } catch {
-            errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
+    }
+}
+
+extension StampEditModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
     }
 }
 
@@ -76,27 +105,27 @@ private extension StampEditModel {
     static let loadFailedMessage = "スタンプを読めませんでした"
 }
 
-extension StampEditModel: SettingsEditRemoving {
+extension StampEditModel: SettingsEditGroups, SettingsEditRemoving {
     var edited: IconDraft {
-        icon.draft
+        state.icon.draft
     }
 
     var problemMessage: String? {
-        icon.draft.problems.first?.message
+        state.icon.draft.problems.first?.message
     }
 
     func remove(_ id: ShelfIcon.ID) async throws -> Deletion {
-        try await database.deleteShelfIcon(id)
+        try await dependencies.database.deleteShelfIcon(id)
     }
 
     func saveHidden(
         _ id: ShelfIcon.ID,
         isHidden: Bool
     ) async throws {
-        try await database.setHidden(
+        try await dependencies.database.setHidden(
             id,
             isHidden: isHidden,
-            at: Date()
+            at: dependencies.clock.now
         )
     }
 }
