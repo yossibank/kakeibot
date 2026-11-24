@@ -14,7 +14,7 @@ struct LaunchScreenModelTests {
         await model.choose(.review)
         let screen = try await setup.database.setting(.launchScreen)
 
-        #expect(model.screen == .review)
+        #expect(model.input.screen == .review)
         #expect(screen == .review)
     }
 }

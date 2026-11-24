@@ -11,6 +11,7 @@
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
 | `ScreenModel` | 画面のモデル。DB の見張りと、読めなかった時のエラーのバナーを共通にする | `Features/Shared/Model/` |
+| `NoticeHolding` | エラーの知らせを持つ、モデルの状態。状態がそれだけの時は `NoticeState` を使う | `Features/Shared/Model/` |
 | `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `Features/Shared/Model/` |
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardListModel` | 一覧を DB から読み、見張るモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `Features/Shared/SettingsParts/Board/` |
