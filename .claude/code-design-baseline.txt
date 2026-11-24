@@ -3,6 +3,7 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Model/EntryModel.swift: 
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Model/EntryModel.swift: EntryModel の保存プロパティの var は 12 個までにする（今は 42 個）。一緒に動く値を struct か enum にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swift: EntryVoiceFlow の保存プロパティの var は 12 個までにする（今は 16 個）。一緒に動く値を struct か enum にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swift: dependencies を持つモデルで、今の時刻を作らない。dependencies の時計から受け取る
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFlow.swift: dependencies を持つモデルで、今の時刻を作らない。dependencies の時計から受け取る
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringEditModel.swift: RecurringEditModel の保存プロパティの var は 12 個までにする（今は 25 個）。一緒に動く値を struct か enum にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Sync/SyncModel.swift: SyncModel の保存プロパティの var は 12 個までにする（今は 17 個）。一緒に動く値を struct か enum にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditModel.swift: TemplateEditModel の保存プロパティの var は 12 個までにする（今は 13 個）。一緒に動く値を struct か enum にまとめる
