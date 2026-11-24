@@ -10,8 +10,7 @@ public extension AssetsModel {
 
     func goalEditModel(editing goal: RewardGoal?) -> AssetsRewardGoalEditModel {
         AssetsRewardGoalEditModel(
-            database: dependencies.database,
-            clock: dependencies.clock,
+            parts: dependencies,
             editing: goal,
             balance: input.rewardBank?.balance ?? 0
         )
@@ -38,8 +37,8 @@ public extension AssetsModel {
 }
 
 public extension AssetsModel {
-    func childDatabase() -> AppDatabase {
-        dependencies.database
+    func childParts() -> ScreenParts {
+        dependencies
     }
 }
 

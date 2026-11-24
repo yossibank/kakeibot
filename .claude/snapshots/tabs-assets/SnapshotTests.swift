@@ -16,7 +16,7 @@ struct SnapshotTests {
         let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = AssetsModel(database: database, clock: .system, today: today)
+        let model = AssetsModel(parts: .system(database), today: today)
         let task = Task {
             await model.run()
         }
@@ -119,11 +119,7 @@ struct SnapshotTests {
 
         task.cancel()
 
-        let emptyModel = try AssetsModel(
-            database: AppDatabase.inMemory(),
-            clock: .system,
-            today: today
-        )
+        let emptyModel = try AssetsModel(parts: .system(AppDatabase.inMemory()), today: today)
         let emptyTask = Task {
             await emptyModel.run()
         }
@@ -389,5 +385,11 @@ private extension SnapshotTests {
             title: title,
             variant: variant.label
         )
+    }
+}
+
+private extension ScreenParts {
+    static func system(_ database: AppDatabase) -> ScreenParts {
+        ScreenParts(database: database, clock: .system)
     }
 }

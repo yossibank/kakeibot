@@ -1,6 +1,6 @@
+import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct AppIconListView: View {
@@ -10,9 +10,9 @@ public struct AppIconListView: View {
 
     public init(
         model: AppIconListModel,
-        database: AppDatabase
+        parts: ScreenParts
     ) {
-        let hintFlag = SettingsScreenFlag.closedHint(.appIcons, in: database)
+        let hintFlag = SettingsScreenFlag.closedHint(.appIcons, in: parts)
 
         self.model = model
         _hintFlag = State(initialValue: hintFlag)

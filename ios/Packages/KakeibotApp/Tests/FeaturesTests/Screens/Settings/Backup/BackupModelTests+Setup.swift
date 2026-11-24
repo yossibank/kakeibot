@@ -55,6 +55,6 @@ extension BackupModelTests.Setup {
 
     @MainActor
     func exporter() -> BackupModel {
-        BackupModel(database: source, clock: .fixed(now), stash: stash)
+        BackupModel(parts: ScreenParts(database: source, clock: .fixed(now)), stash: stash)
     }
 }

@@ -1,7 +1,6 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct MonthStartDayView: View {
@@ -87,13 +86,13 @@ private extension MonthStartDayView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         let today = LocalDate(Date(), in: .current)
 
         NavigationStack {
             MonthStartDayView(
                 model: MonthStartDayModel(
-                    database: database,
+                    parts: parts,
                     today: today
                 )
             )

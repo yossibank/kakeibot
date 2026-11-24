@@ -19,29 +19,27 @@ struct SnapshotTests {
         let options = try await database.entryOptions()
         let longWallet = options.wallets.max { $0.name.count < $1.name.count }
         let sheet = SettingsMenuSheet(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             today: today,
             appIcon: AppIconListModel()
         )
-        let wallets = SettingsBoardPage(WalletBoard(database: database))
-        let rules = SettingsBoardPage(RewardRuleBoard(database: database))
-        let categories = SettingsBoardPage(CategoryBoard(database: database, kind: .expense))
+        let wallets = SettingsBoardPage(WalletBoard(parts: .system(database)))
+        let rules = SettingsBoardPage(RewardRuleBoard(parts: .system(database)))
+        let categories = SettingsBoardPage(CategoryBoard(parts: .system(database), kind: .expense))
         let walletEdit = WalletEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             editing: longWallet?.id
         )
 
         let reminder = ReminderModel(
-            database: database,
+            parts: .system(database),
             today: today,
             time: .evening,
             permission: .allowed
         )
 
-        let monthStart = MonthStartDayModel(database: database, today: today)
-        let budgets = BudgetListModel(database: database, today: today)
+        let monthStart = MonthStartDayModel(parts: .system(database), today: today)
+        let budgets = BudgetListModel(parts: .system(database), today: today)
         let payday = try #require(MonthStartDay(25, shift: .previous))
         let carryoverFrom = today.yearMonth.adding(months: -2)
 
@@ -60,12 +58,17 @@ struct SnapshotTests {
             .frame(height: 1000)
 
         let categoryEdit = CategoryEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             kind: .expense
         )
-        let stampEdit = StampEditModel(database: database, clock: .fixed(snapshotNow))
-        let ruleEdit = RewardRuleEditModel(database: database, clock: .fixed(snapshotNow))
+        let stampEdit = StampEditModel(parts: ScreenParts(
+            database: database,
+            clock: .fixed(snapshotNow)
+        ))
+        let ruleEdit = RewardRuleEditModel(parts: ScreenParts(
+            database: database,
+            clock: .fixed(snapshotNow)
+        ))
 
         await categoryEdit.load()
         await stampEdit.load()
@@ -105,8 +108,7 @@ struct SnapshotTests {
         try await database.setSetting(.backupExportedAt, to: exportedAt)
 
         let recurring = RecurringListModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             today: today
         )
 
@@ -126,8 +128,7 @@ struct SnapshotTests {
                     RecurringListView(
                         board: RecurringBoard(
                             model: recurring,
-                            database: database,
-                            clock: .fixed(snapshotNow)
+                            parts: ScreenParts(database: database, clock: .fixed(snapshotNow))
                         )
                     ),
                     variant: variant,
@@ -140,13 +141,11 @@ struct SnapshotTests {
         observing.cancel()
 
         let templateEdit = TemplateEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             type: .expense
         )
         let recurringEdit = RecurringEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             today: today
         )
 
@@ -170,13 +169,11 @@ struct SnapshotTests {
 
         let card = options.wallets.first { $0.kind == .card }
         let expenseEdit = RecurringEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             today: today
         )
         let transferEdit = RecurringEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             today: today,
             type: .transfer
         )
@@ -223,8 +220,7 @@ struct SnapshotTests {
 
         let loan = try await database.save(loanDraft, at: snapshotNow)
         let loanEdit = RecurringEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             today: today,
             paying: loan.id
         )
@@ -246,13 +242,15 @@ struct SnapshotTests {
 
         let savedTemplate = try await database.templates().first
         let templateEditing = TemplateEditModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             type: .expense,
             editing: savedTemplate?.id
         )
-        let budgetDrawer = BudgetListModel(database: database, today: today)
-        let minusWallet = WalletEditModel(database: database, clock: .fixed(snapshotNow))
+        let budgetDrawer = BudgetListModel(parts: .system(database), today: today)
+        let minusWallet = WalletEditModel(parts: ScreenParts(
+            database: database,
+            clock: .fixed(snapshotNow)
+        ))
 
         await templateEditing.load()
         await budgetDrawer.load()
@@ -334,14 +332,14 @@ struct SnapshotTests {
             )
             try Self.write(budgetView, variant: variant, title: "設定 › 予算", to: "settings-budgets")
             try Self.write(
-                WidgetGuideView(database: database),
+                WidgetGuideView(parts: .system(database)),
                 variant: variant,
                 title: "設定 › ウィジェットの案内",
                 to: "settings-widget-guide"
             )
             try Self.write(
                 WidgetGuideView(
-                    database: database,
+                    parts: .system(database),
                     place: .home,
                     widget: .budget,
                     size: .small
@@ -352,7 +350,7 @@ struct SnapshotTests {
             )
             try Self.write(
                 WidgetGuideView(
-                    database: database,
+                    parts: .system(database),
                     place: .home,
                     widget: .quickRecord,
                     size: .large
@@ -372,19 +370,13 @@ struct SnapshotTests {
                 to: "settings-widget-guide-quick"
             )
             try Self.write(
-                WidgetGuideView(
-                    database: database,
-                    place: .lockScreen
-                ),
+                WidgetGuideView(parts: .system(database), place: .lockScreen),
                 variant: variant,
                 title: "設定 › ウィジェットの案内 › ロック画面",
                 to: "settings-widget-guide-lock"
             )
             try Self.write(
-                WidgetGuideView(
-                    database: database,
-                    place: .control
-                ),
+                WidgetGuideView(parts: .system(database), place: .control),
                 variant: variant,
                 title: "設定 › ウィジェットの案内 › コントロール",
                 to: "settings-widget-guide-control"
@@ -644,5 +636,11 @@ private extension SnapshotTests {
             title: title,
             variant: variant.label
         )
+    }
+}
+
+private extension ScreenParts {
+    static func system(_ database: AppDatabase) -> ScreenParts {
+        ScreenParts(database: database, clock: .system)
     }
 }

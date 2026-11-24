@@ -9,17 +9,14 @@ public final class EntryNoticeModel {
     public let state: State
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
-    public init(
-        database: AppDatabase,
-        clock: ScreenClock
-    ) {
+    public init(parts: ScreenParts) {
         let state = State()
 
         self.state = state
         self.output = Output(state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -213,13 +210,6 @@ public extension EntryNoticeModel.Notice {
         case .batch: false
         case .undone, .failed: true
         }
-    }
-}
-
-extension EntryNoticeModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

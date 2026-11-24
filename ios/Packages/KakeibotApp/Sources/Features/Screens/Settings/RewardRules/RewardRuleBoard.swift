@@ -1,12 +1,11 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 @MainActor
 struct RewardRuleBoard {
-    let database: AppDatabase
+    let parts: ScreenParts
 }
 
 extension RewardRuleBoard: SettingsBoardSpec {
@@ -60,7 +59,7 @@ extension RewardRuleBoard: SettingsBoardSpec {
     }
 
     func editModel(for destination: Destination) -> RewardRuleEditModel {
-        RewardRuleEditModel(database: database, clock: clock, editing: destination.editingID)
+        RewardRuleEditModel(parts: parts, editing: destination.editingID)
     }
 
     func intro(

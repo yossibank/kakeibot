@@ -1,6 +1,6 @@
 #if DEBUG
 import Core
-@testable import Features
+@testable import FeatureModels
 import Foundation
 import Store
 import Testing

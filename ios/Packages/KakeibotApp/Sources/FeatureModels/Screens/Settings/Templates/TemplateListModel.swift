@@ -11,19 +11,16 @@ public final class TemplateListModel {
     public let input: Input
     public let output: Output
 
-    public let dependencies: SettingsBoardDependencies
+    public let dependencies: ScreenParts
 
-    public init(
-        database: AppDatabase,
-        clock: ScreenClock
-    ) {
+    public init(parts: ScreenParts) {
         let state = State()
         let input = Input()
 
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = SettingsBoardDependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 

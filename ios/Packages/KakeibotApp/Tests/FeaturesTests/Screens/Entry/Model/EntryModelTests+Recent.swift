@@ -14,7 +14,7 @@ extension EntryModelTests {
         _ = try await setup.saveEntry(amount: 220)
         _ = try await setup.saveEntry(amount: 1540)
         _ = try await setup.saveEntry(amount: 300)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         await model.reloadCategories()
 
@@ -48,7 +48,7 @@ extension EntryModelTests {
 
         _ = try await setup.database.saveEntry(same, at: Date())
         _ = try await setup.database.saveEntry(other, at: Date())
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         await model.reloadCategories()
 
@@ -60,8 +60,7 @@ extension EntryModelTests {
         let setup = try await Setup()
         _ = try await setup.saveEntry(amount: 980)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -75,7 +74,7 @@ extension EntryModelTests {
     func appliesRecentEntry() async throws {
         let setup = try await Setup()
         let saved = try await setup.saveEntry(amount: 980)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.applyRecent(saved)

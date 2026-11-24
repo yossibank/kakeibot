@@ -11,11 +11,10 @@ public final class CategoryListModel {
     public let input: SettingsBoardSnapshotInput<CategoryList>
     public let output: Output
 
-    public let dependencies: SettingsBoardDependencies
+    public let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         kind: EntryCategory.Kind = .expense
     ) {
         let state = State(kind: kind)
@@ -24,7 +23,7 @@ public final class CategoryListModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = SettingsBoardDependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 

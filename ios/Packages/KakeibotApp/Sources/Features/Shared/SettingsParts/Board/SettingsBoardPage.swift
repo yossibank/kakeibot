@@ -1,6 +1,6 @@
+import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
@@ -24,8 +24,8 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
     private let spec: Spec
 
     init(_ spec: Spec) {
-        let hintFlag = SettingsScreenFlag.closedHint(spec.screen, in: spec.database)
-        let hiddenList = SettingsScreenFlag.openHiddenList(spec.screen, in: spec.database)
+        let hintFlag = SettingsScreenFlag.closedHint(spec.screen, in: spec.parts)
+        let hiddenList = SettingsScreenFlag.openHiddenList(spec.screen, in: spec.parts)
 
         _model = State(initialValue: spec.makeModel())
         _hintFlag = State(initialValue: hintFlag)

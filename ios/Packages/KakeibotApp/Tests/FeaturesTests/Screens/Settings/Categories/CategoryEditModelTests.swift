@@ -10,7 +10,7 @@ struct CategoryEditModelTests {
     @Test
     func keepsOneEmojiAndShortText() throws {
         let database = try Self.database()
-        let model = CategoryEditModel(database: database, clock: .system, kind: .expense)
+        let model = CategoryEditModel(parts: .system(database), kind: .expense)
 
         model.state.icon.inputEmoji("ab🍙")
         let emoji = model.state.icon.emoji
@@ -32,11 +32,11 @@ struct CategoryEditModelTests {
     @Test
     func savesNewCategory() async throws {
         let database = try Self.database()
-        let model = CategoryEditModel(database: database, clock: .system, kind: .income)
+        let model = CategoryEditModel(parts: .system(database), kind: .income)
         model.state.name = "配当"
         model.state.icon.glyph = .invest
 
-        let canSaveBeforeName = CategoryEditModel(database: database, clock: .system, kind: .income)
+        let canSaveBeforeName = CategoryEditModel(parts: .system(database), kind: .income)
             .canSave
         let saved = await model.save()
         let list = try await database.categoryList()
@@ -54,8 +54,7 @@ struct CategoryEditModelTests {
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
         let model = CategoryEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             kind: .expense,
             editing: food.id
         )
@@ -90,14 +89,12 @@ struct CategoryEditModelTests {
 
         try await database.saveEntry(draft, at: Date())
         let usedModel = CategoryEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             kind: .expense,
             editing: used.id
         )
         let unusedModel = CategoryEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             kind: .expense,
             editing: unused.id
         )
@@ -112,7 +109,7 @@ struct CategoryEditModelTests {
     @Test
     func tracksChangesFromStart() throws {
         let database = try Self.database()
-        let model = CategoryEditModel(database: database, clock: .system, kind: .expense)
+        let model = CategoryEditModel(parts: .system(database), kind: .expense)
         let start = model.isChanged
 
         model.state.name = "外食"
@@ -133,8 +130,7 @@ struct CategoryEditModelTests {
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
         let model = CategoryEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             kind: .expense,
             editing: food.id
         )
@@ -168,7 +164,7 @@ struct CategoryEditModelTests {
     @Test
     func rejectsTagWithNameOfAnotherTag() throws {
         let database = try Self.database()
-        let model = CategoryEditModel(database: database, clock: .system, kind: .expense)
+        let model = CategoryEditModel(parts: .system(database), kind: .expense)
 
         _ = model.state.addTag("朝ごはん")
         _ = model.state.addTag("昼ごはん")
@@ -193,8 +189,7 @@ struct CategoryEditModelTests {
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
         let model = CategoryEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             kind: .expense,
             editing: food.id
         )
@@ -220,8 +215,7 @@ struct CategoryEditModelTests {
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
         let model = CategoryEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             kind: .expense,
             editing: food.id
         )
@@ -229,8 +223,7 @@ struct CategoryEditModelTests {
         _ = model.state.addTag("朝ごはん")
         _ = await model.save()
         let reopened = CategoryEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             kind: .expense,
             editing: food.id
         )
@@ -249,7 +242,7 @@ struct CategoryEditModelTests {
     @Test
     func savesTagsWithNewCategory() async throws {
         let database = try Self.database()
-        let model = CategoryEditModel(database: database, clock: .system, kind: .expense)
+        let model = CategoryEditModel(parts: .system(database), kind: .expense)
         model.state.name = "外食"
 
         _ = model.state.addTag("朝ごはん")

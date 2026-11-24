@@ -23,7 +23,7 @@ public extension RecordsModel {
     }
 
     func stampEditModel() -> StampEditModel {
-        StampEditModel(database: dependencies.database, clock: dependencies.clock)
+        StampEditModel(parts: dependencies)
     }
 
     func toggleNoSpendDay(on date: LocalDate) async {

@@ -9,7 +9,7 @@ extension EntryModelTests {
     @Test
     func appliesReceiptReading() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let categoryId = model.state.category.id
         let date = try #require(LocalDate("2026-10-03"))
@@ -37,7 +37,7 @@ extension EntryModelTests {
     @Test
     func appliesIncludedTaxFromReceipt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         await model.apply(
@@ -64,7 +64,7 @@ extension EntryModelTests {
     @Test
     func keepsUnreadValuesFromReceipt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.memo = "店名\n2 行目"
         model.state.press(.digit(5))
@@ -80,7 +80,7 @@ extension EntryModelTests {
     @Test
     func followsItemTotalWhenReceiptTotalIsUnread() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         await model.apply(
@@ -99,7 +99,7 @@ extension EntryModelTests {
     @Test
     func marksSuspectItemsOnlyForReadItems() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.state.press(.digit(6))
@@ -129,7 +129,7 @@ extension EntryModelTests {
     func countsFreeReceiptsLeft() async throws {
         let setup = try await Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: 2)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         #expect(model.output.freeReceiptsLeft == 1)
@@ -138,7 +138,7 @@ extension EntryModelTests {
     @Test
     func remembersNamesUnderReadStore() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         await model.apply(
@@ -161,7 +161,7 @@ extension EntryModelTests {
     @Test
     func forgetsEarlierNamesWhenOnlyTotalIsRead() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         await model.apply(
@@ -184,7 +184,7 @@ extension EntryModelTests {
     @Test
     func reportsAmountOnlyWhenReceiptSetsIt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(5))
 
@@ -198,7 +198,7 @@ extension EntryModelTests {
     @Test
     func skipsCountWhenSavedAsTransfer() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         await model.apply(ReceiptReading(total: 911))
@@ -212,7 +212,7 @@ extension EntryModelTests {
     @Test
     func countsOnlySavesFromReceipt() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.state.press(.digit(5))
@@ -235,7 +235,7 @@ extension EntryModelTests {
     func limitsFreeReceiptSaves() async throws {
         let setup = try await Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: EntryModel.freeReceiptLimit)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         #expect(!model.output.canReadReceipt(isPro: false))
@@ -245,7 +245,7 @@ extension EntryModelTests {
     @Test
     func remembersCorrectedItemNamesByStore() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let reading = ReceiptReading(
             store: "スーパー青葉",
@@ -270,7 +270,7 @@ extension EntryModelTests {
     @Test
     func forgetsNameRestoredToTheReadText() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let reading = ReceiptReading(
             store: "スーパー青葉",
@@ -296,7 +296,7 @@ extension EntryModelTests {
     @Test
     func keepsItemSourcesAlignedWithItems() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         await model.apply(

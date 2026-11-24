@@ -11,17 +11,14 @@ public final class SettingsMenuResetModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
-    public init(
-        database: AppDatabase,
-        clock: ScreenClock
-    ) {
+    public init(parts: ScreenParts) {
         let input = Input()
 
         self.input = input
         self.output = Output(input: input)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -83,13 +80,6 @@ public extension SettingsMenuResetModel.Output {
         }
 
         return text
-    }
-}
-
-extension SettingsMenuResetModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

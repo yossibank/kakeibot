@@ -10,11 +10,10 @@ public final class HomeModel: ScreenModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate
     ) {
         let state = State(today: today)
@@ -23,7 +22,7 @@ public final class HomeModel: ScreenModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -32,11 +31,6 @@ public extension HomeModel {
 }
 
 extension HomeModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
-    }
-
     public static let loadFailedMessage = "記録を読めませんでした"
 
     static let recurringTitle = "固定費"

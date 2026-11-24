@@ -1,6 +1,6 @@
+import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct WidgetGuideView: View {
@@ -10,17 +10,17 @@ public struct WidgetGuideView: View {
     @State private var hintFlag: SettingsScreenFlag
     @State private var shownSample: WidgetGuideSample?
 
-    public init(database: AppDatabase) {
-        self.init(database: database, place: .home)
+    public init(parts: ScreenParts) {
+        self.init(parts: parts, place: .home)
     }
 
     init(
-        database: AppDatabase,
+        parts: ScreenParts,
         place: WidgetGuidePlace,
         widget: WidgetGuideWidget = .quickRecord,
         size: WidgetGuideSize = .medium
     ) {
-        let hintFlag = SettingsScreenFlag.closedHint(.widgetGuide, in: database)
+        let hintFlag = SettingsScreenFlag.closedHint(.widgetGuide, in: parts)
 
         _place = State(initialValue: place)
         _widget = State(initialValue: widget)
@@ -217,9 +217,9 @@ private extension WidgetGuideView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         NavigationStack {
-            WidgetGuideView(database: database)
+            WidgetGuideView(parts: parts)
         }
     }
 }

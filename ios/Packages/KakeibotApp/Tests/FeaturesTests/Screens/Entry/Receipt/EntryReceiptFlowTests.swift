@@ -10,7 +10,7 @@ struct EntryReceiptFlowTests {
     @Test
     func showsGuideBeforeFirstReceipt() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading()
@@ -28,7 +28,7 @@ struct EntryReceiptFlowTests {
     @Test
     func preparesModelWhenCameraOpens() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         var prepared = 0
         let flow = EntryReceiptFlow { _ in
@@ -49,7 +49,7 @@ struct EntryReceiptFlowTests {
     func showsGuideAfterFirstReceipt() async throws {
         let setup = try await EntryModelTests.Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: 1)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading()
@@ -65,7 +65,7 @@ struct EntryReceiptFlowTests {
     func opensCameraWhenGuideIsHidden() async throws {
         let setup = try await EntryModelTests.Setup()
         try await setup.database.setSetting(.receiptGuideHidden, to: true)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading()
@@ -80,7 +80,7 @@ struct EntryReceiptFlowTests {
     @Test
     func hidesGuideWhenChecked() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading()
@@ -102,7 +102,7 @@ struct EntryReceiptFlowTests {
     @Test
     func keepsGuideWhenUnchecked() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading()
@@ -124,7 +124,7 @@ struct EntryReceiptFlowTests {
     func offersProAfterFreeReceipts() async throws {
         let setup = try await EntryModelTests.Setup()
         try await setup.database.setSetting(.receiptSavedCount, to: EntryModel.freeReceiptLimit)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading()
@@ -145,7 +145,7 @@ struct EntryReceiptFlowTests {
     @Test
     func appliesScannedReceipt() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading(store: "スーパー青葉", total: 911)
@@ -164,7 +164,7 @@ struct EntryReceiptFlowTests {
     @Test
     func countsScannedItems() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading(
@@ -185,7 +185,7 @@ struct EntryReceiptFlowTests {
     @Test
     func keepsKeypadWhenAmountIsUnread() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(5))
         let flow = EntryReceiptFlow { _ in
@@ -202,7 +202,7 @@ struct EntryReceiptFlowTests {
     @Test
     func reportsUnreadReceipt() async throws {
         let setup = try await EntryModelTests.Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let flow = EntryReceiptFlow { _ in
             ReceiptReading()

@@ -10,8 +10,7 @@ extension EntryModelTransferTests {
     func savesFeeTypedOnKeypad() async throws {
         let setup = try await Setup()
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -50,8 +49,7 @@ extension EntryModelTransferTests {
 
         try await setup.database.saveEntry(draft, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -76,8 +74,7 @@ extension EntryModelTransferTests {
 
         try await setup.database.saveEntry(income, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .transfer
         )
@@ -108,8 +105,7 @@ extension EntryModelTransferTests {
         let transfer = try await setup.database.saveEntry(draft, at: Date())
         let fee = try #require(try await setup.database.fee(of: transfer.id))
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: fee.id,
             date: setup.date
         )
@@ -146,8 +142,7 @@ extension EntryModelTransferTests {
 
         let transfer = try await setup.database.saveEntry(draft, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: transfer.id,
             date: setup.date
         )

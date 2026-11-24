@@ -1,3 +1,4 @@
+import Core
 import Store
 
 public extension SyncSendProblem {

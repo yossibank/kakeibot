@@ -10,7 +10,7 @@ extension EntryModelTests {
     func movesCardUsageToLaterBill() async throws {
         let setup = try await Setup()
         let card = try await setup.cardWithBill()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(5))
         model.setWallet(card.id)
@@ -58,7 +58,7 @@ extension EntryModelTests {
 
         try await setup.database.saveEntry(income, at: Date())
         try await setup.database.saveEntry(future, at: Date())
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
 
         await model.load()
 
@@ -69,7 +69,7 @@ extension EntryModelTests {
     func startsWithFirstWalletWithoutEntries() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
 
         await model.load()
 
@@ -85,7 +85,7 @@ extension EntryModelTests {
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[0].id, at: 1)
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 2)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
 
         await model.load()
         let first = model.state.payment.walletId
@@ -104,7 +104,7 @@ extension EntryModelTests {
         let categories = options.expenseCategories
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[0].id, wallet: wallets[1].id, at: 1)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.select(.income)
@@ -123,7 +123,7 @@ extension EntryModelTests {
         let categories = options.expenseCategories
         let wallets = options.wallets
         try await setup.saveEntry(category: categories[1].id, wallet: wallets[0].id, at: 1)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.state.setCategory(categories[1].id)
@@ -139,7 +139,7 @@ extension EntryModelTests {
         let options = try await setup.database.entryOptions()
         let shared = options.wallets[1]
         try await setup.database.startSharing(shared.id)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         let own = model.output.selectedCategory
 

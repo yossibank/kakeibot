@@ -10,7 +10,7 @@ struct WalletEditModelTests {
     @Test
     func addsCardWithNegativeBalance() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
         model.state.name = "楽天カード"
         model.state.setKind(.card)
         model.state.press(.digit(3))
@@ -32,8 +32,8 @@ struct WalletEditModelTests {
     func namesWhatIsMissingOnSaveButton() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
-        let model = WalletEditModel(database: setup.database, clock: .system)
-        let editing = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
+        let model = WalletEditModel(parts: .system(setup.database))
+        let editing = WalletEditModel(parts: .system(setup.database), editing: bank.id)
         await editing.load()
 
         let empty = model.saveTitle
@@ -51,7 +51,7 @@ struct WalletEditModelTests {
     @Test
     func tracksChangesFromStart() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
         let start = model.isChanged
 
         model.state.name = "楽天カード"
@@ -72,7 +72,7 @@ struct WalletEditModelTests {
     @Test
     func keepsChosenGlyphWhenKindChanges() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
 
         model.state.setKind(.bank)
         let followed = model.state.icon.glyph
@@ -86,7 +86,7 @@ struct WalletEditModelTests {
     @Test
     func followsSignWhenKindChanges() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
 
         model.state.setKind(.card)
         let card = model.state.isNegative
@@ -103,7 +103,7 @@ struct WalletEditModelTests {
     @Test
     func switchesSignWithKeypadOnlyBeforeAmount() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
 
         model.state.press(.operation(.subtract))
         let minus = model.state.isNegative
@@ -129,7 +129,7 @@ struct WalletEditModelTests {
     @Test
     func startsDebtAsMinusAndKeepsChosenSign() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
 
         model.state.setKind(.loan)
         let loan = model.state.isNegative
@@ -157,8 +157,8 @@ struct WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(draft, at: Date())
-        let used = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
-        let unused = WalletEditModel(database: setup.database, clock: .system, editing: cash.id)
+        let used = WalletEditModel(parts: .system(setup.database), editing: bank.id)
+        let unused = WalletEditModel(parts: .system(setup.database), editing: cash.id)
         await used.load()
         await unused.load()
 
@@ -197,7 +197,7 @@ struct WalletEditModelTests {
 
         try await setup.database.saveEntry(income, at: Date())
         try await setup.database.saveEntry(future, at: Date())
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: bank.id)
 
         await model.load()
 
@@ -221,7 +221,7 @@ struct WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(future, at: Date())
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: bank.id)
 
         await model.load()
 
@@ -258,7 +258,7 @@ struct WalletEditModelTests {
             at: Date()
         )
 
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: cash.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: cash.id)
         await model.load()
 
         model.state.setKind(.card)

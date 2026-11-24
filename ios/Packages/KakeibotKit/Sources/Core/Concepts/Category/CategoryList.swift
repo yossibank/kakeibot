@@ -1,5 +1,3 @@
-import Core
-
 public struct CategoryList: Equatable, Sendable {
     public let categories: [EntryCategory]
     public let tags: [EntryTag]

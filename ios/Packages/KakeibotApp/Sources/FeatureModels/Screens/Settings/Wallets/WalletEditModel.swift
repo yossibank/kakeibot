@@ -10,11 +10,10 @@ public final class WalletEditModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         editing id: Wallet.ID? = nil,
         kind: Wallet.Kind = .cash
     ) {
@@ -27,7 +26,7 @@ public final class WalletEditModel {
         self.state = state
         self.input = input
         self.output = output
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -47,11 +46,6 @@ public extension WalletEditModel {
 }
 
 extension WalletEditModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
-    }
-
     static let defaultColor = "#C9A465"
 
     static func hasEntries(

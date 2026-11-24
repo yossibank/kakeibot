@@ -1,12 +1,12 @@
 import Core
-import Store
+import FeatureModels
 import SwiftUI
 
 public struct RewardRuleListView: View {
     private let board: RewardRuleBoard
 
-    public init(database: AppDatabase) {
-        self.init(board: RewardRuleBoard(database: database))
+    public init(parts: ScreenParts) {
+        self.init(board: RewardRuleBoard(parts: parts))
     }
 
     init(board: RewardRuleBoard) {
@@ -19,9 +19,9 @@ public struct RewardRuleListView: View {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         NavigationStack {
-            RewardRuleListView(database: database)
+            RewardRuleListView(parts: parts)
         }
     }
 }

@@ -25,11 +25,11 @@ public extension EntryModel {
     }
 
     func newWalletModel() -> WalletEditModel {
-        WalletEditModel(database: dependencies.database, clock: dependencies.clock)
+        WalletEditModel(parts: dependencies)
     }
 
     func editWalletModel(_ id: Wallet.ID) -> WalletEditModel {
-        WalletEditModel(database: dependencies.database, clock: dependencies.clock, editing: id)
+        WalletEditModel(parts: dependencies, editing: id)
     }
 
     func reloadWallets() async {

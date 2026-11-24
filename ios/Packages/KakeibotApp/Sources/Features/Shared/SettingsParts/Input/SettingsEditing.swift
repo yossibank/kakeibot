@@ -1,4 +1,4 @@
-import Store
+import Core
 
 @MainActor
 protocol SettingsEditing: AnyObject {

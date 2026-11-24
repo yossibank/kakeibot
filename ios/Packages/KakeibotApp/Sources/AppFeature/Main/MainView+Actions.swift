@@ -196,7 +196,7 @@ extension MainView {
     }
 
     func prepareDraft() {
-        let model = EntryModel(database: database, clock: clock, date: today)
+        let model = EntryModel(parts: parts, date: today)
 
         startsReceipt = false
 

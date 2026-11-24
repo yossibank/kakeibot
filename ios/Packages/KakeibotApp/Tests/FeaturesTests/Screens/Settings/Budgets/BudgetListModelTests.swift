@@ -12,7 +12,7 @@ struct BudgetListModelTests {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(10))
         try await setup.database.setSetting(.monthStartDay, to: payday)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let food = try #require(model.output.categories.first)
@@ -48,7 +48,7 @@ struct BudgetListModelTests {
         let setup = try await HomeModelTests.Setup()
         let month = setup.today.yearMonth
         try await setup.database.setBudget(50000, for: nil, from: month)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.startEditing(.total)
@@ -72,7 +72,7 @@ struct BudgetListModelTests {
         let month = setup.today.yearMonth
         let earlier = month.adding(months: -2)
         try await setup.database.setBudget(30000, for: nil, from: earlier)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.startEditing(.total)
@@ -89,7 +89,7 @@ struct BudgetListModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 9000, daysAgo: 0)
         try await setup.save(.income, amount: 50000, daysAgo: 0)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let food = try #require(model.output.categories.first)
@@ -117,7 +117,7 @@ struct BudgetListModelTests {
     func detectsChangedAmountWhileEditing() async throws {
         let setup = try await HomeModelTests.Setup()
         try await setup.database.setBudget(50000, for: nil, from: setup.today.yearMonth)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let closed = model.output.isChanged
@@ -141,7 +141,7 @@ struct BudgetListModelTests {
     @Test
     func turnsCarryoverOnFromPeriodMonthAndOff() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let initial = model.output.isCarryoverOn
@@ -163,7 +163,7 @@ struct BudgetListModelTests {
     @Test
     func carriesOnlyTotalBudgetRemainingIntoTotalUsage() async throws {
         let setup = try await carryoverSetup()
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let food = try #require(model.output.categories.first)
@@ -178,7 +178,7 @@ struct BudgetListModelTests {
     @Test
     func resetsCarryoverAndRestoresStart() async throws {
         let setup = try await carryoverSetup()
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let start = model.input.carryoverFrom
@@ -199,7 +199,7 @@ struct BudgetListModelTests {
     @Test
     func keepsCarryoverWhenResetIsNotNeeded() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let off = await model.resetCarryover()
@@ -222,7 +222,7 @@ struct BudgetListModelTests {
         try await setup.save(.expense, amount: 45150, daysAgo: 80)
         try await setup.save(.income, amount: 300_000, daysAgo: 20)
         try await setup.saveRecurring(amount: 82800, day: 25)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let closed = model.output.suggestions
@@ -248,7 +248,7 @@ struct BudgetListModelTests {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 30000, daysAgo: 20)
         try await setup.save(.expense, amount: 20001, daysAgo: 50)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.startEditing(.total)
@@ -260,7 +260,7 @@ struct BudgetListModelTests {
     func skipsAverageUntilTwoMonthsAreRecorded() async throws {
         let setup = try await HomeModelTests.Setup()
         try await setup.save(.expense, amount: 30000, daysAgo: 20)
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.startEditing(.total)
@@ -271,7 +271,7 @@ struct BudgetListModelTests {
     @Test
     func suggestsOnlyRecurringWithoutRecords() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = BudgetListModel(database: setup.database, today: setup.today)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.startEditing(.total)

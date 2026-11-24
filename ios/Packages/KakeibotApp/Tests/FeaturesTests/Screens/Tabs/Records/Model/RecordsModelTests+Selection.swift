@@ -12,7 +12,7 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.save(.expense, amount: 220, on: "2026-10-12")
         try await setup.save(.expense, amount: 500, on: "2026-10-10")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let dayDate = try #require(LocalDate("2026-10-12"))
         let otherDate = try #require(LocalDate("2026-10-10"))
@@ -37,7 +37,7 @@ extension RecordsModelTests {
     func togglesOneEntry() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let id = try #require(model.output.days.first?.entries.first?.id)
 
@@ -54,7 +54,7 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
         try await setup.save(.expense, amount: 500, on: "2026-09-30")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let monthIds = model.output.days.flatMap(\.entries).map(\.id)
 
@@ -72,7 +72,7 @@ extension RecordsModelTests {
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
         try await setup.save(.expense, amount: 500, on: "2026-09-30", memo: "ランチ")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let expenseDay = try #require(model.output.days.first)
         let expenseId = try #require(expenseDay.entries.first?.id)
@@ -94,7 +94,7 @@ extension RecordsModelTests {
     @Test
     func doesNotSelectAllWhenNothingShown() async throws {
         let setup = try await Setup()
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         #expect(model.output.shownEntryIDs.isEmpty)
@@ -109,7 +109,7 @@ extension RecordsModelTests {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.save(.expense, amount: 220, on: "2026-10-11")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let ids = Set(model.output.shownEntryIDs)
 
@@ -123,7 +123,7 @@ extension RecordsModelTests {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         try await setup.save(.income, amount: 250_000, on: "2026-10-10")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let ids = Set(model.output.shownEntryIDs)
 
@@ -148,7 +148,7 @@ extension RecordsModelTests {
         )
 
         try await setup.database.saveEntry(transfer, at: Date())
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let ids = Set(model.output.shownEntryIDs)
 
@@ -161,7 +161,7 @@ extension RecordsModelTests {
     func blocksBatchWhenNothingSelected() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
-        let model = RecordsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         #expect(model.output.batchCategoryBlock(of: []) == "記録を選んでください")

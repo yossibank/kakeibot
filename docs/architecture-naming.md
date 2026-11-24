@@ -112,6 +112,7 @@
 | --- | --- | --- |
 | 型と計算 | `Core/Concepts/<概念>/` | `Theme`・`ThemePalette+Contrast` |
 | 表の行 | `Store/Records/Rows/` | `Theme+Record` |
+| 読み出しの型 | `Core/Concepts/<概念>/` | `StampBook`（スタンプ） |
 | 読み出し | `Store/Queries/Methods/` | `AppDatabase+ThemeQuery` |
 | 書き込み | `Store/Writes/Methods/` | `AppDatabase+Theme` |
 | 見た目の部品 | `DesignSystem/` の種類か題材のフォルダ | `DesignSystem/Theme/` |
@@ -125,6 +126,7 @@
 
 | 層 | 置き場所 |
 | --- | --- |
+| 同期の状態と、共有している口座の型 | `Core/Concepts/Sync/` |
 | 送る行の記録と、受け取った行の書き込み | `Store/Sync/` |
 | CKSyncEngine で送り受けする | `Sync/` |
 | 画面のモデルと、iCloud のアカウント（`SyncAccount`）と参加者の型 | `FeatureModels/Screens/Settings/Sync/` |

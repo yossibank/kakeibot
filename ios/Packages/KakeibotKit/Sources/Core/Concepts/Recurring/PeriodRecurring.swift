@@ -1,5 +1,3 @@
-import Core
-
 public struct PeriodRecurring: Hashable, Sendable {
     public let date: LocalDate
     public let recurring: Recurring

@@ -1,23 +1,14 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct SettingsMenuSheet: View {
-    @State var monthStartDay: MonthStartDay = .first
-    @State var launchScreen: LaunchScreen = .home
-    @State var reminderTime: ReminderTime?
+    @State var model: SettingsMenuModel
     @State var authorization: NotificationAuthorization = .allowed
-    @State var theme: ThemeChoice = .system
-    @State var customThemes: [Theme] = []
-    @State var syncStatus = SyncStatus.off
-    @State var backupExportedAt: Date?
-    @State var firstEntryCreatedAt: Date?
     @State var weekStart: SettingsMenuValueModel<Weekday>
     @State var recordReset: SettingsMenuResetModel
     @State var isConfirmingReset = false
-    @State var usesFun: Bool?
 
     #if DEBUG
     @State var isConfirmingSample = false
@@ -33,31 +24,22 @@ public struct SettingsMenuSheet: View {
     @Environment(\.syncCloud) var syncCloud
     @Environment(\.themeStyle) var themeStyle
 
-    let database: AppDatabase
-    let clock: ScreenClock
+    let parts: ScreenParts
     let today: LocalDate
     let appIcon: AppIconListModel
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate,
         appIcon: AppIconListModel
     ) {
-        _weekStart = State(
-            initialValue: SettingsMenuValueModel(
-                database: database,
-                key: .weekStart
-            )
-        )
+        let model = SettingsMenuModel(parts: parts)
 
-        _recordReset = State(initialValue: SettingsMenuResetModel(
-            database: database,
-            clock: clock
-        ))
+        _model = State(initialValue: model)
+        _weekStart = State(initialValue: model.weekStartModel())
+        _recordReset = State(initialValue: SettingsMenuResetModel(parts: parts))
 
-        self.database = database
-        self.clock = clock
+        self.parts = parts
         self.today = today
         self.appIcon = appIcon
     }
@@ -74,7 +56,7 @@ public struct SettingsMenuSheet: View {
 
                         budgetSection
 
-                        if usesFun == true {
+                        if model.input.usesFun == true {
                             funSection
                         }
 
@@ -111,7 +93,7 @@ public struct SettingsMenuSheet: View {
             isPresented: $isConfirmingReset,
             systemImage: "trash",
             title: "記録をすべて削除しますか",
-            message: recordReset.output.message(isSyncing: syncStatus.isEnabled),
+            message: recordReset.output.message(isSyncing: model.input.syncStatus.isEnabled),
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
@@ -127,131 +109,23 @@ public struct SettingsMenuSheet: View {
             }
         }
         .task {
-            await observeMonthStartDay()
+            await model.run()
         }
         .task {
             await weekStart.load()
         }
         .task {
-            await observeReminderTime()
-        }
-        .task {
             authorization = await permission.authorization()
-        }
-        .task {
-            await observeTheme()
-        }
-        .task {
-            await observeCustomThemes()
-        }
-        .task {
-            await observeLaunchScreen()
-        }
-        .task {
-            await observeSync()
-        }
-        .task {
-            await observeBackupExportedAt()
-        }
-        .task {
-            firstEntryCreatedAt = try? await database.entryHistory().firstCreatedAt
-        }
-        .task {
-            await loadUsesFun()
-        }
-    }
-}
-
-private extension SettingsMenuSheet {
-    func loadUsesFun() async {
-        do {
-            let calendar = try await database.stampBook()
-            let rules = try await database.rewardRuleList()
-            usesFun = !calendar.stamps.isEmpty || !rules.rules.isEmpty
-        } catch {
-            usesFun = true
-        }
-    }
-
-    func observeLaunchScreen() async {
-        do {
-            for try await screen in database.settingUpdates(.launchScreen) {
-                launchScreen = screen
-            }
-        } catch {
-            launchScreen = .home
-        }
-    }
-
-    func observeReminderTime() async {
-        do {
-            for try await time in database.settingUpdates(.reminderTime) {
-                reminderTime = time
-            }
-        } catch {
-            reminderTime = nil
-        }
-    }
-
-    func observeSync() async {
-        do {
-            for try await status in database.syncStatusUpdates() {
-                syncStatus = status
-            }
-        } catch {
-            syncStatus = .off
-        }
-    }
-
-    func observeBackupExportedAt() async {
-        do {
-            for try await date in database.settingUpdates(.backupExportedAt) {
-                backupExportedAt = date
-            }
-        } catch {
-            backupExportedAt = nil
-        }
-    }
-
-    func observeTheme() async {
-        do {
-            for try await theme in database.settingUpdates(.theme) {
-                self.theme = theme
-            }
-        } catch {
-            theme = .system
-        }
-    }
-
-    func observeCustomThemes() async {
-        do {
-            for try await themes in database.customThemeUpdates() {
-                customThemes = themes
-            }
-        } catch {
-            customThemes = []
-        }
-    }
-
-    func observeMonthStartDay() async {
-        do {
-            for try await startDay in database.settingUpdates(.monthStartDay) {
-                monthStartDay = startDay
-            }
-        } catch {
-            monthStartDay = .first
         }
     }
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
+    if let parts = ScreenParts.preview() {
         let today = LocalDate(Date(), in: .current)
 
         SettingsMenuSheet(
-            database: database,
-            clock: .system,
+            parts: parts,
             today: today,
             appIcon: AppIconListModel()
         )

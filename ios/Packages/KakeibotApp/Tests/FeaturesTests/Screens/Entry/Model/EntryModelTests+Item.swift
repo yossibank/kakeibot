@@ -9,7 +9,7 @@ extension EntryModelTests {
     @Test
     func savesItemsWithEntry() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.addItem(name: "牛乳", amount: 400)
 
@@ -25,7 +25,7 @@ extension EntryModelTests {
     @Test
     func followsItemTotalWhileNoDifference() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.state.addItem(name: "牛乳", amount: 396)
@@ -51,7 +51,7 @@ extension EntryModelTests {
     @Test
     func restoresRemovedItemInPlace() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.addItem(name: "牛乳", amount: 396)
         model.state.addItem(name: "パン", amount: 250)
@@ -74,8 +74,7 @@ extension EntryModelTests {
         edited.items = [draft]
         try await setup.database.saveEntry(edited, editing: entry.id, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -94,7 +93,7 @@ extension EntryModelTests {
     @Test
     func followsItemTotalWithTax() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.state.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
@@ -111,7 +110,7 @@ extension EntryModelTests {
     @Test
     func keepsAmountWhenItemTotalIsNegative() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(5))
         model.state.addItem(name: "値引", amount: -30)
@@ -125,7 +124,7 @@ extension EntryModelTests {
     @Test
     func countsItemsWithQuantity() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.addItem(name: "牛乳", quantity: 2, amount: 396)
         model.state.addItem(name: "パン", amount: 250)
@@ -141,7 +140,7 @@ extension EntryModelTests {
     @Test
     func editsStoreAsFirstMemoLine() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.state.store = "青葉"
@@ -166,7 +165,7 @@ extension EntryModelTests {
             EntryItem.Draft(name: "パン", amount: 100)
         ]
         try await setup.database.saveEntry(edited, editing: entry.id, at: Date())
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         let all = model.output.itemNameSuggestions(for: " ")

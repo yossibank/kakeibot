@@ -10,18 +10,17 @@ public final class StampEditModel {
     public let state: State
     public let input: Input
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         editing id: ShelfIcon.ID? = nil
     ) {
         let state = State()
 
         self.state = state
         self.input = Input(editingId: id, baseline: state.icon.draft)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -91,13 +90,6 @@ public extension StampEditModel {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
-    }
-}
-
-extension StampEditModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

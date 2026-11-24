@@ -1,7 +1,6 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct RewardRuleEditSheet: View {
@@ -260,8 +259,8 @@ private extension RewardRuleEditSheet {
 extension RewardRuleEditModel: SettingsEditing {}
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        RewardRuleEditSheet(model: RewardRuleEditModel(database: database, clock: .system))
+    if let parts = ScreenParts.preview() {
+        RewardRuleEditSheet(model: RewardRuleEditModel(parts: parts))
     }
 }
 

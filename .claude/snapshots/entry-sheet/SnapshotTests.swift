@@ -680,8 +680,7 @@ private extension SnapshotTests {
         }
 
         let model = EntryModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             date: date,
             type: type
         )
@@ -724,8 +723,7 @@ private extension SnapshotTests {
             let savedAt = snapshotNow.addingTimeInterval(TimeInterval(index - entries.count))
 
             let draft = EntryModel(
-                database: database,
-                clock: .fixed(savedAt),
+                parts: ScreenParts(database: database, clock: .fixed(savedAt)),
                 date: date.adding(days: offset)
             )
 
@@ -740,7 +738,10 @@ private extension SnapshotTests {
             _ = try #require(await draft.save())
         }
 
-        let model = EntryModel(database: database, clock: .fixed(snapshotNow), date: date)
+        let model = EntryModel(
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
+            date: date
+        )
 
         await model.load()
         await model.reloadCategories()
@@ -755,7 +756,10 @@ private extension SnapshotTests {
 
         try database.insertDefaultsIfEmpty(at: now)
 
-        let draft = EntryModel(database: database, clock: .fixed(snapshotNow), date: date)
+        let draft = EntryModel(
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
+            date: date
+        )
 
         await draft.load()
 
@@ -765,8 +769,7 @@ private extension SnapshotTests {
 
         let saved = try #require(await draft.save())
         let model = EntryModel(
-            database: database,
-            clock: .fixed(snapshotNow),
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
             editing: saved.entry.id,
             date: date
         )

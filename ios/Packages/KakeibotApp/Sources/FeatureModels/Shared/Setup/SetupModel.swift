@@ -13,14 +13,14 @@ public final class SetupModel: ScreenModel {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         newsVersion: String
     ) {
         let input = Input(newsVersion: newsVersion)
 
         self.input = input
         self.output = Output(input: input)
-        self.dependencies = Dependencies(database: database)
+        self.dependencies = Dependencies(database: parts.database)
     }
 }
 

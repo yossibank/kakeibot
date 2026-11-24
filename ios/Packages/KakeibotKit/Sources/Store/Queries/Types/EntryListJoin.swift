@@ -1,3 +1,4 @@
+import Core
 import GRDB
 
 actor EntryListJoin<Part: Equatable & Sendable, Value: Equatable & Sendable> {

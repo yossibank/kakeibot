@@ -14,7 +14,7 @@ public final class ReminderModel {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         today: LocalDate,
         time: ReminderTime?,
         authorization: NotificationAuthorization = .allowed,
@@ -26,7 +26,7 @@ public final class ReminderModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, permission: permission)
+        self.dependencies = Dependencies(database: parts.database, permission: permission)
     }
 }
 

@@ -11,7 +11,7 @@ struct RecurringEditModelTests {
     func warnsThatRemindersCannotArriveWhenDenied() async throws {
         let setup = try await HomeModelTests.Setup()
         let client = ReminderModelTests.FakePermission(authorization: .denied)
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         await model.refreshAuthorization(client.permission)
@@ -26,7 +26,7 @@ struct RecurringEditModelTests {
     func doesNotWarnWhenRemindersAreAllowed() async throws {
         let setup = try await HomeModelTests.Setup()
         let client = ReminderModelTests.FakePermission(authorization: .allowed)
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         model.state.schedule.remindDaysBefore = 1
 
@@ -40,8 +40,7 @@ struct RecurringEditModelTests {
         let setup = try await HomeModelTests.Setup()
 
         let model = RecurringEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             type: .transfer
         )
@@ -59,7 +58,7 @@ struct RecurringEditModelTests {
     func opensScheduleWhenAddingRecurring() async throws {
         let setup = try await HomeModelTests.Setup()
 
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
         #expect(model.state.isScheduleOpen)
     }
@@ -69,8 +68,7 @@ struct RecurringEditModelTests {
         let setup = try await HomeModelTests.Setup()
 
         let model = RecurringEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             editing: Recurring.ID()
         )
@@ -81,7 +79,7 @@ struct RecurringEditModelTests {
     @Test
     func doesNotCountClosingScheduleAsChange() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
         model.state.isScheduleOpen = false
@@ -93,7 +91,7 @@ struct RecurringEditModelTests {
     func savesRecurringAndGeneratesEntries() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.state.press(.digit(7))
@@ -118,8 +116,7 @@ struct RecurringEditModelTests {
         let client = ReminderModelTests.FakePermission(authorization: .notDetermined)
 
         let without = RecurringEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today
         )
         await without.load()
@@ -129,7 +126,7 @@ struct RecurringEditModelTests {
         _ = await without.save(permission: client.permission)
         let askedWithout = await client.requested
 
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         model.state.press(.digit(5))
         model.state.memo = "保険"
@@ -148,7 +145,7 @@ struct RecurringEditModelTests {
     @Test
     func suggestsHolidayShiftFromCategory() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.select(.income)
@@ -181,8 +178,7 @@ struct RecurringEditModelTests {
         let card = try await setup.database.save(wallet, at: Date())
 
         let model = RecurringEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             paying: card.id
         )
@@ -214,8 +210,7 @@ struct RecurringEditModelTests {
         let loan = try await setup.database.save(wallet, at: Date())
 
         let model = RecurringEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             paying: loan.id
         )
@@ -283,7 +278,7 @@ struct RecurringEditModelTests {
     func savesTransferBetweenWallets() async throws {
         let setup = try await RecordsModelTests.Setup()
         let start = try #require(LocalDate("2026-09-01"))
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.select(.transfer)
@@ -307,7 +302,7 @@ struct RecurringEditModelTests {
     @Test
     func refusesSameWalletTransfer() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         model.select(.transfer)
@@ -322,7 +317,7 @@ struct RecurringEditModelTests {
     @Test
     func refusesEmptyAmount() async throws {
         let setup = try await RecordsModelTests.Setup()
-        let model = RecurringEditModel(database: setup.database, clock: .system, today: setup.today)
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let saved = await model.save()
@@ -348,8 +343,7 @@ private extension RecurringEditModelTests {
         let loan = try await setup.database.save(wallet, at: Date())
 
         let model = RecurringEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             paying: loan.id
         )

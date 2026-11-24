@@ -16,6 +16,10 @@ Android も同じ分け方で、画面のモデルを `:featuremodels` に置く
 - `AppFeature・Features --> FeatureModels`
 - `AppFeatureTests・FeaturesTests --> TestSupport`
 
+`Features` は `Store` に依存しない。DB は `ScreenParts` に包んで受け取り、`FeatureModels` のモデルだけが開く。
+
+`Features` には `MemberImportVisibility` を付ける。import していないモジュールの関数は呼べない。`import Store` を書いていないことは、`make verify` が確かめる。
+
 テストのターゲットを除いた依存は、次の図のとおりである。
 
 ```mermaid
@@ -37,9 +41,9 @@ flowchart TD
     end
     AppFeature --> Store
     AppWidget --> Store
-    Features --> Store
     FeatureModels --> Store
     Sync --> Store
+    Sync --> Core
     AppFeature --> Core
     AppWidget --> Core
     Features --> Core
@@ -71,6 +75,7 @@ KakeibotKit/
 │   │   │   ├── Review/
 │   │   │   ├── Reward/
 │   │   │   ├── Setting/
+│   │   │   ├── Sync/
 │   │   │   ├── Theme/
 │   │   │   ├── Voice/
 │   │   │   └── Wallet/
@@ -113,10 +118,13 @@ KakeibotKit/
 | `Concepts/Review/` | 振り返りの範囲と集計 |
 | `Concepts/Reward/` | ごほうびと貯金箱 |
 | `Concepts/Setting/` | 設定の値 |
+| `Concepts/Sync/` | 同期の状態とまとめ、共有している口座と誘われた口座 |
 | `Concepts/Theme/` | テーマの色・書体・形 |
 | `Concepts/Voice/` | 話した文から金額・日付・カテゴリ・口座・メモを読む決まり |
 | `Concepts/Wallet/` | 財布と残高 |
+| `Core/Concepts/` の読み出しの型 | DB から読んだ値をまとめた型（`EntryList`・`MonthOverview` など）。DB を知らないので、画面も使う |
 | `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、金額の表記、下書きの決まりと問題、文字の前後の空白を除く拡張 |
+| `Core/Shared/` の `Deletion` | 取り消しに使う削除の値。中の行は、Kit の中だけが読む |
 | `Core/Shared/` の `NamedIconDraft` | 名前とアイコンを持つ下書き。カテゴリと口座の下書きが適合する |
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
 | `Store/Queries/Methods/` | 返す型の名前で付ける。書き込みと同じ型なら `+<型>Query` |
@@ -208,11 +216,13 @@ KakeibotApp/
 | `FeatureModels/Screens/Entry/Receipt/` | レシートを Vision と Foundation Models で読む |
 | `FeatureModels/Screens/Entry/Voice/` | 声を SpeechAnalyzer で聞き、Foundation Models でカテゴリと口座を選ぶ |
 | `FeatureModels/Screens/Pro/` | Pro の購入のモデル |
+| `FeatureModels/Screens/Settings/Menu/` | 設定の入口のモデルと、確かめ用のテストデータ（`#if DEBUG`） |
 | `FeatureModels/Shared/Bill/` | これからの引き落としを月のページに分ける |
 | `FeatureModels/Shared/DateChoice/` | 休日のずらしと曜日の表示の名前 |
 | `FeatureModels/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
 | `FeatureModels/Shared/Model/` | 画面のモデルの見張り（失敗で見張り直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、`ScreenClock`、値を覚える `Derived`・`DerivedTable` も置く |
-| `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、保存の失敗が空き容量不足かの見分け |
+| `FeatureModels/Shared/Model/` の `ScreenParts` | DB と時計を包んで、画面からモデルへ渡す型。中の DB は `FeatureModels` だけが読む |
+| `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、削除の取り消し（`DeletionUndo`）。保存の失敗が空き容量不足かの見分けも置く |
 | `FeatureModels/Shared/Notification/` | 通知の許可の窓口 |
 | `FeatureModels/Shared/Period/` | 期間の範囲と月の始まりの文言 |
 | `FeatureModels/Shared/Pro/` | Pro を買ったかと、購入の窓口。StoreKit の中身は AppFeature が渡す |
@@ -224,7 +234,7 @@ KakeibotApp/
 | `Features/Screens/Entry/Voice/` | 声の入力のカード・波形・終わるボタン・知らせ |
 | `Features/Screens/Onboarding/` | 最初の設定のチュートリアル |
 | `Features/Screens/Pro/` | Pro の画面 |
-| `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口と、確かめ用のテストデータ（`#if DEBUG`） |
+| `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口 |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
 | `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート。`Model/` に版、`View/` にシートとカードとページ送り、`Parts/` に使い方のコマ |
 | `Features/Shared/Bill/` | これからの引き落としの行・月のページ送りとタブ・見込みと確定の印と、その言葉 |

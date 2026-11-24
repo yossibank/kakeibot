@@ -11,11 +11,10 @@ public final class RewardRuleEditModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         editing id: RewardRule.ID? = nil
     ) {
         let state = State()
@@ -27,7 +26,7 @@ public final class RewardRuleEditModel {
         self.state = state
         self.input = input
         self.output = output
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -134,13 +133,6 @@ public extension RewardRuleEditModel {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
-    }
-}
-
-extension RewardRuleEditModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

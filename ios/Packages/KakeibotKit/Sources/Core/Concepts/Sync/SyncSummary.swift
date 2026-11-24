@@ -12,15 +12,3 @@ public struct SyncSummary: Hashable, Sendable {
         self.updatedAt = updatedAt
     }
 }
-
-public extension SyncSummary {
-    init(
-        entryCount: Int,
-        latestUpdate: String?
-    ) {
-        self.init(
-            entryCount: entryCount,
-            updatedAt: latestUpdate.flatMap(Date.stored)
-        )
-    }
-}

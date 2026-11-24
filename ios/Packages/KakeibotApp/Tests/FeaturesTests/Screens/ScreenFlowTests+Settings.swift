@@ -17,7 +17,7 @@ extension ScreenFlowTests {
         _ = try await setup.record(500, on: early)
         _ = try await setup.record(1200, on: late)
         await tabs.wait { $0.amounts.allSatisfy { $0.count == 2 } }
-        let settings = MonthStartDayModel(database: setup.database, today: setup.today)
+        let settings = MonthStartDayModel(parts: .system(setup.database), today: setup.today)
         await settings.load()
 
         #expect(tabs.home.output.monthExpense == 1700)
@@ -59,7 +59,7 @@ extension ScreenFlowTests {
         _ = try await setup.record(700, on: sunday)
         await tabs.wait { $0.amounts.allSatisfy { $0 == [700] } }
         tabs.review.setScale(.week)
-        let settings = SettingsMenuValueModel(database: setup.database, key: .weekStart)
+        let settings = SettingsMenuValueModel(parts: .system(setup.database), key: .weekStart)
         await settings.load()
 
         #expect(tabs.review.output.total == 700)
@@ -80,7 +80,7 @@ extension ScreenFlowTests {
         let setup = try await Setup()
         let tabs = await setup.openTabs()
         _ = try await setup.record(1200)
-        let settings = BudgetListModel(database: setup.database, today: setup.today)
+        let settings = BudgetListModel(parts: .system(setup.database), today: setup.today)
         await settings.load()
         settings.startEditing(.total)
 
@@ -119,8 +119,7 @@ extension ScreenFlowTests {
         let draft = await setup.entryModel()
         draft.setWallet(setup.bank)
         let settings = WalletEditModel(
-            database: setup.database,
-            clock: setup.clock,
+            parts: ScreenParts(database: setup.database, clock: setup.clock),
             editing: setup.bank
         )
         await settings.load()
@@ -159,8 +158,7 @@ extension ScreenFlowTests {
         let draft = await setup.entryModel()
 
         let settings = CategoryEditModel(
-            database: setup.database,
-            clock: setup.clock,
+            parts: ScreenParts(database: setup.database, clock: setup.clock),
             kind: .expense,
             editing: categoryID
         )

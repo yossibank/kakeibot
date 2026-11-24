@@ -48,7 +48,7 @@ extension AssetsModelTests {
         let rule = try await setup.saveRule(amount: 1000)
         try await setup.achieve(rule, on: "2026-10-01")
         let goal = try await setup.saveGoal(target: 1000)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         try await setup.database.failWrites(to: "reward_goal")
 
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
@@ -61,7 +61,7 @@ extension AssetsModelTests {
     func refusesPurchaseShortOfBalance() async throws {
         let setup = try await Setup()
         let goal = try await setup.saveGoal(target: 1000)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
         let bank = try await setup.database.rewardBank()
@@ -80,7 +80,7 @@ extension AssetsModelTests {
         let overpaid = try await setup.saveLoan("車", balance: -50000)
         try await setup.save(.transfer, 60000, on: "2026-10-10", from: setup.bank, to: overpaid)
 
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let freshRow = try #require(model.output.rows.first { $0.wallet.id == fresh })
         let overpaidRow = try #require(model.output.rows.first { $0.wallet.id == overpaid })
@@ -134,7 +134,7 @@ extension AssetsModelTests.Setup {
     func runningModel(
         sourceLocation: SourceLocation = #_sourceLocation
     ) async throws -> AssetsModel {
-        let model = AssetsModel(database: database, clock: .system, today: today)
+        let model = AssetsModel(parts: .system(database), today: today)
 
         let task = Task {
             await model.run()

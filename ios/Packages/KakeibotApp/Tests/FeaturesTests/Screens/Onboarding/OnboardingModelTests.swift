@@ -12,8 +12,7 @@ struct OnboardingModelTests {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))
         let model = OnboardingModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             newsVersion: WhatsNewRelease.latestVersion
         )
@@ -52,8 +51,7 @@ struct OnboardingModelTests {
     func endsMinimalRouteAtBudget() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = OnboardingModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             newsVersion: WhatsNewRelease.latestVersion
         )
@@ -72,8 +70,7 @@ struct OnboardingModelTests {
     func addsStarterTemplatesOnce() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = OnboardingModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             today: setup.today,
             newsVersion: WhatsNewRelease.latestVersion
         )

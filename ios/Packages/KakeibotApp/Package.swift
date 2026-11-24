@@ -55,8 +55,10 @@ let package = Package(
             dependencies: [
                 "DesignSystem",
                 "FeatureModels",
-                .product(name: "Core", package: "KakeibotKit"),
-                .product(name: "Store", package: "KakeibotKit")
+                .product(name: "Core", package: "KakeibotKit")
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(
@@ -68,6 +70,7 @@ let package = Package(
         .target(
             name: "Sync",
             dependencies: [
+                .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
         ),
@@ -120,6 +123,7 @@ let package = Package(
             name: "SyncTests",
             dependencies: [
                 "Sync",
+                .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
             ]
         )

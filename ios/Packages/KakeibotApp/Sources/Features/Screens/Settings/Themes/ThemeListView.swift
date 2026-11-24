@@ -1,7 +1,6 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct ThemeListView: View {
@@ -19,20 +18,20 @@ public struct ThemeListView: View {
     @State private var hintFlag: SettingsScreenFlag
     @State private var deletion: Deletion?
 
-    private let database: AppDatabase
+    private let parts: ScreenParts
     private let appIcon: AppIconListModel
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         appIcon: AppIconListModel
     ) {
-        let model = ThemeListModel(database: database, appIcon: appIcon)
-        let hintFlag = SettingsScreenFlag.closedHint(.themes, in: database)
+        let model = ThemeListModel(parts: parts, appIcon: appIcon)
+        let hintFlag = SettingsScreenFlag.closedHint(.themes, in: parts)
 
         _model = State(initialValue: model)
         _hintFlag = State(initialValue: hintFlag)
 
-        self.database = database
+        self.parts = parts
         self.appIcon = appIcon
     }
 
@@ -118,8 +117,7 @@ public struct ThemeListView: View {
         .navigationDestination(item: $editing) { target in
             ThemeEditSheet(
                 model: ThemeEditModel(
-                    database: database,
-                    clock: .system,
+                    parts: parts,
                     editing: target.theme,
                     base: target.base ?? model.output.currentPalette
                 )

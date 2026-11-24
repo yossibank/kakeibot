@@ -11,7 +11,7 @@ struct WalletListModelTests {
     func reordersShownWallets() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let model = WalletListModel(database: database, clock: .system)
+        let model = WalletListModel(parts: .system(database))
         await model.load()
         let bank = try #require(model.output.shown.last)
 
@@ -33,7 +33,7 @@ struct WalletListModelTests {
         let bank = try #require(options.wallets.last)
         try await database.setHidden(bank.id, isHidden: true, at: Date())
 
-        let model = WalletListModel(database: database, clock: .system)
+        let model = WalletListModel(parts: .system(database))
         await model.load()
         let cash = try #require(model.output.shown.first)
 
@@ -69,7 +69,7 @@ struct WalletListModelTests {
 
         try await database.saveEntry(income, at: Date())
         try await database.saveEntry(future, at: Date())
-        let model = WalletListModel(database: database, clock: .system)
+        let model = WalletListModel(parts: .system(database))
         await model.load()
 
         #expect(model.balance(of: cash) == 1000)
@@ -94,7 +94,7 @@ struct WalletListModelTests {
         )
 
         try await database.saveEntry(future, at: Date())
-        let model = WalletListModel(database: database, clock: .system)
+        let model = WalletListModel(parts: .system(database))
         await model.load()
 
         #expect(model.balance(of: cash) == 0)
@@ -106,7 +106,7 @@ struct WalletListModelTests {
     func hidesWalletButKeepsTheLastOne() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let model = WalletListModel(database: database, clock: .system)
+        let model = WalletListModel(parts: .system(database))
         await model.load()
         let cash = try #require(model.output.shown.first)
         let bank = try #require(model.output.shown.last)
@@ -128,7 +128,7 @@ struct WalletListModelTests {
     func showsHiddenWallet() async throws {
         let database = try AppDatabase.inMemory()
         try database.insertDefaultsIfEmpty(at: Date())
-        let model = WalletListModel(database: database, clock: .system)
+        let model = WalletListModel(parts: .system(database))
         await model.load()
         let bank = try #require(model.output.shown.last)
         await model.hide(bank.id)

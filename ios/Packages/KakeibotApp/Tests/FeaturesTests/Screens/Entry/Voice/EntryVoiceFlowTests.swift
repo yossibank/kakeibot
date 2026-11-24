@@ -279,7 +279,7 @@ extension EntryVoiceFlowTests {
     }
 
     func loadedModel(_ setup: EntryModelTests.Setup) async throws -> EntryModel {
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         return model
     }

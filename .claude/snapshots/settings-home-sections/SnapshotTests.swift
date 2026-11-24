@@ -16,7 +16,7 @@ struct SnapshotTests {
         let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = HomeSectionListModel(database: database)
+        let model = HomeSectionListModel(parts: .system(database))
         let sections = HomeSection.allCases
         let rows = [Array(sections.prefix(3)), Array(sections.dropFirst(3))]
 
@@ -36,7 +36,7 @@ struct SnapshotTests {
         .frame(width: 344, height: 184, alignment: .topLeading)
 
         for variant in Self.variants {
-            let view = HomeSectionListView(model: model, database: database)
+            let view = HomeSectionListView(model: model, parts: .system(database))
 
             try Self.write(view, variant: variant, title: "設定 › ホームの並び", to: "home-sections")
             try Self.write(
@@ -211,5 +211,11 @@ private extension SnapshotTests {
             title: title,
             variant: variant.label
         )
+    }
+}
+
+private extension ScreenParts {
+    static func system(_ database: AppDatabase) -> ScreenParts {
+        ScreenParts(database: database, clock: .system)
     }
 }

@@ -10,7 +10,7 @@ extension WalletEditModelTests {
     func loadsAndEditsWallet() async throws {
         let setup = try await Setup()
         let bank = try await setup.wallet(named: "銀行")
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: bank.id)
         await model.load()
         let loaded = model.state.name
         let isChanged = model.isChanged
@@ -34,7 +34,7 @@ extension WalletEditModelTests {
     @Test
     func savesLoanAmountAndClearsItWhenKindChanges() async throws {
         let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "奨学金"
         adding.state.setKind(.loan)
         adding.state.pressLoanAmount(.digit(3))
@@ -43,7 +43,7 @@ extension WalletEditModelTests {
         adding.state.pressLoanAmount(.digit(0))
         let saved = try #require(await adding.save())
 
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         let loaded = model.state.loanAmount.amount
         let isChanged = model.isChanged
@@ -63,7 +63,7 @@ extension WalletEditModelTests {
     @Test
     func showsRepaidOnNewLoanOnlyAfterBalance() async throws {
         let setup = try await Setup()
-        let model = WalletEditModel(database: setup.database, clock: .system)
+        let model = WalletEditModel(parts: .system(setup.database))
         model.state.name = "奨学金"
         model.state.setKind(.loan)
         model.state.pressLoanAmount(.digit(3))
@@ -100,7 +100,7 @@ extension WalletEditModelTests {
         )
 
         try await setup.database.saveEntry(income, at: Date())
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: bank.id)
         await model.load()
 
         #expect(model.input.balance == 5000)
@@ -111,7 +111,7 @@ extension WalletEditModelTests {
     func entrySheetSeesAddedWallet() async throws {
         let setup = try await Setup()
         let date = try #require(LocalDate("2026-10-12"))
-        let entry = EntryModel(database: setup.database, clock: .system, date: date)
+        let entry = EntryModel(parts: .system(setup.database), date: date)
         await entry.load()
 
         let editor = entry.newWalletModel()
@@ -131,10 +131,10 @@ extension WalletEditModelTests {
         let cash = try await setup.wallet(named: "財布")
         let bank = try await setup.wallet(named: "銀行")
 
-        let bankModel = WalletEditModel(database: setup.database, clock: .system, editing: bank.id)
+        let bankModel = WalletEditModel(parts: .system(setup.database), editing: bank.id)
         let hid = await bankModel.setHidden(true)
 
-        let cashModel = WalletEditModel(database: setup.database, clock: .system, editing: cash.id)
+        let cashModel = WalletEditModel(parts: .system(setup.database), editing: cash.id)
         let refused = await cashModel.setHidden(true)
 
         #expect(hid)

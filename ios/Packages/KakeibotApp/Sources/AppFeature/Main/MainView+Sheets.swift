@@ -34,8 +34,7 @@ extension MainView {
         case let .edit(id):
             EntrySheet(
                 model: EntryModel(
-                    database: database,
-                    clock: clock,
+                    parts: parts,
                     editing: id,
                     date: today
                 ),
@@ -44,8 +43,7 @@ extension MainView {
 
         case .settings:
             SettingsMenuSheet(
-                database: database,
-                clock: clock,
+                parts: parts,
                 today: today,
                 appIcon: appIcon
             )
@@ -53,8 +51,7 @@ extension MainView {
         case let .template(template):
             EntrySheet(
                 model: EntryModel(
-                    database: database,
-                    clock: clock,
+                    parts: parts,
                     date: today,
                     template: template
                 ),
@@ -67,15 +64,14 @@ extension MainView {
         case .templates:
             HomeTemplateShelfSheet(
                 model: home,
-                database: database,
+                parts: parts,
                 onUse: useTemplate
             )
 
         case .newTemplate:
             TemplateEditSheet(
                 model: TemplateEditModel(
-                    database: database,
-                    clock: clock,
+                    parts: parts,
                     type: home.state.templateType
                 )
             )
@@ -83,8 +79,7 @@ extension MainView {
         case let .recurring(id):
             RecurringEditSheet(
                 model: RecurringEditModel(
-                    database: database,
-                    clock: clock,
+                    parts: parts,
                     today: today,
                     editing: id
                 )
@@ -96,7 +91,7 @@ extension MainView {
             NavigationStack {
                 SetupDestination(
                     item,
-                    database: database,
+                    parts: parts,
                     today: today,
                     appIcon: appIcon
                 )
@@ -121,8 +116,7 @@ extension MainView {
         case let .wallet(id):
             WalletEditSheet(
                 model: WalletEditModel(
-                    database: database,
-                    clock: clock,
+                    parts: parts,
                     editing: id
                 )
             ) { _ in } onDelete: { deletion in

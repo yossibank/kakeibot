@@ -34,6 +34,7 @@ struct MainView: View {
 
     let database: AppDatabase
     let clock: ScreenClock
+    let parts: ScreenParts
     let today: LocalDate
     let route: PlannedNotification.Route?
     let onRouteOpened: () -> Void
@@ -50,56 +51,54 @@ struct MainView: View {
         onRouteOpened: @escaping () -> Void = {},
         onLoad: @escaping () -> Void = {}
     ) {
+        let parts = ScreenParts(database: database, clock: clock)
+
         _home = State(
             initialValue: HomeModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 today: today
             )
         )
 
         _records = State(
             initialValue: RecordsModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 today: today
             )
         )
 
         _review = State(
             initialValue: ReviewModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 today: today
             )
         )
 
         _assets = State(
             initialValue: AssetsModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 today: today
             )
         )
 
         _setup = State(
-            initialValue: SetupModel(database: database, newsVersion: WhatsNewRelease.latestVersion)
+            initialValue: SetupModel(parts: parts, newsVersion: WhatsNewRelease.latestVersion)
         )
 
         _draft = State(
             initialValue: EntryModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 date: today
             )
         )
 
-        _notice = State(initialValue: EntryNoticeModel(database: database, clock: clock))
+        _notice = State(initialValue: EntryNoticeModel(parts: parts))
 
-        _undo = State(initialValue: DeletionUndo(database: database))
+        _undo = State(initialValue: DeletionUndo(parts: parts))
 
         self.database = database
         self.clock = clock
+        self.parts = parts
         self.today = today
         self.route = route
         self.isRevealed = isRevealed

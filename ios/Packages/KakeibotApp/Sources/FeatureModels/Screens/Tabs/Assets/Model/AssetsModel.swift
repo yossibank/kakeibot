@@ -11,11 +11,10 @@ public final class AssetsModel: ScreenModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate
     ) {
         let state = State()
@@ -24,7 +23,7 @@ public final class AssetsModel: ScreenModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -70,16 +69,14 @@ public extension AssetsModel {
 
     func newWalletModel(kind: Wallet.Kind) -> WalletEditModel {
         WalletEditModel(
-            database: dependencies.database,
-            clock: dependencies.clock,
+            parts: dependencies,
             kind: kind
         )
     }
 
     func adjustModel(for row: WalletRow) -> AssetsAdjustmentModel {
         AssetsAdjustmentModel(
-            database: dependencies.database,
-            clock: dependencies.clock,
+            parts: dependencies,
             wallet: row.wallet,
             balance: row.balance,
             today: output.today
@@ -118,13 +115,8 @@ public extension AssetsModel {
     }
 }
 
-extension AssetsModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
-    }
-
-    public static let loadFailedMessage = "残高を読めませんでした"
+public extension AssetsModel {
+    static let loadFailedMessage = "残高を読めませんでした"
 }
 
 private extension AssetsModel {

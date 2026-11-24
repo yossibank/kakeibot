@@ -10,7 +10,7 @@ struct TemplateEditModelTests {
     @Test
     func entersAmountWithKeypad() throws {
         let database = try Self.database()
-        let model = TemplateEditModel(database: database, clock: .system, type: .income)
+        let model = TemplateEditModel(parts: .system(database), type: .income)
 
         model.state.press(.digit(1))
         model.state.press(.doubleZero)
@@ -27,7 +27,7 @@ struct TemplateEditModelTests {
     @Test
     func namesWhatIsMissingOnSaveButton() async throws {
         let database = try Self.database()
-        let model = TemplateEditModel(database: database, clock: .system, type: .expense)
+        let model = TemplateEditModel(parts: .system(database), type: .expense)
         await model.load()
 
         let empty = model.saveTitle
@@ -40,7 +40,7 @@ struct TemplateEditModelTests {
     @Test
     func savesNewTemplateWithDefaults() async throws {
         let database = try Self.database()
-        let model = TemplateEditModel(database: database, clock: .system, type: .expense)
+        let model = TemplateEditModel(parts: .system(database), type: .expense)
         await model.load()
         let canSaveWithoutName = model.canSave
         let refused = await model.save()
@@ -64,13 +64,12 @@ struct TemplateEditModelTests {
     @Test
     func loadsExistingTemplateAndTracksChanges() async throws {
         let database = try Self.database()
-        let creator = TemplateEditModel(database: database, clock: .system, type: .income)
+        let creator = TemplateEditModel(parts: .system(database), type: .income)
         await creator.load()
         creator.state.name = "定期"
         let saved = try #require(await creator.save())
         let model = TemplateEditModel(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             type: .expense,
             editing: saved.id
         )

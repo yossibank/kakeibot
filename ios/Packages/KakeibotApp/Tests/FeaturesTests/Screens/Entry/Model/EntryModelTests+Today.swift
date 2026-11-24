@@ -51,7 +51,10 @@ private extension EntryModelTests {
 
         try await setup.database.saveEntry(draft, at: fixedNow)
 
-        let model = EntryModel(database: setup.database, clock: .fixed(fixedNow), date: today)
+        let model = EntryModel(
+            parts: ScreenParts(database: setup.database, clock: .fixed(fixedNow)),
+            date: today
+        )
 
         await model.load()
 

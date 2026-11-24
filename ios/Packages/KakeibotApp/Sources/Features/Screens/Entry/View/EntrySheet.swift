@@ -1,7 +1,6 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct EntrySheet: View {
@@ -386,12 +385,9 @@ private extension EntrySheet {
 }
 
 #Preview {
-    let database = try? AppDatabase.inMemory()
     let today = LocalDate(Date(), in: .current)
 
-    if let database {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
-
-        EntrySheet(model: EntryModel(database: database, clock: .system, date: today))
+    if let parts = ScreenParts.preview() {
+        EntrySheet(model: EntryModel(parts: parts, date: today))
     }
 }

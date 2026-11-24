@@ -11,19 +11,16 @@ public final class WalletListModel {
     public let input: SettingsBoardSnapshotInput<EntryList>
     public let output: Output
 
-    public let dependencies: SettingsBoardDependencies
+    public let dependencies: ScreenParts
 
-    public init(
-        database: AppDatabase,
-        clock: ScreenClock
-    ) {
+    public init(parts: ScreenParts) {
         let state = SettingsBoardMovingState<Wallet.ID>()
         let input = SettingsBoardSnapshotInput<EntryList>()
 
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = SettingsBoardDependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 

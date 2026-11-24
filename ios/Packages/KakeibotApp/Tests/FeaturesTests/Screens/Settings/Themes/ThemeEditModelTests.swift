@@ -11,8 +11,7 @@ struct ThemeEditModelTests {
         let setup = try await HomeModelTests.Setup()
 
         let model = ThemeEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: nil,
             base: ThemePreset.forest.palette
         )
@@ -33,8 +32,7 @@ struct ThemeEditModelTests {
         let setup = try await HomeModelTests.Setup()
 
         let creating = ThemeEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: nil,
             base: ThemePreset.forest.palette
         )
@@ -44,8 +42,7 @@ struct ThemeEditModelTests {
         let theme = try #require(try await setup.database.customThemes().first)
 
         let editing = ThemeEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: theme,
             base: ThemePreset.forest.palette
         )
@@ -55,7 +52,7 @@ struct ThemeEditModelTests {
 
         let switcher = AppIconListModelTests.Switcher(name: nil)
         let appIcon = AppIconListModel(switcher: switcher.client)
-        let list = ThemeListModel(database: setup.database, appIcon: appIcon)
+        let list = ThemeListModel(parts: .system(setup.database), appIcon: appIcon)
         await list.restore(deletion)
 
         #expect(afterDelete == .preset(.white))
@@ -67,8 +64,7 @@ struct ThemeEditModelTests {
     func keepsTextReadableWhenBackgroundChanges() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = ThemeEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: nil,
             base: .night
         )
@@ -83,8 +79,7 @@ struct ThemeEditModelTests {
     func disablesUnreadableSwatches() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = ThemeEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: nil,
             base: .night
         )
@@ -100,8 +95,7 @@ struct ThemeEditModelTests {
     func blocksUnreadableColors() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = ThemeEditModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: nil,
             base: .night
         )

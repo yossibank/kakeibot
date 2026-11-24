@@ -9,7 +9,7 @@ struct LaunchScreenModelTests {
     @Test
     func savesChosenScreen() async throws {
         let setup = try await HomeModelTests.Setup()
-        let model = LaunchScreenModel(database: setup.database)
+        let model = LaunchScreenModel(parts: .system(setup.database))
         await model.load()
 
         await model.choose(.review)

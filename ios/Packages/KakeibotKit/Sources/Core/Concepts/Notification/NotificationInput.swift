@@ -1,5 +1,3 @@
-import Core
-
 public struct NotificationInput: Equatable, Sendable {
     public let recordedDates: Set<LocalDate>
     public let recurrings: [Recurring]

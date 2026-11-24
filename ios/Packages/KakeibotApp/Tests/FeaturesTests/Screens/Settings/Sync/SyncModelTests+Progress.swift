@@ -9,7 +9,7 @@ extension SyncModelTests {
     func showsReceivingUntilFirstFetchEnds() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let syncedAt = Date(timeIntervalSince1970: 1_793_000_000)
 
         let task = Task {
@@ -40,7 +40,7 @@ extension SyncModelTests {
     func showsHowManyAreLeftToSend() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         try await setup.database.turnOnSync()
         try await setup.database.setSyncFetching(false)
         let count = try await setup.database.pendingSyncChanges().count
@@ -68,7 +68,7 @@ extension SyncModelTests {
     func showsNothingWhileOffByHand() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
 
         let task = Task {
             await model.observe()
@@ -91,7 +91,7 @@ extension SyncModelTests {
     func showsWhySyncStoppedInsteadOfProgress() async throws {
         let setup = try await HomeModelTests.Setup()
         let cloud = FakeCloud(hasData: false)
-        let model = SyncModel(database: setup.database, clock: .system, cloud: cloud.cloud)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         try await setup.database.turnOnSync()
         try await setup.database.turnOffSync(because: .cloudReplaced)
 

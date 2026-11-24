@@ -13,7 +13,7 @@ public final class SettingsMenuValueModel<Value: Equatable & Sendable> {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         key: SettingKey<Value>
     ) {
         let state = State()
@@ -22,7 +22,7 @@ public final class SettingsMenuValueModel<Value: Equatable & Sendable> {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, key: key)
+        self.dependencies = Dependencies(database: parts.database, key: key)
     }
 }
 

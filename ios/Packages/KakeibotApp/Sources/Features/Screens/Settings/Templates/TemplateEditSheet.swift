@@ -1,7 +1,6 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 public struct TemplateEditSheet: View {
@@ -256,13 +255,10 @@ private extension TemplateEditSheet {
 extension TemplateEditModel: SettingsEditing {}
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
-
+    if let parts = ScreenParts.preview() {
         TemplateEditSheet(
             model: TemplateEditModel(
-                database: database,
-                clock: .system,
+                parts: parts,
                 type: .expense
             )
         )

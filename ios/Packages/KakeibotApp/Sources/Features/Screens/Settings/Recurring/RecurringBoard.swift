@@ -1,26 +1,22 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 @MainActor
 struct RecurringBoard {
     let model: RecurringListModel
-    let database: AppDatabase
-    let clock: ScreenClock
+    let parts: ScreenParts
 }
 
 extension RecurringBoard {
     init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate
     ) {
         self.init(
-            model: RecurringListModel(database: database, clock: clock, today: today),
-            database: database,
-            clock: clock
+            model: RecurringListModel(parts: parts, today: today),
+            parts: parts
         )
     }
 }
@@ -99,8 +95,7 @@ extension RecurringBoard: SettingsBoardSpec {
         switch destination {
         case let .new(type):
             RecurringEditModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 today: model.input.today,
                 type: type,
                 editing: nil
@@ -108,8 +103,7 @@ extension RecurringBoard: SettingsBoardSpec {
 
         case let .edit(type, id):
             RecurringEditModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 today: model.input.today,
                 type: type,
                 editing: id

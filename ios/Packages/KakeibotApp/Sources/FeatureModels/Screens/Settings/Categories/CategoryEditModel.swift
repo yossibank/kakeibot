@@ -11,11 +11,10 @@ public final class CategoryEditModel {
     public let input: Input
     public let output: Output
 
-    let dependencies: Dependencies
+    let dependencies: ScreenParts
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         kind: EntryCategory.Kind,
         editing id: EntryCategory.ID? = nil
     ) {
@@ -28,7 +27,7 @@ public final class CategoryEditModel {
         self.state = state
         self.input = input
         self.output = output
-        self.dependencies = Dependencies(database: database, clock: clock)
+        self.dependencies = parts
     }
 }
 
@@ -136,15 +135,10 @@ public extension CategoryEditModel {
     }
 }
 
-extension CategoryEditModel {
-    public struct Snapshot: Equatable {
+public extension CategoryEditModel {
+    struct Snapshot: Equatable {
         let draft: EntryCategoryDraft
         let tags: [EntryTagDraft]
-    }
-
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
     }
 }
 

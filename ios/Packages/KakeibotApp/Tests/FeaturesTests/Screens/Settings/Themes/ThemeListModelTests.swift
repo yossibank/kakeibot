@@ -37,7 +37,7 @@ struct ThemeListModelTests {
         let setup = try await HomeModelTests.Setup()
         let switcher = AppIconListModelTests.Switcher(name: nil)
         let appIcon = AppIconListModel(switcher: switcher.client)
-        let model = ThemeListModel(database: setup.database, appIcon: appIcon)
+        let model = ThemeListModel(parts: .system(setup.database), appIcon: appIcon)
 
         await model.select(.preset(.sage))
         let suggested = model.state.suggestedIcon
@@ -53,7 +53,7 @@ struct ThemeListModelTests {
         let setup = try await HomeModelTests.Setup()
         let switcher = AppIconListModelTests.Switcher(name: "AppIcon-Wine")
         let appIcon = AppIconListModel(switcher: switcher.client)
-        let model = ThemeListModel(database: setup.database, appIcon: appIcon)
+        let model = ThemeListModel(parts: .system(setup.database), appIcon: appIcon)
 
         await model.select(.preset(.wine))
 
@@ -65,6 +65,6 @@ private extension ThemeListModelTests {
     static func model(database: AppDatabase) -> ThemeListModel {
         let switcher = AppIconListModelTests.Switcher(name: nil)
         let appIcon = AppIconListModel(switcher: switcher.client)
-        return ThemeListModel(database: database, appIcon: appIcon)
+        return ThemeListModel(parts: .system(database), appIcon: appIcon)
     }
 }

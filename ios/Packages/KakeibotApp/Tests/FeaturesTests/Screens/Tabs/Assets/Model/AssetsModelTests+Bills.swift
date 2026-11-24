@@ -48,7 +48,7 @@ extension AssetsModelTests {
 
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.rows.first { $0.wallet.id == card.id })
         let unpaid = try #require(row.unpaid)
@@ -105,7 +105,7 @@ extension AssetsModelTests {
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
         try await setup.database.saveRecurring(draft, today: setup.today, at: Date())
 
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.rows.first { $0.wallet.id == card.id })
         let unpaid = try #require(row.unpaid)

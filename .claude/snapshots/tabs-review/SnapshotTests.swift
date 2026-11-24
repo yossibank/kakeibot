@@ -16,7 +16,10 @@ struct SnapshotTests {
         let now = snapshotNow
         let today = LocalDate(now, in: .current)
         let database = try await Self.database(today: today, now: now)
-        let model = ReviewModel(database: database, clock: .fixed(snapshotNow), today: today)
+        let model = ReviewModel(
+            parts: ScreenParts(database: database, clock: .fixed(snapshotNow)),
+            today: today
+        )
         let task = Task {
             await model.run()
         }

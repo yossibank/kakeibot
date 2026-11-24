@@ -1,6 +1,5 @@
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -239,9 +238,9 @@ private extension BackupView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
+    if let parts = ScreenParts.preview() {
         NavigationStack {
-            BackupView(model: BackupModel(database: database, clock: .system))
+            BackupView(model: BackupModel(parts: parts))
         }
     }
 }

@@ -1,12 +1,11 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 @MainActor
 struct CategoryBoard {
-    let database: AppDatabase
+    let parts: ScreenParts
     let kind: EntryCategory.Kind
 }
 
@@ -68,10 +67,9 @@ extension CategoryBoard: SettingsBoardSpec {
 
     func editModel(for destination: Destination) -> CategoryEditModel {
         switch destination {
-        case let .new(kind): CategoryEditModel(database: database, clock: clock, kind: kind)
+        case let .new(kind): CategoryEditModel(parts: parts, kind: kind)
         case let .edit(kind, id): CategoryEditModel(
-                database: database,
-                clock: clock,
+                parts: parts,
                 kind: kind,
                 editing: id
             )
@@ -79,7 +77,7 @@ extension CategoryBoard: SettingsBoardSpec {
     }
 
     func makeModel() -> CategoryListModel {
-        CategoryListModel(database: database, clock: clock, kind: kind)
+        CategoryListModel(parts: parts, kind: kind)
     }
 
     func intro(

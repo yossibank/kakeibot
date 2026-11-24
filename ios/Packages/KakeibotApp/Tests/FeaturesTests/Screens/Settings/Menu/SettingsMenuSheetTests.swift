@@ -17,8 +17,7 @@ struct SettingsMenuSheetTests {
         try database.insertDefaultsIfEmpty(at: now)
 
         let sheet = SettingsMenuSheet(
-            database: database,
-            clock: .system,
+            parts: .system(database),
             today: LocalDate(now, in: .current),
             appIcon: AppIconListModel()
         )

@@ -13,7 +13,7 @@ struct CategoryListModelTests {
         let list = try await database.categoryList()
         let food = try #require(list.categories.first { $0.name == "食費" })
         try await database.setHidden(food.id, isHidden: true, at: Date())
-        let model = CategoryListModel(database: database, clock: .system)
+        let model = CategoryListModel(parts: .system(database))
 
         await model.load()
         let expenseShown = model.output.shown.map(\.name)
@@ -31,7 +31,7 @@ struct CategoryListModelTests {
     @Test
     func savesMovedOrder() async throws {
         let database = try Self.database()
-        let model = CategoryListModel(database: database, clock: .system)
+        let model = CategoryListModel(parts: .system(database))
         await model.load()
         let first = try #require(model.output.shown.first)
 
@@ -49,7 +49,7 @@ struct CategoryListModelTests {
     @Test
     func hidesWhileMoving() async throws {
         let database = try Self.database()
-        let model = CategoryListModel(database: database, clock: .system)
+        let model = CategoryListModel(parts: .system(database))
         await model.load()
         let first = try #require(model.output.shown.first)
 
@@ -64,7 +64,7 @@ struct CategoryListModelTests {
     @Test
     func showsHiddenCategory() async throws {
         let database = try Self.database()
-        let model = CategoryListModel(database: database, clock: .system)
+        let model = CategoryListModel(parts: .system(database))
         await model.load()
         let first = try #require(model.output.shown.first)
         await model.hide(first.id)

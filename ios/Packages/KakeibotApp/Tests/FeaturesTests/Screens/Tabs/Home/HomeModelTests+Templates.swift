@@ -24,7 +24,7 @@ extension HomeModelTests {
         )
 
         try await setup.database.saveTemplate(cafe, at: Date())
-        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
+        let home = HomeModel(parts: .system(setup.database), today: setup.date)
 
         let task = Task {
             await home.run()
@@ -61,7 +61,7 @@ extension HomeModelTests {
         )
 
         try await setup.database.saveTemplate(cafe, at: Date())
-        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
+        let home = HomeModel(parts: .system(setup.database), today: setup.date)
 
         let task = Task {
             await home.run()
@@ -80,7 +80,7 @@ extension HomeModelTests {
         let name = home.output.templates.map(\.name)
         task.cancel()
 
-        let reopened = HomeModel(database: setup.database, clock: .system, today: setup.date)
+        let reopened = HomeModel(parts: .system(setup.database), today: setup.date)
         await reopened.loadTemplateOrder()
 
         #expect(manual == ["洗剤", "ティッシュ", "駅前のカフェでモーニング"])
@@ -99,7 +99,7 @@ extension HomeModelTests {
         let old = try #require(soap.entryDraft(on: oldDate))
         try await setup.database.saveEntry(old, at: Date())
         try await setup.database.saveEntry(old, at: Date())
-        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
+        let home = HomeModel(parts: .system(setup.database), today: setup.date)
 
         let task = Task {
             await home.run()
@@ -127,7 +127,7 @@ extension HomeModelTests {
         let setup = try await TemplateSetup()
         try await setup.saveTemplate(name: "ランチ", amount: 980)
         try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
-        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
+        let home = HomeModel(parts: .system(setup.database), today: setup.date)
 
         let task = Task {
             await home.run()
@@ -151,7 +151,7 @@ extension HomeModelTests {
         let setup = try await TemplateSetup()
         let tag = try await setup.saveTag("朝ごはん")
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980, tagId: tag.id)
-        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
+        let home = HomeModel(parts: .system(setup.database), today: setup.date)
 
         let kept = try #require(await home.record(lunch))
 
@@ -166,8 +166,8 @@ extension HomeModelTests {
     func recordsFromHomeAndUndoes() async throws {
         let setup = try await TemplateSetup()
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)
-        let home = HomeModel(database: setup.database, clock: .system, today: setup.date)
-        let notice = EntryNoticeModel(database: setup.database, clock: .system)
+        let home = HomeModel(parts: .system(setup.database), today: setup.date)
+        let notice = EntryNoticeModel(parts: .system(setup.database))
 
         let change = try #require(await home.record(lunch))
         notice.show(change)

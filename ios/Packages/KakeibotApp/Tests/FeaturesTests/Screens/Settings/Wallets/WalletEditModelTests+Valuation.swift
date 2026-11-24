@@ -10,12 +10,12 @@ extension WalletEditModelTests {
     func locksInvestmentWithValuation() async throws {
         let setup = try await Setup()
         let today = LocalDate(Date(), in: .current)
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "積立"
         adding.state.setKind(.investment)
         let saved = try #require(await adding.save())
         try await setup.database.saveValuation(150_000, of: saved.id, on: today, at: Date())
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
 
         model.state.setKind(.bank)
@@ -26,11 +26,11 @@ extension WalletEditModelTests {
     @Test
     func locksKindRightAfterAddingValuation() async throws {
         let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "積立"
         adding.state.setKind(.investment)
         let saved = try #require(await adding.save())
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
 
         model.state.pressValuation(.digit(5))
@@ -47,12 +47,12 @@ extension WalletEditModelTests {
     func unlocksKindRightAfterDeletingLastValuation() async throws {
         let setup = try await Setup()
         let today = LocalDate(Date(), in: .current)
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "積立"
         adding.state.setKind(.investment)
         let saved = try #require(await adding.save())
         try await setup.database.saveValuation(5, of: saved.id, on: today, at: Date())
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         let valuation = try #require(model.input.valuations.first)
 
@@ -67,7 +67,7 @@ extension WalletEditModelTests {
     @Test
     func setsInvestmentValuation() async throws {
         let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(1))
@@ -76,7 +76,7 @@ extension WalletEditModelTests {
         adding.state.press(.digit(0))
         let saved = try #require(await adding.save())
 
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         model.startValuation()
         let start = model.state.valuation.amount
@@ -87,7 +87,7 @@ extension WalletEditModelTests {
         model.state.pressValuation(.doubleZero)
         let isSaved = await model.saveValuation()
 
-        let reloaded = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let reloaded = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await reloaded.load()
 
         #expect(model.output.showsValuation)
@@ -101,14 +101,14 @@ extension WalletEditModelTests {
     @Test
     func deletesValuationAndCountsFromStart() async throws {
         let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(5))
         adding.state.press(.doubleZero)
         let saved = try #require(await adding.save())
 
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         model.startValuation()
         model.state.pressValuation(.digit(9))
@@ -126,14 +126,14 @@ extension WalletEditModelTests {
     @Test
     func restoresDeletedValuationOnUndo() async throws {
         let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(5))
         adding.state.press(.doubleZero)
         let saved = try #require(await adding.save())
 
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         model.startValuation()
         model.state.pressValuation(.digit(9))
@@ -150,14 +150,14 @@ extension WalletEditModelTests {
     @Test
     func offersNoUndoWhenValuationIsAlreadyGone() async throws {
         let setup = try await Setup()
-        let adding = WalletEditModel(database: setup.database, clock: .system)
+        let adding = WalletEditModel(parts: .system(setup.database))
         adding.state.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(5))
         adding.state.press(.doubleZero)
         let saved = try #require(await adding.save())
 
-        let model = WalletEditModel(database: setup.database, clock: .system, editing: saved.id)
+        let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         model.startValuation()
         model.state.pressValuation(.digit(9))

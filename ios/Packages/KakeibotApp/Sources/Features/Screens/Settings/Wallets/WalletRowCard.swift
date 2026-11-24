@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 struct WalletRowCard<Leading: View>: View {

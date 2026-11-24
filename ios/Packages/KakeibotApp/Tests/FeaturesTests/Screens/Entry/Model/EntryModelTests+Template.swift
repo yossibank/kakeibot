@@ -13,8 +13,7 @@ extension EntryModelTests {
         let shared = try await setup.database.entryOptions().wallets[1]
         try await setup.database.startSharing(shared.id)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             type: .income
         )
@@ -29,7 +28,7 @@ extension EntryModelTests {
     func appliesTemplateToEntry() async throws {
         let setup = try await TemplateSetup()
         let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.apply(lunch)
@@ -46,7 +45,7 @@ extension EntryModelTests {
     func keepsTypedAmountAndMemoWhenTemplateLacksThem() async throws {
         let setup = try await TemplateSetup()
         let pass = try await setup.saveTemplate(name: "定期", amount: nil, memo: "")
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(4))
         model.state.press(.digit(5))
@@ -67,7 +66,7 @@ extension EntryModelTests {
         let tag = try await setup.saveTag("買い置き")
         let stock = try await setup.saveTemplate(name: "買い置き", amount: 500, tagId: tag.id)
         _ = try await setup.database.saveTags([], for: tag.categoryId, at: Date())
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.apply(stock)
@@ -81,14 +80,13 @@ extension EntryModelTests {
         let setup = try await TemplateSetup()
         let tag = try await setup.saveTag("買い置き")
         let stock = try await setup.saveTemplate(name: "買い置き", amount: 500, tagId: tag.id)
-        let first = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let first = EntryModel(parts: .system(setup.database), date: setup.date)
         await first.load()
         first.apply(stock)
         let entry = try #require(await first.save()?.entry)
         _ = try await setup.database.saveTags([], for: tag.categoryId, at: Date())
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -109,7 +107,7 @@ extension EntryModelTests {
         let setup = try await TemplateSetup()
         let tag = try await setup.saveTag("買い置き")
         let stock = try await setup.saveTemplate(name: "買い置き", amount: 1200, tagId: tag.id)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.apply(stock)
@@ -133,7 +131,7 @@ extension EntryModelTests {
         let setup = try await TemplateSetup()
         let pass = try await setup.saveTemplate(name: "定期", amount: nil)
         let bus = try await setup.saveTemplate(name: "バス", amount: nil)
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
         model.apply(bus)
@@ -148,8 +146,7 @@ extension EntryModelTests {
         let pass = try await setup.saveTemplate(name: "定期", amount: nil)
         try await setup.saveTemplate(name: "給料", amount: nil, type: .income)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             date: setup.date,
             template: pass
         )
@@ -165,7 +162,7 @@ extension EntryModelTests {
     @Test
     func prefillsNewTemplateFromInput() async throws {
         let setup = try await TemplateSetup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(4))
         model.state.press(.digit(5))

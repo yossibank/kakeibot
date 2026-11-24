@@ -13,14 +13,14 @@ public final class ThemeListModel {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         appIcon: AppIconListModel
     ) {
         let input = Input()
 
         self.input = input
         self.output = Output(input: input)
-        self.dependencies = Dependencies(database: database, appIcon: appIcon)
+        self.dependencies = Dependencies(database: parts.database, appIcon: appIcon)
     }
 }
 

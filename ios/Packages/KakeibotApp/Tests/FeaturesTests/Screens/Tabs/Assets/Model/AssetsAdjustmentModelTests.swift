@@ -12,7 +12,7 @@ struct AssetsAdjustmentModelTests {
         let setup = try await AssetsModelTests.Setup()
         try await setup.save(.expense, 37580, on: "2026-10-10", from: setup.cash)
         try await setup.save(.income, 1000, on: "2026-10-10", from: setup.bank)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
         let flags = model.output.rows.map(\.needsAdjustment)
@@ -24,7 +24,7 @@ struct AssetsAdjustmentModelTests {
     func adjustsBalanceToEnteredAmountWithoutSpending() async throws {
         let setup = try await AssetsModelTests.Setup()
         try await setup.save(.expense, 37580, on: "2026-10-10", from: setup.cash)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.rows.first)
         let adjust = model.adjustModel(for: row)
@@ -48,7 +48,7 @@ struct AssetsAdjustmentModelTests {
     @Test
     func refusesToSaveWithoutDifference() async throws {
         let setup = try await AssetsModelTests.Setup()
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.rows.first)
         let adjust = model.adjustModel(for: row)
@@ -64,7 +64,7 @@ struct AssetsAdjustmentModelTests {
     @Test
     func reportsChangeOnlyWhileAmountDiffersFromOpening() async throws {
         let setup = try await AssetsModelTests.Setup()
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.rows.first)
         let adjust = model.adjustModel(for: row)
@@ -83,7 +83,7 @@ struct AssetsAdjustmentModelTests {
     func describesDifference() async throws {
         let setup = try await AssetsModelTests.Setup()
         try await setup.save(.expense, 37580, on: "2026-10-10", from: setup.cash)
-        let model = AssetsModel(database: setup.database, clock: .system, today: setup.today)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         let row = try #require(model.output.rows.first)
         let adjust = model.adjustModel(for: row)

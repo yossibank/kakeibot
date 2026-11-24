@@ -44,7 +44,7 @@ struct AssetsRewardSheet: View {
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $isEditingRules) {
-                RewardRuleListView(database: model.childDatabase())
+                RewardRuleListView(parts: model.childParts())
             }
         }
         .sheet(item: $goalTarget) { target in

@@ -1,5 +1,3 @@
-import Core
-
 public extension Deletion {
     struct Subject: Equatable, Sendable {
         public let kind: Kind

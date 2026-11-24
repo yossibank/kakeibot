@@ -83,7 +83,7 @@ extension BackupModelTests {
     func takesExportDateFromRestoredFile() async throws {
         let setup = try Setup()
         let source = setup.exporter()
-        let target = BackupModel(database: setup.target, clock: .system, stash: setup.stash)
+        let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         let earlier = setup.now.addingTimeInterval(-90 * 24 * 60 * 60)
         try await setup.source.setSetting(.backupExportedAt, to: earlier)
         await source.makeFile(.json)

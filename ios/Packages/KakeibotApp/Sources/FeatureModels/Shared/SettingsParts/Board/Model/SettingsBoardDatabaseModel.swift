@@ -2,8 +2,5 @@ import Store
 
 @MainActor
 public protocol SettingsBoardDatabaseModel: SettingsBoardListModel {
-    init(
-        database: AppDatabase,
-        clock: ScreenClock
-    )
+    init(parts: ScreenParts)
 }

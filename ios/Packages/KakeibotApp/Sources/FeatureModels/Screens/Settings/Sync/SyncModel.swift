@@ -14,8 +14,7 @@ public final class SyncModel {
     let dependencies: Dependencies
 
     public init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         cloud: SyncCloud
     ) {
         let state = State()
@@ -24,7 +23,7 @@ public final class SyncModel {
         self.state = state
         self.input = input
         self.output = Output(input: input, state: state)
-        self.dependencies = Dependencies(database: database, clock: clock, cloud: cloud)
+        self.dependencies = Dependencies(database: parts.database, clock: parts.clock, cloud: cloud)
     }
 }
 

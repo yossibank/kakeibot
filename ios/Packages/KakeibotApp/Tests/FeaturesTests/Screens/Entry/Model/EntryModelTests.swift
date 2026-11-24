@@ -45,7 +45,7 @@ struct EntryModelTests {
     @Test
     func savesNewEntry() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(5))
         model.state.press(.doubleZero)
@@ -62,7 +62,7 @@ struct EntryModelTests {
     @Test
     func savesOnceWhenSaveIsTappedTwice() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
         model.state.press(.digit(5))
 
@@ -91,8 +91,7 @@ struct EntryModelTests {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -112,8 +111,7 @@ struct EntryModelTests {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -248,7 +246,7 @@ struct EntryModelTests {
     @Test
     func ignoresCancelledLoad() async throws {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
 
         let task = Task {
             await model.load()
@@ -326,8 +324,7 @@ struct EntryModelTests {
         let setup = try await Setup()
         let entry = try await setup.saveEntry(amount: 980)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: setup.date
         )
@@ -362,7 +359,7 @@ struct EntryModelTests {
 extension EntryModelTests {
     static func newModel() async throws -> EntryModel {
         let setup = try await Setup()
-        let model = EntryModel(database: setup.database, clock: .system, date: setup.date)
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
 
         await model.load()
 

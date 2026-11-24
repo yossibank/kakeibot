@@ -1,14 +1,13 @@
 import Core
 import DesignSystem
 import FeatureModels
-import Store
 import SwiftUI
 
 extension SettingsMenuSheet {
     var recordSection: some View {
         section("記録に使うもの") {
             NavigationLink {
-                WalletListView(database: database)
+                WalletListView(parts: parts)
             } label: {
                 row("口座", systemImage: "building.columns")
             }
@@ -16,7 +15,7 @@ extension SettingsMenuSheet {
             Hairline()
 
             NavigationLink {
-                CategoryListView(database: database)
+                CategoryListView(parts: parts)
             } label: {
                 row("カテゴリ", systemImage: "tag")
             }
@@ -24,7 +23,7 @@ extension SettingsMenuSheet {
             Hairline()
 
             NavigationLink {
-                TemplateListView(database: database)
+                TemplateListView(parts: parts)
             } label: {
                 row("テンプレート", systemImage: "rectangle.stack")
             }
@@ -36,7 +35,7 @@ extension SettingsMenuSheet {
             NavigationLink {
                 BudgetListView(
                     model: BudgetListModel(
-                        database: database,
+                        parts: parts,
                         today: today
                     )
                 )
@@ -49,8 +48,7 @@ extension SettingsMenuSheet {
             NavigationLink {
                 RecurringListView(
                     board: RecurringBoard(
-                        database: database,
-                        clock: clock,
+                        parts: parts,
                         today: today
                     )
                 )
@@ -63,7 +61,7 @@ extension SettingsMenuSheet {
             NavigationLink {
                 MonthStartDayView(
                     model: MonthStartDayModel(
-                        database: database,
+                        parts: parts,
                         today: today
                     )
                 )
@@ -82,7 +80,7 @@ extension SettingsMenuSheet {
     var funSection: some View {
         section("楽しみ") {
             NavigationLink {
-                StampListView(database: database)
+                StampListView(parts: parts)
             } label: {
                 row("スタンプ", systemImage: "seal")
             }
@@ -90,7 +88,7 @@ extension SettingsMenuSheet {
             Hairline()
 
             NavigationLink {
-                RewardRuleListView(database: database)
+                RewardRuleListView(parts: parts)
             } label: {
                 row("ごほうびの決まり", systemImage: "gift")
             }
@@ -101,8 +99,8 @@ extension SettingsMenuSheet {
         section("ホームと通知") {
             NavigationLink {
                 HomeSectionListView(
-                    model: HomeSectionListModel(database: database),
-                    database: database
+                    model: HomeSectionListModel(parts: parts),
+                    parts: parts
                 )
             } label: {
                 row("ホームに出すもの", systemImage: "rectangle.grid.1x2")
@@ -111,9 +109,9 @@ extension SettingsMenuSheet {
             Hairline()
 
             NavigationLink {
-                LaunchScreenView(model: LaunchScreenModel(database: database))
+                LaunchScreenView(model: LaunchScreenModel(parts: parts))
             } label: {
-                row("起動時に開く画面", systemImage: "iphone", value: launchScreen.title)
+                row("起動時に開く画面", systemImage: "iphone", value: model.input.launchScreen.title)
             }
 
             Hairline()
@@ -121,9 +119,9 @@ extension SettingsMenuSheet {
             NavigationLink {
                 ReminderView(
                     model: ReminderModel(
-                        database: database,
+                        parts: parts,
                         today: today,
-                        time: reminderTime,
+                        time: model.input.reminderTime,
                         authorization: authorization,
                         permission: permission
                     )
@@ -132,8 +130,8 @@ extension SettingsMenuSheet {
                 row("記録忘れの通知", systemImage: "bell", value: reminderText)
             }
 
-            if usesFun == false {
-                SettingsMenuRewardStartRow(database: database)
+            if model.input.usesFun == false {
+                SettingsMenuRewardStartRow(parts: parts)
             }
         }
     }
@@ -141,19 +139,19 @@ extension SettingsMenuSheet {
     var lookSection: some View {
         section("見た目") {
             NavigationLink {
-                ThemeListView(database: database, appIcon: appIcon)
+                ThemeListView(parts: parts, appIcon: appIcon)
             } label: {
                 row(
                     "テーマ",
                     systemImage: "paintpalette",
-                    value: theme.title(in: customThemes)
+                    value: model.input.theme.title(in: model.input.customThemes)
                 )
             }
 
             Hairline()
 
             NavigationLink {
-                AppIconListView(model: appIcon, database: database)
+                AppIconListView(model: appIcon, parts: parts)
             } label: {
                 row(
                     "アプリアイコン",
@@ -165,7 +163,7 @@ extension SettingsMenuSheet {
             Hairline()
 
             NavigationLink {
-                ThemeStyleTextView(model: ThemeStyleModel(database: database))
+                ThemeStyleTextView(model: ThemeStyleModel(parts: parts))
             } label: {
                 row(
                     "文字",
@@ -178,7 +176,7 @@ extension SettingsMenuSheet {
             Hairline()
 
             NavigationLink {
-                ThemeStyleLookView(model: ThemeStyleModel(database: database))
+                ThemeStyleLookView(model: ThemeStyleModel(parts: parts))
             } label: {
                 row("形と動き", systemImage: "square.on.circle") {
                     ThemeStyleMarks()
@@ -205,13 +203,12 @@ extension SettingsMenuSheet {
             NavigationLink {
                 SyncView(
                     model: SyncModel(
-                        database: database,
-                        clock: clock,
+                        parts: parts,
                         cloud: syncCloud
                     )
                 )
             } label: {
-                SettingsMenuSyncRow(status: syncStatus)
+                SettingsMenuSyncRow(status: model.input.syncStatus)
             }
 
             Hairline()
@@ -219,7 +216,7 @@ extension SettingsMenuSheet {
             NavigationLink {
                 BackupView(
                     model: BackupModel(
-                        database: database, clock: clock,
+                        parts: parts,
                         permission: permission
                     )
                 )
@@ -242,7 +239,7 @@ extension SettingsMenuSheet {
     var aboutSection: some View {
         section("このアプリについて") {
             NavigationLink {
-                WidgetGuideView(database: database)
+                WidgetGuideView(parts: parts)
             } label: {
                 row("ウィジェットの置き方", systemImage: "square.grid.2x2")
             }
@@ -268,11 +265,11 @@ extension SettingsMenuSheet {
 
 private extension SettingsMenuSheet {
     var monthStartDayText: String {
-        PeriodText.startDay(monthStartDay)
+        PeriodText.startDay(model.input.monthStartDay)
     }
 
     var reminderText: String {
-        ReminderModel.rowText(time: reminderTime, authorization: authorization)
+        ReminderModel.rowText(time: model.input.reminderTime, authorization: authorization)
     }
 
     var proText: String {
@@ -280,15 +277,7 @@ private extension SettingsMenuSheet {
     }
 
     var backupText: String? {
-        guard !syncStatus.isEnabled else {
-            return nil
-        }
-
-        return BackupModel.exportAgeText(
-            exportedAt: backupExportedAt,
-            firstCreatedAt: firstEntryCreatedAt,
-            now: clock.now
-        )
+        model.backupText()
     }
 
     var weekStartBinding: Binding<Weekday> {

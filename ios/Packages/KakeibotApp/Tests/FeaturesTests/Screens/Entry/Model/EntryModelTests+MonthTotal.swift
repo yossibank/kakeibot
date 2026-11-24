@@ -16,7 +16,7 @@ extension EntryModelTests {
         try await setup.saveEntry(category: categories[0].id, wallet: wallet, at: 1)
         try await setup.saveEntry(category: categories[0].id, wallet: wallet, at: 2)
         try await setup.saveEntry(category: categories[1].id, wallet: wallet, at: 3)
-        let model = EntryModel(database: setup.database, clock: .system, date: today)
+        let model = EntryModel(parts: .system(setup.database), date: today)
         await model.load()
 
         let empty = model.output.monthTotalText
@@ -50,8 +50,7 @@ extension EntryModelTests {
         try await setup.saveEntry(category: options.expenseCategories[0].id, wallet: wallet, at: 1)
         let entry = try #require(try setup.database.snapshot().entries.first)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: entry.date
         )
@@ -74,8 +73,7 @@ extension EntryModelTests {
         try await setup.saveEntry(category: options.expenseCategories[0].id, wallet: wallet, at: 1)
         let entry = try #require(try setup.database.snapshot().entries.first)
         let model = EntryModel(
-            database: setup.database,
-            clock: .system,
+            parts: .system(setup.database),
             editing: entry.id,
             date: entry.date
         )
