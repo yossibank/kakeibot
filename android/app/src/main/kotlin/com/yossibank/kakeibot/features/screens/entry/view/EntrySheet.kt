@@ -65,6 +65,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.close
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasRecent
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsRecent
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock

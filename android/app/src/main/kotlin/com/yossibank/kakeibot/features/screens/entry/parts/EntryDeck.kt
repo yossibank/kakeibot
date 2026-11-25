@@ -1,5 +1,15 @@
 package com.yossibank.kakeibot.features.screens.entry.parts
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,10 +53,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.Weekday
+import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.date.MonthCalendar
@@ -78,8 +91,32 @@ fun EntryDeck(
     onSaveTemplate: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    key(model.state.form.type) {
+        AnimatedContent(
+            targetState = model.state.field,
+            modifier = modifier,
+            transitionSpec = { deckTransition(isForward = model.state.isForward) },
+            label = "EntryDeck",
+        ) { field ->
+            DeckFace(
+                model = model,
+                field = field,
+                onOpenItems = onOpenItems,
+                onSaveTemplate = onSaveTemplate,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeckFace(
+    model: EntryModel,
+    field: EntryModel.Field,
+    onOpenItems: () -> Unit,
+    onSaveTemplate: () -> Unit,
+) {
     Column(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(
@@ -89,7 +126,7 @@ fun EntryDeck(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             DeckTitle(
-                text = when (model.state.field) {
+                text = when (field) {
                     EntryModel.Field.Category -> "カテゴリを選ぶ"
                     EntryModel.Field.Wallet -> "${model.output.walletTitle}を選ぶ"
                     EntryModel.Field.ToWallet -> "振替先を選ぶ"
@@ -102,13 +139,13 @@ fun EntryDeck(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (model.state.field == EntryModel.Field.Amount && model.output.showsItems) {
+            if (field == EntryModel.Field.Amount && model.output.showsItems) {
                 ItemPill(onOpen = onOpenItems)
             }
         }
 
         Box(modifier = Modifier.weight(1f)) {
-            when (model.state.field) {
+            when (field) {
                 EntryModel.Field.Category -> CategoryArea(
                     model = model,
                     onSaveTemplate = onSaveTemplate,
@@ -128,7 +165,10 @@ fun EntryDeck(
 
                 EntryModel.Field.Date -> DateCalendar(model = model)
 
-                EntryModel.Field.Amount -> AmountKeypad(model = model)
+                EntryModel.Field.Amount -> AmountKeypad(
+                    calculator = model.state.calculator,
+                    onKey = model.state::press,
+                )
 
                 EntryModel.Field.Transfer -> EntryTransferArea(model = model)
 
@@ -140,7 +180,10 @@ fun EntryDeck(
                     )
 
                     Box(modifier = Modifier.weight(1f)) {
-                        AmountKeypad(model = model)
+                        AmountKeypad(
+                            calculator = model.state.feeCalculator,
+                            onKey = model.state::press,
+                        )
                     }
                 }
             }
@@ -206,14 +249,17 @@ private fun DeckTitle(text: String) {
 }
 
 @Composable
-private fun AmountKeypad(model: EntryModel) {
+private fun AmountKeypad(
+    calculator: AmountCalculator,
+    onKey: (AmountCalculator.Key) -> Unit,
+) {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val spacing = 8.dp * (KEY_ROWS - 1)
         val height = ((maxHeight - spacing) / KEY_ROWS).coerceIn(minKeyHeight, maxKeyHeight)
 
         Keypad(
-            calculator = model.output.activeCalculator,
-            onKey = model.state::press,
+            calculator = calculator,
+            onKey = onKey,
             keyHeight = height,
         )
     }
@@ -297,7 +343,31 @@ private fun DateCalendar(model: EntryModel) {
     )
 }
 
+private fun deckTransition(isForward: Boolean): ContentTransform {
+    val entering = if (isForward) 1 else -1
+    val slide = snappy(IntOffset.VisibilityThreshold)
+    val fade = snappy<Float>()
+
+    val enter = slideInHorizontally(animationSpec = slide) { it * entering } +
+        fadeIn(animationSpec = fade)
+
+    val exit = slideOutHorizontally(animationSpec = slide) { -it * entering } +
+        fadeOut(animationSpec = fade)
+
+    return enter togetherWith exit
+}
+
+private fun <T> snappy(visibilityThreshold: T? = null): SpringSpec<T> = spring(
+    dampingRatio = SNAPPY_DAMPING,
+    stiffness = SNAPPY_STIFFNESS,
+    visibilityThreshold = visibilityThreshold,
+)
+
 private const val KEY_ROWS = 5
+
+private const val SNAPPY_DAMPING = 0.85f
+
+private const val SNAPPY_STIFFNESS = 158f
 
 private val minKeyHeight: Dp = 36.dp
 

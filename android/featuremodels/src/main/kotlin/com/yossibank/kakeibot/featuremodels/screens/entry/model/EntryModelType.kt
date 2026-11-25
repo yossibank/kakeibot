@@ -7,6 +7,20 @@ fun EntryModel.Field.field(of: Entry.Kind): EntryModel.Field {
     return if (isWallet && of == Entry.Kind.transfer) EntryModel.Field.Transfer else this
 }
 
+internal fun EntryModel.Field.order(of: Entry.Kind): Int {
+    val fields = if (of == Entry.Kind.transfer) transferFields else paymentFields
+    return fields.indexOf(field(of)).coerceAtLeast(0)
+}
+
+val EntryModel.Output.startField: EntryModel.Field
+    get() {
+        val isTransfer = state.form.type == Entry.Kind.transfer
+        return if (isTransfer) EntryModel.Field.Transfer else EntryModel.Field.Category
+    }
+
+val EntryModel.Output.showsRecent: Boolean
+    get() = isBlank && state.field == startField
+
 fun EntryModel.select(type: Entry.Kind) {
     if (state.form.type == type) {
         return
@@ -42,3 +56,17 @@ fun EntryModel.select(type: Entry.Kind) {
         input.baseline = output.snapshot
     }
 }
+
+private val transferFields = listOf(
+    EntryModel.Field.Transfer,
+    EntryModel.Field.Fee,
+    EntryModel.Field.Date,
+    EntryModel.Field.Amount,
+)
+
+private val paymentFields = listOf(
+    EntryModel.Field.Category,
+    EntryModel.Field.Wallet,
+    EntryModel.Field.Date,
+    EntryModel.Field.Amount,
+)

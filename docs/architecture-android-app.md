@@ -147,7 +147,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | ボタンの高さなどの寸法 | `designsystem/theme/` の `Metrics` |
 | 設定の画面の枠 | `features/shared/settingsparts/layout/` の `SettingsFrame` |
 | 期間を前後に送る見出し | `features/shared/period/` の `PeriodStepper` |
-| 通知の許可 | `features/shared/notification/` |
+| 通知の許可 | `features/shared/notification/`。窓口は `:featuremodels` |
 
 画面のフォルダとファイルで、iOS と違う所は次のとおりである。
 

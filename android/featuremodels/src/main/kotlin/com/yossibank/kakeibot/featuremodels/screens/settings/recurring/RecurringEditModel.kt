@@ -9,6 +9,7 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
+import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorization
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.RecurringDraft
 import com.yossibank.kakeibot.core.concepts.recurring.endDate
@@ -19,6 +20,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.notification.NotificationPermission
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
@@ -142,6 +144,9 @@ class RecurringEditModel(
 
         var baseline: RecurringDraft? by mutableStateOf(null)
             internal set
+
+        var authorization by mutableStateOf(NotificationAuthorization.allowed)
+            internal set
     }
 
     class Output(
@@ -249,8 +254,12 @@ class RecurringEditModel(
         }
     }
 
-    suspend fun save(): Boolean {
-        if (!store()) {
+    fun refreshAuthorization(permission: NotificationPermission) {
+        input.authorization = permission.authorization()
+    }
+
+    suspend fun save(permission: NotificationPermission = NotificationPermission.allowed): Boolean {
+        if (!store(permission)) {
             return false
         }
 
@@ -259,8 +268,10 @@ class RecurringEditModel(
         return true
     }
 
-    suspend fun saveTogglingHidden(): Boolean {
-        if (!store()) {
+    suspend fun saveTogglingHidden(
+        permission: NotificationPermission = NotificationPermission.allowed,
+    ): Boolean {
+        if (!store(permission)) {
             return false
         }
 
@@ -302,7 +313,7 @@ class RecurringEditModel(
         return true
     }
 
-    private suspend fun store(): Boolean {
+    private suspend fun store(permission: NotificationPermission): Boolean {
         val problem = output.draft.problems.firstOrNull()
 
         if (problem != null) {
@@ -321,6 +332,10 @@ class RecurringEditModel(
                 today = state.today,
                 at = dependencies.clock.now,
             )
+        }
+
+        if (saved != null && state.form.remindDaysBefore != null) {
+            permission.requestIfUndecided()
         }
 
         return saved != null

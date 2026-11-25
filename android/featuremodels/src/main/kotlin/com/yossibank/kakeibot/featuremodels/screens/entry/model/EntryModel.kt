@@ -94,7 +94,10 @@ class EntryModel(
         var feeCalculator: AmountCalculator by mutableStateOf(AmountCalculator())
             private set
 
-        var field: Field by mutableStateOf(Field.Amount)
+        var field: Field by mutableStateOf(Field.Category)
+            private set
+
+        var isForward: Boolean by mutableStateOf(true)
             private set
 
         var voiceFilled: VoiceFilled? by mutableStateOf(null)
@@ -116,14 +119,17 @@ class EntryModel(
         }
 
         fun focus(field: Field) {
+            val type = form.type
             val isTransferOnly = field == Field.Fee || field == Field.Transfer
-            this.field =
-                if (isTransferOnly && form.type != Entry.Kind.transfer) Field.Amount else field
+            val next = if (isTransferOnly && type != Entry.Kind.transfer) Field.Amount else field
+
+            isForward = next.order(of = type) >= this.field.order(of = type)
+            this.field = next
         }
 
         fun select(category: EntryCategory) {
             form = form.withCategory(category.id)
-            field = Field.Amount
+            focus(Field.Amount)
         }
 
         fun toggleTag(id: Identifier<EntryTag>) {
@@ -132,7 +138,7 @@ class EntryModel(
 
         fun selectDestination(wallet: Wallet) {
             form = form.copy(toWalletId = wallet.id)
-            field = Field.Transfer
+            focus(Field.Transfer)
         }
 
         fun swapWallets() {
@@ -145,7 +151,7 @@ class EntryModel(
 
         fun select(date: LocalDate) {
             form = form.withDate(date)
-            field = Field.Amount
+            focus(Field.Amount)
         }
 
         fun press(key: AmountCalculator.Key) {
@@ -231,12 +237,6 @@ class EntryModel(
 
         val isBlank: Boolean
             get() = !isEditing && amount <= 0
-
-        val startField: Field
-            get() = if (state.form.type == Entry.Kind.transfer) Field.Transfer else Field.Category
-
-        val showsRecent: Boolean
-            get() = isBlank && state.field == startField
 
         val amount: Int
             get() = state.calculator.amount
