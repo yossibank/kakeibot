@@ -25,7 +25,7 @@ import com.yossibank.kakeibot.store.writes.methods.saveTags
 import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -183,7 +183,7 @@ fun modelTest(
     try {
         body(setup)
     } finally {
-        backgroundScope.coroutineContext[Job]?.cancelChildren()
+        backgroundScope.coroutineContext[Job]?.children?.forEach { it.cancelAndJoin() }
         setup.database.close()
     }
 }
