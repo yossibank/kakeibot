@@ -82,7 +82,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 保存と読み込みの失敗 | `featuremodels/shared/model/` の `ModelTask` に通す。失敗の文と実行中かどうかを、`State` の `task` に持つ |
 | 失敗の知らせの消え方 | 押すか、出してから 6 秒たつと消える。入力を変えても、後で成功しても消さない |
 | 知らせを消すまでの秒 | 画面が `task.Timer()` で数える |
-| 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「端末の空き容量が足りません」に替える |
+| 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「スマホの空き容量が足りません」に替える |
+| 端末の呼び名 | `featuremodels/shared/model/` の `DeviceName` が出す。画面の短い辺が 600dp 以上なら「タブレット」、ほかは「スマホ」にする |
 | 見張りの失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、それでも読めなければ `task` に文を出す |
 | 今の時刻 | `featuremodels/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
 | 説明カードを閉じたか | `settingsparts/hint/` の `SettingsFoldInput` を、モデルの `Input` に置く。読み書きは、`SettingsFoldModel` の `loadFold`・`setFold` に通す |

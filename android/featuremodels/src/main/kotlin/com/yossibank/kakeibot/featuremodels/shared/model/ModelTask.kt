@@ -113,9 +113,11 @@ class ModelTask {
 
         const val saveFailed = "保存できませんでした"
         const val settingSaveFailed = "設定を保存できませんでした"
-        const val storageFull = "端末の空き容量が足りません"
         const val restoreFailed = "元に戻せませんでした"
         const val loadFailed = "読み込めませんでした"
+
+        val storageFull: String
+            get() = "${DeviceName.current}の空き容量が足りません"
 
         suspend fun <Value : Any> quiet(action: suspend () -> Value): Value? = try {
             action()

@@ -66,7 +66,7 @@ class EntryModelFailureTest {
         val saved = model.save()
 
         assertFalse(saved)
-        assertEquals("端末の空き容量が足りません", model.state.task.message)
+        assertEquals("スマホの空き容量が足りません", model.state.task.message)
         assertEquals(ModelTask.storageFull, model.state.task.message)
     }
 }
