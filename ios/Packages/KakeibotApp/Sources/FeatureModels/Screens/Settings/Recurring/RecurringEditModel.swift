@@ -100,6 +100,7 @@ public extension RecurringEditModel {
             )
 
             await requestPermissionIfReminding(permission)
+            await finishSave()
 
             return true
         } catch {

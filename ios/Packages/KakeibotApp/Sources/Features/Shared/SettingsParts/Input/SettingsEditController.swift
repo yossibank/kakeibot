@@ -4,14 +4,15 @@ import FeatureModels
 import SwiftUI
 
 @MainActor
-struct SettingsEditController<Model: SettingsEditing> {
+struct SettingsEditController<Model: SettingsEditRemoving> {
     let model: Model
     let dismiss: DismissAction
     let restsOnHide: Bool
     let onRest: () -> Void
     let onHide: () -> Void
     let onDelete: (Deletion) -> Void
-    let onSave: () async -> Bool
+    let onSaved: (Model.State.Saved) -> Void
+    let onSave: @MainActor (Model) async -> Void
 
     init(
         model: Model,
@@ -20,7 +21,8 @@ struct SettingsEditController<Model: SettingsEditing> {
         onRest: @escaping () -> Void,
         onHide: @escaping () -> Void,
         onDelete: @escaping (Deletion) -> Void,
-        onSave: @escaping () async -> Bool
+        onSaved: @escaping (Model.State.Saved) -> Void = { _ in },
+        onSave: @escaping @MainActor (Model) async -> Void
     ) {
         self.model = model
         self.dismiss = dismiss
@@ -28,6 +30,7 @@ struct SettingsEditController<Model: SettingsEditing> {
         self.onRest = onRest
         self.onHide = onHide
         self.onDelete = onDelete
+        self.onSaved = onSaved
         self.onSave = onSave
     }
 }
@@ -43,55 +46,61 @@ extension SettingsEditController {
         }
     }
 
-    func save(hiding: Bool = false) async {
+    func save() {
         onRest()
 
-        guard await onSave() else {
-            return
+        model.perform(onSave)
+    }
+
+    func saveTogglingHidden() {
+        onRest()
+
+        let onSave = onSave
+
+        model.perform {
+            await $0.saveTogglingHidden(onSave)
         }
-
-        if hiding {
-            guard await model.setHidden(!model.isHidden) else {
-                return
-            }
-
-            if model.isHidden {
-                onHide()
-            }
-        }
-
-        dismiss()
     }
 
     func toggleHidden() {
         guard model.isChanged else {
-            Task {
-                await setHidden(!model.isHidden)
-            }
-
+            setHidden(!model.isHidden)
             return
         }
 
         model.state.prompt.isConfirmingHideChanges = true
     }
 
-    func setHidden(_ isHidden: Bool) async {
+    func setHidden(_ isHidden: Bool) {
         if restsOnHide {
             onRest()
         }
 
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
+        model.perform {
+            await $0.setHidden(isHidden)
         }
     }
 
-    func delete() async {
-        if let deletion = await model.delete() {
+    func delete() {
+        model.perform {
+            await $0.delete()
+        }
+    }
+
+    func receive(_ outcome: SettingsEditOutcome<Model.State.Saved>) {
+        if let saved = outcome.saved {
+            onSaved(saved)
+        }
+
+        if outcome.isHidden == true {
+            onHide()
+        }
+
+        if let deletion = outcome.deletion {
             onDelete(deletion)
+        }
+
+        if outcome.closes {
             dismiss()
         }
     }
@@ -99,26 +108,25 @@ extension SettingsEditController {
 
 extension View {
     func settingsEditConfirmations(
-        _ controller: SettingsEditController<some SettingsEditing>
+        _ controller: SettingsEditController<some SettingsEditRemoving>
     ) -> some View {
         confirmsUnsavedHide(
             isHidden: controller.model.isHidden,
             canSave: controller.model.canSave,
             isPresented: Bindable(controller.model.state).prompt.isConfirmingHideChanges
         ) {
-            Task {
-                await controller.save(hiding: true)
-            }
+            controller.saveTogglingHidden()
         } onDiscard: {
-            Task {
-                await controller.setHidden(!controller.model.isHidden)
-            }
+            controller.setHidden(!controller.model.isHidden)
         }
         .confirmsDiscard(
             when: controller.model.isChanged,
             isPresented: Bindable(controller.model.state).prompt.isConfirmingDiscard
         ) {
             controller.dismiss()
+        }
+        .onOutcome(controller.model.state.outcome) { outcome in
+            controller.receive(outcome)
         }
     }
 }

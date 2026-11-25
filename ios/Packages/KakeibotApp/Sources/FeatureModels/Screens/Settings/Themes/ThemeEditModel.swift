@@ -31,8 +31,10 @@ public final class ThemeEditModel {
 public extension ThemeEditModel {
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
+        public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var draft: ThemeDraft
 
@@ -138,6 +140,8 @@ public extension ThemeEditModel {
                 try await dependencies.database.setSetting(.theme, to: .custom(theme.id))
             }
 
+            state.outcome.send(SettingsEditOutcome(saved: ()))
+
             return true
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
@@ -151,7 +155,11 @@ public extension ThemeEditModel {
         }
 
         do {
-            return try await dependencies.database.deleteTheme(editingId)
+            let deletion = try await dependencies.database.deleteTheme(editingId)
+
+            state.outcome.send(SettingsEditOutcome(deletion: deletion))
+
+            return deletion
         } catch {
             state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
             return nil

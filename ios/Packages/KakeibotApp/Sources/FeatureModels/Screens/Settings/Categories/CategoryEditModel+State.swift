@@ -9,6 +9,7 @@ public extension CategoryEditModel {
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<EntryCategory>>()
 
         public var name = ""
 

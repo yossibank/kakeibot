@@ -7,7 +7,6 @@ public struct RecurringEditSheet: View {
     @State var model: RecurringEditModel
 
     @State private var panel: Panel?
-    @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
@@ -50,7 +49,7 @@ public struct RecurringEditSheet: View {
                 } onHide: {
                     edit.toggleHidden()
                 } onDelete: {
-                    isConfirmingDelete = true
+                    model.state.prompt.isConfirmingDelete = true
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -65,16 +64,14 @@ public struct RecurringEditSheet: View {
             }
             .settingsEditConfirmations(edit)
             .confirmation(
-                isPresented: $isConfirmingDelete,
+                isPresented: Bindable(model.state).prompt.isConfirmingDelete,
                 systemImage: "trash",
                 title: "この固定費を削除しますか",
                 message: "これまでに作った記録は残ります",
                 keepTitle: "やめる",
                 confirmTitle: "削除する"
             ) {
-                Task {
-                    await edit.delete()
-                }
+                edit.delete()
             }
             .animation(.snappy, value: model.output.isNotificationDenied)
             .onChange(of: scenePhase) { _, phase in
@@ -95,9 +92,7 @@ public struct RecurringEditSheet: View {
 extension RecurringEditSheet {
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
-            Task {
-                await edit.save()
-            }
+            edit.save()
         }
         .disabled(!model.canSave)
     }
@@ -208,8 +203,8 @@ private extension RecurringEditSheet {
             },
             onHide: onHide,
             onDelete: onDelete,
-            onSave: {
-                await model.save(permission: permission)
+            onSave: { [permission] in
+                await $0.save(permission: permission)
             }
         )
     }
@@ -243,7 +238,5 @@ private extension RecurringEditSheet {
         }
     }
 }
-
-extension RecurringEditModel: SettingsEditing {}
 
 extension RecurringEditSheet: SettingsEditSheet {}

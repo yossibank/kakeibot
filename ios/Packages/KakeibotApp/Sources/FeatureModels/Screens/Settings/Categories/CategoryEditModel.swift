@@ -122,12 +122,16 @@ public extension CategoryEditModel {
 
     func save() async -> EntryCategory? {
         do {
-            return try await dependencies.database.saveCategory(
+            let category = try await dependencies.database.saveCategory(
                 output.draft,
                 tags: state.tags.map(\.draft),
                 editing: input.editingId,
                 at: dependencies.clock.now
             )
+
+            await finishSave(category)
+
+            return category
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil

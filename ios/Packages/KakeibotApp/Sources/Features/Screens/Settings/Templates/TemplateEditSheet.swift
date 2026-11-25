@@ -12,7 +12,6 @@ public struct TemplateEditSheet: View {
     @Environment(\.themeStyle) var themeStyle
 
     @State private var panel: Panel?
-    @State private var isConfirmingDelete = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -62,7 +61,7 @@ public struct TemplateEditSheet: View {
                     } onHide: {
                         edit.toggleHidden()
                     } onDelete: {
-                        isConfirmingDelete = true
+                        model.state.prompt.isConfirmingDelete = true
                     }
                     .padding(.horizontal, SettingsSpacing.side)
                     .padding(.top, SettingsSpacing.top)
@@ -79,16 +78,14 @@ public struct TemplateEditSheet: View {
                 .haptic(.selection, trigger: model.state.walletId)
                 .settingsEditConfirmations(edit)
                 .confirmation(
-                    isPresented: $isConfirmingDelete,
+                    isPresented: Bindable(model.state).prompt.isConfirmingDelete,
                     systemImage: "trash",
                     title: "このテンプレートを削除しますか",
                     message: "このテンプレートで記録したものは残ります",
                     keepTitle: "やめる",
                     confirmTitle: "削除する"
                 ) {
-                    Task {
-                        await edit.delete()
-                    }
+                    edit.delete()
                 }
                 .onChange(of: focus) {
                     if focus == .name {
@@ -111,9 +108,7 @@ public struct TemplateEditSheet: View {
 extension TemplateEditSheet {
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
-            Task {
-                await edit.save()
-            }
+            edit.save()
         }
         .disabled(!model.canSave)
     }
@@ -144,13 +139,9 @@ extension TemplateEditSheet {
             },
             onHide: onHide,
             onDelete: onDelete,
+            onSaved: onSave,
             onSave: {
-                guard let template = await model.save() else {
-                    return false
-                }
-
-                onSave(template)
-                return true
+                await $0.save()
             }
         )
     }
@@ -249,8 +240,6 @@ private extension TemplateEditSheet {
         }
     }
 }
-
-extension TemplateEditModel: SettingsEditing {}
 
 #Preview {
     if let parts = ScreenParts.preview() {

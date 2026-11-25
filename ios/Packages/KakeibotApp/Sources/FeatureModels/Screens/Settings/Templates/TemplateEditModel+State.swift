@@ -8,6 +8,7 @@ public extension TemplateEditModel {
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<EntryTemplate>>()
 
         public var name = ""
         public var memo = ""

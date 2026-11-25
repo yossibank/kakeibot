@@ -5,7 +5,6 @@ import SwiftUI
 
 public struct StampEditSheet: View {
     @State private var model: StampEditModel
-    @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
@@ -41,9 +40,7 @@ public struct StampEditSheet: View {
             }
         } save: {
             PrimaryButton(model.saveTitle) {
-                Task {
-                    await edit.save()
-                }
+                edit.save()
             }
             .disabled(!model.canSave)
         }
@@ -57,7 +54,7 @@ public struct StampEditSheet: View {
             } onHide: {
                 edit.toggleHidden()
             } onDelete: {
-                isConfirmingDelete = true
+                model.state.prompt.isConfirmingDelete = true
             }
             .padding(.horizontal, SettingsSpacing.side)
             .padding(.top, SettingsSpacing.top)
@@ -70,16 +67,14 @@ public struct StampEditSheet: View {
         .errorBanner(Bindable(model.state).errorNotice)
         .settingsEditConfirmations(edit)
         .confirmation(
-            isPresented: $isConfirmingDelete,
+            isPresented: Bindable(model.state).prompt.isConfirmingDelete,
             systemImage: "trash",
             title: "このスタンプを削除しますか",
             message: "カレンダーに押したスタンプは残ります",
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
-            Task {
-                await edit.delete()
-            }
+            edit.delete()
         }
         .task {
             await model.load()
@@ -104,13 +99,11 @@ private extension StampEditSheet {
             onHide: onHide,
             onDelete: onDelete,
             onSave: {
-                await model.save()
+                await $0.save()
             }
         )
     }
 }
-
-extension StampEditModel: SettingsEditing {}
 
 #Preview {
     if let parts = ScreenParts.preview() {

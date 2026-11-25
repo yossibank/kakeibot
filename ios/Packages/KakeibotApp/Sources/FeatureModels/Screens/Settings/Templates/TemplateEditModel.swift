@@ -108,11 +108,15 @@ public extension TemplateEditModel {
         }
 
         do {
-            return try await dependencies.database.saveTemplate(
+            let template = try await dependencies.database.saveTemplate(
                 output.draft,
                 editing: input.editingId,
                 at: dependencies.clock.now
             )
+
+            await finishSave(template)
+
+            return template
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil

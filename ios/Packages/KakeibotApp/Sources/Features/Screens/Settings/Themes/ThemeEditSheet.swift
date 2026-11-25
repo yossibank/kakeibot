@@ -5,8 +5,6 @@ import SwiftUI
 
 public struct ThemeEditSheet: View {
     @State private var model: ThemeEditModel
-    @State private var isConfirmingDiscard = false
-    @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
@@ -54,9 +52,7 @@ public struct ThemeEditSheet: View {
 
             if focus == nil {
                 PrimaryButton(model.saveTitle) {
-                    Task {
-                        await save()
-                    }
+                    save()
                 }
                 .disabled(!model.canSave)
                 .transition(.opacity)
@@ -74,21 +70,28 @@ public struct ThemeEditSheet: View {
         .errorBanner(Bindable(model.state).errorNotice)
         .confirmsDiscard(
             when: model.isChanged,
-            isPresented: $isConfirmingDiscard
+            isPresented: Bindable(model.state).prompt.isConfirmingDiscard
         ) {
             dismiss()
         }
         .confirmation(
-            isPresented: $isConfirmingDelete,
+            isPresented: Bindable(model.state).prompt.isConfirmingDelete,
             systemImage: "trash",
             title: "このテーマを削除しますか",
             message: "選んでいるときは、ホワイトに戻ります",
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
-            Task {
-                await delete()
+            model.perform {
+                await $0.delete()
             }
+        }
+        .onOutcome(model.state.outcome) { outcome in
+            if let deletion = outcome.deletion {
+                onDelete(deletion)
+            }
+
+            dismiss()
         }
     }
 }
@@ -104,7 +107,7 @@ private extension ThemeEditSheet {
             close()
         } onHide: {} onDelete: {
             focus = nil
-            isConfirmingDelete = true
+            model.state.prompt.isConfirmingDelete = true
         }
     }
 
@@ -187,24 +190,17 @@ private extension ThemeEditSheet {
         focus = nil
 
         if model.isChanged {
-            isConfirmingDiscard = true
+            model.state.prompt.isConfirmingDiscard = true
         } else {
             dismiss()
         }
     }
 
-    func save() async {
+    func save() {
         focus = nil
 
-        if await model.save() {
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
-            dismiss()
+        model.perform {
+            await $0.save()
         }
     }
 }
