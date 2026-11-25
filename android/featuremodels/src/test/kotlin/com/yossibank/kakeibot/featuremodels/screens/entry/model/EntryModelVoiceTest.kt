@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.voice.VoiceReading
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -51,6 +52,20 @@ class EntryModelVoiceTest {
 
         assertEquals(5, model.output.amount)
         assertEquals(setup.today.adding(days = -1), model.state.form.date)
+    }
+
+    @Test
+    fun dropsUnderlineWhenTheFieldChanges() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        val yesterday = setup.today.adding(days = -1)
+
+        model.apply(VoiceReading(amount = 300, date = yesterday, memo = "本屋"))
+        val fromVoice = model.output.isDateFromVoice
+        model.state.select(date = setup.today)
+
+        assertTrue(fromVoice)
+        assertFalse(model.output.isDateFromVoice)
+        assertTrue(model.output.isMemoFromVoice)
     }
 
     @Test

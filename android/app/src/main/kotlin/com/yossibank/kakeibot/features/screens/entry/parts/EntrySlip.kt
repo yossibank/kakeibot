@@ -52,6 +52,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.category
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.categoryText
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.dateValue
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.expressionText
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.field
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.icon
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.isDateFromVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.isWalletFromVoice
@@ -105,10 +106,12 @@ fun EntrySlip(
         }
 
         if (model.state.form.type == Entry.Kind.transfer) {
+            val field = model.state.field.field(of = Entry.Kind.transfer)
+
             SlipRow(
                 title = "振替",
                 value = model.output.routeText,
-                isActive = model.state.field in transferFields,
+                isActive = field == EntryModel.Field.Transfer,
                 onSelect = { model.state.focus(EntryModel.Field.Transfer) },
             ) {
                 SymbolTile(icon = R.drawable.ic_swap)
@@ -274,9 +277,3 @@ private fun AmountRow(
         )
     }
 }
-
-private val transferFields = setOf(
-    EntryModel.Field.Transfer,
-    EntryModel.Field.Wallet,
-    EntryModel.Field.ToWallet,
-)

@@ -2,6 +2,11 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 
+fun EntryModel.Field.field(of: Entry.Kind): EntryModel.Field {
+    val isWallet = this == EntryModel.Field.Wallet || this == EntryModel.Field.ToWallet
+    return if (isWallet && of == Entry.Kind.transfer) EntryModel.Field.Transfer else this
+}
+
 fun EntryModel.select(type: Entry.Kind) {
     if (state.form.type == type) {
         return

@@ -6,6 +6,8 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
+import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
+import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
@@ -13,6 +15,7 @@ import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.store.queries.methods.entryList
 import com.yossibank.kakeibot.store.records.rows.record
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
+import com.yossibank.kakeibot.store.writes.methods.saveTemplate
 
 fun item(
     name: String,
@@ -51,6 +54,29 @@ suspend fun ModelTestSetup.saveTransfer(
     )
 
     database.saveEntry(draft, at = now.plusSeconds(count.toLong()))
+}
+
+suspend fun ModelTestSetup.saveTemplate(
+    name: String,
+    amount: Int?,
+    type: Entry.Kind = Entry.Kind.expense,
+    tagId: Identifier<EntryTag>? = null,
+): EntryTemplate {
+    val options = options()
+    val isIncome = type == Entry.Kind.income
+    val categories = if (isIncome) options.incomeCategories else options.expenseCategories
+
+    val draft = EntryTemplateDraft(
+        name = name,
+        type = type,
+        amount = amount,
+        categoryId = categories[1].id,
+        tagId = tagId,
+        walletId = options.wallets[0].id,
+        memo = "社食",
+    )
+
+    return database.saveTemplate(draft = draft, at = now)
 }
 
 suspend fun ModelTestSetup.startSharing(walletId: Identifier<Wallet>): List<EntryCategory> {

@@ -1,0 +1,56 @@
+package com.yossibank.kakeibot.featuremodels.screens.entry.model
+
+import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.featuremodels.support.modelTest
+import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+
+class EntryModelScreenTest {
+    @Test
+    fun showsFieldWithItsKeypadTarget() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.transferModel()
+
+        model.state.focus(EntryModel.Field.Fee)
+        model.press(3)
+        val fee = model.state.field
+        model.state.focus(EntryModel.Field.Transfer)
+        model.press(5)
+
+        assertEquals(EntryModel.Field.Fee, fee)
+        assertEquals(3, model.output.fee)
+        assertEquals(EntryModel.Field.Transfer, model.state.field)
+        assertEquals(5, model.output.amount)
+    }
+
+    @Test
+    fun startsFromFirstFieldWhenTypeChanges() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        model.state.focus(EntryModel.Field.Date)
+
+        model.select(type = Entry.Kind.transfer)
+        val transfer = model.state.field
+        model.state.focus(EntryModel.Field.Fee)
+        model.press(3)
+        model.select(type = Entry.Kind.income)
+        model.press(5)
+
+        assertEquals(EntryModel.Field.Transfer, transfer)
+        assertEquals(EntryModel.Field.Category, model.state.field)
+        assertEquals(3, model.state.feeCalculator.amount)
+        assertEquals(5, model.output.amount)
+    }
+
+    @Test
+    fun keepsOneShownAtATime() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+
+        model.state.present(EntryModel.Presented.Items)
+        model.state.present(EntryModel.Presented.Discard)
+        val discard = model.state.presented
+        model.state.dismiss()
+
+        assertEquals(EntryModel.Presented.Discard, discard)
+        assertNull(model.state.presented)
+    }
+}

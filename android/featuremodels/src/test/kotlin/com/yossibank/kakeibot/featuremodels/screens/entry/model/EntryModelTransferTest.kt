@@ -331,4 +331,16 @@ class EntryModelTransferTest {
         assertNull(afterWallet)
         assertNull(model.state.form.billMonth)
     }
+
+    @Test
+    fun choosesDestinationByRole() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.transferModel()
+        val source = model.state.form.walletId
+        val wallet = model.output.wallets.last { it.id != source }
+
+        model.state.selectDestination(wallet)
+
+        assertEquals(wallet.id, model.state.form.toWalletId)
+        assertEquals(source, model.state.form.walletId)
+    }
 }

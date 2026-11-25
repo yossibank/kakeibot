@@ -17,24 +17,24 @@ entry.keeps-amount-when-item-total-is-negative	EntryModelTests/keepsAmountWhenIt
 entry.counts-items-with-quantity	EntryModelTests/countsItemsWithQuantity	EntryModelItemTest/followsItemTotalWithTax EntryModelItemTest/keepsAmountWhenItemTotalIsNegative	対応	合計と金額が合う時に hasItemAdjustment が false になる所を確かめていない
 entry.edits-store-as-first-memo-line	EntryModelTests/editsStoreAsFirstMemoLine	EntryModelItemTest/editsStoreAsFirstMemoLine	対応	
 entry.suggests-recent-item-names	EntryModelTests/suggestsRecentItemNames	EntryModelItemTest/suggestsRecentItemNames	対応	
-entry.shows-quantity-only-when-many	EntryModelTests/showsQuantityOnlyWhenMany		未確認	EntryItem.Draft.quantityText にあるがテストが無い
-entry.splits-amount-into-unit-price	EntryModelTests/splitsAmountIntoUnitPrice		未確認	EntryItem.Draft.unitPrice にあるがテストが無い
+entry.shows-quantity-only-when-many	EntryModelTests/showsQuantityOnlyWhenMany	EntryModelItemTest/showsQuantityOnlyWhenMany	対応	
+entry.splits-amount-into-unit-price	EntryModelTests/splitsAmountIntoUnitPrice	EntryModelItemTest/splitsAmountIntoUnitPrice	対応	
 entry.shows-month-total-of-category-without-budget	EntryModelTests/showsMonthTotalOfCategoryWithoutBudget		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.shows-month-total-of-type-without-category	EntryModelTests/showsMonthTotalOfTypeWithoutCategory		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.replaces-edited-amount-in-month-total	EntryModelTests/replacesEditedAmountInMonthTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.removes-entry-moved-out-of-month-from-total	EntryModelTests/removesEntryMovedOutOfMonthFromTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
-entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		未確認	Android は別のブランチで合わせる
-entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		未確認	Android は別のブランチで合わせる
+entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		iOSのみ	入力のモデルを開くたびに作って読むので、開き直しの合図（start）が要らない
+entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		iOSのみ	入力のモデルを開くたびに作るので、前の回の知らせが残らない
 entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterSaving	対応	Android の結果は変更を持たず、閉じ始めの旗も無い。閉じる結果だけを確かめる
 entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails	EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	対応	
 entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving	EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	対応	Android の結果は変更を持たず、送った回数と保存した 2 件で確かめる
 entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterDeleting	対応	Android の結果は変更を持たず、閉じ始めの旗も無い。閉じる結果だけを確かめる
-entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未確認	Android は別のブランチで合わせる
-entry.places-hidden-category-and-moves-back-on-undo	EntryModelTests/placesHiddenCategoryAndMovesBackOnUndo		未確認	Android は別のブランチで合わせる
-entry.clears-hidden-category-when-hiding-fails	EntryModelTests/clearsHiddenCategoryWhenHidingFails		未確認	Android は別のブランチで合わせる
-entry.reports-added-category	EntryModelTests/reportsAddedCategory		未確認	Android は別のブランチで合わせる
-entry.chooses-added-wallet-after-sheet	EntryModelTests/choosesAddedWalletAfterSheet		未確認	Android は別のブランチで合わせる
-entry.chooses-destination-by-role	EntryModelTests/choosesDestinationByRole		未確認	Android は別のブランチで合わせる
+entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未移植	同じ内容で記録し直す recordAgain が無い
+entry.places-hidden-category-and-moves-back-on-undo	EntryModelTests/placesHiddenCategoryAndMovesBackOnUndo		未移植	入力からカテゴリを非表示にする所が無い
+entry.clears-hidden-category-when-hiding-fails	EntryModelTests/clearsHiddenCategoryWhenHidingFails		未移植	入力からカテゴリを非表示にする所が無い
+entry.reports-added-category	EntryModelTests/reportsAddedCategory		未移植	入力からカテゴリを足す所が無い
+entry.chooses-added-wallet-after-sheet	EntryModelTests/choosesAddedWalletAfterSheet		未移植	入力から口座を足す・直すシートが無い
+entry.chooses-destination-by-role	EntryModelTests/choosesDestinationByRole	EntryModelTransferTest/choosesDestinationByRole	対応	
 entry.applies-receipt-reading	EntryModelTests/appliesReceiptReading		未移植	レシートの読み取りを入力に当てる所（apply(ReceiptReading)）が無い
 entry.applies-included-tax-from-receipt	EntryModelTests/appliesIncludedTaxFromReceipt		未移植	レシートの読み取りが無い（税込みの切り替え setTaxIncluded だけはある）
 entry.keeps-unread-values-from-receipt	EntryModelTests/keepsUnreadValuesFromReceipt		未移植	レシートの読み取りを入力に当てる所が無い
@@ -51,30 +51,30 @@ entry.remembers-corrected-item-names-by-store	EntryModelTests/remembersCorrected
 entry.forgets-name-restored-to-the-read-text	EntryModelTests/forgetsNameRestoredToTheReadText		未移植	直した品名を店ごとに覚える所が無い
 entry.keeps-item-sources-aligned-with-items	EntryModelTests/keepsItemSourcesAlignedWithItems		未移植	品目ごとに読み取った元の名前を持つ所が無い
 entry.lists-recent-entries-without-repeats	EntryModelTests/listsRecentEntriesWithoutRepeats	EntryModelTest/listsRecentEntriesWithoutRepeats	対応	件数が上限の3件で止まる所を確かめていない
-entry.skips-recent-entries-that-match-templates	EntryModelTests/skipsRecentEntriesThatMatchTemplates		未確認	recentEntries がひな形と同じ鍵を除くがテストが無い
-entry.lists-no-recent-entries-for-transfers	EntryModelTests/listsNoRecentEntriesForTransfers		未確認	recentEntries は振替で空を返すがテストが無い
+entry.skips-recent-entries-that-match-templates	EntryModelTests/skipsRecentEntriesThatMatchTemplates	EntryModelRecentTest/skipsRecentEntriesThatMatchTemplates	対応	
+entry.lists-no-recent-entries-for-transfers	EntryModelTests/listsNoRecentEntriesForTransfers	EntryModelRecentTest/listsNoRecentEntriesForTransfers	対応	
 entry.applies-recent-entry	EntryModelTests/appliesRecentEntry	EntryModelRecentTest/appliesRecentEntry	対応	
 entry.drops-recent-tag-outside-offered-categories	EntryModelTests/dropsRecentTagOutsideOfferedCategories	EntryModelRecentTest/dropsRecentTagOutsideOfferedCategories	対応	
 entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntryOutOfRecentEntries	EntryModelRecentTest/leavesEditedEntryOutOfRecentEntries	対応	
-entry.shows-deck-with-its-direction-and-keypad-target	EntryModelTests/showsDeckWithItsDirectionAndKeypadTarget		未確認	Android は別のブランチで合わせる
-entry.resets-deck-to-first-field-of-type	EntryModelTests/resetsDeckToFirstFieldOfType		未確認	Android は別のブランチで合わせる
-entry.starts-from-first-field-when-type-changes	EntryModelTests/startsFromFirstFieldWhenTypeChanges		未確認	Android は別のブランチで合わせる
-entry.places-deck-without-changing-keypad-target	EntryModelTests/placesDeckWithoutChangingKeypadTarget		未確認	Android は別のブランチで合わせる
-entry.ends-wallet-editing-when-wallet-deck-opens-again	EntryModelTests/endsWalletEditingWhenWalletDeckOpensAgain		未確認	Android は別のブランチで合わせる
-entry.shows-page-of-selected-category	EntryModelTests/showsPageOfSelectedCategory		未確認	Android は別のブランチで合わせる
-entry.chooses-added-wallet-after-wallet-sheet-once	EntryModelTests/choosesAddedWalletAfterWalletSheetOnce		未確認	Android は別のブランチで合わせる
-entry.skips-wallets-after-other-sheets	EntryModelTests/skipsWalletsAfterOtherSheets		未確認	Android は別のブランチで合わせる
-entry.holds-menu-memo-and-discard-confirmation	EntryModelTests/holdsMenuMemoAndDiscardConfirmation		未確認	Android は別のブランチで合わせる
-entry.keeps-one-shown-at-a-time	EntryModelTests/keepsOneShownAtATime		未確認	Android は別のブランチで合わせる
-entry.opens-and-shows-bills-of-wallet-deck	EntryModelTests/opensAndShowsBillsOfWalletDeck		未確認	Android は別のブランチで合わせる
+entry.shows-deck-with-its-direction-and-keypad-target	EntryModelTests/showsDeckWithItsDirectionAndKeypadTarget	EntryModelScreenTest/showsFieldWithItsKeypadTarget	違い	欄と宛先は field 1 つで同じに動くが、進む向きが無く、欄を動かさずに替える
+entry.resets-deck-to-first-field-of-type	EntryModelTests/resetsDeckToFirstFieldOfType	EntryModelScreenTest/startsFromFirstFieldWhenTypeChanges	対応	種類を替える select が、最初の欄と金額の宛先へ戻す
+entry.starts-from-first-field-when-type-changes	EntryModelTests/startsFromFirstFieldWhenTypeChanges	EntryModelScreenTest/startsFromFirstFieldWhenTypeChanges	対応	
+entry.places-deck-without-changing-keypad-target	EntryModelTests/placesDeckWithoutChangingKeypadTarget		iOSのみ	欄と宛先を field 1 つで持ち、欄だけを置く操作が要らない
+entry.ends-wallet-editing-when-wallet-deck-opens-again	EntryModelTests/endsWalletEditingWhenWalletDeckOpensAgain		未移植	口座の欄に、並べ替えや編集の状態が無い
+entry.shows-page-of-selected-category	EntryModelTests/showsPageOfSelectedCategory		未移植	カテゴリをページに分けず、縦に送る格子で出す
+entry.chooses-added-wallet-after-wallet-sheet-once	EntryModelTests/choosesAddedWalletAfterWalletSheetOnce		未移植	入力から口座を足す・直すシートが無い
+entry.skips-wallets-after-other-sheets	EntryModelTests/skipsWalletsAfterOtherSheets		未移植	入力から口座を足す・直すシートが無い
+entry.holds-menu-memo-and-discard-confirmation	EntryModelTests/holdsMenuMemoAndDiscardConfirmation		未移植	カテゴリのメニューとメモの編集中の状態が無い。破棄の確認だけ presented が持つ
+entry.keeps-one-shown-at-a-time	EntryModelTests/keepsOneShownAtATime	EntryModelScreenTest/keepsOneShownAtATime	対応	
+entry.opens-and-shows-bills-of-wallet-deck	EntryModelTests/opensAndShowsBillsOfWalletDeck		未移植	口座の欄に、請求の月を選ぶ所が無い
 entry.tells-when-loading-fails	EntryModelTests/tellsWhenLoadingFails	EntryModelFailureTest/tellsWhenLoadingFails	対応	設定ではなく、記録の表を読めなくして確かめる
 entry.tells-when-deleting-fails	EntryModelTests/tellsWhenDeletingFails	EntryModelFailureTest/tellsWhenDeletingFails	対応	
 entry.keeps-notice-when-input-changes	EntryModelTests/keepsNoticeWhenInputChanges	EntryModelFailureTest/keepsNoticeWhenInputChanges	対応	
 entry.tells-when-i-phone-storage-is-full	EntryModelTests/tellsWhenIPhoneStorageIsFull	EntryModelFailureTest/tellsWhenStorageIsFull	対応	Android は呼び分けず「端末」と書き、文は「端末の空き容量が足りません」になる
-entry.shows-template-icon-while-shared-wallet-is-chosen	EntryModelTests/showsTemplateIconWhileSharedWalletIsChosen		未確認	EntryRecentRow が category(of:) で全カテゴリから探すがテストが無い
+entry.shows-template-icon-while-shared-wallet-is-chosen	EntryModelTests/showsTemplateIconWhileSharedWalletIsChosen	EntryModelTemplateTest/showsTemplateIconWhileSharedWalletIsChosen	対応	
 entry.applies-template-to-entry	EntryModelTests/appliesTemplateToEntry	EntryModelTest/appliesTemplateToEntry	対応	選んだひな形の目印（isApplied）は Android に無く確かめていない
 entry.keeps-typed-amount-and-memo-when-template-lacks-them	EntryModelTests/keepsTypedAmountAndMemoWhenTemplateLacksThem	EntryModelTest/keepsTypedAmountAndMemoWhenTemplateLacksThem	対応	ひな形のカテゴリに変わる所を確かめていない
-entry.drops-archived-tag-when-applying-template	EntryModelTests/dropsArchivedTagWhenApplyingTemplate		未確認	apply(template) が消したタグを外すがテストが無い
+entry.drops-archived-tag-when-applying-template	EntryModelTests/dropsArchivedTagWhenApplyingTemplate	EntryModelTemplateTest/dropsArchivedTagWhenApplyingTemplate	対応	
 entry.drops-archived-tag-and-template-when-recording-again	EntryModelTests/dropsArchivedTagAndTemplateWhenRecordingAgain		未移植	同じ内容で新しく記録する所（recordAgain）が無い
 entry.applies-tag-and-drops-it-with-other-category	EntryModelTests/appliesTagAndDropsItWithOtherCategory	EntryModelTest/clearsTagWhenCategoryChanges	対応	ひな形でタグが付いて保存される所を確かめていない（isApplied は無い）
 entry.highlights-only-the-applied-template	EntryModelTests/highlightsOnlyTheAppliedTemplate		未移植	選んだひな形の目印（isApplied）がモデルにも画面にも無い
@@ -104,7 +104,7 @@ entry.splits-categories-add-and-edit-into-pages	EntryModelTests/splitsCategories
 entry.remembers-category-for-each-type	EntryModelTests/remembersCategoryForEachType	EntryModelTest/remembersCategoryForEachType	対応	
 entry.tracks-changes-after-loading	EntryModelTests/tracksChangesAfterLoading	EntryModelChangeTest/tracksChangesAfterLoading	対応	
 entry.ignores-type-switch-on-untouched-new-entry	EntryModelTests/ignoresTypeSwitchOnUntouchedNewEntry	EntryModelChangeTest/ignoresTypeSwitchOnUntouchedNewEntry	対応	
-entry.ignores-cancelled-load	EntryModelTests/ignoresCancelledLoad		未確認	ModelTask.attempt が取り消しを投げ直すが EntryModel のテストが無い
+entry.ignores-cancelled-load	EntryModelTests/ignoresCancelledLoad	EntryModelFailureTest/ignoresCancelledLoad	対応	
 entry.hides-selected-category-and-selects-it-again-on-undo	EntryModelTests/hidesSelectedCategoryAndSelectsItAgainOnUndo		未移植	入力画面からカテゴリを非表示にして戻す所（hideCategory）が無い
 entry.keeps-selection-when-undoing-hidden-other-category	EntryModelTests/keepsSelectionWhenUndoingHiddenOtherCategory		未移植	入力画面からカテゴリを非表示にして戻す所（hideCategory）が無い
 entry.selects-added-category	EntryModelTests/selectsAddedCategory		未移植	入力画面からカテゴリを足して選ぶ所（newCategoryModel）が無い
@@ -177,36 +177,36 @@ entry-voice-flow.passes-own-words-as-hints	EntryVoiceFlowTests/passesOwnWordsAsH
 entry-voice-flow.reads-the-amount-from-an-alternative	EntryVoiceFlowTests/readsTheAmountFromAnAlternative	EntryVoiceSpeechTest/picksFirstReadableCandidate	対応	候補を選ぶ所だけで、選んだ文が下書きに入る所は確かめていない
 entry-voice-flow.asks-the-model-with-recent-examples	EntryVoiceFlowTests/asksTheModelWithRecentExamples		iOSのみ	端末の中のモデルへ渡す例文の話で、Android に voiceExamples は無い
 entry-voice-flow.puts-similar-entries-first-in-examples	EntryVoiceFlowTests/putsSimilarEntriesFirstInExamples		iOSのみ	端末の中のモデルへ渡す例文の話で、Android に voiceExamples は無い
-entry-voice-flow.drops-underline-when-the-field-changes	EntryVoiceFlowTests/dropsUnderlineWhenTheFieldChanges		未確認	EntryModelOutputVoice.isDateFromVoice にあるが、変えた後のテストが無い
+entry-voice-flow.drops-underline-when-the-field-changes	EntryVoiceFlowTests/dropsUnderlineWhenTheFieldChanges	EntryModelVoiceTest/dropsUnderlineWhenTheFieldChanges	対応	
 entry-voice-flow.cancel-while-starting-stops-the-source	EntryVoiceFlowTests/cancelWhileStartingStopsTheSource		iOSのみ	始めるのを待つ間の取り消しの話で、Android の start は待たずに始まる
-entry-voice-flow.reads-the-last-result-given-while-finishing	EntryVoiceFlowTests/readsTheLastResultGivenWhileFinishing		未確認	Listener.onResults が最後の候補を読むが、流れのテストが無い
+entry-voice-flow.reads-the-last-result-given-while-finishing	EntryVoiceFlowTests/readsTheLastResultGivenWhileFinishing		未確認	Listener.onResults からだけ動き、SpeechRecognizer が無いと単体テストで呼べない
 entry-voice-flow.hides-voice-for-transfers	EntryVoiceFlowTests/hidesVoiceForTransfers	EntryModelVoiceTest/hidesVoiceForTransfers	対応	
 entry-voice-flow.applies-spoken-fields-and-undoes-them	EntryVoiceFlowTests/appliesSpokenFieldsAndUndoesThem	EntryModelVoiceTest/appliesSpokenFieldsAndUndoesThem EntryVoiceSpeechTest/describesResult	対応	EntryVoiceFlow を通さず、モデルへの反映と知らせの文だけを確かめる
 entry-voice-flow.keeps-keypad-open-when-amount-is-missing	EntryVoiceFlowTests/keepsKeypadOpenWhenAmountIsMissing	EntryModelVoiceTest/keepsAmountWhenSpokenAmountIsMissing EntryVoiceSpeechTest/describesResult	対応	EntryVoiceFlow を通さず、モデルへの反映と知らせの文だけを確かめる
 entry-voice-flow.tells-when-nothing-was-heard	EntryVoiceFlowTests/tellsWhenNothingWasHeard	EntryVoiceSpeechTest/describesResult	対応	知らせの文だけで、何も聞こえずに終える流れは確かめていない
-entry-voice-flow.finishes-after-silence	EntryVoiceFlowTests/finishesAfterSilence		未確認	EntryVoiceFlow.waitForSilence にあるが、流れのテストが無い
-entry-voice-flow.keeps-recent-levels-while-listening	EntryVoiceFlowTests/keepsRecentLevelsWhileListening		未確認	Listener.onRmsChanged が levels を持つが、流れのテストが無い
-entry-voice-flow.counts-silence-from-the-last-voice	EntryVoiceFlowTests/countsSilenceFromTheLastVoice		未確認	EntryVoiceFlow.follow と silenceStart にあるが、テストが無い
-entry-voice-flow.finishes-when-silence-runs-out-before-the-words	EntryVoiceFlowTests/finishesWhenSilenceRunsOutBeforeTheWords		未確認	EntryVoiceFlow.follow から waitForSilence に入るが、テストが無い
-entry-voice-flow.keeps-listening-while-the-voice-is-loud	EntryVoiceFlowTests/keepsListeningWhileTheVoiceIsLoud		未確認	EntryVoiceFlow.follow が大きい声で待ちを取り消すが、テストが無い
-entry-voice-flow.clears-notice-after-a-while	EntryVoiceFlowTests/clearsNoticeAfterAWhile		未確認	EntryVoiceFlow.show の noticeJob にあるが、テストが無い
-entry-voice-flow.cancel-leaves-the-entry-as-it-was	EntryVoiceFlowTests/cancelLeavesTheEntryAsItWas		未確認	EntryVoiceFlow.cancel にあるが、テストが無い
-entry-voice-flow.shows-denied-card-when-permission-was-refused	EntryVoiceFlowTests/showsDeniedCardWhenPermissionWasRefused		未確認	EntryVoiceFlow.deny と Phase.Denied にあるが、流れのテストが無い
+entry-voice-flow.finishes-after-silence	EntryVoiceFlowTests/finishesAfterSilence		未確認	waitForSilence は Listener からだけ動き、単体テストで呼べない
+entry-voice-flow.keeps-recent-levels-while-listening	EntryVoiceFlowTests/keepsRecentLevelsWhileListening		未確認	Listener.onRmsChanged からだけ動き、単体テストで呼べない
+entry-voice-flow.counts-silence-from-the-last-voice	EntryVoiceFlowTests/countsSilenceFromTheLastVoice		未確認	follow は Listener.onRmsChanged からだけ動き、単体テストで呼べない
+entry-voice-flow.finishes-when-silence-runs-out-before-the-words	EntryVoiceFlowTests/finishesWhenSilenceRunsOutBeforeTheWords		未確認	follow は Listener.onRmsChanged からだけ動き、単体テストで呼べない
+entry-voice-flow.keeps-listening-while-the-voice-is-loud	EntryVoiceFlowTests/keepsListeningWhileTheVoiceIsLoud		未確認	follow は Listener.onRmsChanged からだけ動き、単体テストで呼べない
+entry-voice-flow.clears-notice-after-a-while	EntryVoiceFlowTests/clearsNoticeAfterAWhile		未確認	知らせを出す show は Listener からだけ動き、単体テストで呼べない
+entry-voice-flow.cancel-leaves-the-entry-as-it-was	EntryVoiceFlowTests/cancelLeavesTheEntryAsItWas	EntryVoiceFlowTest/cancelLeavesTheEntryAsItWas	対応	聞いている状態からの cancel だけで、認識の部品を止める所は確かめていない
+entry-voice-flow.shows-denied-card-when-permission-was-refused	EntryVoiceFlowTests/showsDeniedCardWhenPermissionWasRefused	EntryVoiceFlowTest/showsDeniedCardWhenPermissionWasRefused	対応	許可を求める所は画面にあり、断られた後の deny と閉じる所だけを確かめる
 entry-voice-interpreter.*	EntryVoiceInterpreterTests/*		iOSのみ	端末の中のモデルに渡す型を作る話で、Android は android.speech だけを使う
 entry-voice-interpreter-accuracy.*	EntryVoiceInterpreterAccuracyTests/*		iOSのみ	端末の中のモデルの当たり具合を測る話で、Android にそのモデルは無い
 entry-receipt-flow.*	EntryReceiptFlowTests/*		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
 entry-deck.starts-with-the-first-field	EntryDeckTests/startsWithTheFirstField	EntryModelTest/startsWithFirstCategoryAndWallet EntryModelTransferTest/startsWithTwoDifferentWallets	対応	収入の時の最初の欄は確かめていない
-entry-deck.points-wallets-to-the-transfer-field	EntryDeckTests/pointsWalletsToTheTransferField		未確認	画面の EntrySlip の transferFields が当たるが、テストが無い
+entry-deck.points-wallets-to-the-transfer-field	EntryDeckTests/pointsWalletsToTheTransferField	EntryDeckTest/pointsWalletsToTheTransferField	対応	
 entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields		未移植	欄の並びから出す向きを決める動きが Android の画面に無い
-entry-item.starts-next-draft-with-last-tax-rate	EntryItemModelTests/startsNextDraftWithLastTaxRate		未確認	Android は別のブランチで合わせる
-entry-item.fills-draft-from-edited-item	EntryItemModelTests/fillsDraftFromEditedItem		未確認	Android は別のブランチで合わせる
-entry-item.keeps-read-amount-until-price-changes	EntryItemModelTests/keepsReadAmountUntilPriceChanges		未確認	Android は別のブランチで合わせる
-entry-item.adds-item-from-draft	EntryItemModelTests/addsItemFromDraft		未確認	Android は別のブランチで合わせる
-entry-item.turns-discount-negative-and-halves-unit	EntryItemModelTests/turnsDiscountNegativeAndHalvesUnit		未確認	Android は別のブランチで合わせる
-entry-item.refuses-draft-without-name-or-price	EntryItemModelTests/refusesDraftWithoutNameOrPrice		未確認	Android は別のブランチで合わせる
-entry-item.updates-edited-item	EntryItemModelTests/updatesEditedItem		未確認	Android は別のブランチで合わせる
-entry-item.follows-edited-row-when-rows-are-removed-and-restored	EntryItemModelTests/followsEditedRowWhenRowsAreRemovedAndRestored		未確認	Android は別のブランチで合わせる
-entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScrollOnlyToExistingRows		未確認	Android は別のブランチで合わせる
+entry-item.starts-next-draft-with-last-tax-rate	EntryItemModelTests/startsNextDraftWithLastTaxRate	EntryItemModelTest/startsNextDraftWithLastTaxRate	対応	
+entry-item.fills-draft-from-edited-item	EntryItemModelTests/fillsDraftFromEditedItem	EntryItemModelTest/fillsDraftFromEditedItem	対応	
+entry-item.keeps-read-amount-until-price-changes	EntryItemModelTests/keepsReadAmountUntilPriceChanges	EntryItemModelTest/keepsReadAmountUntilPriceChanges	対応	
+entry-item.adds-item-from-draft	EntryItemModelTests/addsItemFromDraft	EntryItemModelTest/addsItemFromDraft	対応	
+entry-item.turns-discount-negative-and-halves-unit	EntryItemModelTests/turnsDiscountNegativeAndHalvesUnit	EntryItemModelTest/turnsDiscountNegativeAndHalvesUnit	対応	
+entry-item.refuses-draft-without-name-or-price	EntryItemModelTests/refusesDraftWithoutNameOrPrice	EntryItemModelTest/refusesDraftWithoutNameOrPrice	対応	
+entry-item.updates-edited-item	EntryItemModelTests/updatesEditedItem	EntryItemModelTest/updatesEditedItem	対応	
+entry-item.follows-edited-row-when-rows-are-removed-and-restored	EntryItemModelTests/followsEditedRowWhenRowsAreRemovedAndRestored	EntryItemModelTest/followsEditedRowWhenRowsAreRemovedAndRestored	対応	
+entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScrollOnlyToExistingRows		未移植	品目のシートに、編集する行へ送る動きが無い
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話

@@ -7,6 +7,7 @@ import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class EntryModelRecentTest {
     @Test
@@ -70,6 +71,39 @@ class EntryModelRecentTest {
         assertEquals(shared.id, model.output.category?.walletId)
         assertNull(model.state.form.tagId)
         assertEquals(980, model.output.amount)
+    }
+
+    @Test
+    fun skipsRecentEntriesThatMatchTemplates() = modelTest(today = "2026-10-15") { setup ->
+        val template = setup.saveTemplate(name = "ランチ", amount = 980)
+        setup.save(
+            Entry.Kind.expense,
+            amount = 980,
+            on = setup.today,
+            memo = "社食",
+            categoryId = template.categoryId,
+            walletId = template.walletId,
+        )
+        setup.save(
+            Entry.Kind.expense,
+            amount = 220,
+            on = setup.today,
+            categoryId = template.categoryId,
+            walletId = template.walletId,
+        )
+
+        val model = setup.loadedModel()
+
+        assertEquals(listOf(220), model.output.recentEntries.map { it.amount })
+    }
+
+    @Test
+    fun listsNoRecentEntriesForTransfers() = modelTest(today = "2026-10-12") { setup ->
+        setup.save(Entry.Kind.expense, amount = 980, on = setup.today)
+
+        val model = setup.transferModel()
+
+        assertTrue(model.output.recentEntries.isEmpty())
     }
 
     @Test

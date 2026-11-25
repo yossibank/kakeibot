@@ -9,6 +9,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EntryModelItemTest {
@@ -128,6 +129,26 @@ class EntryModelItemTest {
         assertEquals(setOf("牛乳", "低脂肪乳", "パン"), all.toSet())
         assertEquals(setOf("牛乳", "低脂肪乳"), milk.toSet())
         assertTrue(exact.isEmpty())
+    }
+
+    @Test
+    fun showsQuantityOnlyWhenMany() {
+        val pair = item("牛乳", amount = 396, quantity = 2)
+        val uneven = item("卵", amount = 200, quantity = 3)
+        val single = item("パン", amount = 250)
+
+        assertEquals("2 × ¥198", pair.quantityText())
+        assertEquals("×3", uneven.quantityText())
+        assertNull(single.quantityText())
+    }
+
+    @Test
+    fun splitsAmountIntoUnitPrice() {
+        val pair = item("牛乳", amount = 396, quantity = 2)
+        val odd = item("卵", amount = 100, quantity = 3)
+
+        assertEquals(198 to 2, pair.unitPrice())
+        assertEquals(100 to 1, odd.unitPrice())
     }
 
     @Test
