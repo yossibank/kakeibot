@@ -8,7 +8,7 @@ extension AssetsView {
         let shape = RoundedRectangle(cornerRadius: corner.radius(12))
 
         return Button {
-            isShowingOutlook = true
+            model.state.present(.outlook)
         } label: {
             VStack(alignment: .leading, spacing: 8) {
                 Label("今月これから", systemImage: "calendar")

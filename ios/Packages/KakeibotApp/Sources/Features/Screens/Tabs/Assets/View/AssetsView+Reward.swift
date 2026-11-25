@@ -7,7 +7,7 @@ extension AssetsView {
     var rewardCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
-                isShowingReward = true
+                model.state.present(.reward)
             } label: {
                 rewardCardBody
             }
@@ -15,7 +15,7 @@ extension AssetsView {
 
             if model.output.rewardGoal == nil {
                 AddButton("欲しい物を目標にする") {
-                    isAddingGoal = true
+                    model.state.present(.newGoal)
                 }
             }
 

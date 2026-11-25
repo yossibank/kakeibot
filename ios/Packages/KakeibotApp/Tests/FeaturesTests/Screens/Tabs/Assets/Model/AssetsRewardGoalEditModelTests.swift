@@ -21,6 +21,32 @@ struct AssetsRewardGoalEditModelTests {
     }
 
     @Test
+    func opensAmountPanelOnlyForNewGoal() throws {
+        let database = try AppDatabase.inMemory()
+
+        let goal = RewardGoal(
+            name: "新しい靴",
+            targetAmount: 12000,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+
+        let adding = AssetsRewardGoalEditModel(parts: .system(database))
+        let editing = AssetsRewardGoalEditModel(parts: .system(database), editing: goal)
+
+        let panelWhenAdding = adding.state.panel
+        let panelWhenEditing = editing.state.panel
+
+        adding.state.closePanel()
+        editing.state.open(.amount)
+
+        #expect(panelWhenAdding == .amount)
+        #expect(panelWhenEditing == nil)
+        #expect(adding.state.panel == nil)
+        #expect(editing.state.panel == .amount)
+    }
+
+    @Test
     func editingGoalIsChangedOnlyWhenDraftDiffers() throws {
         let database = try AppDatabase.inMemory()
 

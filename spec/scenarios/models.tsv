@@ -258,6 +258,9 @@ assets.reaches-goal-at-zero-remaining	AssetsModelTests/reachesGoalAtZeroRemainin
 assets.keeps-bought-goal-in-state-after-purchase	AssetsModelTests/keepsBoughtGoalInStateAfterPurchase		未移植	資産のモデルと画面に、ごほうびの機能が無い
 assets.tells-when-purchase-cannot-be-saved	AssetsModelTests/tellsWhenPurchaseCannotBeSaved		未移植	資産のモデルと画面に、ごほうびの機能が無い
 assets.refuses-purchase-short-of-balance	AssetsModelTests/refusesPurchaseShortOfBalance		未移植	資産のモデルと画面に、ごほうびの機能が無い
+assets.opens-reward-sheet-from-its-first-look	AssetsModelTests/opensRewardSheetFromItsFirstLook		未確認	Android は別のブランチで合わせる
+assets.shows-goal-editor-or-rules-in-reward-sheet	AssetsModelTests/showsGoalEditorOrRulesInRewardSheet		未確認	Android は別のブランチで合わせる
+assets.hands-over-pending-opening-once	AssetsModelTests/handsOverPendingOpeningOnce		未確認	Android は別のブランチで合わせる
 assets.counts-loan-repaid-from-zero-to-overpaid	AssetsModelTests/countsLoanRepaidFromZeroToOverpaid		未移植	資産の行に、借入の返済の割合が無い
 assets.sums-balances-by-wallet-and-month	AssetsModelTests/sumsBalancesByWalletAndMonth	AssetsModelTest/sumsBalancesByWallet	対応	先月との差と 6 か月の月ごとの合計は Android に無く、確かめていない
 assets.leaves-out-future-entries-from-balances	AssetsModelTests/leavesOutFutureEntriesFromBalances	AssetsModelTest/leavesOutFutureEntriesFromBalances	対応	

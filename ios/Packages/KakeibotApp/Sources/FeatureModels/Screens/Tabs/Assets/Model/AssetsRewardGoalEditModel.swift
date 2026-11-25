@@ -20,7 +20,7 @@ public final class AssetsRewardGoalEditModel: ScreenPerforming {
     ) {
         let name = goal?.name ?? ""
         let amount = goal?.targetAmount ?? 0
-        let state = State(name: name, amount: amount)
+        let state = State(name: name, amount: amount, panel: goal == nil ? .amount : nil)
 
         let input = Input(
             baseline: RewardGoalDraft(name: name, targetAmount: amount),
@@ -36,6 +36,10 @@ public final class AssetsRewardGoalEditModel: ScreenPerforming {
 }
 
 public extension AssetsRewardGoalEditModel {
+    enum Panel: Hashable, Sendable {
+        case amount
+    }
+
     @MainActor
     @Observable
     final class State: SettingsEditState {
@@ -46,13 +50,26 @@ public extension AssetsRewardGoalEditModel {
         public var name: String
 
         public private(set) var calculator: AmountCalculator
+        public private(set) var panel: Panel?
 
         init(
             name: String,
-            amount: Int
+            amount: Int,
+            panel: Panel?
         ) {
             self.name = name
             self.calculator = AmountCalculator(amount: amount)
+            self.panel = panel
+        }
+
+        public func open(_ panel: Panel) {
+            self.panel = panel
+        }
+
+        public func closePanel() {
+            if panel != nil {
+                panel = nil
+            }
         }
 
         public func press(_ key: AmountCalculator.Key) {

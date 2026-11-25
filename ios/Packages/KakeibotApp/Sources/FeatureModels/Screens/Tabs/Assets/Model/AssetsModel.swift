@@ -35,6 +35,10 @@ public extension AssetsModel {
 
         public var billPage = 0
         public var boughtId: RewardGoal.ID?
+        public var sheet: Sheet?
+
+        public internal(set) var reward = RewardSheet()
+        public internal(set) var pending: Opening?
     }
 
     @MainActor

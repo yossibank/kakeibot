@@ -6,18 +6,7 @@ import SwiftUI
 public struct AssetsView: View {
     @Bindable var model: AssetsModel
 
-    @State var entrySheet: AssetsEntrySheet.Content?
-    @State var isShowingReward = false
-    @State var isAddingGoal = false
-    @State var isAddingWallet = false
-    @State var isShowingOutlook = false
-    @State var addingKind = Wallet.Kind.cash
-    @State var adjusting: AssetsModel.WalletRow?
-
     @Environment(\.themeStyle.corner) var corner
-
-    @State private var pendingEntry: Entry.ID?
-    @State private var pendingRecurring: Recurring.ID?
 
     let onOpenWallet: (Wallet.ID) -> Void
     let onOpenRecurring: (Recurring.ID) -> Void
@@ -71,33 +60,8 @@ public struct AssetsView: View {
             .padding(.bottom, 24)
         }
         .errorBanner(Bindable(model.state).errorNotice)
-        .sheet(isPresented: $isShowingReward) {
-            AssetsRewardSheet(model: model)
-        }
-        .sheet(isPresented: $isAddingGoal) {
-            AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: nil))
-        }
-        .sheet(isPresented: $isAddingWallet) {
-            WalletEditSheet(model: model.newWalletModel(kind: addingKind))
-        }
-        .sheet(item: $adjusting) { row in
-            AssetsAdjustmentSheet(model: model.adjustModel(for: row))
-        }
-        .sheet(isPresented: $isShowingOutlook, onDismiss: openPendingEntry) {
-            AssetsOutlookSheet(
-                model: model,
-                onOpen: { id in
-                    pendingEntry = id
-                },
-                onOpenRecurring: { id in
-                    pendingRecurring = id
-                }
-            )
-        }
-        .sheet(item: $entrySheet, onDismiss: openPendingEntry) { content in
-            AssetsEntrySheet(content: content) { id in
-                pendingEntry = id
-            }
+        .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in
+            sheetContent(sheet)
         }
         .backdrop()
     }
@@ -219,6 +183,39 @@ private extension AssetsView {
         return "先月末より \(sign)\(Yen.text(change))"
     }
 
+    @ViewBuilder
+    func sheetContent(_ sheet: AssetsModel.Sheet) -> some View {
+        switch sheet {
+        case .reward:
+            AssetsRewardSheet(model: model)
+
+        case .newGoal:
+            AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: nil))
+
+        case let .newWallet(kind):
+            WalletEditSheet(model: model.newWalletModel(kind: kind))
+
+        case let .adjustment(row):
+            AssetsAdjustmentSheet(model: model.adjustModel(for: row))
+
+        case .outlook:
+            AssetsOutlookSheet(
+                model: model,
+                onOpen: { id in
+                    model.state.open(afterSheet: .entry(id))
+                },
+                onOpenRecurring: { id in
+                    model.state.open(afterSheet: .recurring(id))
+                }
+            )
+
+        case let .entries(source):
+            AssetsEntrySheet(content: AssetsEntrySheet.Content(source)) { id in
+                model.state.open(afterSheet: .entry(id))
+            }
+        }
+    }
+
     static func isOwed(_ role: Wallet.Kind.Role) -> Bool {
         switch role {
         case .card, .loan: true
@@ -227,23 +224,14 @@ private extension AssetsView {
     }
 
     func addWallet(_ kind: Wallet.Kind) {
-        addingKind = kind
-        isAddingWallet = true
+        model.state.present(.newWallet(kind))
     }
 
-    func openPendingEntry() {
-        if let pendingRecurring {
-            self.pendingRecurring = nil
-
-            onOpenRecurring(pendingRecurring)
+    func openPending() {
+        switch model.state.takePending() {
+        case let .entry(id): onOpenEntry(id)
+        case let .recurring(id): onOpenRecurring(id)
+        case nil: break
         }
-
-        guard let pendingEntry else {
-            return
-        }
-
-        self.pendingEntry = nil
-
-        onOpenEntry(pendingEntry)
     }
 }

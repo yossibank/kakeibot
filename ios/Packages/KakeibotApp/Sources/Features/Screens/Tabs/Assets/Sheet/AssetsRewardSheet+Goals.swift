@@ -13,14 +13,14 @@ extension AssetsRewardSheet {
 
                 if !model.output.waitingGoals.isEmpty {
                     ToolButton(systemImage: "plus") {
-                        goalTarget = GoalTarget(goal: nil)
+                        model.state.editGoal(nil)
                     }
                 }
             }
 
             if model.output.waitingGoals.isEmpty {
                 AddButton("欲しい物を目標にする") {
-                    goalTarget = GoalTarget(goal: nil)
+                    model.state.editGoal(nil)
                 }
             } else {
                 ForEach(model.output.waitingGoals) { goal in
@@ -58,7 +58,7 @@ private extension AssetsRewardSheet {
         )
         .contentShape(.rect)
         .onTapGesture {
-            goalTarget = GoalTarget(goal: goal)
+            model.state.editGoal(goal)
         }
     }
 

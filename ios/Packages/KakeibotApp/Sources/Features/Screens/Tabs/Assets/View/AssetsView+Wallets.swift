@@ -211,7 +211,7 @@ private extension AssetsView {
         let shape = RoundedRectangle(cornerRadius: corner.radius(12))
 
         return Button {
-            adjusting = row
+            model.state.present(.adjustment(row))
         } label: {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
@@ -284,7 +284,7 @@ private extension AssetsView {
 
         if count > 0 {
             Button {
-                entrySheet = .unpaid(of: rows)
+                model.state.present(.entries(.unpaid(rows)))
             } label: {
                 HStack(spacing: 4) {
                     Label(
