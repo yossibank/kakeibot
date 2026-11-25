@@ -7,16 +7,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -31,10 +29,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.saveTitle
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 
 @Composable
-internal fun ActionBar(
-    model: EntryModel,
-    onDelete: () -> Unit,
-) {
+internal fun ActionBar(model: EntryModel) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -52,46 +47,44 @@ internal fun ActionBar(
             isEnabled = model.output.canSave || model.output.opensKeypadOnSave,
         )
 
-        if (model.output.isEditing) {
-            RoundButton(onSelect = onDelete) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_trash),
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp),
-                    tint = Palette.rose,
-                )
-            }
-        } else {
-            RoundButton(onSelect = { model.perform { it.saveAndContinue() } }) {
-                Text(
-                    text = "続けて",
-                    color = Palette.accent,
-                    style = textFont(
-                        size = FontSize.Caption,
-                        weight = FontWeight.SemiBold,
-                    ),
-                )
-            }
+        if (!model.output.isEditing) {
+            ContinueButton(
+                isEnabled = model.output.canSave,
+                onSelect = { model.perform { it.saveAndContinue() } },
+            )
         }
     }
 }
 
 @Composable
-private fun RoundButton(
+private fun ContinueButton(
+    isEnabled: Boolean,
     onSelect: () -> Unit,
-    content: @Composable () -> Unit,
 ) {
     Box(
         modifier = Modifier
             .size(Metrics.buttonHeight)
+            .alpha(if (isEnabled) 1f else DISABLED_ALPHA)
             .clip(CircleShape)
             .border(
                 width = 1.dp,
                 color = Palette.accent.opacity(Emphasis.Medium),
                 shape = CircleShape,
-            ).clickable(onClick = onSelect),
+            ).clickable(
+                enabled = isEnabled,
+                onClick = onSelect,
+            ),
         contentAlignment = Alignment.Center,
     ) {
-        content()
+        Text(
+            text = "続けて",
+            color = Palette.accent,
+            style = textFont(
+                size = FontSize.Caption,
+                weight = FontWeight.SemiBold,
+            ),
+        )
     }
 }
+
+private const val DISABLED_ALPHA = 0.4f

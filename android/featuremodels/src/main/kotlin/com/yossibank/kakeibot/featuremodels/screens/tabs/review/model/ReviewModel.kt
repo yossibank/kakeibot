@@ -184,7 +184,6 @@ class ReviewModel(
                     isPartial = state.today in period.range,
                 )
 
-                val change = total - previousTotal
                 val amount = AmountText.text(abs(change).clamped)
 
                 return when {
@@ -193,6 +192,9 @@ class ReviewModel(
                     else -> "${previous}と同じ"
                 }
             }
+
+        val change: Long
+            get() = total - previousTotal
 
         val total: Long
             get() = total(of = summary)

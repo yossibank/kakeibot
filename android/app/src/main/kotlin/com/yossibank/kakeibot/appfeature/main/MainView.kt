@@ -124,6 +124,7 @@ private fun MainLayers(
                                 today = today,
                                 onOpenBudget = { onOpen(MainSheet.Budget) },
                                 onOpenEntry = openEntry,
+                                onAddEntry = { openEntry(null) },
                                 onOpenSettings = { onOpen(MainSheet.Settings()) },
                             )
                         }

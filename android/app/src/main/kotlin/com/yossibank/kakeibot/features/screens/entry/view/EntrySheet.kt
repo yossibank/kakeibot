@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -174,6 +175,18 @@ fun EntrySheet(
 
                 Spacer(modifier = Modifier.weight(1f))
 
+                if (model.output.isEditing) {
+                    CircleIconButton(
+                        icon = R.drawable.ic_trash,
+                        onClick = { model.state.present(EntryModel.Presented.Delete) },
+                        size = 36.dp,
+                        iconSize = 20.dp,
+                        tint = Palette.rose,
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
                 CircleIconButton(
                     icon = R.drawable.ic_close,
                     onClick = ::close,
@@ -232,10 +245,7 @@ fun EntrySheet(
                 if (!voice.output.isActive && model.output.showsRecent && model.output.hasRecent) {
                     EntryRecentRow(model = model)
                 } else {
-                    ActionBar(
-                        model = model,
-                        onDelete = { model.state.present(EntryModel.Presented.Delete) },
-                    )
+                    ActionBar(model = model)
                 }
             }
         }

@@ -134,6 +134,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
 | 失敗の知らせ | `designsystem/components/notice/` の `NoticeBanner`。タブの画面は、題のすぐ下に出す |
 | 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`LoadFailedColumn` で画面の全体に出す |
+| 記録が無い時の表示 | `features/shared/placeholder/` の `PlaceholderEmpty`。記録するボタンを付けられる |
+| 振替の経路 | `designsystem/components/entry/` の `EntryRoute`。記録の行が、タグの札と一緒に出す |
 | 1 行に収めて縮める文字 | `designsystem/components/text/` の `FittedText` |
 | 横線・縦の区切り | `designsystem/components/surface/` |
 | 置き文字付きの入力欄 | `designsystem/components/input/` の `PlaceholderTextField` |

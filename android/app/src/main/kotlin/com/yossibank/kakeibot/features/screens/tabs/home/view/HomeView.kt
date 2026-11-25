@@ -49,6 +49,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
+import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderEmpty
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderLoadFailed
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -60,6 +61,7 @@ fun HomeView(
     today: LocalDate,
     onOpenBudget: () -> Unit,
     onOpenEntry: (Identifier<Entry>) -> Unit,
+    onAddEntry: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     val entryList = rememberEntryList(database)
@@ -135,6 +137,7 @@ fun HomeView(
             RecentCard(
                 model = model,
                 onOpenEntry = onOpenEntry,
+                onAddEntry = onAddEntry,
             )
         }
     }
@@ -158,6 +161,7 @@ private fun BudgetCard(
     ) {
         Dial(
             usage = usage,
+            monthExpense = overview?.monthExpense ?: 0,
             isFailed = model.state.isListFailed,
         )
 
@@ -222,6 +226,7 @@ private fun BudgetCard(
 @Composable
 private fun Dial(
     usage: BudgetUsage?,
+    monthExpense: Long,
     isFailed: Boolean,
 ) {
     val isOver = usage?.isOver ?: false
@@ -259,27 +264,22 @@ private fun Dial(
                         weight = FontWeight.Bold,
                     ),
                 )
-            } else if (usage != null) {
+            } else {
                 AmountText(
-                    amount = abs(usage.remaining).clamped,
+                    amount = (usage?.let { abs(it.remaining) } ?: monthExpense).clamped,
                     style = displayFont(
                         size = FontSize.Display,
                         weight = FontWeight.Bold,
                     ),
                     color = color,
                 )
+            }
 
+            if (!isFailed && usage != null) {
                 Text(
                     text = "あと ${usage.daysLeft} 日",
                     color = Palette.subtext,
                     style = textFont(style = FontTextStyle.Caption),
-                )
-            } else {
-                Text(
-                    text = "予算を決めると、残りが出ます",
-                    modifier = Modifier.padding(vertical = 12.dp),
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Subheadline),
                 )
             }
         }
@@ -330,6 +330,7 @@ private fun UnknownAmount(style: TextStyle) {
 private fun RecentCard(
     model: HomeModel,
     onOpenEntry: (Identifier<Entry>) -> Unit,
+    onAddEntry: () -> Unit,
 ) {
     val rows = model.output.recentRows
 
@@ -358,14 +359,10 @@ private fun RecentCard(
         }
 
         if (model.output.showsNoRecords) {
-            Text(
-                text = "右下の ＋ から記録できます",
-                modifier = Modifier.padding(
-                    top = 8.dp,
-                    bottom = 16.dp,
-                ),
-                color = Palette.subtext,
-                style = textFont(style = FontTextStyle.Subheadline),
+            PlaceholderEmpty(
+                icon = R.drawable.ic_edit,
+                text = "まだ記録がありません",
+                onRecord = onAddEntry,
             )
         }
 
