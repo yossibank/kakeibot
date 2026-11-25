@@ -26,10 +26,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,43 +50,31 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.close
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.suggestions
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 
 @Composable
 fun BudgetKeypadDrawer(model: BudgetListModel) {
-    var isConfirmingDiscard by remember { mutableStateOf(false) }
-
-    fun close() {
-        if (model.output.isChanged) {
-            isConfirmingDiscard = true
-        } else {
-            model.state.cancelEditing()
-        }
-    }
-
     if (model.state.editing != null) {
-        BackHandler(onBack = ::close)
+        BackHandler(onBack = model::close)
     }
 
     BottomDrawer(
         item = model.state.editing,
         title = { it.title },
-        onClose = ::close,
+        onClose = model::close,
         padding = drawerPadding,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Drawer(model = model)
     }
 
-    if (isConfirmingDiscard) {
+    if (model.state.isConfirmingDiscard) {
         DiscardDialog(
-            onDiscard = {
-                isConfirmingDiscard = false
-                model.state.cancelEditing()
-            },
-            onKeep = { isConfirmingDiscard = false },
+            onDiscard = model.state::cancelEditing,
+            onKeep = { model.state.isConfirmingDiscard = false },
         )
     }
 }

@@ -38,7 +38,7 @@ class RecurringListModelTest {
         assertNull(row.closing)
         assertEquals(78000L, model.output.monthTotal)
 
-        model.state.type = Entry.Kind.income
+        model.state.select(Entry.Kind.income)
 
         assertTrue(model.output.rows.isEmpty())
         assertEquals(0L, model.output.monthTotal)

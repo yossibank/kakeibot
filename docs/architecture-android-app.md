@@ -95,6 +95,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 見張りの回 | `MainView` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
 | 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
 | 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
+| 確認・引き出し・選んだ行 | モデルの `State` に置く。`EntryModel.Presented`・`RecurringPanel` が当たる |
+| 画面の見た目の値 | 画面のファイルの `class Layout` に置く。Composable の関数で `mutableStateOf` を作らない |
 
 ## 🪝 画面とモデルのやり取り
 

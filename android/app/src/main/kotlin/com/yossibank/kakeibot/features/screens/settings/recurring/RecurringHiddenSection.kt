@@ -125,31 +125,35 @@ private fun HiddenRow(
     onEdit: () -> Unit,
     onShow: () -> Unit,
 ) {
-    var dragY by remember { mutableFloatStateOf(0f) }
+    val layout = remember { Layout() }
     val reach = with(LocalDensity.current) { recurringRowHeight.toPx() }
 
     RecurringRowCard(
         row = row,
         isPaused = true,
         modifier = Modifier
-            .zIndex(if (dragY != 0f) 1f else 0f)
-            .offset { IntOffset(0, dragY.roundToInt()) }
-            .alpha(if (dragY != 0f) 1f else 0.5f)
+            .zIndex(if (layout.dragY != 0f) 1f else 0f)
+            .offset { IntOffset(0, layout.dragY.roundToInt()) }
+            .alpha(if (layout.dragY != 0f) 1f else 0.5f)
             .clickable(onClick = onEdit)
             .pointerInput(row.id) {
                 detectDragGesturesAfterLongPress(
                     onDragEnd = {
-                        if (dragY < -reach) {
+                        if (layout.dragY < -reach) {
                             onShow()
                         }
 
-                        dragY = 0f
+                        layout.dragY = 0f
                     },
-                    onDragCancel = { dragY = 0f },
+                    onDragCancel = { layout.dragY = 0f },
                 ) { change, amount ->
                     change.consume()
-                    dragY = minOf(dragY + amount.y, 0f)
+                    layout.dragY = minOf(layout.dragY + amount.y, 0f)
                 }
             },
     )
+}
+
+private class Layout {
+    var dragY: Float by mutableFloatStateOf(0f)
 }

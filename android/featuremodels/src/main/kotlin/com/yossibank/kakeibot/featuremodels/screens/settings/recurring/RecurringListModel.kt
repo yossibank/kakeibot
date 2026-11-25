@@ -42,23 +42,45 @@ class RecurringListModel(
     clock: ScreenClock,
     entryList: Flow<EntryList>,
     today: LocalDate,
+    opening: Identifier<Recurring>? = null,
 ) : SettingsFoldModel {
-    val state = State(today)
+    val state = State(today, opening?.let { Editing.Existing(it) })
     val input = Input()
     val output = Output(input, state)
 
     private val dependencies = Dependencies(database, clock, entryList)
 
+    sealed interface Editing {
+        data object New : Editing
+
+        data class Existing(
+            val id: Identifier<Recurring>,
+        ) : Editing
+    }
+
+    sealed interface DeleteTarget {
+        data object AllHidden : DeleteTarget
+
+        data class One(
+            val id: Identifier<Recurring>,
+        ) : DeleteTarget
+    }
+
     class State(
         today: LocalDate,
+        editing: Editing?,
     ) {
         val task = ModelTask()
         val hidden = UndoNoticeState<Identifier<Recurring>>()
         val deleted = UndoNoticeState<Deletion>()
 
         var today: LocalDate by mutableStateOf(today)
+        var editing: Editing? by mutableStateOf(editing)
+        var openId: Identifier<Recurring>? by mutableStateOf(null)
+        var deleting: DeleteTarget? by mutableStateOf(null)
 
         var type: Entry.Kind by mutableStateOf(Entry.Kind.expense)
+            private set
 
         var movingOrder: List<Identifier<Recurring>>? by mutableStateOf(null)
             private set
@@ -88,6 +110,11 @@ class RecurringListModel(
 
         fun cancelMoving() {
             movingOrder = null
+        }
+
+        fun select(type: Entry.Kind) {
+            openId = null
+            this.type = type
         }
     }
 

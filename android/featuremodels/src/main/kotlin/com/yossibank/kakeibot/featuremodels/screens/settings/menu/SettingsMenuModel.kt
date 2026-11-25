@@ -23,14 +23,29 @@ import kotlinx.coroutines.launch
 
 class SettingsMenuModel(
     database: AppDatabase,
+    screen: Screen = Screen.Menu,
 ) : SettingsFoldModel {
-    val state = State()
+    val state = State(screen)
     val input = Input()
 
     private val dependencies = Dependencies(database)
 
-    class State {
+    enum class Screen(
+        val title: String,
+    ) {
+        Menu("設定"),
+        Budgets("設定"),
+        MonthStart("月の始まり"),
+        WeekStart("週の始まり"),
+        Recurrings("設定"),
+    }
+
+    class State(
+        screen: Screen,
+    ) {
         val task = ModelTask()
+
+        var screen: Screen by mutableStateOf(screen)
     }
 
     class Input {

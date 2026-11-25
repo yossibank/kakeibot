@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringPanel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.canUseClosingDay
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isLoanRepayment

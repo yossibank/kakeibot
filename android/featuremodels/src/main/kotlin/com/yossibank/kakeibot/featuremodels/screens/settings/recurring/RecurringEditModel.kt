@@ -53,6 +53,8 @@ class RecurringEditModel(
 
         var today: LocalDate by mutableStateOf(today)
         var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
+        var panel: RecurringPanel? by mutableStateOf(null)
+        var prompt: RecurringEditPrompt? by mutableStateOf(null)
 
         var form: RecurringEditForm by mutableStateOf(
             RecurringEditForm.starting(
@@ -178,6 +180,14 @@ class RecurringEditModel(
     fun select(category: Identifier<EntryCategory>) {
         state.update { copy(categoryId = category) }
         suggestHolidayShift()
+    }
+
+    fun open(panel: RecurringPanel) {
+        if (panel == RecurringPanel.Count) {
+            prepareCount()
+        }
+
+        state.panel = panel
     }
 
     fun prepareCount() {

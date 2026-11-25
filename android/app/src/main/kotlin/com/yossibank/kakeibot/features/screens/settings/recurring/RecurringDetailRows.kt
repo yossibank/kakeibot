@@ -22,6 +22,7 @@ import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Metrics
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringPanel
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 
 @Composable

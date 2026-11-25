@@ -1,17 +1,6 @@
 android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: Composable の関数で、状態を直接作らない（mutableIntStateOf: round）。意味のある状態は、モデルの State に移す
 android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: Composable の関数で、状態を直接作らない（mutableStateOf: last）。意味のある状態は、モデルの State に移す
 android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: Composable の関数で、状態を直接作らない（mutableStateOf: sheet）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: Composable の関数で、状態を直接作らない（mutableStateOf: isConfirmingDelete）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: Composable の関数で、状態を直接作らない（mutableStateOf: isShowingItems）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: Composable の関数で、状態を直接作らない（mutableStateOf: templateDraft）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetKeypadDrawer.kt: Composable の関数で、状態を直接作らない（mutableStateOf: isConfirmingDiscard）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/menu/SettingsMenuSheet.kt: Composable の関数で、状態を直接作らない（mutableStateOf）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: Composable の関数で、状態を直接作らない（mutableStateOf: panel）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: Composable の関数で、状態を直接作らない（mutableStateOf: prompt）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringHiddenSection.kt: Composable の関数で、状態を直接作らない（mutableFloatStateOf: dragY）。見た目の値は、class Layout にまとめる
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: Composable の関数で、状態を直接作らない（mutableStateOf: deleting）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: Composable の関数で、状態を直接作らない（mutableStateOf: editing）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: Composable の関数で、状態を直接作らない（mutableStateOf: openId）。意味のある状態は、モデルの State に移す
 ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: glow。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: hasSwept。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: isLeaving。意味のある状態は、モデルの state に移す
