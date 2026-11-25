@@ -4,22 +4,27 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class EntryModelScreenTest {
     @Test
-    fun showsFieldWithItsKeypadTarget() = modelTest(today = "2026-10-12") { setup ->
+    fun showsFieldWithItsDirectionAndKeypadTarget() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.transferModel()
 
         model.state.focus(EntryModel.Field.Fee)
         model.press(3)
         val fee = model.state.field
+        val feeForward = model.state.isForward
         model.state.focus(EntryModel.Field.Transfer)
         model.press(5)
 
         assertEquals(EntryModel.Field.Fee, fee)
+        assertTrue(feeForward)
         assertEquals(3, model.output.fee)
         assertEquals(EntryModel.Field.Transfer, model.state.field)
+        assertFalse(model.state.isForward)
         assertEquals(5, model.output.amount)
     }
 

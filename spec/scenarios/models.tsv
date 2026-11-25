@@ -56,7 +56,7 @@ entry.lists-no-recent-entries-for-transfers	EntryModelTests/listsNoRecentEntries
 entry.applies-recent-entry	EntryModelTests/appliesRecentEntry	EntryModelRecentTest/appliesRecentEntry	対応	
 entry.drops-recent-tag-outside-offered-categories	EntryModelTests/dropsRecentTagOutsideOfferedCategories	EntryModelRecentTest/dropsRecentTagOutsideOfferedCategories	対応	
 entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntryOutOfRecentEntries	EntryModelRecentTest/leavesEditedEntryOutOfRecentEntries	対応	
-entry.shows-deck-with-its-direction-and-keypad-target	EntryModelTests/showsDeckWithItsDirectionAndKeypadTarget	EntryModelScreenTest/showsFieldWithItsKeypadTarget	違い	欄と宛先は field 1 つで同じに動くが、進む向きが無く、欄を動かさずに替える
+entry.shows-deck-with-its-direction-and-keypad-target	EntryModelTests/showsDeckWithItsDirectionAndKeypadTarget	EntryModelScreenTest/showsFieldWithItsDirectionAndKeypadTarget	対応	
 entry.resets-deck-to-first-field-of-type	EntryModelTests/resetsDeckToFirstFieldOfType	EntryModelScreenTest/startsFromFirstFieldWhenTypeChanges	対応	種類を替える select が、最初の欄と金額の宛先へ戻す
 entry.starts-from-first-field-when-type-changes	EntryModelTests/startsFromFirstFieldWhenTypeChanges	EntryModelScreenTest/startsFromFirstFieldWhenTypeChanges	対応	
 entry.places-deck-without-changing-keypad-target	EntryModelTests/placesDeckWithoutChangingKeypadTarget		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、開き直しで欄だけを置く操作が無い
@@ -197,7 +197,7 @@ entry-voice-interpreter-accuracy.*	EntryVoiceInterpreterAccuracyTests/*		iOSの�
 entry-receipt-flow.*	EntryReceiptFlowTests/*		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
 entry-deck.starts-with-the-first-field	EntryDeckTests/startsWithTheFirstField	EntryModelTest/startsWithFirstCategoryAndWallet EntryModelTransferTest/startsWithTwoDifferentWallets	対応	収入の時の最初の欄は確かめていない
 entry-deck.points-wallets-to-the-transfer-field	EntryDeckTests/pointsWalletsToTheTransferField	EntryDeckTest/pointsWalletsToTheTransferField	対応	
-entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields		未移植	欄の並びから出す向きを決める動きが Android の画面に無い
+entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields	EntryDeckTest/ordersFieldsByTheirPlaces	対応	
 entry-item.starts-next-draft-with-last-tax-rate	EntryItemModelTests/startsNextDraftWithLastTaxRate	EntryItemModelTest/startsNextDraftWithLastTaxRate	対応	
 entry-item.fills-draft-from-edited-item	EntryItemModelTests/fillsDraftFromEditedItem	EntryItemModelTest/fillsDraftFromEditedItem	対応	
 entry-item.keeps-read-amount-until-price-changes	EntryItemModelTests/keepsReadAmountUntilPriceChanges	EntryItemModelTest/keepsReadAmountUntilPriceChanges	対応	

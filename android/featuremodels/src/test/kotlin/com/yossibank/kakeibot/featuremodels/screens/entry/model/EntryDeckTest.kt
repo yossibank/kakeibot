@@ -15,4 +15,14 @@ class EntryDeckTest {
         assertEquals(EntryModel.Field.Transfer, destination.field(of = Entry.Kind.transfer))
         assertEquals(EntryModel.Field.Fee, EntryModel.Field.Fee.field(of = Entry.Kind.transfer))
     }
+
+    @Test
+    fun ordersFieldsByTheirPlaces() {
+        assertEquals(0, EntryModel.Field.Category.order(of = Entry.Kind.expense))
+        assertEquals(1, EntryModel.Field.Wallet.order(of = Entry.Kind.expense))
+        assertEquals(2, EntryModel.Field.Date.order(of = Entry.Kind.expense))
+        assertEquals(3, EntryModel.Field.Amount.order(of = Entry.Kind.expense))
+        assertEquals(0, EntryModel.Field.ToWallet.order(of = Entry.Kind.transfer))
+        assertEquals(1, EntryModel.Field.Fee.order(of = Entry.Kind.transfer))
+    }
 }
