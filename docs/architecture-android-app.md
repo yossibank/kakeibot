@@ -88,6 +88,9 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる。`AssetsModel` だけは iOS と同じく `input.today` に持ち、画面が `setToday` で入れる |
 | 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
+| タブの記録の一覧の失敗 | 4 つのタブのモデルは、記録の一覧を読めなかった時に `state.isListFailed` を立てる。見張りを始め直す時に下ろす |
+| 見張りの回 | `MainView` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
+| 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
 | 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
 
 モデルのテストは `featuremodels/src/test/` に置く。`modelTest` が DB をメモリに開き、`ModelWait` が値を待つ。iOS と違う動きは `@Ignore` の理由に書く。
@@ -96,7 +99,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 
 入力の値だけで決まる画面の文は、`spec/fixtures` を読んで確かめる。読む部品は `support/ModelFixture.kt` で、iOS も同じファイルを読む。形式は [fixtures](../spec/fixtures.md) にある。
 
-読み書きの失敗は、`support/AppDatabaseFailure.kt` で起こす。記録の一覧の失敗は、失敗する `Flow` をモデルに渡して起こす。
+読み書きの失敗は、`support/AppDatabaseFailure.kt` で起こす。記録の一覧の失敗は、失敗する `Flow` をモデルに渡して起こす。やり直すと読める一覧は、`failingFirst` で作る。
 
 ## 📂 部品とフォルダ
 
@@ -107,6 +110,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 主ボタン・丸いアイコンのボタン | `designsystem/components/button/` |
 | 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
 | 失敗の知らせ | `designsystem/components/notice/` の `NoticeBanner`。タブの画面は、題のすぐ下に出す |
+| 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`LoadFailedColumn` で画面の全体に出す |
 | 1 行に収めて縮める文字 | `designsystem/components/text/` の `FittedText` |
 | 横線・縦の区切り | `designsystem/components/surface/` |
 | 置き文字付きの入力欄 | `designsystem/components/input/` の `PlaceholderTextField` |
@@ -122,5 +126,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
 | `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
 | `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
+| `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
+| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainView` が番号を持ち、タブに配らない |
 | `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
 | `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |

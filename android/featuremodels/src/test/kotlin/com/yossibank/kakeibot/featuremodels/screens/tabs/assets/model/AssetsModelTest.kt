@@ -2,10 +2,12 @@ package com.yossibank.kakeibot.featuremodels.screens.tabs.assets.model
 
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.failingEntryList
+import com.yossibank.kakeibot.featuremodels.support.failingFirst
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.writes.methods.setHidden
@@ -13,6 +15,8 @@ import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.launch
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AssetsModelTest {
@@ -21,12 +25,34 @@ class AssetsModelTest {
         val model = AssetsModel(
             entryList = failingEntryList,
             today = setup.today,
+            round = ObservationRound(),
         )
 
-        model.observe()
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
 
         assertEquals("残高を読めませんでした", model.state.task.message)
         assertTrue(model.output.rows.isEmpty())
+    }
+
+    @Test
+    fun marksListFailureUntilRetried() = modelTest(today = "2026-10-17") { setup ->
+        val model = AssetsModel(
+            entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            today = setup.today,
+            round = ObservationRound(),
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.isListFailed }
+        val message = model.state.task.message
+        val list = model.input.list
+        model.retry()
+        ModelWait.until { model.input.list != null }
+
+        assertEquals("残高を読めませんでした", message)
+        assertNull(list)
+        assertFalse(model.state.isListFailed)
     }
 
     @Test
@@ -34,6 +60,7 @@ class AssetsModelTest {
         val model = AssetsModel(
             entryList = setup.database.entryListUpdates(),
             today = setup.today,
+            round = ObservationRound(),
         )
 
         assertTrue(model.output.rows.isEmpty())
@@ -210,6 +237,7 @@ class AssetsModelTest {
         val model = AssetsModel(
             entryList = database.entryListUpdates(),
             today = today,
+            round = ObservationRound(),
         )
 
         scope.launch { model.observe() }

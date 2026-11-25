@@ -5,16 +5,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -59,7 +56,9 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
+import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
+import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
@@ -69,12 +68,14 @@ fun ReviewView(
     today: LocalDate,
 ) {
     val entryList = rememberEntryList(database)
+    val round = rememberObservationRound()
 
-    val model = remember(database, entryList) {
+    val model = remember(database, entryList, round) {
         ReviewModel(
             database = database,
             entryList = entryList,
             today = today,
+            round = round,
         )
     }
 
@@ -90,15 +91,9 @@ fun ReviewView(
 
     model.state.task.Timer()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            top = 12.dp,
-            end = 16.dp,
-            bottom = 24.dp,
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    LoadFailedColumn(
+        isFailed = model.state.isListFailed,
+        onRetry = model::retry,
     ) {
         item(key = "title") {
             Row(verticalAlignment = Alignment.CenterVertically) {

@@ -79,6 +79,23 @@ class ModelTask {
         return isFailed
     }
 
+    suspend fun <Value> observe(
+        values: Flow<Value>,
+        failure: String,
+        failing: (Boolean) -> Unit,
+        receive: suspend (Value) -> Unit,
+    ) {
+        failing(false)
+
+        val isFailed = observe(
+            values = values,
+            failure = failure,
+            receive = receive,
+        )
+
+        failing(isFailed)
+    }
+
     @Composable
     fun Timer() {
         val shown = count

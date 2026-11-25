@@ -18,6 +18,7 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.entryType
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.setting
@@ -38,12 +39,13 @@ class ReviewModel(
     database: AppDatabase,
     entryList: Flow<EntryList>,
     today: LocalDate,
+    round: ObservationRound,
 ) {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, entryList)
+    private val dependencies = Dependencies(database, entryList, round)
 
     data class Row(
         val key: String,
@@ -71,6 +73,9 @@ class ReviewModel(
 
         var offset: Int by mutableStateOf(0)
             private set
+
+        var isListFailed: Boolean by mutableStateOf(false)
+            internal set
 
         fun move(count: Int) {
             if (offset + count > 0) {
@@ -258,9 +263,18 @@ class ReviewModel(
     private class Dependencies(
         val database: AppDatabase,
         val entryList: Flow<EntryList>,
+        val round: ObservationRound,
     )
 
     suspend fun observe() {
+        dependencies.round.each { observeAll() }
+    }
+
+    fun retry() {
+        dependencies.round.restart()
+    }
+
+    private suspend fun observeAll() {
         loadSelection()
 
         val database = dependencies.database
@@ -277,7 +291,11 @@ class ReviewModel(
             }
 
             launch {
-                observe(dependencies.entryList) { input.list = it }
+                state.task.observe(
+                    values = dependencies.entryList,
+                    failure = loadFailedMessage,
+                    failing = { state.isListFailed = it },
+                ) { input.list = it }
             }
         }
     }

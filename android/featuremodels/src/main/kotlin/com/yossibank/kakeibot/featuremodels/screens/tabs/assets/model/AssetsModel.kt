@@ -14,18 +14,20 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import kotlinx.coroutines.flow.Flow
 
 class AssetsModel(
     entryList: Flow<EntryList>,
     today: LocalDate,
+    round: ObservationRound,
 ) {
     val state = State()
     val input = Input(today)
     val output = Output(input)
 
-    private val dependencies = Dependencies(entryList)
+    private val dependencies = Dependencies(entryList, round)
 
     data class Row(
         val id: Identifier<Wallet>,
@@ -37,6 +39,9 @@ class AssetsModel(
 
     class State {
         val task = ModelTask()
+
+        var isListFailed: Boolean by mutableStateOf(false)
+            internal set
     }
 
     class Input(
@@ -114,6 +119,7 @@ class AssetsModel(
 
     private class Dependencies(
         val entryList: Flow<EntryList>,
+        val round: ObservationRound,
     )
 
     fun setToday(today: LocalDate) {
@@ -121,10 +127,17 @@ class AssetsModel(
     }
 
     suspend fun observe() {
-        state.task.observe(
-            values = dependencies.entryList,
-            failure = loadFailedMessage,
-        ) { input.list = it }
+        dependencies.round.each {
+            state.task.observe(
+                values = dependencies.entryList,
+                failure = loadFailedMessage,
+                failing = { state.isListFailed = it },
+            ) { input.list = it }
+        }
+    }
+
+    fun retry() {
+        dependencies.round.restart()
     }
 
     companion object {

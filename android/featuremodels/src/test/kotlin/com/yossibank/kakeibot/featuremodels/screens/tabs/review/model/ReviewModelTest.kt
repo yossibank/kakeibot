@@ -6,6 +6,7 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryDay
 import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
@@ -90,6 +91,7 @@ class ReviewModelTest {
             database = setup.database,
             entryList = flowOf(list.copy(days = listOf(day))),
             today = setup.today,
+            round = ObservationRound(),
         )
 
         setup.scope.launch { model.observe() }
@@ -330,6 +332,7 @@ class ReviewModelTest {
         database = database,
         entryList = database.entryListUpdates(),
         today = today,
+        round = ObservationRound(),
     )
 
     private suspend fun ModelTestSetup.observedModel(): ReviewModel {

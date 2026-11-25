@@ -27,6 +27,7 @@ import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.menu.SettingsMenuSheet
@@ -36,6 +37,7 @@ import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
 import com.yossibank.kakeibot.features.screens.tabs.review.view.ReviewView
 import com.yossibank.kakeibot.features.shared.entrylist.LocalEntryList
 import com.yossibank.kakeibot.features.shared.entrylist.rememberSharedEntryList
+import com.yossibank.kakeibot.features.shared.observation.LocalObservationRound
 import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
@@ -50,6 +52,7 @@ fun MainView(
     var round by remember { mutableIntStateOf(0) }
 
     val entryList = rememberSharedEntryList(database)
+    val observation = remember { ObservationRound() }
     val openEntry: (Identifier<Entry>?) -> Unit = { sheet = MainSheet.Entry(editing = it) }
 
     LaunchedEffect(link) {
@@ -79,7 +82,10 @@ fun MainView(
         }
     }
 
-    CompositionLocalProvider(LocalEntryList provides entryList) {
+    CompositionLocalProvider(
+        LocalEntryList provides entryList,
+        LocalObservationRound provides observation,
+    ) {
         MainLayers(
             database = database,
             today = today,

@@ -11,6 +11,7 @@ import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.monthOverviewUpdates
@@ -24,12 +25,13 @@ class HomeModel(
     database: AppDatabase,
     entryList: Flow<EntryList>,
     today: LocalDate,
+    round: ObservationRound,
 ) {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, entryList)
+    private val dependencies = Dependencies(database, entryList, round)
 
     class State(
         today: LocalDate,
@@ -37,6 +39,9 @@ class HomeModel(
         val task = ModelTask()
 
         var today: LocalDate by mutableStateOf(today)
+
+        var isListFailed: Boolean by mutableStateOf(false)
+            internal set
     }
 
     class Input {
@@ -106,10 +111,19 @@ class HomeModel(
     private class Dependencies(
         val database: AppDatabase,
         val entryList: Flow<EntryList>,
+        val round: ObservationRound,
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun observe() {
+        dependencies.round.each { observeOverview() }
+    }
+
+    fun retry() {
+        dependencies.round.restart()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun observeOverview() {
         val overviews = snapshotFlow { state.today }.flatMapLatest { day ->
             dependencies.database.monthOverviewUpdates(
                 on = day,
@@ -120,6 +134,7 @@ class HomeModel(
         state.task.observe(
             values = overviews,
             failure = loadFailedMessage,
+            failing = { state.isListFailed = it },
         ) { input.overview = it }
     }
 

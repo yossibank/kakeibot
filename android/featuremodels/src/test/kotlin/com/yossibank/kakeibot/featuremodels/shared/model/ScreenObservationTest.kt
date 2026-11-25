@@ -69,25 +69,30 @@ class ScreenObservationTest {
     }
 
     @Test
-    fun reportsFailureUntilObservedAgain() = runTest {
+    fun marksFailureUntilObservedAgain() = runTest {
         val task = ModelTask()
         val counter = Counter()
-        val received = mutableListOf<Int>()
+        var value: Int? = null
+        var isFailed = false
 
-        val failed = task.observe(
+        task.observe(
             values = values(counter, failures = 4),
-            failure = "失敗",
-        ) { received += it }
+            failure = "読めませんでした",
+            failing = { isFailed = it },
+        ) { value = it }
 
-        val failedAgain = task.observe(
+        val failed = isFailed
+
+        task.observe(
             values = values(counter, failures = 4),
-            failure = "失敗",
-        ) { received += it }
+            failure = "読めませんでした",
+            failing = { isFailed = it },
+        ) { value = it }
 
         assertTrue(failed)
-        assertFalse(failedAgain)
-        assertEquals(listOf(1), received)
-        assertEquals("失敗", task.message)
+        assertFalse(isFailed)
+        assertEquals(1, value)
+        assertEquals("読めませんでした", task.message)
     }
 
     @Test
