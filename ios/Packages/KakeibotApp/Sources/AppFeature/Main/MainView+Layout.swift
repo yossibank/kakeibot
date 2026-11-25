@@ -1,14 +1,8 @@
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 extension MainView {
-    enum MainTab: Hashable {
-        case home
-        case records
-        case review
-        case assets
-    }
-
     static func hasSidebar(_ sizeClass: UserInterfaceSizeClass?) -> Bool {
         sizeClass == .regular
     }
@@ -29,7 +23,7 @@ extension MainView {
 extension MainView {
     static let warmupDuration: Duration = .milliseconds(500)
 
-    static let tabItems: [FloatingTabBar<MainTab>.Item] = [
+    static let tabItems: [FloatingTabBar<MainModel.Tab>.Item] = [
         .init("ホーム", systemImage: "house", value: .home),
         .init("記録", systemImage: "calendar", value: .records),
         .init("振り返り", systemImage: "chart.pie", value: .review),

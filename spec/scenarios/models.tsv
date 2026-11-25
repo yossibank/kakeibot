@@ -194,12 +194,30 @@ entry-outcome.places-closed-after-saving		EntryModelOutcomeTest/placesClosedAfte
 entry-outcome.places-no-outcome-when-saving-fails		EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	Androidのみ	保存に失敗した時は、結果を置かない。iOS の行は後で結び付ける
 entry-outcome.continues-with-next-entry-after-saving		EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	Androidのみ	続けて記録した時に、続きの結果を置く。iOS の行は後で結び付ける
 entry-outcome.places-closed-after-deleting		EntryModelOutcomeTest/placesClosedAfterDeleting	Androidのみ	削除できた時に、閉じる結果を state に置く。iOS の行は後で結び付ける
+main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
+main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
+main.closes-sheet-before-moving-to-tab	MainModelTests/closesSheetBeforeMovingToTab		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
+main.waits-before-moving-even-without-sheet	MainModelTests/waitsBeforeMovingEvenWithoutSheet		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
+main.adds-entry-on-chosen-date	MainModelTests/addsEntryOnChosenDate		未移植	入口のシートに日付を渡す所が無く、入力は今日で開く
+main.adds-transfer-with-draft	MainModelTests/addsTransferWithDraft		未移植	入口に、振替を選んだ入力シートを開く所が無い
+main.replaces-draft-after-sheet-closes	MainModelTests/replacesDraftAfterSheetCloses		iOSのみ	入力の下書きを先に作って持つ仕組みで、Android は開く時に作る
+main.replaces-draft-when-day-changes	MainModelTests/replacesDraftWhenDayChanges		iOSのみ	入力の下書きを先に作って持つ仕組みで、Android は開く時に作る
+main.chooses-launch-tab-from-setting	MainModelTests/choosesLaunchTabFromSetting		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
+main.keeps-home-tab-when-launch-tab-is-not-chosen	MainModelTests/keepsHomeTabWhenLaunchTabIsNotChosen		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
+main.opens-entry-sheet-at-launch	MainModelTests/opensEntrySheetAtLaunch		未移植	起動時に開く画面の設定を読んで、入力シートを開く所が無い
+main.opens-home-route-without-waiting	MainModelTests/opensHomeRouteWithoutWaiting		未確認	行き先は MainView の Composable が開き、モデルもテストも無い
+main.opens-entry-route-on-home-with-date	MainModelTests/opensEntryRouteOnHomeWithDate		未確認	入力の行き先は Composable が開くが、日付とタブは確かめていない
+main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCurrentTab		未確認	固定費の行き先は Composable が設定のシートで開き、テストが無い
+main.opens-template-route-with-saved-template	MainModelTests/opensTemplateRouteWithSavedTemplate		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
+main.opens-new-template-route-on-home	MainModelTests/opensNewTemplateRouteOnHome		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
+main.opens-receipt-route-and-starts-reading	MainModelTests/opensReceiptRouteAndStartsReading		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.shows-templates-of-selected-type-on-home	HomeModelTests/showsTemplatesOfSelectedTypeOnHome		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.records-from-home-without-archived-tag	HomeModelTests/recordsFromHomeWithoutArchivedTag		未移植	ホームのモデルに、テンプレートから記録する関数が無い
 home.records-from-home-and-undoes	HomeModelTests/recordsFromHomeAndUndoes		未移植	ホームのモデルに、テンプレートから記録する関数が無い
+home.places-recorded-change-in-outcome	HomeModelTests/placesRecordedChangeInOutcome		未移植	ホームのモデルに、テンプレートから記録する関数が無い
 home.shows-no-records-only-after-list-arrives	HomeModelTests/showsNoRecordsOnlyAfterListArrives	HomeModelTest/showsNoRecordsOnlyAfterListArrives	対応	
 home.sums-month-today-and-yesterday	HomeModelTests/sumsMonthTodayAndYesterday	HomeModelTest/sumsMonthTodayAndYesterday	対応	
 home.sums-upcoming-recurring-expense	HomeModelTests/sumsUpcomingRecurringExpense		未確認	値は input.overview（MonthOverview）にあるが、画面に固定費の欄が無くテストも無い

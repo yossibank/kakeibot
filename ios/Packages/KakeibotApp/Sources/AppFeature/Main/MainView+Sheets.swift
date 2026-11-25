@@ -5,31 +5,15 @@ import Store
 import SwiftUI
 
 extension MainView {
-    enum Sheet: Hashable, Identifiable {
-        case new
-        case edit(Entry.ID)
-        case settings
-        case template(EntryTemplate)
-        case newTemplate
-        case templates
-        case transfer
-        case wallet(Wallet.ID)
-        case recurring(Recurring.ID)
-        case periodRecurrings
-        case setup(SetupItem)
-        case reward
-        case whatsNew(seenVersion: String?)
-
-        var id: Self {
-            self
-        }
-    }
-
     @ViewBuilder
-    func sheetContent(for sheet: Sheet) -> some View {
+    func sheetContent(for sheet: MainModel.Sheet) -> some View {
         switch sheet {
         case .new:
-            EntrySheet(model: draft, startsReceipt: startsReceipt, onChange: show)
+            EntrySheet(
+                model: model.state.draft,
+                startsReceipt: model.state.startsReceipt,
+                onChange: show
+            )
 
         case let .edit(id):
             EntrySheet(
@@ -59,7 +43,7 @@ extension MainView {
             )
 
         case .transfer:
-            EntrySheet(model: draft, onChange: show)
+            EntrySheet(model: model.state.draft, onChange: show)
 
         case .templates:
             HomeTemplateShelfSheet(
@@ -109,7 +93,7 @@ extension MainView {
             HomeRecurringSheet(
                 model: home,
                 onOpenRecurring: { id in
-                    self.sheet = .recurring(id)
+                    model.state.sheet = .recurring(id)
                 }
             )
 

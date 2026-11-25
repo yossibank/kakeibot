@@ -182,4 +182,22 @@ extension HomeModelTests {
         #expect(afterUndo.days.isEmpty)
         #expect(notice.output.change == nil)
     }
+
+    @Test
+    func placesRecordedChangeInOutcome() async throws {
+        let setup = try await TemplateSetup()
+        let lunch = try await setup.saveTemplate(name: "ランチ", amount: 980)
+        let open = try await setup.saveTemplate(name: "外食", amount: nil)
+        let home = HomeModel(parts: .system(setup.database), today: setup.date)
+
+        await home.record(open)
+        let afterOpen = home.state.outcome
+
+        let change = try #require(await home.record(lunch))
+        let afterRecord = home.state.outcome
+
+        #expect(afterOpen.value == nil)
+        #expect(afterRecord.value == change)
+        #expect(afterRecord != afterOpen)
+    }
 }

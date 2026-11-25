@@ -43,6 +43,7 @@
 | `SettingsEditOutcome` | 編集シートの結果。保存した値・非表示にしたか・消した物・閉じるかを持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsBoardRemoved` | 設定の一覧で、非表示にした行・消した物・まとめて消した結果を持つ。取り消しの知らせに使う | `FeatureModels/Shared/SettingsParts/Board/` |
 | `onOutcome` | 画面が `ScreenOutcome` の変化を受ける modifier | `Features/Shared/Model/` |
+| `MainOutcomeSignal` | `MainView` が結果を受ける、見えない画面。`MainView` の `body` は、結果の値を読まずに済む | `AppFeature/Main/` |
 
 ## 🗺️ 画面の部品
 

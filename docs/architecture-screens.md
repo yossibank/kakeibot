@@ -16,7 +16,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | 子の画面に渡す `ScreenParts` | モデルから開く画面には、モデルの `childParts()` が返す |
 | MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが見張りを始め、全部を読み終えるまで起動画面を出す |
 | MainView のタブの切り替え | 開いたことのあるタブを重ねて持ち、見えるかどうかだけを切り替える。`TabView` は切り替えのたびに中身の大きさを測り直して重いため使わない |
-| MainView のタブの選択 | `MainTabSelection` が持ち、`MainTabLayer` とタブの帯（`MainTabBar`）だけが読む。MainView の `body` が読むと、切り替えのたびに 4 つのタブを組み直して重いため読まない |
+| MainView のタブの選択 | `MainModel` の `state` が持ち、`MainTabLayer` とタブの帯（`MainTabBar`）だけが読む。MainView の `body` が読むと、切り替えのたびに 4 つのタブを組み直して重いため読まない |
 | MainView のシート | 新規・編集・設定・振替・お知らせなど。テンプレート（`EntryTemplate`）・口座（`Wallet`）・固定費（`Recurring`）も開く |
 | MainView の知らせ | 記録・削除の取り消し・失敗の知らせを、タブの帯の上の 1 か所に出す。どれかが出たら他を消し、タブの画面の `errorBanner` は環境の `noticeRound` を進めて消す |
 | ReviewView の一手の理由 | 締めた期間のシートを開くと、`task(id:)` で保存した文を読み、渡す事実が変わっていれば書き直す。同じ期間は、セッションの中で 1 度だけ頼み、書けなければ次に開いた時に頼む |
@@ -66,7 +66,7 @@ model.perform {
 | 読み込みの後 | `.task` は、モデルの `start` だけを呼ぶ。読み込みの後に画面の値を組む時は、モデルが結果を置く |
 | 待ってから出す | 画面の動きを待つ時間は、モデルが待ってから結果を置く。レシートの品目のシートが当たる |
 | 残る `Task` | `Features` では、指の動きを追う `SettingsDrag` と `SettingsAutoScroll` だけが持つ |
-| `AppFeature` | `MainView` は、シートとタブの切り替えを、まだ画面の `Task` で待っている |
+| `AppFeature` | シートとタブは `MainModel` が持ち、閉じる時間を待って切り替える。レビューの依頼は `AppReviewModel` が待つ |
 
 ### 見張り直し
 

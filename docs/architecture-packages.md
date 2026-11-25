@@ -159,6 +159,7 @@ KakeibotApp/
 │   ├── FeatureModels/
 │   │   ├── Screens/
 │   │   │   ├── Entry/
+│   │   │   ├── Main/
 │   │   │   ├── Onboarding/
 │   │   │   ├── Pro/
 │   │   │   ├── Settings/
@@ -216,6 +217,7 @@ KakeibotApp/
 | `FeatureModels/Screens/Entry/` | 記録の入力シートのモデル |
 | `FeatureModels/Screens/Entry/Receipt/` | レシートを Vision と Foundation Models で読む |
 | `FeatureModels/Screens/Entry/Voice/` | 声を SpeechAnalyzer で聞き、Foundation Models でカテゴリと口座を選ぶ |
+| `FeatureModels/Screens/Main/` | 入口の `MainView` のモデル。画面は `AppFeature/Main/` にある |
 | `FeatureModels/Screens/Pro/` | Pro の購入のモデル |
 | `FeatureModels/Screens/Settings/Menu/` | 設定の入口のモデルと、確かめ用のテストデータ（`#if DEBUG`） |
 | `FeatureModels/Shared/Bill/` | これからの引き落としを月のページに分ける |

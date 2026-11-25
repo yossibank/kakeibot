@@ -8,7 +8,8 @@ extension MainView {
     var isLoaded: Bool {
         let isHomeLoaded = home.input.list != nil || home.state.errorNotice.message != nil
         let isSetupLoaded = setup.output.isLoaded || setup.state.errorNotice.message != nil
-        return isHomeLoaded && isSetupLoaded && launchScreen != nil && areTabsLoaded
+        let isLaunchChosen = model.input.launchScreen != nil
+        return isHomeLoaded && isSetupLoaded && isLaunchChosen && areTabsLoaded
     }
 
     var templateOrderBinding: Binding<TemplateOrder> {
@@ -22,19 +23,8 @@ extension MainView {
     }
 
     func chooseLaunchTab() async {
-        let screen = await (try? database.setting(.launchScreen)) ?? .home
-
-        if route == nil,
-           !hasLaunchSheet {
-            switch screen {
-            case .home, .entry: tab = .home
-            case .records: tab = .records
-            case .review: tab = .review
-            case .assets: tab = .assets
-            }
-        }
-
-        launchScreen = screen
+        let choosesTab = route == nil && Self.launchSheet == nil
+        await model.start(choosesTab: choosesTab)
     }
 
     func openLaunchSheet() {
@@ -42,98 +32,51 @@ extension MainView {
             return
         }
 
-        #if DEBUG
-        if let launchSheet = Sheet.launchArgument {
-            sheet = launchSheet
-            return
-        }
-        #endif
-
-        if launchScreen == .entry {
-            sheet = .new
-        }
+        model.openLaunchSheet(preferring: Self.launchSheet)
     }
 
     func openEntry(_ id: Entry.ID) {
-        sheet = .edit(id)
+        model.state.sheet = .edit(id)
     }
 
     func openRecurring(_ id: Recurring.ID) {
-        sheet = .recurring(id)
+        model.state.sheet = .recurring(id)
     }
 
     func openRecurrings() {
-        sheet = .periodRecurrings
+        model.state.sheet = .periodRecurrings
     }
 
     func showDay(_ date: LocalDate) {
         records.open(date)
 
-        tab = .records
+        model.state.select(.records)
     }
 
     func retry() {
         observationRound += 1
     }
 
-    func addEntry(on date: LocalDate) {
-        draft.state.setDate(date)
-        sheet = .new
-    }
-
-    func addTransfer() {
-        draft.select(.transfer)
-        sheet = .transfer
-    }
-
-    func markOpened(_ sheet: Sheet?) async {
+    func markOpened(_ sheet: MainModel.Sheet?) {
         guard sheet == .new else {
             return
         }
 
-        await setup.markEntryOpened()
+        setup.perform {
+            await $0.markEntryOpened()
+        }
     }
 
     func open(_ route: PlannedNotification.Route) {
         onRouteOpened()
 
-        Task {
-            if sheet != nil {
-                sheet = nil
-                try? await Task.sleep(for: Self.sheetCloseDuration)
-            }
-
-            switch route {
-            case .home:
-                tab = .home
-
-            case let .entry(date):
-                tab = .home
-                draft.state.setDate(date)
-                sheet = .new
-
-            case let .recurring(id):
-                sheet = .recurring(id)
-
-            case let .template(id):
-                tab = .home
-                sheet = await templateSheet(id)
-
-            case .newTemplate:
-                tab = .home
-                sheet = .newTemplate
-
-            case .receipt:
-                tab = .home
-                draft.state.setDate(today)
-                startsReceipt = true
-                sheet = .new
-            }
+        model.perform {
+            await $0.open(route)
         }
     }
 
     func openNews() {
-        sheet = .whatsNew(seenVersion: setup.output.seenNewsVersion)
+        model.state.sheet = .whatsNew(seenVersion: setup.output.seenNewsVersion)
 
         setup.perform {
             await $0.markNewsSeen()
@@ -141,103 +84,38 @@ extension MainView {
     }
 
     func tryFeature(_ action: WhatsNewRelease.Action) {
-        Task {
-            sheet = nil
-            try? await Task.sleep(for: Self.sheetCloseDuration)
+        let destination = Self.destination(of: action)
 
-            switch action {
-            case .entry:
-                tab = .home
-                sheet = .new
-
-            case .records:
-                tab = .records
-
-            case .review:
-                tab = .review
-
-            case .assets:
-                tab = .assets
-
-            case let .setup(item):
-                sheet = .setup(item)
-            }
+        model.perform {
+            await $0.move(to: destination.tab, opening: destination.sheet)
         }
     }
 
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
-            sheet = .template(template)
+            model.state.sheet = .template(template)
             return
         }
 
-        sheet = nil
+        model.state.sheet = nil
 
-        Task {
-            if let change = await home.record(template) {
-                show(change)
-            }
+        home.perform {
+            await $0.record(template)
         }
     }
 
     func show(_ change: EntryChange) {
-        let request = AppReviewRequest(database: database)
-
         notice.show(change)
 
-        Task {
-            guard await request.shouldAsk(after: change, at: clock.now) else {
-                return
-            }
-
-            try? await Task.sleep(for: Self.sheetCloseDuration)
-            requestReview()
-        }
-    }
-
-    func prepareDraft() {
-        let model = EntryModel(parts: parts, date: today)
-
-        startsReceipt = false
-
-        draft = model
-
-        model.perform {
-            await $0.load()
+        appReview.perform {
+            await $0.ask(after: change)
         }
     }
 }
 
 private extension MainView {
-    static let sheetCloseDuration: Duration = .milliseconds(600)
-
-    var areTabsLoaded: Bool {
-        let isRecordsLoaded = records.input.list != nil || records.state.errorNotice.message != nil
-        let isReviewLoaded = review.input.list != nil || review.state.errorNotice.message != nil
-        let isAssetsLoaded = assets.output.list != nil || assets.state.errorNotice.message != nil
-        return isRecordsLoaded && isReviewLoaded && isAssetsLoaded
-    }
-
-    var hasLaunchSheet: Bool {
+    static var launchSheet: MainModel.Sheet? {
         #if DEBUG
-        Sheet.launchArgument != nil
-        #else
-        false
-        #endif
-    }
-
-    func templateSheet(_ id: EntryTemplate.ID) async -> Sheet? {
-        let templates = await (try? database.templates()) ?? []
-
-        return templates
-            .first { $0.id == id }
-            .map { .template($0) }
-    }
-}
-
-#if DEBUG
-private extension MainView.Sheet {
-    static var launchArgument: Self? {
         let arguments = ProcessInfo.processInfo.arguments
 
         guard
@@ -254,6 +132,27 @@ private extension MainView.Sheet {
         }
 
         return SetupItem(rawValue: name).map { .setup($0) }
+        #else
+        nil
+        #endif
+    }
+
+    var areTabsLoaded: Bool {
+        let isRecordsLoaded = records.input.list != nil || records.state.errorNotice.message != nil
+        let isReviewLoaded = review.input.list != nil || review.state.errorNotice.message != nil
+        let isAssetsLoaded = assets.output.list != nil || assets.state.errorNotice.message != nil
+        return isRecordsLoaded && isReviewLoaded && isAssetsLoaded
+    }
+
+    static func destination(
+        of action: WhatsNewRelease.Action
+    ) -> (tab: MainModel.Tab?, sheet: MainModel.Sheet?) {
+        switch action {
+        case .entry: (.home, .new)
+        case .records: (.records, nil)
+        case .review: (.review, nil)
+        case .assets: (.assets, nil)
+        case let .setup(item): (nil, .setup(item))
+        }
     }
 }
-#endif
