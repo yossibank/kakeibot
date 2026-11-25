@@ -1,9 +1,9 @@
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 struct MainTabBar: View {
-    @Bindable var selection: MainTabSelection
-
+    let state: MainModel.State
     let hasSidebar: Bool
     let isAddHinted: Bool
     let onAdd: () -> Void
@@ -11,7 +11,7 @@ struct MainTabBar: View {
     var body: some View {
         if hasSidebar {
             SideTabBar(
-                selection: $selection.value,
+                selection: selection,
                 title: "かけいぼっと",
                 items: MainView.tabItems,
                 isAddHinted: isAddHinted,
@@ -19,11 +19,21 @@ struct MainTabBar: View {
             )
         } else {
             FloatingTabBar(
-                selection: $selection.value,
+                selection: selection,
                 items: MainView.tabItems,
                 isAddHinted: isAddHinted,
                 onAdd: onAdd
             )
+        }
+    }
+}
+
+private extension MainTabBar {
+    var selection: Binding<MainModel.Tab> {
+        Binding {
+            state.tab
+        } set: { tab in
+            state.select(tab)
         }
     }
 }

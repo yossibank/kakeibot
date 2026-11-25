@@ -5,27 +5,27 @@ import SwiftUI
 
 extension MainView {
     var homeTab: some View {
-        MainTabLayer(selection: selection, value: .home) {
+        MainTabLayer(state: model.state, value: .home) {
             HomeView(
                 model: home,
                 setup: setup,
                 appIcon: appIcon,
-                isSheetOpen: sheet != nil,
+                isSheetOpen: model.state.sheet != nil,
                 onOpenEntry: openEntry,
                 onShowRecords: {
                     records.openCurrentMonth()
 
-                    tab = .records
+                    model.state.select(.records)
                 },
-                onAddEntry: addEntry(on:),
+                onAddEntry: model.addEntry(on:),
                 onRetry: retry,
                 onOpenSettings: {
-                    sheet = .settings
+                    model.state.sheet = .settings
                 },
                 onOpenNews: openNews,
                 onUseTemplate: useTemplate,
                 onShowAllTemplates: {
-                    sheet = .templates
+                    model.state.sheet = .templates
                 },
                 onOpenOrderMenu: { frame in
                     withAnimation(.snappy(duration: 0.25)) {
@@ -33,7 +33,7 @@ extension MainView {
                     }
                 },
                 onAddTemplate: {
-                    sheet = .newTemplate
+                    model.state.sheet = .newTemplate
                 },
                 onDeleteEntry: { id in
                     notice.perform {
@@ -43,7 +43,7 @@ extension MainView {
                 onOpenRecurrings: openRecurrings,
                 onOpenRecurring: openRecurring,
                 onOpenSetup: { item in
-                    sheet = .setup(item)
+                    model.state.sheet = .setup(item)
                 },
                 onOpenDay: showDay
             )
@@ -52,11 +52,11 @@ extension MainView {
     }
 
     var recordsTab: some View {
-        MainTabLayer(selection: selection, value: .records) {
+        MainTabLayer(state: model.state, value: .records) {
             RecordsView(
                 model: records,
                 onOpenEntry: openEntry,
-                onAddEntry: addEntry(on:),
+                onAddEntry: model.addEntry(on:),
                 onOpenRecurring: openRecurring,
                 onChangeEntries: { ids, change in
                     notice.perform {
@@ -78,13 +78,13 @@ extension MainView {
     }
 
     var reviewTab: some View {
-        MainTabLayer(selection: selection, value: .review) {
+        MainTabLayer(state: model.state, value: .review) {
             ReviewView(
                 model: review,
                 onOpenEntry: openEntry,
                 onOpenRecurring: openRecurring,
                 onOpenDay: showDay,
-                onAddEntry: addEntry(on:),
+                onAddEntry: model.addEntry(on:),
                 onOpenRecurrings: openRecurrings
             )
             .loadFailed(review.input.isListFailed, onRetry: retry)
@@ -93,17 +93,17 @@ extension MainView {
     }
 
     var assetsTab: some View {
-        MainTabLayer(selection: selection, value: .assets) {
+        MainTabLayer(state: model.state, value: .assets) {
             AssetsView(
                 model: assets,
-                onTransfer: addTransfer,
+                onTransfer: model.addTransfer,
                 onOpenWallet: { id in
-                    sheet = .wallet(id)
+                    model.state.sheet = .wallet(id)
                 },
                 onOpenRecurring: openRecurring,
                 onOpenEntry: openEntry,
                 onMarkReward: {
-                    sheet = .reward
+                    model.state.sheet = .reward
                 }
             )
             .loadFailed(assets.input.isListFailed, onRetry: retry)

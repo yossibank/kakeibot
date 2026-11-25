@@ -7,20 +7,16 @@ import StoreKit
 import SwiftUI
 
 struct MainView: View {
-    @State var selection = MainTabSelection()
-    @State var sheet: Sheet?
-    @State var startsReceipt = false
+    @State var model: MainModel
     @State var home: HomeModel
     @State var records: RecordsModel
     @State var review: ReviewModel
     @State var assets: AssetsModel
     @State var setup: SetupModel
     @State var appIcon = AppIconListModel()
-    @State var draft: EntryModel
     @State var notice: EntryNoticeModel
     @State var appReview: AppReviewModel
     @State var undo: DeletionUndo
-    @State var launchScreen: LaunchScreen?
     @State var orderMenuAnchor: CGRect?
     @State var observationRound = 0
 
@@ -33,8 +29,6 @@ struct MainView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
 
-    let database: AppDatabase
-    let clock: ScreenClock
     let parts: ScreenParts
     let today: LocalDate
     let route: PlannedNotification.Route?
@@ -53,6 +47,13 @@ struct MainView: View {
         onLoad: @escaping () -> Void = {}
     ) {
         let parts = ScreenParts(database: database, clock: clock)
+
+        _model = State(
+            initialValue: MainModel(
+                parts: parts,
+                today: today
+            )
+        )
 
         _home = State(
             initialValue: HomeModel(
@@ -86,21 +87,12 @@ struct MainView: View {
             initialValue: SetupModel(parts: parts, newsVersion: WhatsNewRelease.latestVersion)
         )
 
-        _draft = State(
-            initialValue: EntryModel(
-                parts: parts,
-                date: today
-            )
-        )
-
         _notice = State(initialValue: EntryNoticeModel(parts: parts))
 
         _appReview = State(initialValue: AppReviewModel(database: database, clock: clock))
 
         _undo = State(initialValue: DeletionUndo(parts: parts))
 
-        self.database = database
-        self.clock = clock
         self.parts = parts
         self.today = today
         self.route = route
@@ -169,7 +161,9 @@ struct MainView: View {
                 requestReview()
             }
         }
-        .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
+        .sheet(item: Bindable(model.state).sheet) {
+            model.prepareDraft()
+        } content: { sheet in
             sheetContent(for: sheet)
                 .presentationSizing(.tallForm)
         }
@@ -189,7 +183,7 @@ struct MainView: View {
             await setup.run()
         }
         .task {
-            await draft.load()
+            await model.state.draft.load()
         }
         .task {
             await chooseLaunchTab()
@@ -216,7 +210,7 @@ struct MainView: View {
                 open(route)
             }
         }
-        .onChange(of: sheet) { _, sheet in
+        .onChange(of: model.state.sheet) { _, sheet in
             markOpened(sheet)
         }
         .onChange(of: today) { _, today in
@@ -224,20 +218,7 @@ struct MainView: View {
             records.state.today = today
             review.state.today = today
             assets.setToday(today)
-            draft.state.today = today
-
-            prepareDraft()
-        }
-    }
-}
-
-extension MainView {
-    var tab: MainTab {
-        get {
-            selection.value
-        }
-        nonmutating set {
-            selection.value = newValue
+            model.setToday(today)
         }
     }
 }
@@ -254,11 +235,11 @@ private extension MainView {
 private extension MainView {
     var tabBar: some View {
         MainTabBar(
-            selection: selection,
+            state: model.state,
             hasSidebar: hasSidebar,
             isAddHinted: !setup.input.isEntryOpened
         ) {
-            sheet = .new
+            model.state.sheet = .new
         }
     }
 
@@ -296,7 +277,7 @@ private extension MainView {
     }
 
     var entryWarmup: some View {
-        EntrySheet(model: draft)
+        EntrySheet(model: model.state.draft)
             .opacity(0)
             .allowsHitTesting(false)
             .task {
@@ -308,7 +289,7 @@ private extension MainView {
 
 private extension MainView {
     var isLaunchReady: Bool {
-        isRevealed && launchScreen != nil
+        isRevealed && model.input.launchScreen != nil
     }
 
     var hasSidebar: Bool {

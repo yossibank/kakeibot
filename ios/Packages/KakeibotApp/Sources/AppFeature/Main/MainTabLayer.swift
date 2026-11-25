@@ -1,14 +1,15 @@
+import FeatureModels
 import SwiftUI
 
 struct MainTabLayer<Content: View>: View {
-    let selection: MainTabSelection
-    let value: MainView.MainTab
+    let state: MainModel.State
+    let value: MainModel.Tab
 
     @ViewBuilder let content: Content
 
     var body: some View {
-        if selection.visited.contains(value) {
-            let isShown = selection.value == value
+        if state.visitedTabs.contains(value) {
+            let isShown = state.tab == value
 
             content
                 .opacity(isShown ? 1 : 0)

@@ -44,7 +44,7 @@ extension AppReviewModel {
         self.init(
             request: request,
             clock: clock,
-            askDelay: MainView.sheetCloseDuration
+            askDelay: MainModel.sheetCloseDelay
         )
     }
 
