@@ -3,7 +3,6 @@ import DesignSystem
 import SwiftUI
 
 struct EntryCategoryCell: View {
-    @State private var isPressing = false
     @State private var layout = Layout()
 
     let category: EntryCategory
@@ -20,8 +19,8 @@ struct EntryCategoryCell: View {
             isLifted: false
         )
         .glow(isSelected ? Palette.glow.opacity(.muted) : Color.clear, radius: 8)
-        .scaleEffect(scale)
-        .animation(.snappy(duration: 0.2), value: isPressing)
+        .scaleEffect(layout.scale)
+        .animation(.snappy(duration: 0.2), value: layout.scale)
         .animation(.snappy(duration: 0.25), value: isSelected)
         .onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .named(EntrySheet.coordinateSpace))
@@ -32,7 +31,7 @@ struct EntryCategoryCell: View {
         .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
             onMenu(layout.frame)
         } onPressingChanged: { isPressing in
-            self.isPressing = isPressing
+            layout.scale = isPressing ? Self.pressedScale : 1
         }
     }
 }
@@ -51,12 +50,9 @@ extension EntryCategoryCell: Equatable {
 private extension EntryCategoryCell {
     struct Layout {
         var frame: CGRect = .zero
+        var scale: CGFloat = 1
     }
 
     static let menuPressDuration = 0.4
     static let pressedScale: CGFloat = 0.93
-
-    var scale: CGFloat {
-        isPressing ? Self.pressedScale : 1
-    }
 }

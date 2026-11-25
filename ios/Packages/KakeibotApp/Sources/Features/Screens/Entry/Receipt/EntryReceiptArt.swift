@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct EntryReceiptArt: View {
-    @State private var isScanning = false
+    @State private var layout = Layout()
 
     let kind: Kind
 
@@ -33,6 +33,10 @@ extension EntryReceiptArt {
 }
 
 private extension EntryReceiptArt {
+    struct Layout {
+        var scan: CGFloat = 0
+    }
+
     static let lineWidths: [CGFloat] = [0.7, 0.5, 0.8, 0.6]
 
     var flat: some View {
@@ -91,7 +95,7 @@ private extension EntryReceiptArt {
                         endPoint: .bottom
                     )
                     .frame(height: 18)
-                    .offset(y: isScanning ? proxy.size.height - 18 : 0)
+                    .offset(y: (proxy.size.height - 18) * layout.scan)
                 }
                 .clipShape(EntryReceiptShape(tooth: 6, hasTopEdge: true))
             }
@@ -105,7 +109,7 @@ private extension EntryReceiptArt {
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 1.1).repeatForever()) {
-                    isScanning = true
+                    layout.scan = 1
                 }
             }
     }
