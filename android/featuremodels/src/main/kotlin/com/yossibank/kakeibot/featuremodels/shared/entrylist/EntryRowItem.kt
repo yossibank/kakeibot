@@ -13,6 +13,7 @@ data class EntryRowItem(
     val id: Identifier<Entry>,
     val icon: Icon?,
     val title: String,
+    val tag: String?,
     val detail: String?,
     val route: Route?,
     val memo: String?,
@@ -27,9 +28,6 @@ data class EntryRowItem(
         val text: String
             get() = "$source → $destination"
     }
-
-    val place: String?
-        get() = listOfNotNull(detail, route?.text).joinToString("・").takeIf { it.isNotEmpty() }
 
     companion object {
         fun of(
@@ -59,6 +57,7 @@ data class EntryRowItem(
                 id = entry.id,
                 icon = category?.let { list.icons[it.iconId] },
                 title = list.title(of = entry),
+                tag = entry.tagId?.let { list.tags[it] }?.name,
                 detail = detail.takeIf { it.isNotEmpty() },
                 route = route,
                 memo = entry.memo?.takeIf { it.isNotEmpty() },

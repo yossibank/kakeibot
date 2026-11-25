@@ -288,6 +288,7 @@ records.opens-day-in-calendar	RecordsModelTests/opensDayInCalendar		未移植	�
 records.opens-current-month-with-search-closed	RecordsModelTests/opensCurrentMonthWithSearchClosed		未移植	今の月へ戻る openCurrentMonth と検索が、モデルと画面に無い
 records.tells-whether-shown-month-is-current	RecordsModelTests/tellsWhetherShownMonthIsCurrent		未移植	isCurrentMonth・currentMonth が無く、今月へ戻るボタンも無い
 records.stamps-and-removes-with-shown-choices	RecordsModelTests/stampsAndRemovesWithShownChoices		未移植	スタンプを押す・外す機能が、記録のモデルと画面に無い
+records.returns-to-current-period-when-month-start-day-changes	RecordsModelTests/returnsToCurrentPeriodWhenMonthStartDayChanges	RecordsModelTest/returnsToCurrentPeriodWhenMonthStartDayChanges	対応	
 records.confirms-batch-delete-of-ten-or-more	RecordsModelTests/confirmsBatchDeleteOfTenOrMore		未移植	まとめて消す機能と、10 件以上の時の確かめが無い
 records.searches-across-months	RecordsModelTests/searchesAcrossMonths		未移植	記録の検索が、モデルにも画面にも無い
 records.searches-item-names	RecordsModelTests/searchesItemNames		未移植	記録の検索が無く、明細の名前でも探せない
@@ -504,6 +505,7 @@ entry-notice.deletes-selected-entries-and-undoes	EntryNoticeModelTests/deletesSe
 entry-notice.keeps-batch-notice-longer-and-ignores-screen-taps	EntryNoticeModelTests/keepsBatchNoticeLongerAndIgnoresScreenTaps		未移植	まとめての変更の知らせ（EntryBatch）が無い
 entry-notice.restores-no-spend-mark-when-undoing-new-entry	EntryNoticeModelTests/restoresNoSpendMarkWhenUndoingNewEntry		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
 entry-notice.does-not-make-no-spend-mark-when-undoing-entry-on-unmarked-day	EntryNoticeModelTests/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
+entry-row-item.shows-tag-name-of-entry	EntryRowItemTests/showsTagNameOfEntry	EntryRowItemTest/showsTagNameOfEntry	対応	
 entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage	EntryRowItemTest/showsBillDateOfMovedUsage	対応	
 entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown	EntryRowItemTest/keepsMonthWhenBillIsUnknown	対応	
 entry-row-item.skips-hidden-bill-of-same-card	EntryRowItemTests/skipsHiddenBillOfSameCard	EntryRowItemTest/skipsHiddenBillOfSameCard	対応	

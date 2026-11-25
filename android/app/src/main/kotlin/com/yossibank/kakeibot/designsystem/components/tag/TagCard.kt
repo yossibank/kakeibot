@@ -17,6 +17,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
@@ -32,6 +33,7 @@ fun TagCard(
     title: String,
     style: TagCardStyle = TagCardStyle.Plain,
     modifier: Modifier = Modifier,
+    size: TagCardSize = TagCardSize.Regular,
 ) {
     val radius = LocalThemeStyle.current.corner.radius(4.dp)
     val shape = RoundedCornerShape(radius)
@@ -62,16 +64,16 @@ fun TagCard(
 
     Box(
         modifier = outlined.defaultMinSize(
-            minWidth = 56.dp,
-            minHeight = 30.dp,
+            minWidth = size.minWidth,
+            minHeight = size.height,
         ),
         contentAlignment = Alignment.Center,
     ) {
         Box(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 4.dp)
-                .size(4.dp)
+                .padding(top = size.holeTop)
+                .size(size.hole)
                 .border(
                     width = 0.8.dp,
                     color = stroke,
@@ -82,12 +84,12 @@ fun TagCard(
         FittedText(
             text = title,
             modifier = Modifier.padding(
-                start = 8.dp,
-                end = 8.dp,
+                start = size.padding,
+                end = size.padding,
                 top = 4.dp,
             ),
             color = style.foreground,
-            style = textFont(size = FontSize.Caption),
+            style = textFont(size = size.font),
         )
     }
 }
@@ -96,6 +98,32 @@ enum class TagCardStyle {
     Plain,
     Selected,
     Add,
+}
+
+enum class TagCardSize(
+    internal val font: FontSize,
+    internal val height: Dp,
+    internal val minWidth: Dp,
+    internal val padding: Dp,
+    internal val hole: Dp,
+    internal val holeTop: Dp,
+) {
+    Regular(
+        font = FontSize.Caption,
+        height = 30.dp,
+        minWidth = 56.dp,
+        padding = 8.dp,
+        hole = 4.dp,
+        holeTop = 4.dp,
+    ),
+    Small(
+        font = FontSize.Micro,
+        height = 18.dp,
+        minWidth = 0.dp,
+        padding = 4.dp,
+        hole = 3.dp,
+        holeTop = 2.dp,
+    ),
 }
 
 private val TagCardStyle.foreground: Color
