@@ -5,7 +5,6 @@ import SwiftUI
 
 public struct CategoryEditSheet: View {
     @State var model: CategoryEditModel
-    @State var prompt = SettingsEditPrompt()
     @State var tagEdit: TagEdit?
     @State var tagName = ""
     @State var ignoresKeyboard = false

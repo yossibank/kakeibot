@@ -27,8 +27,9 @@ public final class StampEditModel {
 public extension StampEditModel {
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
+        public var prompt = SettingsEditPrompt()
 
         public let icon = SettingsIconEditorModel(glyph: .star)
     }

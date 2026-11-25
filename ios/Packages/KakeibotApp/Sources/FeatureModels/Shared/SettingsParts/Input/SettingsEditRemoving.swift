@@ -3,7 +3,8 @@ import DesignSystem
 import Store
 
 @MainActor
-public protocol SettingsEditRemoving: SettingsEditModel where Input: SettingsEditHidingInput {
+public protocol SettingsEditRemoving: SettingsEditModel
+    where Input: SettingsEditHidingInput, State: SettingsEditState {
     static var deleteFailedMessage: String { get }
 
     func remove(_ id: Input.EditingID) async throws -> Deletion

@@ -60,7 +60,7 @@ struct RecurringEditModelTests {
 
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
-        #expect(model.state.isScheduleOpen)
+        #expect(model.state.schedule.isOpen)
     }
 
     @Test
@@ -73,7 +73,7 @@ struct RecurringEditModelTests {
             editing: Recurring.ID()
         )
 
-        #expect(!model.state.isScheduleOpen)
+        #expect(!model.state.schedule.isOpen)
     }
 
     @Test
@@ -82,7 +82,7 @@ struct RecurringEditModelTests {
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
-        model.state.isScheduleOpen = false
+        model.state.schedule.isOpen = false
 
         #expect(model.isChanged == false)
     }

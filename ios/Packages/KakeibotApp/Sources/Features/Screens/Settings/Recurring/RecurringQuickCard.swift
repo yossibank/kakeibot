@@ -117,7 +117,7 @@ private extension RecurringQuickCard {
         VStack(spacing: 12) {
             scheduleHeader
 
-            if model.state.isScheduleOpen {
+            if model.state.schedule.isOpen {
                 scheduleChooser
                     .transition(.opacity)
             }
@@ -127,7 +127,7 @@ private extension RecurringQuickCard {
     var scheduleHeader: some View {
         Button {
             withAnimation(.snappy) {
-                model.state.isScheduleOpen.toggle()
+                model.state.schedule.isOpen.toggle()
             }
         } label: {
             HStack(alignment: .firstTextBaseline) {
@@ -149,7 +149,7 @@ private extension RecurringQuickCard {
 
                     Image(systemName: "chevron.down")
                         .sansFont(.small)
-                        .rotationEffect(.degrees(model.state.isScheduleOpen ? 180 : 0))
+                        .rotationEffect(.degrees(model.state.schedule.isOpen ? 180 : 0))
                 }
                 .foregroundStyle(Palette.accentStrong)
                 .padding(.trailing, 8)

@@ -12,7 +12,6 @@ public struct TemplateEditSheet: View {
     @Environment(\.themeStyle) var themeStyle
 
     @State private var panel: Panel?
-    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @Environment(\.dismiss) private var dismiss
@@ -139,7 +138,6 @@ extension TemplateEditSheet {
     var edit: SettingsEditController<TemplateEditModel> {
         SettingsEditController(
             model: model,
-            prompt: $prompt,
             dismiss: dismiss,
             onRest: {
                 closePanel()

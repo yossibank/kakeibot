@@ -5,7 +5,6 @@ import SwiftUI
 
 public struct StampEditSheet: View {
     @State private var model: StampEditModel
-    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -97,7 +96,6 @@ private extension StampEditSheet {
     var edit: SettingsEditController<StampEditModel> {
         SettingsEditController(
             model: model,
-            prompt: $prompt,
             dismiss: dismiss,
             restsOnHide: true,
             onRest: {

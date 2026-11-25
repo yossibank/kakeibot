@@ -6,8 +6,9 @@ import Observation
 public extension CategoryEditModel {
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
+        public var prompt = SettingsEditPrompt()
 
         public var name = ""
 

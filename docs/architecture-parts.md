@@ -25,8 +25,9 @@
 | `SettingsEditInput` | 編集のモデルの入力。変わる前の値と、編集中の id を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditHidingInput` | 非表示にできるものの、編集のモデルの入力。非表示かどうかも持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditModel` | 1 件を編集するモデル。状態と入力のまとまりを持ち、下書きと、保存できるかを出す | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditing` | 編集の画面がモデルに頼む操作（非表示・削除）と状態 | `Features/Shared/SettingsParts/Input/` |
-| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足す | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditing` | 編集の画面がモデルに頼む操作（非表示・削除）と、確認中かを持つ状態 | `Features/Shared/SettingsParts/Input/` |
+| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足す。状態は `SettingsEditState` にする | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditState` | 非表示と削除のできる編集のモデルの状態。知らせと、破棄・非表示の確認中か（`SettingsEditPrompt`）を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |

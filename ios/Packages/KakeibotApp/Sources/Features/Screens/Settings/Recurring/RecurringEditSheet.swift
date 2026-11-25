@@ -7,7 +7,6 @@ public struct RecurringEditSheet: View {
     @State var model: RecurringEditModel
 
     @State private var panel: Panel?
-    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -203,7 +202,6 @@ private extension RecurringEditSheet {
     var edit: SettingsEditController<RecurringEditModel> {
         SettingsEditController(
             model: model,
-            prompt: $prompt,
             dismiss: dismiss,
             onRest: {
                 closePanel()
