@@ -396,15 +396,15 @@ settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHid
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.informs-when-every-hidden-item-is-in-use	SettingsBoardModelTests/informsWhenEveryHiddenItemIsInUse		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.tells-when-some-hidden-items-cannot-be-deleted	SettingsBoardModelTests/tellsWhenSomeHiddenItemsCannotBeDeleted	RecurringListModelTest/tellsWhenSomeHiddenRecurringsCannotBeDeleted	対応	消せた分の取り消しが返ることも確かめる
-settings-edit-outcome.places-saved-value-in-outcome	SettingsEditOutcomeTests/placesSavedValueInOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-no-outcome-when-save-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenSaveFails		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.reports-each-save-as-change	SettingsEditOutcomeTests/reportsEachSaveAsChange		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-hidden-in-outcome	SettingsEditOutcomeTests/placesHiddenInOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-no-outcome-when-hiding-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenHidingFails		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/placesDeletionInOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide		未確認	Android は別のブランチで合わせる
+settings-edit-outcome.places-saved-value-in-outcome	SettingsEditOutcomeTests/placesSavedValueInOutcome	SettingsEditOutcomeTest/placesSavedValueInOutcome	対応	
+settings-edit-outcome.places-no-outcome-when-save-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenSaveFails	SettingsEditOutcomeTest/placesNoOutcomeWhenSaveFails	対応	
+settings-edit-outcome.reports-each-save-as-change	SettingsEditOutcomeTests/reportsEachSaveAsChange	SettingsEditOutcomeTest/reportsEachSaveAsChange	対応	
+settings-edit-outcome.places-hidden-in-outcome	SettingsEditOutcomeTests/placesHiddenInOutcome	SettingsEditOutcomeTest/placesHiddenInOutcome	対応	
+settings-edit-outcome.places-no-outcome-when-hiding-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenHidingFails	SettingsEditOutcomeTest/placesNoOutcomeWhenHidingFails	対応	
+settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/placesDeletionInOutcome	SettingsEditOutcomeTest/placesDeletionInOutcome	対応	
+settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome	SettingsEditOutcomeTest/placesSaveAndHideInOneOutcome	対応	
+settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails	SettingsEditOutcomeTest/keepsSheetOpenWhenHidingAfterSaveFails	対応	
+settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide	SettingsEditOutcomeTest/savesWithoutHidingAfterFailedSaveAndHide	対応	
 settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い

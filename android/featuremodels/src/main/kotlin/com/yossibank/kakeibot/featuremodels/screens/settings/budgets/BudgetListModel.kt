@@ -16,6 +16,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
@@ -78,6 +79,8 @@ class BudgetListModel(
         today: LocalDate,
     ) {
         val task = ModelTask()
+        val cleared = UndoNoticeState<Cleared>()
+        val resetFrom = UndoNoticeState<YearMonth>()
 
         var today: LocalDate by mutableStateOf(today)
 
@@ -292,11 +295,15 @@ class BudgetListModel(
             return null
         }
 
-        return Cleared(
+        val cleared = Cleared(
             target = target,
             amount = amount,
             month = month,
         )
+
+        state.cleared.show(cleared)
+
+        return cleared
     }
 
     suspend fun restore(cleared: Cleared) {
@@ -319,6 +326,8 @@ class BudgetListModel(
         if (output.carryover == 0L || !saveCarryoverFrom(output.month)) {
             return null
         }
+
+        state.resetFrom.show(previous)
 
         return previous
     }

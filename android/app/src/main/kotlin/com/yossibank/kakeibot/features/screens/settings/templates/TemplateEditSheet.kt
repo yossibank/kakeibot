@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,13 +66,14 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.templates.TemplateEditModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.features.shared.model.OnOutcome
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -91,7 +91,6 @@ fun TemplateEditSheet(
         )
     }
 
-    val scope = rememberCoroutineScope()
     val focus = LocalFocusManager.current
 
     LaunchedEffect(model) {
@@ -99,6 +98,10 @@ fun TemplateEditSheet(
     }
 
     model.state.task.Timer()
+
+    OnOutcome(model.state.outcome) { outcome ->
+        outcome.saved?.let(onSave)
+    }
 
     BackHandler(onBack = onClose)
 
@@ -270,10 +273,7 @@ fun TemplateEditSheet(
             title = model.output.saveTitle,
             onClick = {
                 focus.clearFocus()
-
-                scope.launch {
-                    model.save()?.let(onSave)
-                }
+                model.perform { it.save() }
             },
             modifier = Modifier.fillMaxWidth(),
             isEnabled = model.output.canSave,

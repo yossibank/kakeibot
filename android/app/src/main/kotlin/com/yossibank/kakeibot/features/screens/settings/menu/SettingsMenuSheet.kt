@@ -15,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -28,6 +27,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.notice.NoticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.title
@@ -48,7 +48,6 @@ import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
 
 private enum class Screen(
     val title: String,
@@ -72,7 +71,6 @@ fun SettingsMenuSheet(
     }
 
     val model = remember(database) { SettingsMenuModel(database = database) }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(model) {
         model.observe()
@@ -168,8 +166,8 @@ fun SettingsMenuSheet(
                     selection = model.input.monthStartDay,
                     today = today,
                     onSelect = { day ->
-                        scope.launch {
-                            model.store(
+                        model.perform {
+                            it.store(
                                 key = SettingKey.monthStartDay,
                                 value = day,
                             )
@@ -182,8 +180,8 @@ fun SettingsMenuSheet(
                 SettingsMenuWeekStart(
                     selection = model.input.weekStart,
                     onSelect = { weekday ->
-                        scope.launch {
-                            model.store(
+                        model.perform {
+                            it.store(
                                 key = SettingKey.weekStart,
                                 value = weekday,
                             )

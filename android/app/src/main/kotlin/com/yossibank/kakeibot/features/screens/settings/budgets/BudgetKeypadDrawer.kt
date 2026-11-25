@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,14 +55,11 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.suggestions
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
-import kotlinx.coroutines.launch
 
 @Composable
-fun BudgetKeypadDrawer(
-    model: BudgetListModel,
-    onCleared: (BudgetListModel.Cleared) -> Unit,
-) {
+fun BudgetKeypadDrawer(model: BudgetListModel) {
     var isConfirmingDiscard by remember { mutableStateOf(false) }
 
     fun close() {
@@ -85,10 +81,7 @@ fun BudgetKeypadDrawer(
         padding = drawerPadding,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Drawer(
-            model = model,
-            onCleared = onCleared,
-        )
+        Drawer(model = model)
     }
 
     if (isConfirmingDiscard) {
@@ -103,12 +96,7 @@ fun BudgetKeypadDrawer(
 }
 
 @Composable
-private fun ColumnScope.Drawer(
-    model: BudgetListModel,
-    onCleared: (BudgetListModel.Cleared) -> Unit,
-) {
-    val scope = rememberCoroutineScope()
-
+private fun ColumnScope.Drawer(model: BudgetListModel) {
     AmountText(
         amount = model.state.calculator.amount,
         style = displayFont(
@@ -151,7 +139,7 @@ private fun ColumnScope.Drawer(
 
     PrimaryButton(
         title = model.output.saveTitle,
-        onClick = { scope.launch { model.save() } },
+        onClick = { model.perform { it.save() } },
         modifier = Modifier.fillMaxWidth(),
         isEnabled = model.output.canSave,
     )
@@ -162,9 +150,8 @@ private fun ColumnScope.Drawer(
             modifier = Modifier
                 .heightIn(min = 44.dp)
                 .clip(CircleShape)
-                .clickable {
-                    scope.launch { model.clear()?.let(onCleared) }
-                }.padding(
+                .clickable { model.perform { it.clear() } }
+                .padding(
                     horizontal = 16.dp,
                     vertical = 12.dp,
                 ),

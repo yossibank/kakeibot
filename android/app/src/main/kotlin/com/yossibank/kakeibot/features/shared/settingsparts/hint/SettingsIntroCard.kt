@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -36,11 +35,11 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
-import kotlinx.coroutines.launch
 
 data class SettingsIntroNote(
     val icon: Int,
@@ -70,8 +69,6 @@ fun SettingsIntroCard(
     model: SettingsFoldModel,
     notes: List<SettingsIntroNote> = emptyList(),
 ) {
-    val scope = rememberCoroutineScope()
-
     LaunchedEffect(fold) {
         model.loadFold(fold)
     }
@@ -126,8 +123,8 @@ fun SettingsIntroCard(
                 RoundIconButton(
                     icon = R.drawable.ic_close,
                     onSelect = {
-                        scope.launch {
-                            model.setFold(
+                        model.perform {
+                            it.setFold(
                                 fold = fold,
                                 isClosed = true,
                             )
@@ -172,8 +169,6 @@ fun SettingsHintButton(
     fold: SettingsFoldInput,
     model: SettingsFoldModel,
 ) {
-    val scope = rememberCoroutineScope()
-
     AnimatedVisibility(
         visible = fold.isClosed == true,
         enter = fadeIn(),
@@ -182,8 +177,8 @@ fun SettingsHintButton(
         RoundIconButton(
             icon = R.drawable.ic_help,
             onSelect = {
-                scope.launch {
-                    model.setFold(
+                model.perform {
+                    it.setFold(
                         fold = fold,
                         isClosed = false,
                     )

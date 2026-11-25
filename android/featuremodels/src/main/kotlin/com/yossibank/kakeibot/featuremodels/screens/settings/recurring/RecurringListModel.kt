@@ -14,6 +14,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -52,6 +53,8 @@ class RecurringListModel(
         today: LocalDate,
     ) {
         val task = ModelTask()
+        val hidden = UndoNoticeState<Identifier<Recurring>>()
+        val deleted = UndoNoticeState<Deletion>()
 
         var today: LocalDate by mutableStateOf(today)
 
@@ -266,11 +269,17 @@ class RecurringListModel(
     suspend fun hide(id: Identifier<Recurring>): Boolean {
         state.cancelMoving()
 
-        return setHidden(
+        val isHidden = setHidden(
             id = id,
             isHidden = true,
             failure = HIDE_FAILED,
         )
+
+        if (isHidden) {
+            state.hidden.show(id)
+        }
+
+        return isHidden
     }
 
     suspend fun show(id: Identifier<Recurring>): Boolean = setHidden(
@@ -282,7 +291,11 @@ class RecurringListModel(
     suspend fun delete(id: Identifier<Recurring>): Deletion? {
         state.cancelMoving()
 
-        return state.task.attempt(failure = DELETE_FAILED) { remove(id) }
+        val deletion = state.task.attempt(failure = DELETE_FAILED) { remove(id) }
+
+        deletion?.let(state.deleted::show)
+
+        return deletion
     }
 
     suspend fun deleteHidden(): Deletion? {
@@ -296,7 +309,11 @@ class RecurringListModel(
             state.task.show(BULK_DELETE_FAILED)
         }
 
-        return deletions.filterNotNull().takeIf { it.isNotEmpty() }?.let { Deletion.merging(it) }
+        val deletion = deletions.filterNotNull().takeIf { it.isNotEmpty() }?.let(Deletion::merging)
+
+        deletion?.let(state.deleted::show)
+
+        return deletion
     }
 
     suspend fun restore(deletion: Deletion) {
