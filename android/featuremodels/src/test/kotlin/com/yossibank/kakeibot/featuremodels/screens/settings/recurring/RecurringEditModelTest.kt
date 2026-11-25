@@ -3,10 +3,12 @@ package com.yossibank.kakeibot.featuremodels.screens.settings.recurring
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorization
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.support.FakePermission
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.modelTest
@@ -21,6 +23,68 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class RecurringEditModelTest {
+    @Test
+    fun warnsThatRemindersCannotArriveWhenDenied() = modelTest(today = "2026-10-17") { setup ->
+        val client = FakePermission(authorization = NotificationAuthorization.denied)
+        val model = setup.editModel()
+        model.load()
+
+        model.refreshAuthorization(client.permission)
+        val withoutReminder = model.output.isNotificationDenied
+        model.state.update { copy(remindDaysBefore = 1) }
+
+        assertFalse(withoutReminder)
+        assertTrue(model.output.isNotificationDenied)
+    }
+
+    @Test
+    fun doesNotWarnBeforeAskingForReminders() = modelTest(today = "2026-10-17") { setup ->
+        val client = FakePermission(authorization = NotificationAuthorization.notDetermined)
+        val model = setup.editModel()
+        model.load()
+        model.state.update { copy(remindDaysBefore = 1) }
+
+        model.refreshAuthorization(client.permission)
+
+        assertFalse(model.output.isNotificationDenied)
+    }
+
+    @Test
+    fun doesNotWarnWhenRemindersAreAllowed() = modelTest(today = "2026-10-17") { setup ->
+        val client = FakePermission(authorization = NotificationAuthorization.allowed)
+        val model = setup.editModel()
+        model.load()
+        model.state.update { copy(remindDaysBefore = 1) }
+
+        model.refreshAuthorization(client.permission)
+
+        assertFalse(model.output.isNotificationDenied)
+    }
+
+    @Test
+    fun asksPermissionOnlyWhenSavingWithReminder() = modelTest(today = "2026-10-17") { setup ->
+        val client = FakePermission(authorization = NotificationAuthorization.notDetermined)
+        val without = setup.editModel()
+        without.load()
+        without.press(5)
+        without.state.update { copy(memo = "家賃") }
+
+        without.save(client.permission)
+        val askedWithout = client.requested
+
+        val model = setup.editModel()
+        model.load()
+        model.press(5)
+        model.state.update { copy(memo = "保険", remindDaysBefore = 1) }
+
+        val saved = model.save(client.permission)
+
+        assertTrue(client.rescheduled)
+        assertTrue(saved)
+        assertFalse(askedWithout)
+        assertTrue(client.requested)
+    }
+
     @Test
     fun opensScheduleOnlyWhenAdding() = modelTest(today = "2026-10-17") { setup ->
         val adding = setup.editModel()

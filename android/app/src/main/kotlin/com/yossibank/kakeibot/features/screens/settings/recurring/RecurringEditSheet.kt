@@ -85,6 +85,7 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.autoPlan
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.canSave
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isChanged
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isLoanRepayment
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isNotificationDenied
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.plannedTotal
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.previewRow
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.saveTitle
@@ -125,10 +126,15 @@ fun RecurringEditSheet(
     }
 
     val focus = LocalFocusManager.current
-    val permission = rememberNotificationPermission()
+    val notification = rememberNotificationPermission()
 
     LaunchedEffect(model) {
         model.load()
+        model.refreshAuthorization(notification.permission)
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        model.refreshAuthorization(notification.permission)
     }
 
     model.state.task.Timer()
@@ -155,14 +161,16 @@ fun RecurringEditSheet(
     fun save(hiding: Boolean = false) {
         model.state.panel = null
 
-        model.perform { if (hiding) it.saveTogglingHidden() else it.save() }
+        model.perform {
+            if (hiding) {
+                it.saveTogglingHidden(notification.permission)
+            } else {
+                it.save(notification.permission)
+            }
+        }
     }
 
     OnOutcome(model.state.outcome) { outcome ->
-        if (outcome.saved != null && model.state.form.remindDaysBefore != null) {
-            permission.requestIfNeeded()
-        }
-
         if (outcome.isHidden == true) {
             onHide()
         }
@@ -273,8 +281,8 @@ fun RecurringEditSheet(
                 )
             }
 
-            if (model.state.form.remindDaysBefore != null && !permission.isAllowed) {
-                DeniedBanner(onOpen = permission::openSettings)
+            if (model.output.isNotificationDenied) {
+                DeniedBanner(onOpen = notification::openSettings)
             }
         }
 

@@ -9,6 +9,7 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
+import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorization
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.RecurringDraft
 import com.yossibank.kakeibot.core.concepts.recurring.billChoiceCount
@@ -62,6 +63,12 @@ val RecurringEditModel.Output.isCardBill: Boolean
 
 val RecurringEditModel.Output.isLoanRepayment: Boolean
     get() = state.form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.loan
+
+val RecurringEditModel.Output.isNotificationDenied: Boolean
+    get() {
+        val isDenied = input.authorization == NotificationAuthorization.denied
+        return state.form.remindDaysBefore != null && isDenied
+    }
 
 val RecurringEditModel.Output.categories: List<EntryCategory>
     get() = when (state.form.type) {

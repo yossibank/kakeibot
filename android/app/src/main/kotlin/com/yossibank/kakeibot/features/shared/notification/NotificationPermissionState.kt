@@ -8,41 +8,70 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.core.content.edit
+import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorization
+import com.yossibank.kakeibot.featuremodels.shared.notification.NotificationPermission
+import kotlinx.coroutines.CompletableDeferred
 
 class NotificationPermissionState(
     private val context: Context,
 ) {
-    var isAllowed: Boolean by mutableStateOf(true)
-        internal set
+    val permission = NotificationPermission(
+        authorization = ::authorization,
+        request = ::request,
+    )
 
     internal var launch: () -> Unit = {}
 
-    fun refresh() {
-        isAllowed = NotificationManagerCompat.from(context).areNotificationsEnabled()
-    }
+    private var answer: CompletableDeferred<Boolean>? = null
 
-    fun requestIfNeeded() {
-        val isEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
+    private val isEnabled: Boolean
+        get() = NotificationManagerCompat.from(context).areNotificationsEnabled()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !isEnabled) {
-            launch()
-        }
-    }
+    private val canAsk: Boolean
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+    private val store
+        get() = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
 
     fun openSettings() {
         val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
             .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
 
         context.startActivity(intent)
+    }
+
+    internal fun receive(isGranted: Boolean) {
+        answer?.complete(isGranted)
+    }
+
+    private fun authorization(): NotificationAuthorization = when {
+        isEnabled -> NotificationAuthorization.allowed
+        canAsk && !store.getBoolean(KEY_ASKED, false) -> NotificationAuthorization.notDetermined
+        else -> NotificationAuthorization.denied
+    }
+
+    private suspend fun request(): Boolean {
+        if (!canAsk) {
+            return isEnabled
+        }
+
+        val waiting = CompletableDeferred<Boolean>()
+
+        answer = waiting
+        store.edit { putBoolean(KEY_ASKED, true) }
+        launch()
+
+        return waiting.await()
+    }
+
+    private companion object {
+        const val STORE_NAME = "notification-permission"
+        const val KEY_ASKED = "asked"
     }
 }
 
@@ -53,9 +82,8 @@ fun rememberNotificationPermission(): NotificationPermissionState {
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        state.isAllowed = isGranted
-    }
+        onResult = state::receive,
+    )
 
     state.launch = {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -63,12 +91,8 @@ fun rememberNotificationPermission(): NotificationPermissionState {
         }
     }
 
-    LaunchedEffect(state) {
-        state.refresh()
-    }
-
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        state.refresh()
+    DisposableEffect(state) {
+        onDispose { state.receive(isGranted = false) }
     }
 
     return state

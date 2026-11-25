@@ -394,15 +394,15 @@ budget-list.skips-average-until-two-months-are-recorded	BudgetListModelTests/ski
 budget-list.suggests-only-recurring-without-records	BudgetListModelTests/suggestsOnlyRecurringWithoutRecords	BudgetListModelTest/suggestsOnlyRecurringWithoutRecords	対応	
 budget-list.tells-when-budgets-cannot-be-read	BudgetListModelTests/tellsWhenBudgetsCannotBeRead	BudgetListModelTest/tellsWhenBudgetsCannotBeRead	対応	設定の表ではなく、共有の記録の一覧を失敗させて確かめる
 budget-list.keeps-notice-when-editing-starts	BudgetListModelTests/keepsNoticeWhenEditingStarts	BudgetListModelTest/keepsNoticeWhenEditingStarts	対応	共有の記録の一覧を失敗させて、知らせを出してから確かめる
-recurring-edit.warns-that-reminders-cannot-arrive-when-denied	RecurringEditModelTests/warnsThatRemindersCannotArriveWhenDenied		違い	まだ許可を尋ねていない時も出す。画面が見る値は、未回答と拒否を分けない
+recurring-edit.warns-that-reminders-cannot-arrive-when-denied	RecurringEditModelTests/warnsThatRemindersCannotArriveWhenDenied	RecurringEditModelTest/warnsThatRemindersCannotArriveWhenDenied	対応	未回答は、Android 13 以上でアプリがまだ尋ねていない時。12 以下には無い
 recurring-edit.opens-one-panel-at-a-time	RecurringEditModelTests/opensOnePanelAtATime		未確認	Android は別のブランチで合わせる
-recurring-edit.does-not-warn-when-reminders-are-allowed	RecurringEditModelTests/doesNotWarnWhenRemindersAreAllowed		未確認	通知の許可は :app の Context に頼る画面の部品が見て、単体テストにできない
+recurring-edit.does-not-warn-when-reminders-are-allowed	RecurringEditModelTests/doesNotWarnWhenRemindersAreAllowed	RecurringEditModelTest/doesNotWarnWhenRemindersAreAllowed	対応	
 recurring-edit.starts-new-recurring-with-given-transfer-type	RecurringEditModelTests/startsNewRecurringWithGivenTransferType	RecurringEditModelTest/startsNewRecurringWithGivenTransferType	対応	
 recurring-edit.opens-schedule-when-adding-recurring	RecurringEditModelTests/opensScheduleWhenAddingRecurring	RecurringEditModelTest/opensScheduleOnlyWhenAdding	対応	
 recurring-edit.closes-schedule-when-editing-recurring	RecurringEditModelTests/closesScheduleWhenEditingRecurring	RecurringEditModelTest/opensScheduleOnlyWhenAdding	対応	
 recurring-edit.does-not-count-closing-schedule-as-change	RecurringEditModelTests/doesNotCountClosingScheduleAsChange	RecurringEditModelTest/doesNotCountClosingScheduleAsChange	対応	
 recurring-edit.saves-recurring-and-generates-entries	RecurringEditModelTests/savesRecurringAndGeneratesEntries	RecurringEditModelTest/savesRecurringAndGeneratesEntries	対応	
-recurring-edit.asks-permission-only-when-saving-with-reminder	RecurringEditModelTests/asksPermissionOnlyWhenSavingWithReminder		未確認	許可を求める口は画面の launcher にあり、単体テストにできない
+recurring-edit.asks-permission-only-when-saving-with-reminder	RecurringEditModelTests/asksPermissionOnlyWhenSavingWithReminder	RecurringEditModelTest/asksPermissionOnlyWhenSavingWithReminder	対応	通知の予約のし直しは、許可の後に画面が戻った時に AppModel が行う
 recurring-edit.suggests-holiday-shift-from-category	RecurringEditModelTests/suggestsHolidayShiftFromCategory	RecurringEditModelTest/suggestsHolidayShiftFromCategory	対応	
 recurring-edit.presets-card-bill-from-card	RecurringEditModelTests/presetsCardBillFromCard		未移植	支払う先の口座を渡して始める入口（paying）が、モデルにも画面にも無い
 recurring-edit.presets-loan-repayment-from-loan	RecurringEditModelTests/presetsLoanRepaymentFromLoan		未移植	支払う先の口座を渡して始める入口（paying）が、モデルにも画面にも無い
@@ -416,6 +416,7 @@ recurring-edit.loads-existing-recurring-and-tracks-changes		RecurringEditModelTe
 recurring-edit.hides-and-deletes-existing-recurring		RecurringEditModelTest/hidesAndDeletesExistingRecurring	Androidのみ	編集の画面から固定費を非表示にして削除する。iOS にこのテストが無い
 recurring-edit.fails-to-load-missing-recurring		RecurringEditModelTest/failsToLoadMissingRecurring	Androidのみ	編集する固定費が無い時に「固定費を読めませんでした」を出す。iOS にテストが無い
 recurring-edit.uses-closing-day-only-for-card-transfer		RecurringEditModelTest/usesClosingDayOnlyForCardTransfer	Androidのみ	締め日はカードへの振替の時だけ下書きに残す。iOS にこのテストが無い
+recurring-edit.does-not-warn-before-asking-for-reminders		RecurringEditModelTest/doesNotWarnBeforeAskingForReminders	Androidのみ	まだ許可を尋ねていない時は「届かない」を出さない。iOS にこのテストが無い
 recurring-list.lists-with-schedule-and-next-date	RecurringListModelTests/listsWithScheduleAndNextDate	RecurringListModelTest/listsWithScheduleAndNextDate	対応	
 recurring-list.totals-month-from-month-start-day	RecurringListModelTests/totalsMonthFromMonthStartDay	RecurringListModelTest/totalsMonthFromMonthStartDay	対応	
 recurring-list.hides-and-shows-recurring	RecurringListModelTests/hidesAndShowsRecurring	RecurringListModelTest/hidesAndShowsRecurring	対応	
