@@ -59,7 +59,7 @@ class AssetsModelTest {
         assertEquals(listOf("財布", "銀行"), model.output.rows.map { it.name })
         assertEquals(listOf(9020L, 240_000L), model.output.rows.map { it.balance })
         assertEquals(249_020L, model.output.netWorth)
-        assertEquals(249_020L, model.output.onHand)
+        assertEquals(249_020L, model.output.total)
     }
 
     @Test
@@ -73,8 +73,20 @@ class AssetsModelTest {
         assertEquals(listOf("財布", "銀行"), model.output.assets.map { it.name })
         assertEquals(listOf(card.id, loan.id), model.output.debts.map { it.id })
         assertEquals(listOf(-3000L, -100_000L), model.output.debts.map { it.balance })
-        assertEquals(50000L, model.output.onHand)
+        assertEquals(47000L, model.output.total)
         assertEquals(-53000L, model.output.netWorth)
+    }
+
+    @Test
+    fun countsCardsInTotal() = modelTest(today = "2026-10-17") { setup ->
+        val card = setup.addWallet(kind = Wallet.Kind.card, name = "カード")
+        setup.save(Entry.Kind.income, amount = 50000, on = date("2026-10-01"))
+        setup.save(Entry.Kind.expense, amount = 3000, on = date("2026-10-05"), walletId = card.id)
+        val model = setup.observedModel()
+
+        assertEquals(50000L, model.output.holdings.onHand)
+        assertEquals(3000L, model.output.holdings.unpaid)
+        assertEquals(47000L, model.output.total)
     }
 
     @Test
@@ -104,7 +116,7 @@ class AssetsModelTest {
 
         assertEquals(1000L, model.output.rows.first().balance)
         assertEquals(1000L, model.output.netWorth)
-        assertEquals(1000L, model.output.onHand)
+        assertEquals(1000L, model.output.total)
     }
 
     @Test

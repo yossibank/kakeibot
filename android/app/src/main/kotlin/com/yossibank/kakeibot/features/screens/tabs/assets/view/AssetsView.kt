@@ -118,12 +118,12 @@ private fun TotalCard(model: AssetsModel) {
         Caption(text = "手元のお金")
 
         AmountText(
-            amount = model.output.onHand.clamped,
+            amount = model.output.total.clamped,
             style = displayFont(
                 size = FontSize.LargeTitle,
                 weight = FontWeight.Bold,
             ),
-            color = if (model.output.onHand < 0) Palette.rose else Palette.accentStrong,
+            color = if (model.output.total < 0) Palette.rose else Palette.accentStrong,
         )
 
         Hairline()

@@ -115,6 +115,7 @@ data class EntryForm(
         fee: Int,
         templates: List<EntryTemplate>,
         includesItems: Boolean,
+        hasBillChoices: Boolean,
     ): EntryDraft? {
         val walletId = walletId ?: return null
         val template = templates.firstOrNull { it.id == templateId && it.type == type }
@@ -129,7 +130,7 @@ data class EntryForm(
             walletId = walletId,
             toWalletId = toWalletId,
             memo = memo,
-            billMonth = billMonth,
+            billMonth = if (hasBillChoices) billMonth else null,
             fee = fee,
             items = if (includesItems) items else emptyList(),
             taxIncluded = taxIncluded,
@@ -149,18 +150,30 @@ data class EntryForm(
         fun of(
             entry: Entry,
             items: List<EntryItem.Draft>,
-        ): EntryForm = EntryForm(
-            date = entry.date,
-            type = entry.type,
-            categoryId = entry.categoryId,
-            tagId = entry.tagId,
-            walletId = entry.walletId,
-            toWalletId = entry.toWalletId,
-            memo = entry.memo ?: "",
-            billMonth = entry.billMonth,
-            items = items,
-            taxIncluded = entry.taxIncluded,
-            templateId = entry.templateId,
-        )
+            offering: List<EntryCategory>,
+            allCategories: List<EntryCategory>,
+            allTags: List<EntryTag>,
+        ): EntryForm {
+            val form = EntryForm(
+                date = entry.date,
+                type = entry.type,
+                categoryId = entry.categoryId,
+                tagId = entry.tagId,
+                toWalletId = entry.toWalletId,
+                memo = entry.memo ?: "",
+                items = items,
+                taxIncluded = entry.taxIncluded,
+                templateId = entry.templateId,
+            )
+
+            val fitted = form.withWallet(
+                id = entry.walletId,
+                offering = offering,
+                allCategories = allCategories,
+                allTags = allTags,
+            )
+
+            return fitted.copy(billMonth = entry.billMonth)
+        }
     }
 }

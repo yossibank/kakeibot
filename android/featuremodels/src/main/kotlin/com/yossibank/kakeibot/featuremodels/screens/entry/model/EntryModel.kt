@@ -77,6 +77,17 @@ class EntryModel(
         var voiceFilled: VoiceFilled? by mutableStateOf(null)
             private set
 
+        var isConfirmingDiscard: Boolean by mutableStateOf(false)
+            private set
+
+        fun askDiscard() {
+            isConfirmingDiscard = true
+        }
+
+        fun keepEditing() {
+            isConfirmingDiscard = false
+        }
+
         fun update(change: EntryForm.() -> EntryForm) {
             form = form.change()
         }
@@ -158,9 +169,11 @@ class EntryModel(
         internal fun load(
             form: EntryForm,
             amount: Int,
+            fee: Int,
         ) {
             this.form = form
             calculator = AmountCalculator(amount = amount)
+            feeCalculator = AmountCalculator(amount = fee)
         }
     }
 
@@ -268,36 +281,29 @@ class EntryModel(
     suspend fun load() {
         val database = dependencies.database
 
-        state.task.attempt(failure = ModelTask.loadFailed) {
+        state.task.attempt(describe = failure(otherwise = ModelTask.loadFailed)) {
             database.insertDefaultsIfEmpty(at = dependencies.clock.now)
 
-            val loaded = database.entryOptions()
-
+            input.options = database.entryOptions()
             input.allTemplates = database.templates()
             input.cardBills = database.recurrings().filter { recurring ->
                 recurring.type == Entry.Kind.transfer && recurring.closingDay != null
             }
 
-            loadHistory()
-
             val entry = loadEntry()
 
-            input.options = loaded
-
             if (entry != null) {
-                val items = database.entryItems(of = entry.id).map { EntryItem.Draft(it) }
-
-                state.load(
-                    form = EntryForm.of(
-                        entry = entry,
-                        items = items,
-                    ),
-                    amount = entry.amount,
+                fill(
+                    entry = entry,
+                    items = database.entryItems(of = entry.id).map { EntryItem.Draft(it) },
+                    fee = database.fee(of = entry.id)?.amount ?: 0,
                 )
-                state.setFee(database.fee(of = entry.id)?.amount ?: 0)
-            } else {
-                state.update { withCategory(output.categories.firstOrNull()?.id) }
-                setWallet(output.usualWalletId)
+            }
+
+            loadHistory()
+
+            if (entry == null) {
+                startNew()
             }
 
             state.focus(output.startField)
@@ -319,7 +325,7 @@ class EntryModel(
             return false
         }
 
-        val saved = state.task.attempt(describe = ::saveFailure) {
+        val saved = state.task.attempt(describe = failure(otherwise = ModelTask.saveFailed)) {
             dependencies.database.saveEntry(
                 draft = draft,
                 editing = input.editingId,
@@ -374,7 +380,9 @@ class EntryModel(
 
     private suspend fun loadEntry(): Entry? {
         val database = dependencies.database
-        val entry = input.editingId?.let { database.entry(it) } ?: return null
+        val editing = input.editingId ?: return null
+        val missing = EntryWriteException(EntryWriteError.entryNotFound)
+        val entry = database.entry(editing) ?: throw missing
         val transferId = entry.transferId ?: return entry
         val transfer = database.entry(transferId) ?: return entry
 
@@ -383,8 +391,8 @@ class EntryModel(
         return transfer
     }
 
-    private fun saveFailure(error: Exception): String {
+    private fun failure(otherwise: String): (Exception) -> String = { error ->
         val isMissing = (error as? EntryWriteException)?.error == EntryWriteError.entryNotFound
-        return if (isMissing) "記録が見つかりませんでした" else ModelTask.saveFailed
+        if (isMissing) "記録が見つかりませんでした" else otherwise
     }
 }

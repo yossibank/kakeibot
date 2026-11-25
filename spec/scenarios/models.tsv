@@ -41,7 +41,9 @@ entry.keeps-item-sources-aligned-with-items	EntryModelTests/keepsItemSourcesAlig
 entry.lists-recent-entries-without-repeats	EntryModelTests/listsRecentEntriesWithoutRepeats	EntryModelTest/listsRecentEntriesWithoutRepeats	対応	件数が上限の3件で止まる所を確かめていない
 entry.skips-recent-entries-that-match-templates	EntryModelTests/skipsRecentEntriesThatMatchTemplates		未確認	recentEntries がひな形と同じ鍵を除くがテストが無い
 entry.lists-no-recent-entries-for-transfers	EntryModelTests/listsNoRecentEntriesForTransfers		未確認	recentEntries は振替で空を返すがテストが無い
-entry.applies-recent-entry	EntryModelTests/appliesRecentEntry	EntryModelTest/listsRecentEntriesWithoutRepeats	違い	applyRecent がタグを全タグから探し、カテゴリに合わないタグが付くことがある
+entry.applies-recent-entry	EntryModelTests/appliesRecentEntry	EntryModelRecentTest/appliesRecentEntry	対応	
+entry.drops-recent-tag-outside-offered-categories	EntryModelTests/dropsRecentTagOutsideOfferedCategories	EntryModelRecentTest/dropsRecentTagOutsideOfferedCategories	対応	
+entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntryOutOfRecentEntries	EntryModelRecentTest/leavesEditedEntryOutOfRecentEntries	対応	
 entry.tells-when-i-phone-storage-is-full	EntryModelTests/tellsWhenIPhoneStorageIsFull		違い	容量が足りない時の専用の文が無く「保存できませんでした」になる
 entry.shows-template-icon-while-shared-wallet-is-chosen	EntryModelTests/showsTemplateIconWhileSharedWalletIsChosen		未確認	EntryRecentRow が category(of:) で全カテゴリから探すがテストが無い
 entry.applies-template-to-entry	EntryModelTests/appliesTemplateToEntry	EntryModelTest/appliesTemplateToEntry	対応	選んだひな形の目印（isApplied）は Android に無く確かめていない
@@ -61,6 +63,7 @@ entry.starts-with-last-recorded-wallet	EntryModelTests/startsWithLastRecordedWal
 entry.starts-each-type-with-its-last-wallet	EntryModelTests/startsEachTypeWithItsLastWallet	EntryModelWalletTest/startsEachTypeWithItsLastWallet	対応	
 entry.keeps-chosen-wallet	EntryModelTests/keepsChosenWallet	EntryModelWalletTest/keepsChosenWallet	対応	
 entry.offers-shared-categories-for-shared-wallet	EntryModelTests/offersSharedCategoriesForSharedWallet	EntryModelSharedWalletTest/offersSharedCategoriesForSharedWallet	対応	
+entry.drops-bill-month-without-bill-choices	EntryModelTests/dropsBillMonthWithoutBillChoices	EntryModelEditingTest/dropsBillMonthWithoutBillChoices	対応	請求の選択肢（billChoices）は Android に無く、確かめていない
 entry.builds-amount-from-keys	EntryModelTests/buildsAmountFromKeys	EntryModelTest/buildsAmountFromKeys	対応	
 entry.caps-amount-at-nine-digits	EntryModelTests/capsAmountAtNineDigits	EntryModelTest/capsAmountAtNineDigits	対応	
 entry.picks-first-category-of-selected-type	EntryModelTests/picksFirstCategoryOfSelectedType	EntryModelTest/picksFirstCategoryOfSelectedType	対応	
@@ -89,6 +92,9 @@ entry.does-not-delete-new-entry		EntryModelTest/doesNotDeleteNewEntry	Androidの
 entry-change.counts-type-switch-on-edited-entry		EntryModelChangeTest/countsTypeSwitchOnEditedEntry	Androidのみ	編集中は種類の切り替えを変更に数える、というテストが iOS に無い
 entry-change.stays-unchanged-before-loading		EntryModelChangeTest/staysUnchangedBeforeLoading	Androidのみ	読み込む前は変更なしのまま、というテストが iOS に無い
 entry-change.ignores-applied-template-id-and-remembered-categories		EntryModelChangeTest/ignoresAppliedTemplateIdAndRememberedCategories	Androidのみ	種類ごとに覚えたカテゴリを変更に数えない、というテストが iOS に無い
+entry-change.closes-unchanged-entry-without-asking		EntryModelChangeTest/closesUnchangedEntryWithoutAsking	Androidのみ	変更が無ければ確かめずに閉じる。iOS は画面の EntrySheet が決める
+entry-change.asks-before-closing-changed-entry		EntryModelChangeTest/asksBeforeClosingChangedEntry	Androidのみ	変更があれば閉じる前に確かめる。iOS は画面の EntrySheet が決める
+entry-change.closes-without-asking-after-starting-next		EntryModelChangeTest/closesWithoutAskingAfterStartingNext	Androidのみ	続けて記録の後は確かめずに閉じる。iOS にテストが無い
 entry-item.drops-items-from-transfer		EntryModelItemTest/dropsItemsFromTransfer	Androidのみ	振替で保存すると品目を落とす、というテストが iOS に無い
 entry-shared-wallet.offers-shared-categories-of-selected-type		EntryModelSharedWalletTest/offersSharedCategoriesOfSelectedType	Androidのみ	共有の口座で収入に切り替えた時のカテゴリのテストが iOS に無い
 entry-shared-wallet.moves-tag-to-same-name-of-shared-category		EntryModelSharedWalletTest/movesTagToSameNameOfSharedCategory	Androidのみ	共有のカテゴリの同じ名前のタグへ移すテストが iOS に無い
@@ -103,17 +109,24 @@ entry-wallet.starts-with-wallet-of-latest-save-not-latest-date		EntryModelWallet
 entry-wallet.ignores-income-and-transfer-for-expense-wallet		EntryModelWalletTest/ignoresIncomeAndTransferForExpenseWallet	Androidのみ	支出の口座に収入と振替の記録を使わないテストが iOS に無い
 entry-wallet.starts-with-first-wallet-when-last-one-is-hidden		EntryModelWalletTest/startsWithFirstWalletWhenLastOneIsHidden	Androidのみ	前回の口座が非表示の時に先頭で始めるテストが iOS に無い
 entry-wallet.keeps-wallet-of-edited-entry		EntryModelWalletTest/keepsWalletOfEditedEntry	Androidのみ	編集中は種類を行き来しても口座を残すテストが iOS に無い
-entry-transfer.keeps-hidden-wallets-when-editing	EntryModelTransferTests/keepsHiddenWalletsWhenEditing		違い	編集中の記録の非表示の口座が選択肢に残らない（wallets は表示中だけ）
-entry-transfer.keeps-hidden-transfer-wallets-when-editing	EntryModelTransferTests/keepsHiddenTransferWalletsWhenEditing		違い	編集中の振替の非表示の振替先が選択肢に残らない
-entry-transfer.keeps-hidden-category-when-editing	EntryModelTransferTests/keepsHiddenCategoryWhenEditing		違い	編集中の記録の非表示のカテゴリが選択肢に残らず、category が null になる
+entry-editing.leaves-hidden-choices-out-of-new-entry		EntryModelEditingTest/leavesHiddenChoicesOutOfNewEntry	Androidのみ	新しい記録では非表示の口座とカテゴリを出さない。iOS にテストが無い
+entry-editing.keeps-bill-month-of-card-with-bill		EntryModelEditingTest/keepsBillMonthOfCardWithBill	Androidのみ	請求のあるカードでは請求月を残して保存する。iOS は請求を選ぶテストで確かめる
+entry-recent.applies-recent-tag-of-offered-category		EntryModelRecentTest/appliesRecentTagOfOfferedCategory	Androidのみ	最近の記録のタグを今のカテゴリから探して付ける。iOS にテストが無い
+entry-transfer.keeps-hidden-wallets-when-editing	EntryModelTransferTests/keepsHiddenWalletsWhenEditing	EntryModelEditingTest/keepsHiddenWalletsWhenEditing	対応	口座を読み直す reloadWallets は無く、読み込みの後で確かめる
+entry-transfer.keeps-hidden-transfer-wallets-when-editing	EntryModelTransferTests/keepsHiddenTransferWalletsWhenEditing	EntryModelEditingTest/keepsHiddenTransferWalletsWhenEditing	対応	口座を読み直す reloadWallets は無く、読み込みの後で確かめる
+entry-transfer.keeps-hidden-category-when-editing	EntryModelTransferTests/keepsHiddenCategoryWhenEditing	EntryModelEditingTest/keepsHiddenCategoryWhenEditing	対応	カテゴリを読み直す reloadCategories は無く、読み込みの後で確かめる
 entry-transfer.reselects-deleted-wallet-when-editing	EntryModelTransferTests/reselectsDeletedWalletWhenEditing		未移植	入力の画面で口座を読み直す reloadWallets が無く、開いた後に口座は変わらない
 entry-transfer.reselects-deleted-category-when-editing	EntryModelTransferTests/reselectsDeletedCategoryWhenEditing		未移植	入力の画面でカテゴリを読み直す reloadCategories が無い
-entry-transfer.restores-hidden-category-after-switching-type	EntryModelTransferTests/restoresHiddenCategoryAfterSwitchingType		違い	非表示のカテゴリが選択肢に無く、種類を戻すと先頭のカテゴリになる
+entry-transfer.restores-hidden-category-after-switching-type	EntryModelTransferTests/restoresHiddenCategoryAfterSwitchingType	EntryModelEditingTest/restoresHiddenCategoryAfterSwitchingType	対応	
+entry-transfer.fits-category-to-shared-wallet-when-editing	EntryModelTransferTests/fitsCategoryToSharedWalletWhenEditing	EntryModelEditingTest/fitsCategoryToSharedWalletWhenEditing	対応	
+entry-transfer.reports-missing-entry-when-loading	EntryModelTransferTests/reportsMissingEntryWhenLoading	EntryModelEditingTest/reportsMissingEntryWhenLoading	対応	
+entry-transfer.leaves-edited-transfer-out-of-recent-transfers	EntryModelTransferTests/leavesEditedTransferOutOfRecentTransfers	EntryModelEditingTest/leavesEditedTransferOutOfRecentTransfers	対応	
 entry-transfer.saves-fee-typed-on-keypad	EntryModelTransferTests/savesFeeTypedOnKeypad	EntryModelTransferTest/savesFeeTypedOnKeypad	対応	手数料の記録の口座は確かめていない
 entry-transfer.puts-used-fees-first	EntryModelTransferTests/putsUsedFeesFirst	EntryModelTransferTest/putsUsedFeesFirst	対応	先頭だけを確かめ、残りの並びは確かめていない
 entry-transfer.counts-fee-in-source-balance	EntryModelTransferTests/countsFeeInSourceBalance	EntryModelTransferTest/countsFeeInSourceBalance	対応	
 entry-transfer.opens-transfer-from-fee	EntryModelTransferTests/opensTransferFromFee	EntryModelTransferTest/opensTransferFromFee	対応	手数料を変えて保存する所と振替後の残高は確かめていない
 entry-transfer.drops-fee-when-recording-again	EntryModelTransferTests/dropsFeeWhenRecordingAgain		未移植	同じ内容で新しい記録にする recordAgain がモデルと画面に無い
+entry-transfer.caps-loan-payoff-at-largest-amount	EntryModelTransferTests/capsLoanPayoffAtLargestAmount	EntryModelTransferTest/capsLoanPayoffAtLargestAmount	対応	
 entry-transfer.starts-with-two-different-wallets	EntryModelTransferTests/startsWithTwoDifferentWallets	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	口座の見出し（振替元）は確かめていない
 entry-transfer.loaded-draft-switched-to-transfer-matches-fresh-transfer	EntryModelTransferTests/loadedDraftSwitchedToTransferMatchesFreshTransfer	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	種類を指定して開く形が無く、切り替えた後の値と未変更だけを確かめる
 entry-transfer.saves-swapped-transfer	EntryModelTransferTests/savesSwappedTransfer	EntryModelTransferTest/savesSwappedTransfer	対応	保存ボタンの文（振り替える）は Android に無く、確かめていない
@@ -194,9 +207,10 @@ assets.leaves-out-future-entries-from-balances	AssetsModelTests/leavesOutFutureE
 assets.lists-future-entries-as-plans	AssetsModelTests/listsFutureEntriesAsPlans		未移植	資産のモデルと画面に、先の日付の記録を予定として並べる欄が無い
 assets.lists-upcoming-card-bills	AssetsModelTests/listsUpcomingCardBills		未移植	資産のモデルと画面に、カードの請求の欄が無い
 assets.estimates-loan-payoff	AssetsModelTests/estimatesLoanPayoff		未移植	資産の行に、借入の完済の見込みが無い
+assets.counts-cards-in-total	AssetsModelTests/countsCardsInTotal	AssetsModelTest/countsCardsInTotal	対応	
 assets.shows-notice-when-list-fails		AssetsModelTest/showsNoticeWhenListFails	Androidのみ	iOS は共通の observe の失敗だけを確かめ、資産の文は確かめていない
 assets.shows-no-rows-before-list-arrives		AssetsModelTest/showsNoRowsBeforeListArrives	Androidのみ	一覧が届く前は行が空で合計が 0 であることは、iOS にテストが無い
-assets.separates-debts-from-assets		AssetsModelTest/separatesDebtsFromAssets	Androidのみ	資産と負債の分け方のテスト。onHand がカードを含まず iOS の total と違う
+assets.separates-debts-from-assets		AssetsModelTest/separatesDebtsFromAssets	Androidのみ	資産と負債の分け方のテスト。iOS は sections で分け、同じ形のテストが無い
 assets.counts-entries-of-today		AssetsModelTest/countsEntriesOfToday	Androidのみ	今日の記録は数え、明日の記録は数えない境目は、iOS にテストが無い
 assets.leaves-out-future-transfers-from-both-wallets		AssetsModelTest/leavesOutFutureTransfersFromBothWallets	Androidのみ	先の日付の振替を両方の口座から外すことは、iOS は口座ごとに確かめていない
 assets.leaves-out-future-card-usage-from-debts		AssetsModelTest/leavesOutFutureCardUsageFromDebts	Androidのみ	先の日付のカードの利用を負債から外すことは、iOS にテストが無い

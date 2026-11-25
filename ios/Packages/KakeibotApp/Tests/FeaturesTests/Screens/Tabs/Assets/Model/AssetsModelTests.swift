@@ -177,6 +177,32 @@ struct AssetsModelTests {
 }
 
 extension AssetsModelTests {
+    @Test
+    func countsCardsInTotal() async throws {
+        let setup = try await Setup()
+
+        let wallet = WalletDraft(
+            kind: .card,
+            name: "カード",
+            mark: .glyph(.card),
+            color: "#4A6FA5",
+            initialBalance: 0
+        )
+
+        let card = try await setup.database.save(wallet, at: Date())
+        try await setup.save(.income, 50000, on: "2026-10-01", from: setup.cash)
+        try await setup.save(.expense, 3000, on: "2026-10-05", from: card.id)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
+
+        await model.load()
+
+        #expect(model.output.holdings.onHand == 50000)
+        #expect(model.output.holdings.unpaid == 3000)
+        #expect(model.output.total == 47000)
+    }
+}
+
+extension AssetsModelTests {
     struct Setup {
         let database: AppDatabase
         let today: LocalDate

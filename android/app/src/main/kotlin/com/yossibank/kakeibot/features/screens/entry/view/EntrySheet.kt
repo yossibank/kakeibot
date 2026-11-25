@@ -53,6 +53,7 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
 import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
+import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -64,6 +65,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.close
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasRecent
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsVoice
@@ -130,7 +132,13 @@ fun EntrySheet(
         onDispose(voice::close)
     }
 
-    BackHandler(onBack = onClose)
+    fun close() {
+        if (model.close()) {
+            onClose()
+        }
+    }
+
+    BackHandler(onBack = ::close)
 
     BackHandler(enabled = voice.output.isActive, onBack = voice::cancel)
 
@@ -169,7 +177,7 @@ fun EntrySheet(
 
                 CircleIconButton(
                     icon = R.drawable.ic_close,
-                    onClick = onClose,
+                    onClick = ::close,
                     size = 36.dp,
                     iconSize = 20.dp,
                     tint = Palette.subtext,
@@ -285,6 +293,16 @@ fun EntrySheet(
                 }
             },
             onDismiss = { isConfirmingDelete = false },
+        )
+    }
+
+    if (model.state.isConfirmingDiscard) {
+        DiscardDialog(
+            onDiscard = {
+                model.state.keepEditing()
+                onClose()
+            },
+            onKeep = model.state::keepEditing,
         )
     }
 }

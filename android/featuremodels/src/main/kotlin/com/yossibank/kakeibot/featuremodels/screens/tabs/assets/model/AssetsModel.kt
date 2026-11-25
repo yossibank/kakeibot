@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.icon.Icon
+import com.yossibank.kakeibot.core.concepts.wallet.Holdings
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.concepts.wallet.isDebt
 import com.yossibank.kakeibot.core.concepts.wallet.role
@@ -75,11 +76,24 @@ class AssetsModel(
         val debts: List<Row>
             get() = rows.filter { it.kind.isDebt }
 
-        val onHand: Long
-            get() = rows.filter { it.kind.role == Wallet.Kind.Role.onHand }.sumOf { it.balance }
+        val holdings: Holdings
+            get() {
+                fun total(role: Wallet.Kind.Role): Long =
+                    rows.filter { it.kind.role == role }.sumOf { it.balance }
+
+                return Holdings(
+                    onHand = total(Wallet.Kind.Role.onHand),
+                    cards = total(Wallet.Kind.Role.card),
+                    investments = total(Wallet.Kind.Role.investment),
+                    loans = total(Wallet.Kind.Role.loan),
+                )
+            }
+
+        val total: Long
+            get() = holdings.available
 
         val netWorth: Long
-            get() = rows.sumOf { it.balance }
+            get() = holdings.netWorth
     }
 
     private class Dependencies(

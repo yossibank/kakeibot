@@ -25,6 +25,7 @@ val EntryModel.Output.recentEntries: List<Entry>
                 entry.type == state.form.type &&
                     entry.recurringId == null &&
                     entry.transferId == null &&
+                    entry.id != input.editingId &&
                     entry.categoryId in shown
             }.sortedByDescending { it.createdAt }
             .filter { entry ->
@@ -52,6 +53,7 @@ val EntryModel.Output.recentTransfers: List<Entry>
             .filter { entry ->
                 entry.type == Entry.Kind.transfer &&
                     entry.recurringId == null &&
+                    entry.id != input.editingId &&
                     entry.walletId in shown &&
                     entry.toWalletId in shown
             }.sortedByDescending { it.createdAt }

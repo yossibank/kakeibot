@@ -172,4 +172,75 @@ extension EntryModelTransferTests {
 
         #expect(model.state.category.id == setup.salary)
     }
+
+    @Test
+    func fitsCategoryToSharedWalletWhenEditing() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let own = options.expenseCategories[0]
+        try await setup.database.startSharing(setup.bank)
+
+        let draft = EntryDraft(
+            type: .expense,
+            amount: 800,
+            date: setup.date,
+            categoryId: own.id,
+            walletId: setup.bank
+        )
+
+        let entry = try await setup.database.saveEntry(draft, at: Date())
+        try await setup.database.setCategory(of: entry.id, to: own.id)
+        let model = EntryModel(
+            parts: .system(setup.database),
+            editing: entry.id,
+            date: setup.date
+        )
+
+        await model.load()
+
+        #expect(entry.categoryId != own.id)
+        #expect(model.state.payment.walletId == setup.bank)
+        #expect(model.state.category.id == entry.categoryId)
+        #expect(model.output.selectedCategory?.name == own.name)
+        #expect(model.output.selectedCategory?.walletId == setup.bank)
+        #expect(!model.output.isChanged)
+    }
+
+    @Test
+    func reportsMissingEntryWhenLoading() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(
+            parts: .system(setup.database),
+            editing: Entry.ID(),
+            date: setup.date
+        )
+
+        await model.load()
+        let change = await model.save()
+
+        #expect(model.state.errorNotice.message == "記録が見つかりませんでした")
+        #expect(model.output.isEditing)
+        #expect(model.state.payment.walletId == nil)
+        #expect(model.state.category.id == nil)
+        #expect(!model.output.isChanged)
+        #expect(change == nil)
+    }
+
+    @Test
+    func leavesEditedTransferOutOfRecentTransfers() async throws {
+        let setup = try await Setup()
+        try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)
+        try await setup.saveTransfer(1000, from: setup.bank, to: setup.cash, at: 2)
+        let entries = try setup.database.snapshot().entries
+        let edited = try #require(entries.first { $0.amount == 1000 })
+        let model = EntryModel(
+            parts: .system(setup.database),
+            editing: edited.id,
+            date: setup.date
+        )
+
+        await model.load()
+
+        #expect(model.output.recentTransfers.map(\.amount) == [3000])
+    }
 }
