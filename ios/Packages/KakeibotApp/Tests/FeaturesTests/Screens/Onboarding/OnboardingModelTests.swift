@@ -50,6 +50,20 @@ struct OnboardingModelTests {
     }
 
     @Test
+    func opensSetupItemOnPath() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = OnboardingModel(
+            parts: .system(setup.database),
+            today: setup.today,
+            newsVersion: WhatsNewRelease.latestVersion
+        )
+
+        model.state.open(.wallets)
+
+        #expect(model.state.path == [.wallets])
+    }
+
+    @Test
     func endsMinimalRouteAtBudget() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = OnboardingModel(

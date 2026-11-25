@@ -3,7 +3,7 @@ import FeatureModels
 import SwiftUI
 
 struct EntryDeletionBanner: View {
-    @State private var remaining = 1.0
+    @State private var layout = Layout()
 
     let change: EntryChange
     let seconds: Int
@@ -53,13 +53,17 @@ struct EntryDeletionBanner: View {
         .shadow(color: Palette.shadow.opacity(0.5), radius: 20, y: 10)
         .onAppear {
             withAnimation(.linear(duration: Double(seconds))) {
-                remaining = 0
+                layout.remaining = 0
             }
         }
     }
 }
 
 private extension EntryDeletionBanner {
+    struct Layout {
+        var remaining: Double = 1
+    }
+
     var subject: some View {
         Text(change.subject)
             .lineLimit(1)
@@ -102,7 +106,7 @@ private extension EntryDeletionBanner {
         Capsule()
             .fill(Palette.rose.opacity(0.7))
             .frame(height: 2)
-            .scaleEffect(x: remaining, anchor: .leading)
+            .scaleEffect(x: layout.remaining, anchor: .leading)
             .padding(.horizontal, 28)
             .padding(.bottom, 4)
     }

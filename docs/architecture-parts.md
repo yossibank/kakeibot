@@ -58,6 +58,7 @@
 | `SettingsBoardScreen` | `SettingsBoardPage` の中で使う、設定の一覧の外枠。説明カード・タイルの並び・追加ボタンを組む | `Features/Shared/SettingsParts/Board/` |
 | `PageSlideReader` | 頁めくりの入れ物。動きの値を中に持って中身に `PageSlideProxy` を渡し、画面は値を持たない | `DesignSystem/Components/Navigation/` |
 | `PageSlideProxy` | 頁めくりの口。`pageSlide` と `onPageSwipe` に渡し、ボタンからは `run(forward:)` で頁を送る | `DesignSystem/Components/Navigation/` |
+| `ResizingPager` | 横に送る頁の入れ物。送っている途中も、隣の頁との間で高さをなめらかに変える | `DesignSystem/Components/Navigation/` |
 
 ## 🗄️ 書き込みの共通の関数
 

@@ -2,8 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct WhatsNewCard: View {
-    @State private var shownSteps: Int
-    @State private var stepsWidth: CGFloat = 0
+    @State private var layout: Layout
 
     let feature: WhatsNewRelease.Feature
     let onTry: (WhatsNewRelease.Action) -> Void
@@ -13,7 +12,9 @@ struct WhatsNewCard: View {
         revealsSteps: Bool,
         onTry: @escaping (WhatsNewRelease.Action) -> Void
     ) {
-        _shownSteps = State(initialValue: revealsSteps ? 0 : feature.steps.count)
+        let shownSteps = revealsSteps ? 0 : feature.steps.count
+
+        _layout = State(initialValue: Layout(shownSteps: Double(shownSteps)))
 
         self.feature = feature
         self.onTry = onTry
@@ -35,7 +36,7 @@ struct WhatsNewCard: View {
             }
 
             Group {
-                if stepsWidth >= wideStepsWidth {
+                if layout.stepsWidth >= wideStepsWidth {
                     VStack(spacing: 8) {
                         HStack(spacing: Self.gap) {
                             ForEach(indexedSteps, id: \.offset) { index, step in
@@ -91,7 +92,7 @@ struct WhatsNewCard: View {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { width in
-                stepsWidth = width
+                layout.stepsWidth = width
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -145,6 +146,11 @@ struct WhatsNewCard: View {
 }
 
 private extension WhatsNewCard {
+    struct Layout {
+        var shownSteps: Double
+        var stepsWidth: CGFloat = 0
+    }
+
     struct StepReveal: ViewModifier {
         let isShown: Bool
 
@@ -175,7 +181,7 @@ private extension WhatsNewCard {
     }
 
     func isShown(_ index: Int) -> Bool {
-        index < shownSteps
+        Double(index) < layout.shownSteps
     }
 }
 
@@ -208,6 +214,8 @@ private extension WhatsNewCard {
     }
 
     func revealSteps() async {
+        let shownSteps = Int(layout.shownSteps)
+
         guard shownSteps < feature.steps.count else {
             return
         }
@@ -220,7 +228,7 @@ private extension WhatsNewCard {
             }
 
             withAnimation(.spring(duration: 0.45, bounce: 0.25)) {
-                shownSteps = count
+                layout.shownSteps = Double(count)
             }
         }
     }

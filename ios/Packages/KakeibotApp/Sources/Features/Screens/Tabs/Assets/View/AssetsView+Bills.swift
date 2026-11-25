@@ -19,9 +19,10 @@ extension AssetsView {
                     .padding(.bottom, 12)
                 }
 
-                BillPager(
+                ResizingPager(
                     current: Bindable(model.state).billPage,
                     pages: model.output.billPages,
+                    id: \.month,
                     inset: Self.billInset
                 ) { page in
                     billList(page)

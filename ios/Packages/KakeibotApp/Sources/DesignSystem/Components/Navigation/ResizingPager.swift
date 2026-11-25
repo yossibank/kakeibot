@@ -1,22 +1,36 @@
-import Core
-import FeatureModels
 import SwiftUI
 
-struct BillPager<Page: View>: View {
+public struct ResizingPager<Item, ID: Hashable, Page: View>: View {
     @Binding var current: Int
 
     @State private var position: Int?
     @State private var heights: [Int: CGFloat] = [:]
     @State private var progress: CGFloat = 0
 
-    let pages: [BillPage]
+    let pages: [Item]
+    let id: KeyPath<Item, ID>
     let inset: CGFloat
-    let page: (BillPage) -> Page
+    let page: (Item) -> Page
 
-    var body: some View {
+    public init(
+        current: Binding<Int>,
+        pages: [Item],
+        id: KeyPath<Item, ID>,
+        inset: CGFloat,
+        @ViewBuilder page: @escaping (Item) -> Page
+    ) {
+        _current = current
+
+        self.pages = pages
+        self.id = id
+        self.inset = inset
+        self.page = page
+    }
+
+    public var body: some View {
         ScrollView(.horizontal) {
             HStack(alignment: .top, spacing: 0) {
-                ForEach(Array(pages.enumerated()), id: \.element.month) { index, item in
+                ForEach(Array(pages.enumerated()), id: itemID) { index, item in
                     page(item)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal, inset)
@@ -62,7 +76,11 @@ struct BillPager<Page: View>: View {
     }
 }
 
-private extension BillPager {
+private extension ResizingPager {
+    var itemID: KeyPath<(offset: Int, element: Item), ID> {
+        (\(offset: Int, element: Item).element).appending(path: id)
+    }
+
     var height: CGFloat? {
         guard !heights.isEmpty else {
             return nil

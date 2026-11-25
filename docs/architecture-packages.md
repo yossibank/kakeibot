@@ -229,7 +229,7 @@ KakeibotApp/
 | `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、削除の取り消し（`DeletionUndo`）。保存の失敗が空き容量不足かの見分けも置く |
 | `FeatureModels/Shared/Notification/` | 通知の許可の窓口 |
 | `FeatureModels/Shared/Period/` | 期間の範囲と月の始まりの文言 |
-| `FeatureModels/Shared/Pro/` | Pro を買ったかと、購入の窓口。StoreKit の中身は AppFeature が渡す |
+| `FeatureModels/Shared/Pro/` | Pro を買ったか・購入の窓口・案内のモデル。StoreKit の中身は AppFeature が渡す |
 | `FeatureModels/Shared/SettingsParts/` | 設定の画面で使うモデル（Board・Hint・Icon・Input）。並べ替え・編集・アイコンの選びと、説明カードを閉じたかを受け持つ |
 | `FeatureModels/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `FeatureModels/Shared/Stamp/` | スタンプを押した日の数え上げ |
@@ -240,8 +240,8 @@ KakeibotApp/
 | `Features/Screens/Pro/` | Pro の画面 |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口 |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
-| `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート。`Model/` に版、`View/` にシートとカードとページ送り、`Parts/` に使い方のコマ |
-| `Features/Shared/Bill/` | これからの引き落としの行・月のページ送りとタブ・見込みと確定の印と、その言葉 |
+| `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート。`Model/` に版とモデル、`View/` にシートとカードとページ送り、`Parts/` に使い方のコマ |
+| `Features/Shared/Bill/` | これからの引き落としの行・月のタブ・見込みと確定の印と、その言葉 |
 | `Features/Shared/DateChoice/` | 月の始まりの日を選ぶ部品 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
 | `Features/Shared/Model/` | モデルが `state` に置いた結果の変化を、画面が受ける modifier |

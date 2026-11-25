@@ -564,6 +564,7 @@ category-list.*	CategoryListModelTests/*		未移植	カテゴリの一覧の画�
 home-section-list.*	HomeSectionListModelTests/*		未移植	ホームの並びを変える画面が無い
 launch-screen.*	LaunchScreenModelTests/*		未移植	最初に開く画面を選ぶ画面が無い
 onboarding.*	OnboardingModelTests/*		未移植	はじめての案内の画面が無い
+pro-offer.*	ProOfferModelTests/*		未移植	Pro の案内のカードと、Pro を買う画面が無い
 pro-purchase.*	ProPurchaseModelTests/*		未移植	Pro を買う画面が無い
 reminder.*	ReminderModelTests/*		未移植	記録の通知を決める画面が無い
 reward-rule-edit.*	RewardRuleEditModelTests/*		未移植	ポイントの規則を編集する画面が無い
@@ -576,4 +577,5 @@ theme-list.*	ThemeListModelTests/*		未移植	テーマの一覧の画面が無�
 theme-style.*	ThemeStyleModelTests/*		未移植	明暗と見た目を選ぶ画面が無い
 wallet-edit.*	WalletEditModelTests/*		未移植	口座を編集する画面が無い
 wallet-list.*	WalletListModelTests/*		未移植	口座の一覧の画面が無い
+whats-new.*	WhatsNewModelTests/*		未移植	お知らせの画面が無い
 widget-guide.*	WidgetGuideModelTests/*		未移植	ウィジェットの置き方の画面が無い

@@ -5,7 +5,6 @@ import SwiftUI
 
 public struct OnboardingView: View {
     @State var model: OnboardingModel
-    @State var path: [SetupItem] = []
 
     @State private var appIcon = AppIconListModel()
 
@@ -32,7 +31,7 @@ public struct OnboardingView: View {
     }
 
     public var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack(path: Bindable(model.state).path) {
             PageSlideReader { slide in
                 content(slide)
             }
