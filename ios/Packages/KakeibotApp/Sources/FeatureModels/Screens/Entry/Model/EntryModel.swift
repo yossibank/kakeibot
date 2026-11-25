@@ -34,6 +34,9 @@ public extension EntryModel {
     func start() async {
         let isFirst = !output.isLoaded
 
+        state.results.deletion = nil
+        state.results.hiddenCategory = nil
+
         if isFirst {
             await load()
         }

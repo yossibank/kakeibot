@@ -21,6 +21,21 @@ extension EntryModelTests {
     }
 
     @Test
+    func dropsUndoNoticesWhenStartingAgain() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
+        await model.start()
+        let category = try #require(model.output.categories.first)
+        model.state.results.deletion = Deletion(merging: [])
+        model.state.results.hiddenCategory = .init(id: category.id, wasSelected: false)
+
+        await model.start()
+
+        #expect(model.state.results.deletion == nil)
+        #expect(model.state.results.hiddenCategory == nil)
+    }
+
+    @Test
     func placesSavedChangeAndBeginsClosing() async throws {
         let model = try await Self.newModel()
         model.state.press(.digit(5))

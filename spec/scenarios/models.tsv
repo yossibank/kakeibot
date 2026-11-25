@@ -24,6 +24,7 @@ entry.shows-month-total-of-type-without-category	EntryModelTests/showsMonthTotal
 entry.replaces-edited-amount-in-month-total	EntryModelTests/replacesEditedAmountInMonthTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.removes-entry-moved-out-of-month-from-total	EntryModelTests/removesEntryMovedOutOfMonthFromTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		未確認	Android は別のブランチで合わせる
+entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		未確認	Android は別のブランチで合わせる
 entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing		未確認	Android は別のブランチで合わせる
 entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails		未確認	Android は別のブランチで合わせる
 entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving		未確認	Android は別のブランチで合わせる
