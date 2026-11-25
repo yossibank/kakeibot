@@ -97,7 +97,6 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Sync/SyncView.swift: 
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: panel。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: tagCategory。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleFrame.swift: View の @State に置けるのは、モデルと layout だけにする: openedStyle。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleTextView.swift: View の @State に置けるのは、モデルと layout だけにする: fontOffer。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: View の @State に置けるのは、モデルと layout だけにする: deletion。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: View の @State に置けるのは、モデルと layout だけにする: editing。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: View の @State に置けるのは、モデルと layout だけにする: menuHeight。見た目の値は、入れ子の struct Layout にまとめる

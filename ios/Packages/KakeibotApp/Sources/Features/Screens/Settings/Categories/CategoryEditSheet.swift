@@ -83,12 +83,13 @@ public struct CategoryEditSheet: View {
                 ignoresKeyboard = false
             }
         }
-        .task {
-            await model.load()
-
+        .onOutcome(model.state.ready) { _ in
             if startsAddingTag {
                 addTag()
             }
+        }
+        .task {
+            await model.start()
         }
         .presentationSizing(.tallForm)
     }

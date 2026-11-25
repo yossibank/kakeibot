@@ -89,6 +89,12 @@ public extension CategoryEditModel {
         }
     }
 
+    func start() async {
+        await load()
+
+        state.ready.send(())
+    }
+
     func load() async {
         guard let editingId = input.editingId else {
             return

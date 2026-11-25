@@ -254,6 +254,26 @@ struct CategoryEditModelTests {
         #expect(after.map(\.name) == ["朝ごはん"])
         #expect(after.first?.categoryId == category.id)
     }
+
+    @Test
+    func reportsReadyAfterLoading() async throws {
+        let database = try Self.database()
+        let category = try #require(await database.categoryList().categories.first)
+        let adding = CategoryEditModel(parts: .system(database), kind: .expense)
+        let editing = CategoryEditModel(
+            parts: .system(database),
+            kind: .expense,
+            editing: category.id
+        )
+        let start = editing.state.ready
+
+        await adding.start()
+        await editing.start()
+
+        #expect(adding.state.ready != start)
+        #expect(editing.state.ready != start)
+        #expect(editing.state.name == category.name)
+    }
 }
 
 private extension CategoryEditModelTests {
