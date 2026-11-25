@@ -39,6 +39,8 @@ public extension BackupModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+        public var isExporting = false
+        public var isConfirmingRestore = false
 
         public internal(set) var file: BackupFile?
         public internal(set) var pending: ExportV1?
@@ -166,10 +168,13 @@ public extension BackupModel {
             let name = Self.fileName(of: kind, at: date)
 
             state.file = BackupFile(kind: kind, data: data, name: name)
+            state.isExporting = true
 
             return true
         } catch {
             state.errorNotice.show(Self.exportFailedMessage)
+            state.isExporting = false
+
             return false
         }
     }
@@ -200,6 +205,8 @@ public extension BackupModel {
 
         guard case let .success(url) = result else {
             state.errorNotice.show(Self.readFailedMessage)
+            state.isConfirmingRestore = false
+
             return false
         }
 
@@ -318,9 +325,13 @@ private extension BackupModel {
     func accept(_ export: Result<ExportV1, any Error>) -> Bool {
         do {
             state.pending = try export.get()
+            state.isConfirmingRestore = true
+
             return true
         } catch {
             state.errorNotice.show(Self.readMessage(for: error))
+            state.isConfirmingRestore = false
+
             return false
         }
     }
