@@ -124,6 +124,7 @@ public extension HomeModel {
         }
     }
 
+    @discardableResult
     func record(_ template: EntryTemplate) async -> EntryChange? {
         do {
             let recordable = try await dependencies.database.entryDraft(
@@ -140,12 +141,16 @@ public extension HomeModel {
                 at: dependencies.clock.now
             )
 
-            return EntryChange(
+            let change = EntryChange(
                 kind: .recorded,
                 entry: saved.entry,
                 label: template.name,
                 clearedNoSpendDays: saved.clearedNoSpendDays
             )
+
+            state.outcome.send(change)
+
+            return change
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
             return nil

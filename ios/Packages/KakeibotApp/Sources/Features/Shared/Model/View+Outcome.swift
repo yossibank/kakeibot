@@ -1,7 +1,7 @@
 import FeatureModels
 import SwiftUI
 
-extension View {
+public extension View {
     func onOutcome<Value>(
         _ outcome: ScreenOutcome<Value>,
         perform action: @escaping (Value) -> Void

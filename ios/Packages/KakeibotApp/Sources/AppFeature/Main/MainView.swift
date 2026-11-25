@@ -18,6 +18,7 @@ struct MainView: View {
     @State var appIcon = AppIconListModel()
     @State var draft: EntryModel
     @State var notice: EntryNoticeModel
+    @State var appReview: AppReviewModel
     @State var undo: DeletionUndo
     @State var launchScreen: LaunchScreen?
     @State var orderMenuAnchor: CGRect?
@@ -94,6 +95,8 @@ struct MainView: View {
 
         _notice = State(initialValue: EntryNoticeModel(parts: parts))
 
+        _appReview = State(initialValue: AppReviewModel(database: database, clock: clock))
+
         _undo = State(initialValue: DeletionUndo(parts: parts))
 
         self.database = database
@@ -153,6 +156,18 @@ struct MainView: View {
             } onLoad: {
                 onLoad()
             }
+
+            MainOutcomeSignal {
+                home.state.outcome
+            } onOutcome: { change in
+                show(change)
+            }
+
+            MainOutcomeSignal {
+                appReview.state.outcome
+            } onOutcome: {
+                requestReview()
+            }
         }
         .sheet(item: $sheet, onDismiss: prepareDraft) { sheet in
             sheetContent(for: sheet)
@@ -202,9 +217,7 @@ struct MainView: View {
             }
         }
         .onChange(of: sheet) { _, sheet in
-            Task {
-                await markOpened(sheet)
-            }
+            markOpened(sheet)
         }
         .onChange(of: today) { _, today in
             home.state.today = today

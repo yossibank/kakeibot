@@ -200,6 +200,7 @@ home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUse
 home.shows-templates-of-selected-type-on-home	HomeModelTests/showsTemplatesOfSelectedTypeOnHome		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.records-from-home-without-archived-tag	HomeModelTests/recordsFromHomeWithoutArchivedTag		未移植	ホームのモデルに、テンプレートから記録する関数が無い
 home.records-from-home-and-undoes	HomeModelTests/recordsFromHomeAndUndoes		未移植	ホームのモデルに、テンプレートから記録する関数が無い
+home.places-recorded-change-in-outcome	HomeModelTests/placesRecordedChangeInOutcome		未移植	ホームのモデルに、テンプレートから記録する関数が無い
 home.shows-no-records-only-after-list-arrives	HomeModelTests/showsNoRecordsOnlyAfterListArrives	HomeModelTest/showsNoRecordsOnlyAfterListArrives	対応	
 home.sums-month-today-and-yesterday	HomeModelTests/sumsMonthTodayAndYesterday	HomeModelTest/sumsMonthTodayAndYesterday	対応	
 home.sums-upcoming-recurring-expense	HomeModelTests/sumsUpcomingRecurringExpense		未確認	値は input.overview（MonthOverview）にあるが、画面に固定費の欄が無くテストも無い

@@ -12,6 +12,8 @@ public extension HomeModel {
 
         public var errorNotice = ErrorNotice()
 
+        public internal(set) var outcome = ScreenOutcome<EntryChange>()
+
         init(today: LocalDate) {
             self.today = today
         }

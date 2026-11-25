@@ -86,12 +86,14 @@ extension MainView {
         sheet = .transfer
     }
 
-    func markOpened(_ sheet: Sheet?) async {
+    func markOpened(_ sheet: Sheet?) {
         guard sheet == .new else {
             return
         }
 
-        await setup.markEntryOpened()
+        setup.perform {
+            await $0.markEntryOpened()
+        }
     }
 
     func open(_ route: PlannedNotification.Route) {
@@ -173,25 +175,16 @@ extension MainView {
 
         sheet = nil
 
-        Task {
-            if let change = await home.record(template) {
-                show(change)
-            }
+        home.perform {
+            await $0.record(template)
         }
     }
 
     func show(_ change: EntryChange) {
-        let request = AppReviewRequest(database: database)
-
         notice.show(change)
 
-        Task {
-            guard await request.shouldAsk(after: change, at: clock.now) else {
-                return
-            }
-
-            try? await Task.sleep(for: Self.sheetCloseDuration)
-            requestReview()
+        appReview.perform {
+            await $0.ask(after: change)
         }
     }
 
@@ -208,9 +201,11 @@ extension MainView {
     }
 }
 
-private extension MainView {
+extension MainView {
     static let sheetCloseDuration: Duration = .milliseconds(600)
+}
 
+private extension MainView {
     var areTabsLoaded: Bool {
         let isRecordsLoaded = records.input.list != nil || records.state.errorNotice.message != nil
         let isReviewLoaded = review.input.list != nil || review.state.errorNotice.message != nil
