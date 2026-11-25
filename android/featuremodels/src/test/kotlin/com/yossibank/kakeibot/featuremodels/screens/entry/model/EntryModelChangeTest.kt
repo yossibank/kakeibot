@@ -5,6 +5,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -56,6 +57,42 @@ class EntryModelChangeTest {
 
         assertFalse(loaded)
         assertTrue(model.output.isChanged)
+    }
+
+    @Test
+    fun closesUnchangedEntryWithoutAsking() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+
+        val closes = model.close()
+
+        assertTrue(closes)
+        assertFalse(model.state.isConfirmingDiscard)
+    }
+
+    @Test
+    fun asksBeforeClosingChangedEntry() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        model.press(5)
+
+        val closes = model.close()
+        val asked = model.state.isConfirmingDiscard
+        model.state.keepEditing()
+
+        assertFalse(closes)
+        assertTrue(asked)
+        assertFalse(model.state.isConfirmingDiscard)
+        assertEquals(5, model.output.amount)
+    }
+
+    @Test
+    fun closesWithoutAskingAfterStartingNext() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        model.press(5)
+        model.save()
+
+        model.startNext()
+
+        assertTrue(model.close())
     }
 
     @Test

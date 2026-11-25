@@ -77,6 +77,17 @@ class EntryModel(
         var voiceFilled: VoiceFilled? by mutableStateOf(null)
             private set
 
+        var isConfirmingDiscard: Boolean by mutableStateOf(false)
+            private set
+
+        fun askDiscard() {
+            isConfirmingDiscard = true
+        }
+
+        fun keepEditing() {
+            isConfirmingDiscard = false
+        }
+
         fun update(change: EntryForm.() -> EntryForm) {
             form = form.change()
         }

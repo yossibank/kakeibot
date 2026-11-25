@@ -92,6 +92,9 @@ entry.does-not-delete-new-entry		EntryModelTest/doesNotDeleteNewEntry	Androidの
 entry-change.counts-type-switch-on-edited-entry		EntryModelChangeTest/countsTypeSwitchOnEditedEntry	Androidのみ	編集中は種類の切り替えを変更に数える、というテストが iOS に無い
 entry-change.stays-unchanged-before-loading		EntryModelChangeTest/staysUnchangedBeforeLoading	Androidのみ	読み込む前は変更なしのまま、というテストが iOS に無い
 entry-change.ignores-applied-template-id-and-remembered-categories		EntryModelChangeTest/ignoresAppliedTemplateIdAndRememberedCategories	Androidのみ	種類ごとに覚えたカテゴリを変更に数えない、というテストが iOS に無い
+entry-change.closes-unchanged-entry-without-asking		EntryModelChangeTest/closesUnchangedEntryWithoutAsking	Androidのみ	変更が無ければ確かめずに閉じる。iOS は画面の EntrySheet が決める
+entry-change.asks-before-closing-changed-entry		EntryModelChangeTest/asksBeforeClosingChangedEntry	Androidのみ	変更があれば閉じる前に確かめる。iOS は画面の EntrySheet が決める
+entry-change.closes-without-asking-after-starting-next		EntryModelChangeTest/closesWithoutAskingAfterStartingNext	Androidのみ	続けて記録の後は確かめずに閉じる。iOS にテストが無い
 entry-item.drops-items-from-transfer		EntryModelItemTest/dropsItemsFromTransfer	Androidのみ	振替で保存すると品目を落とす、というテストが iOS に無い
 entry-shared-wallet.offers-shared-categories-of-selected-type		EntryModelSharedWalletTest/offersSharedCategoriesOfSelectedType	Androidのみ	共有の口座で収入に切り替えた時のカテゴリのテストが iOS に無い
 entry-shared-wallet.moves-tag-to-same-name-of-shared-category		EntryModelSharedWalletTest/movesTagToSameNameOfSharedCategory	Androidのみ	共有のカテゴリの同じ名前のタグへ移すテストが iOS に無い

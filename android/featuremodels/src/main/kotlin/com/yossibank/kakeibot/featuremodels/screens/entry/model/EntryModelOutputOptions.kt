@@ -26,7 +26,7 @@ val EntryModel.Output.tags: List<EntryTag>
 val EntryModel.Output.categories: List<EntryCategory>
     get() = categories(of = state.form.type, walletId = state.form.walletId)
 
-internal val EntryModel.Output.isChanged: Boolean
+val EntryModel.Output.isChanged: Boolean
     get() = input.baseline?.let { it != snapshot } ?: false
 
 val EntryModel.Output.wallets: List<Wallet>
