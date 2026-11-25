@@ -29,7 +29,6 @@ fun EntryModel.apply(template: EntryTemplate) {
     template.amount?.let(state::setAmount)
 
     state.focus(EntryModel.Field.Amount)
-    state.task.clear()
 }
 
 fun EntryModel.applyRecent(entry: Entry) {
@@ -52,7 +51,6 @@ fun EntryModel.applyRecent(entry: Entry) {
 
     state.setAmount(entry.amount)
     state.focus(EntryModel.Field.Amount)
-    state.task.clear()
 }
 
 fun EntryModel.applyTransfer(entry: Entry) {
@@ -67,7 +65,6 @@ fun EntryModel.applyTransfer(entry: Entry) {
     state.setAmount(entry.amount)
     state.setFee(output.fee(of = entry))
     state.focus(EntryModel.Field.Amount)
-    state.task.clear()
 }
 
 fun EntryModel.Output.newTemplateDraft(): EntryTemplateDraft = EntryTemplateDraft(

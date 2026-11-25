@@ -101,8 +101,6 @@ class EntryModel(
         fun select(category: EntryCategory) {
             form = form.withCategory(category.id)
             field = Field.Amount
-
-            task.clear()
         }
 
         fun toggleTag(id: Identifier<EntryTag>) {
@@ -112,8 +110,6 @@ class EntryModel(
         fun selectDestination(wallet: Wallet) {
             form = form.copy(toWalletId = wallet.id)
             field = Field.Transfer
-
-            task.clear()
         }
 
         fun swapWallets() {
@@ -122,8 +118,6 @@ class EntryModel(
                 toWalletId = form.walletId,
                 billMonth = null,
             )
-
-            task.clear()
         }
 
         fun select(date: LocalDate) {
@@ -137,8 +131,6 @@ class EntryModel(
             } else {
                 calculator = calculator.press(key)
             }
-
-            task.clear()
         }
 
         fun setAmount(amount: Int) {
@@ -274,7 +266,6 @@ class EntryModel(
         }
 
         state.focus(output.startField)
-        state.task.clear()
 
         if (isUntouched) {
             input.baseline = output.snapshot

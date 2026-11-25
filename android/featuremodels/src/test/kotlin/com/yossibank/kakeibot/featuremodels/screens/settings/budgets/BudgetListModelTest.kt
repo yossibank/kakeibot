@@ -265,6 +265,21 @@ class BudgetListModelTest {
         assertNull(model.input.overview)
     }
 
+    @Test
+    fun keepsNoticeWhenEditingStarts() = modelTest(today = "2026-10-12") { setup ->
+        val model = BudgetListModel(
+            database = setup.database,
+            entryList = failingEntryList,
+            today = setup.today,
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
+        model.startEditing(Target.Total)
+
+        assertEquals("予算を読めませんでした", model.state.task.message)
+    }
+
     private fun BudgetListModel.press(vararg digits: Int) {
         for (digit in digits) {
             state.press(AmountCalculator.Key.Digit(digit))

@@ -93,8 +93,6 @@ class BudgetListModel(
         ) {
             calculator = AmountCalculator(amount = amount)
             editing = target
-
-            task.clear()
         }
 
         fun cancelEditing() {

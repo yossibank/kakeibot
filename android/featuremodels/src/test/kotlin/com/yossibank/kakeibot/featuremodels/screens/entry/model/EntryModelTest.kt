@@ -172,10 +172,6 @@ class EntryModelTest {
 
         assertFalse(saved)
         assertEquals("金額を入れてください", model.state.task.message)
-
-        model.press(1)
-
-        assertEquals("", model.state.task.message)
     }
 
     @Test

@@ -47,6 +47,16 @@ class EntryModelFailureTest {
     }
 
     @Test
+    fun keepsNoticeWhenInputChanges() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        model.save()
+
+        model.press(1)
+
+        assertEquals("金額を入れてください", model.state.task.message)
+    }
+
+    @Test
     fun tellsWhenStorageIsFull() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
         model.press(5)
