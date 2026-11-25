@@ -101,7 +101,10 @@ extension ScreenFlowTests {
         editor.state.schedule.day = 10
         editor.state.schedule.startDate = start
         let isSaved = await editor.save()
-        await tabs.wait { $0.amounts.allSatisfy { $0 == [78000, 78000] } }
+        await tabs.wait {
+            $0.amounts.allSatisfy { $0 == [78000, 78000] }
+                && $0.home.output.periodRecurrings.map(\.status) == [.done]
+        }
 
         #expect(isSaved)
         #expect(tabs.home.output.periodRecurrings.map(\.status) == [.done])
