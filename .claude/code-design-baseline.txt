@@ -78,24 +78,7 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: orderButtonFrame。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: pendingDay。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: shelfWidth。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsMarkButton.swift: View の @State に置けるのは、モデルと layout だけにする: frame。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsMarkMenu.swift: View の @State に置けるのは、モデルと layout だけにする: panelHeight。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsSearchHistory.swift: View の @State に置けるのは、モデルと layout だけにする: clearedWords。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Sheet/RecordsFilterSheet.swift: View の @State に置けるのは、モデルと layout だけにする: tab。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Sheet/RecordsRewardSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isAddingRule。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Sheet/RecordsStampSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isAddingStamp。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: batchTarget。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: isCalendarWide。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: isFiltering。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: isMovingForward。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: markMenu。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: openAdjustment。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: openItemIds。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: rewardTarget。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: selection。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: slide。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: stampCount。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: stampTarget。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: View の @State に置けるのは、モデルと layout だけにする: analysisShare。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: View の @State に置けるのは、モデルと layout だけにする: openShare。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: View の @State に置けるのは、モデルと layout だけにする: openStamp。意味のある状態は、モデルの state に移す

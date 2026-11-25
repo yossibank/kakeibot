@@ -16,6 +16,7 @@ public extension RecordsModel {
         public var searchText = ""
         public var filter = EntryFilter()
         public var outcome = ScreenOutcome<Deletion>()
+        public var screen = Screen()
 
         public private(set) var month: YearMonth
         public private(set) var pendingDeleteIDs: [Entry.ID] = []

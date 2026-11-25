@@ -69,19 +69,15 @@ struct SnapshotTests {
         let secondDayIds = selectedDays.dropFirst().first?.entries.prefix(1).map(\.id) ?? []
         let selection = Set(firstDayIds + secondDayIds)
 
+        model.state.select(selection)
+
         for variant in Self.variants {
-            let view = RecordsView(
-                model: model,
-                selection: selection,
-                onOpenEntry: { _ in },
-                onAddEntry: { _ in },
-                onOpenRecurring: { _ in },
-                onChangeEntries: { _, _ in },
-                onDeleteEntries: { _ in }
-            )
+            let view = Self.recordsView(model)
 
             try Self.write(view, variant: variant, title: "記録 › 選んでいる時", to: "records-selecting")
         }
+
+        model.state.finishSelecting()
 
         let deletions = Self.deletions(in: model)
 

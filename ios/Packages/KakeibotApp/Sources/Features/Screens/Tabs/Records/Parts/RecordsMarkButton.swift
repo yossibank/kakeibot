@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RecordsMarkButton<Label: View>: View {
-    @State private var frame: CGRect = .zero
+    @State private var layout = Layout()
 
     let action: (CGRect) -> Void
     let label: Label
@@ -16,7 +16,7 @@ struct RecordsMarkButton<Label: View>: View {
 
     var body: some View {
         Button {
-            action(frame)
+            action(layout.frame)
         } label: {
             label
         }
@@ -24,7 +24,13 @@ struct RecordsMarkButton<Label: View>: View {
         .onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .global)
         } action: { frame in
-            self.frame = frame
+            layout.frame = frame
         }
+    }
+}
+
+private extension RecordsMarkButton {
+    struct Layout {
+        var frame: CGRect = .zero
     }
 }

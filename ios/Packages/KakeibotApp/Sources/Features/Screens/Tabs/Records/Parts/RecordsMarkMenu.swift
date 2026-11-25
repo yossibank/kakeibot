@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsMarkMenu: View {
-    @State private var panelHeight: CGFloat = 0
+    @State private var layout = Layout()
 
     let anchor: CGRect
     let onStamp: () -> Void
@@ -30,6 +30,10 @@ struct RecordsMarkMenu: View {
 }
 
 private extension RecordsMarkMenu {
+    struct Layout {
+        var panelHeight: CGFloat = 0
+    }
+
     static let width: CGFloat = 248
     static let inset: CGFloat = 16
     static let gap: CGFloat = 6
@@ -62,7 +66,7 @@ private extension RecordsMarkMenu {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.height
         } action: { height in
-            panelHeight = height
+            layout.panelHeight = height
         }
     }
 
@@ -83,9 +87,9 @@ private extension RecordsMarkMenu {
         in height: CGFloat
     ) -> CGFloat {
         let below = anchor.maxY + Self.gap
-        let above = anchor.minY - Self.gap - panelHeight
+        let above = anchor.minY - Self.gap - layout.panelHeight
 
-        guard below + panelHeight > height, above >= 0 else {
+        guard below + layout.panelHeight > height, above >= 0 else {
             return below
         }
 

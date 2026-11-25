@@ -8,7 +8,7 @@ struct RecordsBatchSheet: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let model: RecordsModel
-    let target: Target
+    let target: RecordsModel.BatchTarget
     let count: Int
     let onChoose: (EntryBatchChange) -> Void
 
@@ -40,17 +40,6 @@ struct RecordsBatchSheet: View {
                 }
                 .sharesTextScale(id: names)
             }
-        }
-    }
-}
-
-extension RecordsBatchSheet {
-    enum Target: Hashable, Identifiable {
-        case category(Entry.Kind)
-        case wallet
-
-        var id: Self {
-            self
         }
     }
 }

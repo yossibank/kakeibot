@@ -300,6 +300,11 @@ records.remembers-searched-words	RecordsModelTests/remembersSearchedWords		未�
 records.restores-cleared-searches	RecordsModelTests/restoresClearedSearches		未移植	検索の履歴を消す・戻す機能が無い
 records.counts-search-results-hidden-by-filter	RecordsModelTests/countsSearchResultsHiddenByFilter		未移植	検索と絞り込みが無く、隠れた件数の出力も無い
 records.counts-shown-entries	RecordsModelTests/countsShownEntries		未移植	表示中の件数（shownEntryCount）と、検索・絞り込みが無い
+records.presents-one-thing-at-a-time	RecordsModelTests/presentsOneThingAtATime		未確認	Android は別のブランチで合わせる
+records.starts-each-sheet-from-its-first-look	RecordsModelTests/startsEachSheetFromItsFirstLook		未確認	Android は別のブランチで合わせる
+records.keeps-selection-until-finished	RecordsModelTests/keepsSelectionUntilFinished		未確認	Android は別のブランチで合わせる
+records.opens-and-closes-items-of-each-entry	RecordsModelTests/opensAndClosesItemsOfEachEntry		未確認	Android は別のブランチで合わせる
+records.remembers-direction-of-last-move	RecordsModelTests/remembersDirectionOfLastMove		未確認	Android は別のブランチで合わせる
 records.selects-and-clears-whole-day	RecordsModelTests/selectsAndClearsWholeDay		未移植	日ごとにまとめて選ぶ・外す機能が、モデルにも画面にも無い
 records.toggles-one-entry	RecordsModelTests/togglesOneEntry		未移植	記録を選ぶ機能（選択の状態）が、モデルにも画面にも無い
 records.selects-all-shown-in-month	RecordsModelTests/selectsAllShownInMonth		未移植	月の記録を全部選ぶ機能が、モデルにも画面にも無い

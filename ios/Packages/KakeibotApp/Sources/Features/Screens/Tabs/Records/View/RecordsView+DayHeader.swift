@@ -151,7 +151,7 @@ private extension RecordsView {
         } else {
             if canReward {
                 Button {
-                    rewardTarget = StampTarget(date: date)
+                    model.state.present(.reward(date))
                 } label: {
                     rewardButtonLabel(on: date)
                         .tapArea(Self.dayButtonTapOutsets)
@@ -160,7 +160,7 @@ private extension RecordsView {
             }
 
             Button {
-                stampTarget = StampTarget(date: date)
+                model.state.present(.stamp(date))
             } label: {
                 stampButtonLabel(on: date)
                     .tapArea(Self.dayButtonTapOutsets)
@@ -176,7 +176,7 @@ private extension RecordsView {
         let isSelected = model.output.isSelected(day, in: selection)
 
         return Button {
-            self.selection = model.output.toggling(day, in: selection)
+            model.state.select(model.output.toggling(day, in: selection))
         } label: {
             SelectionMark(isSelected: isSelected)
                 .frame(minHeight: 26)

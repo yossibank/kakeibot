@@ -6,8 +6,6 @@ import SwiftUI
 struct RecordsFilterSheet: View {
     @Bindable var model: RecordsModel
 
-    @State private var tab: Tab = .expense
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
@@ -15,7 +13,7 @@ struct RecordsFilterSheet: View {
         VStack(spacing: 20) {
             header
 
-            CapsulePicker(selection: $tab, options: tabOptions)
+            CapsulePicker(selection: Bindable(model.state).screen.filterTab, options: tabOptions)
 
             if isEmpty {
                 Text(emptyText)
@@ -60,13 +58,6 @@ struct RecordsFilterSheet: View {
 }
 
 private extension RecordsFilterSheet {
-    enum Tab: Hashable {
-        case expense
-        case income
-        case wallet
-        case tag
-    }
-
     struct Item: Identifiable {
         let id: AnyHashable
         let name: String
@@ -196,6 +187,10 @@ private extension RecordsFilterSheet {
         }
     }
 
+    var tab: RecordsModel.FilterTab {
+        model.state.screen.filterTab
+    }
+
     var list: EntryList? {
         model.input.list
     }
@@ -205,7 +200,7 @@ private extension RecordsFilterSheet {
         return count > 0 ? "\(count) 件を表示" : "当てはまる記録はありません"
     }
 
-    var tabOptions: [CapsulePicker<Tab>.Option] {
+    var tabOptions: [CapsulePicker<RecordsModel.FilterTab>.Option] {
         let expense = tabTitle("支出", count: count(of: .expense))
         let income = tabTitle("収入", count: count(of: .income))
         let wallet = tabTitle("口座", count: filter.walletIds.count)
@@ -300,7 +295,7 @@ private extension RecordsFilterSheet {
             .count
     }
 
-    func items(in tab: Tab) -> [Item] {
+    func items(in tab: RecordsModel.FilterTab) -> [Item] {
         switch tab {
         case .expense: categoryItems(.expense)
         case .income: categoryItems(.income)

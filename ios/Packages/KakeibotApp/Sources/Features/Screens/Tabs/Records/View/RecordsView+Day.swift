@@ -4,19 +4,6 @@ import FeatureModels
 import SwiftUI
 
 extension RecordsView {
-    struct StampTarget: Identifiable {
-        let date: LocalDate
-
-        var id: LocalDate {
-            date
-        }
-    }
-
-    struct MarkMenu {
-        let date: LocalDate
-        let anchor: CGRect
-    }
-
     func dayCard(_ day: EntryDay) -> some View {
         let rows = model.output.rows(for: day)
 
@@ -155,7 +142,7 @@ extension RecordsView {
         if selection == nil {
             ForEach(model.output.adjustmentRows(on: date)) { row in
                 Button {
-                    openAdjustment = row
+                    model.state.present(.adjustment(row))
                 } label: {
                     RecordsAdjustmentRow(row: row)
                 }
@@ -166,14 +153,16 @@ extension RecordsView {
     }
 
     func openMarkMenu(on date: LocalDate, anchor: CGRect) {
+        layout.markAnchor = anchor
+
         withAnimation(.snappy(duration: 0.25)) {
-            markMenu = MarkMenu(date: date, anchor: anchor)
+            model.state.present(.markMenu(date))
         }
     }
 
     func closeMarkMenu() {
         withAnimation(.snappy(duration: 0.2)) {
-            markMenu = nil
+            model.state.closeMarkMenu()
         }
     }
 }
@@ -200,6 +189,6 @@ private extension RecordsView {
             return
         }
 
-        self.selection = model.output.toggling(id, in: selection)
+        model.state.select(model.output.toggling(id, in: selection))
     }
 }

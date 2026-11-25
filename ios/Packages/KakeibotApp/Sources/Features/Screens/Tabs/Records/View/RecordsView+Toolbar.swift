@@ -13,7 +13,11 @@ extension RecordsView {
             isOn: isSelecting
         ) {
             withAnimation(.snappy) {
-                selection = isSelecting ? nil : []
+                if isSelecting {
+                    model.state.finishSelecting()
+                } else {
+                    model.state.select([])
+                }
             }
         }
     }
@@ -24,7 +28,7 @@ extension RecordsView {
             title: title,
             isOn: !model.state.filter.isEmpty
         ) {
-            isFiltering = true
+            model.state.present(.filter)
         }
     }
 
@@ -68,7 +72,7 @@ extension RecordsView {
 extension RecordsView {
     func finishSelecting() {
         withAnimation(.snappy) {
-            selection = nil
+            model.state.finishSelecting()
         }
     }
 }
