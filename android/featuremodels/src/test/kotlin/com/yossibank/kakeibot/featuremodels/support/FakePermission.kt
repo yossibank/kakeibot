@@ -10,15 +10,11 @@ class FakePermission(
     var requested = false
         private set
 
-    var rescheduled = false
-        private set
-
     private var status = authorization
 
     val permission = NotificationPermission(
         authorization = { status },
         request = ::request,
-        reschedule = { rescheduled = true },
     )
 
     private fun request(): Boolean {

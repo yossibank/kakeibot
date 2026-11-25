@@ -79,7 +79,6 @@ class RecurringEditModelTest {
 
         val saved = model.save(client.permission)
 
-        assertTrue(client.rescheduled)
         assertTrue(saved)
         assertFalse(askedWithout)
         assertTrue(client.requested)

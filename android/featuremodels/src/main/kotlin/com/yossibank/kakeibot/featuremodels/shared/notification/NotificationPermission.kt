@@ -5,16 +5,13 @@ import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorizati
 class NotificationPermission(
     val authorization: () -> NotificationAuthorization,
     val request: suspend () -> Boolean,
-    val reschedule: suspend () -> Unit = {},
 ) {
     suspend fun requestIfUndecided() {
         if (authorization() != NotificationAuthorization.notDetermined) {
             return
         }
 
-        if (request()) {
-            reschedule()
-        }
+        request()
     }
 
     companion object {
