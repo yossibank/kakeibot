@@ -478,20 +478,20 @@ settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHin
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い
 screen-flow.next-day-turns-today-into-yesterday-in-every-tab	ScreenFlowTests/nextDayTurnsTodayIntoYesterdayInEveryTab	HomeModelTest/relabelsRowsWhenTodayChanges RecordsModelTest/followsTodayWhenDateChanges	対応	ホームと記録をタブごとに確かめ、振り返りと資産は確かめていない
-screen-flow.planned-entry-counts-in-balances-when-its-day-comes	ScreenFlowTests/plannedEntryCountsInBalancesWhenItsDayComes		未確認	当日に残高へ入る動きは AssetsModel にあるが、予定の一覧（plans）は無い
+screen-flow.planned-entry-counts-in-balances-when-its-day-comes	ScreenFlowTests/plannedEntryCountsInBalancesWhenItsDayComes	ScreenFlowTest/plannedEntryCountsInBalancesWhenItsDayComes	対応	予定の一覧（plans）は無く、当日に残高へ入る所を確かめる
 screen-flow.first-day-of-next-month-starts-a-new-period-in-every-tab	ScreenFlowTests/firstDayOfNextMonthStartsANewPeriodInEveryTab	HomeModelTest/followsTodayIntoNextMonth RecordsModelTest/followsTodayWhenDateChanges	対応	ホームと記録をタブごとに確かめ、振り返りと資産は確かめていない
-screen-flow.entry-recorded-after-the-day-changed-lands-on-the-new-day	ScreenFlowTests/entryRecordedAfterTheDayChangedLandsOnTheNewDay		未確認	EntryModel と各タブに today はあるが、日付の変わり目をまたぐテストが無い
-screen-flow.transfer-with-fee-moves-balances-until-deleted-and-undone	ScreenFlowTests/transferWithFeeMovesBalancesUntilDeletedAndUndone		未確認	手数料つきの振替の保存はあるが、一覧からの削除と取り消しは無い
-screen-flow.card-expense-waits-for-its-bill-and-is-paid-when-the-day-comes	ScreenFlowTests/cardExpenseWaitsForItsBillAndIsPaidWhenTheDayComes		未確認	カードの残高は AssetsModel にあるが、請求の一覧（upcomingBills・billPages）は無い
-screen-flow.recurring-saved-in-settings-fills-tabs-and-is-recorded-on-its-next-day	ScreenFlowTests/recurringSavedInSettingsFillsTabsAndIsRecordedOnItsNextDay		未確認	固定費の保存はあるが、ホームの固定費の状況（periodRecurrings）と記録し直しは無い
-screen-flow.changed-month-start-day-moves-the-period-of-every-tab	ScreenFlowTests/changedMonthStartDayMovesThePeriodOfEveryTab		未確認	月の開始日の設定と各タブの monthStartDay はあるが、またぐテストが無い
+screen-flow.entry-recorded-after-the-day-changed-lands-on-the-new-day	ScreenFlowTests/entryRecordedAfterTheDayChangedLandsOnTheNewDay	ScreenFlowTest/entryRecordedAfterTheDayChangedLandsOnTheNewDay	対応	
+screen-flow.transfer-with-fee-moves-balances-until-deleted-and-undone	ScreenFlowTests/transferWithFeeMovesBalancesUntilDeletedAndUndone	ScreenFlowTest/transferWithFeeMovesBalancesUntilDeletedAndUndone	対応	一覧からの削除と取り消しは無く、入力のシートから消す所までを確かめる
+screen-flow.card-expense-waits-for-its-bill-and-is-paid-when-the-day-comes	ScreenFlowTests/cardExpenseWaitsForItsBillAndIsPaidWhenTheDayComes	ScreenFlowTest/cardExpenseWaitsForItsBillAndIsPaidWhenTheDayComes	対応	請求の一覧（upcomingBills・billPages）は無く、残高と引き落としを確かめる
+screen-flow.recurring-saved-in-settings-fills-tabs-and-is-recorded-on-its-next-day	ScreenFlowTests/recurringSavedInSettingsFillsTabsAndIsRecordedOnItsNextDay	ScreenFlowTest/recurringSavedInSettingsFillsTabsAndIsRecordedOnItsNextDay	対応	ホームの固定費の状況と記録し直しは無く、作られた記録と次の日を確かめる
+screen-flow.changed-month-start-day-moves-the-period-of-every-tab	ScreenFlowTests/changedMonthStartDayMovesThePeriodOfEveryTab	ScreenFlowTest/changedMonthStartDayMovesThePeriodOfEveryTab	対応	資産に月の合計が無く、ホーム・記録・振り返りの期間を確かめる
 screen-flow.changed-week-start-moves-the-week-of-records-and-review	ScreenFlowTests/changedWeekStartMovesTheWeekOfRecordsAndReview	RecordsModelTest/startsWeekOnSetting ReviewModelTest/startsWeekOnSetting	対応	設定の画面から変える流れは通さず、タブごとに週の始まりを確かめる
-screen-flow.budget-set-in-settings-follows-new-entries-on-home	ScreenFlowTests/budgetSetInSettingsFollowsNewEntriesOnHome		未確認	BudgetListModel と HomeModel の usage はあるが、middleTitle は無い
+screen-flow.budget-set-in-settings-follows-new-entries-on-home	ScreenFlowTests/budgetSetInSettingsFollowsNewEntriesOnHome	ScreenFlowTest/budgetSetInSettingsFollowsNewEntriesOnHome	対応	振り返りの予算（input.budgets）は無く、ホームの残りと題を確かめる
 screen-flow.hidden-wallet-leaves-assets-and-entry-choices-but-keeps-its-records	ScreenFlowTests/hiddenWalletLeavesAssetsAndEntryChoicesButKeepsItsRecords		未移植	口座を非表示にする設定の画面とモデル（WalletEditModel）が無い
 screen-flow.hidden-category-keeps-naming-records-but-leaves-entry-choices	ScreenFlowTests/hiddenCategoryKeepsNamingRecordsButLeavesEntryChoices		未移植	カテゴリを非表示にする設定の画面とモデル（CategoryEditModel）が無い
 screen-flow.recorded-entry-appears-in-every-tab	ScreenFlowTests/recordedEntryAppearsInEveryTab	AssetsModelTest/followsNewEntries	対応	資産の残高だけを確かめ、ほかのタブへの反映はまたいで確かめていない
-screen-flow.edited-entry-moves-to-another-month-in-every-tab	ScreenFlowTests/editedEntryMovesToAnotherMonthInEveryTab		未確認	編集と月の移動はあるが、編集の取り消し（EntryNoticeModel）は無い
-screen-flow.deleted-entry-leaves-every-tab-until-undone	ScreenFlowTests/deletedEntryLeavesEveryTabUntilUndone		未確認	EntryModel.delete はあるが、削除の取り消しは無い
+screen-flow.edited-entry-moves-to-another-month-in-every-tab	ScreenFlowTests/editedEntryMovesToAnotherMonthInEveryTab	ScreenFlowTest/editedEntryMovesToAnotherMonthInEveryTab	対応	編集の取り消し（EntryNoticeModel）は無く、月を移る所までを確かめる
+screen-flow.deleted-entry-leaves-every-tab-until-undone	ScreenFlowTests/deletedEntryLeavesEveryTabUntilUndone	ScreenFlowTest/deletedEntryLeavesEveryTabUntilUndone	対応	削除の取り消しは無く、どのタブからも消える所までを確かめる
 screen-flow.undone-recording-leaves-every-tab-and-restores-no-spend-day	ScreenFlowTests/undoneRecordingLeavesEveryTabAndRestoresNoSpendDay		未移植	記録の取り消しも、使わなかった日の印（toggleNoSpendDay）も無い
 screen-flow.swiped-deletion-keeps-items-when-undone	ScreenFlowTests/swipedDeletionKeepsItemsWhenUndone		未移植	一覧の行からの削除とその取り消しが無く、行に品目も出さない
 screen-flow.batch-deletion-and-wallet-change-follow-in-every-tab	ScreenFlowTests/batchDeletionAndWalletChangeFollowInEveryTab		未移植	複数の記録を選んで消す・口座を変える操作が無い
