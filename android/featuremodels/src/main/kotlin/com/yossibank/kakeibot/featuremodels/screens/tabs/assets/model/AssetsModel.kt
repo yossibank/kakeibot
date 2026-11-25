@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.concepts.wallet.isDebt
 import com.yossibank.kakeibot.core.concepts.wallet.role
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import kotlinx.coroutines.flow.Flow
 
@@ -17,6 +18,7 @@ class AssetsModel(
     entryList: Flow<EntryList>,
     today: LocalDate,
 ) {
+    val state = State()
     val input = Input(today)
     val output = Output(input)
 
@@ -29,6 +31,10 @@ class AssetsModel(
         val kind: Wallet.Kind,
         val balance: Long,
     )
+
+    class State {
+        val task = ModelTask()
+    }
 
     class Input(
         today: LocalDate,
@@ -85,6 +91,13 @@ class AssetsModel(
     }
 
     suspend fun observe() {
-        dependencies.entryList.collect { input.list = it }
+        state.task.observe(
+            values = dependencies.entryList,
+            failure = loadFailedMessage,
+        ) { input.list = it }
+    }
+
+    companion object {
+        const val loadFailedMessage = "残高を読めませんでした"
     }
 }

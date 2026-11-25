@@ -59,6 +59,8 @@ class ReviewModel(
     class State(
         today: LocalDate,
     ) {
+        val task = ModelTask()
+
         var today: LocalDate by mutableStateOf(today)
 
         var offset: Int by mutableStateOf(0)
@@ -223,17 +225,17 @@ class ReviewModel(
 
         coroutineScope {
             launch {
-                database.settingUpdates(SettingKey.monthStartDay).collect {
+                observe(database.settingUpdates(SettingKey.monthStartDay)) {
                     input.monthStartDay = it
                 }
             }
 
             launch {
-                database.settingUpdates(SettingKey.weekStart).collect { input.weekStart = it }
+                observe(database.settingUpdates(SettingKey.weekStart)) { input.weekStart = it }
             }
 
             launch {
-                dependencies.entryList.collect { input.list = it }
+                observe(dependencies.entryList) { input.list = it }
             }
         }
     }
@@ -241,7 +243,7 @@ class ReviewModel(
     suspend fun loadSelection() {
         val database = dependencies.database
 
-        ModelTask.quiet {
+        state.task.attempt(failure = loadFailedMessage) {
             input.scale = database.setting(SettingKey.reviewScale)
             input.kind = database.setting(SettingKey.reviewKind)
         }
@@ -259,7 +261,7 @@ class ReviewModel(
     suspend fun saveSelection() {
         val database = dependencies.database
 
-        ModelTask.quiet {
+        state.task.attempt(failure = ModelTask.saveFailed) {
             database.setSetting(
                 key = SettingKey.reviewScale,
                 to = input.scale,
@@ -269,5 +271,20 @@ class ReviewModel(
                 to = input.kind,
             )
         }
+    }
+
+    private suspend fun <Value> observe(
+        values: Flow<Value>,
+        receive: suspend (Value) -> Unit,
+    ) {
+        state.task.observe(
+            values = values,
+            failure = loadFailedMessage,
+            receive = receive,
+        )
+    }
+
+    companion object {
+        const val loadFailedMessage = "記録を読めませんでした"
     }
 }

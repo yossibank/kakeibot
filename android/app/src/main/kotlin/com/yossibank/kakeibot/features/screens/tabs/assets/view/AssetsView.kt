@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
+import com.yossibank.kakeibot.designsystem.components.notice.noticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
@@ -78,6 +79,8 @@ fun AssetsView(
                 style = displayFont(size = FontSize.Headline),
             )
         }
+
+        noticeBanner(task = model.state.task)
 
         item(key = "total") {
             TotalCard(model = model)

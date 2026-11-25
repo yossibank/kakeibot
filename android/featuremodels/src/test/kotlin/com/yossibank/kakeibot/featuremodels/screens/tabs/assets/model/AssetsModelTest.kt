@@ -5,6 +5,7 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
+import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.writes.methods.setHidden
@@ -15,6 +16,19 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class AssetsModelTest {
+    @Test
+    fun showsNoticeWhenListFails() = modelTest(today = "2026-10-17") { setup ->
+        val model = AssetsModel(
+            entryList = failingEntryList,
+            today = setup.today,
+        )
+
+        model.observe()
+
+        assertEquals("残高を読めませんでした", model.state.task.message)
+        assertTrue(model.output.rows.isEmpty())
+    }
+
     @Test
     fun showsNoRowsBeforeListArrives() = modelTest(today = "2026-10-17") { setup ->
         val model = AssetsModel(

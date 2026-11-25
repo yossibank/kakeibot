@@ -43,6 +43,8 @@ class RecordsModel(
     class State(
         today: LocalDate,
     ) {
+        val task = ModelTask()
+
         var today: LocalDate by mutableStateOf(today)
 
         var month: YearMonth? by mutableStateOf(null)
@@ -156,21 +158,21 @@ class RecordsModel(
 
         coroutineScope {
             launch {
-                database.settingUpdates(SettingKey.monthStartDay).collect {
+                observe(database.settingUpdates(SettingKey.monthStartDay)) {
                     input.monthStartDay = it
                 }
             }
 
             launch {
-                database.settingUpdates(SettingKey.weekStart).collect { input.weekStart = it }
+                observe(database.settingUpdates(SettingKey.weekStart)) { input.weekStart = it }
             }
 
             launch {
-                database.settingUpdates(SettingKey.recordsLayout).collect { input.layout = it }
+                observe(database.settingUpdates(SettingKey.recordsLayout)) { input.layout = it }
             }
 
             launch {
-                dependencies.entryList.collect {
+                observe(dependencies.entryList) {
                     input.list = it
                     input.isLoaded = true
                 }
@@ -191,5 +193,20 @@ class RecordsModel(
                 to = layout,
             )
         }
+    }
+
+    private suspend fun <Value> observe(
+        values: Flow<Value>,
+        receive: suspend (Value) -> Unit,
+    ) {
+        state.task.observe(
+            values = values,
+            failure = loadFailedMessage,
+            receive = receive,
+        )
+    }
+
+    companion object {
+        const val loadFailedMessage = "記録を読めませんでした"
     }
 }

@@ -8,6 +8,8 @@ import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
+import com.yossibank.kakeibot.featuremodels.support.failReads
+import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -187,6 +189,37 @@ class RecordsModelTest {
             RecordsLayout.list,
             setup.database.settingUpdates(SettingKey.recordsLayout).first(),
         )
+    }
+
+    @Test
+    fun showsNoticeWhenListFails() = modelTest(today = "2026-10-17") { setup ->
+        val model = RecordsModel(
+            database = setup.database,
+            entryList = failingEntryList,
+            today = setup.today,
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
+        setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.sunday)
+        ModelWait.until { model.input.weekStart == Weekday.sunday }
+
+        assertEquals("記録を読めませんでした", model.state.task.message)
+        assertFalse(model.input.isLoaded)
+        assertNull(model.input.list)
+    }
+
+    @Test
+    fun showsNoticeWhenSettingsFail() = modelTest(today = "2026-10-17") { setup ->
+        setup.database.failReads(of = "setting")
+        val model = setup.recordsModel()
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.input.isLoaded }
+
+        assertEquals("記録を読めませんでした", model.state.task.message)
+        assertEquals(MonthStartDay.first, model.input.monthStartDay)
     }
 
     private fun ModelTestSetup.recordsModel() = RecordsModel(
