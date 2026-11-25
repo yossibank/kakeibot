@@ -333,6 +333,8 @@ template-edit.clears-tag-when-category-changes		TemplateEditModelTest/clearsTagW
 template-edit.toggles-tag-off		TemplateEditModelTest/togglesTagOff	Androidのみ	同じタグをもう一度選ぶと外れる。iOS のテンプレートの編集にテストが無い
 template-edit.keeps-bill-shift-only-for-billed-card		TemplateEditModelTest/keepsBillShiftOnlyForBilledCard	Androidのみ	請求月のずらしは請求のあるカードの時だけ残す。iOS にテストが無い
 template-list.*	TemplateListModelTests/*		未移植	テンプレートの一覧（非表示・並べ替え）の画面とモデルが Android に無い
+settings-menu.follows-changed-settings	SettingsMenuModelTests/followsChangedSettings		未移植	起動時の画面・通知の時刻・テーマの項目が設定のメニューに無い
+settings-menu.tells-backup-age-after-export	SettingsMenuModelTests/tellsBackupAgeAfterExport		未移植	バックアップの書き出しが Android に無い
 settings-menu-link.*	SettingsMenuLinkTests/*		未移植	問い合わせのフォームへのリンクが、設定のメニューに無い
 settings-menu-sample-data.*	SettingsMenuSampleDataTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sheet.*	SettingsMenuSheetTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
@@ -354,8 +356,9 @@ settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHid
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.informs-when-every-hidden-item-is-in-use	SettingsBoardModelTests/informsWhenEveryHiddenItemIsInUse		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.tells-when-some-hidden-items-cannot-be-deleted	SettingsBoardModelTests/tellsWhenSomeHiddenItemsCannotBeDeleted		違い	まとめて 1 回で消し、失敗の文が「保存できませんでした」になる
-settings-screen-flag.keeps-closed-hint-per-screen	SettingsScreenFlagTests/keepsClosedHintPerScreen		未確認	SettingsScreenFlag.closedHint にあるが、featuremodels にテストが無い
-settings-screen-flag.remembers-open-hidden-list	SettingsScreenFlagTests/remembersOpenHiddenList		未確認	SettingsScreenFlag.openHiddenList にあるが、featuremodels にテストが無い
+settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
+settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
+settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い
 screen-flow.next-day-turns-today-into-yesterday-in-every-tab	ScreenFlowTests/nextDayTurnsTodayIntoYesterdayInEveryTab	HomeModelTest/relabelsRowsWhenTodayChanges RecordsModelTest/followsTodayWhenDateChanges	対応	ホームと記録をタブごとに確かめ、振り返りと資産は確かめていない
 screen-flow.planned-entry-counts-in-balances-when-its-day-comes	ScreenFlowTests/plannedEntryCountsInBalancesWhenItsDayComes		未確認	当日に残高へ入る動きは AssetsModel にあるが、予定の一覧（plans）は無い
 screen-flow.first-day-of-next-month-starts-a-new-period-in-every-tab	ScreenFlowTests/firstDayOfNextMonthStartsANewPeriodInEveryTab	HomeModelTest/followsTodayIntoNextMonth RecordsModelTest/followsTodayWhenDateChanges	対応	ホームと記録をタブごとに確かめ、振り返りと資産は確かめていない
