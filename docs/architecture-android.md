@@ -80,7 +80,7 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 | `Store/Migrations/` | iOS の最新の形から始めるので、移さない |
 | 振り返りの一手と理由 | `ReviewComment`・`ReviewGoal` の行・読み出し・書き込みは、まだ移していない |
 | Android だけのファイル | `database/` の `AppDatabaseChecks`・`AppDatabaseObservation`。トリガーと見張りを、Room の形で足す |
-| iOS だけのファイル | `AppDatabase+Interruption` と `AppDatabase+StorageFull`。`Database/` にある |
+| iOS だけのファイル | `AppDatabase+Interruption`。`Database/` にある |
 
 フォルダとファイルは、次のとおりに対応させる。
 
