@@ -21,17 +21,37 @@ extension SyncEngine {
     }
 
     func record(for recordID: CKRecord.ID) async -> CKRecord? {
-        guard
-            let id = SyncRecordID(recordID),
-            let local = try? await database.syncRecord(for: id),
-            let zone = try? await database.syncSaveZone(for: id.key),
-            zone == id.zoneName
-        else {
+        guard let id = SyncRecordID(recordID) else {
             return nil
         }
 
-        let systemFields = try? await database.syncSystemFields(for: id)
-        return try? local.record(in: recordID.zoneID, systemFields: systemFields)
+        do {
+            guard
+                let local = try await database.syncRecord(for: id),
+                try await database.syncSaveZone(for: id.key) == id.zoneName
+            else {
+                missing.append(recordID)
+                return nil
+            }
+
+            let systemFields = try? await database.syncSystemFields(for: id)
+            return try? local.record(in: recordID.zoneID, systemFields: systemFields)
+        } catch {
+            return nil
+        }
+    }
+
+    func dequeueMissing() async {
+        guard !missing.isEmpty else {
+            return
+        }
+
+        let saves = missing.map(CKSyncEngine.PendingRecordZoneChange.saveRecord)
+
+        missing = []
+        engine?.state.remove(pendingRecordZoneChanges: saves)
+
+        await enqueuePending()
     }
 
     func finishSending(_ sent: CKSyncEngine.Event.SentRecordZoneChanges) async {

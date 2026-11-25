@@ -10,6 +10,7 @@ public actor SyncEngine {
 
     var engine: CKSyncEngine?
     var sending: [SyncKey: SyncChange] = [:]
+    var missing: [CKRecord.ID] = []
     var owners: [String: String] = [:]
     var isSyncEnabled = false
     var knowsZones = false
@@ -127,6 +128,7 @@ public extension SyncEngine {
     func stop() {
         engine = nil
         sending = [:]
+        missing = []
     }
 }
 
@@ -263,6 +265,7 @@ extension SyncEngine: CKSyncEngineDelegate {
 
         let saves = batch?.recordsToSave.compactMap { SyncRecordID($0.recordID) } ?? []
         try? await database.noteSyncSends(saves)
+        await dequeueMissing()
 
         return batch
     }

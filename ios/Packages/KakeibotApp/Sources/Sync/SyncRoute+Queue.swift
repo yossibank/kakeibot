@@ -17,17 +17,18 @@ extension SyncRoute {
         _ changes: [SyncChange],
         pending: Set<Pending>
     ) -> Enqueue {
-        let saving = Set(pending.compactMap(\.savedKey))
+        let saving = Dictionary(grouping: pending.compactMap(\.saved), by: \.key)
 
         var added: [Pending] = []
         var removed: [Pending] = []
         var dropped: [SyncChange] = []
 
         for change in changes {
-            var targets = targets(of: change)
+            let queued = saving[change.key] ?? []
+            var targets = targets(of: change, queued: queued)
 
             if targets.isEmpty,
-               !saving.contains(change.key) {
+               queued.isEmpty {
                 if let zone = unsentDeletionZone(of: change) {
                     targets = [.delete(SyncRecordID(key: change.key, zoneName: zone))]
                 } else if drops(change) {
@@ -79,7 +80,10 @@ extension SyncRoute.Pending {
 }
 
 private extension SyncRoute {
-    func targets(of change: SyncChange) -> [Pending] {
+    func targets(
+        of change: SyncChange,
+        queued: [SyncRecordID]
+    ) -> [Pending] {
         var targets: [Pending] = []
 
         if let zone = change.saveZone,
@@ -91,16 +95,24 @@ private extension SyncRoute {
             targets.append(.delete(SyncRecordID(key: change.key, zoneName: zone)))
         }
 
+        guard change.isDeletion else {
+            return targets
+        }
+
+        for id in queued where sends(to: id.zoneName) && !targets.contains(.delete(id)) {
+            targets.append(.delete(id))
+        }
+
         return targets
     }
 }
 
 private extension SyncRoute.Pending {
-    var savedKey: SyncKey? {
+    var saved: SyncRecordID? {
         guard case let .save(id) = self else {
             return nil
         }
 
-        return id.key
+        return id
     }
 }

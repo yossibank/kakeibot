@@ -95,6 +95,7 @@ extension SyncSendOrderTests.Device {
 
         var saves: [SyncRecordID: SyncRecord] = [:]
         var deletes: [SyncRecordID] = []
+        var missing: [SyncRoute.Pending] = []
 
         for change in pending {
             switch change {
@@ -102,6 +103,8 @@ extension SyncSendOrderTests.Device {
                 if let record = try await database.syncRecord(for: id),
                    try await database.syncSaveZone(for: id.key) == id.zoneName {
                     saves[id] = record
+                } else {
+                    missing.append(change)
                 }
 
             case let .delete(id):
@@ -110,6 +113,11 @@ extension SyncSendOrderTests.Device {
         }
 
         try await database.noteSyncSends(Array(saves.keys))
+
+        if !missing.isEmpty {
+            pending.subtract(missing)
+            try await enqueue()
+        }
 
         guard !saves.isEmpty || !deletes.isEmpty else {
             return nil
@@ -182,11 +190,11 @@ extension SyncSendOrderTests.Device {
         for _ in 0..<Self.maxRounds {
             try await enqueue()
 
-            guard let batch = try await takeBatch() else {
+            if let batch = try await takeBatch() {
+                try await deliver(batch)
+            } else if pending.isEmpty {
                 return
             }
-
-            try await deliver(batch)
         }
 
         Issue.record("\(Self.maxRounds) 回送っても、送るものが残った")
