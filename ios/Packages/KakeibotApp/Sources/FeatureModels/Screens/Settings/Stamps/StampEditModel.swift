@@ -79,6 +79,7 @@ public extension StampEditModel {
         }
     }
 
+    @discardableResult
     func save() async -> Bool {
         do {
             try await dependencies.database.save(

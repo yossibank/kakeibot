@@ -127,6 +127,7 @@ public extension AssetsRewardGoalEditModel {
         }
     }
 
+    @discardableResult
     func save() async -> Bool {
         do {
             try await dependencies.database.saveRewardGoal(
@@ -144,6 +145,7 @@ public extension AssetsRewardGoalEditModel {
         }
     }
 
+    @discardableResult
     func delete() async -> Bool {
         guard let editing = input.editing else {
             return false

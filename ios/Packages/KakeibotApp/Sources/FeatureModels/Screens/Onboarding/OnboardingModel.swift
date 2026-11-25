@@ -164,6 +164,7 @@ public extension OnboardingModel {
         state.page = previous
     }
 
+    @discardableResult
     func finish() async -> Bool {
         let version = state.setup.input.newsVersion
 

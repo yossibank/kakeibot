@@ -120,6 +120,7 @@ public extension CategoryEditModel {
         }
     }
 
+    @discardableResult
     func save() async -> EntryCategory? {
         do {
             let category = try await dependencies.database.saveCategory(

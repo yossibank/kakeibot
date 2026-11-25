@@ -12,6 +12,7 @@ public extension RecordsModel {
         }
     }
 
+    @discardableResult
     func deleteAdjustment(_ id: Adjustment.ID) async -> Deletion? {
         do {
             let deletion = try await dependencies.database.deleteAdjustment(id)

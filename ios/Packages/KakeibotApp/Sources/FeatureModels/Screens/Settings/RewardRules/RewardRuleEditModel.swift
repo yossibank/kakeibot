@@ -122,6 +122,7 @@ public extension RewardRuleEditModel {
         }
     }
 
+    @discardableResult
     func save() async -> Bool {
         do {
             try await dependencies.database.save(

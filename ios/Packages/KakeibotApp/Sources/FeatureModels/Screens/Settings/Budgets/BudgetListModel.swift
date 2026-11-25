@@ -123,6 +123,7 @@ public extension BudgetListModel {
         await saveCarryoverFrom(start)
     }
 
+    @discardableResult
     func resetCarryover() async -> YearMonth? {
         guard
             let previous = input.carryoverFrom,
@@ -172,6 +173,7 @@ public extension BudgetListModel {
         await setBudget(state.calculator.amount)
     }
 
+    @discardableResult
     func clear() async -> Cleared? {
         guard
             let editing = state.editing,

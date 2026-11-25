@@ -111,6 +111,7 @@ public extension SettingsBoardModel {
         }
     }
 
+    @discardableResult
     func delete(_ id: Item.ID) async -> Deletion? {
         state.movingOrder = nil
 
@@ -130,6 +131,7 @@ public extension SettingsBoardModel {
         }
     }
 
+    @discardableResult
     func deleteHidden() async -> SettingsBulkDelete {
         state.movingOrder = nil
 

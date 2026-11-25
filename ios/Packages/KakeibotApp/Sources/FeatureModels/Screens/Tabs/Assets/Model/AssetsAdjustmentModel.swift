@@ -109,6 +109,7 @@ public extension AssetsAdjustmentModel {
         }
     }
 
+    @discardableResult
     func save() async -> Bool {
         guard output.canSave else {
             return false

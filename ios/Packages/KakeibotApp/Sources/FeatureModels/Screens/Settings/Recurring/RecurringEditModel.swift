@@ -85,6 +85,7 @@ public extension RecurringEditModel {
         input.authorization = await permission.authorization()
     }
 
+    @discardableResult
     func save(permission: NotificationPermission = .allowed) async -> Bool {
         if let text = output.problemMessage {
             state.errorNotice.show(text)

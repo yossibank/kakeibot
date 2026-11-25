@@ -101,6 +101,7 @@ public extension TemplateEditModel {
         }
     }
 
+    @discardableResult
     func save() async -> EntryTemplate? {
         if let text = output.problemMessage {
             state.errorNotice.show(text)

@@ -200,6 +200,7 @@ public extension BackupModel {
         }
     }
 
+    @discardableResult
     func read(_ result: Result<URL, any Error>) async -> Bool {
         state.doneMessage = nil
 

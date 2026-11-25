@@ -128,6 +128,7 @@ public extension ThemeEditModel {
         case accent
     }
 
+    @discardableResult
     func save() async -> Bool {
         do {
             let theme = try await dependencies.database.saveTheme(
@@ -149,6 +150,7 @@ public extension ThemeEditModel {
         }
     }
 
+    @discardableResult
     func delete() async -> Deletion? {
         guard let editingId = input.editingId else {
             return nil

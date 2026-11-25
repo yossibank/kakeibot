@@ -90,6 +90,7 @@ public extension ProPurchaseModel {
         input.price = price
     }
 
+    @discardableResult
     func purchase() async -> Bool {
         let status = await work(
             .purchase,
@@ -107,6 +108,7 @@ public extension ProPurchaseModel {
         return true
     }
 
+    @discardableResult
     func restore() async -> Bool {
         let status = await work(
             .restore,

@@ -29,6 +29,7 @@ public extension SettingsEditRemoving {
         nil
     }
 
+    @discardableResult
     func setHidden(_ isHidden: Bool) async -> Bool {
         guard let editingId = input.editingId else {
             return false
@@ -52,6 +53,7 @@ public extension SettingsEditRemoving {
         state.prompt.togglesHiddenAfterSave = false
     }
 
+    @discardableResult
     func delete() async -> Deletion? {
         guard let editingId = input.editingId else {
             return nil
