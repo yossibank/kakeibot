@@ -36,8 +36,8 @@ extension MainView {
                     sheet = .newTemplate
                 },
                 onDeleteEntry: { id in
-                    Task {
-                        await notice.delete(id, in: home.input.list)
+                    notice.perform {
+                        await $0.delete(id, in: home.input.list)
                     }
                 },
                 onOpenRecurrings: openRecurrings,
@@ -59,13 +59,13 @@ extension MainView {
                 onAddEntry: addEntry(on:),
                 onOpenRecurring: openRecurring,
                 onChangeEntries: { ids, change in
-                    Task {
-                        await notice.changeEntries(ids, to: change)
+                    notice.perform {
+                        await $0.changeEntries(ids, to: change)
                     }
                 },
                 onDeleteEntries: { ids in
-                    Task {
-                        await notice.deleteEntries(ids)
+                    notice.perform {
+                        await $0.deleteEntries(ids)
                     }
                 },
                 onDeleteAdjustment: { deletion in

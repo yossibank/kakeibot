@@ -5,7 +5,7 @@ import Store
 
 @MainActor
 @Observable
-public final class EntryNoticeModel {
+public final class EntryNoticeModel: ScreenPerforming {
     public let state: State
     public let output: Output
 

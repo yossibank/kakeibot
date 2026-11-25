@@ -87,8 +87,8 @@ private extension AssetsRewardSheet {
             AmountText(-goal.targetAmount, font: .style(.footnote), color: Palette.subtext)
 
             Button {
-                Task {
-                    await model.setPurchased(goal.id, isPurchased: false)
+                model.perform {
+                    await $0.setPurchased(goal.id, isPurchased: false)
                 }
             } label: {
                 Label("戻す", systemImage: "arrow.uturn.backward")

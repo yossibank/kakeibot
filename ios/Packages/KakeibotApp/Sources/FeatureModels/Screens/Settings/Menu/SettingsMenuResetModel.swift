@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class SettingsMenuResetModel {
+public final class SettingsMenuResetModel: ScreenPerforming {
     public let state = NoticeState()
     public let input: Input
     public let output: Output

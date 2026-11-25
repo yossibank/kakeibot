@@ -61,14 +61,14 @@ public struct RootView: View {
             }
 
             if phase == .active {
-                Task {
-                    await model.refreshDay()
+                model.perform {
+                    await $0.refreshDay()
                 }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
-            Task {
-                await model.refreshDay()
+            model.perform {
+                await $0.refreshDay()
             }
         }
         .environment(
@@ -143,8 +143,8 @@ private extension RootView {
                 Label("データを開けませんでした", systemImage: "exclamationmark.triangle")
             } actions: {
                 Button("もう一度試す") {
-                    Task {
-                        await model.retryOpen()
+                    model.perform {
+                        await $0.retryOpen()
                     }
                 }
             }

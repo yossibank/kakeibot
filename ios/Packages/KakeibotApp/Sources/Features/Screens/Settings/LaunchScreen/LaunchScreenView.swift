@@ -36,8 +36,8 @@ public struct LaunchScreenView: View {
                                 systemImage: screen.systemImage,
                                 isSelected: model.input.screen == screen
                             ) {
-                                Task {
-                                    await model.choose(screen)
+                                model.perform {
+                                    await $0.choose(screen)
                                 }
                             }
                         }

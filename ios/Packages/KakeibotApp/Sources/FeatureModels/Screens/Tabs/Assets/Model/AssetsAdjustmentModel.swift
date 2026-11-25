@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class AssetsAdjustmentModel {
+public final class AssetsAdjustmentModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output

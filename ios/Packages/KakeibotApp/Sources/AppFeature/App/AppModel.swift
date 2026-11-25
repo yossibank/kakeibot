@@ -14,7 +14,7 @@ import WidgetKit
 
 @MainActor
 @Observable
-final class AppModel {
+final class AppModel: ScreenPerforming {
     var notice = ErrorNotice()
     var isPro = false
     var syncEngine: SyncEngine?

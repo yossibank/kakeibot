@@ -96,8 +96,8 @@ public struct ThemeListView: View {
             confirmTitle: "そろえる",
             role: .suggestion
         ) { [icon = model.state.suggestedIcon] in
-            Task {
-                await model.use(icon)
+            model.perform {
+                await $0.use(icon)
             }
         }
         .backdrop()
@@ -184,8 +184,8 @@ extension ThemeListView {
             return
         }
 
-        Task {
-            await model.select(choice)
+        model.perform {
+            await $0.select(choice)
         }
     }
 
@@ -210,8 +210,8 @@ extension ThemeListView {
             editing = .new(base: base)
 
         case let .select(choice):
-            Task {
-                await model.select(choice)
+            model.perform {
+                await $0.select(choice)
             }
         }
     }
@@ -331,14 +331,14 @@ private extension ThemeListView {
     }
 
     func reload() {
-        Task {
-            await model.load()
+        model.perform {
+            await $0.load()
         }
     }
 
     func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
+        model.perform {
+            await $0.restore(deletion)
         }
     }
 }

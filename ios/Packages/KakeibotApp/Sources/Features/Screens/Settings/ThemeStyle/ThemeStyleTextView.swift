@@ -39,7 +39,9 @@ public struct ThemeStyleTextView: View {
                     .foregroundStyle(Palette.text)
                     .frame(height: Self.sizeSampleHeight)
             } choose: { size in
-                await model.choose(size)
+                model.perform {
+                    await $0.choose(size)
+                }
             }
 
             ThemeStyleChoices(
@@ -56,7 +58,7 @@ public struct ThemeStyleTextView: View {
                     scale: 0.5
                 )
             } choose: { font in
-                await choose(.display(font))
+                choose(.display(font))
             }
 
             ThemeStyleChoices(
@@ -73,7 +75,7 @@ public struct ThemeStyleTextView: View {
                     scale: 0.8
                 )
             } choose: { font in
-                await choose(.text(font))
+                choose(.text(font))
             }
         }
         .proOffer(fontOffer?.feature) {
@@ -158,8 +160,8 @@ private extension ThemeStyleTextView {
                 .fixedSize(horizontal: false, vertical: true)
 
             ChipButton("大きめにする", systemImage: "textformat.size") {
-                Task {
-                    await model.choose(ThemeTextSize.large)
+                model.perform {
+                    await $0.choose(ThemeTextSize.large)
                 }
             }
         }
@@ -184,11 +186,21 @@ private extension ThemeStyleTextView {
 private extension ThemeStyleTextView {
     static let freeFonts: Set<ThemeFont> = [.mincho, .gothic]
 
+    static func save(_ offer: FontOffer, in model: ThemeStyleModel) async {
+        switch offer {
+        case let .display(font):
+            await model.choose(displayFont: font)
+
+        case let .text(font):
+            await model.choose(textFont: font)
+        }
+    }
+
     func isLocked(_ font: ThemeFont) -> Bool {
         !isPro && !Self.freeFonts.contains(font)
     }
 
-    func choose(_ offer: FontOffer) async {
+    func choose(_ offer: FontOffer) {
         switch offer {
         case let .display(font) where isLocked(font) && font != model.output.savedStyle.displayFont:
             model.cancelPreview()
@@ -202,8 +214,11 @@ private extension ThemeStyleTextView {
 
         default:
             fontOffer = nil
-            model.cancelPreview()
-            await save(offer)
+
+            model.perform {
+                $0.cancelPreview()
+                await Self.save(offer, in: $0)
+            }
         }
     }
 
@@ -214,18 +229,8 @@ private extension ThemeStyleTextView {
 
         fontOffer = nil
 
-        Task {
-            await save(offer)
-        }
-    }
-
-    func save(_ offer: FontOffer) async {
-        switch offer {
-        case let .display(font):
-            await model.choose(displayFont: font)
-
-        case let .text(font):
-            await model.choose(textFont: font)
+        model.perform {
+            await Self.save(offer, in: $0)
         }
     }
 }

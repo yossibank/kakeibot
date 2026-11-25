@@ -70,8 +70,8 @@ public struct ReminderView: View {
         .haptic(.selection, trigger: model.state.previewDay)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                Task {
-                    await model.refreshAuthorization()
+                model.perform {
+                    await $0.refreshAuthorization()
                 }
             }
         }
@@ -137,8 +137,8 @@ private extension ReminderView {
                         timeButton("\(time.hour)", isSelected: isSelected) {
                             isPickingTime = false
 
-                            Task {
-                                await model.choose(time)
+                            model.perform {
+                                await $0.choose(time)
                             }
                         }
                     }
@@ -216,8 +216,8 @@ private extension ReminderView {
         Binding {
             model.output.isOn
         } set: { isOn in
-            Task {
-                await model.setOn(isOn)
+            model.perform {
+                await $0.setOn(isOn)
             }
         }
     }
@@ -243,8 +243,8 @@ private extension ReminderView {
                 minute: parts.minute ?? 0
             )
 
-            Task {
-                await model.choose(time)
+            model.perform {
+                await $0.choose(time)
             }
         }
     }

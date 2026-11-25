@@ -55,8 +55,8 @@ struct AssetsRewardSheet: View {
             message: "買ったものに移しました",
             systemImage: "bag"
         ) { id in
-            Task {
-                await model.setPurchased(id, isPurchased: false)
+            model.perform {
+                await $0.setPurchased(id, isPurchased: false)
             }
         }
         .presentationSizing(.tallForm)

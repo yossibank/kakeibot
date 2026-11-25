@@ -74,8 +74,8 @@ public struct SyncView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                Task {
-                    await model.refreshAccount()
+                model.perform {
+                    await $0.refreshAccount()
                 }
             }
         }
@@ -262,8 +262,8 @@ private extension SyncView {
             return
         }
 
-        Task {
-            await model.setOn(isOn)
+        model.perform {
+            await $0.setOn(isOn)
         }
     }
 
@@ -279,8 +279,8 @@ private extension SyncView {
             turn(true)
 
         case let .share(item):
-            Task {
-                await model.open(item)
+            model.perform {
+                await $0.open(item)
             }
         }
     }
@@ -290,8 +290,8 @@ private extension SyncView {
             return
         }
 
-        Task {
-            await model.leave(item)
+        model.perform {
+            await $0.leave(item)
         }
     }
 
@@ -305,32 +305,32 @@ private extension SyncView {
             return
         }
 
-        Task {
-            await model.stopSharing(item)
+        model.perform {
+            await $0.stopSharing(item)
         }
     }
 
     func confirmInvitation() {
-        Task {
-            await model.confirmInvitation()
+        model.perform {
+            await $0.confirmInvitation()
         }
     }
 
     func inviteMore() {
-        Task {
-            await model.inviteMore()
+        model.perform {
+            await $0.inviteMore()
         }
     }
 
     func useLocalData() {
-        Task {
-            await model.useLocalData()
+        model.perform {
+            await $0.useLocalData()
         }
     }
 
     func useCloudData() {
-        Task {
-            await model.useCloudData()
+        model.perform {
+            await $0.useCloudData()
         }
     }
 }

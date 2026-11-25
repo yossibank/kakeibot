@@ -44,8 +44,8 @@ private struct BudgetKeypadDrawer: ViewModifier {
 private extension BudgetKeypadDrawer {
     var drawer: some View {
         SettingsDrawer(model.output.editingTitle, showsDone: false) {
-            Task {
-                await model.finishEditing()
+            model.perform {
+                await $0.finishEditing()
             }
         } content: {
             VStack(spacing: 12) {
@@ -64,16 +64,16 @@ private extension BudgetKeypadDrawer {
                 }
 
                 Keypad(calculator: model.state.calculator) {
-                    Task {
-                        await model.finishEditing()
+                    model.perform {
+                        await $0.finishEditing()
                     }
                 } onKey: { key in
                     model.state.press(key)
                 }
 
                 PrimaryButton(model.output.saveTitle) {
-                    Task {
-                        await model.save()
+                    model.perform {
+                        await $0.save()
                     }
                 }
                 .disabled(!model.output.canSave)

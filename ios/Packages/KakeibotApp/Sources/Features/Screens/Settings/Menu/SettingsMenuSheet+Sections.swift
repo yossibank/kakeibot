@@ -281,8 +281,8 @@ private extension SettingsMenuSheet {
         Binding {
             weekStart.output.value
         } set: { day in
-            Task {
-                await weekStart.choose(day)
+            weekStart.perform {
+                await $0.choose(day)
             }
         }
     }

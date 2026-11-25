@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-public final class SettingsIconEditorModel {
+public final class SettingsIconEditorModel: ScreenPerforming {
     public var markKind: MarkKind = .glyph
     public var glyph: Icon.Glyph
     public var color: String

@@ -16,8 +16,8 @@ extension EntrySheet {
             today: today,
             onCancel: cancelVoice,
             onFinish: {
-                Task {
-                    await voice.finish()
+                voice.perform {
+                    await $0.finish()
                 }
             },
             onOpenSettings: openVoiceSettings
@@ -47,8 +47,8 @@ extension EntrySheet {
     }
 
     func startVoice() {
-        Task {
-            await voice.start(for: model, today: today) {
+        voice.perform {
+            await $0.start(for: model, today: today) {
                 showSelectedCategory()
             }
         }
@@ -60,8 +60,8 @@ extension EntrySheet {
             return
         }
 
-        Task {
-            await voice.cancel()
+        voice.perform {
+            await $0.cancel()
         }
     }
 }

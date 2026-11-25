@@ -79,8 +79,8 @@ public struct RecurringEditSheet: View {
             .animation(.snappy, value: model.output.isNotificationDenied)
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
-                    Task {
-                        await model.refreshAuthorization(permission)
+                    model.perform {
+                        await $0.refreshAuthorization(permission)
                     }
                 }
             }

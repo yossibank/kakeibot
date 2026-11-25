@@ -97,8 +97,8 @@ public struct WalletEditSheet: View {
         )
         .errorBanner(Bindable(model.state).errorNotice)
         .deletionNotice($valuationDeletion) { deletion in
-            Task {
-                await model.restore(deletion)
+            model.perform {
+                await $0.restore(deletion)
             }
         }
         .confirmsUnsavedHide(

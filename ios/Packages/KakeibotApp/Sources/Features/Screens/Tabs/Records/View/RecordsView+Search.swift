@@ -75,8 +75,8 @@ private extension RecordsView {
     func rememberSearch() {
         let text = model.state.searchText
 
-        Task {
-            await model.rememberSearch(text)
+        model.perform {
+            await $0.rememberSearch(text)
         }
     }
 
@@ -86,14 +86,14 @@ private extension RecordsView {
     }
 
     func clearRecent() {
-        Task {
-            await model.clearRecentSearches()
+        model.perform {
+            await $0.clearRecentSearches()
         }
     }
 
     func restoreRecent(_ words: [String]) {
-        Task {
-            await model.restoreRecentSearches(words)
+        model.perform {
+            await $0.restoreRecentSearches(words)
         }
     }
 

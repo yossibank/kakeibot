@@ -41,14 +41,14 @@ private extension ReviewView {
             openURL(url)
         }
 
-        Task {
-            await model.openStoreReview()
+        model.perform {
+            await $0.openStoreReview()
         }
     }
 
     func closeStoreReviewCard() {
-        Task {
-            await model.closeStoreReviewCard()
+        model.perform {
+            await $0.closeStoreReviewCard()
         }
     }
 }

@@ -9,7 +9,7 @@ struct SettingsSwitch: View {
     let detail: String
     let systemImage: String
     let isOn: Bool
-    let change: (Bool) async -> Void
+    let change: (Bool) -> Void
 
     var body: some View {
         GoldSwitch(
@@ -36,9 +36,7 @@ private extension SettingsSwitch {
         Binding {
             isOn
         } set: { value in
-            Task {
-                await change(value)
-            }
+            change(value)
         }
     }
 }

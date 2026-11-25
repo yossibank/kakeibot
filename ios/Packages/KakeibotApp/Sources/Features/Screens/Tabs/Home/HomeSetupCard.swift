@@ -11,8 +11,8 @@ struct HomeSetupCard: View {
             CardHeader(
                 "あと \(model.output.cardItems.count) つで準備がそろいます",
                 onClose: {
-                    Task {
-                        await model.closeCard()
+                    model.perform {
+                        await $0.closeCard()
                     }
                 }
             )

@@ -75,8 +75,8 @@ extension RecordsView {
                         .frame(width: 1, height: 24)
 
                     dayButton(title, systemImage: image) {
-                        Task {
-                            await model.toggleNoSpendDay(on: date)
+                        model.perform {
+                            await $0.toggleNoSpendDay(on: date)
                         }
                     }
                 }

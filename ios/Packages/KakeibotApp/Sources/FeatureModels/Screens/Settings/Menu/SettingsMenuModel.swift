@@ -5,7 +5,7 @@ import Store
 
 @MainActor
 @Observable
-public final class SettingsMenuModel {
+public final class SettingsMenuModel: ScreenPerforming {
     public let input = Input()
 
     let dependencies: ScreenParts

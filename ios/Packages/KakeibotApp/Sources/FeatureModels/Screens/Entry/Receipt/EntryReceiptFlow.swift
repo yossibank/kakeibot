@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-public final class EntryReceiptFlow {
+public final class EntryReceiptFlow: ScreenPerforming {
     public let state: State
     public let output: Output
 

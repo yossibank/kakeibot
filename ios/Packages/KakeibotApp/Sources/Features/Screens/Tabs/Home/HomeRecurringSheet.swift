@@ -229,8 +229,8 @@ private extension HomeRecurringSheet {
 
     func recordButton(_ item: PeriodRecurring) -> some View {
         Button {
-            Task {
-                await model.record(item)
+            model.perform {
+                await $0.record(item)
             }
         } label: {
             Label("この日の分を記録", systemImage: "plus")

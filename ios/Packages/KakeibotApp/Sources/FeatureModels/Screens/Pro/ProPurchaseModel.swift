@@ -5,7 +5,7 @@ import OSLog
 
 @MainActor
 @Observable
-public final class ProPurchaseModel {
+public final class ProPurchaseModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output

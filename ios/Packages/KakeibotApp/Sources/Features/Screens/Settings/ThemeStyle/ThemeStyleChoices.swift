@@ -15,7 +15,7 @@ struct ThemeStyleChoices<Option: Hashable & Sendable, Sample: View>: View {
 
     @ViewBuilder let sample: (Option) -> Sample
 
-    let choose: (Option) async -> Void
+    let choose: (Option) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -39,9 +39,7 @@ private extension ThemeStyleChoices {
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
 
         return Button {
-            Task {
-                await choose(option)
-            }
+            choose(option)
         } label: {
             VStack(spacing: 8) {
                 sample(option)

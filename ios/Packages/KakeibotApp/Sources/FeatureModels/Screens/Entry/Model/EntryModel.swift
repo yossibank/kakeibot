@@ -6,7 +6,7 @@ import Store
 
 @MainActor
 @Observable
-public final class EntryModel {
+public final class EntryModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output

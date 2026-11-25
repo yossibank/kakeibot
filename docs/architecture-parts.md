@@ -12,6 +12,7 @@
 | --- | --- | --- |
 | `ScreenModel` | 画面のモデル。`NoticeHolding` の状態を持ち、DB を見張って、読めなかった時は状態の知らせに出す | `FeatureModels/Shared/Model/` |
 | `NoticeHolding` | エラーの知らせを持つ、モデルの状態。状態がそれだけの時は `NoticeState` を使う | `FeatureModels/Shared/Model/` |
+| `ScreenPerforming` | 画面がモデルの async の関数を呼ぶ口。`perform` が `Task` を始め、画面は `Task` を書かない | `FeatureModels/Shared/Model/` |
 | `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `FeatureModels/Shared/Model/` |
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardListModel` | 一覧を DB から読み、見張るモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `FeatureModels/Shared/SettingsParts/Board/Model/` |

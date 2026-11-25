@@ -2,7 +2,7 @@ import DesignSystem
 import Store
 
 @MainActor
-public protocol SettingsEditModel: AnyObject {
+public protocol SettingsEditModel: ScreenPerforming {
     associatedtype State: NoticeHolding
     associatedtype Input: SettingsEditInput
 

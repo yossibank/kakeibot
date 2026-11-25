@@ -437,6 +437,9 @@ screen.stops-at-limit-with-notice	ScreenModelTests/stopsAtLimitWithNotice	Screen
 screen.marks-failure-until-observed-again	ScreenModelTests/marksFailureUntilObservedAgain	ScreenObservationTest/reportsFailureUntilObservedAgain	違い	失敗を observe の戻り値で返すだけで、モデルに旗とやり直しのボタンが無い
 screen.stops-when-failing-right-after-each-value	ScreenModelTests/stopsWhenFailingRightAfterEachValue	ScreenObservationTest/stopsWhenFailingRightAfterEachValue	対応	
 screen.stops-when-cancelled	ScreenModelTests/stopsWhenCancelled	ScreenObservationTest/stopsWhenCancelled	対応	
+screen-performing.runs-model-work-until-it-ends	ScreenPerformingTests/runsModelWorkUntilItEnds		iOSのみ	画面が Task を始める代わりの口（perform）で、Compose は画面の scope で始める
+screen-performing.starts-work-after-caller-returns	ScreenPerformingTests/startsWorkAfterCallerReturns		iOSのみ	画面が Task を始める代わりの口（perform）で、Compose は画面の scope で始める
+screen-performing.starts-works-in-called-order	ScreenPerformingTests/startsWorksInCalledOrder		iOSのみ	画面が Task を始める代わりの口（perform）で、Compose は画面の scope で始める
 settings-icon-editor.*	SettingsIconEditorModelTests/*		未移植	アイコンを絵文字や文字で作る編集のモデルと画面が無い
 setup.*	SetupModelTests/*		未移植	はじめの案内のカードとお知らせの既読（SetupModel）が無い
 screen-observation.succeeds-on-last-retry		ScreenObservationTest/succeedsOnLastRetry	Androidのみ	最後のやり直しで成功した時に知らせを出さないことを、iOS は確かめていない

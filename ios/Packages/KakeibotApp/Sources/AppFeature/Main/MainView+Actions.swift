@@ -15,8 +15,8 @@ extension MainView {
         Binding {
             home.input.templateOrder
         } set: { order in
-            Task {
-                await home.setTemplateOrder(order)
+            home.perform {
+                await $0.setTemplateOrder(order)
             }
         }
     }
@@ -135,8 +135,8 @@ extension MainView {
     func openNews() {
         sheet = .whatsNew(seenVersion: setup.output.seenNewsVersion)
 
-        Task {
-            await setup.markNewsSeen()
+        setup.perform {
+            await $0.markNewsSeen()
         }
     }
 
@@ -202,8 +202,8 @@ extension MainView {
 
         draft = model
 
-        Task {
-            await model.load()
+        model.perform {
+            await $0.load()
         }
     }
 }

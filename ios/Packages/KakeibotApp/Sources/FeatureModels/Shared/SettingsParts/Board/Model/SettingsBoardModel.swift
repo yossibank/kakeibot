@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 
 @MainActor
-public protocol SettingsBoardModel: AnyObject {
+public protocol SettingsBoardModel: ScreenPerforming {
     associatedtype Item: Identifiable where Item.ID: Sendable
     associatedtype State: SettingsBoardState where State.ID == Item.ID
     associatedtype Output: SettingsBoardOutput where Output.Item == Item, Output.State == State

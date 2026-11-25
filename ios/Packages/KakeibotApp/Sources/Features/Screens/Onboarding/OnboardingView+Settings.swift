@@ -18,8 +18,8 @@ extension OnboardingView {
                 )
 
                 MonthStartDayGrid(selection: model.state.monthStart.input.startDay) { day in
-                    Task {
-                        await model.state.monthStart.choose(day)
+                    model.state.monthStart.perform {
+                        await $0.choose(day)
                     }
                 }
 
@@ -149,8 +149,8 @@ private extension OnboardingView {
         Binding {
             model.input.weekStart
         } set: { weekStart in
-            Task {
-                await model.chooseWeekStart(weekStart)
+            model.perform {
+                await $0.chooseWeekStart(weekStart)
             }
         }
     }

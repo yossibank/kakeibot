@@ -212,8 +212,8 @@ private extension ReviewView {
             PageSlide.run($slide, forward: to > from) {
                 model.setScale(scale)
 
-                Task {
-                    await model.saveSelection()
+                model.perform {
+                    await $0.saveSelection()
                 }
             }
         }
