@@ -66,12 +66,14 @@ class BudgetListModelTest {
         model.startEditing(Target.Total)
         val current = model.state.calculator.amount
         val cleared = assertNotNull(model.clear())
+        val shown = model.state.cleared.current
         ModelWait.until { model.output.totalAmount == null }
 
         model.restore(cleared)
         ModelWait.until { model.output.totalAmount != null }
 
         assertEquals(50000, current)
+        assertEquals(cleared, shown)
         assertEquals("月全体の予算", cleared.target.title)
         assertEquals(50000, model.output.totalAmount)
         assertEquals(1, setup.database.budgets().size)
@@ -177,6 +179,7 @@ class BudgetListModelTest {
         val start = model.input.overview?.carryoverFrom
 
         val previous = assertNotNull(model.resetCarryover())
+        val shown = model.state.resetFrom.current
         ModelWait.until { model.output.carryover == 0L }
         val resetStart = setup.database.setting(SettingKey.budgetCarryoverFrom)
 
@@ -184,6 +187,7 @@ class BudgetListModelTest {
         ModelWait.until { model.output.carryover != 0L }
 
         assertEquals(start, previous)
+        assertEquals(previous, shown)
         assertEquals(model.output.month, resetStart)
         assertEquals(70000L, model.output.carryover)
         assertEquals(start, setup.database.setting(SettingKey.budgetCarryoverFrom))
@@ -200,6 +204,7 @@ class BudgetListModelTest {
 
         assertNull(off)
         assertNull(zero)
+        assertNull(model.state.resetFrom.current)
         assertEquals(0L, model.output.carryover)
         assertEquals(model.output.month, setup.database.setting(SettingKey.budgetCarryoverFrom))
     }

@@ -18,22 +18,21 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.voiceHints
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.voiceReading
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceResult.Outcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class EntryVoiceFlow(
     context: Context,
-    scope: CoroutineScope,
     clock: ScreenClock,
-) {
+) : ScreenPerforming {
     val state = State()
     val input = Input(isAvailable = EntryVoiceSpeech.isAvailable(context))
     val output = Output(state)
 
-    private val dependencies = Dependencies(context, scope, clock)
+    private val dependencies = Dependencies(context, clock)
     private val runtime = Runtime()
 
     sealed interface Phase {
@@ -120,7 +119,6 @@ class EntryVoiceFlow(
 
     private class Dependencies(
         val context: Context,
-        val scope: CoroutineScope,
         val clock: ScreenClock,
     )
 
@@ -259,7 +257,7 @@ class EntryVoiceFlow(
         runtime.noticeJob?.cancel()
         state.show(notice)
 
-        runtime.noticeJob = dependencies.scope.launch {
+        runtime.noticeJob = perform {
             delay(UndoNoticeState.MILLIS)
 
             if (state.notice?.id == notice.id) {
@@ -294,7 +292,7 @@ class EntryVoiceFlow(
 
         state.move(to = listening.copy(silenceStart = dependencies.clock.now.toEpochMilli()))
 
-        runtime.silenceJob = dependencies.scope.launch {
+        runtime.silenceJob = perform {
             delay(SILENCE_MILLIS)
             runtime.silenceJob = null
             finish()

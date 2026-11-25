@@ -17,6 +17,9 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.latestEntryList
@@ -33,7 +36,7 @@ class RecurringEditModel(
     today: LocalDate,
     type: Entry.Kind = Entry.Kind.expense,
     editingId: Identifier<Recurring>? = null,
-) {
+) : ScreenPerforming {
     val state = State(today, type, isScheduleOpen = editingId == null)
     val input = Input(editingId)
     val output = Output(input, state)
@@ -46,6 +49,7 @@ class RecurringEditModel(
         isScheduleOpen: Boolean,
     ) {
         val task = ModelTask()
+        val outcome = ScreenOutcome<SettingsEditOutcome<Unit>>()
 
         var today: LocalDate by mutableStateOf(today)
         var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
@@ -236,6 +240,59 @@ class RecurringEditModel(
     }
 
     suspend fun save(): Boolean {
+        if (!store()) {
+            return false
+        }
+
+        state.outcome.send(SettingsEditOutcome(saved = Unit))
+
+        return true
+    }
+
+    suspend fun saveTogglingHidden(): Boolean {
+        if (!store()) {
+            return false
+        }
+
+        val isHidden = !input.isHidden
+
+        val outcome = if (hide(isHidden)) {
+            SettingsEditOutcome(saved = Unit, isHidden = isHidden)
+        } else {
+            SettingsEditOutcome(saved = Unit, closes = false)
+        }
+
+        state.outcome.send(outcome)
+
+        return true
+    }
+
+    suspend fun delete(): Deletion? {
+        val id = input.editingId ?: return null
+
+        val deletion = state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.deleteRecurring(
+                id = id,
+                at = dependencies.clock.now,
+            )
+        }
+
+        deletion?.let { state.outcome.send(SettingsEditOutcome(deletion = it)) }
+
+        return deletion
+    }
+
+    suspend fun setHidden(isHidden: Boolean): Boolean {
+        if (!hide(isHidden)) {
+            return false
+        }
+
+        state.outcome.send(SettingsEditOutcome(isHidden = isHidden))
+
+        return true
+    }
+
+    private suspend fun store(): Boolean {
         val problem = output.draft.problems.firstOrNull()
 
         if (problem != null) {
@@ -259,18 +316,7 @@ class RecurringEditModel(
         return saved != null
     }
 
-    suspend fun delete(): Deletion? {
-        val id = input.editingId ?: return null
-
-        return state.task.attempt(failure = ModelTask.saveFailed) {
-            dependencies.database.deleteRecurring(
-                id = id,
-                at = dependencies.clock.now,
-            )
-        }
-    }
-
-    suspend fun setHidden(isHidden: Boolean): Boolean {
+    private suspend fun hide(isHidden: Boolean): Boolean {
         val id = input.editingId ?: return false
 
         val done = state.task.attempt(failure = ModelTask.saveFailed) {
@@ -289,25 +335,6 @@ class RecurringEditModel(
         return done != null
     }
 
-    private fun chooseCountMode() {
-        if (!output.isEditing) {
-            state.updateLoan { copy(isCountAuto = true) }
-            return
-        }
-
-        val plan = output.autoPlan
-        val end = state.form.endDate
-
-        if (plan == null || end == null) {
-            state.updateLoan { copy(isCountAuto = false) }
-            return
-        }
-
-        val isAuto = output.autoEndDate(plan) == end && plan.finalAmount == state.loan.manualFinal
-
-        state.updateLoan { copy(isCountAuto = isAuto) }
-    }
-
     private suspend fun loadLoanBalances() {
         val list = dependencies.database.latestEntryList()
 
@@ -319,26 +346,6 @@ class RecurringEditModel(
                     through = state.today,
                 )
             }
-    }
-
-    private fun presetDestination() {
-        val form = state.form
-
-        if (form.type != Entry.Kind.transfer || form.toWalletId != null) {
-            return
-        }
-
-        state.update {
-            copy(toWalletId = output.wallets.firstOrNull { it.id != form.walletId }?.id)
-        }
-    }
-
-    private fun suggestHolidayShift() {
-        if (output.isEditing || state.isHolidayShiftChosen) {
-            return
-        }
-
-        state.update { copy(holidayShift = output.suggestedHolidayShift) }
     }
 
     private suspend fun loadRecurring() {

@@ -38,6 +38,21 @@ suspend fun AppDatabase.failWrites(to: String) {
     }
 }
 
+suspend fun AppDatabase.failUpdates(
+    to: String,
+    changing: String,
+) {
+    useWriterConnection { connection ->
+        val sql = """
+            CREATE TRIGGER fail_${to}_${changing}_update BEFORE UPDATE ON $to
+            WHEN OLD.$changing IS NOT NEW.$changing
+            BEGIN SELECT RAISE(ABORT, 'failing for tests'); END
+        """.trimIndent()
+
+        connection.usePrepared(sql) { it.step() }
+    }
+}
+
 suspend fun AppDatabase.failDeletes(
     from: String,
     where: String,

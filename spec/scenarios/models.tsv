@@ -178,6 +178,10 @@ entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields	
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
+entry-outcome.places-closed-after-saving		EntryModelOutcomeTest/placesClosedAfterSaving	Androidのみ	保存できた時に、閉じる結果を state に置く。iOS の行は後で結び付ける
+entry-outcome.places-no-outcome-when-saving-fails		EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	Androidのみ	保存に失敗した時は、結果を置かない。iOS の行は後で結び付ける
+entry-outcome.continues-with-next-entry-after-saving		EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	Androidのみ	続けて記録した時に、続きの結果を置く。iOS の行は後で結び付ける
+entry-outcome.places-closed-after-deleting		EntryModelOutcomeTest/placesClosedAfterDeleting	Androidのみ	削除できた時に、閉じる結果を state に置く。iOS の行は後で結び付ける
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
@@ -396,15 +400,15 @@ settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHid
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.informs-when-every-hidden-item-is-in-use	SettingsBoardModelTests/informsWhenEveryHiddenItemIsInUse		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.tells-when-some-hidden-items-cannot-be-deleted	SettingsBoardModelTests/tellsWhenSomeHiddenItemsCannotBeDeleted	RecurringListModelTest/tellsWhenSomeHiddenRecurringsCannotBeDeleted	対応	消せた分の取り消しが返ることも確かめる
-settings-edit-outcome.places-saved-value-in-outcome	SettingsEditOutcomeTests/placesSavedValueInOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-no-outcome-when-save-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenSaveFails		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.reports-each-save-as-change	SettingsEditOutcomeTests/reportsEachSaveAsChange		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-hidden-in-outcome	SettingsEditOutcomeTests/placesHiddenInOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-no-outcome-when-hiding-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenHidingFails		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/placesDeletionInOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails		未確認	Android は別のブランチで合わせる
-settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide		未確認	Android は別のブランチで合わせる
+settings-edit-outcome.places-saved-value-in-outcome	SettingsEditOutcomeTests/placesSavedValueInOutcome	SettingsEditOutcomeTest/placesSavedValueInOutcome	対応	
+settings-edit-outcome.places-no-outcome-when-save-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenSaveFails	SettingsEditOutcomeTest/placesNoOutcomeWhenSaveFails	対応	
+settings-edit-outcome.reports-each-save-as-change	SettingsEditOutcomeTests/reportsEachSaveAsChange	SettingsEditOutcomeTest/reportsEachSaveAsChange	対応	
+settings-edit-outcome.places-hidden-in-outcome	SettingsEditOutcomeTests/placesHiddenInOutcome	SettingsEditOutcomeTest/placesHiddenInOutcome	対応	
+settings-edit-outcome.places-no-outcome-when-hiding-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenHidingFails	SettingsEditOutcomeTest/placesNoOutcomeWhenHidingFails	対応	
+settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/placesDeletionInOutcome	SettingsEditOutcomeTest/placesDeletionInOutcome	対応	
+settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome	SettingsEditOutcomeTest/placesSaveAndHideInOneOutcome	対応	
+settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails	SettingsEditOutcomeTest/keepsSheetOpenWhenHidingAfterSaveFails	対応	
+settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide	SettingsEditOutcomeTest/savesWithoutHidingAfterFailedSaveAndHide	対応	
 settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い
@@ -464,11 +468,11 @@ screen.stops-at-limit-with-notice	ScreenModelTests/stopsAtLimitWithNotice	Screen
 screen.marks-failure-until-observed-again	ScreenModelTests/marksFailureUntilObservedAgain	ScreenObservationTest/marksFailureUntilObservedAgain	対応	
 screen.stops-when-failing-right-after-each-value	ScreenModelTests/stopsWhenFailingRightAfterEachValue	ScreenObservationTest/stopsWhenFailingRightAfterEachValue	対応	
 screen.stops-when-cancelled	ScreenModelTests/stopsWhenCancelled	ScreenObservationTest/stopsWhenCancelled	対応	
-screen-outcome.starts-without-value	ScreenOutcomeTests/startsWithoutValue		iOSのみ	モデルの結果を state に置く型（ScreenOutcome）の話で、Compose は関数の戻り値で受ける
-screen-outcome.reports-same-value-sent-twice-as-change	ScreenOutcomeTests/reportsSameValueSentTwiceAsChange		iOSのみ	モデルの結果を state に置く型（ScreenOutcome）の話で、Compose は関数の戻り値で受ける
-screen-performing.runs-model-work-until-it-ends	ScreenPerformingTests/runsModelWorkUntilItEnds		iOSのみ	画面が Task を始める代わりの口（perform）で、Compose は画面の scope で始める
-screen-performing.starts-work-after-caller-returns	ScreenPerformingTests/startsWorkAfterCallerReturns		iOSのみ	画面が Task を始める代わりの口（perform）で、Compose は画面の scope で始める
-screen-performing.starts-works-in-called-order	ScreenPerformingTests/startsWorksInCalledOrder		iOSのみ	画面が Task を始める代わりの口（perform）で、Compose は画面の scope で始める
+screen-outcome.starts-without-value	ScreenOutcomeTests/startsWithoutValue	ScreenOutcomeTest/startsWithoutValue	対応	
+screen-outcome.reports-same-value-sent-twice-as-change	ScreenOutcomeTests/reportsSameValueSentTwiceAsChange	ScreenOutcomeTest/reportsSameValueSentTwiceAsChange	対応	
+screen-performing.runs-model-work-until-it-ends	ScreenPerformingTests/runsModelWorkUntilItEnds	ScreenPerformingTest/runsModelWorkUntilItEnds	対応	
+screen-performing.starts-work-after-caller-returns	ScreenPerformingTests/startsWorkAfterCallerReturns	ScreenPerformingTest/startsWorkAfterCallerReturns	対応	
+screen-performing.starts-works-in-called-order	ScreenPerformingTests/startsWorksInCalledOrder	ScreenPerformingTest/startsWorksInCalledOrder	対応	
 settings-icon-editor.*	SettingsIconEditorModelTests/*		未移植	アイコンを絵文字や文字で作る編集のモデルと画面が無い
 setup.*	SetupModelTests/*		未移植	はじめの案内のカードとお知らせの既読（SetupModel）が無い
 screen-observation.succeeds-on-last-retry		ScreenObservationTest/succeedsOnLastRetry	Androidのみ	最後のやり直しで成功した時に知らせを出さないことを、iOS は確かめていない

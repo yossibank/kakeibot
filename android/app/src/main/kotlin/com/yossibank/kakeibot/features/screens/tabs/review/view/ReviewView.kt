@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,13 +53,13 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.review.model.ReviewMode
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
 import com.yossibank.kakeibot.store.database.AppDatabase
-import kotlinx.coroutines.launch
 
 @Composable
 fun ReviewView(
@@ -78,8 +77,6 @@ fun ReviewView(
             round = round,
         )
     }
-
-    val scope = rememberCoroutineScope()
 
     SideEffect {
         model.state.today = today
@@ -109,7 +106,7 @@ fun ReviewView(
                     options = scales,
                     onSelect = { scale ->
                         model.setScale(scale)
-                        scope.launch { model.saveSelection() }
+                        model.perform { it.saveSelection() }
                     },
                 )
             }
@@ -224,7 +221,6 @@ private fun BreakdownCard(model: ReviewModel) {
     val rows = model.output.rows
     val bars = model.output.balanceBars
     val isBalance = model.input.kind == ReviewKind.balance
-    val scope = rememberCoroutineScope()
     val total = model.output.total
 
     Column(
@@ -254,7 +250,7 @@ private fun BreakdownCard(model: ReviewModel) {
                 options = kinds,
                 onSelect = { kind ->
                     model.setKind(kind)
-                    scope.launch { model.saveSelection() }
+                    model.perform { it.saveSelection() }
                 },
             )
         }

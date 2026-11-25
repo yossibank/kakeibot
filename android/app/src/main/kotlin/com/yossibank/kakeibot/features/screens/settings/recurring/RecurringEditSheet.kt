@@ -44,7 +44,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -91,6 +90,8 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.plannedTo
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.previewRow
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.saveTitle
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.features.shared.model.OnOutcome
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
@@ -99,7 +100,6 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.writes.types.Deletion
-import kotlinx.coroutines.launch
 
 enum class RecurringPanel(
     val title: String,
@@ -139,7 +139,6 @@ fun RecurringEditSheet(
     }
 
     val focus = LocalFocusManager.current
-    val scope = rememberCoroutineScope()
     val permission = rememberNotificationPermission()
 
     var panel by remember { mutableStateOf<RecurringPanel?>(null) }
@@ -172,34 +171,28 @@ fun RecurringEditSheet(
     }
 
     fun setHidden(isHidden: Boolean) {
-        scope.launch {
-            if (model.setHidden(isHidden)) {
-                if (isHidden) {
-                    onHide()
-                }
-
-                onClose()
-            }
-        }
+        model.perform { it.setHidden(isHidden) }
     }
 
     fun save(hiding: Boolean = false) {
         panel = null
 
-        scope.launch {
-            if (!model.save()) {
-                return@launch
-            }
+        model.perform { if (hiding) it.saveTogglingHidden() else it.save() }
+    }
 
-            if (model.state.form.remindDaysBefore != null) {
-                permission.requestIfNeeded()
-            }
+    OnOutcome(model.state.outcome) { outcome ->
+        if (outcome.saved != null && model.state.form.remindDaysBefore != null) {
+            permission.requestIfNeeded()
+        }
 
-            if (hiding) {
-                setHidden(!model.input.isHidden)
-            } else {
-                onClose()
-            }
+        if (outcome.isHidden == true) {
+            onHide()
+        }
+
+        outcome.deletion?.let(onDelete)
+
+        if (outcome.closes) {
+            onClose()
         }
     }
 
@@ -330,14 +323,7 @@ fun RecurringEditSheet(
         canSave = model.output.canSave,
         onDismiss = { prompt = null },
         onDiscard = onClose,
-        onDelete = {
-            scope.launch {
-                model.delete()?.let {
-                    onDelete(it)
-                    onClose()
-                }
-            }
-        },
+        onDelete = { model.perform { it.delete() } },
         onSaveHiding = { save(hiding = true) },
         onDiscardHiding = { setHidden(!model.input.isHidden) },
     )

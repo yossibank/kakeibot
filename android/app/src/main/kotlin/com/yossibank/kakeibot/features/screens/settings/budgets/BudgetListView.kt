@@ -27,7 +27,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +40,6 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
-import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.designsystem.components.budget.BudgetUsageBar
 import com.yossibank.kakeibot.designsystem.components.budget.carryoverText
 import com.yossibank.kakeibot.designsystem.components.budget.remainingText
@@ -58,7 +56,7 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
-import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
@@ -70,7 +68,6 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivid
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
-import kotlinx.coroutines.launch
 
 @Composable
 fun BudgetListView(
@@ -92,19 +89,13 @@ fun BudgetListView(
         model.state.today = today
     }
 
-    val scope = rememberCoroutineScope()
-
-    val cleared = remember { UndoNoticeState<BudgetListModel.Cleared>() }
-    val resetFrom = remember { UndoNoticeState<YearMonth>() }
-
     LaunchedEffect(model) {
         model.observe()
     }
 
     model.state.task.Timer()
-
-    cleared.Timer()
-    resetFrom.Timer()
+    model.state.cleared.Timer()
+    model.state.resetFrom.Timer()
 
     BackHandler(onBack = onBack)
 
@@ -121,15 +112,10 @@ fun BudgetListView(
         overlay = {
             BudgetNotices(
                 model = model,
-                cleared = cleared,
-                resetFrom = resetFrom,
                 modifier = Modifier.align(Alignment.BottomCenter),
             )
 
-            BudgetKeypadDrawer(
-                model = model,
-                onCleared = cleared::show,
-            )
+            BudgetKeypadDrawer(model = model)
         },
     ) {
         SettingsIntroCard(
@@ -153,9 +139,7 @@ fun BudgetListView(
             BudgetTotalCard(
                 model = model,
                 onEdit = { model.startEditing(BudgetListModel.Target.Total) },
-                onReset = {
-                    scope.launch { model.resetCarryover()?.let(resetFrom::show) }
-                },
+                onReset = { model.perform { it.resetCarryover() } },
             )
 
             SettingsSwitch(
@@ -163,9 +147,7 @@ fun BudgetListView(
                 detail = "使いすぎた分は、次の月の予算から引きます",
                 icon = R.drawable.ic_repeat,
                 isOn = model.output.isCarryoverOn,
-                onChange = { isOn ->
-                    scope.launch { model.setCarryover(isOn) }
-                },
+                onChange = { isOn -> model.perform { it.setCarryover(isOn) } },
             )
 
             if (model.output.budgeted.isNotEmpty()) {
@@ -202,11 +184,10 @@ fun BudgetListView(
 @Composable
 private fun BudgetNotices(
     model: BudgetListModel,
-    cleared: UndoNoticeState<BudgetListModel.Cleared>,
-    resetFrom: UndoNoticeState<YearMonth>,
     modifier: Modifier = Modifier,
 ) {
-    val scope = rememberCoroutineScope()
+    val cleared = model.state.cleared
+    val resetFrom = model.state.resetFrom
 
     Column(
         modifier = modifier
@@ -221,7 +202,7 @@ private fun BudgetNotices(
             SettingsUndoNotice(
                 message = "${current.target.title}をなくしました",
                 icon = R.drawable.ic_trash,
-                onUndo = { scope.launch { model.restore(current) } },
+                onUndo = { model.perform { it.restore(current) } },
                 onClose = cleared::dismiss,
             )
         }
@@ -230,7 +211,7 @@ private fun BudgetNotices(
             SettingsUndoNotice(
                 message = "繰越を 0 に戻しました",
                 icon = R.drawable.ic_repeat,
-                onUndo = { scope.launch { model.restoreCarryover(from = start) } },
+                onUndo = { model.perform { it.restoreCarryover(from = start) } },
                 onClose = resetFrom::dismiss,
             )
         }

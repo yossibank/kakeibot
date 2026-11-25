@@ -34,7 +34,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -79,8 +78,8 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.shared.notice.DeletionNotice
-import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
@@ -89,8 +88,6 @@ import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNo
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
-import com.yossibank.kakeibot.store.writes.types.Deletion
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 private sealed interface Editing {
@@ -131,14 +128,12 @@ fun RecurringListView(
         model.state.today = today
     }
 
-    val scope = rememberCoroutineScope()
-
     var editing by remember { mutableStateOf(opening?.let { Editing.Existing(it) } as Editing?) }
     var openId by remember { mutableStateOf<Identifier<Recurring>?>(null) }
     var deleting by remember { mutableStateOf<DeleteTarget?>(null) }
 
-    val hiddenNotice = remember { UndoNoticeState<Identifier<Recurring>>() }
-    val deletedNotice = remember { UndoNoticeState<Deletion>() }
+    val hiddenNotice = model.state.hidden
+    val deletedNotice = model.state.deleted
     val lift = remember { RecurringLift() }
 
     LaunchedEffect(model) {
@@ -156,18 +151,10 @@ fun RecurringListView(
 
     BackHandler(onBack = onBack)
 
-    fun hide(id: Identifier<Recurring>) {
-        scope.launch {
-            if (model.hide(id)) {
-                hiddenNotice.show(id)
-            }
-        }
-    }
-
     val actions = RecurringRowActions(
         onOpen = { openId = it },
         onEdit = { editing = Editing.Existing(it) },
-        onHide = ::hide,
+        onHide = { id -> model.perform { it.hide(id) } },
         onDelete = { deleting = DeleteTarget.One(it) },
     )
 
@@ -197,7 +184,7 @@ fun RecurringListView(
                     SettingsUndoNotice(
                         message = "止めて非表示にしました",
                         icon = R.drawable.ic_pause,
-                        onUndo = { scope.launch { model.show(id) } },
+                        onUndo = { model.perform { it.show(id) } },
                         onClose = hiddenNotice::dismiss,
                     )
                 }
@@ -206,7 +193,7 @@ fun RecurringListView(
                     SettingsUndoNotice(
                         message = DeletionNotice.message(current),
                         icon = R.drawable.ic_trash,
-                        onUndo = { scope.launch { model.restore(current) } },
+                        onUndo = { model.perform { it.restore(current) } },
                         onClose = deletedNotice::dismiss,
                     )
                 }
@@ -301,10 +288,10 @@ fun RecurringListView(
                 RecurringHiddenSection(
                     rows = model.output.hiddenRows,
                     isOpen = model.input.hiddenList.isClosed != true,
-                    onToggle = { scope.launch { model.toggleHiddenList() } },
+                    onToggle = { model.perform { it.toggleHiddenList() } },
                     onDeleteAll = { deleting = DeleteTarget.AllHidden },
                     onEdit = actions.onEdit,
-                    onShow = { id -> scope.launch { model.show(id) } },
+                    onShow = { id -> model.perform { it.show(id) } },
                 )
             }
         }
@@ -330,13 +317,11 @@ fun RecurringListView(
             onConfirm = {
                 deleting = null
 
-                scope.launch {
-                    val deletion = when (target) {
-                        DeleteTarget.AllHidden -> model.deleteHidden()
-                        is DeleteTarget.One -> model.delete(target.id)
+                model.perform {
+                    when (target) {
+                        DeleteTarget.AllHidden -> it.deleteHidden()
+                        is DeleteTarget.One -> it.delete(target.id)
                     }
-
-                    deletion?.let(deletedNotice::show)
                 }
             },
             onDismiss = { deleting = null },

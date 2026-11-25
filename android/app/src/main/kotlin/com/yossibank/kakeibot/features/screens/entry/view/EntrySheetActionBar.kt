@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,16 +28,13 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.canSave
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.opensKeypadOnSave
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.saveTitle
-import kotlinx.coroutines.launch
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 
 @Composable
 internal fun ActionBar(
     model: EntryModel,
-    onSaved: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -49,11 +45,7 @@ internal fun ActionBar(
                 if (model.output.opensKeypadOnSave) {
                     model.state.focus(EntryModel.Field.Amount)
                 } else {
-                    scope.launch {
-                        if (model.save()) {
-                            onSaved()
-                        }
-                    }
+                    model.perform { it.save() }
                 }
             },
             modifier = Modifier.weight(1f),
@@ -70,15 +62,7 @@ internal fun ActionBar(
                 )
             }
         } else {
-            RoundButton(
-                onSelect = {
-                    scope.launch {
-                        if (model.save()) {
-                            model.startNext()
-                        }
-                    }
-                },
-            ) {
+            RoundButton(onSelect = { model.perform { it.saveAndContinue() } }) {
                 Text(
                     text = "続けて",
                     color = Palette.accent,

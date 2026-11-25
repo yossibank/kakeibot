@@ -16,6 +16,9 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.recurrings
@@ -26,7 +29,7 @@ class TemplateEditModel(
     database: AppDatabase,
     clock: ScreenClock,
     draft: EntryTemplateDraft,
-) {
+) : ScreenPerforming {
     val state = State(draft)
     val input = Input()
     val output = Output(input, state)
@@ -37,6 +40,7 @@ class TemplateEditModel(
         draft: EntryTemplateDraft,
     ) {
         val task = ModelTask()
+        val outcome = ScreenOutcome<SettingsEditOutcome<EntryTemplate>>()
 
         var form: EntryTemplateDraft by mutableStateOf(draft)
             private set
@@ -181,12 +185,16 @@ class TemplateEditModel(
             return null
         }
 
-        return state.task.attempt(failure = ModelTask.saveFailed) {
+        val saved = state.task.attempt(failure = ModelTask.saveFailed) {
             dependencies.database.saveTemplate(
                 draft = draft,
                 at = dependencies.clock.now,
             )
         }
+
+        saved?.let { state.outcome.send(SettingsEditOutcome(saved = it)) }
+
+        return saved
     }
 }
 

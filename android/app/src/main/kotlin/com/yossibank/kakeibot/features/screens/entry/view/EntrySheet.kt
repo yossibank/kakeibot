@@ -37,7 +37,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,9 +67,11 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.close
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasRecent
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.newTemplateDraft
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryDeck
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryRecentRow
 import com.yossibank.kakeibot.features.screens.entry.parts.EntrySlip
@@ -80,8 +81,8 @@ import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceCard
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceNotice
 import com.yossibank.kakeibot.features.screens.entry.voice.rememberVoiceStarter
 import com.yossibank.kakeibot.features.screens.settings.templates.TemplateEditSheet
+import com.yossibank.kakeibot.features.shared.model.OnOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
-import kotlinx.coroutines.launch
 
 @Composable
 fun EntrySheet(
@@ -103,13 +104,11 @@ fun EntrySheet(
     var isShowingItems by remember { mutableStateOf(false) }
     var templateDraft: EntryTemplateDraft? by remember { mutableStateOf(null) }
 
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
     val voice = remember(model) {
         EntryVoiceFlow(
             context = context,
-            scope = scope,
             clock = ScreenClock.system,
         )
     }
@@ -129,6 +128,12 @@ fun EntrySheet(
     }
 
     model.state.task.Timer()
+
+    OnOutcome(model.state.outcome) { outcome ->
+        if (outcome == EntryModel.Outcome.Closed) {
+            onClose()
+        }
+    }
 
     DisposableEffect(voice) {
         onDispose(voice::close)
@@ -172,7 +177,7 @@ fun EntrySheet(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 EntryTypeSwitch(
                     selection = model.state.form.type,
-                    onSelect = model::select,
+                    onSelect = { model.select(type = it) },
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -233,7 +238,6 @@ fun EntrySheet(
                 } else {
                     ActionBar(
                         model = model,
-                        onSaved = onClose,
                         onDelete = { isConfirmingDelete = true },
                     )
                 }
@@ -262,10 +266,7 @@ fun EntrySheet(
                 draft = draft,
                 onSave = {
                     templateDraft = null
-
-                    scope.launch {
-                        model.reloadTemplates()
-                    }
+                    model.perform { it.reloadTemplates() }
                 },
                 onClose = { templateDraft = null },
             )
@@ -288,12 +289,7 @@ fun EntrySheet(
             title = "この記録を削除しますか",
             onConfirm = {
                 isConfirmingDelete = false
-
-                scope.launch {
-                    if (model.delete()) {
-                        onClose()
-                    }
-                }
+                model.perform { it.delete() }
             },
             onDismiss = { isConfirmingDelete = false },
         )

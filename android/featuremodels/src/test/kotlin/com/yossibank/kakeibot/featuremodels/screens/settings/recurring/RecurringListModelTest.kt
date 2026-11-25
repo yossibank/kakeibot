@@ -64,6 +64,7 @@ class RecurringListModelTest {
         val model = setup.observedModel()
 
         val hidden = model.hide(saved.id)
+        val noticed = model.state.hidden.current
         ModelWait.until { model.output.hiddenRows.isNotEmpty() }
         val shownWhileHidden = model.output.rows.size
         val totalWhileHidden = model.output.monthTotal
@@ -72,6 +73,7 @@ class RecurringListModelTest {
         ModelWait.until { model.output.rows.isNotEmpty() }
 
         assertTrue(hidden)
+        assertEquals(saved.id, noticed)
         assertTrue(shown)
         assertEquals(0, shownWhileHidden)
         assertEquals(0L, totalWhileHidden)
@@ -102,10 +104,12 @@ class RecurringListModelTest {
         val model = setup.observedModel()
 
         val deletion = assertNotNull(model.delete(saved.id))
+        val noticed = model.state.deleted.current
         ModelWait.until { model.output.rows.isEmpty() }
         model.restore(deletion)
         ModelWait.until { model.output.rows.isNotEmpty() }
 
+        assertEquals(deletion, noticed)
         assertEquals(listOf(saved.id), setup.database.recurrings().map { it.id })
     }
 
@@ -123,6 +127,7 @@ class RecurringListModelTest {
 
         assertNull(none)
         assertNotNull(deletion)
+        assertEquals(deletion, model.state.deleted.current)
         assertEquals(
             listOf("サブスク"),
             setup.database.recurrings(includingHidden = true).map {

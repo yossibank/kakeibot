@@ -19,6 +19,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.setting
@@ -40,7 +41,7 @@ class ReviewModel(
     entryList: Flow<EntryList>,
     today: LocalDate,
     round: ObservationRound,
-) {
+) : ScreenPerforming {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)

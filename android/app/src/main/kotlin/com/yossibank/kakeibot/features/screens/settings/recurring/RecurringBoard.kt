@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +42,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringRow
-import kotlinx.coroutines.launch
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import kotlin.math.roundToInt
 
 private val rowSpacing = 12.dp
@@ -131,7 +130,6 @@ private fun BoardRow(
     openId: Identifier<Recurring>?,
     actions: RecurringRowActions,
 ) {
-    val scope = rememberCoroutineScope()
     val slot = with(LocalDensity.current) { (recurringRowHeight + rowSpacing).toPx() }
 
     val isLifted = lift.id == row.id
@@ -172,7 +170,7 @@ private fun BoardRow(
                             model.state.cancelMoving()
                             actions.onHide(hiding)
                         } else {
-                            scope.launch { model.finishMoving() }
+                            model.perform { it.finishMoving() }
                         }
                     },
                     onDragCancel = {
