@@ -6,8 +6,6 @@ import SwiftUI
 struct AssetsRewardGoalEditSheet: View {
     @State private var model: AssetsRewardGoalEditModel
     @State private var panel: Panel?
-    @State private var isConfirmingDiscard = false
-    @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
@@ -34,7 +32,7 @@ struct AssetsRewardGoalEditSheet: View {
                 ) {
                     close()
                 } onHide: {} onDelete: {
-                    isConfirmingDelete = true
+                    model.state.prompt.isConfirmingDelete = true
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -49,21 +47,24 @@ struct AssetsRewardGoalEditSheet: View {
             .errorBanner(Bindable(model.state).errorNotice)
             .confirmsDiscard(
                 when: model.output.isChanged,
-                isPresented: $isConfirmingDiscard
+                isPresented: Bindable(model.state).prompt.isConfirmingDiscard
             ) {
                 dismiss()
             }
             .confirmation(
-                isPresented: $isConfirmingDelete,
+                isPresented: Bindable(model.state).prompt.isConfirmingDelete,
                 systemImage: "trash",
                 title: "この目標を削除しますか",
                 message: "貯金箱の額はそのまま残ります",
                 keepTitle: "やめる",
                 confirmTitle: "削除する"
             ) {
-                Task {
-                    await delete()
+                model.perform {
+                    await $0.delete()
                 }
+            }
+            .onOutcome(model.state.outcome) { _ in
+                dismiss()
             }
             .onChange(of: focus) {
                 if focus != nil {
@@ -118,9 +119,7 @@ private extension AssetsRewardGoalEditSheet {
 
     var saveButton: some View {
         PrimaryButton(model.output.saveTitle) {
-            Task {
-                await save()
-            }
+            save()
         }
         .disabled(!model.output.canSave)
     }
@@ -189,23 +188,17 @@ private extension AssetsRewardGoalEditSheet {
         closePanel()
 
         if model.output.isChanged {
-            isConfirmingDiscard = true
+            model.state.prompt.isConfirmingDiscard = true
         } else {
             dismiss()
         }
     }
 
-    func save() async {
+    func save() {
         closePanel()
 
-        if await model.save() {
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if await model.delete() {
-            dismiss()
+        model.perform {
+            await $0.save()
         }
     }
 }

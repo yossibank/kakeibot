@@ -5,7 +5,6 @@ import SwiftUI
 
 struct AssetsRewardSheet: View {
     @State var goalTarget: GoalTarget?
-    @State var boughtId: RewardGoal.ID?
 
     @State private var isEditingRules = false
     @State private var isGuideOpen = false
@@ -51,13 +50,16 @@ struct AssetsRewardSheet: View {
             AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: target.goal))
         }
         .settingsHideNotice(
-            $boughtId,
+            Bindable(model.state).boughtId,
             message: "買ったものに移しました",
             systemImage: "bag"
         ) { id in
             model.perform {
                 await $0.setPurchased(id, isPurchased: false)
             }
+        }
+        .onDisappear {
+            model.state.boughtId = nil
         }
         .presentationSizing(.tallForm)
     }

@@ -59,6 +59,39 @@ struct ProPurchaseModelTests {
     }
 
     @Test
+    func placesOutcomeWhenPurchaseUnlocks() async {
+        let model = ProPurchaseModel(store: .stub(purchase: .success(.unlocked)))
+
+        _ = await model.purchase()
+        let first = model.state.outcome
+        _ = await model.purchase()
+
+        #expect(first.value == .purchase)
+        #expect(model.state.outcome != first)
+    }
+
+    @Test
+    func placesNoOutcomeWhenPurchaseStaysLocked() async {
+        let model = ProPurchaseModel(store: .stub(purchase: .success(.locked)))
+
+        _ = await model.purchase()
+
+        #expect(model.state.outcome.value == nil)
+    }
+
+    @Test
+    func placesOutcomeOnlyWhenRestoreUnlocks() async {
+        let locked = ProPurchaseModel(store: .stub(restore: .success(.locked)))
+        let unlocked = ProPurchaseModel(store: .stub(restore: .success(.unlocked)))
+
+        _ = await locked.restore()
+        _ = await unlocked.restore()
+
+        #expect(locked.state.outcome.value == nil)
+        #expect(unlocked.state.outcome.value == .restore)
+    }
+
+    @Test
     func purchaseStaysLockedWhenCancelled() async {
         let model = ProPurchaseModel(store: .stub(purchase: .success(.locked)))
 

@@ -45,6 +45,9 @@ public struct OnboardingView: View {
                     )
                 }
         }
+        .onOutcome(model.state.outcome) { _ in
+            onFinish()
+        }
         .task {
             await model.load()
         }
@@ -76,9 +79,7 @@ private extension OnboardingView {
 
             if !model.output.isFirstPage {
                 PrimaryButton(model.output.nextTitle) {
-                    Task {
-                        await next()
-                    }
+                    next()
                 }
             }
         }
@@ -120,8 +121,8 @@ private extension OnboardingView {
                     .frame(width: 44, height: 44)
             } else {
                 Button("設定を飛ばして始める") {
-                    Task {
-                        await finish()
+                    model.perform {
+                        await $0.finish()
                     }
                 }
                 .textFont(.footnote)
@@ -180,9 +181,9 @@ private extension OnboardingView {
                     detail: "設定はあとで",
                     duration: nil
                 ) {
-                    Task {
-                        model.choose(.quick)
-                        await finish()
+                    model.perform {
+                        $0.choose(.quick)
+                        await $0.finish()
                     }
                 }
             }
@@ -245,13 +246,15 @@ private extension OnboardingView {
 }
 
 private extension OnboardingView {
-    func next() async {
+    func next() {
         guard model.output.isLastPage else {
             turnPage(.forward)
             return
         }
 
-        await finish()
+        model.perform {
+            await $0.finish()
+        }
     }
 
     func turnPage(_ direction: PageSwipeDirection) {
@@ -266,12 +269,6 @@ private extension OnboardingView {
             case .forward: model.next()
             case .backward: model.back()
             }
-        }
-    }
-
-    func finish() async {
-        if await model.finish() {
-            onFinish()
         }
     }
 }

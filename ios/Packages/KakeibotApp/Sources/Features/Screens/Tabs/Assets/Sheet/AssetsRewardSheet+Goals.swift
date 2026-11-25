@@ -51,8 +51,8 @@ private extension AssetsRewardSheet {
             remaining: model.output.remaining(to: goal),
             progress: model.output.progress(to: goal),
             onBuy: {
-                Task {
-                    await buy(goal)
+                model.perform {
+                    await $0.setPurchased(goal.id, isPurchased: true)
                 }
             }
         )
@@ -110,13 +110,5 @@ private extension AssetsRewardSheet {
         .padding(.horizontal, 16)
         .frame(minHeight: 56)
         .card()
-    }
-}
-
-private extension AssetsRewardSheet {
-    func buy(_ goal: RewardGoal) async {
-        if await model.setPurchased(goal.id, isPurchased: true) {
-            boughtId = goal.id
-        }
     }
 }

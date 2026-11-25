@@ -31,10 +31,12 @@ struct OnboardingModelTests {
         model.next()
         model.next()
         let title = model.output.nextTitle
+        let outcomeBefore = model.state.outcome
         let finished = await model.finish()
         let completed = try await setup.database.setting(.onboardingCompleted)
         let seenNews = try await setup.database.setting(.whatsNewSeenVersion)
 
+        #expect(model.state.outcome != outcomeBefore)
         #expect(first)
         #expect(!locked)
         #expect(budgetMonth == YearMonth(year: 2026, month: 10))
