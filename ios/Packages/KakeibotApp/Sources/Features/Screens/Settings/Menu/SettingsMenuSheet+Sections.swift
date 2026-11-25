@@ -119,7 +119,7 @@ extension SettingsMenuSheet {
                         parts: parts,
                         today: today,
                         time: model.input.reminderTime,
-                        authorization: authorization,
+                        authorization: model.input.authorization,
                         permission: permission
                     )
                 )
@@ -224,8 +224,8 @@ extension SettingsMenuSheet {
             Hairline()
 
             Button {
-                Task {
-                    isConfirmingReset = await recordReset.prepare()
+                recordReset.perform {
+                    await $0.prepare()
                 }
             } label: {
                 row("記録をすべて削除", systemImage: "trash", tint: Palette.rose)
@@ -266,7 +266,10 @@ private extension SettingsMenuSheet {
     }
 
     var reminderText: String {
-        ReminderModel.rowText(time: model.input.reminderTime, authorization: authorization)
+        ReminderModel.rowText(
+            time: model.input.reminderTime,
+            authorization: model.input.authorization
+        )
     }
 
     var proText: String {

@@ -72,4 +72,22 @@ struct SettingsMenuModelTests {
         #expect(unsaved == nil)
         #expect(model.backupText() == "2 か月前")
     }
+
+    @Test
+    func readsNotificationAuthorization() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = SettingsMenuModel(parts: .system(setup.database))
+
+        let denied = NotificationPermission {
+            .denied
+        } request: {
+            false
+        }
+
+        let start = model.input.authorization
+        await model.loadAuthorization(denied)
+
+        #expect(start == .allowed)
+        #expect(model.input.authorization == .denied)
+    }
 }

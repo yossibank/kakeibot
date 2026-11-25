@@ -28,6 +28,7 @@ public extension SettingsMenuModel {
         public internal(set) var backupExportedAt: Date?
         public internal(set) var firstEntryCreatedAt: Date?
         public internal(set) var usesFun: Bool?
+        public internal(set) var authorization: NotificationAuthorization = .allowed
     }
 
     func run() async {
@@ -78,6 +79,10 @@ public extension SettingsMenuModel {
                 await self.loadUsesFun()
             }
         ])
+    }
+
+    func loadAuthorization(_ permission: NotificationPermission) async {
+        input.authorization = await permission.authorization()
     }
 
     func weekStartModel() -> SettingsMenuValueModel<Weekday> {

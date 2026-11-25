@@ -373,8 +373,13 @@ template-edit.keeps-bill-shift-only-for-billed-card		TemplateEditModelTest/keeps
 template-list.*	TemplateListModelTests/*		未移植	テンプレートの一覧（非表示・並べ替え）の画面とモデルが Android に無い
 settings-menu.follows-changed-settings	SettingsMenuModelTests/followsChangedSettings		未移植	起動時の画面・通知の時刻・テーマの項目が設定のメニューに無い
 settings-menu.tells-backup-age-after-export	SettingsMenuModelTests/tellsBackupAgeAfterExport		未移植	バックアップの書き出しが Android に無い
+settings-menu.reads-notification-authorization	SettingsMenuModelTests/readsNotificationAuthorization		未確認	Android は別のブランチで合わせる
 settings-menu-link.*	SettingsMenuLinkTests/*		未移植	問い合わせのフォームへのリンクが、設定のメニューに無い
+settings-menu-reset.asks-to-confirm-when-records-exist	SettingsMenuResetModelTests/asksToConfirmWhenRecordsExist		未確認	Android は別のブランチで合わせる
+settings-menu-reset.tells-instead-of-confirming-when-nothing-to-delete	SettingsMenuResetModelTests/tellsInsteadOfConfirmingWhenNothingToDelete		未確認	Android は別のブランチで合わせる
+settings-menu-reset.closes-confirmation-when-counting-fails	SettingsMenuResetModelTests/closesConfirmationWhenCountingFails		未確認	Android は別のブランチで合わせる
 settings-menu-sample-data.*	SettingsMenuSampleDataTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
+settings-menu-sample.*	SettingsMenuSampleModelTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sheet.*	SettingsMenuSheetTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-menu-value.starts-with-amount-until-turned-off	SettingsMenuValueModelTests/startsWithAmountUntilTurnedOff		未移植	「金額から始める」の切り替えが設定のメニューに無い（キーは store にだけある）
 settings-menu-value.saves-chosen-day	SettingsMenuValueModelTests/savesChosenDay	SettingsMenuModelTest/savesChosenDay	対応	

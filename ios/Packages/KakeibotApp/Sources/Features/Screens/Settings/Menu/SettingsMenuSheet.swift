@@ -5,15 +5,11 @@ import SwiftUI
 
 public struct SettingsMenuSheet: View {
     @State var model: SettingsMenuModel
-    @State var authorization: NotificationAuthorization = .allowed
     @State var weekStart: SettingsMenuValueModel<Weekday>
     @State var recordReset: SettingsMenuResetModel
-    @State var isConfirmingReset = false
 
     #if DEBUG
-    @State var isConfirmingSample = false
-    @State var isInsertingSample = false
-    @State var sampleMessage: String?
+    @State var sample: SettingsMenuSampleModel
     #endif
 
     @Environment(\.isPro) var isPro
@@ -38,6 +34,10 @@ public struct SettingsMenuSheet: View {
         _model = State(initialValue: model)
         _weekStart = State(initialValue: model.weekStartModel())
         _recordReset = State(initialValue: SettingsMenuResetModel(parts: parts))
+
+        #if DEBUG
+        _sample = State(initialValue: model.sampleModel())
+        #endif
 
         self.parts = parts
         self.today = today
@@ -90,7 +90,7 @@ public struct SettingsMenuSheet: View {
         .errorBanner(Bindable(weekStart.state).errorNotice)
         .errorBanner(Bindable(recordReset.state).errorNotice)
         .confirmation(
-            isPresented: $isConfirmingReset,
+            isPresented: Bindable(recordReset.state).isConfirming,
             systemImage: "trash",
             title: "記録をすべて削除しますか",
             message: recordReset.output.message(isSyncing: model.input.syncStatus.isEnabled),
@@ -103,8 +103,8 @@ public struct SettingsMenuSheet: View {
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                Task {
-                    authorization = await permission.authorization()
+                model.perform { [permission] in
+                    await $0.loadAuthorization(permission)
                 }
             }
         }
@@ -115,7 +115,7 @@ public struct SettingsMenuSheet: View {
             await weekStart.load()
         }
         .task {
-            authorization = await permission.authorization()
+            await model.loadAuthorization(permission)
         }
     }
 }
