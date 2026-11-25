@@ -94,7 +94,9 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | タブの記録の一覧の失敗 | 4 つのタブのモデルは、記録の一覧を読めなかった時に `state.isListFailed` を立てる。見張りを始め直す時に下ろす |
 | 見張りの回 | `MainView` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
 | 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
-| 開いているシート | `MainSheet` のように、1 つの sealed interface で持つ |
+| 開いているシート | `MainModel.Sheet` のように、1 つの sealed interface で持つ |
+| 入口のタブとシート | `featuremodels/screens/main/` の `MainModel` が持つ。通知やリンクの行き先は、`open` が開く |
+| 入口の状態の引き継ぎ | `appfeature/main/` の `rememberMainModel` が、タブとシートを保存する |
 | 確認・引き出し・選んだ行 | モデルの `State` に置く。`EntryModel.Presented`・`RecurringPanel` が当たる |
 | 画面の見た目の値 | 画面のファイルの `class Layout` に置く。Composable の関数で `mutableStateOf` を作らない |
 
@@ -132,6 +134,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | --- | --- |
 | 主ボタン・丸いアイコンのボタン | `designsystem/components/button/` |
 | 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
+| 下からせり上がる全画面の層 | `designsystem/components/modal/` の `SheetLayer`。閉じる動きの間は、最後の中身を出す |
 | 失敗の知らせ | `designsystem/components/notice/` の `NoticeBanner`。タブの画面は、題のすぐ下に出す |
 | 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`LoadFailedColumn` で画面の全体に出す |
 | 記録が無い時の表示 | `features/shared/placeholder/` の `PlaceholderEmpty`。記録するボタンを付けられる |

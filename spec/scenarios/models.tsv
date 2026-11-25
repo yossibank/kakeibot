@@ -210,8 +210,8 @@ entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScroll
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
-main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
-main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
+main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute	MainModelTest/replacesOpenSheetWithRouteAtOnce	違い	開いたシートが閉じるのを待たず、すぐに行き先のシートへ替える
+main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits		違い	待たないので、続けて来た行き先は、後から来た物が残る
 main.closes-sheet-before-moving-to-tab	MainModelTests/closesSheetBeforeMovingToTab		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
 main.waits-before-moving-even-without-sheet	MainModelTests/waitsBeforeMovingEvenWithoutSheet		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
 main.adds-entry-on-chosen-date	MainModelTests/addsEntryOnChosenDate		未移植	入口のシートに日付を渡す所が無く、入力は今日で開く
@@ -221,12 +221,13 @@ main.replaces-draft-when-day-changes	MainModelTests/replacesDraftWhenDayChanges	
 main.chooses-launch-tab-from-setting	MainModelTests/choosesLaunchTabFromSetting		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.keeps-home-tab-when-launch-tab-is-not-chosen	MainModelTests/keepsHomeTabWhenLaunchTabIsNotChosen		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.opens-entry-sheet-at-launch	MainModelTests/opensEntrySheetAtLaunch		未移植	起動時に開く画面の設定を読んで、入力シートを開く所が無い
-main.opens-home-route-without-waiting	MainModelTests/opensHomeRouteWithoutWaiting		未確認	行き先は MainView の Composable が開き、モデルもテストも無い
-main.opens-entry-route-on-home-with-date	MainModelTests/opensEntryRouteOnHomeWithDate		未確認	入力の行き先は Composable が開くが、日付とタブは確かめていない
-main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCurrentTab		未確認	固定費の行き先は Composable が設定のシートで開き、テストが無い
+main.opens-home-route-without-waiting	MainModelTests/opensHomeRouteWithoutWaiting	MainModelTest/opensHomeRoute	対応	
+main.opens-entry-route-on-home-with-date	MainModelTests/opensEntryRouteOnHomeWithDate	MainModelTest/opensEntryRouteOnCurrentTab	違い	タブをホームへ切り替えず、行き先の日付も入力に渡さない
+main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCurrentTab	MainModelTest/opensRecurringRouteOnCurrentTab	対応	固定費は、設定のシートの中で開く
 main.opens-template-route-with-saved-template	MainModelTests/opensTemplateRouteWithSavedTemplate		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-new-template-route-on-home	MainModelTests/opensNewTemplateRouteOnHome		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-receipt-route-and-starts-reading	MainModelTests/opensReceiptRouteAndStartsReading		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
+main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い

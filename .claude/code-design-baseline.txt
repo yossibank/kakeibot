@@ -1,6 +1,3 @@
-android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: Composable の関数で、状態を直接作らない（mutableIntStateOf: round）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: Composable の関数で、状態を直接作らない（mutableStateOf: last）。意味のある状態は、モデルの State に移す
-android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: Composable の関数で、状態を直接作らない（mutableStateOf: sheet）。意味のある状態は、モデルの State に移す
 ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: glow。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: hasSwept。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: isLeaving。意味のある状態は、モデルの state に移す
