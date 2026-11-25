@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.screens.tabs.home.model
 
+import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
@@ -9,7 +10,10 @@ import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.failingFirst
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
+import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
+import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.writes.methods.setBudget
+import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.launch
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -200,6 +204,22 @@ class HomeModelTest {
             listOf("昨日・財布", "10/11・財布"),
             model.output.recentRows.map { it.detail },
         )
+    }
+
+    @Test
+    fun countsHomeByPeriod() = modelTest(today = "2026-10-12") { setup ->
+        setup.save(Entry.Kind.expense, amount = 980, daysAgo = 0)
+        setup.save(Entry.Kind.expense, amount = 500, daysAgo = 17)
+        setup.save(Entry.Kind.expense, amount = 3000, daysAgo = 18)
+        setup.database.setSetting(
+            key = SettingKey.monthStartDay,
+            to = checkNotNull(MonthStartDay.of(day = 25)),
+        )
+
+        val model = setup.observedModel()
+        ModelWait.until { model.output.periodText == "9/25〜10/24" }
+
+        assertEquals(1480L, model.input.overview?.monthExpense)
     }
 
     private fun ModelTestSetup.homeModel() = HomeModel(

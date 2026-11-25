@@ -38,6 +38,23 @@ suspend fun AppDatabase.failWrites(to: String) {
     }
 }
 
+suspend fun AppDatabase.failWrites(
+    to: String,
+    containing: String,
+) {
+    useWriterConnection { connection ->
+        for (event in listOf("INSERT", "UPDATE")) {
+            val sql = """
+                CREATE TRIGGER fail_${containing}_${event.lowercase()} BEFORE $event ON $to
+                WHEN instr(NEW.value, '$containing') > 0
+                BEGIN SELECT RAISE(ABORT, 'failing for tests'); END
+            """.trimIndent()
+
+            connection.usePrepared(sql) { it.step() }
+        }
+    }
+}
+
 suspend fun AppDatabase.failUpdates(
     to: String,
     changing: String,

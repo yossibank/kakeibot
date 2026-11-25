@@ -7,6 +7,6 @@
     <group android:translateY="960">
         <path
             android:fillColor="#FF000000"
-            android:pathData="M200-600h560v60H200z M200-420h560v60H200z" />
+            android:pathData="M180-300v-100h600v100H180Zm0-260v-100h600v100H180Z" />
     </group>
 </vector>

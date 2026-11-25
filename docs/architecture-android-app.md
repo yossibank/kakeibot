@@ -96,6 +96,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
 | 開いているシート | `MainModel.Sheet` のように、1 つの sealed interface で持つ |
 | 入口のタブとシート | `featuremodels/screens/main/` の `MainModel` が持つ。通知やリンクの行き先は、`open` が開く |
+| 行き先を開く前の待ち | シートが出ていれば閉じ、`MainModel.sheetCloseDelay` だけ待ってから開く。長さは iOS と同じ 600 ミリ秒で、`SheetLayer` が下がりきる |
+| 行き先の日付 | 入力の行き先は、`MainModel.Sheet.Entry` の `date` に入れる。`EntrySheet` が `EntryModel` に渡す |
 | 入口の状態の引き継ぎ | `appfeature/main/` の `rememberMainModel` が、タブとシートを保存する。保存の形は `MainModel` の `saved` と `restore` にある |
 | 確認・引き出し・選んだ行 | モデルの `State` に置く。`EntryModel.Presented`・`RecurringPanel` が当たる |
 | 画面の見た目の値 | 画面のファイルの `class Layout` に置く。Composable の関数で `mutableStateOf` を作らない |

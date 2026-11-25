@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
+import com.yossibank.kakeibot.featuremodels.shared.period.keepingShift
 import com.yossibank.kakeibot.featuremodels.shared.period.title
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 
@@ -63,7 +64,7 @@ fun MonthStartDayView(
                     ChoiceChip(
                         title = if (day.isLastDay) "末日" else "${day.day}",
                         isSelected = day.day == selection.day,
-                        onSelect = { onSelect(day.shifted(by = selection.shift)) },
+                        onSelect = { onSelect(day.keepingShift(of = selection)) },
                         modifier = Modifier.widthIn(min = 40.dp),
                     )
                 }
@@ -100,7 +101,10 @@ private fun PeriodCard(
         )
 
         Text(
-            text = PeriodText.range(month.period(startingOn = selection)),
+            text = PeriodText.current(
+                startingOn = selection,
+                today = today,
+            ),
             color = Palette.accentStrong,
             style = displayFont(size = FontSize.Title),
         )
@@ -143,31 +147,12 @@ private fun ShiftSection(
         }
 
         Text(
-            text = shiftNote(
-                selection = selection,
+            text = PeriodText.shiftNote(
+                startingOn = selection,
                 today = today,
             ),
             color = Palette.subtext,
             style = textFont(style = FontTextStyle.Caption),
         )
     }
-}
-
-private fun shiftNote(
-    selection: MonthStartDay,
-    today: LocalDate,
-): String {
-    if (selection.shift == HolidayShift.none) {
-        return "土日・祝日でも、そのまま数えます"
-    }
-
-    val month = today.periodMonth(startingOn = selection)
-    val start = month.period(startingOn = selection).start
-    val unshifted = month.period(startingOn = selection.shifted(by = HolidayShift.none)).start
-
-    if (start == unshifted) {
-        return "今の期間の始まりは、平日です"
-    }
-
-    return "${PeriodText.weekdayDate(unshifted)}を ${PeriodText.weekdayDate(start)}にずらしています"
 }

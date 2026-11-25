@@ -235,6 +235,24 @@ class BudgetListModelTest {
     }
 
     @Test
+    fun suggestsOnlyRecurringWithoutRecords() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.observedModel()
+
+        model.startEditing(Target.Total)
+        val empty = model.output.suggestions
+        setup.saveRecurring(amount = 82800, day = 25)
+        ModelWait.until { model.output.recurringExpense != 0L }
+        val total = model.output.suggestions
+        val food = model.output.categories.first()
+        model.startEditing(Target.Category(food))
+
+        assertTrue(empty.isEmpty())
+        assertEquals(listOf("固定費"), total.map { it.title })
+        assertEquals(listOf(82800), total.map { it.amount })
+        assertTrue(model.output.suggestions.isEmpty())
+    }
+
+    @Test
     fun averagesOnlyMonthsSinceFirstRecord() = modelTest(today = "2026-10-12") { setup ->
         setup.save(Entry.Kind.expense, amount = 30000, daysAgo = 20)
         setup.save(Entry.Kind.expense, amount = 20001, daysAgo = 50)

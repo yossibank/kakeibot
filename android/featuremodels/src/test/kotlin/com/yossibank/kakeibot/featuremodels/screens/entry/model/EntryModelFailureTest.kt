@@ -3,14 +3,19 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.failReads
 import com.yossibank.kakeibot.featuremodels.support.failWrites
 import com.yossibank.kakeibot.featuremodels.support.fillStorage
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entry
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class EntryModelFailureTest {
     @Test
@@ -20,6 +25,25 @@ class EntryModelFailureTest {
         val model = setup.loadedModel()
 
         assertEquals("保存できませんでした", model.state.task.message)
+    }
+
+    @Test
+    fun ignoresCancelledLoad() = modelTest(today = "2026-10-12") { setup ->
+        val model = EntryModel(
+            database = setup.database,
+            clock = ScreenClock.fixed(setup.now),
+            today = setup.today,
+        )
+
+        val load = launch(start = CoroutineStart.UNDISPATCHED) { model.load() }
+        val isRunning = model.state.task.isRunning
+        load.cancelAndJoin()
+
+        assertTrue(isRunning)
+        assertTrue(load.isCancelled)
+        assertEquals("", model.state.task.message)
+        assertEquals(0, model.state.task.count)
+        assertFalse(model.state.task.isRunning)
     }
 
     @Test

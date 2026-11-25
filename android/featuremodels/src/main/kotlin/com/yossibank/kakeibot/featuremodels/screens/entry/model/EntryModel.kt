@@ -41,8 +41,9 @@ class EntryModel(
     clock: ScreenClock,
     today: LocalDate,
     editing: Identifier<Entry>? = null,
+    date: LocalDate = today,
 ) : ScreenPerforming {
-    val state = State(today)
+    val state = State(today, date)
     val input = Input(editing)
     val output = Output(input, state)
 
@@ -77,13 +78,14 @@ class EntryModel(
 
     class State(
         today: LocalDate,
+        date: LocalDate,
     ) {
         val task = ModelTask()
         val outcome = ScreenOutcome<Outcome>()
 
         var today: LocalDate by mutableStateOf(today)
 
-        var form: EntryForm by mutableStateOf(EntryForm(date = today))
+        var form: EntryForm by mutableStateOf(EntryForm(date = date))
             private set
 
         var calculator: AmountCalculator by mutableStateOf(AmountCalculator())

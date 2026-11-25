@@ -231,6 +231,22 @@ class RecurringListModelTest {
     }
 
     @Test
+    fun keepsMoveInsideTheBoard() = modelTest(today = "2026-10-17") { setup ->
+        setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
+        setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")
+        setup.saveRecurring(amount = 3000, day = 10, memo = "ジム")
+        val model = setup.observedModel(count = 3)
+        val ids = model.output.visible.map { it.id }
+
+        model.move(id = ids[2], to = -5)
+        val toStart = model.state.movingOrder
+        model.move(id = ids[2], to = 99)
+
+        assertEquals(listOf(ids[2], ids[0], ids[1]), toStart)
+        assertEquals(ids, model.state.movingOrder)
+    }
+
+    @Test
     fun clearsDeletionInStateWhenDeletingFails() = modelTest(today = "2026-10-17") { setup ->
         val rent = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
         val other = setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")
