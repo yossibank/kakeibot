@@ -12,10 +12,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import com.yossibank.kakeibot.R
@@ -27,6 +24,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.notice.NoticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel.Screen
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
@@ -49,16 +47,6 @@ import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.CancellationException
 
-private enum class Screen(
-    val title: String,
-) {
-    Menu("設定"),
-    Budgets("設定"),
-    MonthStart("月の始まり"),
-    WeekStart("週の始まり"),
-    Recurrings("設定"),
-}
-
 @Composable
 fun SettingsMenuSheet(
     database: AppDatabase,
@@ -66,11 +54,14 @@ fun SettingsMenuSheet(
     onClose: () -> Unit,
     openRecurring: Identifier<Recurring>? = null,
 ) {
-    var screen by remember {
-        mutableStateOf(if (openRecurring != null) Screen.Recurrings else Screen.Menu)
+    val model = remember(database) {
+        SettingsMenuModel(
+            database = database,
+            screen = if (openRecurring != null) Screen.Recurrings else Screen.Menu,
+        )
     }
 
-    val model = remember(database) { SettingsMenuModel(database = database) }
+    val screen = model.state.screen
 
     LaunchedEffect(model) {
         model.observe()
@@ -81,7 +72,7 @@ fun SettingsMenuSheet(
     fun back() {
         when (screen) {
             Screen.Menu -> onClose()
-            else -> screen = Screen.Menu
+            else -> model.state.screen = Screen.Menu
         }
     }
 
@@ -120,7 +111,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "予算",
                         value = "",
-                        onSelect = { screen = Screen.Budgets },
+                        onSelect = { model.state.screen = Screen.Budgets },
                     )
 
                     SettingsDivider()
@@ -128,7 +119,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "固定費",
                         value = "${model.input.recurringCount} 件",
-                        onSelect = { screen = Screen.Recurrings },
+                        onSelect = { model.state.screen = Screen.Recurrings },
                     )
 
                     SettingsDivider()
@@ -136,7 +127,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "月の始まり",
                         value = model.input.monthStartDay.title,
-                        onSelect = { screen = Screen.MonthStart },
+                        onSelect = { model.state.screen = Screen.MonthStart },
                     )
 
                     SettingsDivider()
@@ -144,7 +135,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "週の始まり",
                         value = model.input.weekStart.title,
-                        onSelect = { screen = Screen.WeekStart },
+                        onSelect = { model.state.screen = Screen.WeekStart },
                     )
                 }
             }

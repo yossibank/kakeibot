@@ -7,6 +7,7 @@ import com.yossibank.kakeibot.featuremodels.support.modelTest
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EntryModelChangeTest {
@@ -66,7 +67,7 @@ class EntryModelChangeTest {
         val closes = model.close()
 
         assertTrue(closes)
-        assertFalse(model.state.isConfirmingDiscard)
+        assertNull(model.state.presented)
     }
 
     @Test
@@ -75,12 +76,12 @@ class EntryModelChangeTest {
         model.press(5)
 
         val closes = model.close()
-        val asked = model.state.isConfirmingDiscard
-        model.state.keepEditing()
+        val asked = model.state.presented == EntryModel.Presented.Discard
+        model.state.dismiss()
 
         assertFalse(closes)
         assertTrue(asked)
-        assertFalse(model.state.isConfirmingDiscard)
+        assertNull(model.state.presented)
         assertEquals(5, model.output.amount)
     }
 

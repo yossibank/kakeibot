@@ -210,8 +210,8 @@ entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScroll
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
-main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
-main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
+main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute	MainModelTest/replacesOpenSheetWithRouteAtOnce	違い	開いたシートが閉じるのを待たず、すぐに行き先のシートへ替える
+main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits		違い	待たないので、続けて来た行き先は、後から来た物が残る
 main.closes-sheet-before-moving-to-tab	MainModelTests/closesSheetBeforeMovingToTab		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
 main.waits-before-moving-even-without-sheet	MainModelTests/waitsBeforeMovingEvenWithoutSheet		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
 main.adds-entry-on-chosen-date	MainModelTests/addsEntryOnChosenDate		未移植	入口のシートに日付を渡す所が無く、入力は今日で開く
@@ -221,12 +221,13 @@ main.replaces-draft-when-day-changes	MainModelTests/replacesDraftWhenDayChanges	
 main.chooses-launch-tab-from-setting	MainModelTests/choosesLaunchTabFromSetting		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.keeps-home-tab-when-launch-tab-is-not-chosen	MainModelTests/keepsHomeTabWhenLaunchTabIsNotChosen		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.opens-entry-sheet-at-launch	MainModelTests/opensEntrySheetAtLaunch		未移植	起動時に開く画面の設定を読んで、入力シートを開く所が無い
-main.opens-home-route-without-waiting	MainModelTests/opensHomeRouteWithoutWaiting		未確認	行き先は MainView の Composable が開き、モデルもテストも無い
-main.opens-entry-route-on-home-with-date	MainModelTests/opensEntryRouteOnHomeWithDate		未確認	入力の行き先は Composable が開くが、日付とタブは確かめていない
-main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCurrentTab		未確認	固定費の行き先は Composable が設定のシートで開き、テストが無い
+main.opens-home-route-without-waiting	MainModelTests/opensHomeRouteWithoutWaiting	MainModelTest/opensHomeRoute	対応	
+main.opens-entry-route-on-home-with-date	MainModelTests/opensEntryRouteOnHomeWithDate	MainModelTest/opensEntryRouteOnCurrentTab	違い	タブをホームへ切り替えず、行き先の日付も入力に渡さない
+main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCurrentTab	MainModelTest/opensRecurringRouteOnCurrentTab	対応	固定費は、設定のシートの中で開く
 main.opens-template-route-with-saved-template	MainModelTests/opensTemplateRouteWithSavedTemplate		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-new-template-route-on-home	MainModelTests/opensNewTemplateRouteOnHome		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-receipt-route-and-starts-reading	MainModelTests/opensReceiptRouteAndStartsReading		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
+main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	保存した値から作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
@@ -288,6 +289,7 @@ records.opens-day-in-calendar	RecordsModelTests/opensDayInCalendar		未移植	�
 records.opens-current-month-with-search-closed	RecordsModelTests/opensCurrentMonthWithSearchClosed		未移植	今の月へ戻る openCurrentMonth と検索が、モデルと画面に無い
 records.tells-whether-shown-month-is-current	RecordsModelTests/tellsWhetherShownMonthIsCurrent		未移植	isCurrentMonth・currentMonth が無く、今月へ戻るボタンも無い
 records.stamps-and-removes-with-shown-choices	RecordsModelTests/stampsAndRemovesWithShownChoices		未移植	スタンプを押す・外す機能が、記録のモデルと画面に無い
+records.returns-to-current-period-when-month-start-day-changes	RecordsModelTests/returnsToCurrentPeriodWhenMonthStartDayChanges	RecordsModelTest/returnsToCurrentPeriodWhenMonthStartDayChanges	対応	
 records.confirms-batch-delete-of-ten-or-more	RecordsModelTests/confirmsBatchDeleteOfTenOrMore		未移植	まとめて消す機能と、10 件以上の時の確かめが無い
 records.searches-across-months	RecordsModelTests/searchesAcrossMonths		未移植	記録の検索が、モデルにも画面にも無い
 records.searches-item-names	RecordsModelTests/searchesItemNames		未移植	記録の検索が無く、明細の名前でも探せない
@@ -443,7 +445,7 @@ settings-board.keeps-move-inside-the-board	SettingsBoardModelTests/keepsMoveInsi
 settings-board.ignores-move-to-same-place-or-unknown-item	SettingsBoardModelTests/ignoresMoveToSamePlaceOrUnknownItem	RecurringListModelTest/ignoresMoveToSamePlaceOrUnknownRecurring	対応	
 settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/keepsHiddenItemInStateAfterHiding	RecurringListModelTest/hidesAndShowsRecurring	対応	
 settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting	RecurringListModelTest/deletesAndRestoresRecurring	対応	Android は、削除を元に戻す所まで 1 つのテストで確かめる
-settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails		違い	削除に失敗しても、前の削除の知らせ（state.deleted）を消さない
+settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails	RecurringListModelTest/clearsDeletionInStateWhenDeletingFails	対応	
 settings-board.keeps-bulk-deletion-in-state-after-deleting-hidden	SettingsBoardModelTests/keepsBulkDeletionInStateAfterDeletingHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	残した件数（keptCount）は Android に無く、確かめていない
 settings-board.deletes-nothing-when-none-are-hidden	SettingsBoardModelTests/deletesNothingWhenNoneAreHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	
 settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHiddenItem	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	並べ替え中の順を消すことは確かめていない
@@ -504,6 +506,7 @@ entry-notice.deletes-selected-entries-and-undoes	EntryNoticeModelTests/deletesSe
 entry-notice.keeps-batch-notice-longer-and-ignores-screen-taps	EntryNoticeModelTests/keepsBatchNoticeLongerAndIgnoresScreenTaps		未移植	まとめての変更の知らせ（EntryBatch）が無い
 entry-notice.restores-no-spend-mark-when-undoing-new-entry	EntryNoticeModelTests/restoresNoSpendMarkWhenUndoingNewEntry		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
 entry-notice.does-not-make-no-spend-mark-when-undoing-entry-on-unmarked-day	EntryNoticeModelTests/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
+entry-row-item.shows-tag-name-of-entry	EntryRowItemTests/showsTagNameOfEntry	EntryRowItemTest/showsTagNameOfEntry	対応	
 entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage	EntryRowItemTest/showsBillDateOfMovedUsage	対応	
 entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown	EntryRowItemTest/keepsMonthWhenBillIsUnknown	対応	
 entry-row-item.skips-hidden-bill-of-same-card	EntryRowItemTests/skipsHiddenBillOfSameCard	EntryRowItemTest/skipsHiddenBillOfSameCard	対応	

@@ -7,18 +7,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.zIndex
+import com.yossibank.kakeibot.featuremodels.screens.main.MainModel
 
 @Composable
 fun MainTabLayer(
-    selection: MainTabSelection,
-    value: MainTab,
+    model: MainModel,
+    value: MainModel.Tab,
     content: @Composable () -> Unit,
 ) {
-    if (value !in selection.visited) {
+    if (value !in model.state.visitedTabs) {
         return
     }
 
-    val isShown = selection.value == value
+    val isShown = model.state.tab == value
 
     Box(
         modifier = Modifier

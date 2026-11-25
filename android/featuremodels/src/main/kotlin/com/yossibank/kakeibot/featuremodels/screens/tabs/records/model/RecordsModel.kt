@@ -68,6 +68,10 @@ class RecordsModel(
         fun select(date: LocalDate) {
             selected = date
         }
+
+        internal fun openCurrentMonth() {
+            month = null
+        }
     }
 
     class Input {
@@ -174,8 +178,11 @@ class RecordsModel(
 
         coroutineScope {
             launch {
-                observe(database.settingUpdates(SettingKey.monthStartDay)) {
-                    input.monthStartDay = it
+                observe(database.settingUpdates(SettingKey.monthStartDay)) { startDay ->
+                    if (startDay != input.monthStartDay) {
+                        input.monthStartDay = startDay
+                        state.openCurrentMonth()
+                    }
                 }
             }
 

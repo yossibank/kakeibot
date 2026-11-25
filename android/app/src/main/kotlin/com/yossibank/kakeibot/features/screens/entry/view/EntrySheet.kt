@@ -28,16 +28,14 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
-import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
 import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
@@ -99,10 +96,6 @@ fun EntrySheet(
             editing = editing,
         )
     }
-
-    var isConfirmingDelete by remember { mutableStateOf(false) }
-    var isShowingItems by remember { mutableStateOf(false) }
-    var templateDraft: EntryTemplateDraft? by remember { mutableStateOf(null) }
 
     val context = LocalContext.current
 
@@ -182,6 +175,18 @@ fun EntrySheet(
 
                 Spacer(modifier = Modifier.weight(1f))
 
+                if (model.output.isEditing) {
+                    CircleIconButton(
+                        icon = R.drawable.ic_trash,
+                        onClick = { model.state.present(EntryModel.Presented.Delete) },
+                        size = 36.dp,
+                        iconSize = 20.dp,
+                        tint = Palette.rose,
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
                 CircleIconButton(
                     icon = R.drawable.ic_close,
                     onClick = ::close,
@@ -193,7 +198,7 @@ fun EntrySheet(
 
             EntrySlip(
                 model = model,
-                onOpenItems = { isShowingItems = true },
+                onOpenItems = { model.state.present(EntryModel.Presented.Items) },
                 onVoice = startVoice.takeIf {
                     voice.input.isAvailable && model.output.showsVoice && !voice.output.isActive
                 },
@@ -220,8 +225,12 @@ fun EntrySheet(
                 } else {
                     EntryDeck(
                         model = model,
-                        onOpenItems = { isShowingItems = true },
-                        onSaveTemplate = { templateDraft = model.output.newTemplateDraft() },
+                        onOpenItems = { model.state.present(EntryModel.Presented.Items) },
+                        onSaveTemplate = {
+                            model.state.present(
+                                EntryModel.Presented.Template(model.output.newTemplateDraft()),
+                            )
+                        },
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -236,10 +245,7 @@ fun EntrySheet(
                 if (!voice.output.isActive && model.output.showsRecent && model.output.hasRecent) {
                     EntryRecentRow(model = model)
                 } else {
-                    ActionBar(
-                        model = model,
-                        onDelete = { isConfirmingDelete = true },
-                    )
+                    ActionBar(model = model)
                 }
             }
         }
@@ -260,48 +266,48 @@ fun EntrySheet(
             )
         }
 
-        templateDraft?.let { draft ->
+        (model.state.presented as? EntryModel.Presented.Template)?.let { template ->
             TemplateEditSheet(
                 database = database,
-                draft = draft,
+                draft = template.draft,
                 onSave = {
-                    templateDraft = null
+                    model.state.dismiss()
                     model.perform { it.reloadTemplates() }
                 },
-                onClose = { templateDraft = null },
+                onClose = model.state::dismiss,
             )
         }
 
         AnimatedVisibility(
-            visible = isShowingItems,
+            visible = model.state.presented == EntryModel.Presented.Items,
             enter = slideInVertically { it },
             exit = slideOutVertically { it },
         ) {
             EntryItemSheet(
                 model = model,
-                onClose = { isShowingItems = false },
+                onClose = model.state::dismiss,
             )
         }
     }
 
-    if (isConfirmingDelete) {
+    if (model.state.presented == EntryModel.Presented.Delete) {
         DeleteDialog(
             title = "この記録を削除しますか",
             onConfirm = {
-                isConfirmingDelete = false
+                model.state.dismiss()
                 model.perform { it.delete() }
             },
-            onDismiss = { isConfirmingDelete = false },
+            onDismiss = model.state::dismiss,
         )
     }
 
-    if (model.state.isConfirmingDiscard) {
+    if (model.state.presented == EntryModel.Presented.Discard) {
         DiscardDialog(
             onDiscard = {
-                model.state.keepEditing()
+                model.state.dismiss()
                 onClose()
             },
-            onKeep = model.state::keepEditing,
+            onKeep = model.state::dismiss,
         )
     }
 }

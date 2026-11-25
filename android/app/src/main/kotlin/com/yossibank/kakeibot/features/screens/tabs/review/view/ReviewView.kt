@@ -285,11 +285,7 @@ private fun BreakdownCard(model: ReviewModel) {
             }
         }
 
-        Text(
-            text = model.output.comparisonText,
-            color = Palette.subtext,
-            style = textFont(style = FontTextStyle.Caption),
-        )
+        ReviewComparison(model = model)
 
         if (isBalance) {
             ReviewBalanceBars(bars = bars)

@@ -19,6 +19,8 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
+import com.yossibank.kakeibot.designsystem.components.tag.TagCard
+import com.yossibank.kakeibot.designsystem.components.tag.TagCardSize
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
@@ -29,6 +31,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
+import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
 import androidx.compose.material3.Icon as SymbolIcon
 
 @Composable
@@ -39,9 +42,13 @@ fun EntryRow(
     amount: Int,
     type: Entry.Kind,
     modifier: Modifier = Modifier,
+    tag: String? = null,
+    route: EntryRowItem.Route? = null,
     memo: String? = null,
     isRecurring: Boolean = false,
 ) {
+    val joinsMemo = tag == null && route == null
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -95,14 +102,31 @@ fun EntryRow(
                 }
             }
 
-            val note = listOfNotNull(detail, memo).joinToString("｜")
+            if (tag != null) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TagCard(
+                        title = tag,
+                        size = TagCardSize.Small,
+                    )
 
-            if (note.isNotEmpty()) {
-                FittedText(
-                    text = note,
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption),
+                    Note(text = detail)
+                }
+            } else {
+                Note(text = listOfNotNull(detail, memo.takeIf { joinsMemo }).joinToString("｜"))
+            }
+
+            if (route != null) {
+                EntryRoute(
+                    source = route.source,
+                    destination = route.destination,
                 )
+            }
+
+            if (!joinsMemo) {
+                Note(text = memo)
             }
         }
 
@@ -112,4 +136,17 @@ fun EntryRow(
             type = type,
         )
     }
+}
+
+@Composable
+private fun Note(text: String?) {
+    if (text.isNullOrEmpty()) {
+        return
+    }
+
+    FittedText(
+        text = text,
+        color = Palette.subtext,
+        style = textFont(style = FontTextStyle.Caption),
+    )
 }

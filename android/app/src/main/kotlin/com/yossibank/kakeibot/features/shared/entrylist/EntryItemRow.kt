@@ -15,10 +15,12 @@ fun EntryItemRow(
     EntryRow(
         icon = item.icon,
         title = item.title,
-        detail = item.place,
+        detail = item.detail,
         amount = item.amount,
         type = item.type,
         modifier = modifier.clickable(onClick = onOpen),
+        tag = item.tag,
+        route = item.route,
         memo = item.memo,
         isRecurring = item.isRecurring,
     )

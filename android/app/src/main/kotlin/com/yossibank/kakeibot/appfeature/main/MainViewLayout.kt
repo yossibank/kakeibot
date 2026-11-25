@@ -17,36 +17,28 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.navigation.FloatingTabBar
 import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.featuremodels.screens.main.MainModel
 
-enum class MainTab(
-    val title: String,
-) {
-    Home("ホーム"),
-    Records("記録"),
-    Review("振り返り"),
-    Assets("資産"),
-}
-
-internal val tabItems: List<FloatingTabBar.Item<MainTab>> = listOf(
+internal val tabItems: List<FloatingTabBar.Item<MainModel.Tab>> = listOf(
     FloatingTabBar.Item(
-        title = MainTab.Home.title,
+        title = MainModel.Tab.Home.title,
         icon = R.drawable.ic_tab_home,
-        value = MainTab.Home,
+        value = MainModel.Tab.Home,
     ),
     FloatingTabBar.Item(
-        title = MainTab.Records.title,
+        title = MainModel.Tab.Records.title,
         icon = R.drawable.ic_tab_records,
-        value = MainTab.Records,
+        value = MainModel.Tab.Records,
     ),
     FloatingTabBar.Item(
-        title = MainTab.Review.title,
+        title = MainModel.Tab.Review.title,
         icon = R.drawable.ic_tab_review,
-        value = MainTab.Review,
+        value = MainModel.Tab.Review,
     ),
     FloatingTabBar.Item(
-        title = MainTab.Assets.title,
+        title = MainModel.Tab.Assets.title,
         icon = R.drawable.ic_tab_assets,
-        value = MainTab.Assets,
+        value = MainModel.Tab.Assets,
     ),
 )
 

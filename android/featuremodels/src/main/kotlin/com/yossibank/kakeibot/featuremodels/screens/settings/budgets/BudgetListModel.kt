@@ -90,6 +90,8 @@ class BudgetListModel(
         var calculator by mutableStateOf(AmountCalculator())
             private set
 
+        var isConfirmingDiscard: Boolean by mutableStateOf(false)
+
         fun startEditing(
             target: Target,
             amount: Int,
@@ -100,6 +102,7 @@ class BudgetListModel(
 
         fun cancelEditing() {
             editing = null
+            isConfirmingDiscard = false
         }
 
         fun choose(suggestion: Suggestion) {

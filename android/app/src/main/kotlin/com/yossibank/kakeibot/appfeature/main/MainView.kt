@@ -1,8 +1,5 @@
 package com.yossibank.kakeibot.appfeature.main
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,23 +7,16 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
-import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
-import com.yossibank.kakeibot.core.concepts.recurring.Recurring
-import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.designsystem.components.modal.SheetLayer
 import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.featuremodels.screens.main.MainModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
@@ -47,39 +37,15 @@ fun MainView(
     link: String?,
     onOpenLink: () -> Unit,
 ) {
-    val selection = rememberSaveable(saver = MainTabSelection.Saver) { MainTabSelection() }
-    var sheet by rememberSaveable(stateSaver = MainSheet.Saver) { mutableStateOf(null) }
-    var round by remember { mutableIntStateOf(0) }
-
+    val model = rememberMainModel()
     val entryList = rememberSharedEntryList(database)
     val observation = remember { ObservationRound() }
-    val openEntry: (Identifier<Entry>?) -> Unit = { sheet = MainSheet.Entry(editing = it) }
 
     LaunchedEffect(link) {
         val route = link?.let { PlannedNotification.Route.of(link = it) } ?: return@LaunchedEffect
 
         onOpenLink()
-
-        sheet = null
-
-        when (route) {
-            is PlannedNotification.Route.Recurring -> {
-                round += 1
-
-                sheet = MainSheet.Settings(
-                    recurring = route.id,
-                    round = round,
-                )
-            }
-
-            is PlannedNotification.Route.Entry -> {
-                openEntry(null)
-            }
-
-            else -> {
-                selection.select(MainTab.Home)
-            }
-        }
+        model.open(route)
     }
 
     CompositionLocalProvider(
@@ -89,9 +55,7 @@ fun MainView(
         MainLayers(
             database = database,
             today = today,
-            selection = selection,
-            sheet = sheet,
-            onOpen = { sheet = it },
+            model = model,
         )
     }
 }
@@ -100,50 +64,52 @@ fun MainView(
 private fun MainLayers(
     database: AppDatabase,
     today: LocalDate,
-    selection: MainTabSelection,
-    sheet: MainSheet?,
-    onOpen: (MainSheet?) -> Unit,
+    model: MainModel,
 ) {
-    val openEntry: (Identifier<Entry>?) -> Unit = { onOpen(MainSheet.Entry(editing = it)) }
+    val sheet = model.state.sheet
+    val close = { model.state.sheet = null }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Palette.background),
     ) {
-        MainTab.entries.forEach { tab ->
+        MainModel.Tab.entries.forEach { tab ->
             MainTabLayer(
-                selection = selection,
+                model = model,
                 value = tab,
             ) {
                 TabContent {
                     when (tab) {
-                        MainTab.Home -> {
+                        MainModel.Tab.Home -> {
                             HomeView(
                                 database = database,
                                 today = today,
-                                onOpenBudget = { onOpen(MainSheet.Budget) },
-                                onOpenEntry = openEntry,
-                                onOpenSettings = { onOpen(MainSheet.Settings()) },
+                                onOpenBudget = { model.state.sheet = MainModel.Sheet.Budget },
+                                onOpenEntry = model::openEntry,
+                                onAddEntry = { model.openEntry(editing = null) },
+                                onOpenSettings = {
+                                    model.state.sheet = MainModel.Sheet.Settings()
+                                },
                             )
                         }
 
-                        MainTab.Records -> {
+                        MainModel.Tab.Records -> {
                             RecordsView(
                                 database = database,
                                 today = today,
-                                onOpenEntry = openEntry,
+                                onOpenEntry = model::openEntry,
                             )
                         }
 
-                        MainTab.Review -> {
+                        MainModel.Tab.Review -> {
                             ReviewView(
                                 database = database,
                                 today = today,
                             )
                         }
 
-                        MainTab.Assets -> {
+                        MainModel.Tab.Assets -> {
                             AssetsView(
                                 database = database,
                                 today = today,
@@ -155,62 +121,49 @@ private fun MainLayers(
         }
 
         MainTabBar(
-            selection = selection,
-            onAdd = { openEntry(null) },
+            model = model,
+            onAdd = { model.openEntry(editing = null) },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding(),
         )
 
-        SheetLayer<MainSheet.Entry>(sheet = sheet) { entry ->
+        SheetLayer(
+            item = sheet as? MainModel.Sheet.Entry,
+            modifier = Modifier.zIndex(SHEET_LAYER),
+        ) { entry ->
             EntrySheet(
                 database = database,
                 today = today,
                 editing = entry.editing,
-                onClose = { onOpen(null) },
+                onClose = close,
             )
         }
 
-        SheetLayer<MainSheet.Settings>(sheet = sheet) { settings ->
+        SheetLayer(
+            item = sheet as? MainModel.Sheet.Settings,
+            modifier = Modifier.zIndex(SHEET_LAYER),
+        ) { settings ->
             key(settings.round) {
                 SettingsMenuSheet(
                     database = database,
                     today = today,
-                    onClose = { onOpen(null) },
+                    onClose = close,
                     openRecurring = settings.recurring,
                 )
             }
         }
 
-        SheetLayer<MainSheet.Budget>(sheet = sheet) {
+        SheetLayer(
+            item = sheet as? MainModel.Sheet.Budget,
+            modifier = Modifier.zIndex(SHEET_LAYER),
+        ) {
             BudgetListView(
                 database = database,
                 today = today,
-                onBack = { onOpen(null) },
+                onBack = close,
             )
         }
-    }
-}
-
-@Composable
-private inline fun <reified Sheet : MainSheet> SheetLayer(
-    sheet: MainSheet?,
-    crossinline content: @Composable (Sheet) -> Unit,
-) {
-    val current = sheet as? Sheet
-    var last by remember { mutableStateOf(current) }
-
-    if (current != null) {
-        last = current
-    }
-
-    AnimatedVisibility(
-        visible = current != null,
-        modifier = Modifier.zIndex(SHEET_LAYER),
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it },
-    ) {
-        last?.let { content(it) }
     }
 }
 

@@ -12,12 +12,7 @@ import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
-
-enum class RecurringEditPrompt {
-    Discard,
-    Delete,
-    Hide,
-}
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditPrompt
 
 @Composable
 fun RecurringEditDialogs(

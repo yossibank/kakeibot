@@ -29,13 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -76,6 +73,8 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel.DeleteTarget
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel.Editing
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
@@ -89,22 +88,6 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.roundToInt
-
-private sealed interface Editing {
-    data object New : Editing
-
-    data class Existing(
-        val id: Identifier<Recurring>,
-    ) : Editing
-}
-
-private sealed interface DeleteTarget {
-    data object AllHidden : DeleteTarget
-
-    data class One(
-        val id: Identifier<Recurring>,
-    ) : DeleteTarget
-}
 
 @Composable
 fun RecurringListView(
@@ -121,16 +104,13 @@ fun RecurringListView(
             clock = ScreenClock.system,
             entryList = entryList,
             today = today,
+            opening = opening,
         )
     }
 
     SideEffect {
         model.state.today = today
     }
-
-    var editing by remember { mutableStateOf(opening?.let { Editing.Existing(it) } as Editing?) }
-    var openId by remember { mutableStateOf<Identifier<Recurring>?>(null) }
-    var deleting by remember { mutableStateOf<DeleteTarget?>(null) }
 
     val hiddenNotice = model.state.hidden
     val deletedNotice = model.state.deleted
@@ -152,10 +132,10 @@ fun RecurringListView(
     BackHandler(onBack = onBack)
 
     val actions = RecurringRowActions(
-        onOpen = { openId = it },
-        onEdit = { editing = Editing.Existing(it) },
+        onOpen = { model.state.openId = it },
+        onEdit = { model.state.editing = Editing.Existing(it) },
         onHide = { id -> model.perform { it.hide(id) } },
-        onDelete = { deleting = DeleteTarget.One(it) },
+        onDelete = { model.state.deleting = DeleteTarget.One(it) },
     )
 
     SettingsFrame(
@@ -213,11 +193,11 @@ fun RecurringListView(
             }
 
             AnimatedVisibility(
-                visible = editing != null,
+                visible = model.state.editing != null,
                 enter = slideInHorizontally { it },
                 exit = slideOutHorizontally { it },
             ) {
-                val current = remember { editing }
+                val current = remember { model.state.editing }
 
                 if (current != null) {
                     RecurringEditSheet(
@@ -225,7 +205,7 @@ fun RecurringListView(
                         today = today,
                         type = model.state.type,
                         editingId = (current as? Editing.Existing)?.id,
-                        onClose = { editing = null },
+                        onClose = { model.state.editing = null },
                         onDelete = deletedNotice::show,
                         onHide = { (current as? Editing.Existing)?.id?.let(hiddenNotice::show) },
                     )
@@ -252,10 +232,7 @@ fun RecurringListView(
         SegmentSwitch(
             selection = model.state.type,
             options = typeOptions,
-            onSelect = {
-                openId = null
-                model.state.type = it
-            },
+            onSelect = model.state::select,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -280,7 +257,7 @@ fun RecurringListView(
             RecurringBoard(
                 model = model,
                 lift = lift,
-                openId = openId,
+                openId = model.state.openId,
                 actions = actions,
             )
 
@@ -289,7 +266,7 @@ fun RecurringListView(
                     rows = model.output.hiddenRows,
                     isOpen = model.input.hiddenList.isClosed != true,
                     onToggle = { model.perform { it.toggleHiddenList() } },
-                    onDeleteAll = { deleting = DeleteTarget.AllHidden },
+                    onDeleteAll = { model.state.deleting = DeleteTarget.AllHidden },
                     onEdit = actions.onEdit,
                     onShow = { id -> model.perform { it.show(id) } },
                 )
@@ -301,21 +278,21 @@ fun RecurringListView(
         } else {
             PrimaryButton(
                 title = "${model.state.type.title}の固定費を追加",
-                onClick = { editing = Editing.New },
+                onClick = { model.state.editing = Editing.New },
                 modifier = Modifier.fillMaxWidth(),
                 icon = R.drawable.ic_add,
             )
         }
     }
 
-    deleting?.let { target ->
+    model.state.deleting?.let { target ->
         val isAll = target == DeleteTarget.AllHidden
 
         DeleteDialog(
             title = if (isAll) "非表示の固定費をまとめて削除しますか" else "この固定費を削除しますか",
             message = "これまでに作った記録は残ります",
             onConfirm = {
-                deleting = null
+                model.state.deleting = null
 
                 model.perform {
                     when (target) {
@@ -324,7 +301,7 @@ fun RecurringListView(
                     }
                 }
             },
-            onDismiss = { deleting = null },
+            onDismiss = { model.state.deleting = null },
         )
     }
 }

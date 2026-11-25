@@ -104,6 +104,25 @@ class RecordsModelTest {
     }
 
     @Test
+    fun returnsToCurrentPeriodWhenMonthStartDayChanges() = modelTest(
+        today = "2026-10-17",
+    ) { setup ->
+        val model = setup.observedModel()
+        model.move(months = -3)
+        val moved = model.output.shownMonth.toString()
+
+        setup.database.setSetting(
+            key = SettingKey.monthStartDay,
+            to = checkNotNull(MonthStartDay.of(day = 25)),
+        )
+        ModelWait.until { model.input.monthStartDay.day == 25 }
+
+        assertEquals("2026-07", moved)
+        assertEquals("2026-10", model.output.shownMonth.toString())
+        assertEquals("9/25〜10/24", model.output.periodText)
+    }
+
+    @Test
     fun startsWeekOnSundayBeforeSettingArrives() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.recordsModel()
 

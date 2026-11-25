@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
+import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
@@ -62,6 +63,18 @@ class EntryModel(
         Continued,
     }
 
+    sealed interface Presented {
+        data object Discard : Presented
+
+        data object Delete : Presented
+
+        data object Items : Presented
+
+        data class Template(
+            val draft: EntryTemplateDraft,
+        ) : Presented
+    }
+
     class State(
         today: LocalDate,
     ) {
@@ -85,15 +98,15 @@ class EntryModel(
         var voiceFilled: VoiceFilled? by mutableStateOf(null)
             private set
 
-        var isConfirmingDiscard: Boolean by mutableStateOf(false)
+        var presented: Presented? by mutableStateOf(null)
             private set
 
-        fun askDiscard() {
-            isConfirmingDiscard = true
+        fun present(presented: Presented) {
+            this.presented = presented
         }
 
-        fun keepEditing() {
-            isConfirmingDiscard = false
+        fun dismiss() {
+            presented = null
         }
 
         fun update(change: EntryForm.() -> EntryForm) {

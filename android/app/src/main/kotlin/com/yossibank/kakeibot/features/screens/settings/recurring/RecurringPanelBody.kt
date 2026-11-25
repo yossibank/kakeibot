@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringPanel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.autoPlan
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.countCalculator

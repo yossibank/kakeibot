@@ -41,10 +41,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,6 +78,8 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditPrompt
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringPanel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.autoPlan
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.canSave
@@ -100,19 +99,6 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.writes.types.Deletion
-
-enum class RecurringPanel(
-    val title: String,
-) {
-    Amount("金額"),
-    Start("始まり"),
-    End("終わり"),
-    Holiday("休日なら"),
-    Closing("金額の決め方"),
-    Fee("手数料"),
-    Count("回数"),
-    Remind("前に知らせる"),
-}
 
 @Composable
 fun RecurringEditSheet(
@@ -141,9 +127,6 @@ fun RecurringEditSheet(
     val focus = LocalFocusManager.current
     val permission = rememberNotificationPermission()
 
-    var panel by remember { mutableStateOf<RecurringPanel?>(null) }
-    var prompt by remember { mutableStateOf<RecurringEditPrompt?>(null) }
-
     LaunchedEffect(model) {
         model.load()
     }
@@ -152,19 +135,14 @@ fun RecurringEditSheet(
 
     fun open(next: RecurringPanel) {
         focus.clearFocus()
-
-        if (next == RecurringPanel.Count) {
-            model.prepareCount()
-        }
-
-        panel = next
+        model.open(next)
     }
 
     fun close() {
-        panel = null
+        model.state.panel = null
 
         if (model.output.isChanged) {
-            prompt = RecurringEditPrompt.Discard
+            model.state.prompt = RecurringEditPrompt.Discard
         } else {
             onClose()
         }
@@ -175,7 +153,7 @@ fun RecurringEditSheet(
     }
 
     fun save(hiding: Boolean = false) {
-        panel = null
+        model.state.panel = null
 
         model.perform { if (hiding) it.saveTogglingHidden() else it.save() }
     }
@@ -197,8 +175,8 @@ fun RecurringEditSheet(
     }
 
     BackHandler {
-        if (panel != null) {
-            panel = null
+        if (model.state.panel != null) {
+            model.state.panel = null
         } else {
             close()
         }
@@ -216,7 +194,7 @@ fun RecurringEditSheet(
                         isHidden = model.input.isHidden,
                         onSelect = {
                             if (model.output.isChanged) {
-                                prompt = RecurringEditPrompt.Hide
+                                model.state.prompt = RecurringEditPrompt.Hide
                             } else {
                                 setHidden(!model.input.isHidden)
                             }
@@ -225,21 +203,21 @@ fun RecurringEditSheet(
 
                     RoundIconButton(
                         icon = R.drawable.ic_trash,
-                        onSelect = { prompt = RecurringEditPrompt.Delete },
+                        onSelect = { model.state.prompt = RecurringEditPrompt.Delete },
                     )
                 }
             }
         },
         overlay = {
             BottomDrawer(
-                item = panel,
+                item = model.state.panel,
                 title = { it.title },
-                onClose = { panel = null },
+                onClose = { model.state.panel = null },
             ) { current ->
                 RecurringPanelBody(
                     panel = current,
                     model = model,
-                    onClose = { panel = null },
+                    onClose = { model.state.panel = null },
                 )
             }
         },
@@ -318,10 +296,10 @@ fun RecurringEditSheet(
     }
 
     RecurringEditDialogs(
-        prompt = prompt,
+        prompt = model.state.prompt,
         isHidden = model.input.isHidden,
         canSave = model.output.canSave,
-        onDismiss = { prompt = null },
+        onDismiss = { model.state.prompt = null },
         onDiscard = onClose,
         onDelete = { model.perform { it.delete() } },
         onSaveHiding = { save(hiding = true) },

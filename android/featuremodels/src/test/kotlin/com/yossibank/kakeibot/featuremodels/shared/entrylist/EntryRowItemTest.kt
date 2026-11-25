@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.shared.entrylist
 
+import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
@@ -11,6 +12,7 @@ import com.yossibank.kakeibot.featuremodels.support.ModelTestDatabase
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class EntryRowItemTest {
     private val now = ModelTestDatabase.now
@@ -89,6 +91,34 @@ class EntryRowItemTest {
         )
 
         assertEquals("カード（2月払い）", item.detail)
+    }
+
+    @Test
+    fun showsTagNameOfEntry() {
+        val entry = entry(billMonth = "2027-02")
+
+        val tag = EntryTag(
+            categoryId = checkNotNull(entry.categoryId),
+            name = "昼ごはん",
+            sortOrder = 0,
+            createdAt = now,
+            updatedAt = now,
+        )
+
+        val list = list(bill).copy(tags = mapOf(tag.id to tag))
+
+        val plain = EntryRowItem.of(
+            entry = entry,
+            list = list,
+        )
+
+        val tagged = EntryRowItem.of(
+            entry = entry.copy(tagId = tag.id),
+            list = list,
+        )
+
+        assertNull(plain.tag)
+        assertEquals("昼ごはん", tagged.tag)
     }
 
     private fun list(vararg bills: Recurring): EntryList = EntryList(
