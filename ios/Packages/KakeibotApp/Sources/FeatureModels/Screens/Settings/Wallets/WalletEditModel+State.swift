@@ -3,11 +3,29 @@ import DesignSystem
 import Observation
 
 public extension WalletEditModel {
+    enum Drawer: Hashable, Sendable {
+        case amount
+        case valuation
+        case loanAmount
+    }
+
+    struct Payment: Sendable {
+        public var isAsking = false
+        public var isEditing = false
+
+        public internal(set) var addedWallet: Wallet?
+    }
+
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: SettingsEditState {
         public var name = ""
         public var isNegative: Bool
+        public var drawer: Drawer?
+        public var valuationDeletion: Deletion?
+        public var payment = Payment()
+        public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<Wallet>>()
 
         public private(set) var kind: Wallet.Kind
         public private(set) var calculator = AmountCalculator()

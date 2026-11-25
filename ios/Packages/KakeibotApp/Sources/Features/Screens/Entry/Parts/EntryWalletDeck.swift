@@ -71,10 +71,7 @@ struct EntryWalletDeck: View {
 }
 
 extension EntryWalletDeck {
-    enum Role: Hashable {
-        case source
-        case destination
-    }
+    typealias Role = EntryModel.WalletRole
 }
 
 private extension EntryWalletDeck {

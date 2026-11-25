@@ -23,6 +23,18 @@ entry.shows-month-total-of-category-without-budget	EntryModelTests/showsMonthTot
 entry.shows-month-total-of-type-without-category	EntryModelTests/showsMonthTotalOfTypeWithoutCategory		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.replaces-edited-amount-in-month-total	EntryModelTests/replacesEditedAmountInMonthTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.removes-entry-moved-out-of-month-from-total	EntryModelTests/removesEntryMovedOutOfMonthFromTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
+entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		未確認	Android は別のブランチで合わせる
+entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		未確認	Android は別のブランチで合わせる
+entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing		未確認	Android は別のブランチで合わせる
+entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails		未確認	Android は別のブランチで合わせる
+entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving		未確認	Android は別のブランチで合わせる
+entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing		未確認	Android は別のブランチで合わせる
+entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未確認	Android は別のブランチで合わせる
+entry.places-hidden-category-and-moves-back-on-undo	EntryModelTests/placesHiddenCategoryAndMovesBackOnUndo		未確認	Android は別のブランチで合わせる
+entry.clears-hidden-category-when-hiding-fails	EntryModelTests/clearsHiddenCategoryWhenHidingFails		未確認	Android は別のブランチで合わせる
+entry.reports-added-category	EntryModelTests/reportsAddedCategory		未確認	Android は別のブランチで合わせる
+entry.chooses-added-wallet-after-sheet	EntryModelTests/choosesAddedWalletAfterSheet		未確認	Android は別のブランチで合わせる
+entry.chooses-destination-by-role	EntryModelTests/choosesDestinationByRole		未確認	Android は別のブランチで合わせる
 entry.applies-receipt-reading	EntryModelTests/appliesReceiptReading		未移植	レシートの読み取りを入力に当てる所（apply(ReceiptReading)）が無い
 entry.applies-included-tax-from-receipt	EntryModelTests/appliesIncludedTaxFromReceipt		未移植	レシートの読み取りが無い（税込みの切り替え setTaxIncluded だけはある）
 entry.keeps-unread-values-from-receipt	EntryModelTests/keepsUnreadValuesFromReceipt		未移植	レシートの読み取りを入力に当てる所が無い
@@ -374,8 +386,13 @@ template-edit.keeps-bill-shift-only-for-billed-card		TemplateEditModelTest/keeps
 template-list.*	TemplateListModelTests/*		未移植	テンプレートの一覧（非表示・並べ替え）の画面とモデルが Android に無い
 settings-menu.follows-changed-settings	SettingsMenuModelTests/followsChangedSettings		未移植	起動時の画面・通知の時刻・テーマの項目が設定のメニューに無い
 settings-menu.tells-backup-age-after-export	SettingsMenuModelTests/tellsBackupAgeAfterExport		未移植	バックアップの書き出しが Android に無い
+settings-menu.reads-notification-authorization	SettingsMenuModelTests/readsNotificationAuthorization		未確認	Android は別のブランチで合わせる
 settings-menu-link.*	SettingsMenuLinkTests/*		未移植	問い合わせのフォームへのリンクが、設定のメニューに無い
+settings-menu-reset.asks-to-confirm-when-records-exist	SettingsMenuResetModelTests/asksToConfirmWhenRecordsExist		未確認	Android は別のブランチで合わせる
+settings-menu-reset.tells-instead-of-confirming-when-nothing-to-delete	SettingsMenuResetModelTests/tellsInsteadOfConfirmingWhenNothingToDelete		未確認	Android は別のブランチで合わせる
+settings-menu-reset.closes-confirmation-when-counting-fails	SettingsMenuResetModelTests/closesConfirmationWhenCountingFails		未確認	Android は別のブランチで合わせる
 settings-menu-sample-data.*	SettingsMenuSampleDataTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
+settings-menu-sample.*	SettingsMenuSampleModelTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sheet.*	SettingsMenuSheetTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-menu-value.starts-with-amount-until-turned-off	SettingsMenuValueModelTests/startsWithAmountUntilTurnedOff		未移植	「金額から始める」の切り替えが設定のメニューに無い（キーは store にだけある）
 settings-menu-value.saves-chosen-day	SettingsMenuValueModelTests/savesChosenDay	SettingsMenuModelTest/savesChosenDay	対応	

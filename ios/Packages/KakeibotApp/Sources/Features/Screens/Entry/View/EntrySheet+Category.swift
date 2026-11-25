@@ -74,8 +74,8 @@ extension EntrySheet {
                     onHide: {
                         closeCategoryMenu()
 
-                        Task {
-                            hiddenCategory = await model.hideCategory(menu.category)
+                        model.perform {
+                            await $0.hideCategory(menu.category)
                         }
                     }
                 )
@@ -107,14 +107,6 @@ extension EntrySheet {
 
         if template.amount == nil {
             show(.amount)
-        }
-    }
-
-    func addCategory(_ category: EntryCategory) async {
-        await model.reloadCategories(selecting: category.id)
-
-        withAnimation(.snappy) {
-            showSelectedCategory()
         }
     }
 }

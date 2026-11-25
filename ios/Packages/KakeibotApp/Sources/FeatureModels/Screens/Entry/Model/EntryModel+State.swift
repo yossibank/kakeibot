@@ -114,10 +114,33 @@ public extension EntryModel {
         }
     }
 
+    struct Progress: Equatable {
+        public internal(set) var isClosing = false
+
+        var isSaving = false
+    }
+
+    enum Outcome: Hashable, Sendable {
+        case ready(isFirst: Bool)
+        case closed(EntryChange)
+        case continued(EntryChange)
+        case categoryMoved
+        case categoryAdded
+        case walletChosen
+    }
+
+    struct Results {
+        public var deletion: Deletion?
+        public var hiddenCategory: HiddenCategory?
+
+        public internal(set) var outcome = ScreenOutcome<Outcome>()
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+        public var results = Results()
 
         public var memo = ""
         public var today: LocalDate
@@ -128,11 +151,9 @@ public extension EntryModel {
         public internal(set) var keypad = Keypad()
         public internal(set) var items = Items()
         public internal(set) var voiceFilled: VoiceFilled?
-
-        public internal(set) var isClosing = false
+        public internal(set) var progress = Progress()
 
         var appliedTemplateId: EntryTemplate.ID?
-        var isSaving = false
 
         init(
             type: Entry.Kind,

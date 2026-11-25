@@ -13,6 +13,8 @@ public extension CategoryEditModel {
 
         public var name = ""
 
+        public internal(set) var ready = ScreenOutcome<Void>()
+
         public private(set) var tags: [EditingTag] = []
         public private(set) var tagProblem: String?
 

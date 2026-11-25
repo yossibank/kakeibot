@@ -85,14 +85,11 @@ extension EntrySheet {
         _ wallet: Wallet,
         as role: EntryWalletDeck.Role
     ) {
-        switch role {
-        case .source:
-            model.setWallet(wallet.id)
+        model.choose(wallet.id, as: role)
+        showTransferDeck()
+    }
 
-        case .destination:
-            model.state.setDestination(wallet.id)
-        }
-
+    func showTransferDeck() {
         if model.state.type == .transfer {
             show(.transfer)
         }

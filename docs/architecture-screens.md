@@ -62,7 +62,11 @@ model.perform {
 | 閉じた後 | 閉じた画面には、結果が届かない |
 | 編集シート | 結果は `SettingsEditOutcome` で持つ。`SettingsEditController` の `receive` が受ける |
 | 知らせと確認 | 取り消しの知らせの値と、結果で出す確認は、モデルが `state` の値を書いて出す |
-| 残る `Task` | 口座の編集シート・入力シート・設定の入口は、まだ画面の `Task` で戻り値を見ている |
+| 結果が何種類もある画面 | 結果を 1 つの `enum` にして、`ScreenOutcome` に入れる。入力シートの `EntryModel.Outcome` が当たる |
+| 読み込みの後 | `.task` は、モデルの `start` だけを呼ぶ。読み込みの後に画面の値を組む時は、モデルが結果を置く |
+| 待ってから出す | 画面の動きを待つ時間は、モデルが待ってから結果を置く。レシートの品目のシートが当たる |
+| 残る `Task` | `Features` では、指の動きを追う `SettingsDrag` と `SettingsAutoScroll` だけが持つ |
+| `AppFeature` | `MainView` は、シートとタブの切り替えを、まだ画面の `Task` で待っている |
 
 ### 見張り直し
 

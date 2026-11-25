@@ -58,12 +58,47 @@ extension WalletEditModel {
     }
 }
 
-extension WalletEditModel: SettingsEditModel {
+extension WalletEditModel: SettingsEditRemoving {
     public var edited: WalletDraft {
         output.draft
     }
 
     public var problemMessage: String? {
         output.draft.problems.first?.message
+    }
+
+    public func remove(_ id: Wallet.ID) async throws -> Deletion {
+        try await dependencies.database.deleteWallet(
+            id,
+            at: dependencies.clock.now
+        )
+    }
+
+    public func deleteFailedMessage(for error: any Error) -> String? {
+        switch error as? AppDatabase.WalletWriteError {
+        case .hasEntries: AppDatabase.WalletWriteError.hasEntriesMessage
+        case .lastShownWallet: AppDatabase.WalletWriteError.lastShownDeleteMessage
+        default: nil
+        }
+    }
+
+    public func hideFailedMessage(for error: any Error) -> String? {
+        switch error as? AppDatabase.WalletWriteError {
+        case .lastShownWallet: AppDatabase.WalletWriteError.lastShownMessage
+        default: nil
+        }
+    }
+
+    public func saveHidden(
+        _ id: Wallet.ID,
+        isHidden: Bool
+    ) async throws {
+        try await dependencies.database.setHidden(
+            id,
+            isHidden: isHidden,
+            at: dependencies.clock.now
+        )
+
+        input.isHidden = isHidden
     }
 }

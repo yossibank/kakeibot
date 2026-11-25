@@ -9,6 +9,7 @@ public protocol SettingsEditRemoving: SettingsEditModel
 
     func remove(_ id: Input.EditingID) async throws -> Deletion
     func deleteFailedMessage(for error: any Error) -> String?
+    func hideFailedMessage(for error: any Error) -> String?
 
     func saveHidden(
         _ id: Input.EditingID,
@@ -29,6 +30,10 @@ public extension SettingsEditRemoving {
         nil
     }
 
+    func hideFailedMessage(for _: any Error) -> String? {
+        nil
+    }
+
     @discardableResult
     func setHidden(_ isHidden: Bool) async -> Bool {
         guard let editingId = input.editingId else {
@@ -40,7 +45,7 @@ public extension SettingsEditRemoving {
             state.outcome.send(SettingsEditOutcome(isHidden: isHidden))
             return true
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            showHideFailure(error)
             return false
         }
     }
@@ -93,8 +98,18 @@ extension SettingsEditRemoving {
             try await saveHidden(editingId, isHidden: isHidden)
             state.outcome.send(SettingsEditOutcome(saved: saved, isHidden: isHidden))
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            showHideFailure(error)
             state.outcome.send(SettingsEditOutcome(saved: saved, closes: false))
+        }
+    }
+}
+
+private extension SettingsEditRemoving {
+    func showHideFailure(_ error: any Error) {
+        if let message = hideFailedMessage(for: error) {
+            state.errorNotice.show(message)
+        } else {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
         }
     }
 }

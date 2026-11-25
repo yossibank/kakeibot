@@ -30,10 +30,27 @@ extension ThemeStyleModel {
 }
 
 public extension ThemeStyleModel {
+    enum FontOffer: Hashable, Sendable {
+        case display(ThemeFont)
+        case text(ThemeFont)
+
+        public var feature: String {
+            "\(font.title)の字体"
+        }
+
+        var font: ThemeFont {
+            switch self {
+            case let .display(font), let .text(font): font
+            }
+        }
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+
+        public internal(set) var fontOffer: FontOffer?
 
         public private(set) var preview: ThemeStyle?
 
@@ -84,6 +101,13 @@ public extension ThemeStyleModel {
         }
     }
 
+    static func isLocked(
+        _ font: ThemeFont,
+        isPro: Bool
+    ) -> Bool {
+        !isPro && !freeFonts.contains(font)
+    }
+
     func load() async {
         do {
             input.style = try await dependencies.database.style()
@@ -116,6 +140,51 @@ public extension ThemeStyleModel {
         state.clearPreview()
     }
 
+    func choose(
+        _ offer: FontOffer,
+        isPro: Bool
+    ) async {
+        let isLocked = Self.isLocked(offer.font, isPro: isPro)
+
+        guard
+            isLocked,
+            offer.font != savedFont(for: offer)
+        else {
+            state.fontOffer = nil
+
+            cancelPreview()
+
+            await save(offer)
+
+            return
+        }
+
+        cancelPreview()
+
+        switch offer {
+        case let .display(font): preview(displayFont: font)
+        case let .text(font): preview(textFont: font)
+        }
+
+        state.fontOffer = offer
+    }
+
+    func closeFontOffer() {
+        state.fontOffer = nil
+
+        cancelPreview()
+    }
+
+    func unlockFont() async {
+        guard let offer = state.fontOffer else {
+            return
+        }
+
+        state.fontOffer = nil
+
+        await save(offer)
+    }
+
     func choose(_ size: ThemeTextSize) async {
         await choose(size, at: \.textSize, key: .textSize)
     }
@@ -146,6 +215,22 @@ public extension ThemeStyleModel {
 }
 
 private extension ThemeStyleModel {
+    static let freeFonts: Set<ThemeFont> = [.mincho, .gothic]
+
+    func savedFont(for offer: FontOffer) -> ThemeFont {
+        switch offer {
+        case .display: input.style.displayFont
+        case .text: input.style.textFont
+        }
+    }
+
+    func save(_ offer: FontOffer) async {
+        switch offer {
+        case let .display(font): await choose(displayFont: font)
+        case let .text(font): await choose(textFont: font)
+        }
+    }
+
     func choose<Value>(
         _ value: Value,
         at keyPath: WritableKeyPath<ThemeStyle, Value>,

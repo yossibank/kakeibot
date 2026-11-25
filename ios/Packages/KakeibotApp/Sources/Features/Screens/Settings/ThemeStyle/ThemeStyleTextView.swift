@@ -5,7 +5,6 @@ import SwiftUI
 
 public struct ThemeStyleTextView: View {
     @State private var model: ThemeStyleModel
-    @State private var fontOffer: FontOffer?
 
     @Environment(\.isPro) private var isPro
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -78,23 +77,11 @@ public struct ThemeStyleTextView: View {
                 choose(.text(font))
             }
         }
-        .proOffer(fontOffer?.feature) {
-            fontOffer = nil
-            model.cancelPreview()
+        .proOffer(model.state.fontOffer?.feature) {
+            model.closeFontOffer()
         } onUnlock: {
-            unlock()
-        }
-    }
-}
-
-private extension ThemeStyleTextView {
-    enum FontOffer: Equatable {
-        case display(ThemeFont)
-        case text(ThemeFont)
-
-        var feature: String {
-            switch self {
-            case let .display(font), let .text(font): "\(font.title)の字体"
+            model.perform {
+                await $0.unlockFont()
             }
         }
     }
@@ -184,53 +171,13 @@ private extension ThemeStyleTextView {
 }
 
 private extension ThemeStyleTextView {
-    static let freeFonts: Set<ThemeFont> = [.mincho, .gothic]
-
-    static func save(_ offer: FontOffer, in model: ThemeStyleModel) async {
-        switch offer {
-        case let .display(font):
-            await model.choose(displayFont: font)
-
-        case let .text(font):
-            await model.choose(textFont: font)
-        }
-    }
-
     func isLocked(_ font: ThemeFont) -> Bool {
-        !isPro && !Self.freeFonts.contains(font)
+        ThemeStyleModel.isLocked(font, isPro: isPro)
     }
 
-    func choose(_ offer: FontOffer) {
-        switch offer {
-        case let .display(font) where isLocked(font) && font != model.output.savedStyle.displayFont:
-            model.cancelPreview()
-            model.preview(displayFont: font)
-            fontOffer = offer
-
-        case let .text(font) where isLocked(font) && font != model.output.savedStyle.textFont:
-            model.cancelPreview()
-            model.preview(textFont: font)
-            fontOffer = offer
-
-        default:
-            fontOffer = nil
-
-            model.perform {
-                $0.cancelPreview()
-                await Self.save(offer, in: $0)
-            }
-        }
-    }
-
-    func unlock() {
-        guard let offer = fontOffer else {
-            return
-        }
-
-        fontOffer = nil
-
-        model.perform {
-            await Self.save(offer, in: $0)
+    func choose(_ offer: ThemeStyleModel.FontOffer) {
+        model.perform { [isPro] in
+            await $0.choose(offer, isPro: isPro)
         }
     }
 }

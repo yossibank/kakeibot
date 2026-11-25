@@ -147,4 +147,77 @@ struct ThemeStyleModelTests {
         #expect(model.output.style == .standard)
         #expect(model.state.errorNotice.message == "設定を保存できませんでした")
     }
+
+    @Test
+    func offersProForLockedFontWithoutSaving() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeStyleModel(parts: .system(setup.database))
+        await model.load()
+
+        await model.choose(.display(.rounded), isPro: false)
+        let style = try await setup.database.style()
+
+        #expect(model.state.fontOffer == .display(.rounded))
+        #expect(model.state.fontOffer?.feature == "\(ThemeFont.rounded.title)の字体")
+        #expect(model.output.style.displayFont == .rounded)
+        #expect(style == .standard)
+    }
+
+    @Test
+    func savesFreeFontAndClosesOffer() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeStyleModel(parts: .system(setup.database))
+        await model.load()
+        await model.choose(.text(.rounded), isPro: false)
+
+        await model.choose(.text(.gothic), isPro: false)
+        let style = try await setup.database.style()
+
+        #expect(model.state.fontOffer == nil)
+        #expect(model.state.preview == nil)
+        #expect(style.textFont == .gothic)
+    }
+
+    @Test
+    func savesLockedFontForPro() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeStyleModel(parts: .system(setup.database))
+        await model.load()
+
+        await model.choose(.display(.rounded), isPro: true)
+        let style = try await setup.database.style()
+
+        #expect(model.state.fontOffer == nil)
+        #expect(style.displayFont == .rounded)
+    }
+
+    @Test
+    func savesOfferedFontAfterUnlock() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeStyleModel(parts: .system(setup.database))
+        await model.load()
+        await model.choose(.text(.rounded), isPro: false)
+
+        await model.unlockFont()
+        let style = try await setup.database.style()
+
+        #expect(model.state.fontOffer == nil)
+        #expect(style.textFont == .rounded)
+    }
+
+    @Test
+    func closingOfferRestoresStyle() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeStyleModel(parts: .system(setup.database))
+        await model.load()
+        await model.choose(.display(.rounded), isPro: false)
+
+        model.closeFontOffer()
+        await model.unlockFont()
+        let style = try await setup.database.style()
+
+        #expect(model.state.fontOffer == nil)
+        #expect(model.output.style == .standard)
+        #expect(style == .standard)
+    }
 }

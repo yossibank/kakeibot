@@ -16,8 +16,8 @@ extension EntrySheet {
                     style: .destructive,
                     label: "削除"
                 ) {
-                    Task {
-                        await delete()
+                    model.perform {
+                        await $0.delete()
                     }
                 }
             }

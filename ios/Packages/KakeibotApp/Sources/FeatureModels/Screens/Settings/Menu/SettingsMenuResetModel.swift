@@ -7,7 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class SettingsMenuResetModel: ScreenPerforming {
-    public let state = NoticeState()
+    public let state = State()
     public let input: Input
     public let output: Output
 
@@ -25,6 +25,13 @@ public final class SettingsMenuResetModel: ScreenPerforming {
 public extension SettingsMenuResetModel {
     @MainActor
     @Observable
+    final class State: NoticeHolding {
+        public var errorNotice = ErrorNotice()
+        public var isConfirming = false
+    }
+
+    @MainActor
+    @Observable
     final class Input {
         public internal(set) var count = 0
         public internal(set) var hasSharedWallets = false
@@ -39,12 +46,14 @@ public extension SettingsMenuResetModel {
         }
     }
 
+    @discardableResult
     func prepare() async -> Bool {
         do {
             input.count = try await dependencies.database.deletableRecordCount()
             input.hasSharedWallets = try await sharesWallets()
         } catch {
             state.errorNotice.show(Self.loadFailedMessage, for: error)
+            state.isConfirming = false
 
             return false
         }
@@ -53,7 +62,9 @@ public extension SettingsMenuResetModel {
             state.errorNotice.inform(Self.emptyMessage)
         }
 
-        return input.count > 0
+        state.isConfirming = input.count > 0
+
+        return state.isConfirming
     }
 
     func deleteAll() async {

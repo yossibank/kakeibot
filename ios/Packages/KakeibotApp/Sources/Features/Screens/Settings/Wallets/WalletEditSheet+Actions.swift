@@ -15,6 +15,22 @@ extension WalletEditSheet {
         case loanAmount
     }
 
+    var edit: SettingsEditController<WalletEditModel> {
+        SettingsEditController(
+            model: model,
+            dismiss: dismiss,
+            onRest: {
+                focus = nil
+            },
+            onHide: onHide,
+            onDelete: onDelete,
+            onSaved: onSave,
+            onSave: {
+                await $0.save()
+            }
+        )
+    }
+
     var title: String {
         model.isEditing ? "口座を編集" : "口座を追加"
     }
@@ -54,7 +70,8 @@ extension WalletEditSheet {
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
-        let amount = isEnteringValuation ? model.state.valuation.amount : model.input.balance
+        let isEntering = model.state.drawer == .valuation
+        let amount = isEntering ? model.state.valuation.amount : model.input.balance
 
         return [
             .init(
@@ -89,12 +106,12 @@ extension WalletEditSheet {
     }
 
     var amountStroke: Color {
-        isEnteringAmount ? signColor : signColor.opacity(.muted)
+        model.state.drawer == .amount ? signColor : signColor.opacity(.muted)
     }
 
     func open(_ panel: Panel) {
         switch panel {
-        case .payment: isEditingPayment = true
+        case .payment: model.state.payment.isEditing = true
         case .valuation: openValuation()
         case .loanAmount: openLoanAmount()
         }
@@ -103,15 +120,11 @@ extension WalletEditSheet {
     func openAmount() {
         focus = nil
 
-        withAnimation(.snappy) {
-            isEnteringAmount = true
-        }
+        show(.amount)
     }
 
     func closeAmount() {
-        withAnimation(.snappy) {
-            isEnteringAmount = false
-        }
+        show(nil)
     }
 
     func openValuation() {
@@ -119,97 +132,44 @@ extension WalletEditSheet {
 
         model.startValuation()
 
-        withAnimation(.snappy) {
-            isEnteringValuation = true
-        }
+        show(.valuation)
     }
 
     func closeValuation() {
-        withAnimation(.snappy) {
-            isEnteringValuation = false
-        }
+        show(nil)
     }
 
     func openLoanAmount() {
         focus = nil
 
-        withAnimation(.snappy) {
-            isEnteringLoanAmount = true
-        }
+        show(.loanAmount)
     }
 
     func closeLoanAmount() {
+        show(nil)
+    }
+
+    func show(_ drawer: WalletEditModel.Drawer?) {
         withAnimation(.snappy) {
-            isEnteringLoanAmount = false
+            model.state.drawer = drawer
         }
     }
 
-    func saveValuation() async {
-        if await model.saveValuation() {
-            closeValuation()
+    func saveValuation() {
+        model.perform {
+            await $0.saveValuation()
         }
-    }
-
-    func close() {
-        focus = nil
-
-        if model.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
-    }
-
-    func save(hiding: Bool = false) async {
-        focus = nil
-
-        guard let wallet = await model.save() else {
-            return
-        }
-
-        guard
-            !model.isEditing,
-            model.output.asksPayment
-        else {
-            onSave(wallet)
-
-            if hiding {
-                guard await model.setHidden(!model.input.isHidden) else {
-                    return
-                }
-
-                if model.input.isHidden {
-                    onHide()
-                }
-            }
-
-            dismiss()
-
-            return
-        }
-
-        addedWallet = wallet
-        isAskingPayment = true
     }
 
     func closePayment() {
-        guard addedWallet == nil else {
-            finishAddedWallet()
+        guard model.state.payment.addedWallet == nil else {
+            model.finishAddedWallet()
             return
         }
 
         model.perform {
             await $0.loadPayment()
         }
-    }
-
-    func finishAddedWallet() {
-        guard let addedWallet else {
-            return
-        }
-
-        onSave(addedWallet)
-        dismiss()
     }
 
     func toggleHidden() {
@@ -220,35 +180,6 @@ extension WalletEditSheet {
             return
         }
 
-        requestHide()
-    }
-
-    func requestHide() {
-        guard model.isChanged else {
-            Task {
-                await setHidden(!model.input.isHidden)
-            }
-
-            return
-        }
-
-        isConfirmingHideChanges = true
-    }
-
-    func setHidden(_ isHidden: Bool) async {
-        if await model.setHidden(isHidden) {
-            if isHidden {
-                onHide()
-            }
-
-            dismiss()
-        }
-    }
-
-    func delete() async {
-        if let deletion = await model.delete() {
-            onDelete(deletion)
-            dismiss()
-        }
+        edit.toggleHidden()
     }
 }

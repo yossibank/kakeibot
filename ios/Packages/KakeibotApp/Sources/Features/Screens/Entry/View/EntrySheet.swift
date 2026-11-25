@@ -10,15 +10,13 @@ public struct EntrySheet: View {
     @State var isEditingMemo = false
     @State var categoryPage: Int? = 0
     @State var sheet: Sheet?
-    @State var addedWallet: AddedWallet?
+    @State var addedWallet: EntryModel.AddedWallet?
     @State var reloadsWallets = false
     @State var categoryMenu: CategoryMenu?
     @State var sheetWidth: CGFloat = 0
     @State var panelHeight: CGFloat = 0
     @State var slipGrowth: CGFloat = 0
     @State var bottomInset: CGFloat = 0
-    @State var deletion: Deletion?
-    @State var hiddenCategory: EntryModel.HiddenCategory?
     @State var receipt = EntryReceiptFlow()
     @State var voice: EntryVoiceFlow
 
@@ -101,17 +99,28 @@ public struct EntrySheet: View {
             ) {
                 model.state.errorNotice.clear()
             }
-            .deletionNotice($deletion, bottom: bannerBottom) { deletion in
+            .deletionNotice(
+                Bindable(model.state).results.deletion,
+                bottom: bannerBottom
+            ) { deletion in
                 model.perform {
                     await $0.restore(deletion)
                     await $0.reloadWallets()
                 }
             }
-            .settingsHideNotice($hiddenCategory, bottom: bannerBottom) { hidden in
-                Task {
-                    await model.showCategory(hidden)
-                    showSelectedCategory()
+            .settingsHideNotice(
+                Bindable(model.state).results.hiddenCategory,
+                bottom: bannerBottom
+            ) { hidden in
+                model.perform {
+                    await $0.showCategory(hidden)
                 }
+            }
+            .onOutcome(model.state.results.outcome) { outcome in
+                receive(outcome)
+            }
+            .onOutcome(receipt.state.outcome) { outcome in
+                receive(outcome)
             }
             .entryNotice(
                 notice,
@@ -146,13 +155,7 @@ public struct EntrySheet: View {
                 sheetContent(for: sheet)
             }
             .task {
-                await load()
-
-                if startsReceipt, showsReceiptButton {
-                    withAnimation(.snappy) {
-                        receipt.start(for: model, isPro: isPro)
-                    }
-                }
+                await model.start()
             }
             .task {
                 await model.observeHistory()
@@ -180,8 +183,8 @@ extension EntrySheet {
                         return
                     }
 
-                    Task {
-                        await save()
+                    model.perform {
+                        await $0.save()
                     }
                 }
                 .disabled(!model.output.canSave && !opensKeypadOnSave)
@@ -192,8 +195,8 @@ extension EntrySheet {
                         systemImage: "doc.on.doc",
                         isEnabled: true
                     ) {
-                        Task {
-                            await recordAgain()
+                        model.perform {
+                            await $0.recordAgain()
                         }
                     }
                 } else {
@@ -202,8 +205,8 @@ extension EntrySheet {
                         systemImage: "plus.square.on.square",
                         isEnabled: model.output.canSave
                     ) {
-                        Task {
-                            await saveAndContinue()
+                        model.perform {
+                            await $0.saveAndContinue()
                         }
                     }
                 }
@@ -229,14 +232,28 @@ extension EntrySheet {
         }
     }
 
-    func delete() async {
-        guard let change = await model.delete() else {
-            return
+    func start(isFirst: Bool) {
+        if isFirst {
+            deck = EntryDeck.start(for: model.state.type)
         }
 
-        model.beginClosing()
+        showSelectedCategory()
+
+        if startsReceipt, showsReceiptButton {
+            withAnimation(.snappy) {
+                receipt.start(for: model, isPro: isPro)
+            }
+        }
+    }
+
+    func finish(_ change: EntryChange) {
         onChange(change)
         dismiss()
+    }
+
+    func showNext(after change: EntryChange) {
+        notice.show(change)
+        show(EntryDeck.start(for: model.state.type))
     }
 }
 
@@ -326,11 +343,6 @@ private extension EntrySheet {
         .disabled(!isEnabled)
         .opacity(isEnabled ? 1 : 0.4)
     }
-
-    func recordAgain() async {
-        await model.recordAgain()
-        showSelectedCategory()
-    }
 }
 
 private extension EntrySheet {
@@ -351,36 +363,6 @@ private extension EntrySheet {
 
     var opensKeypadOnSave: Bool {
         deck != .amount && !model.output.isEditing && model.output.amount <= 0
-    }
-
-    func load() async {
-        if !model.output.isLoaded {
-            await model.load()
-
-            deck = EntryDeck.start(for: model.state.type)
-        }
-
-        showSelectedCategory()
-    }
-
-    func save() async {
-        guard let change = await model.save() else {
-            return
-        }
-
-        model.beginClosing()
-        onChange(change)
-        dismiss()
-    }
-
-    func saveAndContinue() async {
-        guard let change = await model.save() else {
-            return
-        }
-
-        await model.startNext()
-        notice.show(change)
-        show(EntryDeck.start(for: model.state.type))
     }
 }
 

@@ -1,4 +1,5 @@
 import Core
+import FeatureModels
 
 enum EntryDeck: Hashable {
     case category

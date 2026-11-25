@@ -26,7 +26,7 @@
 | `SettingsEditInput` | 編集のモデルの入力。変わる前の値と、編集中の id を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditHidingInput` | 非表示にできるものの、編集のモデルの入力。非表示かどうかも持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditModel` | 1 件を編集するモデル。状態と入力のまとまりを持ち、下書きと、保存できるかを出す | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足し、状態は `SettingsEditState` にする。保存できた時は、モデルの `save` が `finishSave` を呼んで結果を置く | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足し、状態は `SettingsEditState` にする。`save` が `finishSave` で結果を置き、失敗の文は `hideFailedMessage` などで替える | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditState` | 編集のモデルの状態。知らせと、破棄・非表示・削除の確認中か（`SettingsEditPrompt`）と、結果（`outcome`）を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
