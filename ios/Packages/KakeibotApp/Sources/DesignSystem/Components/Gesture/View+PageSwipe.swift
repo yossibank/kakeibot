@@ -7,11 +7,14 @@ public enum PageSwipeDirection: Sendable {
 
 public extension View {
     func onPageSwipe(
-        following slide: Binding<PageSlide>,
+        following slide: PageSlideProxy,
+        isEnabled: Bool = true,
         canMove: @escaping (PageSwipeDirection) -> Bool = { _ in true },
         perform action: @escaping (PageSwipeDirection) -> Void
     ) -> some View {
-        gesture(
+        let slide = isEnabled ? slide.binding : .constant(PageSlide())
+
+        return gesture(
             SwipeGesture { x in
                 let direction: PageSwipeDirection = x < 0 ? .forward : .backward
                 let reach = canMove(direction) ? x : x * pageSwipeResistance

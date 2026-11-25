@@ -56,6 +56,8 @@
 | `SettingsBoardShown` | 一覧の画面が出している物。行き先・開いている行・確認（`SettingsBoardPrompt`）を持つ | `FeatureModels/Shared/SettingsParts/Board/` |
 | `SettingsEditPrompt` | 編集シートが出している物。開いているパネルと、メニュー・破棄・非表示・削除の確認のどれか 1 つを持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsBoardScreen` | `SettingsBoardPage` の中で使う、設定の一覧の外枠。説明カード・タイルの並び・追加ボタンを組む | `Features/Shared/SettingsParts/Board/` |
+| `PageSlideReader` | 頁めくりの入れ物。動きの値を中に持って中身に `PageSlideProxy` を渡し、画面は値を持たない | `DesignSystem/Components/Navigation/` |
+| `PageSlideProxy` | 頁めくりの口。`pageSlide` と `onPageSwipe` に渡し、ボタンからは `run(forward:)` で頁を送る | `DesignSystem/Components/Navigation/` |
 
 ## 🗄️ 書き込みの共通の関数
 

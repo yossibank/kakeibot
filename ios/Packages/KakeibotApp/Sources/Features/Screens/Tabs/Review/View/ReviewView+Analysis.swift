@@ -77,7 +77,7 @@ extension ReviewView {
         .buttonStyle(PressButtonStyle())
     }
 
-    var analysisSheet: some View {
+    func analysisSheet(_ slide: PageSlideProxy) -> some View {
         VStack(spacing: 12) {
             SheetHeader {
                 model.state.sheet = nil
@@ -95,22 +95,24 @@ extension ReviewView {
                 transition: periodTextTransition,
                 canMoveForward: model.output.canMoveForward,
                 onMove: { count in
-                    move(by: count)
+                    move(by: count, with: slide)
                 },
-                onCurrent: moveToCurrentPeriod
+                onCurrent: {
+                    moveToCurrentPeriod(with: slide)
+                }
             )
             .padding(.horizontal, 16)
 
             ScrollView {
-                sheetContent
+                sheetContent(slide)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 24)
                     .pageSlide(slide, page: model.output.period)
             }
             .scrollIndicators(.hidden)
             .id(model.output.period.commentKey)
-            .onPageSwipe(following: $slide, canMove: canMove) { direction in
-                move(direction)
+            .onPageSwipe(following: slide, canMove: canMove) { direction in
+                move(direction, with: slide)
             }
         }
         .padding(.top, 20)
@@ -134,9 +136,9 @@ extension ReviewView {
 
 private extension ReviewView {
     @ViewBuilder
-    var sheetContent: some View {
+    func sheetContent(_ slide: PageSlideProxy) -> some View {
         if model.output.isCurrentPeriod {
-            progressView
+            progressView(slide)
         } else {
             ReviewClosingView(
                 content: model.output.closingContent,
@@ -158,7 +160,7 @@ private extension ReviewView {
         }
     }
 
-    var progressView: some View {
+    func progressView(_ slide: PageSlideProxy) -> some View {
         let period = model.output.period
         let closingDate = period.range.upperBound.adding(days: 1)
         let previousTitle = "\(period.previous.displayName)のふりかえりを見る"
@@ -176,7 +178,7 @@ private extension ReviewView {
             nextGoalTitle: "\(period.adding(1).displayName)の一手",
             previousTitle: previousTitle,
             onOpenPrevious: {
-                move(by: -1)
+                move(by: -1, with: slide)
             },
             onOpenMonth: { month in
                 model.state.analysisShare = model.output.monthShare(of: month)

@@ -1,17 +1,32 @@
 import SwiftUI
 
-public struct PageSlide: Equatable, Sendable {
-    public var offset: CGFloat
-    public var opacity: Double
-    public var isDragging = false
-    public var animation: Animation?
+struct PageSlide: Equatable {
+    var offset: CGFloat
+    var opacity: Double
+    var isDragging = false
+    var animation: Animation?
 
-    public init() {
+    init() {
         self.init(offset: 0, opacity: 1)
     }
 }
 
-public extension PageSlide {
+public struct PageSlideProxy {
+    let value: PageSlide
+    let binding: Binding<PageSlide>
+}
+
+public extension PageSlideProxy {
+    @MainActor
+    func run(
+        forward: Bool,
+        change: @escaping @MainActor () -> Void
+    ) {
+        PageSlide.run(binding, forward: forward, change: change)
+    }
+}
+
+extension PageSlide {
     static let distance: CGFloat = 40
     static let outDuration = 0.15
     static let fadeDistance: CGFloat = 400
@@ -89,16 +104,16 @@ private extension PageSlide {
 }
 
 public extension View {
-    func pageSlide(_ slide: PageSlide) -> some View {
-        animation(slide.animation) { content in
+    func pageSlide(_ slide: PageSlideProxy) -> some View {
+        animation(slide.value.animation) { content in
             content
-                .offset(x: slide.offset)
-                .opacity(slide.opacity)
+                .offset(x: slide.value.offset)
+                .opacity(slide.value.opacity)
         }
     }
 
     func pageSlide(
-        _ slide: PageSlide,
+        _ slide: PageSlideProxy,
         page: some Hashable
     ) -> some View {
         id(page)
