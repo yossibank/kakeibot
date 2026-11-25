@@ -342,6 +342,9 @@ review.moves-only-up-to-current-period	ReviewModelTests/movesOnlyUpToCurrentPeri
 review.moves-back-to-current-period	ReviewModelTests/movesBackToCurrentPeriod		未移植	今の期間へ戻る moveToCurrent・isCurrentPeriod が無く、ボタンも無い
 review.remembers-selection	ReviewModelTests/remembersSelection	ReviewModelTest/remembersSelection	対応	
 review.lists-days-of-stamp	ReviewModelTests/listsDaysOfStamp		未移植	スタンプの集計と押した日の一覧が、モデルと画面に無い
+review.opens-chosen-entry-after-closing-share-sheet	ReviewModelTests/opensChosenEntryAfterClosingShareSheet		未確認	Android は別のブランチで合わせる
+review.closes-analysis-and-its-share-before-opening	ReviewModelTests/closesAnalysisAndItsShareBeforeOpening		未確認	Android は別のブランチで合わせる
+review.opens-picked-day-after-closing-stamp-sheet	ReviewModelTests/opensPickedDayAfterClosingStampSheet		未確認	Android は別のブランチで合わせる
 review.shows-store-review-card-after-ten-entries	ReviewModelTests/showsStoreReviewCardAfterTenEntries		未移植	ストアの評価を頼むカードが、モデルにも画面にも無い
 review.hides-store-review-card-after-closing	ReviewModelTests/hidesStoreReviewCardAfterClosing		未移植	ストアの評価を頼むカードと、閉じた記憶が無い
 review.marks-store-review-opened	ReviewModelTests/marksStoreReviewOpened		未移植	ストアの評価を開いた記憶（storeReviewOpened）が無い

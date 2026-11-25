@@ -49,7 +49,7 @@ extension ReviewView {
             VStack(spacing: 0) {
                 ForEach(moves) { move in
                     Button {
-                        openShare = model.output.share(of: move)
+                        model.state.sheet = .share(model.output.share(of: move))
                     } label: {
                         moveRow(move)
                     }

@@ -34,8 +34,11 @@ public extension ReviewModel {
         public var errorNotice = ErrorNotice()
 
         public var today: LocalDate
+        public var sheet: Sheet?
+        public var analysisShare: Share?
 
         public internal(set) var checkTime: Date
+        public internal(set) var pending: Opening?
 
         public private(set) var offset = 0
         public private(set) var isMovingForward = true
