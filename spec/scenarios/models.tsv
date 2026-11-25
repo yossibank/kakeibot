@@ -194,9 +194,10 @@ assets.leaves-out-future-entries-from-balances	AssetsModelTests/leavesOutFutureE
 assets.lists-future-entries-as-plans	AssetsModelTests/listsFutureEntriesAsPlans		未移植	資産のモデルと画面に、先の日付の記録を予定として並べる欄が無い
 assets.lists-upcoming-card-bills	AssetsModelTests/listsUpcomingCardBills		未移植	資産のモデルと画面に、カードの請求の欄が無い
 assets.estimates-loan-payoff	AssetsModelTests/estimatesLoanPayoff		未移植	資産の行に、借入の完済の見込みが無い
+assets.counts-cards-in-total	AssetsModelTests/countsCardsInTotal	AssetsModelTest/countsCardsInTotal	対応	
 assets.shows-notice-when-list-fails		AssetsModelTest/showsNoticeWhenListFails	Androidのみ	iOS は共通の observe の失敗だけを確かめ、資産の文は確かめていない
 assets.shows-no-rows-before-list-arrives		AssetsModelTest/showsNoRowsBeforeListArrives	Androidのみ	一覧が届く前は行が空で合計が 0 であることは、iOS にテストが無い
-assets.separates-debts-from-assets		AssetsModelTest/separatesDebtsFromAssets	Androidのみ	資産と負債の分け方のテスト。onHand がカードを含まず iOS の total と違う
+assets.separates-debts-from-assets		AssetsModelTest/separatesDebtsFromAssets	Androidのみ	資産と負債の分け方のテスト。iOS は sections で分け、同じ形のテストが無い
 assets.counts-entries-of-today		AssetsModelTest/countsEntriesOfToday	Androidのみ	今日の記録は数え、明日の記録は数えない境目は、iOS にテストが無い
 assets.leaves-out-future-transfers-from-both-wallets		AssetsModelTest/leavesOutFutureTransfersFromBothWallets	Androidのみ	先の日付の振替を両方の口座から外すことは、iOS は口座ごとに確かめていない
 assets.leaves-out-future-card-usage-from-debts		AssetsModelTest/leavesOutFutureCardUsageFromDebts	Androidのみ	先の日付のカードの利用を負債から外すことは、iOS にテストが無い
