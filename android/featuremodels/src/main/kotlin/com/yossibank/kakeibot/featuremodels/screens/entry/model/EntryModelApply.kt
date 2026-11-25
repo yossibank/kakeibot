@@ -37,12 +37,14 @@ fun EntryModel.applyRecent(entry: Entry) {
         setWallet(wallet.id)
     }
 
-    val hasCategory = output.categories.any { it.id == entry.categoryId }
-    val tagId = output.allTags.firstOrNull { it.id == entry.tagId && it.archivedAt == null }?.id
+    if (output.categories.any { it.id == entry.categoryId }) {
+        state.update { withCategory(entry.categoryId) }
+    }
+
+    val tagId = output.tags.firstOrNull { it.id == entry.tagId && it.archivedAt == null }?.id
 
     state.update {
         copy(
-            categoryId = if (hasCategory) entry.categoryId else categoryId,
             tagId = tagId,
             memo = entry.memo?.takeIf { it.isNotEmpty() } ?: memo,
         )

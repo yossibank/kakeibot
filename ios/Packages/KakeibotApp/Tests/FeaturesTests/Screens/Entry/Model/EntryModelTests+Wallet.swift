@@ -155,4 +155,35 @@ extension EntryModelTests {
         #expect(walletIDs == [shared.id])
         #expect(back == own)
     }
+
+    @Test
+    func dropsBillMonthWithoutBillChoices() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let billMonth = try #require(YearMonth(year: 2026, month: 11))
+
+        let draft = EntryDraft(
+            type: .expense,
+            amount: 800,
+            date: setup.date,
+            categoryId: options.expenseCategories[0].id,
+            walletId: options.wallets[0].id,
+            billMonth: billMonth
+        )
+
+        let entry = try await setup.database.saveEntry(draft, at: Date())
+        let model = EntryModel(
+            parts: .system(setup.database),
+            editing: entry.id,
+            date: setup.date
+        )
+
+        await model.load()
+        let loaded = model.state.payment.billMonth
+        let change = try #require(await model.save())
+
+        #expect(loaded == billMonth)
+        #expect(model.output.billChoices.isEmpty)
+        #expect(change.entry.billMonth == nil)
+    }
 }

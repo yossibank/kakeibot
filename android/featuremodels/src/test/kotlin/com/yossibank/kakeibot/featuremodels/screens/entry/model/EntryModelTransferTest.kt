@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
+import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
@@ -181,6 +182,25 @@ class EntryModelTransferTest {
         assertEquals(70000L, partial?.amount)
         assertEquals(100_000, model.output.amount)
         assertEquals(0L, model.output.afterLine(of = loan, isSource = false)?.amount)
+    }
+
+    @Test
+    fun capsLoanPayoffAtLargestAmount() = modelTest(today = "2026-10-12") { setup ->
+        val bank = setup.options().wallets[1]
+        val loan = setup.addWallet(
+            kind = Wallet.Kind.loan,
+            name = "住宅ローン",
+            initialBalance = -AmountCalculator.maxValue,
+        )
+        setup.saveTransfer(1000, from = loan.id, to = bank.id)
+        val model = setup.transferModel()
+        model.select(wallet = bank)
+        model.state.selectDestination(loan)
+
+        model.payOffLoan()
+
+        assertEquals(AmountCalculator.maxValue + 1000L, model.output.loanRemaining)
+        assertEquals(AmountCalculator.maxValue, model.output.amount)
     }
 
     @Test
