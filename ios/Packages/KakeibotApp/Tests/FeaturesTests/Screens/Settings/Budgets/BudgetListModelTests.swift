@@ -290,6 +290,17 @@ struct BudgetListModelTests {
         #expect(total.map(\.amount) == [82800])
         #expect(model.output.suggestions.isEmpty)
     }
+
+    @Test
+    func tellsWhenBudgetsCannotBeRead() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
+        try await setup.database.failReads(of: "setting")
+
+        await model.load()
+
+        #expect(model.state.errorNotice.message == "予算を読めませんでした")
+    }
 }
 
 private extension BudgetListModelTests {

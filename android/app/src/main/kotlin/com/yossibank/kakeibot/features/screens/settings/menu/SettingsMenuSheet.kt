@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,15 +19,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.designsystem.components.notice.NoticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.card
-import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
@@ -80,6 +78,8 @@ fun SettingsMenuSheet(
         model.observe()
     }
 
+    model.state.task.Timer()
+
     fun back() {
         when (screen) {
             Screen.Menu -> onClose()
@@ -103,6 +103,13 @@ fun SettingsMenuSheet(
             }
         },
     ) {
+        if (model.state.task.message.isNotEmpty()) {
+            NoticeBanner(
+                message = model.state.task.message,
+                onClose = model.state.task::clear,
+            )
+        }
+
         when (screen) {
             Screen.Menu -> {
                 SettingsCaption(text = "予算と期間")

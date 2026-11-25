@@ -78,6 +78,17 @@ class ReviewModelNoticeTest {
     }
 
     @Test
+    fun keepsNoticeAfterLaterSuccess() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.reviewModel()
+        setup.database.failWrites(to = "setting")
+
+        model.saveSelection()
+        model.loadSelection()
+
+        assertEquals("保存できませんでした", model.state.task.message)
+    }
+
+    @Test
     fun closesNoticeByHand() = modelTest(today = "2026-10-17") { setup ->
         setup.database.failReads(of = "setting")
         val model = setup.reviewModel()

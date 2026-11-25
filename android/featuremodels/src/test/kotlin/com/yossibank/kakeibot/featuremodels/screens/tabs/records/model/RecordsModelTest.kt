@@ -9,9 +9,11 @@ import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.failReads
+import com.yossibank.kakeibot.featuremodels.support.failWrites
 import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
+import com.yossibank.kakeibot.store.queries.methods.setting
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
@@ -189,6 +191,18 @@ class RecordsModelTest {
             RecordsLayout.list,
             setup.database.settingUpdates(SettingKey.recordsLayout).first(),
         )
+    }
+
+    @Test
+    fun tellsWhenLayoutCannotBeSaved() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.observedModel()
+        setup.database.failWrites(to = "setting")
+
+        model.select(layout = RecordsLayout.list)
+
+        assertEquals(RecordsLayout.list, model.input.layout)
+        assertEquals(RecordsLayout.calendar, setup.database.setting(SettingKey.recordsLayout))
+        assertEquals("保存できませんでした", model.state.task.message)
     }
 
     @Test

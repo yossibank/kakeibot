@@ -22,6 +22,31 @@ suspend fun AppDatabase.failWrites(to: String) {
     }
 }
 
+suspend fun AppDatabase.failDeletes(
+    from: String,
+    where: String,
+) {
+    useWriterConnection { connection ->
+        val sql = """
+            CREATE TRIGGER fail_${from}_some_delete BEFORE DELETE ON $from WHEN OLD.$where
+            BEGIN SELECT RAISE(ABORT, 'failing for tests'); END
+        """.trimIndent()
+
+        connection.usePrepared(sql) { it.step() }
+    }
+}
+
+suspend fun AppDatabase.fillStorage() {
+    useWriterConnection { connection ->
+        val pages = connection.usePrepared("PRAGMA page_count") { statement ->
+            statement.step()
+            statement.getLong(0)
+        }
+
+        connection.usePrepared("PRAGMA max_page_count = $pages") { it.step() }
+    }
+}
+
 suspend fun AppDatabase.failReads(of: String) {
     useWriterConnection { connection ->
         connection.usePrepared("DROP TABLE $of") { it.step() }

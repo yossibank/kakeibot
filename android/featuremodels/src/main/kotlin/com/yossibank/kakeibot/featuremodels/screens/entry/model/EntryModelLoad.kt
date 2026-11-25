@@ -2,6 +2,9 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
+import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.store.writes.methods.EntryWriteError
+import com.yossibank.kakeibot.store.writes.methods.EntryWriteException
 
 fun EntryModel.close(): Boolean {
     if (output.isChanged) {
@@ -35,4 +38,9 @@ internal fun EntryModel.fill(
         amount = entry.amount,
         fee = fee,
     )
+}
+
+internal fun EntryModel.describe(error: Exception): String {
+    val isMissing = (error as? EntryWriteException)?.error == EntryWriteError.entryNotFound
+    return if (isMissing) "記録が見つかりませんでした" else ModelTask.saveFailed
 }

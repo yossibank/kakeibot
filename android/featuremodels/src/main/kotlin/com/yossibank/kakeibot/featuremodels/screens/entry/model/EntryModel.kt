@@ -183,6 +183,9 @@ class EntryModel(
         var editingId: Identifier<Entry>? by mutableStateOf(editingId)
             internal set
 
+        var original: Entry? = null
+            internal set
+
         var history: EntryList? by mutableStateOf(null)
             internal set
 
@@ -281,7 +284,7 @@ class EntryModel(
     suspend fun load() {
         val database = dependencies.database
 
-        state.task.attempt(describe = failure(otherwise = ModelTask.loadFailed)) {
+        state.task.attempt(describe = ::describe) {
             database.insertDefaultsIfEmpty(at = dependencies.clock.now)
 
             input.options = database.entryOptions()
@@ -325,7 +328,7 @@ class EntryModel(
             return false
         }
 
-        val saved = state.task.attempt(describe = failure(otherwise = ModelTask.saveFailed)) {
+        val saved = state.task.attempt(describe = ::describe) {
             dependencies.database.saveEntry(
                 draft = draft,
                 editing = input.editingId,
@@ -337,15 +340,15 @@ class EntryModel(
     }
 
     suspend fun delete(): Boolean {
-        val editing = input.editingId
+        val original = input.original
 
-        if (editing == null || state.task.isRunning) {
+        if (original == null || state.task.isRunning) {
             return false
         }
 
-        val deleted = state.task.attempt(failure = "削除できませんでした") {
+        val deleted = state.task.attempt(describe = ::describe) {
             dependencies.database.deleteEntry(
-                id = editing,
+                id = original.id,
                 at = dependencies.clock.now,
             )
         }
@@ -357,7 +360,7 @@ class EntryModel(
         state.clear()
         state.focus(output.startField)
 
-        state.task.attempt(failure = ModelTask.loadFailed) {
+        state.task.attempt(describe = ::describe) {
             loadHistory()
         }
 
@@ -365,7 +368,7 @@ class EntryModel(
     }
 
     suspend fun reloadTemplates() {
-        state.task.attempt(failure = ModelTask.loadFailed) {
+        state.task.attempt(describe = ::describe) {
             input.allTemplates = dependencies.database.templates()
         }
     }
@@ -382,17 +385,12 @@ class EntryModel(
         val database = dependencies.database
         val editing = input.editingId ?: return null
         val missing = EntryWriteException(EntryWriteError.entryNotFound)
-        val entry = database.entry(editing) ?: throw missing
-        val transferId = entry.transferId ?: return entry
-        val transfer = database.entry(transferId) ?: return entry
+        val found = database.entry(editing) ?: throw missing
+        val entry = found.transferId?.let { database.entry(it) } ?: found
 
-        input.editingId = transfer.id
+        input.editingId = entry.id
+        input.original = entry
 
-        return transfer
-    }
-
-    private fun failure(otherwise: String): (Exception) -> String = { error ->
-        val isMissing = (error as? EntryWriteException)?.error == EntryWriteError.entryNotFound
-        if (isMissing) "記録が見つかりませんでした" else otherwise
+        return entry
     }
 }

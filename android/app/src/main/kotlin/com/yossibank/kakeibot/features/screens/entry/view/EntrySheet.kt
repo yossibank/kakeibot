@@ -128,6 +128,8 @@ fun EntrySheet(
         model.load()
     }
 
+    model.state.task.Timer()
+
     DisposableEffect(voice) {
         onDispose(voice::close)
     }
@@ -221,6 +223,7 @@ fun EntrySheet(
 
                 FittedText(
                     text = model.state.task.message,
+                    modifier = Modifier.clickable(onClick = model.state.task::clear),
                     color = Palette.rose,
                     style = textFont(size = FontSize.Caption),
                 )

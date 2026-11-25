@@ -44,7 +44,9 @@ entry.lists-no-recent-entries-for-transfers	EntryModelTests/listsNoRecentEntries
 entry.applies-recent-entry	EntryModelTests/appliesRecentEntry	EntryModelRecentTest/appliesRecentEntry	対応	
 entry.drops-recent-tag-outside-offered-categories	EntryModelTests/dropsRecentTagOutsideOfferedCategories	EntryModelRecentTest/dropsRecentTagOutsideOfferedCategories	対応	
 entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntryOutOfRecentEntries	EntryModelRecentTest/leavesEditedEntryOutOfRecentEntries	対応	
-entry.tells-when-i-phone-storage-is-full	EntryModelTests/tellsWhenIPhoneStorageIsFull		違い	容量が足りない時の専用の文が無く「保存できませんでした」になる
+entry.tells-when-loading-fails	EntryModelTests/tellsWhenLoadingFails	EntryModelFailureTest/tellsWhenLoadingFails	対応	設定ではなく、記録の表を読めなくして確かめる
+entry.tells-when-deleting-fails	EntryModelTests/tellsWhenDeletingFails	EntryModelFailureTest/tellsWhenDeletingFails	対応	
+entry.tells-when-i-phone-storage-is-full	EntryModelTests/tellsWhenIPhoneStorageIsFull	EntryModelFailureTest/tellsWhenStorageIsFull	対応	端末の呼び名を出し分けず、文は「端末の空き容量が足りません」になる
 entry.shows-template-icon-while-shared-wallet-is-chosen	EntryModelTests/showsTemplateIconWhileSharedWalletIsChosen		未確認	EntryRecentRow が category(of:) で全カテゴリから探すがテストが無い
 entry.applies-template-to-entry	EntryModelTests/appliesTemplateToEntry	EntryModelTest/appliesTemplateToEntry	対応	選んだひな形の目印（isApplied）は Android に無く確かめていない
 entry.keeps-typed-amount-and-memo-when-template-lacks-them	EntryModelTests/keepsTypedAmountAndMemoWhenTemplateLacksThem	EntryModelTest/keepsTypedAmountAndMemoWhenTemplateLacksThem	対応	ひな形のカテゴリに変わる所を確かめていない
@@ -120,6 +122,7 @@ entry-transfer.reselects-deleted-category-when-editing	EntryModelTransferTests/r
 entry-transfer.restores-hidden-category-after-switching-type	EntryModelTransferTests/restoresHiddenCategoryAfterSwitchingType	EntryModelEditingTest/restoresHiddenCategoryAfterSwitchingType	対応	
 entry-transfer.fits-category-to-shared-wallet-when-editing	EntryModelTransferTests/fitsCategoryToSharedWalletWhenEditing	EntryModelEditingTest/fitsCategoryToSharedWalletWhenEditing	対応	
 entry-transfer.reports-missing-entry-when-loading	EntryModelTransferTests/reportsMissingEntryWhenLoading	EntryModelEditingTest/reportsMissingEntryWhenLoading	対応	
+entry-transfer.deletes-nothing-when-entry-is-missing	EntryModelTransferTests/deletesNothingWhenEntryIsMissing	EntryModelFailureTest/deletesNothingWhenEntryIsMissing	対応	
 entry-transfer.leaves-edited-transfer-out-of-recent-transfers	EntryModelTransferTests/leavesEditedTransferOutOfRecentTransfers	EntryModelEditingTest/leavesEditedTransferOutOfRecentTransfers	対応	
 entry-transfer.saves-fee-typed-on-keypad	EntryModelTransferTests/savesFeeTypedOnKeypad	EntryModelTransferTest/savesFeeTypedOnKeypad	対応	手数料の記録の口座は確かめていない
 entry-transfer.puts-used-fees-first	EntryModelTransferTests/putsUsedFeesFirst	EntryModelTransferTest/putsUsedFeesFirst	対応	先頭だけを確かめ、残りの並びは確かめていない
@@ -225,6 +228,7 @@ records.deletes-adjustment-with-undo	RecordsModelTests/deletesAdjustmentWithUndo
 records.refuses-reward-on-future-day	RecordsModelTests/refusesRewardOnFutureDay		未移植	ごほうびを付ける機能が、記録のモデルと画面に無い
 records.toggles-no-spend-day	RecordsModelTests/togglesNoSpendDay		未移植	使わなかった日の印が、記録のモデルと画面に無い
 records.remembers-layout	RecordsModelTests/remembersLayout	RecordsModelTest/savesChosenLayout	対応	開き直したモデルでの読み直しは確かめず、保存された設定の値だけを見る
+records.tells-when-layout-cannot-be-saved	RecordsModelTests/tellsWhenLayoutCannotBeSaved	RecordsModelTest/tellsWhenLayoutCannotBeSaved	対応	
 records.opens-day-in-calendar	RecordsModelTests/opensDayInCalendar		未移植	日付を指定してカレンダーで開く open が無く、検索と絞り込みも無い
 records.opens-current-month-with-search-closed	RecordsModelTests/opensCurrentMonthWithSearchClosed		未移植	今の月へ戻る openCurrentMonth と検索が、モデルと画面に無い
 records.tells-whether-shown-month-is-current	RecordsModelTests/tellsWhetherShownMonthIsCurrent		未移植	isCurrentMonth・currentMonth が無く、今月へ戻るボタンも無い
@@ -273,6 +277,7 @@ review.hides-store-review-card-after-closing	ReviewModelTests/hidesStoreReviewCa
 review.marks-store-review-opened	ReviewModelTests/marksStoreReviewOpened		未移植	ストアの評価を開いた記憶（storeReviewOpened）が無い
 review.keeps-store-review-unopened-after-closing	ReviewModelTests/keepsStoreReviewUnopenedAfterClosing		未移植	ストアの評価を頼むカードが、モデルにも画面にも無い
 review.compares-with-previous-month	ReviewModelTests/comparesWithPreviousMonth	ReviewModelTest/comparesWithSameDaysOfPreviousMonth	対応	
+review.keeps-notice-after-later-success	ReviewModelTests/keepsNoticeAfterLaterSuccess	ReviewModelNoticeTest/keepsNoticeAfterLaterSuccess	対応	
 review.compares-whole-previous-month-when-finished	ReviewModelTests/comparesWholePreviousMonthWhenFinished	ReviewModelTest/comparesWholePreviousMonthWhenFinished	対応	isComparingPartially が無く、終わった期間でも画面の文は「同じ時点より」のまま
 review.knows-whether-previous-period-has-entries	ReviewModelTests/knowsWhetherPreviousPeriodHasEntries		違い	hasPreviousEntries が無く、前の期間に記録が無くても比べる文を出す
 review.counts-moves-to-archived-wallet-in-past-period	ReviewModelTests/countsMovesToArchivedWalletInPastPeriod		未移植	返済・積立の動き（moves）が、モデルにも画面にも無い
@@ -310,6 +315,7 @@ budget-list.suggests-last-month-average-and-recurring	BudgetListModelTests/sugge
 budget-list.averages-only-months-since-first-record	BudgetListModelTests/averagesOnlyMonthsSinceFirstRecord	BudgetListModelTest/averagesOnlyMonthsSinceFirstRecord	対応	
 budget-list.skips-average-until-two-months-are-recorded	BudgetListModelTests/skipsAverageUntilTwoMonthsAreRecorded	BudgetListModelTest/skipsAverageUntilTwoMonthsAreRecorded	対応	
 budget-list.suggests-only-recurring-without-records	BudgetListModelTests/suggestsOnlyRecurringWithoutRecords		未確認	Output.suggestions にあるが、記録が無く固定費だけの時のテストが無い
+budget-list.tells-when-budgets-cannot-be-read	BudgetListModelTests/tellsWhenBudgetsCannotBeRead	BudgetListModelTest/tellsWhenBudgetsCannotBeRead	対応	設定の表ではなく、共有の記録の一覧を失敗させて確かめる
 recurring-edit.warns-that-reminders-cannot-arrive-when-denied	RecurringEditModelTests/warnsThatRemindersCannotArriveWhenDenied		未確認	画面の RecurringEditSheet が通知の許可を見て出す。モデルに無くテストも無い
 recurring-edit.does-not-warn-when-reminders-are-allowed	RecurringEditModelTests/doesNotWarnWhenRemindersAreAllowed		未確認	画面の RecurringEditSheet が通知の許可を見て隠す。モデルに無くテストも無い
 recurring-edit.starts-new-recurring-with-given-transfer-type	RecurringEditModelTests/startsNewRecurringWithGivenTransferType	RecurringEditModelTest/startsNewRecurringWithGivenTransferType	対応	
@@ -334,6 +340,8 @@ recurring-edit.uses-closing-day-only-for-card-transfer		RecurringEditModelTest/u
 recurring-list.lists-with-schedule-and-next-date	RecurringListModelTests/listsWithScheduleAndNextDate	RecurringListModelTest/listsWithScheduleAndNextDate	対応	
 recurring-list.totals-month-from-month-start-day	RecurringListModelTests/totalsMonthFromMonthStartDay	RecurringListModelTest/totalsMonthFromMonthStartDay	対応	
 recurring-list.hides-and-shows-recurring	RecurringListModelTests/hidesAndShowsRecurring	RecurringListModelTest/hidesAndShowsRecurring	対応	
+recurring-list.tells-when-recurrings-cannot-be-read	RecurringListModelTests/tellsWhenRecurringsCannotBeRead	RecurringListModelTest/tellsWhenRecurringsCannotBeRead	対応	固定費の表ではなく、共有の記録の一覧を失敗させて確かめる
+recurring-list.names-failed-action	RecurringListModelTests/namesFailedAction	RecurringListModelTest/namesFailedAction	対応	
 recurring-list.saves-moved-order		RecurringListModelTest/savesMovedOrder	Androidのみ	固定費の並べ替えを保存する。iOS は別の一覧（カテゴリ・スタンプ）でだけ確かめている
 recurring-list.deletes-and-restores-recurring		RecurringListModelTest/deletesAndRestoresRecurring	Androidのみ	固定費を 1 件削除して元に戻す。iOS にこのテストが無い
 recurring-list.starts-from-first-period-on-later-day		RecurringListModelTest/startsFromFirstPeriodOnLaterDay	Androidのみ	始まりの日より後の最初の予定日を次回に出す。iOS の画面のテストに無い
@@ -353,23 +361,24 @@ settings-menu-link.*	SettingsMenuLinkTests/*		未移植	問い合わせのフォ
 settings-menu-sample-data.*	SettingsMenuSampleDataTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sheet.*	SettingsMenuSheetTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-menu-value.starts-with-amount-until-turned-off	SettingsMenuValueModelTests/startsWithAmountUntilTurnedOff		未移植	「金額から始める」の切り替えが設定のメニューに無い（キーは store にだけある）
-settings-menu-value.saves-chosen-day	SettingsMenuValueModelTests/savesChosenDay		未確認	SettingsMenuModel.store と weekStart の観察にあるが、テストが無い
-settings-menu-value.rolls-back-and-tells-when-saving-fails	SettingsMenuValueModelTests/rollsBackAndTellsWhenSavingFails		違い	SettingsMenuModel.store が失敗を黙って捨て、「保存できませんでした」が出ない
+settings-menu-value.saves-chosen-day	SettingsMenuValueModelTests/savesChosenDay	SettingsMenuModelTest/savesChosenDay	対応	
+settings-menu-value.rolls-back-and-tells-when-saving-fails	SettingsMenuValueModelTests/rollsBackAndTellsWhenSavingFails	SettingsMenuModelTest/tellsWhenSavingFails	対応	選んだ値を先に出さない作りで、値を戻す動きは通らない
 settings-menu-value.keeps-later-choice-when-earlier-save-fails	SettingsMenuValueModelTests/keepsLaterChoiceWhenEarlierSaveFails		未確認	選んだ値を先に出さず DB の観察で表示する作りで、続けて選ぶテストが無い
 settings-menu-value.returns-to-saved-day-when-both-quick-saves-fail	SettingsMenuValueModelTests/returnsToSavedDayWhenBothQuickSavesFail		未確認	選んだ値を先に出さず DB の観察で表示する作りで、続けて失敗するテストが無い
 month-start-day.chooses-and-saves-start-day	MonthStartDayModelTests/choosesAndSavesStartDay		未確認	画面の MonthStartDayView と SettingsMenuModel.store にあるが、テストが無い
+month-start-day.rolls-back-and-tells-when-saving-fails	MonthStartDayModelTests/rollsBackAndTellsWhenSavingFails	SettingsMenuModelTest/tellsWhenMonthStartCannotBeSaved	対応	選んだ値を先に出さない作りで、値を戻す動きは通らない
 month-start-day.keeps-shift-when-changing-day	MonthStartDayModelTests/keepsShiftWhenChangingDay		未確認	画面の MonthStartDayView が日を変える時にずらしを残す。モデルに無くテストも無い
 month-start-day.counts-home-by-period	MonthStartDayModelTests/countsHomeByPeriod		未確認	HomeModel の periodText と月の合計にあるが、月の始まりを変えたテストが無い
 month-start-day.opens-records-at-todays-period	MonthStartDayModelTests/opensRecordsAtTodaysPeriod	RecordsModelTest/followsMonthStartDaySetting	対応	前の月へ動かした時の期間と支出の合計を確かめていない
 month-start-day.ends-asset-months-at-period-end	MonthStartDayModelTests/endsAssetMonthsAtPeriodEnd		未移植	資産の月ごとの合計（currentMonth・monthTotals）が AssetsModel に無い
 settings-list-screen.*	SettingsListScreenTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-board.keeps-move-inside-the-board	SettingsBoardModelTests/keepsMoveInsideTheBoard		未確認	RecurringListModel.State.move が端で丸めるが、端を越える移動のテストが無い
-settings-board.ignores-move-to-same-place-or-unknown-item	SettingsBoardModelTests/ignoresMoveToSamePlaceOrUnknownItem		違い	同じ位置への移動でも movingOrder が入り、指を離すと同じ順を保存する
+settings-board.ignores-move-to-same-place-or-unknown-item	SettingsBoardModelTests/ignoresMoveToSamePlaceOrUnknownItem	RecurringListModelTest/ignoresMoveToSamePlaceOrUnknownRecurring	対応	
 settings-board.deletes-nothing-when-none-are-hidden	SettingsBoardModelTests/deletesNothingWhenNoneAreHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	
-settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHiddenItem	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	並べ替え中の順を消すことは確かめていない（Android の deleteHidden は消さない）
+settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHiddenItem	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	並べ替え中の順を消すことは確かめていない
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.informs-when-every-hidden-item-is-in-use	SettingsBoardModelTests/informsWhenEveryHiddenItemIsInUse		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
-settings-board.tells-when-some-hidden-items-cannot-be-deleted	SettingsBoardModelTests/tellsWhenSomeHiddenItemsCannotBeDeleted		違い	まとめて 1 回で消し、失敗の文が「保存できませんでした」になる
+settings-board.tells-when-some-hidden-items-cannot-be-deleted	SettingsBoardModelTests/tellsWhenSomeHiddenItemsCannotBeDeleted	RecurringListModelTest/tellsWhenSomeHiddenRecurringsCannotBeDeleted	対応	消せた分の取り消しが返ることも確かめる
 settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い
@@ -425,12 +434,14 @@ period-text.shows-year-only-outside-this-year	PeriodTextTests/showsYearOnlyOutsi
 period-text.shows-year-of-range-outside-this-year	PeriodTextTests/showsYearOfRangeOutsideThisYear		違い	振り返りの週の範囲に年を付けない（PeriodText.range に today が無い）
 screen.resubscribes-after-failure	ScreenModelTests/resubscribesAfterFailure	ScreenObservationTest/resubscribesAfterFailure	対応	
 screen.stops-at-limit-with-notice	ScreenModelTests/stopsAtLimitWithNotice	ScreenObservationTest/stopsAtLimitWithNotice	対応	
+screen.marks-failure-until-observed-again	ScreenModelTests/marksFailureUntilObservedAgain	ScreenObservationTest/reportsFailureUntilObservedAgain	違い	失敗を observe の戻り値で返すだけで、モデルに旗とやり直しのボタンが無い
 screen.stops-when-failing-right-after-each-value	ScreenModelTests/stopsWhenFailingRightAfterEachValue	ScreenObservationTest/stopsWhenFailingRightAfterEachValue	対応	
 screen.stops-when-cancelled	ScreenModelTests/stopsWhenCancelled	ScreenObservationTest/stopsWhenCancelled	対応	
 settings-icon-editor.*	SettingsIconEditorModelTests/*		未移植	アイコンを絵文字や文字で作る編集のモデルと画面が無い
 setup.*	SetupModelTests/*		未移植	はじめの案内のカードとお知らせの既読（SetupModel）が無い
 screen-observation.succeeds-on-last-retry		ScreenObservationTest/succeedsOnLastRetry	Androidのみ	最後のやり直しで成功した時に知らせを出さないことを、iOS は確かめていない
 screen-observation.keeps-earlier-message-while-observing		ScreenObservationTest/keepsEarlierMessageWhileObserving	Androidのみ	監視が値を受けても前の知らせを消さないことを、iOS は確かめていない
+screen-observation.counts-each-notice-and-keeps-it-after-success		ScreenObservationTest/countsEachNoticeAndKeepsItAfterSuccess	Androidのみ	知らせを数え、後の成功で消さない。iOS は ReviewModel で確かめる
 screen-observation.shares-values-after-source-recovers		ScreenObservationTest/sharesValuesAfterSourceRecovers	Androidのみ	監視を分け合う ScreenObservation.share は Android だけにある
 screen-observation.shares-failure-with-each-subscriber		ScreenObservationTest/sharesFailureWithEachSubscriber	Androidのみ	監視を分け合う ScreenObservation.share は Android だけにある
 app-icon-list.*	AppIconListModelTests/*		未移植	アプリのアイコンを選ぶ画面が無い

@@ -26,6 +26,22 @@ struct MonthStartDayModelTests {
     }
 
     @Test
+    func rollsBackAndTellsWhenSavingFails() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let payday = try #require(MonthStartDay(25))
+        let model = MonthStartDayModel(parts: .system(setup.database), today: setup.today)
+        await model.load()
+        try await setup.database.failWrites(to: "setting")
+
+        await model.choose(payday)
+        let saved = try await setup.database.setting(.monthStartDay)
+
+        #expect(model.input.startDay == .first)
+        #expect(saved == .first)
+        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
+    }
+
+    @Test
     func keepsShiftWhenChangingDay() async throws {
         let setup = try await HomeModelTests.Setup()
         let payday = try #require(MonthStartDay(25))

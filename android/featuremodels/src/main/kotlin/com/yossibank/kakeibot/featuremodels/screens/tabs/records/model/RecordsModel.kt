@@ -187,7 +187,7 @@ class RecordsModel(
     suspend fun select(layout: RecordsLayout) {
         input.layout = layout
 
-        ModelTask.quiet {
+        state.task.attempt(failure = ModelTask.saveFailed) {
             dependencies.database.setSetting(
                 key = SettingKey.recordsLayout,
                 to = layout,

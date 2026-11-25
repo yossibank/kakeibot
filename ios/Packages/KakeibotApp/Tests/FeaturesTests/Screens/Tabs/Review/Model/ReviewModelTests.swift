@@ -37,6 +37,18 @@ struct ReviewModelTests {
     }
 
     @Test
+    func keepsNoticeAfterLaterSuccess() async throws {
+        let setup = try await RecordsModelTests.Setup()
+        let model = ReviewModel(parts: .system(setup.database), today: setup.today)
+        try await setup.database.failWrites(to: "setting")
+
+        await model.saveSelection()
+        await model.loadSelection()
+
+        #expect(model.state.errorNotice.message == "保存できませんでした")
+    }
+
+    @Test
     func comparesWholePreviousMonthWhenFinished() async throws {
         let setup = try await RecordsModelTests.Setup()
         try await setup.save(.expense, amount: 3000, on: "2026-09-05")

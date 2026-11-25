@@ -27,7 +27,6 @@ import com.yossibank.kakeibot.store.queries.types.title
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
-import com.yossibank.kakeibot.store.writes.methods.deleteRecurrings
 import com.yossibank.kakeibot.store.writes.methods.reorder
 import com.yossibank.kakeibot.store.writes.methods.restore
 import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
@@ -76,7 +75,6 @@ class RecurringListModel(
             val target = to.coerceIn(0, order.lastIndex)
 
             if (from == target) {
-                movingOrder = order
                 return
             }
 
@@ -207,14 +205,14 @@ class RecurringListModel(
 
         coroutineScope {
             launch {
-                database.recurringUpdates(includingHidden = true).collect { input.recurrings = it }
+                observe(database.recurringUpdates(includingHidden = true)) { input.recurrings = it }
             }
 
             launch {
-                dependencies.entryList.collect { input.list = it }
+                observe(dependencies.entryList) { input.list = it }
             }
 
-            database.settingUpdates(SettingKey.monthStartDay).collect { input.monthStartDay = it }
+            observe(database.settingUpdates(SettingKey.monthStartDay)) { input.monthStartDay = it }
         }
     }
 
@@ -254,7 +252,7 @@ class RecurringListModel(
         val order = state.movingOrder ?: return
         val others = input.recurrings.map { it.id }.filter { it !in order }
 
-        state.task.attempt(failure = ModelTask.saveFailed) {
+        state.task.attempt(failure = ORDER_FAILED) {
             dependencies.database.reorder(
                 RecurringTable,
                 ids = order + others,
@@ -265,37 +263,40 @@ class RecurringListModel(
         state.cancelMoving()
     }
 
-    suspend fun hide(id: Identifier<Recurring>): Boolean = setHidden(
-        id = id,
-        isHidden = true,
-    )
+    suspend fun hide(id: Identifier<Recurring>): Boolean {
+        state.cancelMoving()
+
+        return setHidden(
+            id = id,
+            isHidden = true,
+            failure = HIDE_FAILED,
+        )
+    }
 
     suspend fun show(id: Identifier<Recurring>): Boolean = setHidden(
         id = id,
         isHidden = false,
+        failure = SHOW_FAILED,
     )
 
-    suspend fun delete(id: Identifier<Recurring>): Deletion? =
-        state.task.attempt(failure = ModelTask.saveFailed) {
-            dependencies.database.deleteRecurring(
-                id = id,
-                at = dependencies.clock.now,
-            )
-        }
+    suspend fun delete(id: Identifier<Recurring>): Deletion? {
+        state.cancelMoving()
+
+        return state.task.attempt(failure = DELETE_FAILED) { remove(id) }
+    }
 
     suspend fun deleteHidden(): Deletion? {
-        val ids = output.hidden.map { it.id }
+        state.cancelMoving()
 
-        if (ids.isEmpty()) {
-            return null
+        val deletions = output.hidden.map { recurring ->
+            ModelTask.quiet { remove(recurring.id) }
         }
 
-        return state.task.attempt(failure = ModelTask.saveFailed) {
-            dependencies.database.deleteRecurrings(
-                ids = ids,
-                at = dependencies.clock.now,
-            )
+        if (deletions.any { it == null }) {
+            state.task.show(BULK_DELETE_FAILED)
         }
+
+        return deletions.filterNotNull().takeIf { it.isNotEmpty() }?.let { Deletion.merging(it) }
     }
 
     suspend fun restore(deletion: Deletion) {
@@ -304,11 +305,29 @@ class RecurringListModel(
         }
     }
 
+    private suspend fun remove(id: Identifier<Recurring>): Deletion =
+        dependencies.database.deleteRecurring(
+            id = id,
+            at = dependencies.clock.now,
+        )
+
+    private suspend fun <Value> observe(
+        values: Flow<Value>,
+        receive: suspend (Value) -> Unit,
+    ) {
+        state.task.observe(
+            values = values,
+            failure = loadFailedMessage,
+            receive = receive,
+        )
+    }
+
     private suspend fun setHidden(
         id: Identifier<Recurring>,
         isHidden: Boolean,
+        failure: String,
     ): Boolean {
-        val done = state.task.attempt(failure = ModelTask.saveFailed) {
+        val done = state.task.attempt(failure = failure) {
             dependencies.database.setRecurringHidden(
                 id = id,
                 isHidden = isHidden,
@@ -321,6 +340,14 @@ class RecurringListModel(
     }
 
     companion object {
+        const val loadFailedMessage = "固定費を読めませんでした"
+
+        private const val HIDE_FAILED = "非表示にできませんでした"
+        private const val SHOW_FAILED = "表示に戻せませんでした"
+        private const val DELETE_FAILED = "削除できませんでした"
+        private const val ORDER_FAILED = "並びを保存できませんでした"
+        private const val BULK_DELETE_FAILED = "削除できないものがありました"
+
         fun title(type: Entry.Kind): String = if (type == Entry.Kind.transfer) "振替" else "固定費"
     }
 }

@@ -69,6 +69,46 @@ class ScreenObservationTest {
     }
 
     @Test
+    fun reportsFailureUntilObservedAgain() = runTest {
+        val task = ModelTask()
+        val counter = Counter()
+        val received = mutableListOf<Int>()
+
+        val failed = task.observe(
+            values = values(counter, failures = 4),
+            failure = "失敗",
+        ) { received += it }
+
+        val failedAgain = task.observe(
+            values = values(counter, failures = 4),
+            failure = "失敗",
+        ) { received += it }
+
+        assertTrue(failed)
+        assertFalse(failedAgain)
+        assertEquals(listOf(1), received)
+        assertEquals("失敗", task.message)
+    }
+
+    @Test
+    fun countsEachNoticeAndKeepsItAfterSuccess() = runTest {
+        val task = ModelTask()
+
+        task.attempt(failure = "失敗") { throw IOException("failing for tests") }
+        val first = task.count
+        task.attempt(failure = "失敗") { 1 }
+        val kept = task.message
+        task.show("失敗")
+        val second = task.count
+        task.clear()
+
+        assertEquals(1, first)
+        assertEquals("失敗", kept)
+        assertEquals(2, second)
+        assertEquals("", task.message)
+    }
+
+    @Test
     fun stopsWhenFailingRightAfterEachValue() = runTest {
         val counter = Counter()
         val received = mutableListOf<Int>()

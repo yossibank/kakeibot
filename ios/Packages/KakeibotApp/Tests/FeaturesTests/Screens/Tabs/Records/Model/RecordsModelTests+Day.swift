@@ -69,6 +69,21 @@ extension RecordsModelTests {
     }
 
     @Test
+    func tellsWhenLayoutCannotBeSaved() async throws {
+        let setup = try await Setup()
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
+        try await setup.database.failWrites(to: "setting")
+
+        model.chooseLayout(.list)
+        await model.saveLayout()
+        let saved = try await setup.database.setting(.recordsLayout)
+
+        #expect(model.input.layout == .list)
+        #expect(saved == .calendar)
+        #expect(model.state.errorNotice.message == "保存できませんでした")
+    }
+
+    @Test
     func opensDayInCalendar() async throws {
         let setup = try await Setup()
         let options = try await setup.database.entryOptions()

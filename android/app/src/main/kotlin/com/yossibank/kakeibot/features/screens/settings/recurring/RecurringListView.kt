@@ -148,6 +148,8 @@ fun RecurringListView(
         model.observe()
     }
 
+    model.state.task.Timer()
+
     hiddenNotice.Timer()
     deletedNotice.Timer()
 
