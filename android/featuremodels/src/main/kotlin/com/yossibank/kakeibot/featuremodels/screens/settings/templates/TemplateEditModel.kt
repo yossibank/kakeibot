@@ -55,12 +55,10 @@ class TemplateEditModel(
 
         fun select(category: EntryCategory?) {
             form = form.withCategory(category?.id)
-            task.clear()
         }
 
         fun select(wallet: Wallet) {
             form = form.withWallet(wallet.id)
-            task.clear()
         }
 
         fun toggleTag(id: Identifier<EntryTag>) {
@@ -69,7 +67,6 @@ class TemplateEditModel(
 
         fun press(key: AmountCalculator.Key) {
             calculator = calculator.press(key)
-            task.clear()
         }
     }
 

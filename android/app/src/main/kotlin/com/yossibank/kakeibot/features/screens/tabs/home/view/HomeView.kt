@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
@@ -47,6 +48,8 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
+import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
+import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderLoadFailed
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.abs
@@ -60,12 +63,14 @@ fun HomeView(
     onOpenSettings: () -> Unit,
 ) {
     val entryList = rememberEntryList(database)
+    val round = rememberObservationRound()
 
-    val model = remember(database, entryList) {
+    val model = remember(database, entryList, round) {
         HomeModel(
             database = database,
             entryList = entryList,
             today = today,
+            round = round,
         )
     }
 
@@ -151,7 +156,10 @@ private fun BudgetCard(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Dial(usage = usage)
+        Dial(
+            usage = usage,
+            isFailed = model.state.isListFailed,
+        )
 
         Row(
             modifier = Modifier
@@ -184,6 +192,7 @@ private fun BudgetCard(
                 title = "今日の支出",
                 amount = overview?.todayExpense ?: 0,
                 type = Entry.Kind.expense,
+                isFailed = model.state.isListFailed,
                 modifier = Modifier.weight(1f),
             )
 
@@ -193,6 +202,7 @@ private fun BudgetCard(
                 title = model.output.middleTitle,
                 amount = model.output.middleAmount,
                 type = Entry.Kind.expense,
+                isFailed = model.state.isListFailed,
                 modifier = Modifier.weight(1f),
             )
 
@@ -202,6 +212,7 @@ private fun BudgetCard(
                 title = "今月の収入",
                 amount = overview?.monthIncome ?: 0,
                 type = Entry.Kind.income,
+                isFailed = model.state.isListFailed,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -209,7 +220,10 @@ private fun BudgetCard(
 }
 
 @Composable
-private fun Dial(usage: BudgetUsage?) {
+private fun Dial(
+    usage: BudgetUsage?,
+    isFailed: Boolean,
+) {
     val isOver = usage?.isOver ?: false
     val color = if (isOver) Palette.rose else Palette.accentStrong
 
@@ -220,7 +234,7 @@ private fun Dial(usage: BudgetUsage?) {
         contentAlignment = Alignment.BottomCenter,
     ) {
         HalfDial(
-            progress = usage?.progress ?: 0.0,
+            progress = if (isFailed) 0.0 else usage?.progress ?: 0.0,
             color = if (isOver) Palette.rose else Palette.accent,
         )
 
@@ -238,7 +252,14 @@ private fun Dial(usage: BudgetUsage?) {
                 style = textFont(style = FontTextStyle.Caption),
             )
 
-            if (usage != null) {
+            if (isFailed) {
+                UnknownAmount(
+                    style = displayFont(
+                        size = FontSize.Display,
+                        weight = FontWeight.Bold,
+                    ),
+                )
+            } else if (usage != null) {
                 AmountText(
                     amount = abs(usage.remaining).clamped,
                     style = displayFont(
@@ -270,6 +291,7 @@ private fun Stat(
     title: String,
     amount: Long,
     type: Entry.Kind,
+    isFailed: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -283,12 +305,25 @@ private fun Stat(
             style = textFont(style = FontTextStyle.Caption),
         )
 
-        AmountText(
-            amount = amount.clamped,
-            style = displayFont(size = FontSize.Body),
-            type = type,
-        )
+        if (isFailed) {
+            UnknownAmount(style = displayFont(size = FontSize.Body))
+        } else {
+            AmountText(
+                amount = amount.clamped,
+                style = displayFont(size = FontSize.Body),
+                type = type,
+            )
+        }
     }
+}
+
+@Composable
+private fun UnknownAmount(style: TextStyle) {
+    Text(
+        text = "—",
+        color = Palette.subtext,
+        style = style,
+    )
 }
 
 @Composable
@@ -317,6 +352,10 @@ private fun RecentCard(
                 weight = FontWeight.SemiBold,
             ),
         )
+
+        if (model.state.isListFailed) {
+            return@Column PlaceholderLoadFailed(onRetry = model::retry)
+        }
 
         if (model.output.showsNoRecords) {
             Text(

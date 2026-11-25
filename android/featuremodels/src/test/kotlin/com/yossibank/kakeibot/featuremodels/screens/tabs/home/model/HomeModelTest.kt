@@ -1,10 +1,12 @@
 package com.yossibank.kakeibot.featuremodels.screens.tabs.home.model
 
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.failingEntryList
+import com.yossibank.kakeibot.featuremodels.support.failingFirst
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.writes.methods.setBudget
@@ -22,12 +24,35 @@ class HomeModelTest {
             database = setup.database,
             entryList = failingEntryList,
             today = setup.today,
+            round = ObservationRound(),
         )
 
-        model.observe()
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
 
         assertEquals("記録を読めませんでした", model.state.task.message)
         assertNull(model.input.overview)
+    }
+
+    @Test
+    fun marksListFailureUntilRetried() = modelTest(today = "2026-10-12") { setup ->
+        val model = HomeModel(
+            database = setup.database,
+            entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            today = setup.today,
+            round = ObservationRound(),
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.isListFailed }
+        val message = model.state.task.message
+        val overview = model.input.overview
+        model.retry()
+        ModelWait.until { model.input.overview != null }
+
+        assertEquals("記録を読めませんでした", message)
+        assertNull(overview)
+        assertFalse(model.state.isListFailed)
     }
 
     @Test
@@ -181,6 +206,7 @@ class HomeModelTest {
         database = database,
         entryList = database.entryListUpdates(),
         today = today,
+        round = ObservationRound(),
     )
 
     private suspend fun ModelTestSetup.observedModel(): HomeModel {

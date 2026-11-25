@@ -47,6 +47,16 @@ class EntryModelFailureTest {
     }
 
     @Test
+    fun keepsNoticeWhenInputChanges() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        model.save()
+
+        model.press(1)
+
+        assertEquals("金額を入れてください", model.state.task.message)
+    }
+
+    @Test
     fun tellsWhenStorageIsFull() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
         model.press(5)
@@ -56,7 +66,7 @@ class EntryModelFailureTest {
         val saved = model.save()
 
         assertFalse(saved)
-        assertEquals("端末の空き容量が足りません", model.state.task.message)
+        assertEquals("スマホの空き容量が足りません", model.state.task.message)
         assertEquals(ModelTask.storageFull, model.state.task.message)
     }
 }

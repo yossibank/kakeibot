@@ -1,25 +1,15 @@
 package com.yossibank.kakeibot.features.screens.tabs.records.view
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,22 +18,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.yossibank.kakeibot.R
-import com.yossibank.kakeibot.core.concepts.date.Holiday
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
-import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryDay
 import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.designsystem.components.entry.EntryRow
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
 import com.yossibank.kakeibot.designsystem.components.notice.noticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
@@ -59,12 +41,11 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.records.model.RecordsMo
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
-import com.yossibank.kakeibot.featuremodels.shared.datechoice.shortName
-import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
-import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
+import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
+import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
@@ -75,12 +56,14 @@ fun RecordsView(
     onOpenEntry: (Identifier<Entry>) -> Unit,
 ) {
     val entryList = rememberEntryList(database)
+    val round = rememberObservationRound()
 
-    val model = remember(database, entryList) {
+    val model = remember(database, entryList, round) {
         RecordsModel(
             database = database,
             entryList = entryList,
             today = today,
+            round = round,
         )
     }
 
@@ -96,15 +79,9 @@ fun RecordsView(
 
     model.state.task.Timer()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            top = 12.dp,
-            end = 16.dp,
-            bottom = 24.dp,
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    LoadFailedColumn(
+        isFailed = model.state.isListFailed,
+        onRetry = model::retry,
     ) {
         item(key = "title") {
             Text(
@@ -147,7 +124,7 @@ fun RecordsView(
             item(key = "selected") {
                 val date = model.output.selectedDate
 
-                DayCard(
+                RecordsDayCard(
                     day = model.output.day(on = date) ?: EntryDay(
                         date = date,
                         entries = emptyList(),
@@ -167,7 +144,7 @@ fun RecordsView(
                 items = model.output.days,
                 key = { it.date.toString() },
             ) { day ->
-                DayCard(
+                RecordsDayCard(
                     day = day,
                     model = model,
                     onOpenEntry = onOpenEntry,
@@ -259,117 +236,6 @@ private fun SummaryValue(
             style = displayFont(size = FontSize.Body),
             type = type,
         )
-    }
-}
-
-@Composable
-private fun DayCard(
-    day: EntryDay,
-    model: RecordsModel,
-    onOpenEntry: (Identifier<Entry>) -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .card()
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 4.dp),
-    ) {
-        DayHeader(
-            day = day,
-            today = model.state.today,
-        )
-
-        if (day.entries.isEmpty()) {
-            Text(
-                text = "この日の記録はありません",
-                modifier = Modifier.padding(
-                    top = 4.dp,
-                    bottom = 16.dp,
-                ),
-                color = Palette.subtext,
-                style = textFont(style = FontTextStyle.Subheadline),
-            )
-        }
-
-        model.output.rows(of = day).forEach { row ->
-            Hairline()
-
-            EntryItemRow(
-                item = row,
-                onOpen = { onOpenEntry(row.id) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun DayHeader(
-    day: EntryDay,
-    today: LocalDate,
-) {
-    val date = day.date
-
-    val weekdayColor = weekdayColor(weekday = date.weekday)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                top = 12.dp,
-                bottom = 8.dp,
-            ),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = PeriodText.day(
-                date = date,
-                today = today,
-            ),
-            modifier = Modifier.alignByBaseline(),
-            color = Palette.accentStrong,
-            style = displayFont(style = FontTextStyle.Title3),
-        )
-
-        Text(
-            text = "（${date.weekday.shortName}）",
-            modifier = Modifier.alignByBaseline(),
-            color = weekdayColor,
-            style = textFont(style = FontTextStyle.Caption),
-        )
-
-        if (date == today) {
-            Text(
-                text = "今日",
-                modifier = Modifier.alignByBaseline(),
-                color = Palette.accent,
-                style = textFont(
-                    style = FontTextStyle.Caption2,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        if (day.expenseTotal > 0) {
-            AmountText(
-                amount = day.expenseTotal.toInt(),
-                style = displayFont(style = FontTextStyle.Footnote),
-                modifier = Modifier.alignByBaseline(),
-                type = Entry.Kind.expense,
-            )
-        }
-
-        if (day.incomeTotal > 0) {
-            AmountText(
-                amount = day.incomeTotal.toInt(),
-                style = displayFont(style = FontTextStyle.Footnote),
-                modifier = Modifier.alignByBaseline(),
-                type = Entry.Kind.income,
-            )
-        }
     }
 }
 

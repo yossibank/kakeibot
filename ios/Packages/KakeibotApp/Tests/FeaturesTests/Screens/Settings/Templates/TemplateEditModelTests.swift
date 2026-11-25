@@ -87,6 +87,18 @@ struct TemplateEditModelTests {
         #expect(!loaded)
         #expect(model.isChanged)
     }
+
+    @Test
+    func keepsNoticeWhenInputChanges() async throws {
+        let database = try Self.database()
+        let model = TemplateEditModel(parts: .system(database), type: .expense)
+        await model.load()
+        await model.save()
+
+        model.state.press(.digit(9))
+
+        #expect(model.state.errorNotice.message == "名前を入れてください")
+    }
 }
 
 private extension TemplateEditModelTests {

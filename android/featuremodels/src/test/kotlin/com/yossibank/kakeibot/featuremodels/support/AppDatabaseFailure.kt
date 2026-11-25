@@ -4,10 +4,26 @@ import androidx.room.useWriterConnection
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 
 val failingEntryList: Flow<EntryList> = flow { throw IOException("failing for tests") }
+
+fun <Value> Flow<Value>.failingFirst(times: Int): Flow<Value> {
+    val source = this
+    var attempts = 0
+
+    return flow {
+        attempts += 1
+
+        if (attempts <= times) {
+            throw IOException("failing for tests")
+        }
+
+        emitAll(source)
+    }
+}
 
 suspend fun AppDatabase.failWrites(to: String) {
     useWriterConnection { connection ->

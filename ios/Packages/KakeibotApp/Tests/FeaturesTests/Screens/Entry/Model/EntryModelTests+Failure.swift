@@ -34,4 +34,16 @@ extension EntryModelTests {
         #expect(stored == entry)
         #expect(model.state.errorNotice.message == "保存できませんでした")
     }
+
+    @Test
+    func keepsNoticeWhenInputChanges() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
+        await model.load()
+        _ = await model.save()
+
+        model.state.press(.digit(1))
+
+        #expect(model.state.errorNotice.message == "金額を入れてください")
+    }
 }

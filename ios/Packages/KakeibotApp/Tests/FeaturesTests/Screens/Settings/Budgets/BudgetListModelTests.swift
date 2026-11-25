@@ -304,6 +304,18 @@ struct BudgetListModelTests {
 
         #expect(model.state.errorNotice.message == "予算を読めませんでした")
     }
+
+    @Test
+    func keepsNoticeWhenEditingStarts() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
+        try await setup.database.failReads(of: "setting")
+        await model.load()
+
+        model.startEditing(.total)
+
+        #expect(model.state.errorNotice.message == "予算を読めませんでした")
+    }
 }
 
 private extension BudgetListModelTests {

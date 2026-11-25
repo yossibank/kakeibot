@@ -5,12 +5,14 @@ import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.failReads
 import com.yossibank.kakeibot.featuremodels.support.failWrites
 import com.yossibank.kakeibot.featuremodels.support.failingEntryList
+import com.yossibank.kakeibot.featuremodels.support.failingFirst
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.setting
@@ -220,6 +222,7 @@ class RecordsModelTest {
             database = setup.database,
             entryList = failingEntryList,
             today = setup.today,
+            round = ObservationRound(),
         )
 
         setup.scope.launch { model.observe() }
@@ -230,6 +233,38 @@ class RecordsModelTest {
         assertEquals("記録を読めませんでした", model.state.task.message)
         assertFalse(model.input.isLoaded)
         assertNull(model.input.list)
+    }
+
+    @Test
+    fun marksListFailureUntilRetried() = modelTest(today = "2026-10-17") { setup ->
+        val model = RecordsModel(
+            database = setup.database,
+            entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            today = setup.today,
+            round = ObservationRound(),
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.isListFailed }
+        val message = model.state.task.message
+        val list = model.input.list
+        model.retry()
+        ModelWait.until { model.input.isLoaded }
+
+        assertEquals("記録を読めませんでした", message)
+        assertNull(list)
+        assertFalse(model.state.isListFailed)
+    }
+
+    @Test
+    fun marksNoListFailureWhenSettingsFail() = modelTest(today = "2026-10-17") { setup ->
+        setup.database.failReads(of = "setting")
+        val model = setup.recordsModel()
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
+
+        assertFalse(model.state.isListFailed)
     }
 
     @Test
@@ -249,6 +284,7 @@ class RecordsModelTest {
         database = database,
         entryList = database.entryListUpdates(),
         today = today,
+        round = ObservationRound(),
     )
 
     private suspend fun ModelTestSetup.observedModel(): RecordsModel {

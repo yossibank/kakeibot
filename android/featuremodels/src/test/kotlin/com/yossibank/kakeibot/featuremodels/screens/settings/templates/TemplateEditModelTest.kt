@@ -76,7 +76,17 @@ class TemplateEditModelTest {
         assertEquals(980, saved?.amount)
         assertEquals(listOf("ランチ"), templates.map { it.name })
         assertEquals(model.state.form.categoryId, templates.first().categoryId)
-        assertEquals("", model.state.task.message)
+    }
+
+    @Test
+    fun keepsNoticeWhenInputChanges() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.templateModel(type = Entry.Kind.expense)
+        model.load()
+        model.save()
+
+        model.state.press(AmountCalculator.Key.Digit(9))
+
+        assertEquals("名前を入れてください", model.state.task.message)
     }
 
     @Test
