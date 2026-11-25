@@ -33,7 +33,7 @@ public extension ThemeEditModel {
     @Observable
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt()
+        public var prompt = SettingsEditPrompt<Never>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var draft: ThemeDraft

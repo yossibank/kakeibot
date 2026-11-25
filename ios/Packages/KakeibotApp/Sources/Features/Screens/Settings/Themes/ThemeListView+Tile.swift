@@ -12,7 +12,7 @@ extension ThemeListView {
     ) -> some View {
         let isCurrent = choice == model.input.current
         let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
-        let scale: CGFloat = pressing == choice ? 0.94 : 1
+        let scale: CGFloat = model.state.pressing == choice ? 0.94 : 1
 
         return VStack(spacing: 8) {
             preview(palette, isCurrent: isCurrent)
@@ -28,17 +28,9 @@ extension ThemeListView {
                             .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
                                 let space = CoordinateSpace.named(Self.space)
 
-                                let menu = Menu(
-                                    choice: choice,
-                                    palette: palette,
-                                    title: title,
-                                    theme: theme,
-                                    frame: proxy.frame(in: space)
-                                )
-
-                                openMenu(menu)
+                                openMenu(choice, frame: proxy.frame(in: space))
                             } onPressingChanged: { isPressing in
-                                pressing = isPressing ? choice : nil
+                                model.state.press(isPressing ? choice : nil)
                             }
                     }
                 }
@@ -91,7 +83,7 @@ private extension ThemeListView {
     ) {
         if let theme,
            choice == model.input.current {
-            editing = .edit(theme)
+            edit(theme)
         } else {
             select(choice)
         }

@@ -221,3 +221,22 @@ struct ThemeStyleModelTests {
         #expect(style == .standard)
     }
 }
+
+extension ThemeStyleModelTests {
+    @Test
+    func keepsStyleOfFirstOpening() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = ThemeStyleModel(parts: .system(setup.database))
+        var changed = ThemeStyle.standard
+
+        changed.corner = .small
+
+        let unopened = model.input.openedStyle
+
+        model.open(with: .standard)
+        model.open(with: changed)
+
+        #expect(unopened == nil)
+        #expect(model.input.openedStyle == .standard)
+    }
+}

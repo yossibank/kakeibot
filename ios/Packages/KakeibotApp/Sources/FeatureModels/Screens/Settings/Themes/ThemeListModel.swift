@@ -29,8 +29,11 @@ public extension ThemeListModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+        public var deletion: Deletion?
 
         public internal(set) var suggestedIcon: AppIconChoice?
+        public internal(set) var presented: Presented?
+        public internal(set) var pressing: ThemeChoice?
     }
 
     @MainActor
@@ -47,21 +50,27 @@ public extension ThemeListModel {
         let input: Input
 
         public var currentPalette: ThemePalette {
-            switch input.current {
-            case .system:
-                return ThemePreset.white.palette
-
-            case let .preset(preset):
-                return preset.palette
-
-            case let .custom(id):
-                let theme = input.customThemes.first { $0.id == id }
-                return theme?.palette ?? ThemePreset.white.palette
-            }
+            palette(of: input.current)
         }
 
         init(input: Input) {
             self.input = input
+        }
+
+        public func theme(of choice: ThemeChoice) -> Theme? {
+            guard case let .custom(id) = choice else {
+                return nil
+            }
+
+            return input.customThemes.first { $0.id == id }
+        }
+
+        public func palette(of choice: ThemeChoice) -> ThemePalette {
+            switch choice {
+            case .system: ThemePreset.white.palette
+            case let .preset(preset): preset.palette
+            case .custom: theme(of: choice)?.palette ?? ThemePreset.white.palette
+            }
         }
     }
 

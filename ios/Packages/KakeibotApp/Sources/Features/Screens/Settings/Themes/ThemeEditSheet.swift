@@ -99,6 +99,7 @@ public struct ThemeEditSheet: View {
 private extension ThemeEditSheet {
     var header: some View {
         SettingsEditHeader(
+            isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
             title: model.isEditing ? "テーマを編集" : "テーマを追加",
             isEditing: model.isEditing,
             isHidden: false,
