@@ -233,6 +233,8 @@ main.restarts-observation-on-retry	MainModelTests/restartsObservationOnRetry	Mai
 main.advances-notice-round-to-hide-tab-notices	MainModelTests/advancesNoticeRoundToHideTabNotices		未移植	入口に記録や削除の知らせが無く、タブの知らせと入れ替えて消す場面が無い
 main.keeps-deletion-for-undo	MainModelTests/keepsDeletionForUndo		未移植	入口が削除の取り消し（DeletionUndo）を持たず、入口で受ける削除も無い
 main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	保存した値から作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
+app-review.*	AppReviewModelTests/*		未移植	レビューのお願いを待って出すモデルが Android に無い
+app-review-request.*	AppReviewRequestTests/*		未移植	レビューのお願いを出すかを決める型が Android に無い
 foreground-return.detects-foreground-after-inactive	ForegroundReturnTests/detectsForegroundAfterInactive	ForegroundReturnTest/detectsForegroundAfterInactive	対応	
 home.opens-picked-day-after-closing-stamp-sheet	HomeModelTests/opensPickedDayAfterClosingStampSheet		未移植	スタンプが、ホームのモデルと画面に無い
 home.starts-shelf-over-after-closing	HomeModelTests/startsShelfOverAfterClosing		未移植	ひな形の棚が、ホームのモデルと画面に無い

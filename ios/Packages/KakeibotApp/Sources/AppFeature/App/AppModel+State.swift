@@ -8,16 +8,21 @@ import Sync
 extension AppModel {
     enum Launch {
         case opening
-        case onboarding(AppDatabase)
-        case ready(AppDatabase)
+        case onboarding(Opened)
+        case ready(Opened)
         case failed
 
         var database: AppDatabase? {
             switch self {
-            case let .onboarding(database), let .ready(database): database
+            case let .onboarding(opened), let .ready(opened): opened.database
             case .opening, .failed: nil
             }
         }
+    }
+
+    struct Opened {
+        let database: AppDatabase
+        let parts: ScreenParts
     }
 
     enum Curtain {

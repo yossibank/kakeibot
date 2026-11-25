@@ -1,7 +1,7 @@
 import Core
+import DesignSystem
 import FeatureModels
 import Features
-import Store
 import SwiftUI
 
 extension MainView {

@@ -60,8 +60,8 @@ extension AppModel {
         let retryDelays: [Duration]
     }
 
-    func screenParts(for database: AppDatabase) -> ScreenParts {
-        ScreenParts(database: database, clock: dependencies.clock)
+    static func live() -> AppModel {
+        AppModel(openDatabase: AppDatabase.appGroup)
     }
 
     func screenProStore() -> ProStore {
@@ -100,7 +100,11 @@ extension AppModel {
 
             input.look = await (try? database.themeLook()) ?? .followsDevice
             input.style = await (try? database.style()) ?? .standard
-            state.setLaunch(completed ? .ready(database) : .onboarding(database))
+
+            let parts = ScreenParts(database: database, clock: dependencies.clock)
+            let opened = Opened(database: database, parts: parts)
+
+            state.setLaunch(completed ? .ready(opened) : .onboarding(opened))
         } catch {
             state.setLaunch(.failed)
         }
@@ -125,11 +129,11 @@ extension AppModel {
     }
 
     func finishOnboarding() {
-        guard case let .onboarding(database) = state.launch else {
+        guard case let .onboarding(opened) = state.launch else {
             return
         }
 
-        state.setLaunch(.ready(database))
+        state.setLaunch(.ready(opened))
     }
 
     func changeScene(to phase: ScenePhase) {
@@ -180,7 +184,11 @@ extension AppModel {
         }
     }
 
-    func observeWidgets(in database: AppDatabase) async {
+    func observeWidgets() async {
+        guard let database = state.launch.database else {
+            return
+        }
+
         await withDiscardingTaskGroup { group in
             group.addTask {
                 await self.observeOverviewForWidgets(in: database)
@@ -196,7 +204,11 @@ extension AppModel {
         }
     }
 
-    func observeNotifications(in database: AppDatabase) async {
+    func observeNotifications() async {
+        guard let database = state.launch.database else {
+            return
+        }
+
         let today = input.today
 
         await watch(database.notificationInputUpdates(from: today)) { input in
@@ -204,7 +216,11 @@ extension AppModel {
         }
     }
 
-    func observeSync(in database: AppDatabase) async {
+    func observeSync() async {
+        guard let database = state.launch.database else {
+            return
+        }
+
         await watch(database.syncActivityUpdates()) { activity in
             self.input.syncActivity = activity
         }

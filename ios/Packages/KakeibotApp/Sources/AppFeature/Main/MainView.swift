@@ -2,7 +2,6 @@ import Core
 import DesignSystem
 import FeatureModels
 import Features
-import Store
 import StoreKit
 import SwiftUI
 
@@ -32,16 +31,13 @@ struct MainView: View {
     private let onLoad: () -> Void
 
     init(
-        database: AppDatabase,
-        clock: ScreenClock,
+        parts: ScreenParts,
         today: LocalDate,
         route: PlannedNotification.Route? = nil,
         isRevealed: Bool = true,
         onRouteOpened: @escaping () -> Void = {},
         onLoad: @escaping () -> Void = {}
     ) {
-        let parts = ScreenParts(database: database, clock: clock)
-
         _model = State(
             initialValue: MainModel(
                 parts: parts,
@@ -83,7 +79,7 @@ struct MainView: View {
 
         _notice = State(initialValue: EntryNoticeModel(parts: parts))
 
-        _appReview = State(initialValue: AppReviewModel(database: database, clock: clock))
+        _appReview = State(initialValue: AppReviewModel(parts: parts))
 
         self.parts = parts
         self.today = today
@@ -324,12 +320,9 @@ private extension MainView {
 }
 
 #Preview {
-    if let database = try? AppDatabase.inMemory() {
-        let _ = try? database.insertDefaultsIfEmpty(at: Date())
-
+    if let parts = ScreenParts.preview() {
         MainView(
-            database: database,
-            clock: .system,
+            parts: parts,
             today: LocalDate(Date(), in: .current)
         )
     }
