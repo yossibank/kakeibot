@@ -80,7 +80,7 @@ model.perform {
 | 回数 | 1 回の見張りの中で数え、値を受けても戻さない |
 | RootView | DB が使えるかどうかと今日が変わるたびに、AppModel の見張りを張り直す |
 | 前面に戻った時 | MainModel が `changeScene` で各画面の見張りを始め直す。AppModel は `changeScene` で、止まった見張りだけを始め直す |
-| 裏に回った印 | モデルの `ForegroundReturn` が覚え、inactive を挟んで戻っても検出する |
+| 裏に回った印 | モデルの `ForegroundReturn` が覚え、inactive を挟んで戻っても検出する。Android は `ON_STOP` を裏とする |
 | 止まった画面 | ホーム・記録・振り返り・資産は、「読めませんでした」と「もう一度読み込む」を出す |
 
 ### 保存から反映まで
