@@ -65,16 +65,20 @@ class MainModelTest {
     fun keepsTabsAndSheetWhenRestored() {
         val id = Identifier<Entry>()
 
-        val model = MainModel(
-            tab = MainModel.Tab.Review,
-            visitedTabs = setOf(MainModel.Tab.Home, MainModel.Tab.Review),
-            sheet = MainModel.Sheet.Entry(editing = id),
+        val model = MainModel()
+        model.state.select(MainModel.Tab.Review)
+        model.openEntry(editing = id)
+
+        val saved = model.saved()
+        val restored = MainModel.restore(saved)
+
+        restored.state.select(MainModel.Tab.Assets)
+
+        assertEquals(MainModel.Tab.Assets, restored.state.tab)
+        assertEquals(
+            MainModel.Tab.entries.toSet() - MainModel.Tab.Records,
+            restored.state.visitedTabs,
         )
-
-        model.state.select(MainModel.Tab.Assets)
-
-        assertEquals(MainModel.Tab.Assets, model.state.tab)
-        assertEquals(MainModel.Tab.entries.toSet() - MainModel.Tab.Records, model.state.visitedTabs)
-        assertEquals(MainModel.Sheet.Entry(editing = id), model.state.sheet)
+        assertEquals(MainModel.Sheet.Entry(editing = id), restored.state.sheet)
     }
 }

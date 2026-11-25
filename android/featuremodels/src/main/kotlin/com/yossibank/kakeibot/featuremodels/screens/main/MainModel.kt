@@ -80,4 +80,6 @@ class MainModel(
     fun openEntry(editing: Identifier<Record>?) {
         state.sheet = Sheet.Entry(editing = editing)
     }
+
+    companion object
 }

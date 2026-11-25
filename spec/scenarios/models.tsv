@@ -227,7 +227,7 @@ main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCu
 main.opens-template-route-with-saved-template	MainModelTests/opensTemplateRouteWithSavedTemplate		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-new-template-route-on-home	MainModelTests/opensNewTemplateRouteOnHome		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-receipt-route-and-starts-reading	MainModelTests/opensReceiptRouteAndStartsReading		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
-main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
+main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	保存した値から作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
