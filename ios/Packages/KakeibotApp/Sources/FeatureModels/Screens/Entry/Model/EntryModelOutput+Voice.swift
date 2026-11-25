@@ -7,15 +7,15 @@ public extension EntryModel.Output {
     }
 
     var isWalletFromVoice: Bool {
-        state.voiceFilled?.walletId.map { $0 == state.payment.walletId } ?? false
+        state.filled.voice?.walletId.map { $0 == state.payment.walletId } ?? false
     }
 
     var isDateFromVoice: Bool {
-        state.voiceFilled?.date.map { $0 == state.payment.date } ?? false
+        state.filled.voice?.date.map { $0 == state.payment.date } ?? false
     }
 
     var isMemoFromVoice: Bool {
-        state.voiceFilled?.memo.map { !$0.isEmpty && $0 == state.store } ?? false
+        state.filled.voice?.memo.map { !$0.isEmpty && $0 == state.store } ?? false
     }
 
     var voiceHints: [String] {

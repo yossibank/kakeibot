@@ -67,6 +67,11 @@ public extension EntryModel {
         }
     }
 
+    enum KeypadTarget: Hashable {
+        case amount
+        case fee
+    }
+
     struct Keypad: Equatable {
         public internal(set) var calculator = AmountCalculator()
         public internal(set) var feeCalculator = AmountCalculator()
@@ -114,6 +119,12 @@ public extension EntryModel {
         }
     }
 
+    struct Filled {
+        public internal(set) var voice: VoiceFilled?
+
+        var templateId: EntryTemplate.ID?
+    }
+
     struct Progress: Equatable {
         public internal(set) var isClosing = false
 
@@ -144,16 +155,15 @@ public extension EntryModel {
 
         public var memo = ""
         public var today: LocalDate
+        public var screen: Screen
 
         public internal(set) var type: Entry.Kind
         public internal(set) var payment: Payment
         public internal(set) var category = CategoryChoice()
         public internal(set) var keypad = Keypad()
         public internal(set) var items = Items()
-        public internal(set) var voiceFilled: VoiceFilled?
+        public internal(set) var filled = Filled()
         public internal(set) var progress = Progress()
-
-        var appliedTemplateId: EntryTemplate.ID?
 
         init(
             type: Entry.Kind,
@@ -163,6 +173,7 @@ public extension EntryModel {
             self.type = type
             self.payment = Payment(date: date)
             self.today = today
+            self.screen = Screen(deck: EntryModel.Deck.start(for: type))
         }
     }
 }
@@ -309,8 +320,7 @@ extension EntryModel.State {
         items = EntryModel.Items()
         category.tagId = nil
         payment.billMonth = nil
-        appliedTemplateId = nil
-        voiceFilled = nil
+        filled = EntryModel.Filled()
     }
 }
 

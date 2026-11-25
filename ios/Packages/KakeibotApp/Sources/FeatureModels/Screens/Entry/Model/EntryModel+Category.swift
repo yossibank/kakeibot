@@ -31,7 +31,7 @@ public extension EntryModel {
         state.setCategory(template.categoryId)
         state.category.tagId = output.recordableTagId(of: template)
         setWallet(template.walletId)
-        state.appliedTemplateId = template.id
+        state.filled.templateId = template.id
 
         state.payment.billMonth = output.billRecurring?.billMonth(
             for: state.payment.date,

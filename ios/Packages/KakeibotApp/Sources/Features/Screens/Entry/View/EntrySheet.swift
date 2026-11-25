@@ -5,18 +5,7 @@ import SwiftUI
 
 public struct EntrySheet: View {
     @State var model: EntryModel
-    @State var deck: EntryDeck
-    @State var deckEdge: Edge = .trailing
-    @State var isEditingMemo = false
-    @State var categoryPage: Int? = 0
-    @State var sheet: Sheet?
-    @State var addedWallet: EntryModel.AddedWallet?
-    @State var reloadsWallets = false
-    @State var categoryMenu: CategoryMenu?
-    @State var sheetWidth: CGFloat = 0
-    @State var panelHeight: CGFloat = 0
-    @State var slipGrowth: CGFloat = 0
-    @State var bottomInset: CGFloat = 0
+    @State var layout = Layout()
     @State var receipt = EntryReceiptFlow()
     @State var voice: EntryVoiceFlow
 
@@ -25,7 +14,6 @@ public struct EntrySheet: View {
     @Environment(\.canScanReceipt) var canScanReceipt
     @Environment(\.openURL) var openURL
 
-    @State private var isConfirmingDiscard = false
     @State private var notice: EntryNoticeModel
 
     @FocusState private var isMemoFocused: Bool
@@ -41,7 +29,6 @@ public struct EntrySheet: View {
         onChange: @escaping (EntryChange) -> Void = { _ in }
     ) {
         _model = State(initialValue: model)
-        _deck = State(initialValue: EntryDeck.start(for: model.state.type))
         _notice = State(initialValue: model.newNoticeModel())
         _voice = State(initialValue: model.newVoiceFlow())
 
@@ -53,7 +40,7 @@ public struct EntrySheet: View {
         FloatingInputReader { proxy in
             ZStack(alignment: .top) {
                 fittedContent(in: proxy.size.height)
-                    .floatingInput(isPresented: isEditingMemo) {
+                    .floatingInput(isPresented: model.state.screen.isEditingMemo) {
                         editMemo(false)
                     } card: {
                         EntryMemoCard(model: model, isFocused: $isMemoFocused) {
@@ -61,8 +48,8 @@ public struct EntrySheet: View {
                         }
                     }
 
-                if let categoryMenu {
-                    categoryMenuLayer(categoryMenu)
+                if let category = model.state.screen.menuCategory {
+                    categoryMenuLayer(category, at: layout.menuFrame)
                 }
 
                 receiptLayer
@@ -73,18 +60,18 @@ public struct EntrySheet: View {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { width in
-                sheetWidth = width
+                layout.sheetWidth = width
             }
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.safeAreaInsets.bottom
             } action: { inset in
-                bottomInset = inset
+                layout.bottomInset = inset
             }
             .haptic(
                 .impact(weight: .medium),
-                trigger: categoryMenu
-            ) { _, menu in
-                menu != nil
+                trigger: model.state.screen.menuCategory
+            ) { _, category in
+                category != nil
             }
             .onChange(of: voice.output.isActive) {
                 if voice.output.isActive {
@@ -145,13 +132,13 @@ public struct EntrySheet: View {
             .backdrop()
             .modifier(
                 EntryDiscardGuard(
-                    isPresented: $isConfirmingDiscard,
+                    isPresented: Bindable(model.state).screen.isConfirmingDiscard,
                     model: model
                 ) {
                     dismiss()
                 }
             )
-            .sheet(item: $sheet, onDismiss: reloadAfterSheet) { sheet in
+            .sheet(item: Bindable(model.state).screen.sheet, onDismiss: reloadAfterSheet) { sheet in
                 sheetContent(for: sheet)
             }
             .task {
@@ -220,13 +207,13 @@ extension EntrySheet {
         }
 
         withAnimation(.snappy(duration: 0.25)) {
-            isEditingMemo = isEditing
+            model.state.editMemo(isEditing)
         }
     }
 
     func close() {
         if model.output.isChanged {
-            isConfirmingDiscard = true
+            model.state.confirmDiscard()
         } else {
             dismiss()
         }
@@ -234,10 +221,10 @@ extension EntrySheet {
 
     func start(isFirst: Bool) {
         if isFirst {
-            deck = EntryDeck.start(for: model.state.type)
+            model.state.place(EntryModel.Deck.start(for: model.state.type))
         }
 
-        showSelectedCategory()
+        model.showSelectedCategory()
 
         if startsReceipt, showsReceiptButton {
             withAnimation(.snappy) {
@@ -253,11 +240,19 @@ extension EntrySheet {
 
     func showNext(after change: EntryChange) {
         notice.show(change)
-        show(EntryDeck.start(for: model.state.type))
+        show(EntryModel.Deck.start(for: model.state.type))
     }
 }
 
 extension EntrySheet {
+    struct Layout {
+        var sheetWidth: CGFloat = 0
+        var panelHeight: CGFloat = 0
+        var slipGrowth: CGFloat = 0
+        var bottomInset: CGFloat = 0
+        var menuFrame: CGRect = .zero
+    }
+
     nonisolated static let coordinateSpace = "EntrySheet"
 
     static let menuInset: CGFloat = 12
@@ -268,17 +263,21 @@ extension EntrySheet {
         .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
     }
 
+    var deck: EntryModel.Deck {
+        model.state.screen.deck
+    }
+
     var today: LocalDate {
         model.state.today
     }
 
     init(
         model: EntryModel,
-        deck: EntryDeck
+        deck: EntryModel.Deck
     ) {
         self.init(model: model)
 
-        _deck = State(initialValue: deck)
+        model.state.place(deck)
     }
 }
 
@@ -350,15 +349,15 @@ private extension EntrySheet {
     static let fitBase: CGFloat = 692
 
     var bottomGap: CGFloat {
-        bottomInset > 0 ? 20 : 8
+        layout.bottomInset > 0 ? 20 : 8
     }
 
     var fitHeight: CGFloat {
-        Self.fitBase + bottomGap - bottomInset
+        Self.fitBase + bottomGap - layout.bottomInset
     }
 
     var bannerBottom: CGFloat {
-        panelHeight + bottomGap - bottomInset + 4
+        layout.panelHeight + bottomGap - layout.bottomInset + 4
     }
 
     var opensKeypadOnSave: Bool {

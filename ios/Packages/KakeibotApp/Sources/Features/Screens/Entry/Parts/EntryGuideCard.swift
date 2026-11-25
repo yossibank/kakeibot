@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct EntryGuideCard: View {
-    @State private var isShown = false
+    @State private var layout = Layout()
 
     var onConfirm: (() -> Void)?
     var hidesNext: Binding<Bool>?
@@ -11,8 +11,6 @@ struct EntryGuideCard: View {
     let onClose: () -> Void
 
     var body: some View {
-        let scale: CGFloat = isShown ? 1 : 0.94
-
         ZStack {
             Scrim(.modal)
                 .ignoresSafeArea()
@@ -48,12 +46,12 @@ struct EntryGuideCard: View {
                     .shadow(color: Palette.shadow.opacity(0.5), radius: 30, y: 14)
             }
             .padding(.horizontal, 24)
-            .scaleEffect(scale)
+            .scaleEffect(layout.scale)
         }
         .transition(.opacity)
         .onAppear {
             withAnimation(.snappy(duration: 0.25)) {
-                isShown = true
+                layout.scale = 1
             }
         }
     }
@@ -115,6 +113,10 @@ extension EntryGuideCard.Guide {
 }
 
 private extension EntryGuideCard {
+    struct Layout {
+        var scale: CGFloat = 0.94
+    }
+
     static let maxWidth: CGFloat = 340
     static let markSize: CGFloat = 32
 }

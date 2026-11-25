@@ -6,10 +6,7 @@ import SwiftUI
 struct EntryWalletDeck: View {
     @Environment(\.themeStyle.corner) private var corner
 
-    @State private var isEditing = false
-    @State private var isBillOpen = false
-    @State private var isBillShown = false
-    @State private var scrollPosition = ScrollPosition()
+    @State private var layout = Layout()
 
     let model: EntryModel
 
@@ -32,10 +29,10 @@ struct EntryWalletDeck: View {
                 ChipButton(
                     editTitle,
                     systemImage: editImage,
-                    isSelected: isEditing
+                    isSelected: shown.isEditing
                 ) {
                     withAnimation(.snappy) {
-                        isEditing.toggle()
+                        model.state.toggleWalletEditing()
                     }
                 }
             }
@@ -48,7 +45,7 @@ struct EntryWalletDeck: View {
                         }
                     }
 
-                    if isBillShown {
+                    if shown.isBillShown {
                         billSection
                             .transition(.opacity)
                     }
@@ -58,11 +55,11 @@ struct EntryWalletDeck: View {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
-            .scrollPosition($scrollPosition)
+            .scrollPosition($layout.scrollPosition)
         }
         .haptic(.selection, trigger: model.state.payment.billMonth)
         .onChange(of: model.state.payment.walletId, initial: true) {
-            isBillOpen = model.state.payment.billMonth != nil
+            model.state.openBills(model.state.payment.billMonth != nil)
         }
         .onChange(of: billTrigger, initial: true) { old, new in
             showBills(from: old, to: new)
@@ -77,12 +74,12 @@ extension EntryWalletDeck {
 private extension EntryWalletDeck {
     var billSection: some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
-        let ring = isBillOpen ? Palette.accent : Palette.line
+        let ring = shown.isBillOpen ? Palette.accent : Palette.line
 
         return VStack(alignment: .leading, spacing: 0) {
             billHeader
 
-            if isBillOpen {
+            if shown.isBillOpen {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
                         ForEach(model.output.billChoices) { choice in
@@ -112,7 +109,7 @@ private extension EntryWalletDeck {
     var billHeader: some View {
         Button {
             withAnimation(.snappy) {
-                isBillOpen.toggle()
+                model.state.openBills(!shown.isBillOpen)
             }
         } label: {
             HStack(spacing: 8) {
@@ -139,13 +136,13 @@ private extension EntryWalletDeck {
 
                 Spacer(minLength: 0)
 
-                if !isBillOpen {
+                if !shown.isBillOpen {
                     Text("変える")
                         .textFont(.caption, weight: .semibold)
                         .foregroundStyle(Palette.accent)
                 }
 
-                Image(systemName: isBillOpen ? "chevron.up" : "chevron.right")
+                Image(systemName: shown.isBillOpen ? "chevron.up" : "chevron.right")
                     .textFont(.caption2, weight: .semibold)
                     .foregroundStyle(Palette.accent)
             }
@@ -167,13 +164,13 @@ private extension EntryWalletDeck {
 
     func tile(_ wallet: Wallet) -> some View {
         let isSelected = selectedId == wallet.id
-        let isLocked = takenId == wallet.id && !isEditing
+        let isLocked = takenId == wallet.id && !shown.isEditing
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Palette.panel.opacity(.strong)
         let ring = isSelected ? Palette.accent : Palette.line
 
         return Button {
-            guard !isEditing else {
+            guard !shown.isEditing else {
                 onEdit(wallet)
                 return
             }
@@ -219,7 +216,7 @@ private extension EntryWalletDeck {
                     .stroke(ring, lineWidth: 1)
             }
             .overlay(alignment: .topTrailing) {
-                if isEditing {
+                if shown.isEditing {
                     editBadge
                         .transition(.scale.combined(with: .opacity))
                 }
@@ -264,6 +261,10 @@ private extension EntryWalletDeck {
 }
 
 private extension EntryWalletDeck {
+    struct Layout {
+        var scrollPosition = ScrollPosition()
+    }
+
     struct BillTrigger: Equatable {
         let walletId: Wallet.ID?
         let showsBills: Bool
@@ -276,12 +277,16 @@ private extension EntryWalletDeck {
         GridItem(.flexible(), spacing: 8)
     ]
 
+    var shown: EntryModel.WalletDeck {
+        model.state.screen.wallets
+    }
+
     var wallets: [Wallet] {
         model.output.walletSections.flatMap(\.wallets)
     }
 
     var showsBills: Bool {
-        role == .source && !model.output.billChoices.isEmpty && !isEditing
+        role == .source && !model.output.billChoices.isEmpty && !shown.isEditing
     }
 
     var billTrigger: BillTrigger {
@@ -289,11 +294,11 @@ private extension EntryWalletDeck {
     }
 
     var editTitle: String {
-        isEditing ? "完了" : "編集"
+        shown.isEditing ? "完了" : "編集"
     }
 
     var editImage: String {
-        isEditing ? "checkmark" : "pencil"
+        shown.isEditing ? "checkmark" : "pencil"
     }
 
     var shiftTitle: String? {
@@ -358,14 +363,14 @@ private extension EntryWalletDeck {
         to new: BillTrigger
     ) {
         guard old != new else {
-            isBillShown = new.showsBills
+            model.state.showBills(new.showsBills)
             return
         }
 
         let isChosen = old.walletId != new.walletId
 
         guard old.showsBills != new.showsBills else {
-            if isChosen, isBillShown {
+            if isChosen, shown.isBillShown {
                 scrollToBills()
             }
 
@@ -373,9 +378,9 @@ private extension EntryWalletDeck {
         }
 
         withAnimation(.snappy) {
-            isBillShown = new.showsBills
+            model.state.showBills(new.showsBills)
         } completion: {
-            guard isChosen, isBillShown else {
+            guard isChosen, shown.isBillShown else {
                 return
             }
 
@@ -385,7 +390,7 @@ private extension EntryWalletDeck {
 
     func scrollToBills() {
         withAnimation(.snappy) {
-            scrollPosition.scrollTo(edge: .bottom)
+            layout.scrollPosition.scrollTo(edge: .bottom)
         }
     }
 }

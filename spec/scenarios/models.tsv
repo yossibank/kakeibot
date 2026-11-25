@@ -56,6 +56,17 @@ entry.lists-no-recent-entries-for-transfers	EntryModelTests/listsNoRecentEntries
 entry.applies-recent-entry	EntryModelTests/appliesRecentEntry	EntryModelRecentTest/appliesRecentEntry	対応	
 entry.drops-recent-tag-outside-offered-categories	EntryModelTests/dropsRecentTagOutsideOfferedCategories	EntryModelRecentTest/dropsRecentTagOutsideOfferedCategories	対応	
 entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntryOutOfRecentEntries	EntryModelRecentTest/leavesEditedEntryOutOfRecentEntries	対応	
+entry.shows-deck-with-its-direction-and-keypad-target	EntryModelTests/showsDeckWithItsDirectionAndKeypadTarget		未確認	Android は別のブランチで合わせる
+entry.resets-deck-to-first-field-of-type	EntryModelTests/resetsDeckToFirstFieldOfType		未確認	Android は別のブランチで合わせる
+entry.starts-from-first-field-when-type-changes	EntryModelTests/startsFromFirstFieldWhenTypeChanges		未確認	Android は別のブランチで合わせる
+entry.places-deck-without-changing-keypad-target	EntryModelTests/placesDeckWithoutChangingKeypadTarget		未確認	Android は別のブランチで合わせる
+entry.ends-wallet-editing-when-wallet-deck-opens-again	EntryModelTests/endsWalletEditingWhenWalletDeckOpensAgain		未確認	Android は別のブランチで合わせる
+entry.shows-page-of-selected-category	EntryModelTests/showsPageOfSelectedCategory		未確認	Android は別のブランチで合わせる
+entry.chooses-added-wallet-after-wallet-sheet-once	EntryModelTests/choosesAddedWalletAfterWalletSheetOnce		未確認	Android は別のブランチで合わせる
+entry.skips-wallets-after-other-sheets	EntryModelTests/skipsWalletsAfterOtherSheets		未確認	Android は別のブランチで合わせる
+entry.holds-menu-memo-and-discard-confirmation	EntryModelTests/holdsMenuMemoAndDiscardConfirmation		未確認	Android は別のブランチで合わせる
+entry.keeps-one-shown-at-a-time	EntryModelTests/keepsOneShownAtATime		未確認	Android は別のブランチで合わせる
+entry.opens-and-shows-bills-of-wallet-deck	EntryModelTests/opensAndShowsBillsOfWalletDeck		未確認	Android は別のブランチで合わせる
 entry.tells-when-loading-fails	EntryModelTests/tellsWhenLoadingFails	EntryModelFailureTest/tellsWhenLoadingFails	対応	設定ではなく、記録の表を読めなくして確かめる
 entry.tells-when-deleting-fails	EntryModelTests/tellsWhenDeletingFails	EntryModelFailureTest/tellsWhenDeletingFails	対応	
 entry.keeps-notice-when-input-changes	EntryModelTests/keepsNoticeWhenInputChanges	EntryModelFailureTest/keepsNoticeWhenInputChanges	対応	
@@ -187,6 +198,15 @@ entry-receipt-flow.*	EntryReceiptFlowTests/*		未移植	レシートを撮って
 entry-deck.starts-with-the-first-field	EntryDeckTests/startsWithTheFirstField	EntryModelTest/startsWithFirstCategoryAndWallet EntryModelTransferTest/startsWithTwoDifferentWallets	対応	収入の時の最初の欄は確かめていない
 entry-deck.points-wallets-to-the-transfer-field	EntryDeckTests/pointsWalletsToTheTransferField		未確認	画面の EntrySlip の transferFields が当たるが、テストが無い
 entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields		未移植	欄の並びから出す向きを決める動きが Android の画面に無い
+entry-item.starts-next-draft-with-last-tax-rate	EntryItemModelTests/startsNextDraftWithLastTaxRate		未確認	Android は別のブランチで合わせる
+entry-item.fills-draft-from-edited-item	EntryItemModelTests/fillsDraftFromEditedItem		未確認	Android は別のブランチで合わせる
+entry-item.keeps-read-amount-until-price-changes	EntryItemModelTests/keepsReadAmountUntilPriceChanges		未確認	Android は別のブランチで合わせる
+entry-item.adds-item-from-draft	EntryItemModelTests/addsItemFromDraft		未確認	Android は別のブランチで合わせる
+entry-item.turns-discount-negative-and-halves-unit	EntryItemModelTests/turnsDiscountNegativeAndHalvesUnit		未確認	Android は別のブランチで合わせる
+entry-item.refuses-draft-without-name-or-price	EntryItemModelTests/refusesDraftWithoutNameOrPrice		未確認	Android は別のブランチで合わせる
+entry-item.updates-edited-item	EntryItemModelTests/updatesEditedItem		未確認	Android は別のブランチで合わせる
+entry-item.follows-edited-row-when-rows-are-removed-and-restored	EntryItemModelTests/followsEditedRowWhenRowsAreRemovedAndRestored		未確認	Android は別のブランチで合わせる
+entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScrollOnlyToExistingRows		未確認	Android は別のブランチで合わせる
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話

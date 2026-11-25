@@ -53,7 +53,7 @@ public extension EntryModel {
             state.store = memo
         }
 
-        state.voiceFilled = VoiceFilled(
+        state.filled.voice = VoiceFilled(
             walletId: reading.walletId,
             date: reading.date,
             memo: reading.memo
@@ -70,6 +70,6 @@ public extension EntryModel {
         state.setDate(undo.date)
         state.payment.billMonth = undo.billMonth
         state.memo = undo.memo
-        state.voiceFilled = nil
+        state.filled.voice = nil
     }
 }

@@ -101,7 +101,7 @@ extension EntryModel.Output {
         }
 
         let templateId = input.allTemplates
-            .first { $0.id == state.appliedTemplateId && $0.type == state.type }?
+            .first { $0.id == state.filled.templateId && $0.type == state.type }?
             .id
 
         let billMonth = billChoices.isEmpty ? nil : state.payment.billMonth

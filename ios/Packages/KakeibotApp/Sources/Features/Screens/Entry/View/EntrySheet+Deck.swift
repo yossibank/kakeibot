@@ -33,43 +33,30 @@ extension EntrySheet {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.height
         } action: { height in
-            panelHeight = height
+            layout.panelHeight = height
 
-            if !isEditingMemo {
-                slipGrowth = slipGrowth(forPanel: height)
+            if !model.state.screen.isEditingMemo {
+                layout.slipGrowth = slipGrowth(forPanel: height)
             }
         }
     }
 }
 
 extension EntrySheet {
-    func show(_ next: EntryDeck) {
-        let type = model.state.type
-        let target: AmountTarget = next == .fee ? .fee : .amount
-
+    func show(_ next: EntryModel.Deck) {
         if next != .amount,
            voice.state.step == .listening {
             cancelVoice()
         }
 
-        deckEdge = next.order(for: type) >= deck.order(for: type)
-            ? .trailing
-            : .leading
-
         withAnimation(.snappy) {
-            deck = next
-            model.state.enter(target)
+            model.state.show(next)
         }
-    }
-
-    func resetDeck() {
-        deck = EntryDeck.start(for: model.state.type)
-        model.state.enter(.amount)
     }
 
     func useRecent(_ entry: Entry) {
         model.applyRecent(entry)
-        showSelectedCategory()
+        model.showSelectedCategory()
         show(.amount)
     }
 
@@ -97,8 +84,6 @@ extension EntrySheet {
 }
 
 private extension EntrySheet {
-    typealias AmountTarget = EntryModel.KeypadTarget
-
     static let amountTitleHeight: CGFloat = 28
     static let panelInset: CGFloat = 12
     static let dateSpacing: CGFloat = 8
@@ -134,10 +119,13 @@ private extension EntrySheet {
     }
 
     var deckTransition: AnyTransition {
-        .asymmetric(
-            insertion: .move(edge: deckEdge).combined(with: .opacity),
-            removal: .move(edge: deckEdge == .trailing ? .leading : .trailing)
-                .combined(with: .opacity)
+        let isForward = model.state.screen.isForward
+        let entering: Edge = isForward ? .trailing : .leading
+        let leaving: Edge = isForward ? .leading : .trailing
+
+        return .asymmetric(
+            insertion: .move(edge: entering).combined(with: .opacity),
+            removal: .move(edge: leaving).combined(with: .opacity)
         )
     }
 
@@ -159,7 +147,7 @@ private extension EntrySheet {
     }
 
     func slipGrowth(forPanel height: CGFloat) -> CGFloat {
-        let spare = height + slipGrowth - Self.panelNeed
+        let spare = height + layout.slipGrowth - Self.panelNeed
         return min(max(spare, 0), EntrySlip.growthLimit)
     }
 }

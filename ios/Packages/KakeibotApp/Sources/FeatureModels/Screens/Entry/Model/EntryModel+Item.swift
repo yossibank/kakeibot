@@ -8,6 +8,10 @@ public extension EntryModel {
         public let index: Int
         public let item: EntryItem.Draft
     }
+
+    func newItemModel(isSlipOpen: Bool = false) -> EntryItemModel {
+        EntryItemModel(isSlipOpen: isSlipOpen)
+    }
 }
 
 extension EntryModel {
@@ -25,7 +29,8 @@ extension EntryModel {
             : "×\(item.quantity)"
     }
 
-    public static func unitPrice(of item: EntryItem.Draft) -> (unit: Int, quantity: Int) {
+    public nonisolated static func unitPrice(of item: EntryItem
+        .Draft) -> (unit: Int, quantity: Int) {
         guard
             item.quantity > 1,
             item.amount % item.quantity == 0

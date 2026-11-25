@@ -5,11 +5,11 @@ import SwiftUI
 
 extension EntrySheet {
     @ViewBuilder
-    func sheetContent(for sheet: Sheet) -> some View {
+    func sheetContent(for sheet: EntryModel.Sheet) -> some View {
         switch sheet {
         case let .newWallet(role):
             WalletEditSheet(model: model.newWalletModel()) { wallet in
-                addedWallet = EntryModel.AddedWallet(wallet: wallet, role: role)
+                model.state.noteAdded(wallet, as: role)
             }
 
         case let .editWallet(id):
@@ -62,44 +62,13 @@ extension EntrySheet {
 }
 
 extension EntrySheet {
-    enum Sheet: Hashable, Identifiable {
-        case newWallet(EntryWalletDeck.Role)
-        case editWallet(Wallet.ID)
-        case items
-        case newItem
-        case newCategory
-        case editCategory(EntryCategory)
-        case addTag(EntryCategory)
-        case newTemplate
-        case categories
-
-        var id: Self {
-            self
-        }
-
-        var isWallet: Bool {
-            switch self {
-            case .newWallet, .editWallet: true
-            default: false
-            }
-        }
-    }
-
-    func open(_ sheet: Sheet) {
-        self.sheet = sheet
-
-        reloadsWallets = sheet.isWallet
+    func open(_ sheet: EntryModel.Sheet) {
+        model.state.open(sheet)
     }
 
     func reloadAfterSheet() {
-        let added = addedWallet
-        let needsWallets = reloadsWallets
-
-        addedWallet = nil
-        reloadsWallets = false
-
         model.perform {
-            await $0.reloadAfterSheet(wallets: needsWallets, adding: added)
+            await $0.reloadAfterSheet()
         }
     }
 
@@ -115,11 +84,11 @@ extension EntrySheet {
             showNext(after: change)
 
         case .categoryMoved:
-            showSelectedCategory()
+            model.showSelectedCategory()
 
         case .categoryAdded:
             withAnimation(.snappy) {
-                showSelectedCategory()
+                model.showSelectedCategory()
             }
 
         case .walletChosen:

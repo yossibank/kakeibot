@@ -4,28 +4,12 @@ import FeatureModels
 import SwiftUI
 
 struct EntryItemSheet: View {
-    @State private var isShowingHelp = false
-
     @Environment(\.dismiss) private var dismiss
 
     let model: EntryModel
 
-    @State var name = ""
-    @State var unit = AmountCalculator()
-    @State var quantity = AmountCalculator(amount: 1)
-    @State var target: Target = .unit
-    @State var editingIndex: Int?
-    @State var editingItem: EntryItem.Draft?
-    @State var taxRate: EntryItem.TaxRate?
-    @State var isDiscount = false
-    @State var isSlipOpen = false
-    @State var scrollRequest: ScrollRequest?
-    @State var removed: EntryModel.RemovedItem?
-    @State var openIndex: Int?
-    @State var scrollPosition = ScrollPosition()
-    @State var scrollGeometry: ScrollGeometry?
-    @State var slipHeight: CGFloat = 0
-    @State var barHeight: CGFloat = 0
+    @State var items: EntryItemModel
+    @State var layout = Layout()
 
     @FocusState var focus: Field?
 
@@ -37,10 +21,10 @@ struct EntryItemSheet: View {
         }
         .ignoresSafeArea(.keyboard)
         .overlay {
-            if isShowingHelp {
+            if items.state.isShowingHelp {
                 EntryGuideCard(guide: .items) {
                     withAnimation(.snappy) {
-                        isShowingHelp = false
+                        items.state.isShowingHelp = false
                     }
                 }
             }
@@ -55,7 +39,7 @@ private extension EntryItemSheet {
             HStack {
                 RingButton(systemImage: "questionmark") {
                     withAnimation(.snappy) {
-                        isShowingHelp = true
+                        items.state.isShowingHelp = true
                     }
                 }
 
@@ -80,29 +64,25 @@ private extension EntryItemSheet {
                 .scrollBounceBehavior(.basedOnSize)
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
-                .scrollPosition($scrollPosition)
+                .scrollPosition($layout.scrollPosition)
                 .onScrollGeometryChange(for: ScrollGeometry.self) { geometry in
                     geometry
                 } action: { _, geometry in
-                    scrollGeometry = geometry
+                    layout.scrollGeometry = geometry
                 }
-                .onChange(of: scrollRequest) { _, request in
-                    guard let request else {
-                        return
-                    }
-
+                .onOutcome(items.state.scroll) { index in
                     withAnimation(.snappy) {
-                        proxy.scrollTo(request.index, anchor: .top)
+                        proxy.scrollTo(index, anchor: .top)
                     }
                 }
             }
 
-            if isSlipOpen {
+            if items.state.isSlipOpen {
                 slip
                     .onGeometryChange(for: CGFloat.self) { proxy in
                         proxy.size.height
                     } action: { height in
-                        slipHeight = height
+                        layout.slipHeight = height
                     }
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             } else {
@@ -110,12 +90,12 @@ private extension EntryItemSheet {
                     .onGeometryChange(for: CGFloat.self) { proxy in
                         proxy.size.height
                     } action: { height in
-                        barHeight = height
+                        layout.barHeight = height
                     }
             }
         }
         .settingsHideNotice(
-            $removed,
+            Bindable(items.state).removed,
             message: "品目を消しました",
             systemImage: "trash",
             bottom: Self.noticeBottom
@@ -137,13 +117,20 @@ extension EntryItemSheet {
         model: EntryModel,
         isSlipOpen: Bool = false
     ) {
-        _isSlipOpen = State(initialValue: isSlipOpen)
+        _items = State(initialValue: model.newItemModel(isSlipOpen: isSlipOpen))
 
         self.model = model
     }
 }
 
 extension EntryItemSheet {
+    struct Layout {
+        var scrollPosition = ScrollPosition()
+        var scrollGeometry: ScrollGeometry?
+        var slipHeight: CGFloat = 0
+        var barHeight: CGFloat = 0
+    }
+
     static let noticeBottom: CGFloat = 76
     static let discountIndent: CGFloat = 12
     static let taxModeWidth: CGFloat = 136
@@ -152,6 +139,10 @@ extension EntryItemSheet {
         .init("外税", value: false),
         .init("内税", value: true)
     ]
+
+    var draft: EntryItemModel.Draft {
+        items.state.draft
+    }
 
     var showsRates: Bool {
         Set(model.state.items.list.map(\.taxRate)).count > 1
@@ -167,12 +158,7 @@ extension EntryItemSheet {
     }
 
     func restore(_ removed: EntryModel.RemovedItem) {
-        if let editingIndex,
-           removed.index <= editingIndex {
-            self.editingIndex = editingIndex + 1
-        }
-
-        model.state.restoreItem(removed)
+        items.restore(removed, in: model)
     }
 }
 
