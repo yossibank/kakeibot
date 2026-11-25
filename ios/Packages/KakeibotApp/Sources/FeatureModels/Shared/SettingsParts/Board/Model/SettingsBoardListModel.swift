@@ -3,9 +3,9 @@ import DesignSystem
 import Store
 
 @MainActor
-public protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel, SettingsFoldModel {
+public protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel, SettingsFoldModel
+    where Input: SettingsBoardInput, Input.Snapshot == Snapshot {
     associatedtype Snapshot
-    associatedtype Input: SettingsBoardInput where Input.Snapshot == Snapshot
     associatedtype Updates: AsyncSequence where Updates.Element == Snapshot
 
     var input: Input { get }
