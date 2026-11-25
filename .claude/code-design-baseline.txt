@@ -112,20 +112,10 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: View の @State に置けるのは、モデルと layout だけにする: pressing。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: View の @State に置けるのは、モデルと layout だけにする: proOffer。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: View の @State に置けるのは、モデルと layout だけにする: size。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: addedWallet。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: iconBottom。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isAskingPayment。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingDelete。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingDiscard。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingHideChanges。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingHide。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isEditingIcon。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isEditingPayment。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isEnteringAmount。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isEnteringLoanAmount。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isEnteringValuation。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: openValuationId。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: View の @State に置けるのは、モデルと layout だけにする: valuationDeletion。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: View の @State に置けるのは、モデルと layout だけにする: place。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: View の @State に置けるのは、モデルと layout だけにする: shownSample。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: View の @State に置けるのは、モデルと layout だけにする: size。意味のある状態は、モデルの state に移す

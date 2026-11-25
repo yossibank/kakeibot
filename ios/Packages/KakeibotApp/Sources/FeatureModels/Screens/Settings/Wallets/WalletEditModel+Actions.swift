@@ -7,6 +7,7 @@ public extension WalletEditModel {
         state.valuation = AmountCalculator(amount: max(input.balance, 0))
     }
 
+    @discardableResult
     func saveValuation() async -> Bool {
         guard let editingId = input.editingId else {
             return false
@@ -22,6 +23,11 @@ public extension WalletEditModel {
                 at: dependencies.clock.now
             )
             await loadBalance()
+
+            if state.drawer == .valuation {
+                state.drawer = nil
+            }
+
             return true
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
@@ -29,13 +35,18 @@ public extension WalletEditModel {
         }
     }
 
+    @discardableResult
     func deleteValuation(_ id: Valuation.ID) async -> Deletion? {
         do {
             let deletion = try await dependencies.database.deleteValuation(id)
             await loadBalance()
+
+            state.valuationDeletion = deletion
+
             return deletion
         } catch {
             state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
+            state.valuationDeletion = nil
             return nil
         }
     }
@@ -118,65 +129,48 @@ public extension WalletEditModel {
         }
     }
 
-    func paymentModel(for id: Wallet.ID? = nil) -> RecurringEditModel {
+    func paymentModel() -> RecurringEditModel {
         RecurringEditModel(
             parts: dependencies,
             today: dependencies.clock.today,
             editing: input.payment?.id,
-            paying: id ?? input.editingId
+            paying: state.payment.addedWallet?.id ?? input.editingId
         )
     }
 
+    @discardableResult
     func save() async -> Wallet? {
         do {
-            return try await dependencies.database.save(
+            let wallet = try await dependencies.database.save(
                 output.draft,
                 editing: input.editingId,
                 at: dependencies.clock.now
             )
+
+            guard
+                !isEditing,
+                output.asksPayment
+            else {
+                await finishSave(wallet)
+                return wallet
+            }
+
+            state.payment.addedWallet = wallet
+            state.payment.isAsking = true
+
+            return wallet
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }
 
-    func setHidden(_ isHidden: Bool) async -> Bool {
-        guard let editingId = input.editingId else {
-            return false
+    func finishAddedWallet() {
+        guard let wallet = state.payment.addedWallet else {
+            return
         }
 
-        do {
-            try await dependencies.database.setHidden(
-                editingId,
-                isHidden: isHidden,
-                at: dependencies.clock.now
-            )
-            input.isHidden = isHidden
-            return true
-        } catch AppDatabase.WalletWriteError.lastShownWallet {
-            state.errorNotice.show(AppDatabase.WalletWriteError.lastShownMessage)
-            return false
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return false
-        }
-    }
-
-    func delete() async -> Deletion? {
-        guard let editingId = input.editingId else {
-            return nil
-        }
-
-        do {
-            return try await dependencies.database.deleteWallet(
-                editingId,
-                at: dependencies.clock.now
-            )
-        } catch {
-            let message = AppDatabase.WalletWriteError.deleteMessage(for: error)
-            state.errorNotice.show(message, for: error)
-            return nil
-        }
+        state.outcome.send(SettingsEditOutcome(saved: wallet))
     }
 }
 

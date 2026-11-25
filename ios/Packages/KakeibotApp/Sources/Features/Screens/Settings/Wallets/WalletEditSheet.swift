@@ -5,20 +5,10 @@ import SwiftUI
 
 public struct WalletEditSheet: View {
     @State var model: WalletEditModel
-    @State var isConfirmingDiscard = false
-    @State var isConfirmingHideChanges = false
-    @State var isEnteringAmount = false
-    @State var isEnteringValuation = false
-    @State var isEnteringLoanAmount = false
     @State var isEditingIcon = false
     @State var iconBottom: CGFloat = 0
     @State var openValuationId: Valuation.ID?
     @State var isConfirmingHide = false
-    @State var isConfirmingDelete = false
-    @State var isEditingPayment = false
-    @State var isAskingPayment = false
-    @State var addedWallet: Wallet?
-    @State var valuationDeletion: Deletion?
 
     @FocusState var focus: Field?
 
@@ -47,7 +37,7 @@ public struct WalletEditSheet: View {
             ZStack(alignment: .bottom) {
                 content
 
-                if isEnteringAmount {
+                if model.state.drawer == .amount {
                     amountDrawer(
                         "最初の残高",
                         calculator: model.state.calculator,
@@ -58,26 +48,22 @@ public struct WalletEditSheet: View {
                     )
                 }
 
-                if isEnteringValuation {
+                if model.state.drawer == .valuation {
                     amountDrawer(
                         "今の評価額",
                         calculator: model.state.valuation,
                         onPress: model.state.pressValuation,
                         onDismiss: closeValuation
                     ) {
-                        Task {
-                            await saveValuation()
-                        }
+                        saveValuation()
                     } button: {
                         PrimaryButton("評価額を保存") {
-                            Task {
-                                await saveValuation()
-                            }
+                            saveValuation()
                         }
                     }
                 }
 
-                if isEnteringLoanAmount {
+                if model.state.drawer == .loanAmount {
                     amountDrawer(
                         "最初に借りた額",
                         calculator: model.state.loanAmount,
@@ -87,6 +73,7 @@ public struct WalletEditSheet: View {
                     )
                 }
             }
+            .animation(.snappy, value: model.state.drawer)
         }
         .iconEditorDrawer(
             isPresented: $isEditingIcon,
@@ -96,59 +83,42 @@ public struct WalletEditSheet: View {
             below: iconBottom
         )
         .errorBanner(Bindable(model.state).errorNotice)
-        .deletionNotice($valuationDeletion) { deletion in
+        .deletionNotice(Bindable(model.state).valuationDeletion) { deletion in
             model.perform {
                 await $0.restore(deletion)
             }
         }
-        .confirmsUnsavedHide(
-            isHidden: model.input.isHidden,
-            canSave: model.canSave,
-            isPresented: $isConfirmingHideChanges
-        ) {
-            Task {
-                await save(hiding: true)
-            }
-        } onDiscard: {
-            Task {
-                await setHidden(!model.input.isHidden)
-            }
-        }
-        .confirmsDiscard(when: model.isChanged, isPresented: $isConfirmingDiscard) {
-            dismiss()
-        }
+        .settingsEditConfirmations(edit)
         .confirmsWalletDelete(
             hasEntries: model.input.hasEntries,
-            isPresented: $isConfirmingDelete
+            isPresented: Bindable(model.state).prompt.isConfirmingDelete
         ) {
             toggleHidden()
         } onConfirm: {
-            Task {
-                await delete()
-            }
+            edit.delete()
         }
         .confirmsWalletHide(balance: model.input.balance, isPresented: $isConfirmingHide) {
-            requestHide()
+            edit.toggleHidden()
         }
         .onChange(of: model.state.kind) {
             focus = nil
         }
-        .sheet(isPresented: $isEditingPayment) {
+        .sheet(isPresented: Bindable(model.state).payment.isEditing) {
             closePayment()
         } content: {
-            RecurringEditSheet(model: model.paymentModel(for: addedWallet?.id))
+            RecurringEditSheet(model: model.paymentModel())
         }
         .confirmation(
-            isPresented: $isAskingPayment,
+            isPresented: Bindable(model.state).payment.isAsking,
             systemImage: "repeat",
             title: model.output.paymentQuestion,
             message: model.output.paymentQuestionNote,
             keepTitle: "あとで",
             confirmTitle: "決める",
             role: .suggestion,
-            onKeep: finishAddedWallet
+            onKeep: model.finishAddedWallet
         ) {
-            isEditingPayment = true
+            model.state.payment.isEditing = true
         }
         .task {
             await model.load()

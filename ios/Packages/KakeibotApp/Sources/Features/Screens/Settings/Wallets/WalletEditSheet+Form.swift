@@ -47,12 +47,12 @@ extension WalletEditSheet {
                 isHidden: model.input.isHidden,
                 canDelete: !(model.input.isHidden && model.input.hasEntries)
             ) {
-                close()
+                edit.close()
             } onHide: {
                 toggleHidden()
             } onDelete: {
                 focus = nil
-                isConfirmingDelete = true
+                model.state.prompt.isConfirmingDelete = true
             }
             .padding(.horizontal, SettingsSpacing.side)
             .padding(.top, SettingsSpacing.top)
@@ -66,9 +66,7 @@ extension WalletEditSheet {
 
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
-            Task {
-                await save()
-            }
+            edit.save()
         }
         .disabled(!model.canSave)
     }
@@ -161,8 +159,8 @@ extension WalletEditSheet {
                 SwipeRow(id: valuation.id, openId: $openValuationId) {
                     openValuationId = nil
                 } onAction: {
-                    Task {
-                        valuationDeletion = await model.deleteValuation(valuation.id)
+                    model.perform {
+                        await $0.deleteValuation(valuation.id)
                     }
                 } content: {
                     valuationRow(valuation)
