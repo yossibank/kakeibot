@@ -97,7 +97,7 @@ public extension EntryModel.Output {
         let amountMatches = template.amount.map { $0 == amount } ?? true
         let memoMatches = EntryModel.filledMemo(of: template).map { $0 == state.memo } ?? true
 
-        return template.id == state.appliedTemplateId
+        return template.id == state.filled.templateId
             && template.type == state.type
             && template.categoryId == state.category.id
             && recordableTagId(of: template) == state.category.tagId

@@ -163,12 +163,12 @@ public extension EntryModel {
     }
 
     func recordAgain() async {
-        state.voiceFilled = nil
+        state.filled.voice = nil
         input.editingId = nil
         input.original = nil
         input.originalFee = nil
         state.keypad.feeCalculator = AmountCalculator()
-        state.appliedTemplateId = nil
+        state.filled.templateId = nil
         updateToday()
         state.setDate(state.today)
         state.payment.billMonth = nil
@@ -347,7 +347,7 @@ private extension EntryModel {
         setWallet(entry.walletId)
         state.setDestination(entry.toWalletId)
         state.memo = entry.memo ?? ""
-        state.appliedTemplateId = entry.templateId
+        state.filled.templateId = entry.templateId
         state.payment.billMonth = entry.billMonth
         state.keypad.setFee(input.originalFee?.amount ?? 0)
         state.items.list = try await database.entryItems(of: entry.id).map(EntryItem.Draft.init)
