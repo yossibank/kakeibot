@@ -15,5 +15,6 @@ kakeibot の文書を読み書きするときに読み込まれる決まり。sp
 | --- | --- | --- |
 | spec/export-format | 書き出しの形式 | 表の形（data へリンク） |
 | spec/fixtures | fixtures の JSON の形式 | 置き場所と名前（architecture へリンク） |
+| spec/scenarios | 筋書きの一覧の形式と区分、テストを足した時の手順、テストの無い違い | 1 件ずつの対応（`spec/scenarios/models.tsv`） |
 
 README の技術のアイコンと実行環境の表は、ほかの文書と同じ事実を書く例外である。対応 OS は overview、言語の版と使う技術は architecture と同じにする。CLAUDE.md の「文書」の表で一緒に直す。

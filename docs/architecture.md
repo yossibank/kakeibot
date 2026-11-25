@@ -27,7 +27,10 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/no-warnings.sh` | `make verify` のアプリのビルドを包み、外のパッケージを除いた `warning:` で失敗にする。差分ビルドなので、組み直したファイルの警告だけを見る |
 | `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON を整形する。`make format` と pre-commit で直し、`make verify-docs` で確かめる |
 | claude-config の書き方を確かめるフック | `docs-check.py`・`swift-style-check.py`・`kotlin-style-check.py`。`.md` は `make verify-docs`、`.swift` と `.kt` は `make verify` で全部にかける |
-| `spec/` | `export-format.md`、`fixtures.md`、`fixtures/` |
+| `scripts/scenarios-check.py` | 画面のモデルのテストと [scenarios](../spec/scenarios.md) の一覧の一致を確かめ、`make verify-docs` で走る。`make scenarios` で区分ごとの件数を出す |
+| `scripts/scenarios-check-test.py` | `scenarios-check.py` を、仮のテストと一覧に通して確かめる。`make verify-docs` で走る |
+| `spec/` | `export-format.md`、`fixtures.md`、`fixtures/`、`scenarios.md`、`scenarios/` |
+| `spec/scenarios/` | 画面のモデルのテストを iOS と Android で結び付けた一覧（`models.tsv`） |
 | `spec/fixtures/` | フォルダ名は、Core のフォルダ名の小文字にそろえる |
 | `.claude/rules/` | spec の文書の役割 |
 | `.claude/snapshots/` | `ui-snapshot` で描くセット。名前は描く場所（`tabs-`・`entry-`・`settings-`・`components`・`widget`・`store`）で始める |

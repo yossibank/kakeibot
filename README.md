@@ -68,6 +68,7 @@ flowchart LR
 | 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
 | fixtures の形式 | [spec/fixtures.md](spec/fixtures.md) |
+| 画面のモデルのテストの突き合わせ | [spec/scenarios.md](spec/scenarios.md) |
 | 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
 | 文書の役割 | [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) |
 | 全リポジトリ共通の決まり | [claude-config](https://github.com/yossibank/claude-config) |

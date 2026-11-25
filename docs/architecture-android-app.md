@@ -88,6 +88,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 
 モデルのテストは `featuremodels/src/test/` に置く。`modelTest` が DB をメモリに開き、`ModelWait` が値を待つ。iOS と違う動きは `@Ignore` の理由に書く。
 
+テストは、iOS のテストと 1 件ずつ結び付けて [scenarios](../spec/scenarios.md) の一覧に載せる。
+
 読み書きの失敗は、`support/AppDatabaseFailure.kt` で起こす。記録の一覧の失敗は、失敗する `Flow` をモデルに渡して起こす。
 
 ## 📂 部品とフォルダ
