@@ -120,6 +120,7 @@ entry-change.ignores-applied-template-id-and-remembered-categories		EntryModelCh
 entry-change.closes-unchanged-entry-without-asking		EntryModelChangeTest/closesUnchangedEntryWithoutAsking	Androidのみ	変更が無ければ確かめずに閉じる。iOS は画面の EntrySheet が決める
 entry-change.asks-before-closing-changed-entry		EntryModelChangeTest/asksBeforeClosingChangedEntry	Androidのみ	変更があれば閉じる前に確かめる。iOS は画面の EntrySheet が決める
 entry-change.closes-without-asking-after-starting-next		EntryModelChangeTest/closesWithoutAskingAfterStartingNext	Androidのみ	続けて記録の後は確かめずに閉じる。iOS にテストが無い
+entry-item.drops-items-from-transfer		EntryModelItemTest/dropsItemsFromTransfer	Androidのみ	振替で保存すると品目を落とす、というテストが iOS に無い
 entry-shared-wallet.offers-shared-categories-of-selected-type		EntryModelSharedWalletTest/offersSharedCategoriesOfSelectedType	Androidのみ	共有の口座で収入に切り替えた時のカテゴリのテストが iOS に無い
 entry-shared-wallet.moves-tag-to-same-name-of-shared-category		EntryModelSharedWalletTest/movesTagToSameNameOfSharedCategory	Androidのみ	共有のカテゴリの同じ名前のタグへ移すテストが iOS に無い
 entry-shared-wallet.falls-back-to-first-shared-category-without-same-name		EntryModelSharedWalletTest/fallsBackToFirstSharedCategoryWithoutSameName	Androidのみ	同じ名前が無い時に先頭の共有カテゴリにするテストが iOS に無い
@@ -196,6 +197,15 @@ entry-receipt-flow.*	EntryReceiptFlowTests/*		未移植	レシートを撮って
 entry-deck.starts-with-the-first-field	EntryDeckTests/startsWithTheFirstField	EntryModelTest/startsWithFirstCategoryAndWallet EntryModelTransferTest/startsWithTwoDifferentWallets	対応	収入の時の最初の欄は確かめていない
 entry-deck.points-wallets-to-the-transfer-field	EntryDeckTests/pointsWalletsToTheTransferField		未確認	画面の EntrySlip の transferFields が当たるが、テストが無い
 entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields		未移植	欄の並びから出す向きを決める動きが Android の画面に無い
+entry-item.starts-next-draft-with-last-tax-rate	EntryItemModelTests/startsNextDraftWithLastTaxRate		未確認	Android は別のブランチで合わせる
+entry-item.fills-draft-from-edited-item	EntryItemModelTests/fillsDraftFromEditedItem		未確認	Android は別のブランチで合わせる
+entry-item.keeps-read-amount-until-price-changes	EntryItemModelTests/keepsReadAmountUntilPriceChanges		未確認	Android は別のブランチで合わせる
+entry-item.adds-item-from-draft	EntryItemModelTests/addsItemFromDraft		未確認	Android は別のブランチで合わせる
+entry-item.turns-discount-negative-and-halves-unit	EntryItemModelTests/turnsDiscountNegativeAndHalvesUnit		未確認	Android は別のブランチで合わせる
+entry-item.refuses-draft-without-name-or-price	EntryItemModelTests/refusesDraftWithoutNameOrPrice		未確認	Android は別のブランチで合わせる
+entry-item.updates-edited-item	EntryItemModelTests/updatesEditedItem		未確認	Android は別のブランチで合わせる
+entry-item.follows-edited-row-when-rows-are-removed-and-restored	EntryItemModelTests/followsEditedRowWhenRowsAreRemovedAndRestored		未確認	Android は別のブランチで合わせる
+entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScrollOnlyToExistingRows		未確認	Android は別のブランチで合わせる
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
