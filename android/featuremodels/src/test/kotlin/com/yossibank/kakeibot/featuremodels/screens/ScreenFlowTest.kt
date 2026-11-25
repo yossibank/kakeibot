@@ -109,9 +109,10 @@ class ScreenFlowTest {
         entry.select(wallet = card)
 
         val isSaved = entry.save()
-        ModelWait.until { tabs.balance(of = card.id) == -3000L }
+        ModelWait.until { tabs.amounts.all { 3000 in it } }
 
         assertTrue(isSaved)
+        assertEquals(-3000L, tabs.balance(of = card.id))
         assertEquals(0L, tabs.balance(of = bank))
         assertEquals(0L, tabs.assets.output.holdings.onHand)
         assertEquals(-3000L, tabs.assets.output.total)
@@ -158,8 +159,9 @@ class ScreenFlowTest {
         assertEquals(-156_000L, tabs.balance(of = cash))
 
         setup.passDay(to = nextDay, tabs = tabs)
-        ModelWait.until { tabs.isOn(nextDay) && tabs.balance(of = cash) == -234_000L }
+        ModelWait.until { tabs.isOn(nextDay) && tabs.amounts.all { it.size == 3 } }
 
+        assertEquals(-234_000L, tabs.balance(of = cash))
         assertEquals(listOf(nextDay), tabs.records.output.days.map { it.date })
         assertEquals(78000L, tabs.review.output.total)
     }
@@ -207,6 +209,7 @@ class ScreenFlowTest {
     fun budgetSetInSettingsFollowsNewEntriesOnHome() = modelTest(today = "2026-10-15") { setup ->
         val tabs = setup.openTabs()
         setup.record(1200)
+        ModelWait.until { tabs.amounts.all { it == listOf(1200) } }
         val settings = BudgetListModel(
             database = setup.database,
             entryList = setup.database.entryListUpdates(),
