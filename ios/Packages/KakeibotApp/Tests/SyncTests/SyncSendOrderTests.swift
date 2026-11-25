@@ -26,14 +26,96 @@ struct SyncSendOrderTests {
 
         try await device.database.deleteEntry(entry.id, at: Device.now)
         try await device.sync()
-        let waitingKeys = try await device.waitingKeys
 
         #expect(device.cloud[entry.ownRecordID] == nil)
+        #expect(try await device.waitingKeys.isEmpty)
+        #expect(device.pending.isEmpty)
+    }
 
-        withKnownIssue("送る前の保存が送る列に残っていると、消した行の削除が終わらず sync_change に残る") {
-            #expect(waitingKeys.isEmpty)
-            #expect(device.pending.isEmpty)
-        }
+    @Test
+    func finishesDeletionWhenBatchIsBuiltBeforeDeletionIsQueued() async throws {
+        let device = try await Device.syncing()
+        let entry = try await device.saveEntry()
+        try await device.enqueue()
+
+        try await device.database.deleteEntry(entry.id, at: Device.now)
+        let batch = try await device.takeBatch()
+        let queued = device.pending
+        try await device.sync()
+
+        #expect(batch == nil)
+        #expect(queued == [.delete(entry.ownRecordID)])
+        #expect(device.cloud[entry.ownRecordID] == nil)
+        #expect(try await device.waitingKeys.isEmpty)
+        #expect(device.pending.isEmpty)
+    }
+
+    @Test
+    func finishesDeletionOfEntryEditedWhileItsSaveWasQueued() async throws {
+        let device = try await Device.syncing()
+        let entry = try await device.saveEntry(amount: 500)
+        try await device.enqueue()
+        _ = try await device.saveEntry(amount: 800, editing: entry.id)
+        try await device.enqueue()
+
+        try await device.database.deleteEntry(entry.id, at: Device.now)
+        try await device.sync()
+
+        #expect(device.cloud[entry.ownRecordID] == nil)
+        #expect(try await device.waitingKeys.isEmpty)
+        #expect(device.pending.isEmpty)
+    }
+
+    @Test(arguments: [true, false])
+    func finishesDeletionOfQueuedEntryAfterAppReopens(keepingEngineState: Bool) async throws {
+        let device = try await Device.syncing()
+        let entry = try await device.saveEntry()
+        try await device.enqueue()
+        try await device.database.deleteEntry(entry.id, at: Device.now)
+
+        try await device.relaunch(keepingEngineState: keepingEngineState)
+        try await device.fetch()
+        try await device.sync()
+
+        #expect(device.cloud[entry.ownRecordID] == nil)
+        #expect(try await device.database.entry(entry.id) == nil)
+        #expect(try await device.waitingKeys.isEmpty)
+        #expect(device.pending.isEmpty)
+    }
+
+    @Test
+    func sendsEntryDeletedAndRestoredWhileItsSaveWasQueued() async throws {
+        let device = try await Device.syncing()
+        let entry = try await device.saveEntry()
+        try await device.enqueue()
+
+        try await device.database.deleteEntry(entry.id, at: Device.now)
+        try await device.enqueue()
+        try await device.database.restoreEntry(entry, at: Device.now)
+        try await device.sync()
+
+        let local = try await device.database.syncRecord(for: entry.syncKey)
+
+        #expect(local != nil)
+        #expect(device.cloud[entry.ownRecordID] == local)
+        #expect(try await device.waitingKeys.isEmpty)
+        #expect(device.pending.isEmpty)
+    }
+
+    @Test
+    func sendsOnlyNewEntryWhenQueuedEntryIsDeletedAndRecordedAgain() async throws {
+        let device = try await Device.syncing()
+        let entry = try await device.saveEntry(amount: 500)
+        try await device.enqueue()
+
+        try await device.database.deleteEntry(entry.id, at: Device.now)
+        let again = try await device.saveEntry(amount: 800)
+        try await device.sync()
+
+        #expect(device.cloud[entry.ownRecordID] == nil)
+        #expect(device.cloud[again.ownRecordID]?.values["amount"] == .integer(800))
+        #expect(try await device.waitingKeys.isEmpty)
+        #expect(device.pending.isEmpty)
     }
 
     @Test
