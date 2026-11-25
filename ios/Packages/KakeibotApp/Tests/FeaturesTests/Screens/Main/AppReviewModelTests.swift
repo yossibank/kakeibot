@@ -1,5 +1,4 @@
-@testable import AppFeature
-import FeatureModels
+@testable import FeatureModels
 import Testing
 
 @MainActor

@@ -18,7 +18,7 @@ Android も同じ分け方で、画面のモデルを `:featuremodels` に置く
 
 `Features` は `Store` に依存しない。DB は `ScreenParts` に包んで受け取り、`FeatureModels` のモデルだけが開く。
 
-`Features` には `MemberImportVisibility` を付ける。import していないモジュールの関数は呼べない。`import Store` を書いていないことは、`make verify` が確かめる。
+`Features` と `AppFeature` には `MemberImportVisibility` を付ける。import していないモジュールの関数は呼べない。`import Store` が `AppModel` の 4 ファイルだけなのは、`make verify` が確かめる。
 
 テストのターゲットを除いた依存は、次の図のとおりである。
 
@@ -207,7 +207,7 @@ KakeibotApp/
 
 | フォルダ | 中身 |
 | --- | --- |
-| `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備、レビューのお願い。Pro が無くなったら同期を止める |
+| `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備。Pro が無くなったら同期を止める |
 | `AppFeature/Bridge/` | Pro の購入を StoreKit で、iCloud のアカウントと共有の参加者を CloudKit で読む。`ScenePhase` をモデルの型に変える |
 | `AppFeature/Main/` | 4 つのタブと入力シートなどのシートを組む |
 | `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
@@ -217,7 +217,7 @@ KakeibotApp/
 | `FeatureModels/Screens/Entry/` | 記録の入力シートのモデル |
 | `FeatureModels/Screens/Entry/Receipt/` | レシートを Vision と Foundation Models で読む |
 | `FeatureModels/Screens/Entry/Voice/` | 声を SpeechAnalyzer で聞き、Foundation Models でカテゴリと口座を選ぶ |
-| `FeatureModels/Screens/Main/` | 入口の `MainView` のモデル。画面は `AppFeature/Main/` にある |
+| `FeatureModels/Screens/Main/` | 入口の `MainView` のモデルと、レビューのお願い。画面は `AppFeature/Main/` にある |
 | `FeatureModels/Screens/Pro/` | Pro の購入のモデル |
 | `FeatureModels/Screens/Settings/Menu/` | 設定の入口のモデルと、確かめ用のテストデータ（`#if DEBUG`） |
 | `FeatureModels/Shared/Bill/` | これからの引き落としを月のページに分ける |

@@ -12,7 +12,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | --- | --- |
 | AppModel | 最初の設定が済んでいなければ Onboarding を出す。今日は RootView が MainView と Onboarding に渡す |
 | AppModel の持ち物 | DB を開く関数・時計・通知・Pro の窓口は、`dependencies` にまとめる。今の時刻は、その時計から受け取る |
-| DB と時計の受け渡し | AppModel の `screenParts(for:)` が `ScreenParts` を作り、RootView が渡す。画面は、子の画面とモデルの init へそのまま渡す |
+| DB と時計の受け渡し | AppModel が DB を開いた時に `ScreenParts` を作り、RootView が渡す。画面は、子の画面とモデルの init へそのまま渡す |
 | 子の画面に渡す `ScreenParts` | モデルから開く画面には、モデルの `childParts()` が返す |
 | MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが見張りを始め、全部を読み終えるまで起動画面を出す |
 | MainView のタブの切り替え | 開いたことのあるタブを重ねて持ち、見えるかどうかだけを切り替える。`TabView` は切り替えのたびに中身の大きさを測り直して重いため使わない |

@@ -31,6 +31,9 @@ let package = Package(
                 "Sync",
                 .product(name: "Core", package: "KakeibotKit"),
                 .product(name: "Store", package: "KakeibotKit")
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(

@@ -1,9 +1,14 @@
+import DesignSystem
 import FeatureModels
 import Features
 import Store
 
 extension AppModel {
-    func observePro(in database: AppDatabase) async {
+    func observePro() async {
+        guard let database = state.launch.database else {
+            return
+        }
+
         let status = await dependencies.proStore.status()
         await apply(status, in: database)
 

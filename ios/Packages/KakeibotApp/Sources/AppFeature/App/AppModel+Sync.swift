@@ -6,7 +6,11 @@ import Store
 import Sync
 
 extension AppModel {
-    func syncChanges(in database: AppDatabase) async {
+    func syncChanges() async {
+        guard let database = state.launch.database else {
+            return
+        }
+
         await state.syncEngine?.stop()
         await state.sharedSyncEngine?.stop()
 
@@ -45,7 +49,11 @@ extension AppModel {
         }
     }
 
-    func acceptShares(in database: AppDatabase) async {
+    func acceptShares() async {
+        guard let database = state.launch.database else {
+            return
+        }
+
         let shares = dependencies.shareInbox.take()
 
         guard !shares.isEmpty else {

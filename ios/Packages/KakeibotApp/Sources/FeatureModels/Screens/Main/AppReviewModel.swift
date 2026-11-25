@@ -1,13 +1,21 @@
-import FeatureModels
 import Observation
-import Store
 
 @MainActor
 @Observable
-final class AppReviewModel: ScreenPerforming {
-    let state = State()
+public final class AppReviewModel: ScreenPerforming {
+    public let state = State()
 
     let dependencies: Dependencies
+
+    public convenience init(parts: ScreenParts) {
+        let request = AppReviewRequest(database: parts.database)
+
+        self.init(
+            request: request,
+            clock: parts.clock,
+            askDelay: MainModel.sheetCloseDelay
+        )
+    }
 
     init(
         request: AppReviewRequest,
@@ -22,30 +30,11 @@ final class AppReviewModel: ScreenPerforming {
     }
 }
 
-extension AppReviewModel {
+public extension AppReviewModel {
     @MainActor
     @Observable
     final class State {
-        var outcome = ScreenOutcome<Void>()
-    }
-
-    struct Dependencies {
-        let request: AppReviewRequest
-        let clock: ScreenClock
-        let askDelay: Duration
-    }
-
-    convenience init(
-        database: AppDatabase,
-        clock: ScreenClock
-    ) {
-        let request = AppReviewRequest(database: database)
-
-        self.init(
-            request: request,
-            clock: clock,
-            askDelay: MainModel.sheetCloseDelay
-        )
+        public var outcome = ScreenOutcome<Void>()
     }
 
     func ask(after change: EntryChange) async {
@@ -57,5 +46,13 @@ extension AppReviewModel {
 
         try? await Task.sleep(for: dependencies.askDelay)
         state.outcome.send(())
+    }
+}
+
+extension AppReviewModel {
+    struct Dependencies {
+        let request: AppReviewRequest
+        let clock: ScreenClock
+        let askDelay: Duration
     }
 }

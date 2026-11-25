@@ -78,6 +78,7 @@ verify: verify-docs
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py || { echo "NG claude-config に code-design-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt')
 	scripts/verify.sh features-no-store sh -c '! grep -rnE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/Features'
+	scripts/verify.sh app-feature-no-store sh -c '! grep -rlE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/AppFeature | grep -vxE "ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel(\+(Pro|State|Sync))?\.swift"'
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build scripts/no-warnings.sh $(XCODEBUILD) $(ANY_SIMULATOR) build
 	scripts/verify.sh android-test $(GRADLE) :core:test :store:jvmTest :featuremodels:testDebugUnitTest

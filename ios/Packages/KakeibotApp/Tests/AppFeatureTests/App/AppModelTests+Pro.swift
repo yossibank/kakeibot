@@ -11,7 +11,8 @@ extension AppModelTests {
         let database = try AppDatabase.inMemory()
         let model = AppModel(openDatabase: { database }, proStore: .stub(status: .unlocked))
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(model.input.isPro)
     }
@@ -21,7 +22,8 @@ extension AppModelTests {
         let database = try AppDatabase.inMemory()
         let model = AppModel(openDatabase: { database }, proStore: .stub(status: .locked))
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(!model.input.isPro)
     }
@@ -35,7 +37,8 @@ extension AppModelTests {
             proStore: .stub(status: .locked, updates: [.unlocked, .revoked, .unlocked])
         )
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(model.input.isPro)
     }
@@ -46,7 +49,8 @@ extension AppModelTests {
         try await database.turnOnSync()
         let model = AppModel(openDatabase: { database }, proStore: .stub(status: .revoked))
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(try await database.isSyncEnabled() == false)
         #expect(!model.input.isPro)
@@ -63,7 +67,8 @@ extension AppModelTests {
             proStore: .stub(status: .unlocked, updates: [.revoked])
         )
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(try await database.isSyncEnabled() == false)
         #expect(!model.input.isPro)
@@ -74,7 +79,8 @@ extension AppModelTests {
         let database = try AppDatabase.inMemory()
         let model = AppModel(openDatabase: { database }, proStore: .stub(status: .revoked))
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(try await database.isSyncEnabled() == false)
         #expect(!model.input.isPro)
@@ -97,7 +103,8 @@ extension AppModelTests {
 
         let model = AppModel(openDatabase: { database }, proStore: .stub(status: .revoked))
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(try await database.isSyncEnabled())
         #expect(!model.input.isPro)
@@ -110,7 +117,8 @@ extension AppModelTests {
         try await database.turnOnSync()
         let model = AppModel(openDatabase: { database }, proStore: .stub(status: .locked))
 
-        await model.observePro(in: database)
+        await model.open()
+        await model.observePro()
 
         #expect(try await database.isSyncEnabled())
     }

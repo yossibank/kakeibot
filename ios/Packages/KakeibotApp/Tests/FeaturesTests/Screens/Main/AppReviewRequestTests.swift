@@ -1,7 +1,5 @@
-@testable import AppFeature
 import Core
-import FeatureModels
-import Features
+@testable import FeatureModels
 import Foundation
 import Store
 import Testing

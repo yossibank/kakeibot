@@ -1,14 +1,16 @@
 import CloudKit
+import Core
 import Foundation
+import Store
 
 public extension SyncEngine {
     static func share(
-        zoneName: String,
+        walletID: Wallet.ID,
         title: String,
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
     ) async throws -> CKShare {
         let database = container.privateCloudDatabase
-        let zoneID = CKRecordZone.ID(zoneName: zoneName)
+        let zoneID = CKRecordZone.ID(zoneName: SyncZone.wallet(walletID))
         let shareID = CKRecord.ID(recordName: CKRecordNameZoneWideShare, zoneID: zoneID)
         let zone = CKRecordZone(zoneID: zoneID)
 
@@ -41,10 +43,10 @@ public extension SyncEngine {
     }
 
     static func deleteShare(
-        zoneName: String,
+        walletID: Wallet.ID,
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
     ) async throws {
-        let zoneID = CKRecordZone.ID(zoneName: zoneName)
+        let zoneID = CKRecordZone.ID(zoneName: SyncZone.wallet(walletID))
 
         do {
             try await container.privateCloudDatabase.deleteRecordZone(withID: zoneID)
@@ -54,11 +56,11 @@ public extension SyncEngine {
     }
 
     static func leaveShare(
-        zoneName: String,
+        walletID: Wallet.ID,
         ownerName: String,
         in container: CKContainer = CKContainer(identifier: containerIdentifier)
     ) async throws {
-        let zoneID = CKRecordZone.ID(zoneName: zoneName, ownerName: ownerName)
+        let zoneID = CKRecordZone.ID(zoneName: SyncZone.wallet(walletID), ownerName: ownerName)
         let shareID = CKRecord.ID(recordName: CKRecordNameZoneWideShare, zoneID: zoneID)
 
         do {

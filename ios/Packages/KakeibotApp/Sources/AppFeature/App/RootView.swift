@@ -1,16 +1,16 @@
+import CloudKit
 import Core
 import DesignSystem
 import FeatureModels
 import Features
 import Notifications
-import Store
 import SwiftUI
 import Sync
 import UIKit
 import VisionKit
 
 public struct RootView: View {
-    @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
+    @State private var model = AppModel.live()
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
@@ -85,9 +85,9 @@ private extension RootView {
         case .opening:
             ProgressView()
 
-        case let .onboarding(database):
+        case let .onboarding(opened):
             OnboardingView(
-                parts: model.screenParts(for: database),
+                parts: opened.parts,
                 today: model.input.today
             ) {
                 withAnimation(.snappy) {
@@ -96,10 +96,9 @@ private extension RootView {
             }
             .transition(.opacity)
 
-        case let .ready(database):
+        case let .ready(opened):
             MainView(
-                database: database,
-                clock: model.screenParts(for: database).clock,
+                parts: opened.parts,
                 today: model.input.today,
                 route: model.route,
                 isRevealed: !model.state.curtain.isShown
@@ -109,22 +108,22 @@ private extension RootView {
                 model.state.markHomeLoaded()
             }
             .task(id: model.observationID(model.input.today)) {
-                await model.observeNotifications(in: database)
+                await model.observeNotifications()
             }
             .task(id: model.observationID(model.input.today)) {
-                await model.observeWidgets(in: database)
+                await model.observeWidgets()
             }
             .task(id: model.observationID(model.input.today)) {
-                await model.observeSync(in: database)
+                await model.observeSync()
             }
             .task(id: model.observationID(model.input.syncActivity)) {
-                await model.syncChanges(in: database)
+                await model.syncChanges()
             }
             .task(id: model.observationID(model.receivedShareCount)) {
-                await model.acceptShares(in: database)
+                await model.acceptShares()
             }
             .task {
-                await model.observePro(in: database)
+                await model.observePro()
             }
 
         case .failed:
@@ -203,11 +202,9 @@ extension SyncCloud {
     } deleteData: {
         try await SyncEngine.deleteCloudData()
     } createShare: { walletID, title in
-        let zoneName = SyncZone.wallet(walletID)
-        _ = try await SyncEngine.share(zoneName: zoneName, title: title)
+        _ = try await SyncEngine.share(walletID: walletID, title: title)
     } showShare: { walletID, title, onStop, onFail in
-        let zoneName = SyncZone.wallet(walletID)
-        let share = try await SyncEngine.share(zoneName: zoneName, title: title)
+        let share = try await SyncEngine.share(walletID: walletID, title: title)
 
         SyncShareSheet.present(
             share,
@@ -216,16 +213,13 @@ extension SyncCloud {
             onFail: onFail
         )
     } participants: { walletID, title in
-        let zoneName = SyncZone.wallet(walletID)
-        let share = try await SyncEngine.share(zoneName: zoneName, title: title)
+        let share = try await SyncEngine.share(walletID: walletID, title: title)
 
         return share.participants.compactMap(SyncParticipant.init)
     } deleteShare: { walletID in
-        let zoneName = SyncZone.wallet(walletID)
-        try await SyncEngine.deleteShare(zoneName: zoneName)
+        try await SyncEngine.deleteShare(walletID: walletID)
     } leaveShare: { walletID, ownerName in
-        let zoneName = SyncZone.wallet(walletID)
-        try await SyncEngine.leaveShare(zoneName: zoneName, ownerName: ownerName)
+        try await SyncEngine.leaveShare(walletID: walletID, ownerName: ownerName)
     }
 }
 
