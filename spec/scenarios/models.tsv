@@ -383,6 +383,7 @@ budget-list.clears-budget	BudgetListModelTests/clearsBudget	BudgetListModelTest/
 budget-list.restores-budget-carried-from-earlier-month	BudgetListModelTests/restoresBudgetCarriedFromEarlierMonth	BudgetListModelTest/restoresBudgetCarriedFromEarlierMonth	対応	
 budget-list.saves-with-done-and-shows-spending	BudgetListModelTests/savesWithDoneAndShowsSpending	BudgetListModelTest/savesWithDoneAndShowsSpending	対応	
 budget-list.detects-changed-amount-while-editing	BudgetListModelTests/detectsChangedAmountWhileEditing	BudgetListModelTest/detectsChangedAmountWhileEditing	対応	
+budget-list.asks-before-discarding-changed-amount	BudgetListModelTests/asksBeforeDiscardingChangedAmount		未確認	Android は別のブランチで合わせる
 budget-list.turns-carryover-on-from-period-month-and-off	BudgetListModelTests/turnsCarryoverOnFromPeriodMonthAndOff	BudgetListModelTest/turnsCarryoverOnFromPeriodMonthAndOff	対応	
 budget-list.carries-only-total-budget-remaining-into-total-usage	BudgetListModelTests/carriesOnlyTotalBudgetRemainingIntoTotalUsage	BudgetListModelTest/carriesOnlyTotalBudgetRemainingIntoTotalUsage	対応	
 budget-list.resets-carryover-and-restores-start	BudgetListModelTests/resetsCarryoverAndRestoresStart	BudgetListModelTest/resetsCarryoverAndRestoresStart	対応	
@@ -394,6 +395,7 @@ budget-list.suggests-only-recurring-without-records	BudgetListModelTests/suggest
 budget-list.tells-when-budgets-cannot-be-read	BudgetListModelTests/tellsWhenBudgetsCannotBeRead	BudgetListModelTest/tellsWhenBudgetsCannotBeRead	対応	設定の表ではなく、共有の記録の一覧を失敗させて確かめる
 budget-list.keeps-notice-when-editing-starts	BudgetListModelTests/keepsNoticeWhenEditingStarts	BudgetListModelTest/keepsNoticeWhenEditingStarts	対応	共有の記録の一覧を失敗させて、知らせを出してから確かめる
 recurring-edit.warns-that-reminders-cannot-arrive-when-denied	RecurringEditModelTests/warnsThatRemindersCannotArriveWhenDenied		違い	まだ許可を尋ねていない時も出す。画面が見る値は、未回答と拒否を分けない
+recurring-edit.opens-one-panel-at-a-time	RecurringEditModelTests/opensOnePanelAtATime		未確認	Android は別のブランチで合わせる
 recurring-edit.does-not-warn-when-reminders-are-allowed	RecurringEditModelTests/doesNotWarnWhenRemindersAreAllowed		未確認	通知の許可は :app の Context に頼る画面の部品が見て、単体テストにできない
 recurring-edit.starts-new-recurring-with-given-transfer-type	RecurringEditModelTests/startsNewRecurringWithGivenTransferType	RecurringEditModelTest/startsNewRecurringWithGivenTransferType	対応	
 recurring-edit.opens-schedule-when-adding-recurring	RecurringEditModelTests/opensScheduleWhenAddingRecurring	RecurringEditModelTest/opensScheduleOnlyWhenAdding	対応	
@@ -422,6 +424,7 @@ recurring-list.names-failed-action	RecurringListModelTests/namesFailedAction	Rec
 recurring-list.saves-moved-order		RecurringListModelTest/savesMovedOrder	Androidのみ	固定費の並べ替えを保存する。iOS は別の一覧（カテゴリ・スタンプ）でだけ確かめている
 recurring-list.starts-from-first-period-on-later-day		RecurringListModelTest/startsFromFirstPeriodOnLaterDay	Androidのみ	始まりの日より後の最初の予定日を次回に出す。iOS の画面のテストに無い
 template-edit.enters-amount-with-keypad	TemplateEditModelTests/entersAmountWithKeypad	TemplateEditModelTest/entersAmountWithKeypad	対応	Android に typeName（収入・支出の名前）が無く、確かめていない
+template-edit.opens-one-panel-at-a-time	TemplateEditModelTests/opensOnePanelAtATime		未確認	Android は別のブランチで合わせる
 template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton	TemplateEditModelTest/namesWhatIsMissingOnSaveButton	対応	
 template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	名前が無い時は save の結果で確かめる
 template-edit.loads-existing-template-and-tracks-changes	TemplateEditModelTests/loadsExistingTemplateAndTracksChanges		未移植	既にあるテンプレートを編集する入口（editing・isChanged）が無い
@@ -456,6 +459,8 @@ month-start-day.ends-asset-months-at-period-end	MonthStartDayModelTests/endsAsse
 settings-list-screen.*	SettingsListScreenTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-board.keeps-move-inside-the-board	SettingsBoardModelTests/keepsMoveInsideTheBoard	RecurringListModelTest/keepsMoveInsideTheBoard	対応	
 settings-board.ignores-move-to-same-place-or-unknown-item	SettingsBoardModelTests/ignoresMoveToSamePlaceOrUnknownItem	RecurringListModelTest/ignoresMoveToSamePlaceOrUnknownRecurring	対応	
+settings-board.asks-one-confirmation-at-a-time	SettingsBoardModelTests/asksOneConfirmationAtATime		未確認	Android は別のブランチで合わせる
+settings-board.opens-editor-while-keeping-open-row	SettingsBoardModelTests/opensEditorWhileKeepingOpenRow		未確認	Android は別のブランチで合わせる
 settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/keepsHiddenItemInStateAfterHiding	RecurringListModelTest/hidesAndShowsRecurring	対応	
 settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting	RecurringListModelTest/deletesAndRestoresRecurring	対応	Android は、削除を元に戻す所まで 1 つのテストで確かめる
 settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails	RecurringListModelTest/clearsDeletionInStateWhenDeletingFails	対応	
@@ -474,6 +479,9 @@ settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/places
 settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome	SettingsEditOutcomeTest/placesSaveAndHideInOneOutcome	対応	
 settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails	SettingsEditOutcomeTest/keepsSheetOpenWhenHidingAfterSaveFails	対応	
 settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide	SettingsEditOutcomeTest/savesWithoutHidingAfterFailedSaveAndHide	対応	
+settings-edit-prompt.shows-one-prompt-at-a-time	SettingsEditPromptTests/showsOnePromptAtATime		未確認	Android は別のブランチで合わせる
+settings-edit-prompt.closes-only-the-prompt-in-front	SettingsEditPromptTests/closesOnlyThePromptInFront		未確認	Android は別のブランチで合わせる
+settings-edit-prompt.keeps-panel-open-behind-prompt	SettingsEditPromptTests/keepsPanelOpenBehindPrompt		未確認	Android は別のブランチで合わせる
 settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い
@@ -568,3 +576,4 @@ theme-list.*	ThemeListModelTests/*		未移植	テーマの一覧の画面が無�
 theme-style.*	ThemeStyleModelTests/*		未移植	明暗と見た目を選ぶ画面が無い
 wallet-edit.*	WalletEditModelTests/*		未移植	口座を編集する画面が無い
 wallet-list.*	WalletListModelTests/*		未移植	口座の一覧の画面が無い
+widget-guide.*	WidgetGuideModelTests/*		未移植	ウィジェットの置き方の画面が無い

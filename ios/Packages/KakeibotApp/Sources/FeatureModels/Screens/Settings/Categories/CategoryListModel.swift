@@ -28,6 +28,11 @@ public final class CategoryListModel {
 }
 
 public extension CategoryListModel {
+    enum Destination: Hashable, Sendable {
+        case new(EntryCategory.Kind)
+        case edit(EntryCategory.Kind, EntryCategory.ID)
+    }
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
@@ -36,6 +41,7 @@ public extension CategoryListModel {
         public var kind: EntryCategory.Kind
         public var movingOrder: [EntryCategory.ID]?
         public var removed = SettingsBoardRemoved<EntryCategory.ID>()
+        public var shown = SettingsBoardShown<EntryCategory.ID, Destination>()
 
         init(kind: EntryCategory.Kind) {
             self.kind = kind

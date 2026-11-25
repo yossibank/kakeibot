@@ -5,13 +5,10 @@ import SwiftUI
 
 public struct TemplateEditSheet: View {
     @State var model: TemplateEditModel
-    @State var tagCategory: EntryCategory?
 
     @FocusState var focus: Field?
 
     @Environment(\.themeStyle) var themeStyle
-
-    @State private var panel: Panel?
 
     @Environment(\.dismiss) private var dismiss
 
@@ -36,7 +33,7 @@ public struct TemplateEditSheet: View {
         FloatingInputReader { _ in
             content
                 .ignoresSafeArea(keyboardRegions)
-                .floatingInput(isPresented: panel == .memo) {
+                .floatingInput(isPresented: model.state.prompt.panel == .memo) {
                     closePanel()
                 } card: {
                     memoCard
@@ -52,6 +49,7 @@ public struct TemplateEditSheet: View {
                 }
                 .overlay(alignment: .top) {
                     SettingsEditHeader(
+                        isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
                         title: title,
                         isEditing: model.isEditing,
                         isHidden: model.input.isHidden,
@@ -92,7 +90,7 @@ public struct TemplateEditSheet: View {
                         hidePanel()
                     }
                 }
-                .sheet(item: $tagCategory, onDismiss: reloadTags) { category in
+                .sheet(item: Bindable(model.state).tagCategory, onDismiss: reloadTags) { category in
                     CategoryEditSheet(
                         model: model.editCategoryModel(category),
                         startsAddingTag: true
@@ -120,14 +118,10 @@ extension TemplateEditSheet {
         case memo
     }
 
-    enum Panel: Hashable {
-        case amount
-        case tag
-        case memo
-    }
+    typealias Panel = TemplateEditModel.Panel
 
     var drawerPanel: Panel? {
-        panel == .memo ? nil : panel
+        model.state.prompt.panel == .memo ? nil : model.state.prompt.panel
     }
 
     var edit: SettingsEditController<TemplateEditModel> {
@@ -150,7 +144,7 @@ extension TemplateEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            self.panel = panel
+            model.state.open(panel)
         }
     }
 
@@ -190,7 +184,7 @@ private extension TemplateEditSheet {
     }
 
     var keyboardRegions: SafeAreaRegions {
-        panel == .memo ? .keyboard : []
+        model.state.prompt.panel == .memo ? .keyboard : []
     }
 
     var memoValue: String {
@@ -236,7 +230,7 @@ private extension TemplateEditSheet {
 
     func hidePanel() {
         withAnimation(.snappy) {
-            panel = nil
+            model.state.closePanel()
         }
     }
 }

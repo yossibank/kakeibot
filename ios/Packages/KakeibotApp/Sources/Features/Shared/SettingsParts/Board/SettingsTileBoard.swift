@@ -3,8 +3,9 @@ import FeatureModels
 import SwiftUI
 
 struct SettingsTileBoard<Item: Identifiable, Face: View>: View {
-    @Binding var grid: SettingsBoardGrid
+    @Binding var width: CGFloat
 
+    let grid: SettingsBoardGrid
     let items: [Item]
     let drag: SettingsDrag<Item.ID>
     let space: String
@@ -24,7 +25,7 @@ struct SettingsTileBoard<Item: Identifiable, Face: View>: View {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { width in
-            grid.width = width
+            self.width = width
         }
     }
 }
@@ -56,13 +57,15 @@ private extension SettingsTileBoard {
 
 extension SettingsTileBoard {
     init<Model: SettingsBoardModel>(
-        grid: Binding<SettingsBoardGrid>,
+        grid: SettingsBoardGrid,
+        width: Binding<CGFloat>,
         controller: SettingsBoardController<Model>,
         space: String,
         @ViewBuilder face: @escaping (Item) -> Face,
         onTap: ((Item) -> Void)? = nil
     ) where Model.Item == Item {
         self.init(
+            width: width,
             grid: grid,
             items: controller.model.output.shown,
             drag: controller.drag,

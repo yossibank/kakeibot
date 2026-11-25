@@ -9,6 +9,10 @@ extension WalletEditSheet {
         case text
     }
 
+    struct Layout {
+        var iconBottom: CGFloat = 0
+    }
+
     enum Panel: Hashable {
         case payment
         case valuation
@@ -70,7 +74,7 @@ extension WalletEditSheet {
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
-        let isEntering = model.state.drawer == .valuation
+        let isEntering = model.state.prompt.panel == .valuation
         let amount = isEntering ? model.state.valuation.amount : model.input.balance
 
         return [
@@ -102,11 +106,11 @@ extension WalletEditSheet {
     }
 
     var iconStrokeWidth: CGFloat {
-        isEditingIcon ? 2 : IconBadge.lineWidth
+        model.state.icon.isPresented ? 2 : IconBadge.lineWidth
     }
 
     var amountStroke: Color {
-        model.state.drawer == .amount ? signColor : signColor.opacity(.muted)
+        model.state.prompt.panel == .amount ? signColor : signColor.opacity(.muted)
     }
 
     func open(_ panel: Panel) {
@@ -151,7 +155,11 @@ extension WalletEditSheet {
 
     func show(_ drawer: WalletEditModel.Drawer?) {
         withAnimation(.snappy) {
-            model.state.drawer = drawer
+            if let drawer {
+                model.state.open(drawer)
+            } else {
+                model.state.closePanel()
+            }
         }
     }
 
@@ -176,7 +184,7 @@ extension WalletEditSheet {
         focus = nil
 
         guard !model.output.needsHideConfirmation else {
-            isConfirmingHide = true
+            model.state.prompt.isConfirmingHide = true
             return
         }
 

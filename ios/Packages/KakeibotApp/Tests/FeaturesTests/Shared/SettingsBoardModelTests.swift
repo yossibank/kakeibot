@@ -33,6 +33,39 @@ struct SettingsBoardModelTests {
     }
 
     @Test
+    func asksOneConfirmationAtATime() {
+        let board = FakeBoard(visible: ["a", "b"])
+
+        board.state.ask(.delete("a"))
+        board.state.ask(.hide("a"))
+        let asked = board.state.shown.prompt
+
+        board.state.closePrompt(.delete("a"))
+        let kept = board.state.shown.prompt
+
+        board.state.closePrompt(.hide("a"))
+
+        #expect(asked == .hide("a"))
+        #expect(asked?.hidingId == "a")
+        #expect(asked?.deletingId == nil)
+        #expect(kept == .hide("a"))
+        #expect(board.state.shown.prompt == nil)
+    }
+
+    @Test
+    func opensEditorWhileKeepingOpenRow() {
+        let board = FakeBoard(visible: ["a", "b"])
+        board.state.shown.openId = "b"
+
+        board.state.open(.edit("a"))
+
+        #expect(board.state.shown.destination == .edit("a"))
+        #expect(board.state.shown.destination?.editingID == "a")
+        #expect(board.state.shown.openId == "b")
+        #expect(board.state.shown.prompt == nil)
+    }
+
+    @Test
     func keepsHiddenItemInStateAfterHiding() async {
         let board = FakeBoard(visible: ["a", "b"])
 

@@ -21,10 +21,10 @@ public extension WalletEditModel {
     final class State: SettingsEditState {
         public var name = ""
         public var isNegative: Bool
-        public var drawer: Drawer?
+        public var openValuationId: Valuation.ID?
         public var valuationDeletion: Deletion?
         public var payment = Payment()
-        public var prompt = SettingsEditPrompt()
+        public var prompt = SettingsEditPrompt<Drawer>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Wallet>>()
 
         public private(set) var kind: Wallet.Kind

@@ -38,6 +38,7 @@ public extension SyncModel {
         public internal(set) var workingWallet: Wallet.ID?
         public internal(set) var invitation: WalletShare?
         public internal(set) var opened: WalletShare?
+        public internal(set) var asking: Asking?
 
         var requestedOn: Bool?
     }

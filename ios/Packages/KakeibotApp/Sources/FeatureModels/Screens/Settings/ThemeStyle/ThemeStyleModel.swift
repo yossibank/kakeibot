@@ -74,6 +74,7 @@ public extension ThemeStyleModel {
     @Observable
     final class Input {
         public internal(set) var style: ThemeStyle = .standard
+        public internal(set) var openedStyle: ThemeStyle?
 
         public let textHint = SettingsFoldInput.hint(.themeText)
         public let lookHint = SettingsFoldInput.hint(.themeLook)
@@ -113,6 +114,12 @@ public extension ThemeStyleModel {
             input.style = try await dependencies.database.style()
         } catch {
             state.errorNotice.show(SettingMessage.loadFailed)
+        }
+    }
+
+    func open(with style: ThemeStyle) {
+        if input.openedStyle == nil {
+            input.openedStyle = style
         }
     }
 

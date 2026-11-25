@@ -5,10 +5,7 @@ import SwiftUI
 
 public struct WalletEditSheet: View {
     @State var model: WalletEditModel
-    @State var isEditingIcon = false
-    @State var iconBottom: CGFloat = 0
-    @State var openValuationId: Valuation.ID?
-    @State var isConfirmingHide = false
+    @State var layout = Layout()
 
     @FocusState var focus: Field?
 
@@ -37,7 +34,7 @@ public struct WalletEditSheet: View {
             ZStack(alignment: .bottom) {
                 content
 
-                if model.state.drawer == .amount {
+                if model.state.prompt.panel == .amount {
                     amountDrawer(
                         "最初の残高",
                         calculator: model.state.calculator,
@@ -48,7 +45,7 @@ public struct WalletEditSheet: View {
                     )
                 }
 
-                if model.state.drawer == .valuation {
+                if model.state.prompt.panel == .valuation {
                     amountDrawer(
                         "今の評価額",
                         calculator: model.state.valuation,
@@ -63,7 +60,7 @@ public struct WalletEditSheet: View {
                     }
                 }
 
-                if model.state.drawer == .loanAmount {
+                if model.state.prompt.panel == .loanAmount {
                     amountDrawer(
                         "最初に借りた額",
                         calculator: model.state.loanAmount,
@@ -73,14 +70,13 @@ public struct WalletEditSheet: View {
                     )
                 }
             }
-            .animation(.snappy, value: model.state.drawer)
+            .animation(.snappy, value: model.state.prompt.panel)
         }
         .iconEditorDrawer(
-            isPresented: $isEditingIcon,
             model: model.state.icon,
             focus: $focus,
             textField: .text,
-            below: iconBottom
+            below: layout.iconBottom
         )
         .errorBanner(Bindable(model.state).errorNotice)
         .deletionNotice(Bindable(model.state).valuationDeletion) { deletion in
@@ -97,7 +93,10 @@ public struct WalletEditSheet: View {
         } onConfirm: {
             edit.delete()
         }
-        .confirmsWalletHide(balance: model.input.balance, isPresented: $isConfirmingHide) {
+        .confirmsWalletHide(
+            balance: model.input.balance,
+            isPresented: Bindable(model.state).prompt.isConfirmingHide
+        ) {
             edit.toggleHidden()
         }
         .onChange(of: model.state.kind) {

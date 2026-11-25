@@ -1,6 +1,7 @@
 import Core
 import FeatureModels
 import Features
+import Foundation
 import Store
 import Testing
 
@@ -62,9 +63,91 @@ struct ThemeListModelTests {
 }
 
 private extension ThemeListModelTests {
+    static let draft = ThemeDraft(name: "わたしの色", palette: ThemePreset.wine.palette)
+
     static func model(database: AppDatabase) -> ThemeListModel {
         let switcher = AppIconListModelTests.Switcher(name: nil)
         let appIcon = AppIconListModel(switcher: switcher.client)
         return ThemeListModel(parts: .system(database), appIcon: appIcon)
+    }
+}
+
+extension ThemeListModelTests {
+    @Test
+    func offersProBeforeChoosingCustomTheme() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let saved = try await setup.database.saveTheme(Self.draft, at: Date())
+        let model = Self.model(database: setup.database)
+        await model.load()
+
+        await model.choose(.custom(saved.id), isPro: false)
+        let offered = model.state.presented
+        let kept = model.input.current
+
+        await model.unlock()
+
+        #expect(offered == .offer(.select(.custom(saved.id))))
+        #expect(offered?.offer?.feature == "作ったテーマ")
+        #expect(kept == .system)
+        #expect(model.state.presented == nil)
+        #expect(model.input.current == .custom(saved.id))
+    }
+
+    @Test
+    func opensNewThemeAfterUnlocking() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = Self.model(database: setup.database)
+        let base = ThemePreset.wine.palette
+
+        model.create(base: base, isPro: false)
+        let offered = model.state.presented
+
+        await model.unlock()
+        let unlocked = model.state.presented
+
+        model.create(base: nil, isPro: true)
+
+        #expect(offered == .offer(.create(base: base)))
+        #expect(unlocked == .editing(.new(base: base)))
+        #expect(model.state.presented?.editing == .new(base: nil))
+    }
+
+    @Test
+    func presentsOneThingAtATime() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = Self.model(database: setup.database)
+        let choice = ThemeChoice.preset(.forest)
+
+        model.state.press(choice)
+        let pressed = model.state.pressing
+        model.state.press(nil)
+        model.state.present(.menu(choice))
+        let menu = model.state.presented?.menu
+
+        model.state.present(.editing(.new(base: nil)))
+        model.state.close(.menu(choice))
+        let kept = model.state.presented
+
+        model.state.close(kept)
+
+        #expect(pressed == choice)
+        #expect(model.state.pressing == nil)
+        #expect(menu == choice)
+        #expect(kept == .editing(.new(base: nil)))
+        #expect(model.state.presented == nil)
+    }
+
+    @Test
+    func findsPaletteAndThemeOfChoice() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let saved = try await setup.database.saveTheme(Self.draft, at: Date())
+        let model = Self.model(database: setup.database)
+        await model.load()
+
+        #expect(model.output.theme(of: .custom(saved.id))?.id == saved.id)
+        #expect(model.output.palette(of: .custom(saved.id)) == saved.palette)
+        #expect(model.output.theme(of: .preset(.wine)) == nil)
+        #expect(model.output.palette(of: .preset(.wine)) == ThemePreset.wine.palette)
+        #expect(model.output.palette(of: .system) == ThemePreset.white.palette)
     }
 }

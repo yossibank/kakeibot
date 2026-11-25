@@ -4,8 +4,6 @@ import FeatureModels
 import SwiftUI
 
 struct ThemeStyleFrame<Preview: View, Content: View>: View {
-    @State private var openedStyle: ThemeStyle?
-
     @Environment(\.themeStyle) private var appStyle
 
     let title: String
@@ -56,7 +54,7 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
         .haptic(.selection, trigger: model.output.style, condition: Self.isSwitchKept)
         .environment(\.themeStyle.haptics, model.output.style.haptics)
         .onAppear {
-            openedStyle = openedStyle ?? appStyle
+            model.open(with: appStyle)
         }
         .task {
             await model.load()
@@ -70,7 +68,7 @@ private extension ThemeStyleFrame {
     }
 
     var shownStyle: ThemeStyle {
-        openedStyle ?? appStyle
+        model.input.openedStyle ?? appStyle
     }
 
     static func isSwitchKept(

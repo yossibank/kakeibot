@@ -21,7 +21,7 @@ struct BackupModelTests {
         let export = try ExportV1(json: file.data)
 
         #expect(isMade)
-        #expect(model.state.isExporting)
+        #expect(model.state.picker == .exporter)
         #expect(file.name == "kakeibot-2026-10-03.json")
         #expect(export.app == ExportV1.App(platform: .ios, version: "1.2"))
     }

@@ -31,11 +31,15 @@ public final class RewardRuleEditModel {
 }
 
 public extension RewardRuleEditModel {
+    enum Panel: Hashable, Sendable {
+        case amount
+    }
+
     @MainActor
     @Observable
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt()
+        public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var name = ""

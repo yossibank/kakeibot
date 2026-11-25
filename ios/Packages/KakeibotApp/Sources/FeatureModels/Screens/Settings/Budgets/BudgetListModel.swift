@@ -68,6 +68,7 @@ public extension BudgetListModel {
         public var errorNotice = ErrorNotice()
         public var cleared: Cleared?
         public var resetFrom: YearMonth?
+        public var isConfirmingDiscard = false
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
@@ -149,8 +150,20 @@ public extension BudgetListModel {
         state.editing = target
     }
 
+    func closeEditing() {
+        if output.isChanged {
+            state.isConfirmingDiscard = true
+        } else {
+            cancelEditing()
+        }
+    }
+
     func cancelEditing() {
         state.editing = nil
+
+        if state.isConfirmingDiscard {
+            state.isConfirmingDiscard = false
+        }
     }
 
     func save() async {

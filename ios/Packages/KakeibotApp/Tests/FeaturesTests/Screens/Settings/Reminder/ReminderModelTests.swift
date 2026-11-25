@@ -206,3 +206,31 @@ extension ReminderModelTests.FakePermission {
         rescheduled = true
     }
 }
+
+extension ReminderModelTests {
+    @Test
+    func startsPickingWhenSavedTimeIsNotPreset() throws {
+        let database = try AppDatabase.inMemory()
+        let today = LocalDate(Date(), in: .current)
+        let client = FakePermission(authorization: .allowed)
+        let custom = try #require(ReminderTime("22:30"))
+
+        let models = [nil, ReminderTime.evening, custom].map { time in
+            ReminderModel(
+                parts: .system(database),
+                today: today,
+                time: time,
+                permission: client.permission
+            )
+        }
+
+        let picking = models.map(\.state.isPickingTime)
+
+        models[2].state.pickTime(false)
+        models[0].state.pickTime(true)
+
+        #expect(picking == [false, false, true])
+        #expect(!models[2].state.isPickingTime)
+        #expect(models[0].state.isPickingTime)
+    }
+}

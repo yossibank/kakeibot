@@ -17,7 +17,7 @@
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardListModel` | 一覧を DB から読み、見張るモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardDatabaseModel` | `ScreenParts` だけで作れる一覧のモデル。`SettingsBoardSpec` の `makeModel()` の既定の実装を使える | `FeatureModels/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並びと知らせと、非表示にした行・消した物（`removed`）を持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並び・知らせ・消した物（`removed`）・出している物（`shown`）を持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardInput` | 一覧のモデルの入力で、DB から読んだ一覧と、説明カード・非表示の一覧を閉じたかを持つ。それだけの時は `SettingsBoardSnapshotInput` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardOutput` | 一覧のモデルの出力。出す行・非表示の行・並べ替え中の行を出す | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardSpec` | 一覧の画面ごとの設定（題・文言・並びの形・タイル・編集画面・確認）。画面ごとに 1 つ書く | `Features/Shared/SettingsParts/Board/` |
@@ -27,7 +27,7 @@
 | `SettingsEditHidingInput` | 非表示にできるものの、編集のモデルの入力。非表示かどうかも持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditModel` | 1 件を編集するモデル。状態と入力のまとまりを持ち、下書きと、保存できるかを出す | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足し、状態は `SettingsEditState` にする。`save` が `finishSave` で結果を置き、失敗の文は `hideFailedMessage` などで替える | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditState` | 編集のモデルの状態。知らせと、破棄・非表示・削除の確認中か（`SettingsEditPrompt`）と、結果（`outcome`）を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditState` | 編集のモデルの状態で、知らせ・出している物（`SettingsEditPrompt`）・結果（`outcome`）を持つ。パネルの型は、画面ごとの `Panel` で決める | `FeatureModels/Shared/SettingsParts/Input/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |
@@ -49,10 +49,12 @@
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
-| `SettingsBoardPage` | 設定の一覧の画面の全体。`SettingsBoardSpec` を受け取り、状態・行き先・削除の確認・見張りを持つ | `Features/Shared/SettingsParts/Board/` |
+| `SettingsBoardPage` | 設定の一覧の画面の全体で、`SettingsBoardSpec` を受け取り、モデルと見張りを持つ。行き先と確認は、モデルの `shown` から読む | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardLayout` | 一覧の並びの形。`tiles`（タイル）、`swipeCards`（幅を測って置く、横に払える行）、`swipeRows`（横に払える行） | `Features/Shared/SettingsParts/Board/` |
 | `SettingsConfirmation` | 行を非表示・削除する前の確認の文言。`SettingsBoardSpec` が返す | `Features/Shared/SettingsParts/Board/` |
-| `SettingsBoardDestination` | 新規と編集だけの行き先。`SettingsBoardSpec` の既定の実装がある | `Features/Shared/SettingsParts/Board/` |
+| `SettingsBoardDestination` | 新規と編集だけの行き先。`SettingsBoardMovingState` が使い、`SettingsBoardSpec` の既定の実装がある | `FeatureModels/Shared/SettingsParts/Board/` |
+| `SettingsBoardShown` | 一覧の画面が出している物。行き先・開いている行・確認（`SettingsBoardPrompt`）を持つ | `FeatureModels/Shared/SettingsParts/Board/` |
+| `SettingsEditPrompt` | 編集シートが出している物。開いているパネルと、メニュー・破棄・非表示・削除の確認のどれか 1 つを持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsBoardScreen` | `SettingsBoardPage` の中で使う、設定の一覧の外枠。説明カード・タイルの並び・追加ボタンを組む | `Features/Shared/SettingsParts/Board/` |
 
 ## 🗄️ 書き込みの共通の関数
@@ -99,5 +101,5 @@
 | 非表示・削除の前の確認 | `hideConfirmation`・`deleteConfirmation`。無ければ確認せずに行う | `WalletBoard`（非表示は残高がある時だけ）・`RecurringBoard` |
 | 文字の大きさをそろえる | `scaleID(in:)`。変わると、そろえ直す | `WalletBoard`・`RecurringBoard` |
 | 編集画面 | `typealias Editor` を書き、`editModel(for:)` を 1 つ書く | 全部の `Board` |
-| 種類の切り替え | `header(in:)` に `CapsulePicker` を置き、行き先に種類を持たせる | `CategoryBoard`・`RecurringBoard`・`TemplateBoard` |
+| 種類の切り替え | `header(in:)` に `CapsulePicker` を置く。行き先の型はモデルに書き、種類を持たせる | `CategoryBoard`・`RecurringBoard`・`TemplateBoard` |
 | モデルを外から渡す | `makeModel()` が、持っているモデルを返す | `RecurringBoard` |

@@ -30,6 +30,50 @@ struct CategoryEditModelTests {
     }
 
     @Test
+    func renamesTagThroughCard() throws {
+        let database = try Self.database()
+        let model = CategoryEditModel(parts: .system(database), kind: .expense)
+        model.state.showTag(.add)
+        model.state.inputTag("朝ごはん")
+        let isAdded = model.state.commitTag()
+        model.state.closeTag()
+        let id = try #require(model.state.tags.first?.id)
+
+        model.state.showTag(.rename(id))
+        let shown = model.state.tagEdit
+        model.state.inputTag("モーニング")
+        let isRenamed = model.state.commitTag()
+        model.state.closeTag()
+
+        #expect(isAdded)
+        #expect(shown?.target == .rename(id))
+        #expect(shown?.name == "朝ごはん")
+        #expect(isRenamed)
+        #expect(model.state.tags.map(\.draft.name) == ["モーニング"])
+        #expect(model.state.tagEdit == nil)
+    }
+
+    @Test
+    func keepsTagCardOpenWhileNameIsInvalid() throws {
+        let database = try Self.database()
+        let model = CategoryEditModel(parts: .system(database), kind: .expense)
+
+        model.state.showTag(.add)
+        let isAdded = model.state.commitTag()
+        let problem = model.state.tagProblem
+        let shown = model.state.tagEdit
+
+        model.state.closeTag()
+
+        #expect(!isAdded)
+        #expect(problem == "タグの名前を入れてください")
+        #expect(shown?.target == .add)
+        #expect(model.state.tagProblem == nil)
+        #expect(model.state.tagEdit == nil)
+        #expect(model.state.tags.isEmpty)
+    }
+
+    @Test
     func savesNewCategory() async throws {
         let database = try Self.database()
         let model = CategoryEditModel(parts: .system(database), kind: .income)

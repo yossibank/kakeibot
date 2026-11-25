@@ -2,8 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsPagedGrid<Item: Identifiable, Tile: View>: View {
-    @State private var page: Int?
-    @State private var width: CGFloat = 0
+    @State private var layout = Layout()
 
     let items: [Item]
     let selected: Item.ID?
@@ -26,7 +25,7 @@ struct SettingsPagedGrid<Item: Identifiable, Tile: View>: View {
                             spacing: spacing,
                             tile: tile
                         )
-                        .frame(width: width)
+                        .frame(width: layout.width)
                         .id(index)
                     }
                 }
@@ -35,27 +34,34 @@ struct SettingsPagedGrid<Item: Identifiable, Tile: View>: View {
             .scrollTargetBehavior(.paging)
             .scrollIndicators(.hidden)
             .scrollBounceBehavior(.basedOnSize)
-            .scrollPosition(id: $page)
+            .scrollPosition($layout.position)
             .clipped()
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.size.width
             } action: { width in
-                self.width = width
+                layout.width = width
             }
 
             if pages.count > 1 {
-                PageDots(count: pages.count, current: page ?? 0)
+                PageDots(count: pages.count, current: layout.position.viewID(type: Int.self) ?? 0)
             }
         }
         .onAppear {
-            page = pages.firstIndex { page in
+            let page = pages.firstIndex { page in
                 page.contains { $0.id == selected }
             } ?? 0
+
+            layout.position.scrollTo(id: page)
         }
     }
 }
 
 private extension SettingsPagedGrid {
+    struct Layout {
+        var width: CGFloat = 0
+        var position = ScrollPosition(idType: Int.self)
+    }
+
     static func pages(
         of items: [Item],
         size: Int

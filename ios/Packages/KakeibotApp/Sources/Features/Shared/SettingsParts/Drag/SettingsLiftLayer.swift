@@ -33,7 +33,7 @@ extension View {
 }
 
 private struct SettingsLiftLayer<ID: Hashable, Tile: View>: ViewModifier {
-    @State private var origin: CGPoint = .zero
+    @State private var layout = Layout()
 
     let drag: SettingsDrag<ID>
     let size: CGSize?
@@ -53,13 +53,17 @@ private struct SettingsLiftLayer<ID: Hashable, Tile: View>: ViewModifier {
                 .onGeometryChange(for: CGPoint.self) { proxy in
                     proxy.frame(in: .global).origin
                 } action: { origin in
-                    self.origin = origin
+                    layout.origin = origin
                 }
             }
     }
 }
 
 private extension SettingsLiftLayer {
+    struct Layout {
+        var origin: CGPoint = .zero
+    }
+
     func floatingTile(_ floating: SettingsDrag<ID>.Floating) -> some View {
         let tileSize = floating.size ?? size ?? .zero
         let dock = dockArea
@@ -67,8 +71,8 @@ private extension SettingsLiftLayer {
         let tileScale = dock.map { fitScale(tileSize, in: $0) } ?? scale
 
         let natural = CGPoint(
-            x: floating.center.x + drag.origin.x - origin.x,
-            y: floating.center.y + drag.origin.y - origin.y
+            x: floating.center.x + drag.origin.x - layout.origin.x,
+            y: floating.center.y + drag.origin.y - layout.origin.y
         )
 
         let center = dock.map { CGPoint(x: $0.midX, y: $0.midY) } ?? natural
@@ -106,8 +110,8 @@ private extension SettingsLiftLayer {
         }
 
         return CGRect(
-            x: zone.minX - origin.x + Self.dockInset,
-            y: top - origin.y,
+            x: zone.minX - layout.origin.x + Self.dockInset,
+            y: top - layout.origin.y,
             width: zone.width - Self.dockInset * 2,
             height: open - label - Self.dockInset
         )

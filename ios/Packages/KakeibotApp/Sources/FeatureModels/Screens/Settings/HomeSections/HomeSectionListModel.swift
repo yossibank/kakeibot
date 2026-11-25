@@ -17,12 +17,18 @@ public final class HomeSectionListModel {
 }
 
 public extension HomeSectionListModel {
+    struct Dragging: Equatable, Sendable {
+        public let section: HomeSection
+        public let start: Int
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
 
         public internal(set) var layout = HomeLayout.standard
+        public internal(set) var dragging: Dragging?
     }
 
     @MainActor
@@ -51,6 +57,35 @@ public extension HomeSectionListModel {
         toSlot index: Int
     ) {
         state.layout.move(section, toSlot: index)
+    }
+
+    func startDragging(_ section: HomeSection) {
+        guard state.dragging == nil else {
+            return
+        }
+
+        let start = state.layout.slots.firstIndex(of: .section(section)) ?? 0
+
+        state.dragging = Dragging(section: section, start: start)
+    }
+
+    func moveDragging(bySlots steps: Int) {
+        guard let dragging = state.dragging else {
+            return
+        }
+
+        move(dragging.section, toSlot: dragging.start + steps)
+    }
+
+    @discardableResult
+    func finishDragging() -> Bool {
+        guard state.dragging != nil else {
+            return false
+        }
+
+        state.dragging = nil
+
+        return true
     }
 
     func save() async {

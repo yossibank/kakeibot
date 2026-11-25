@@ -22,11 +22,7 @@ extension RecurringBoard {
 }
 
 extension RecurringBoard: SettingsBoardSpec {
-    enum Destination: Hashable {
-        case new(Entry.Kind)
-        case edit(Entry.Kind, Recurring.ID)
-    }
-
+    typealias Destination = RecurringListModel.Destination
     typealias Editor = RecurringEditSheet
 
     var title: String {

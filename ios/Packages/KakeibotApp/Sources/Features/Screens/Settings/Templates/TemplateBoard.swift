@@ -9,11 +9,7 @@ struct TemplateBoard {
 }
 
 extension TemplateBoard: SettingsBoardSpec {
-    enum Destination: Hashable {
-        case new(Entry.Kind)
-        case edit(Entry.Kind, EntryTemplate.ID)
-    }
-
+    typealias Destination = TemplateListModel.Destination
     typealias Editor = TemplateEditSheet
 
     var title: String {

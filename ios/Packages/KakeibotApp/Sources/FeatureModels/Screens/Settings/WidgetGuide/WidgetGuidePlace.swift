@@ -1,14 +1,14 @@
-enum WidgetGuidePlace: CaseIterable, Hashable {
+public enum WidgetGuidePlace: CaseIterable, Hashable, Sendable {
     case home
     case lockScreen
     case control
 }
 
-extension WidgetGuidePlace {
-    struct Ability: Hashable {
-        let systemImage: String
-        let title: String
-        let detail: String
+public extension WidgetGuidePlace {
+    struct Ability: Hashable, Sendable {
+        public let systemImage: String
+        public let title: String
+        public let detail: String
     }
 
     var title: String {

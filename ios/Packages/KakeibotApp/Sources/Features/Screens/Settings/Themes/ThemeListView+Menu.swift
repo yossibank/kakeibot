@@ -60,14 +60,14 @@ extension ThemeListView {
                     systemImage: "square.and.pencil"
                 ) {
                     closeMenu()
-                    editing = .edit(theme)
+                    edit(theme)
                 }
             }
         }
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.height
         } action: { height in
-            menuHeight = height
+            layout.menuHeight = height
         }
         .offset(x: menuX(for: menu), y: menuY(for: menu))
         .transition(.opacity.combined(with: .scale(scale: 0.96)))
@@ -75,11 +75,16 @@ extension ThemeListView {
 }
 
 extension ThemeListView {
-    func openMenu(_ menu: Menu) {
-        pressing = nil
+    func openMenu(
+        _ choice: ThemeChoice,
+        frame: CGRect
+    ) {
+        model.state.press(nil)
+
+        layout.menuFrame = frame
 
         withAnimation(.snappy(duration: 0.25)) {
-            self.menu = menu
+            model.state.present(.menu(choice))
         }
     }
 }
@@ -91,24 +96,24 @@ private extension ThemeListView {
 
     func closeMenu() {
         withAnimation(.snappy(duration: 0.2)) {
-            menu = nil
+            model.state.close(model.state.presented?.menu.map { .menu($0) })
         }
     }
 
     func menuX(for menu: Menu) -> CGFloat {
         let preferred = menu.frame.midX - Self.menuWidth / 2
-        let limit = size.width - Self.menuWidth - Self.menuInset
+        let limit = layout.size.width - Self.menuWidth - Self.menuInset
         return min(max(preferred, Self.menuInset), limit)
     }
 
     func menuY(for menu: Menu) -> CGFloat {
         let below = menu.frame.maxY + Self.menuGap
-        let fitsBelow = below + menuHeight <= size.height - Self.menuInset
+        let fitsBelow = below + layout.menuHeight <= layout.size.height - Self.menuInset
 
         guard !fitsBelow else {
             return below
         }
 
-        return menu.frame.minY - Self.menuGap - menuHeight
+        return menu.frame.minY - Self.menuGap - layout.menuHeight
     }
 }

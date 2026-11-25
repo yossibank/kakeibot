@@ -8,13 +8,10 @@ public struct ReminderView: View {
 
     @Environment(\.themeStyle.corner) var corner
 
-    @State private var isPickingTime = false
-
     @Environment(\.scenePhase) private var scenePhase
 
     public init(model: ReminderModel) {
         _model = State(initialValue: model)
-        _isPickingTime = State(initialValue: model.output.isCustom)
     }
 
     public var body: some View {
@@ -61,7 +58,7 @@ public struct ReminderView: View {
         .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
         .animation(.snappy, value: model.input.time)
         .animation(.snappy, value: model.output.isDenied)
-        .animation(.snappy, value: isPickingTime)
+        .animation(.snappy, value: model.state.isPickingTime)
         .animation(.snappy, value: model.state.previewDay)
         .transaction(value: model.input.isLoaded) { transaction in
             transaction.disablesAnimations = true
@@ -132,10 +129,10 @@ private extension ReminderView {
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     ForEach(ReminderModel.presets, id: \.self) { time in
-                        let isSelected = !isPickingTime && model.input.time == time
+                        let isSelected = !model.state.isPickingTime && model.input.time == time
 
                         timeButton("\(time.hour)", isSelected: isSelected) {
-                            isPickingTime = false
+                            model.state.pickTime(false)
 
                             model.perform {
                                 await $0.choose(time)
@@ -143,8 +140,8 @@ private extension ReminderView {
                         }
                     }
 
-                    timeButton("…", isSelected: isPickingTime) {
-                        isPickingTime = true
+                    timeButton("…", isSelected: model.state.isPickingTime) {
+                        model.state.pickTime(true)
                     }
                 }
                 .padding(.vertical, 4)
@@ -152,7 +149,7 @@ private extension ReminderView {
             }
             .scrollIndicators(.hidden)
 
-            if isPickingTime {
+            if model.state.isPickingTime {
                 DatePicker(
                     "時刻",
                     selection: dateBinding,

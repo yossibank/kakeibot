@@ -24,6 +24,21 @@ struct SettingsIconEditorModelTests {
     }
 
     @Test
+    func presentsEditorUntilDismissed() {
+        let model = SettingsIconEditorModel(glyph: .food)
+        let closed = model.isPresented
+
+        model.present()
+        let opened = model.isPresented
+
+        model.dismiss()
+
+        #expect(!closed)
+        #expect(opened)
+        #expect(!model.isPresented)
+    }
+
+    @Test
     func keepsLastEmojiOfInput() {
         let model = SettingsIconEditorModel(glyph: .food)
 

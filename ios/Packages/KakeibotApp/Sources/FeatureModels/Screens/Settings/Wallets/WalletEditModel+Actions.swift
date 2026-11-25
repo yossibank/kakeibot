@@ -24,8 +24,8 @@ public extension WalletEditModel {
             )
             await loadBalance()
 
-            if state.drawer == .valuation {
-                state.drawer = nil
+            if state.prompt.panel == .valuation {
+                state.closePanel()
             }
 
             return true

@@ -34,16 +34,16 @@ struct AssetsRewardGoalEditModelTests {
         let adding = AssetsRewardGoalEditModel(parts: .system(database))
         let editing = AssetsRewardGoalEditModel(parts: .system(database), editing: goal)
 
-        let panelWhenAdding = adding.state.panel
-        let panelWhenEditing = editing.state.panel
+        let panelWhenAdding = adding.state.prompt.panel
+        let panelWhenEditing = editing.state.prompt.panel
 
         adding.state.closePanel()
         editing.state.open(.amount)
 
         #expect(panelWhenAdding == .amount)
         #expect(panelWhenEditing == nil)
-        #expect(adding.state.panel == nil)
-        #expect(editing.state.panel == .amount)
+        #expect(adding.state.prompt.panel == nil)
+        #expect(editing.state.prompt.panel == .amount)
     }
 
     @Test

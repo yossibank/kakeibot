@@ -5,17 +5,10 @@ import SwiftUI
 
 public struct ThemeListView: View {
     @State var model: ThemeListModel
-    @State var editing: EditTarget?
-    @State var menu: Menu?
-    @State var pressing: ThemeChoice?
-    @State var size: CGSize = .zero
-    @State var menuHeight: CGFloat = 0
-    @State var proOffer: ProOffer?
+    @State var layout = Layout()
 
     @Environment(\.isPro) var isPro
     @Environment(\.themeStyle.corner) var corner
-
-    @State private var deletion: Deletion?
 
     private let parts: ScreenParts
     private let appIcon: AppIconListModel
@@ -59,8 +52,8 @@ public struct ThemeListView: View {
                     .padding(.vertical, 8)
                 }
                 .scrollIndicators(.hidden)
-                .scrollDisabled(menu != nil)
-                .deletionNotice($deletion) { deletion in
+                .scrollDisabled(shownMenu != nil)
+                .deletionNotice(Bindable(model.state).deletion) { deletion in
                     restore(deletion)
                 }
 
@@ -72,8 +65,8 @@ public struct ThemeListView: View {
             .padding(.top, SettingsSpacing.top)
             .padding(.bottom, 8)
 
-            if let menu {
-                menuLayer(menu)
+            if let shownMenu {
+                menuLayer(shownMenu)
             }
         }
         .coordinateSpace(.named(Self.space))
@@ -81,7 +74,7 @@ public struct ThemeListView: View {
         .onGeometryChange(for: CGSize.self) { proxy in
             proxy.size
         } action: { size in
-            self.size = size
+            layout.size = size
         }
         .errorBanner(Bindable(model.state).errorNotice)
         .errorBanner(appIcon.state.errorNotice) {
@@ -102,16 +95,16 @@ public struct ThemeListView: View {
         }
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
-        .proOffer(proOffer?.feature) {
-            proOffer = nil
+        .proOffer(offer?.feature) {
+            model.state.close(offer.map { .offer($0) })
         } onUnlock: {
             unlock()
         }
         .haptic(.selection, trigger: model.input.current)
-        .haptic(.impact(weight: .medium), trigger: menu) { _, new in
+        .haptic(.impact(weight: .medium), trigger: model.state.presented?.menu) { _, new in
             new != nil
         }
-        .navigationDestination(item: $editing) { target in
+        .navigationDestination(item: editing) { target in
             ThemeEditSheet(
                 model: ThemeEditModel(
                     parts: parts,
@@ -119,12 +112,12 @@ public struct ThemeListView: View {
                     base: target.base ?? model.output.currentPalette
                 )
             ) { deletion in
-                self.deletion = deletion
+                model.state.deletion = deletion
             }
             .toolbar(.hidden, for: .navigationBar)
             .environment(\.isSettingsEditPushed, true)
         }
-        .onChange(of: editing) { _, editing in
+        .onChange(of: model.state.presented?.editing) { _, editing in
             if editing == nil {
                 reload()
             }
@@ -136,83 +129,35 @@ public struct ThemeListView: View {
 }
 
 extension ThemeListView {
-    enum ProOffer: Equatable {
-        case create(base: ThemePalette?)
-        case select(ThemeChoice)
-
-        var feature: String {
-            switch self {
-            case .create: "テーマを作るの"
-            case .select: "作ったテーマ"
-            }
-        }
-    }
-
-    enum EditTarget: Hashable, Identifiable {
-        case new(base: ThemePalette?)
-        case edit(Theme)
-
-        var id: String {
-            switch self {
-            case .new: "new"
-            case let .edit(theme): theme.id.description
-            }
-        }
-
-        var theme: Theme? {
-            switch self {
-            case .new: nil
-            case let .edit(theme): theme
-            }
-        }
-
-        var base: ThemePalette? {
-            switch self {
-            case let .new(base): base
-            case .edit: nil
-            }
-        }
+    struct Layout {
+        var size: CGSize = .zero
+        var menuHeight: CGFloat = 0
+        var menuFrame: CGRect = .zero
     }
 
     static let space = "themes"
 
-    func select(_ choice: ThemeChoice) {
-        if case .custom = choice,
-           choice != model.input.current,
-           !isPro {
-            proOffer = .select(choice)
-            return
-        }
+    var offer: ThemeListModel.Offer? {
+        model.state.presented?.offer
+    }
 
-        model.perform {
-            await $0.select(choice)
+    func select(_ choice: ThemeChoice) {
+        model.perform { [isPro] in
+            await $0.choose(choice, isPro: isPro)
         }
     }
 
     func create(base: ThemePalette?) {
-        guard isPro else {
-            proOffer = .create(base: base)
-            return
-        }
+        model.create(base: base, isPro: isPro)
+    }
 
-        editing = .new(base: base)
+    func edit(_ theme: Theme) {
+        model.state.present(.editing(.edit(theme)))
     }
 
     func unlock() {
-        guard let offer = proOffer else {
-            return
-        }
-
-        proOffer = nil
-
-        switch offer {
-        case let .create(base):
-            editing = .new(base: base)
-
-        case let .select(choice):
-            model.perform {
-                await $0.select(choice)
-            }
+        model.perform {
+            await $0.unlock()
         }
     }
 }
@@ -313,6 +258,30 @@ private extension ThemeListView {
         let edit = SettingsIntroCard.Note("square.and.pencil", "つくったテーマは、もう一度押すと編集できます")
         let base = SettingsIntroCard.Note("plus.square.on.square", "長押しで、その色をもとにつくれます")
         return model.input.customThemes.isEmpty ? [select, base] : [select, edit, base]
+    }
+
+    var editing: Binding<ThemeListModel.EditTarget?> {
+        Binding {
+            model.state.presented?.editing
+        } set: { target in
+            if target == nil {
+                model.state.close(model.state.presented?.editing.map { .editing($0) })
+            }
+        }
+    }
+
+    var shownMenu: Menu? {
+        guard let choice = model.state.presented?.menu else {
+            return nil
+        }
+
+        return Menu(
+            choice: choice,
+            palette: model.output.palette(of: choice),
+            title: choice.title(in: model.input.customThemes),
+            theme: model.output.theme(of: choice),
+            frame: layout.menuFrame
+        )
     }
 
     var isSuggestingIcon: Binding<Bool> {

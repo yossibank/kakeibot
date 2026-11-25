@@ -48,3 +48,30 @@ struct HomeSectionListModelTests {
         #expect(order == HomeSection.standard)
     }
 }
+
+extension HomeSectionListModelTests {
+    @Test
+    func movesDraggedSectionFromWhereItStarted() async throws {
+        let database = try AppDatabase.inMemory()
+        let model = HomeSectionListModel(parts: .system(database))
+        await model.load()
+        let moved = try #require(model.state.layout.slots.compactMap(\.section).last)
+        let other = try #require(model.state.layout.slots.compactMap(\.section).first)
+        let start = try #require(model.state.layout.slots.firstIndex(of: .section(moved)))
+
+        model.startDragging(moved)
+        model.startDragging(other)
+        let dragging = model.state.dragging
+
+        model.moveDragging(bySlots: -start)
+        let isFinished = model.finishDragging()
+        let isFinishedAgain = model.finishDragging()
+
+        #expect(dragging?.section == moved)
+        #expect(dragging?.start == start)
+        #expect(model.state.layout.slots.first == .section(moved))
+        #expect(isFinished)
+        #expect(!isFinishedAgain)
+        #expect(model.state.dragging == nil)
+    }
+}

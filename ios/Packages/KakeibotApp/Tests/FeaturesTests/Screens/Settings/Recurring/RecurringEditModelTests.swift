@@ -23,6 +23,21 @@ struct RecurringEditModelTests {
     }
 
     @Test
+    func opensOnePanelAtATime() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
+
+        model.state.open(.amount)
+        model.state.open(.holiday)
+        let opened = model.state.prompt.panel
+
+        model.state.closePanel()
+
+        #expect(opened == .holiday)
+        #expect(model.state.prompt.panel == nil)
+    }
+
+    @Test
     func doesNotWarnWhenRemindersAreAllowed() async throws {
         let setup = try await HomeModelTests.Setup()
         let client = ReminderModelTests.FakePermission(authorization: .allowed)

@@ -28,6 +28,11 @@ public final class RecurringListModel {
 }
 
 public extension RecurringListModel {
+    enum Destination: Hashable, Sendable {
+        case new(Entry.Kind)
+        case edit(Entry.Kind, Recurring.ID)
+    }
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
@@ -36,6 +41,7 @@ public extension RecurringListModel {
         public var type: Entry.Kind = .expense
         public var movingOrder: [Recurring.ID]?
         public var removed = SettingsBoardRemoved<Recurring.ID>()
+        public var shown = SettingsBoardShown<Recurring.ID, Destination>()
     }
 
     @MainActor

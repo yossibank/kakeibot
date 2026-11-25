@@ -46,6 +46,7 @@ public struct StampEditSheet: View {
         }
         .overlay(alignment: .top) {
             SettingsEditHeader(
+                isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
                 title: model.isEditing ? "スタンプを編集" : "スタンプを追加",
                 isEditing: model.isEditing,
                 isHidden: model.input.isHidden

@@ -3,16 +3,23 @@ import DesignSystem
 import Observation
 
 public extension TemplateEditModel {
+    enum Panel: Hashable, Sendable {
+        case amount
+        case tag
+        case memo
+    }
+
     @MainActor
     @Observable
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt()
+        public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<EntryTemplate>>()
 
         public var name = ""
         public var memo = ""
         public var billShift = 0
+        public var tagCategory: EntryCategory?
 
         public private(set) var walletId: Wallet.ID?
         public private(set) var categoryId: EntryCategory.ID?

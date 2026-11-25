@@ -140,6 +140,32 @@ struct BudgetListModelTests {
     }
 
     @Test
+    func asksBeforeDiscardingChangedAmount() async throws {
+        let setup = try await HomeModelTests.Setup()
+        try await setup.database.setBudget(50000, for: nil, from: setup.today.yearMonth)
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
+        await model.load()
+
+        model.startEditing(.total)
+        model.closeEditing()
+        let unchanged = model.state.editing
+
+        model.startEditing(.total)
+        model.state.press(.digit(1))
+        model.closeEditing()
+        let isAsking = model.state.isConfirmingDiscard
+        let kept = model.state.editing
+
+        model.cancelEditing()
+
+        #expect(unchanged == nil)
+        #expect(isAsking)
+        #expect(kept == .total)
+        #expect(!model.state.isConfirmingDiscard)
+        #expect(model.state.editing == nil)
+    }
+
+    @Test
     func turnsCarryoverOnFromPeriodMonthAndOff() async throws {
         let setup = try await HomeModelTests.Setup()
         let model = BudgetListModel(parts: .system(setup.database), today: setup.today)

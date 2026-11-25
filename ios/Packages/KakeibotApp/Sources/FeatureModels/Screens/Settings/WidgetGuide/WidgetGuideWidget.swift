@@ -1,9 +1,9 @@
-enum WidgetGuideWidget: CaseIterable, Hashable {
+public enum WidgetGuideWidget: CaseIterable, Hashable, Sendable {
     case budget
     case quickRecord
 }
 
-extension WidgetGuideWidget {
+public extension WidgetGuideWidget {
     var title: String {
         switch self {
         case .budget: "あといくら"

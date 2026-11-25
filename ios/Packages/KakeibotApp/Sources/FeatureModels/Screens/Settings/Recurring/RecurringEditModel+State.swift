@@ -61,6 +61,17 @@ public extension RecurringEditModel {
         }
     }
 
+    enum Panel: Hashable, Sendable {
+        case amount
+        case start
+        case end
+        case holiday
+        case closing
+        case fee
+        case count
+        case remind
+    }
+
     struct Calculators {
         public internal(set) var amount = AmountCalculator()
         public internal(set) var fee = AmountCalculator()
@@ -70,7 +81,7 @@ public extension RecurringEditModel {
     @Observable
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt()
+        public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var categoryId: EntryCategory.ID?

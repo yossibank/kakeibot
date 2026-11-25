@@ -16,13 +16,14 @@ struct AssetsRewardGoalEditSheet: View {
 
     var body: some View {
         content
-            .settingsDrawerLayer(item: model.state.panel) {
+            .settingsDrawerLayer(item: model.state.prompt.panel) {
                 closePanel()
             } drawer: { panel in
                 drawerView(panel)
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
+                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
                     title: model.output.isEditing ? "目標を編集" : "目標を決める",
                     isEditing: model.output.isEditing,
                     isHidden: false,

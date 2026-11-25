@@ -7,25 +7,21 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
     @State var model: Spec.Model
 
     @State private var drag = SettingsDrag<Spec.Model.Item.ID>()
-    @State private var destination: Spec.Destination?
-    @State private var openId: Spec.Model.Item.ID?
-    @State private var hiding: Spec.Model.Item?
-    @State private var deleting: Spec.Model.Item?
-    @State private var isConfirmingHide = false
-    @State private var isConfirmingDelete = false
-    @State private var isConfirmingDeleteHidden = false
-    @State private var grid: SettingsBoardGrid
+    @State private var layout = Layout()
 
     private let spec: Spec
 
     init(_ spec: Spec) {
         _model = State(initialValue: spec.makeModel())
-        _grid = State(initialValue: spec.grid)
 
         self.spec = spec
     }
 
     var body: some View {
+        let prompt = model.state.shown.prompt
+        let hiding = prompt?.hidingId
+        let deleting = prompt?.deletingId
+
         SettingsBoardScreen(
             title: spec.title,
             hint: hint,
@@ -43,7 +39,7 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
             controller: controller,
             errorNotice: Bindable(model.state).errorNotice
         ) {
-            destination = spec.newDestination(in: model)
+            model.state.open(spec.newDestination(in: model))
         } header: {
             spec.header(in: model)
         } board: {
@@ -56,27 +52,27 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
             floatingTile(id)
         }
         .settingsSharesTextScale(spec.scaleID(in: model))
-        .navigationDestination(item: $destination) { destination in
+        .navigationDestination(item: Bindable(model.state).shown.destination) { destination in
             editor(for: destination)
         }
         .settingsConfirmation(
-            hiding.flatMap { spec.hideConfirmation(of: $0, in: model) },
-            isPresented: $isConfirmingHide
+            item(hiding).flatMap { spec.hideConfirmation(of: $0, in: model) },
+            isPresented: isAsking(hiding.map(Prompt.hide))
         ) {
             if let hiding {
-                controller.hide(hiding.id)
+                controller.hide(hiding)
             }
         }
         .settingsConfirmation(
-            deleting.flatMap { spec.deleteConfirmation(of: $0, in: model) },
-            isPresented: $isConfirmingDelete
+            item(deleting).flatMap { spec.deleteConfirmation(of: $0, in: model) },
+            isPresented: isAsking(deleting.map(Prompt.delete))
         ) {
-            if let deleting {
-                confirmDelete(deleting)
+            if let item = item(deleting) {
+                confirmDelete(item)
             }
         }
         .settingsDeleteHiddenConfirmation(
-            isPresented: $isConfirmingDeleteHidden,
+            isPresented: isAsking(prompt == .deleteHidden ? prompt : nil),
             title: spec.deleteHiddenTitle,
             message: spec.deleteHiddenMessage
         ) {
@@ -89,6 +85,20 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
 }
 
 private extension SettingsBoardPage {
+    struct Layout {
+        var width: CGFloat = 0
+    }
+
+    typealias Prompt = SettingsBoardPrompt<Spec.Model.Item.ID>
+
+    var grid: SettingsBoardGrid {
+        var grid = spec.grid
+
+        grid.width = layout.width
+
+        return grid
+    }
+
     var controller: SettingsBoardController<Spec.Model> {
         SettingsBoardController(
             model: model,
@@ -110,18 +120,20 @@ private extension SettingsBoardPage {
         switch spec.layout {
         case .tiles:
             SettingsTileBoard(
-                grid: $grid,
+                grid: grid,
+                width: $layout.width,
                 controller: controller,
                 space: spec.space
             ) { item in
                 tileFace(item, isHidden: false)
             } onTap: { item in
-                destination = spec.destination(editing: item)
+                model.state.open(spec.destination(editing: item))
             }
 
         case .swipeCards:
             SettingsTileBoard(
-                grid: $grid,
+                grid: grid,
+                width: $layout.width,
                 controller: controller,
                 space: spec.space
             ) { item in
@@ -158,15 +170,15 @@ private extension SettingsBoardPage {
         ) { item in
             tileFace(item, isHidden: true)
         } onTap: { item in
-            destination = spec.destination(editing: item)
+            model.state.open(spec.destination(editing: item))
         } onDeleteAll: {
-            isConfirmingDeleteHidden = true
+            model.state.ask(.deleteHidden)
         }
     }
 
     @ViewBuilder
     func floatingTile(_ id: Spec.Model.Item.ID) -> some View {
-        if let item = (model.output.shown + model.output.hidden).first(where: { $0.id == id }) {
+        if let item = item(id) {
             tileFace(item, isHidden: false)
         }
     }
@@ -180,8 +192,8 @@ private extension SettingsBoardPage {
     }
 
     func swipeFace(_ item: Spec.Model.Item) -> some View {
-        SwipeRow(id: item.id, openId: $openId, role: .hide) {
-            destination = spec.destination(editing: item)
+        SwipeRow(id: item.id, openId: Bindable(model.state).shown.openId, role: .hide) {
+            model.state.open(spec.destination(editing: item))
         } onAction: {
             requestHide(item)
         } onDelete: {
@@ -201,6 +213,21 @@ private extension SettingsBoardPage {
         }
         .toolbar(.hidden, for: .navigationBar)
         .environment(\.isSettingsEditPushed, true)
+    }
+
+    func item(_ id: Spec.Model.Item.ID?) -> Spec.Model.Item? {
+        (model.output.shown + model.output.hidden).first { $0.id == id }
+    }
+
+    func isAsking(_ prompt: Prompt?) -> Binding<Bool> {
+        Binding {
+            prompt != nil
+        } set: { isShown in
+            if !isShown,
+               let prompt {
+                model.state.closePrompt(prompt)
+            }
+        }
     }
 
     func drop() {
@@ -225,8 +252,7 @@ private extension SettingsBoardPage {
             return
         }
 
-        hiding = item
-        isConfirmingHide = true
+        model.state.ask(.hide(item.id))
     }
 
     func requestDelete(_ item: Spec.Model.Item) {
@@ -235,8 +261,7 @@ private extension SettingsBoardPage {
             return
         }
 
-        deleting = item
-        isConfirmingDelete = true
+        model.state.ask(.delete(item.id))
     }
 
     func confirmDelete(_ item: Spec.Model.Item) {

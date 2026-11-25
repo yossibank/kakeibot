@@ -5,18 +5,13 @@ import SwiftUI
 
 public struct CategoryEditSheet: View {
     @State var model: CategoryEditModel
-    @State var tagEdit: TagEdit?
-    @State var tagName = ""
-    @State var ignoresKeyboard = false
 
     @FocusState var focus: Field?
     @FocusState var isTagFocused: Bool?
 
     @Environment(\.dismiss) var dismiss
 
-    @State private var isMovingTag = false
-    @State private var isEditingIcon = false
-    @State private var iconBottom: CGFloat = 0
+    @State private var layout = Layout()
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -45,21 +40,20 @@ public struct CategoryEditSheet: View {
             ZStack {
                 content
                     .ignoresSafeArea(keyboardRegions)
-                    .floatingInput(isPresented: tagEdit != nil) {
+                    .floatingInput(isPresented: model.state.tagEdit != nil) {
                         cancelTag()
                     } card: {
-                        if let tagEdit {
+                        if let tagEdit = model.state.tagEdit {
                             tagCard(tagEdit)
                         }
                     }
             }
         }
         .iconEditorDrawer(
-            isPresented: $isEditingIcon,
             model: model.state.icon,
             focus: $focus,
             textField: .text,
-            below: iconBottom
+            below: layout.iconBottom
         )
         .errorBanner(Bindable(model.state).errorNotice)
         .settingsEditConfirmations(edit)
@@ -79,8 +73,9 @@ public struct CategoryEditSheet: View {
             }
         }
         .onChange(of: focus) {
-            if focus != nil {
-                ignoresKeyboard = false
+            if focus != nil,
+               model.state.ignoresKeyboard {
+                model.state.ignoresKeyboard = false
             }
         }
         .onOutcome(model.state.ready) { _ in
@@ -101,10 +96,7 @@ extension CategoryEditSheet {
         case text
     }
 
-    enum TagEdit: Hashable {
-        case add
-        case rename(UUID)
-    }
+    typealias TagEdit = CategoryEditModel.TagEdit
 }
 
 private extension CategoryEditSheet {
@@ -114,7 +106,7 @@ private extension CategoryEditSheet {
                 .onGeometryChange(for: CGFloat.self) { proxy in
                     proxy.frame(in: .global).maxY
                 } action: { maxY in
-                    iconBottom = maxY
+                    layout.iconBottom = maxY
                 }
 
             SettingsField(
@@ -133,7 +125,7 @@ private extension CategoryEditSheet {
             }
             .disabled(!model.canSave)
         }
-        .scrollDisabled(isMovingTag)
+        .scrollDisabled(model.state.isMovingTag)
         .overlay(alignment: .top) {
             header
                 .padding(.horizontal, SettingsSpacing.side)
@@ -148,6 +140,7 @@ private extension CategoryEditSheet {
 
     var header: some View {
         SettingsEditHeader(
+            isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
             title: model.isEditing ? "カテゴリを編集" : "カテゴリを追加",
             isEditing: model.isEditing,
             isHidden: model.input.isHidden,
@@ -170,7 +163,7 @@ private extension CategoryEditSheet {
         ) {
             Button {
                 focus = nil
-                isEditingIcon = true
+                model.state.icon.present()
             } label: {
                 CategoryTileFace(
                     icon: model.state.icon.preview,
@@ -179,7 +172,7 @@ private extension CategoryEditSheet {
                 )
                 .frame(width: 80, height: 78)
                 .overlay {
-                    if isEditingIcon {
+                    if model.state.icon.isPresented {
                         RoundedRectangle(cornerRadius: corner.radius(16))
                             .stroke(Palette.accent, lineWidth: 2)
                     }
@@ -204,7 +197,9 @@ private extension CategoryEditSheet {
                 model.state.moveTag(id, to: index)
             }
             .onPreferenceChange(TagLineMovingKey.self) { isMoving in
-                isMovingTag = isMoving
+                if model.state.isMovingTag != isMoving {
+                    model.state.isMovingTag = isMoving
+                }
             }
 
             if model.state.tags.count > 1 {
@@ -215,9 +210,9 @@ private extension CategoryEditSheet {
 
     func tagCard(_ edit: TagEdit) -> some View {
         CategoryTagCard(
-            name: $tagName,
+            name: tagName,
             isFocused: $isTagFocused,
-            isAdding: edit == .add,
+            isAdding: edit.target == .add,
             errorMessage: model.state.tagProblem,
             onCommit: {
                 commitTag()
@@ -231,6 +226,10 @@ private extension CategoryEditSheet {
 }
 
 private extension CategoryEditSheet {
+    struct Layout {
+        var iconBottom: CGFloat = 0
+    }
+
     static let hasEntriesMessage = "記録があります。非表示にすると、記録を残したまま一覧から外せます"
 
     var kindName: String {
@@ -262,7 +261,15 @@ private extension CategoryEditSheet {
     }
 
     var keyboardRegions: SafeAreaRegions {
-        ignoresKeyboard ? .keyboard : []
+        model.state.ignoresKeyboard ? .keyboard : []
+    }
+
+    var tagName: Binding<String> {
+        Binding {
+            model.state.tagEdit?.name ?? ""
+        } set: { name in
+            model.state.inputTag(name)
+        }
     }
 
     var tagItems: [TagLine<UUID>.Item] {
@@ -270,7 +277,7 @@ private extension CategoryEditSheet {
     }
 
     func deleteAction(for edit: TagEdit) -> (() -> Void)? {
-        guard case let .rename(id) = edit else {
+        guard case let .rename(id) = edit.target else {
             return nil
         }
 

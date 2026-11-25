@@ -4,21 +4,37 @@ import Foundation
 import Observation
 
 public extension CategoryEditModel {
+    struct TagEdit: Hashable, Sendable {
+        public let target: Target
+
+        public internal(set) var name: String
+    }
+
     @MainActor
     @Observable
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt()
+        public var prompt = SettingsEditPrompt<Never>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<EntryCategory>>()
 
         public var name = ""
+        public var isMovingTag = false
+        public var ignoresKeyboard = false
 
         public internal(set) var ready = ScreenOutcome<Void>()
 
         public private(set) var tags: [EditingTag] = []
         public private(set) var tagProblem: String?
+        public private(set) var tagEdit: TagEdit?
 
         public let icon = SettingsIconEditorModel(glyph: .food)
+    }
+}
+
+public extension CategoryEditModel.TagEdit {
+    enum Target: Hashable, Sendable {
+        case add
+        case rename(UUID)
     }
 }
 
@@ -83,8 +99,42 @@ public extension CategoryEditModel.State {
         tags.removeAll { $0.id == id }
     }
 
-    func clearTagProblem() {
+    func showTag(_ target: CategoryEditModel.TagEdit.Target) {
+        let name = switch target {
+        case .add: ""
+        case let .rename(id): tags.first { $0.id == id }?.draft.name ?? ""
+        }
+
         tagProblem = nil
+        tagEdit = CategoryEditModel.TagEdit(target: target, name: name)
+    }
+
+    func inputTag(_ name: String) {
+        if let tagEdit,
+           tagEdit.name != name {
+            self.tagEdit?.name = name
+        }
+    }
+
+    func commitTag() -> Bool {
+        guard let tagEdit else {
+            return true
+        }
+
+        return switch tagEdit.target {
+        case .add: addTag(tagEdit.name)
+        case let .rename(id): renameTag(id, to: tagEdit.name)
+        }
+    }
+
+    func closeTag() {
+        if tagProblem != nil {
+            tagProblem = nil
+        }
+
+        if tagEdit != nil {
+            tagEdit = nil
+        }
     }
 }
 
