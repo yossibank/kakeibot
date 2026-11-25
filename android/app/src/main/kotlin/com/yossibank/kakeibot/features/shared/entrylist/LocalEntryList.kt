@@ -1,10 +1,10 @@
 package com.yossibank.kakeibot.features.shared.entrylist
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenObservation
+import com.yossibank.kakeibot.featuremodels.shared.model.SharedObservation
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.types.EntryList
@@ -15,20 +15,23 @@ val LocalEntryList = staticCompositionLocalOf<Flow<EntryList>?> { null }
 
 @Composable
 fun rememberSharedEntryList(database: AppDatabase): Flow<EntryList> {
-    val scope = rememberCoroutineScope()
-
-    return remember(database) {
+    val shared = remember(database) {
         val sharing = SharingStarted.WhileSubscribed(
             stopTimeoutMillis = STOP_MILLIS,
             replayExpirationMillis = 0,
         )
 
-        ScreenObservation.share(
+        SharedObservation(
             values = database.entryListUpdates(),
-            scope = scope,
             started = sharing,
         )
     }
+
+    DisposableEffect(shared) {
+        onDispose { shared.stop() }
+    }
+
+    return shared.values
 }
 
 @Composable

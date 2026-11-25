@@ -82,13 +82,14 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 保存と読み込みの失敗 | `featuremodels/shared/model/` の `ModelTask` に通す。失敗の文と実行中かどうかを、`State` の `task` に持つ |
 | 失敗の知らせの消え方 | 押すか、出してから 6 秒たつと消える。入力を変えても、後で成功しても消さない |
 | 知らせを消すまでの秒 | 画面が `task.Timer()` で数える |
-| 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「スマホの空き容量が足りません」に替える |
-| 端末の呼び名 | `featuremodels/shared/model/` の `DeviceName` が出す。画面の短い辺が 600dp 以上なら「タブレット」、ほかは「スマホ」にする |
+| 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「端末の空き容量が足りません」に替える |
+| 端末の呼び名 | スマホとタブレットを呼び分けず、「端末」と書く。声の入力の案内も同じ語を使う |
 | 見張りの失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、それでも読めなければ `task` に文を出す |
 | 今の時刻 | `featuremodels/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
 | 説明カードを閉じたか | `settingsparts/hint/` の `SettingsFoldInput` を、モデルの `Input` に置く。読み書きは、`SettingsFoldModel` の `loadFold`・`setFold` に通す |
 | 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる。`AssetsModel` だけは iOS と同じく `input.today` に持ち、画面が `setToday` で入れる |
 | 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
+| 共有した見張りの持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
 | 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
 | タブの記録の一覧の失敗 | 4 つのタブのモデルは、記録の一覧を読めなかった時に `state.isListFailed` を立てる。見張りを始め直す時に下ろす |
 | 見張りの回 | `MainView` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
@@ -111,7 +112,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 受ける所 | 画面は、`features/shared/model/` の `OnOutcome` を 1 か所に書く。閉じる・親に知らせるだけを書く |
 | 編集シートの結果 | `SettingsEditOutcome`。保存した値・非表示にしたか・消した物・閉じるかを持つ |
 | 取り消しの知らせ | モデルが、`state` の `UndoNoticeState` に出す。予算と固定費の一覧が当たる |
-| 残す `rememberCoroutineScope` | `designsystem` の動きと、`rememberSharedEntryList` の共有の見張りだけが持つ |
+| 残す `rememberCoroutineScope` | `designsystem` の動きだけが持つ。画面のファイルには書かない |
 
 モデルのテストは `featuremodels/src/test/` に置く。`modelTest` が DB をメモリに開き、`ModelWait` が値を待つ。iOS と違う動きは `@Ignore` の理由に書く。
 
