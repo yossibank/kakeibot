@@ -320,7 +320,7 @@ class RecurringListModel(
 
         val deletion = state.task.attempt(failure = DELETE_FAILED) { remove(id) }
 
-        deletion?.let(state.deleted::show)
+        deletion?.let(state.deleted::show) ?: state.deleted.dismiss()
 
         return deletion
     }

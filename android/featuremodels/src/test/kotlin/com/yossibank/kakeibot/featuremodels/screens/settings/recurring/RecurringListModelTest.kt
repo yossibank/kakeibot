@@ -231,6 +231,23 @@ class RecurringListModelTest {
     }
 
     @Test
+    fun clearsDeletionInStateWhenDeletingFails() = modelTest(today = "2026-10-17") { setup ->
+        val rent = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
+        val other = setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")
+        val model = setup.observedModel(count = 2)
+        setup.database.failDeletes(from = "recurring", where = "memo = '家賃'")
+        model.delete(other.id)
+        val shown = model.state.deleted.current
+
+        val deletion = model.delete(rent.id)
+
+        assertNotNull(shown)
+        assertNull(deletion)
+        assertNull(model.state.deleted.current)
+        assertEquals("削除できませんでした", model.state.task.message)
+    }
+
+    @Test
     fun tellsWhenSomeHiddenRecurringsCannotBeDeleted() = modelTest(today = "2026-10-17") { setup ->
         val rent = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
         val other = setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")
