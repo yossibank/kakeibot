@@ -2,12 +2,15 @@ package com.yossibank.kakeibot.featuremodels.screens.tabs.review.model
 
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.entry.EntryDay
 import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
+import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.modelTest
+import com.yossibank.kakeibot.store.queries.methods.entryList
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.setting
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
@@ -15,6 +18,7 @@ import com.yossibank.kakeibot.store.records.settingkeys.reviewKind
 import com.yossibank.kakeibot.store.records.settingkeys.reviewScale
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -60,6 +64,43 @@ class ReviewModelTest {
     }
 
     @Test
+    fun knowsWhetherPreviousPeriodHasEntries() = modelTest(today = "2026-10-17") { setup ->
+        setup.save(Entry.Kind.expense, amount = 980, on = date("2026-10-05"))
+        setup.save(Entry.Kind.income, amount = 3000, on = date("2026-09-03"))
+        val model = setup.observedModel()
+
+        val hasPreviousNow = model.output.hasPreviousEntries
+        val comparison = model.output.comparisonText
+        model.state.move(count = -1)
+
+        assertTrue(hasPreviousNow)
+        assertEquals("前の月の同じ日までより ¥980 多い", comparison)
+        assertFalse(model.output.hasPreviousEntries)
+        assertEquals("比べる記録がまだありません", model.output.comparisonText)
+    }
+
+    @Test
+    fun leavesOutCategoriesMissingFromList() = modelTest(today = "2026-10-17") { setup ->
+        val known = setup.save(Entry.Kind.expense, amount = 500, on = date("2026-10-12"))
+        val list = setup.database.entryList()
+        val unknown = known.copy(id = Identifier(), categoryId = Identifier(), amount = 300)
+        val day = EntryDay(date = known.date, entries = listOf(known, unknown))
+
+        val model = ReviewModel(
+            database = setup.database,
+            entryList = flowOf(list.copy(days = listOf(day))),
+            today = setup.today,
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.input.list != null }
+
+        assertEquals(800L, model.output.total)
+        assertEquals(listOf(500L), model.output.rows.map { it.amount })
+        assertEquals(listOf<String?>("100%"), model.output.rows.map { it.percent })
+    }
+
+    @Test
     fun ranksCategoriesByAmount() = modelTest(today = "2026-10-17") { setup ->
         val options = setup.options()
         val food = options.expenseCategories[0]
@@ -78,6 +119,7 @@ class ReviewModelTest {
         assertEquals(listOf(daily.name, food.name), rows.map { it.name })
         assertEquals(listOf(6000L, 2000L), rows.map { it.amount })
         assertEquals(listOf(0.75, 0.25), rows.map { it.ratio })
+        assertEquals(listOf("75%", "25%"), rows.map { it.percent })
         assertEquals(listOf(daily.id.toString(), food.id.toString()), rows.map { it.key })
     }
 
@@ -118,14 +160,14 @@ class ReviewModelTest {
         val model = setup.reviewModel()
         model.setScale(ReviewPeriod.Scale.week)
         model.saveSelection()
-        val monday = model.output.title
+        val sunday = model.output.title
 
-        setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.sunday)
+        setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.monday)
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.input.weekStart == Weekday.sunday }
+        ModelWait.until { model.input.weekStart == Weekday.monday }
 
-        assertEquals("10/12〜10/18", monday)
-        assertEquals("10/11〜10/17", model.output.title)
+        assertEquals("10/11〜10/17", sunday)
+        assertEquals("10/12〜10/18", model.output.title)
     }
 
     @Test

@@ -183,12 +183,12 @@ home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUse
 home.shows-templates-of-selected-type-on-home	HomeModelTests/showsTemplatesOfSelectedTypeOnHome		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.records-from-home-without-archived-tag	HomeModelTests/recordsFromHomeWithoutArchivedTag		未移植	ホームのモデルに、テンプレートから記録する関数が無い
 home.records-from-home-and-undoes	HomeModelTests/recordsFromHomeAndUndoes		未移植	ホームのモデルに、テンプレートから記録する関数が無い
-home.shows-no-records-only-after-list-arrives	HomeModelTests/showsNoRecordsOnlyAfterListArrives	HomeModelTest/showsNothingBeforeOverviewArrives	違い	届く前と空を分ける showsNoRecords が無く、画面は届く前も空の文を出す
+home.shows-no-records-only-after-list-arrives	HomeModelTests/showsNoRecordsOnlyAfterListArrives	HomeModelTest/showsNoRecordsOnlyAfterListArrives	対応	
 home.sums-month-today-and-yesterday	HomeModelTests/sumsMonthTodayAndYesterday	HomeModelTest/sumsMonthTodayAndYesterday	対応	
 home.sums-upcoming-recurring-expense	HomeModelTests/sumsUpcomingRecurringExpense		未確認	値は input.overview（MonthOverview）にあるが、画面に固定費の欄が無くテストも無い
 home.marks-and-records-missing-recurring	HomeModelTests/marksAndRecordsMissingRecurring		未移植	ホームに固定費の欄と、抜けた固定費を記録する関数が無い
 home.shows-remaining-budget-of-period	HomeModelTests/showsRemainingBudgetOfPeriod	HomeModelTest/showsRemainingBudgetOfPeriod	対応	
-home.swaps-middle-figure-by-budget	HomeModelTests/swapsMiddleFigureByBudget		違い	予算が無い時も真ん中は「今月の支出」のままで、「昨日の支出」に替えない
+home.swaps-middle-figure-by-budget	HomeModelTests/swapsMiddleFigureByBudget	HomeModelTest/swapsMiddleFigureByBudget	対応	
 home.lists-recent-entries-newest-first	HomeModelTests/listsRecentEntriesNewestFirst	HomeModelTest/listsRecentEntriesNewestFirst	対応	
 home.shows-notice-when-list-fails		HomeModelTest/showsNoticeWhenListFails	Androidのみ	iOS は共通の observe の失敗だけを確かめ、ホームの文は確かめていない
 home.shows-no-notice-while-list-arrives		HomeModelTest/showsNoNoticeWhileListArrives	Androidのみ	一覧が届く間は知らせが空であることは、iOS にテストが無い
@@ -219,6 +219,7 @@ assets.leaves-out-future-transfers-from-both-wallets		AssetsModelTest/leavesOutF
 assets.leaves-out-future-card-usage-from-debts		AssetsModelTest/leavesOutFutureCardUsageFromDebts	Androidのみ	先の日付のカードの利用を負債から外すことは、iOS にテストが無い
 assets.leaves-out-entries-when-today-goes-back		AssetsModelTest/leavesOutEntriesWhenTodayGoesBack	Androidのみ	今日が戻った時に記録を残高から外すことは、iOS にテストが無い
 assets.leaves-out-hidden-wallets		AssetsModelTest/leavesOutHiddenWallets	Androidのみ	非表示の口座を資産に出さない。iOS は口座の編集を通す流れのテストで確かめる
+assets.describes-breakdown-of-total		AssetsModelTest/describesBreakdownOfTotal	Androidのみ	「手持ち・未払い」の内訳の文。iOS は画面で組み立て、テストが無い
 assets-adjustment.*	AssetsAdjustmentModelTests/*		未移植	残高を手元の額に合わせるモデルと画面が Android に無い
 assets-reward-goal-edit.*	AssetsRewardGoalEditModelTests/*		未移植	ごほうびの目標を編集するモデルと画面が Android に無い
 assets-entry-sheet.*	AssetsEntrySheetTests/*		未移植	カードごとの未払いの記録を並べるシートが Android に無い
@@ -262,6 +263,7 @@ records.describes-rows-with-memo-and-wallet	RecordsModelTests/describesRowsWithM
 records.describes-fee-row-with-transfer-route	RecordsModelTests/describesFeeRowWithTransferRoute	RecordsModelTest/describesFeeRowWithTransferRoute	対応	
 records.shows-today-until-another-day-is-chosen	RecordsModelTests/showsTodayUntilAnotherDayIsChosen	RecordsModelTest/showsTodayUntilAnotherDayIsChosen	対応	
 records.marks-only-past-days-without-expense	RecordsModelTests/marksOnlyPastDaysWithoutExpense		未移植	使わなかった日の印を付けられるかの判定が無い
+records.starts-week-on-sunday-before-setting-arrives	RecordsModelTests/startsWeekOnSundayBeforeSettingArrives	RecordsModelTest/startsWeekOnSundayBeforeSettingArrives	対応	
 records.describes-month-and-period		RecordsModelTest/describesMonthAndPeriod	Androidのみ	月の見出し（monthTitle）と期間の文。iOS のモデルに monthTitle は無い
 records.shows-notice-when-list-fails		RecordsModelTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 records.shows-notice-when-settings-fail		RecordsModelTest/showsNoticeWhenSettingsFail	Androidのみ	設定の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
@@ -279,10 +281,11 @@ review.keeps-store-review-unopened-after-closing	ReviewModelTests/keepsStoreRevi
 review.compares-with-previous-month	ReviewModelTests/comparesWithPreviousMonth	ReviewModelTest/comparesWithSameDaysOfPreviousMonth	対応	
 review.keeps-notice-after-later-success	ReviewModelTests/keepsNoticeAfterLaterSuccess	ReviewModelNoticeTest/keepsNoticeAfterLaterSuccess	対応	
 review.compares-whole-previous-month-when-finished	ReviewModelTests/comparesWholePreviousMonthWhenFinished	ReviewModelTest/comparesWholePreviousMonthWhenFinished	対応	isComparingPartially が無く、終わった期間でも画面の文は「同じ時点より」のまま
-review.knows-whether-previous-period-has-entries	ReviewModelTests/knowsWhetherPreviousPeriodHasEntries		違い	hasPreviousEntries が無く、前の期間に記録が無くても比べる文を出す
+review.knows-whether-previous-period-has-entries	ReviewModelTests/knowsWhetherPreviousPeriodHasEntries	ReviewModelTest/knowsWhetherPreviousPeriodHasEntries	対応	
 review.counts-moves-to-archived-wallet-in-past-period	ReviewModelTests/countsMovesToArchivedWalletInPastPeriod		未移植	返済・積立の動き（moves）が、モデルにも画面にも無い
 review.leaves-out-future-repayments-from-payoff	ReviewModelTests/leavesOutFutureRepaymentsFromPayoff		未移植	返済の動きと完済の見込み（payoff）が無い
 review.cached-moves-still-watch-recurrings	ReviewModelTests/cachedMovesStillWatchRecurrings		未移植	返済の動き（moves）と、定期の記録の読み込みが無い
+review.starts-week-on-sunday-before-setting-arrives	ReviewModelTests/startsWeekOnSundayBeforeSettingArrives	ReviewModelTest/startsWeekOnSetting	対応	
 review.shows-no-rows-without-total		ReviewModelTest/showsNoRowsWithoutTotal	Androidのみ	合計が 0 の種類ではカテゴリの行を出さない。iOS に同じ筋書きのテストは無い
 review.moves-forward-up-to-current-period		ReviewModelTest/movesForwardUpToCurrentPeriod	Androidのみ	戻った分だけ進めて今の期間に戻る。iOS は moveToCurrent の側だけを確かめる
 review.starts-with-month-and-expense-without-selection		ReviewModelTest/startsWithMonthAndExpenseWithoutSelection	Androidのみ	保存が無い時の初めの値（月・支出）。iOS にテストは無い
@@ -293,15 +296,16 @@ review.shows-empty-balance-bars-without-entries		ReviewModelTest/showsEmptyBalan
 review.scales-balance-bars-to-larger-expense		ReviewModelTest/scalesBalanceBarsToLargerExpense	Androidのみ	収支の棒を大きい方に合わせる。balanceBars は iOS のモデルに無い
 review.keeps-selection-only-after-saving		ReviewModelTest/keepsSelectionOnlyAfterSaving	Androidのみ	選んだだけでは保存せず、saveSelection で保存する。iOS にテストは無い
 review.reads-saved-selection-when-observing		ReviewModelTest/readsSavedSelectionWhenObserving	Androidのみ	observe の初めに保存済みの選択を読む。iOS にテストは無い
+review.leaves-out-categories-missing-from-list		ReviewModelTest/leavesOutCategoriesMissingFromList	Androidのみ	一覧に無いカテゴリを内訳から落とす。iOS にテストは無い
 review-notice.shows-notice-when-list-fails		ReviewModelNoticeTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 review-notice.shows-notice-when-selection-cannot-be-read		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeRead	Androidのみ	選択を読めない時の知らせ。iOS も出すがテストは無い
 review-notice.shows-notice-when-selection-cannot-be-saved		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeSaved	Androidのみ	選択を保存できない時の知らせ。iOS も出すがテストは無い
 review-notice.keeps-list-notice-after-saving		ReviewModelNoticeTest/keepsListNoticeAfterSaving	Androidのみ	保存が通っても、見張りの失敗の知らせを残す
 review-notice.closes-notice-by-hand		ReviewModelNoticeTest/closesNoticeByHand	Androidのみ	知らせを手で閉じる。iOS の ReviewModel にこの筋書きのテストは無い
 review-note-writer-accuracy.*	ReviewNoteWriterAccuracyTests/*		iOSのみ	Apple の FoundationModels でまとめを書く精度の確かめで、Android に相手が無い
-review-text.names-shares	ReviewTextTests/namesShares		違い	割合は四捨五入だけで、合計 100% の調整・99.9%・1% 未満を隠す決まりが無い
+review-text.names-shares	ReviewTextTests/namesShares	ReviewTextTest/namesShares	対応	
 review-text.names-budget-usage	ReviewTextTests/namesBudgetUsage		未移植	振り返りに予算の使い方の文が無い（予算を読み込まない）
-review-text.signs-balance	ReviewTextTests/signsBalance		違い	記録の balanceTitle は 0 円で「収支 · 黒字」。振り返りの側は iOS と同じ
+review-text.signs-balance	ReviewTextTests/signsBalance	ReviewTextTest/signsBalance	対応	
 budget-list.sets-total-and-category-budgets-from-period-month	BudgetListModelTests/setsTotalAndCategoryBudgetsFromPeriodMonth	BudgetListModelTest/setsTotalAndCategoryBudgetsFromPeriodMonth	対応	
 budget-list.clears-budget	BudgetListModelTests/clearsBudget	BudgetListModelTest/clearsAndRestoresBudget	対応	
 budget-list.restores-budget-carried-from-earlier-month	BudgetListModelTests/restoresBudgetCarriedFromEarlierMonth	BudgetListModelTest/restoresBudgetCarriedFromEarlierMonth	対応	

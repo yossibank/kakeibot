@@ -14,6 +14,7 @@ import com.yossibank.kakeibot.core.concepts.entry.expenseTotal
 import com.yossibank.kakeibot.core.concepts.entry.incomeTotal
 import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
+import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
@@ -73,7 +74,7 @@ class RecordsModel(
         var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
             internal set
 
-        var weekStart: Weekday by mutableStateOf(Weekday.monday)
+        var weekStart: Weekday by mutableStateOf(Weekday.sunday)
             internal set
 
         var layout: RecordsLayout by mutableStateOf(RecordsLayout.calendar)
@@ -132,7 +133,7 @@ class RecordsModel(
             get() = incomeTotal - expenseTotal
 
         val balanceTitle: String
-            get() = if (balance < 0) "収支 · 赤字" else "収支 · 黒字"
+            get() = ReviewText.balanceTitle(balance)
 
         fun day(on: LocalDate): EntryDay? = daysByDate[on]
 

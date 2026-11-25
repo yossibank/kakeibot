@@ -102,16 +102,24 @@ class RecordsModelTest {
     }
 
     @Test
+    fun startsWeekOnSundayBeforeSettingArrives() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.recordsModel()
+
+        assertEquals(Weekday.sunday, model.output.weekdays.first())
+        assertEquals("2026-10-01", model.output.weeks.first()[4].toString())
+    }
+
+    @Test
     fun startsWeekOnSetting() = modelTest(today = "2026-10-17") { setup ->
-        setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.sunday)
+        setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.monday)
         val model = setup.recordsModel()
 
         backgroundScope.launch { model.observe() }
-        ModelWait.until { model.input.weekStart == Weekday.sunday }
+        ModelWait.until { model.input.weekStart == Weekday.monday }
 
-        assertEquals(Weekday.sunday, model.output.weekdays.first())
+        assertEquals(Weekday.monday, model.output.weekdays.first())
         assertEquals(null, model.output.weeks.first().first())
-        assertEquals("2026-10-01", model.output.weeks.first()[4].toString())
+        assertEquals("2026-10-01", model.output.weeks.first()[3].toString())
     }
 
     @Test

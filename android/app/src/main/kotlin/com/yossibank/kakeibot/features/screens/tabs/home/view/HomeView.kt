@@ -190,8 +190,8 @@ private fun BudgetCard(
             VerticalRule()
 
             Stat(
-                title = "今月の支出",
-                amount = overview?.monthExpense ?: 0,
+                title = model.output.middleTitle,
+                amount = model.output.middleAmount,
                 type = Entry.Kind.expense,
                 modifier = Modifier.weight(1f),
             )
@@ -318,7 +318,7 @@ private fun RecentCard(
             ),
         )
 
-        if (rows.isEmpty()) {
+        if (model.output.showsNoRecords) {
             Text(
                 text = "右下の ＋ から記録できます",
                 modifier = Modifier.padding(

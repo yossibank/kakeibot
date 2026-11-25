@@ -54,14 +54,14 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.model.ReviewModel
+import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
-import com.yossibank.kakeibot.features.screens.tabs.review.parts.ReviewText
+import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @Composable
 fun ReviewView(
@@ -231,7 +231,6 @@ private fun BreakdownCard(model: ReviewModel) {
     val isBalance = model.input.kind == ReviewKind.balance
     val scope = rememberCoroutineScope()
     val total = model.output.total
-    val difference = total - model.output.previousTotal
 
     Column(
         modifier = Modifier
@@ -296,10 +295,7 @@ private fun BreakdownCard(model: ReviewModel) {
         }
 
         Text(
-            text = "前の期間の同じ時点より ${AmountText.text(
-                amount = difference.clamped,
-                sign = AmountText.Sign.Plus,
-            )}",
+            text = model.output.comparisonText,
             color = Palette.subtext,
             style = textFont(style = FontTextStyle.Caption),
         )
@@ -346,11 +342,13 @@ private fun CategoryRow(row: ReviewModel.Row) {
             style = textFont(style = FontTextStyle.Subheadline),
         )
 
-        Text(
-            text = "${(row.ratio * 100).roundToInt()}%",
-            color = Palette.subtext,
-            style = textFont(style = FontTextStyle.Caption),
-        )
+        row.percent?.let { percent ->
+            Text(
+                text = percent,
+                color = Palette.subtext,
+                style = textFont(style = FontTextStyle.Caption),
+            )
+        }
 
         AmountText(
             amount = row.amount.clamped,

@@ -56,9 +56,12 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.tabs.records.model.RecordsModel
+import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.datechoice.shortName
+import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
+import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
@@ -227,7 +230,7 @@ private fun SummaryCard(model: RecordsModel) {
                     weight = FontWeight.SemiBold,
                 ),
                 sign = AmountText.Sign.Plus,
-                color = if (balance < 0) Palette.rose else Palette.accent,
+                color = ReviewText.balanceColor(model.output.balance),
             )
         }
     }
@@ -274,7 +277,7 @@ private fun DayCard(
     ) {
         DayHeader(
             day = day,
-            isToday = day.date == model.state.today,
+            today = model.state.today,
         )
 
         if (day.entries.isEmpty()) {
@@ -303,7 +306,7 @@ private fun DayCard(
 @Composable
 private fun DayHeader(
     day: EntryDay,
-    isToday: Boolean,
+    today: LocalDate,
 ) {
     val date = day.date
 
@@ -320,7 +323,10 @@ private fun DayHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = date.monthDayText,
+            text = PeriodText.day(
+                date = date,
+                today = today,
+            ),
             modifier = Modifier.alignByBaseline(),
             color = Palette.accentStrong,
             style = displayFont(style = FontTextStyle.Title3),
@@ -333,7 +339,7 @@ private fun DayHeader(
             style = textFont(style = FontTextStyle.Caption),
         )
 
-        if (isToday) {
+        if (date == today) {
             Text(
                 text = "今日",
                 modifier = Modifier.alignByBaseline(),

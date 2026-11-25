@@ -39,5 +39,7 @@
 | `date/period-text-day.json` | 今日と違う年の日付にだけ年を付ける、日付の文 |
 | `date/period-text-range.json` | 今日と違う年の日付にだけ年を付ける、期間の文 |
 | `entry/entry-date-text.json` | 入力の画面の日付の文。`text` は曜日を添えた文、`short` は短い文 |
+| `review/review-share-text.json` | 振り返りの内訳の割合の文。出さない行は `null` |
+| `review/review-balance-text.json` | 収支の見出しと、符号を付けた金額の文 |
 
 載せるのは、入力の値だけで文字が決まる関数である。DB や画面の状態が要る文は、テストを写してそろえる。

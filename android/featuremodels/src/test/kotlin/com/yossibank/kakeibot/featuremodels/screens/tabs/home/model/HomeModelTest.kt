@@ -11,6 +11,7 @@ import com.yossibank.kakeibot.store.writes.methods.setBudget
 import kotlinx.coroutines.launch
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -37,13 +38,37 @@ class HomeModelTest {
     }
 
     @Test
-    fun showsNothingBeforeOverviewArrives() = modelTest(today = "2026-10-12") { setup ->
+    fun showsNoRecordsOnlyAfterListArrives() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.homeModel()
+        val before = model.output.showsNoRecords
 
         assertNull(model.output.month)
         assertEquals("", model.output.periodText)
         assertNull(model.output.usage)
         assertTrue(model.output.recentRows.isEmpty())
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.input.overview != null }
+
+        assertFalse(before)
+        assertTrue(model.output.showsNoRecords)
+    }
+
+    @Test
+    fun swapsMiddleFigureByBudget() = modelTest(today = "2026-10-12") { setup ->
+        setup.save(Entry.Kind.expense, amount = 980, daysAgo = 0)
+        setup.save(Entry.Kind.expense, amount = 4500, daysAgo = 1)
+        val model = setup.observedModel()
+
+        val title = model.output.middleTitle
+        val amount = model.output.middleAmount
+        setup.database.setBudget(amount = 120_000, categoryId = null, from = setup.today.yearMonth)
+        ModelWait.until { model.output.usage != null }
+
+        assertEquals("昨日の支出", title)
+        assertEquals(4500L, amount)
+        assertEquals("今月の支出", model.output.middleTitle)
+        assertEquals(5480L, model.output.middleAmount)
     }
 
     @Test
