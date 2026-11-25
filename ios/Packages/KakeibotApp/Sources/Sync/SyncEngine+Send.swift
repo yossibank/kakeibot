@@ -88,85 +88,19 @@ private extension SyncEngine {
             return
         }
 
-        let pending = Set(engine.state.pendingRecordZoneChanges)
+        let pending = engine.state.pendingRecordZoneChanges.compactMap(SyncRoute.Pending.init)
+        let plan = route.enqueue(changes, pending: Set(pending))
 
-        let savingKeys = pending.compactMap { change -> SyncKey? in
-            guard case let .saveRecord(id) = change else {
-                return nil
-            }
-
-            return SyncKey(id)
-        }
-
-        let saving = Set(savingKeys)
-
-        var added: [CKSyncEngine.PendingRecordZoneChange] = []
-        var removed: [CKSyncEngine.PendingRecordZoneChange] = []
-        var dropped: [SyncChange] = []
-
-        let route = route
-
-        for change in changes {
-            var targets = pendingTargets(of: change)
-
-            if targets.isEmpty,
-               !saving.contains(change.key) {
-                if let zone = route.unsentDeletionZone(of: change) {
-                    targets = [deletion(of: change.key, in: zone)]
-                } else if route.drops(change) {
-                    dropped.append(change)
-                }
-            }
-
-            for (wanted, opposite) in targets where !pending.contains(wanted) {
-                added.append(wanted)
-
-                if pending.contains(opposite) {
-                    removed.append(opposite)
-                }
-            }
-        }
-
-        engine.state.remove(pendingRecordZoneChanges: removed)
-        engine.state.add(pendingRecordZoneChanges: added)
-        try? await database.removeSyncChanges(dropped)
+        engine.state.remove(pendingRecordZoneChanges: plan.removed.map(pendingChange))
+        engine.state.add(pendingRecordZoneChanges: plan.added.map(pendingChange))
+        try? await database.removeSyncChanges(plan.dropped)
     }
 
-    func pendingTargets(of change: SyncChange) -> [(
-        wanted: CKSyncEngine.PendingRecordZoneChange,
-        opposite: CKSyncEngine.PendingRecordZoneChange
-    )] {
-        var targets: [(
-            wanted: CKSyncEngine.PendingRecordZoneChange,
-            opposite: CKSyncEngine.PendingRecordZoneChange
-        )] = []
-
-        let route = route
-
-        if let zone = change.saveZone,
-           route.sends(to: zone) {
-            let syncID = SyncRecordID(key: change.key, zoneName: zone)
-            let id = recordID(of: syncID)
-            targets.append((.saveRecord(id), .deleteRecord(id)))
+    func pendingChange(_ pending: SyncRoute.Pending) -> CKSyncEngine.PendingRecordZoneChange {
+        switch pending {
+        case let .save(id): .saveRecord(recordID(of: id))
+        case let .delete(id): .deleteRecord(recordID(of: id))
         }
-
-        for zone in change.deleteZones where route.sends(to: zone) {
-            targets.append(deletion(of: change.key, in: zone))
-        }
-
-        return targets
-    }
-
-    func deletion(
-        of key: SyncKey,
-        in zone: String
-    ) -> (
-        wanted: CKSyncEngine.PendingRecordZoneChange,
-        opposite: CKSyncEngine.PendingRecordZoneChange
-    ) {
-        let syncID = SyncRecordID(key: key, zoneName: zone)
-        let id = recordID(of: syncID)
-        return (.deleteRecord(id), .saveRecord(id))
     }
 
     func finishChanges(
@@ -179,9 +113,7 @@ private extension SyncEngine {
             deleted: deleted
         )
 
-        let deletions = result.staleDeletions.map { id in
-            CKSyncEngine.PendingRecordZoneChange.deleteRecord(recordID(of: id))
-        }
+        let deletions = result.staleDeletions.map { pendingChange(.delete($0)) }
 
         for change in result.finished {
             sending.removeValue(forKey: change.key)

@@ -5,11 +5,6 @@ import Foundation
 import Testing
 
 extension SyncSendOrderTests {
-    enum Pending: Hashable {
-        case save(SyncRecordID)
-        case delete(SyncRecordID)
-    }
-
     struct Batch {
         let saves: [SyncRecordID: SyncRecord]
         let deletes: [SyncRecordID]
@@ -18,7 +13,7 @@ extension SyncSendOrderTests {
     final class Device {
         let database: AppDatabase
 
-        var pending: Set<Pending> = []
+        var pending: Set<SyncRoute.Pending> = []
         var sending: [SyncKey: SyncChange] = [:]
         var cloud: [SyncRecordID: SyncRecord] = [:]
 
@@ -28,19 +23,10 @@ extension SyncSendOrderTests {
     }
 }
 
-extension SyncSendOrderTests.Pending {
-    var opposite: Self {
-        switch self {
-        case let .save(id): .delete(id)
-        case let .delete(id): .save(id)
-        }
-    }
-}
-
 extension SyncSendOrderTests.Batch {
-    var sent: Set<SyncSendOrderTests.Pending> {
-        let saved = saves.keys.map(SyncSendOrderTests.Pending.save)
-        let deleted = deletes.map(SyncSendOrderTests.Pending.delete)
+    var sent: Set<SyncRoute.Pending> {
+        let saved = saves.keys.map(SyncRoute.Pending.save)
+        let deleted = deletes.map(SyncRoute.Pending.delete)
         return Set(saved + deleted)
     }
 }
@@ -94,39 +80,12 @@ extension SyncSendOrderTests.Device {
 
     func enqueue() async throws {
         let changes = try await database.pendingSyncChanges()
-        let before = pending
+        let plan = Self.route.enqueue(changes, pending: pending)
 
-        let saving = Set(
-            before.compactMap { change -> SyncKey? in
-                guard case let .save(id) = change else {
-                    return nil
-                }
+        pending.subtract(plan.removed)
+        pending.formUnion(plan.added)
 
-                return id.key
-            }
-        )
-
-        var dropped: [SyncChange] = []
-
-        for change in changes {
-            var targets = Self.targets(of: change)
-
-            if targets.isEmpty,
-               !saving.contains(change.key) {
-                if let zone = Self.route.unsentDeletionZone(of: change) {
-                    targets = [.delete(change.key.recordID(in: zone))]
-                } else if Self.route.drops(change) {
-                    dropped.append(change)
-                }
-            }
-
-            for wanted in targets where !before.contains(wanted) {
-                pending.remove(wanted.opposite)
-                pending.insert(wanted)
-            }
-        }
-
-        try await database.removeSyncChanges(dropped)
+        try await database.removeSyncChanges(plan.dropped)
     }
 
     func takeBatch() async throws -> SyncSendOrderTests.Batch? {
@@ -231,23 +190,6 @@ extension SyncSendOrderTests.Device {
         }
 
         Issue.record("\(Self.maxRounds) 回送っても、送るものが残った")
-    }
-}
-
-private extension SyncSendOrderTests.Device {
-    static func targets(of change: SyncChange) -> [SyncSendOrderTests.Pending] {
-        var targets: [SyncSendOrderTests.Pending] = []
-
-        if let zone = change.saveZone,
-           route.sends(to: zone) {
-            targets.append(.save(change.key.recordID(in: zone)))
-        }
-
-        for zone in change.deleteZones where route.sends(to: zone) {
-            targets.append(.delete(change.key.recordID(in: zone)))
-        }
-
-        return targets
     }
 }
 
