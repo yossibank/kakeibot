@@ -261,7 +261,7 @@ class ReviewModel(
     suspend fun saveSelection() {
         val database = dependencies.database
 
-        ModelTask.quiet {
+        state.task.attempt(failure = ModelTask.saveFailed) {
             database.setSetting(
                 key = SettingKey.reviewScale,
                 to = input.scale,
@@ -270,7 +270,7 @@ class ReviewModel(
                 key = SettingKey.reviewKind,
                 to = input.kind,
             )
-        } ?: state.task.show(ModelTask.saveFailed)
+        }
     }
 
     private suspend fun <Value> observe(

@@ -2,10 +2,14 @@ package com.yossibank.kakeibot.featuremodels.screens.settings.recurring
 
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
+import com.yossibank.kakeibot.featuremodels.support.failDeletes
+import com.yossibank.kakeibot.featuremodels.support.failWrites
+import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.recurrings
@@ -165,6 +169,80 @@ class RecurringListModelTest {
         assertEquals(true, hintSaved)
         assertEquals(true, listSaved)
         assertEquals(false, reopened.input.hiddenList.isClosed)
+    }
+
+    @Test
+    fun tellsWhenRecurringsCannotBeRead() = modelTest(today = "2026-10-17") { setup ->
+        val model = RecurringListModel(
+            database = setup.database,
+            clock = ScreenClock.fixed(setup.now),
+            entryList = failingEntryList,
+            today = setup.today,
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
+
+        assertEquals("固定費を読めませんでした", model.state.task.message)
+    }
+
+    @Test
+    fun namesFailedAction() = modelTest(today = "2026-10-17") { setup ->
+        val rent = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
+        setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")
+        val model = setup.observedModel(count = 2)
+        val second = model.output.rows[1].id
+        setup.database.failWrites(to = "recurring")
+
+        model.hide(rent.id)
+        val hiding = model.state.task.message
+        model.show(rent.id)
+        val showing = model.state.task.message
+        model.delete(rent.id)
+        val deleting = model.state.task.message
+        model.move(id = second, to = 0)
+        model.finishMoving()
+        val moving = model.state.task.message
+
+        assertEquals("非表示にできませんでした", hiding)
+        assertEquals("表示に戻せませんでした", showing)
+        assertEquals("削除できませんでした", deleting)
+        assertEquals("並びを保存できませんでした", moving)
+        assertNull(model.state.movingOrder)
+    }
+
+    @Test
+    fun ignoresMoveToSamePlaceOrUnknownRecurring() = modelTest(today = "2026-10-17") { setup ->
+        setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
+        setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")
+        val model = setup.observedModel(count = 2)
+
+        model.move(id = model.output.rows[1].id, to = 1)
+        val samePlace = model.state.movingOrder
+        model.move(id = Identifier(), to = 0)
+
+        assertNull(samePlace)
+        assertNull(model.state.movingOrder)
+    }
+
+    @Test
+    fun tellsWhenSomeHiddenRecurringsCannotBeDeleted() = modelTest(today = "2026-10-17") { setup ->
+        val rent = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
+        val other = setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")
+        val model = setup.observedModel(count = 2)
+        model.hide(rent.id)
+        model.hide(other.id)
+        ModelWait.until { model.output.hidden.size == 2 }
+        setup.database.failDeletes(from = "recurring", where = "memo = '家賃'")
+
+        val deletion = model.deleteHidden()
+
+        assertNotNull(deletion)
+        assertEquals("削除できないものがありました", model.state.task.message)
+        assertEquals(
+            listOf("家賃"),
+            setup.database.recurrings(includingHidden = true).map { it.memo },
+        )
     }
 
     private suspend fun ModelTestSetup.observedModel(count: Int = 1): RecurringListModel {

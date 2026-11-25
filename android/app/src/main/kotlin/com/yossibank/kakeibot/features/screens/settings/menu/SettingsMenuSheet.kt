@@ -2,6 +2,7 @@ package com.yossibank.kakeibot.features.screens.settings.menu
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,7 +30,9 @@ import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.surface.card
+import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
+import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
@@ -80,6 +84,8 @@ fun SettingsMenuSheet(
         model.observe()
     }
 
+    model.state.task.Timer()
+
     fun back() {
         when (screen) {
             Screen.Menu -> onClose()
@@ -103,6 +109,19 @@ fun SettingsMenuSheet(
             }
         },
     ) {
+        if (model.state.task.message.isNotEmpty()) {
+            Text(
+                text = model.state.task.message,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .card()
+                    .clickable(onClick = model.state.task::clear)
+                    .padding(12.dp),
+                color = Palette.rose,
+                style = textFont(style = FontTextStyle.Caption),
+            )
+        }
+
         when (screen) {
             Screen.Menu -> {
                 SettingsCaption(text = "予算と期間")

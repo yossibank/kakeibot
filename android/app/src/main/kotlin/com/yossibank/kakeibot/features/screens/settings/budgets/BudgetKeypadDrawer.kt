@@ -143,6 +143,7 @@ private fun ColumnScope.Drawer(
     if (model.state.task.message.isNotEmpty()) {
         Text(
             text = model.state.task.message,
+            modifier = Modifier.clickable(onClick = model.state.task::clear),
             color = Palette.rose,
             style = textFont(style = FontTextStyle.Caption),
         )

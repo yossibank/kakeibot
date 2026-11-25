@@ -14,6 +14,12 @@ extension AppDatabase {
         }
     }
 
+    func failReads(of table: String) async throws {
+        try await writer.write { db in
+            try db.execute(sql: "DROP TABLE \(table)")
+        }
+    }
+
     func fillStorage() async throws {
         try await writer.writeWithoutTransaction { db in
             let pages = try Int.fetchOne(db, sql: "PRAGMA page_count") ?? 0

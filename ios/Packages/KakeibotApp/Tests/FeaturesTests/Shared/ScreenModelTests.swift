@@ -42,6 +42,31 @@ struct ScreenModelTests {
     }
 
     @Test
+    func marksFailureUntilObservedAgain() async {
+        let model = Model()
+        let counter = Counter()
+
+        await model.observe(
+            Self.values(counter, failures: 4),
+            into: \.value,
+            failing: \.isFailed
+        )
+
+        let failed = model.isFailed
+
+        await model.observe(
+            Self.values(counter, failures: 4),
+            into: \.value,
+            failing: \.isFailed
+        )
+
+        #expect(failed)
+        #expect(!model.isFailed)
+        #expect(model.value == 1)
+        #expect(model.state.errorNotice.message == "読めませんでした")
+    }
+
+    @Test
     func stopsWhenFailingRightAfterEachValue() async {
         let counter = Counter()
 
@@ -88,6 +113,9 @@ extension ScreenModelTests {
         static let loadFailedMessage = "読めませんでした"
 
         let state = NoticeState()
+
+        var value: Int?
+        var isFailed = false
     }
 }
 

@@ -88,6 +88,8 @@ fun ReviewView(
         model.observe()
     }
 
+    model.state.task.Timer()
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(

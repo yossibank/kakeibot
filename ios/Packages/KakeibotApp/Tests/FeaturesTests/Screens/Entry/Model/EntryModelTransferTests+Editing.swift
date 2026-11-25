@@ -227,6 +227,22 @@ extension EntryModelTransferTests {
     }
 
     @Test
+    func deletesNothingWhenEntryIsMissing() async throws {
+        let setup = try await Setup()
+        let model = EntryModel(
+            parts: .system(setup.database),
+            editing: Entry.ID(),
+            date: setup.date
+        )
+
+        await model.load()
+        let change = await model.delete()
+
+        #expect(change == nil)
+        #expect(model.state.errorNotice.message == "記録が見つかりませんでした")
+    }
+
+    @Test
     func leavesEditedTransferOutOfRecentTransfers() async throws {
         let setup = try await Setup()
         try await setup.saveTransfer(3000, from: setup.cash, to: setup.bank, at: 1)

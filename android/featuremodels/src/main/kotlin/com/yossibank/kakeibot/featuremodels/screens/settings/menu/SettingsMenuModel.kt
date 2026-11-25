@@ -18,14 +18,20 @@ import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class SettingsMenuModel(
     database: AppDatabase,
 ) : SettingsFoldModel {
+    val state = State()
     val input = Input()
 
     private val dependencies = Dependencies(database)
+
+    class State {
+        val task = ModelTask()
+    }
 
     class Input {
         var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
@@ -49,16 +55,23 @@ class SettingsMenuModel(
 
         coroutineScope {
             launch {
-                database.settingUpdates(SettingKey.monthStartDay).collect {
-                    input.monthStartDay = it
-                }
+                follow(
+                    values = database.settingUpdates(SettingKey.monthStartDay),
+                    fallback = MonthStartDay.first,
+                ) { input.monthStartDay = it }
             }
 
             launch {
-                database.settingUpdates(SettingKey.weekStart).collect { input.weekStart = it }
+                follow(
+                    values = database.settingUpdates(SettingKey.weekStart),
+                    fallback = Weekday.monday,
+                ) { input.weekStart = it }
             }
 
-            database.recurringUpdates().collect { input.recurringCount = it.size }
+            follow(
+                values = database.recurringUpdates(),
+                fallback = emptyList(),
+            ) { input.recurringCount = it.size }
         }
     }
 
@@ -80,11 +93,19 @@ class SettingsMenuModel(
         key: SettingKey<Value>,
         value: Value,
     ) {
-        ModelTask.quiet {
+        state.task.attempt(failure = ModelTask.settingSaveFailed) {
             dependencies.database.setSetting(
                 key = key,
                 to = value,
             )
         }
+    }
+
+    private suspend fun <Value> follow(
+        values: Flow<Value>,
+        fallback: Value,
+        receive: (Value) -> Unit,
+    ) {
+        ModelTask.quiet { values.collect { receive(it) } } ?: receive(fallback)
     }
 }

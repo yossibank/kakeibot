@@ -6,6 +6,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel.Target
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
+import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.budgets
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
@@ -247,6 +248,21 @@ class BudgetListModelTest {
         model.startEditing(Target.Total)
 
         assertEquals(listOf("先月"), model.output.suggestions.map { it.title })
+    }
+
+    @Test
+    fun tellsWhenBudgetsCannotBeRead() = modelTest(today = "2026-10-12") { setup ->
+        val model = BudgetListModel(
+            database = setup.database,
+            entryList = failingEntryList,
+            today = setup.today,
+        )
+
+        setup.scope.launch { model.observe() }
+        ModelWait.until { model.state.task.message.isNotEmpty() }
+
+        assertEquals("予算を読めませんでした", model.state.task.message)
+        assertNull(model.input.overview)
     }
 
     private fun BudgetListModel.press(vararg digits: Int) {

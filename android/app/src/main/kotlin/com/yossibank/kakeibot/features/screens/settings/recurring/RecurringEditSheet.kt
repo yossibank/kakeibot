@@ -149,6 +149,8 @@ fun RecurringEditSheet(
         model.load()
     }
 
+    model.state.task.Timer()
+
     fun open(next: RecurringPanel) {
         focus.clearFocus()
 

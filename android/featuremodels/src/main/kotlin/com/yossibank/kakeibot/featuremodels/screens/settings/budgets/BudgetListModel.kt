@@ -233,16 +233,17 @@ class BudgetListModel(
 
         coroutineScope {
             launch {
-                database.categoryListUpdates().collect { input.categoryList = it }
+                observe(database.categoryListUpdates()) { input.categoryList = it }
             }
 
-            snapshotFlow { state.today }
-                .flatMapLatest { day ->
-                    database.monthOverviewUpdates(
-                        on = day,
-                        list = dependencies.entryList,
-                    )
-                }.collect { input.overview = it }
+            val overviews = snapshotFlow { state.today }.flatMapLatest { day ->
+                database.monthOverviewUpdates(
+                    on = day,
+                    list = dependencies.entryList,
+                )
+            }
+
+            observe(overviews) { input.overview = it }
         }
     }
 
@@ -350,6 +351,17 @@ class BudgetListModel(
         return saved != null
     }
 
+    private suspend fun <Value> observe(
+        values: Flow<Value>,
+        receive: suspend (Value) -> Unit,
+    ) {
+        state.task.observe(
+            values = values,
+            failure = loadFailedMessage,
+            receive = receive,
+        )
+    }
+
     private suspend fun saveCarryoverFrom(
         start: YearMonth?,
         failure: String = SAVE_FAILED,
@@ -364,7 +376,9 @@ class BudgetListModel(
         return saved != null
     }
 
-    private companion object {
-        const val SAVE_FAILED = "予算を保存できませんでした"
+    companion object {
+        const val loadFailedMessage = "予算を読めませんでした"
+
+        private const val SAVE_FAILED = "予算を保存できませんでした"
     }
 }

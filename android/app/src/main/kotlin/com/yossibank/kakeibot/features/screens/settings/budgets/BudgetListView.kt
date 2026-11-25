@@ -101,6 +101,8 @@ fun BudgetListView(
         model.observe()
     }
 
+    model.state.task.Timer()
+
     cleared.Timer()
     resetFrom.Timer()
 
@@ -239,6 +241,7 @@ private fun BudgetNotices(
                 modifier = Modifier
                     .fillMaxWidth()
                     .card()
+                    .clickable(onClick = model.state.task::clear)
                     .padding(12.dp),
                 color = Palette.rose,
                 style = textFont(style = FontTextStyle.Caption),
