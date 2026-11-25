@@ -3,9 +3,7 @@ import FeatureModels
 import SwiftUI
 
 struct SettingsIconEditorDrawer<Field: Hashable>: ViewModifier {
-    @Binding var isPresented: Bool
-
-    @State private var top: CGFloat = 0
+    @State private var layout = Layout()
 
     let model: SettingsIconEditorModel
     let focus: FocusState<Field?>.Binding
@@ -15,7 +13,7 @@ struct SettingsIconEditorDrawer<Field: Hashable>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .overlay {
-                if isPresented {
+                if model.isPresented {
                     VStack(spacing: 0) {
                         Color.clear
                             .frame(height: inset)
@@ -46,15 +44,14 @@ struct SettingsIconEditorDrawer<Field: Hashable>: ViewModifier {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.frame(in: .global).minY
             } action: { minY in
-                top = minY
+                layout.top = minY
             }
-            .animation(.snappy, value: isPresented)
+            .animation(.snappy, value: model.isPresented)
     }
 }
 
 extension View {
     func iconEditorDrawer<Field: Hashable>(
-        isPresented: Binding<Bool>,
         model: SettingsIconEditorModel,
         focus: FocusState<Field?>.Binding,
         textField: Field,
@@ -62,7 +59,6 @@ extension View {
     ) -> some View {
         modifier(
             SettingsIconEditorDrawer(
-                isPresented: isPresented,
                 model: model,
                 focus: focus,
                 textField: textField,
@@ -73,16 +69,20 @@ extension View {
 }
 
 private extension SettingsIconEditorDrawer {
+    struct Layout {
+        var top: CGFloat = 0
+    }
+
     static var gap: CGFloat {
         16
     }
 
     var inset: CGFloat {
-        max(below - top + Self.gap, 0)
+        max(below - layout.top + Self.gap, 0)
     }
 
     func close() {
         focus.wrappedValue = nil
-        isPresented = false
+        model.dismiss()
     }
 }

@@ -44,13 +44,12 @@ public extension AssetsRewardGoalEditModel {
     @Observable
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt()
+        public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var name: String
 
         public private(set) var calculator: AmountCalculator
-        public private(set) var panel: Panel?
 
         init(
             name: String,
@@ -59,17 +58,7 @@ public extension AssetsRewardGoalEditModel {
         ) {
             self.name = name
             self.calculator = AmountCalculator(amount: amount)
-            self.panel = panel
-        }
-
-        public func open(_ panel: Panel) {
-            self.panel = panel
-        }
-
-        public func closePanel() {
-            if panel != nil {
-                panel = nil
-            }
+            prompt.panel = panel
         }
 
         public func press(_ key: AmountCalculator.Key) {

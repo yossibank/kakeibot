@@ -6,7 +6,6 @@ import SwiftUI
 @MainActor
 protocol SettingsBoardSpec {
     associatedtype Model: SettingsBoardListModel
-    associatedtype Destination: Hashable
     associatedtype Header: View = EmptyView
     associatedtype Lead: View = EmptyView
     associatedtype ScaleID: Equatable = Int
@@ -32,9 +31,9 @@ protocol SettingsBoardSpec {
     func header(in model: Model) -> Header
     func lead(in model: Model) -> Lead
     func scaleID(in model: Model) -> ScaleID?
-    func newDestination(in model: Model) -> Destination
-    func destination(editing item: Model.Item) -> Destination
-    func itemID(of destination: Destination) -> Model.Item.ID?
+    func newDestination(in model: Model) -> Model.State.Destination
+    func destination(editing item: Model.Item) -> Model.State.Destination
+    func itemID(of destination: Model.State.Destination) -> Model.Item.ID?
 
     func tile(
         _ item: Model.Item,
@@ -42,10 +41,10 @@ protocol SettingsBoardSpec {
         isHidden: Bool
     ) -> Tile
 
-    func editModel(for destination: Destination) -> Editor.EditModel
+    func editModel(for destination: Model.State.Destination) -> Editor.EditModel
 
     func editor(
-        for destination: Destination,
+        for destination: Model.State.Destination,
         onDelete: @escaping (Deletion) -> Void,
         onHide: @escaping () -> Void
     ) -> Editor
@@ -62,6 +61,8 @@ protocol SettingsBoardSpec {
 }
 
 extension SettingsBoardSpec {
+    typealias Destination = Model.State.Destination
+
     var layout: SettingsBoardLayout {
         .tiles
     }
@@ -127,7 +128,8 @@ extension SettingsBoardSpec where Header == EmptyView {
     }
 }
 
-extension SettingsBoardSpec where Destination == SettingsBoardDestination<Model.Item.ID> {
+extension SettingsBoardSpec
+    where Model.State.Destination == SettingsBoardDestination<Model.Item.ID> {
     func newDestination(in _: Model) -> Destination {
         .new
     }

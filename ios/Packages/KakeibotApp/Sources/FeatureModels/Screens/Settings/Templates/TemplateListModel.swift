@@ -25,6 +25,11 @@ public final class TemplateListModel {
 }
 
 public extension TemplateListModel {
+    enum Destination: Hashable, Sendable {
+        case new(Entry.Kind)
+        case edit(Entry.Kind, EntryTemplate.ID)
+    }
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
@@ -33,6 +38,7 @@ public extension TemplateListModel {
         public var type: Entry.Kind = .expense
         public var movingOrder: [EntryTemplate.ID]?
         public var removed = SettingsBoardRemoved<EntryTemplate.ID>()
+        public var shown = SettingsBoardShown<EntryTemplate.ID, Destination>()
     }
 
     @MainActor

@@ -10,11 +10,7 @@ struct CategoryBoard {
 }
 
 extension CategoryBoard: SettingsBoardSpec {
-    enum Destination: Hashable {
-        case new(EntryCategory.Kind)
-        case edit(EntryCategory.Kind, EntryCategory.ID)
-    }
-
+    typealias Destination = CategoryListModel.Destination
     typealias Editor = CategoryEditSheet
 
     var title: String {

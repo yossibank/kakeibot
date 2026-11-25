@@ -456,6 +456,8 @@ month-start-day.ends-asset-months-at-period-end	MonthStartDayModelTests/endsAsse
 settings-list-screen.*	SettingsListScreenTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-board.keeps-move-inside-the-board	SettingsBoardModelTests/keepsMoveInsideTheBoard	RecurringListModelTest/keepsMoveInsideTheBoard	対応	
 settings-board.ignores-move-to-same-place-or-unknown-item	SettingsBoardModelTests/ignoresMoveToSamePlaceOrUnknownItem	RecurringListModelTest/ignoresMoveToSamePlaceOrUnknownRecurring	対応	
+settings-board.asks-one-confirmation-at-a-time	SettingsBoardModelTests/asksOneConfirmationAtATime		未確認	Android は別のブランチで合わせる
+settings-board.opens-editor-while-keeping-open-row	SettingsBoardModelTests/opensEditorWhileKeepingOpenRow		未確認	Android は別のブランチで合わせる
 settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/keepsHiddenItemInStateAfterHiding	RecurringListModelTest/hidesAndShowsRecurring	対応	
 settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting	RecurringListModelTest/deletesAndRestoresRecurring	対応	Android は、削除を元に戻す所まで 1 つのテストで確かめる
 settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails	RecurringListModelTest/clearsDeletionInStateWhenDeletingFails	対応	
@@ -474,6 +476,9 @@ settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/places
 settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome	SettingsEditOutcomeTest/placesSaveAndHideInOneOutcome	対応	
 settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails	SettingsEditOutcomeTest/keepsSheetOpenWhenHidingAfterSaveFails	対応	
 settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide	SettingsEditOutcomeTest/savesWithoutHidingAfterFailedSaveAndHide	対応	
+settings-edit-prompt.shows-one-prompt-at-a-time	SettingsEditPromptTests/showsOnePromptAtATime		未確認	Android は別のブランチで合わせる
+settings-edit-prompt.closes-only-the-prompt-in-front	SettingsEditPromptTests/closesOnlyThePromptInFront		未確認	Android は別のブランチで合わせる
+settings-edit-prompt.keeps-panel-open-behind-prompt	SettingsEditPromptTests/keepsPanelOpenBehindPrompt		未確認	Android は別のブランチで合わせる
 settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い

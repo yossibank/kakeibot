@@ -66,19 +66,4 @@ ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillPager.swift: View の 
 ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillPager.swift: View の @State に置けるのは、モデルと layout だけにする: progress。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Shared/Notice/EntryDeletionBanner.swift: View の @State に置けるのは、モデルと layout だけにする: remaining。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Shared/Pro/View+ProOffer.swift: View の @State に置けるのは、モデルと layout だけにする: isShowingPro。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: deleting。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: destination。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: drag。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: grid。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: hiding。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingDeleteHidden。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingDelete。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingHide。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: openId。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsLiftLayer.swift: View の @State に置けるのは、モデルと layout だけにする: origin。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsZoneBox.swift: View の @State に置けるのは、モデルと layout だけにする: isOpen。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsZoneBox.swift: View の @State に置けるのは、モデルと layout だけにする: showsOnLabel。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Icon/SettingsIconEditorDrawer.swift: View の @State に置けるのは、モデルと layout だけにする: top。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Layout/SettingsEditHeader.swift: View の @State に置けるのは、モデルと layout だけにする: isMenuOpen。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Tile/SettingsPagedGrid.swift: View の @State に置けるのは、モデルと layout だけにする: page。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Tile/SettingsPagedGrid.swift: View の @State に置けるのは、モデルと layout だけにする: width。見た目の値は、入れ子の struct Layout にまとめる

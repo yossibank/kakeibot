@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsEditHeader: View {
-    @State private var isMenuOpen = false
+    @Binding var isMenuOpen: Bool
 
     @Environment(\.isSettingsEditPushed) private var isPushed
 
@@ -128,6 +128,10 @@ private extension SettingsEditHeader {
     }
 
     func openMenu(_ isOpen: Bool) {
+        guard isMenuOpen != isOpen else {
+            return
+        }
+
         withAnimation(.snappy(duration: 0.25)) {
             isMenuOpen = isOpen
         }

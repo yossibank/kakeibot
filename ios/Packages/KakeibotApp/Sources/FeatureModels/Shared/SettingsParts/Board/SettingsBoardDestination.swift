@@ -1,9 +1,9 @@
-enum SettingsBoardDestination<ID: Hashable>: Hashable {
+public enum SettingsBoardDestination<ID: Hashable & Sendable>: Hashable, Sendable {
     case new
     case edit(ID)
 }
 
-extension SettingsBoardDestination {
+public extension SettingsBoardDestination {
     var editingID: ID? {
         switch self {
         case .new: nil

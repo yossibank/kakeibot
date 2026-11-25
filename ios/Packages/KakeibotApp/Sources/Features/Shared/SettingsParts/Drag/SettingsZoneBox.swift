@@ -3,8 +3,7 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsZoneBox: View {
-    @State private var isOpen = false
-    @State private var showsOnLabel = false
+    @State private var layout = Layout()
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -17,9 +16,10 @@ struct SettingsZoneBox: View {
     var body: some View {
         let color = isOn ? tint : Palette.subtext
         let fill = isOn ? tint.opacity(.subtle) : Color.clear
-        let height = isOpen ? SettingsDropZones.openHeight : closedHeight
-        let labelHeight = isOpen ? SettingsDropZones.labelHeight : closedHeight
-        let label = showsOnLabel ? onLabel : offLabel
+        let opening = layout.opening
+        let height = closedHeight + (SettingsDropZones.openHeight - closedHeight) * opening
+        let labelHeight = closedHeight + (SettingsDropZones.labelHeight - closedHeight) * opening
+        let label = layout.onLabel > 0 ? onLabel : offLabel
 
         VStack(spacing: 0) {
             ZStack {
@@ -57,6 +57,11 @@ extension SettingsZoneBox {
 }
 
 private extension SettingsZoneBox {
+    struct Layout {
+        var opening: Double = 0
+        var onLabel: Double = 0
+    }
+
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
     }
@@ -65,19 +70,19 @@ private extension SettingsZoneBox {
 private extension SettingsZoneBox {
     func update() {
         guard isOn else {
-            showsOnLabel = false
+            layout.onLabel = 0
 
             withAnimation(.smooth(duration: 0.3)) {
-                isOpen = false
+                layout.opening = 0
             }
 
             return
         }
 
         withAnimation(.spring(duration: 0.4, bounce: 0.35)) {
-            isOpen = true
+            layout.opening = 1
         } completion: {
-            showsOnLabel = isOn
+            layout.onLabel = isOn ? 1 : 0
         }
     }
 }

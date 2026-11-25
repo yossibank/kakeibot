@@ -11,6 +11,7 @@ public final class SettingsIconEditorModel: ScreenPerforming {
 
     public private(set) var emoji = ""
     public private(set) var text = ""
+    public private(set) var isPresented = false
 
     public init(
         glyph: Icon.Glyph,
@@ -266,6 +267,18 @@ public extension SettingsIconEditorModel {
 
     func inputText(_ value: String) {
         text = String(value.prefix(IconDraft.maxTextLength))
+    }
+
+    func present() {
+        if !isPresented {
+            isPresented = true
+        }
+    }
+
+    func dismiss() {
+        if isPresented {
+            isPresented = false
+        }
     }
 
     func apply(_ icon: Icon) {
