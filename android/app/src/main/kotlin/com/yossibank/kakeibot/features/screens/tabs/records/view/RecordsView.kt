@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,13 +40,13 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.records.model.RecordsMo
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
 import com.yossibank.kakeibot.store.database.AppDatabase
-import kotlinx.coroutines.launch
 
 @Composable
 fun RecordsView(
@@ -70,8 +69,6 @@ fun RecordsView(
     SideEffect {
         model.state.today = today
     }
-
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(model) {
         model.observe()
@@ -110,9 +107,7 @@ fun RecordsView(
             SegmentSwitch(
                 selection = model.input.layout,
                 options = layouts,
-                onSelect = { layout ->
-                    scope.launch { model.select(layout) }
-                },
+                onSelect = { layout -> model.perform { it.select(layout) } },
             )
         }
 
