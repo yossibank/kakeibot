@@ -20,3 +20,13 @@ fun EntryModel.payOffLoan() {
 fun EntryModel.State.applyRoute(route: TransferRoute) {
     update { withWallet(route.walletId).copy(toWalletId = route.toWalletId) }
 }
+
+internal fun EntryModel.chooseDestination() {
+    val form = state.form
+
+    if (form.toWalletId != null && form.toWalletId != form.walletId) {
+        return
+    }
+
+    state.update { copy(toWalletId = output.wallets.firstOrNull { it.id != form.walletId }?.id) }
+}

@@ -56,6 +56,32 @@ data class EntryForm(
         )
     }
 
+    fun withWallet(
+        id: Identifier<Wallet>?,
+        offering: List<EntryCategory>,
+        allCategories: List<EntryCategory>,
+        allTags: List<EntryTag>,
+    ): EntryForm {
+        val moved = withWallet(id)
+        val current = allCategories.firstOrNull { it.id == categoryId }
+
+        if (id == walletId || current == null || offering.any { it.id == current.id }) {
+            return moved
+        }
+
+        val tagName = allTags.firstOrNull { it.id == tagId }?.name
+        val fitted = offering.firstOrNull { it.name == current.name } ?: offering.firstOrNull()
+
+        val tag = allTags.firstOrNull { tag ->
+            tag.categoryId == fitted?.id && tag.archivedAt == null && tag.name == tagName
+        }
+
+        return moved.copy(
+            categoryId = fitted?.id,
+            tagId = tag?.id,
+        )
+    }
+
     fun withCategory(id: Identifier<EntryCategory>?): EntryForm {
         if (id == categoryId) {
             return this

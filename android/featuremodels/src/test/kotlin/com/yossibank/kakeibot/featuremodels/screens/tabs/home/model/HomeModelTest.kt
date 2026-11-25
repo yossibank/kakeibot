@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
+import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.writes.methods.setBudget
@@ -14,6 +15,27 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class HomeModelTest {
+    @Test
+    fun showsNoticeWhenListFails() = modelTest(today = "2026-10-12") { setup ->
+        val model = HomeModel(
+            database = setup.database,
+            entryList = failingEntryList,
+            today = setup.today,
+        )
+
+        model.observe()
+
+        assertEquals("記録を読めませんでした", model.state.task.message)
+        assertNull(model.input.overview)
+    }
+
+    @Test
+    fun showsNoNoticeWhileListArrives() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.observedModel()
+
+        assertEquals("", model.state.task.message)
+    }
+
     @Test
     fun showsNothingBeforeOverviewArrives() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.homeModel()

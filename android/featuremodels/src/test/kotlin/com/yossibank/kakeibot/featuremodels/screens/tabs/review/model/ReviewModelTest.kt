@@ -187,7 +187,7 @@ class ReviewModelTest {
     }
 
     @Test
-    fun startsWithExpenseWhenBalanceWasSaved() = modelTest(today = "2026-10-17") { setup ->
+    fun startsWithBalanceWhenBalanceWasSaved() = modelTest(today = "2026-10-17") { setup ->
         setup.database.setSetting(
             key = SettingKey.reviewKind,
             to = ReviewKind.balance,
@@ -195,8 +195,66 @@ class ReviewModelTest {
         val model = setup.reviewModel()
 
         model.loadSelection()
+        model.setScale(ReviewPeriod.Scale.year)
+        model.saveSelection()
 
-        assertEquals(ReviewKind.expense, model.input.kind)
+        assertEquals(ReviewKind.balance, model.input.kind)
+        assertEquals(ReviewKind.balance, setup.database.setting(SettingKey.reviewKind))
+    }
+
+    @Test
+    fun remembersBalance() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.reviewModel()
+
+        model.setKind(ReviewKind.balance)
+        model.saveSelection()
+        val reopened = setup.reviewModel()
+        reopened.loadSelection()
+
+        assertEquals(ReviewKind.balance, reopened.input.kind)
+    }
+
+    @Test
+    fun comparesIncomeAndExpenseForBalance() = modelTest(today = "2026-10-17") { setup ->
+        setup.save(Entry.Kind.expense, amount = 3000, on = date("2026-10-05"))
+        setup.save(Entry.Kind.income, amount = 12000, on = date("2026-10-10"))
+        setup.save(Entry.Kind.expense, amount = 9000, on = date("2026-09-10"))
+        val model = setup.observedModel()
+        val hidden = model.output.balanceBars
+
+        model.setKind(ReviewKind.balance)
+        val bars = model.output.balanceBars
+
+        assertTrue(hidden.isEmpty())
+        assertEquals(listOf("収入", "支出"), bars.map { it.title })
+        assertEquals(listOf(Entry.Kind.income, Entry.Kind.expense), bars.map { it.type })
+        assertEquals(listOf(12000L, 3000L), bars.map { it.amount })
+        assertEquals(listOf(1.0, 0.25), bars.map { it.ratio })
+        assertEquals(9000L, model.output.total)
+        assertTrue(model.output.rows.isEmpty())
+    }
+
+    @Test
+    fun showsEmptyBalanceBarsWithoutEntries() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.observedModel()
+
+        model.setKind(ReviewKind.balance)
+
+        assertEquals(listOf(0L, 0L), model.output.balanceBars.map { it.amount })
+        assertEquals(listOf(0.0, 0.0), model.output.balanceBars.map { it.ratio })
+        assertEquals(0L, model.output.total)
+    }
+
+    @Test
+    fun scalesBalanceBarsToLargerExpense() = modelTest(today = "2026-10-17") { setup ->
+        setup.save(Entry.Kind.expense, amount = 8000, on = date("2026-10-05"))
+        setup.save(Entry.Kind.income, amount = 2000, on = date("2026-10-10"))
+        val model = setup.observedModel()
+
+        model.setKind(ReviewKind.balance)
+
+        assertEquals(listOf(0.25, 1.0), model.output.balanceBars.map { it.ratio })
+        assertEquals(-6000L, model.output.total)
     }
 
     @Test

@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.monthOverviewUpdates
@@ -33,6 +34,8 @@ class HomeModel(
     class State(
         today: LocalDate,
     ) {
+        val task = ModelTask()
+
         var today: LocalDate by mutableStateOf(today)
     }
 
@@ -95,12 +98,20 @@ class HomeModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun observe() {
-        snapshotFlow { state.today }
-            .flatMapLatest { day ->
-                dependencies.database.monthOverviewUpdates(
-                    on = day,
-                    list = dependencies.entryList,
-                )
-            }.collect { input.overview = it }
+        val overviews = snapshotFlow { state.today }.flatMapLatest { day ->
+            dependencies.database.monthOverviewUpdates(
+                on = day,
+                list = dependencies.entryList,
+            )
+        }
+
+        state.task.observe(
+            values = overviews,
+            failure = loadFailedMessage,
+        ) { input.overview = it }
+    }
+
+    companion object {
+        const val loadFailedMessage = "記録を読めませんでした"
     }
 }

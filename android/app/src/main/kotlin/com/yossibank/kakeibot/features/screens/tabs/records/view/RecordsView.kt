@@ -45,6 +45,7 @@ import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.entry.EntryRow
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
+import com.yossibank.kakeibot.designsystem.components.notice.noticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
@@ -107,6 +108,8 @@ fun RecordsView(
                 style = displayFont(size = FontSize.Headline),
             )
         }
+
+        noticeBanner(task = model.state.task)
 
         item(key = "month") {
             PeriodStepper(

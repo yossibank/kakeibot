@@ -33,6 +33,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.budget.budgetText
 import com.yossibank.kakeibot.designsystem.components.dial.HalfDial
 import com.yossibank.kakeibot.designsystem.components.entry.EntryRow
+import com.yossibank.kakeibot.designsystem.components.notice.noticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
@@ -113,6 +114,8 @@ fun HomeView(
                 )
             }
         }
+
+        noticeBanner(task = model.state.task)
 
         item(key = "budget") {
             BudgetCard(

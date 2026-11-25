@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlin.time.Duration
 
 class ModelTask {
     var message: String by mutableStateOf("")
@@ -50,6 +52,25 @@ class ModelTask {
         } finally {
             running -= 1
         }
+    }
+
+    suspend fun <Value> observe(
+        values: Flow<Value>,
+        failure: String,
+        retryDelays: List<Duration> = ScreenObservation.retryDelays,
+        receive: suspend (Value) -> Unit,
+    ): Boolean {
+        val isFailed = ScreenObservation.retry(
+            values = values,
+            retryDelays = retryDelays,
+            receive = receive,
+        )
+
+        if (isFailed) {
+            message = failure
+        }
+
+        return isFailed
     }
 
     companion object {

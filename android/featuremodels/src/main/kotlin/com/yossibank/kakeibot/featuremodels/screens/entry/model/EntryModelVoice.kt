@@ -20,21 +20,22 @@ data class VoiceFilled(
 )
 
 fun EntryModel.apply(reading: VoiceReading): VoiceUndo {
-    val form = state.form
     val calculator = state.calculator
 
     val undo = VoiceUndo(
-        form = form,
+        form = state.form,
         calculator = calculator,
     )
 
     val amount = reading.amount
     val isAmountValid = amount != null && amount in 1..AmountCalculator.maxValue
+
+    reading.walletId?.let { setWallet(it) }
+
     val categoryId = reading.categoryId?.takeIf { id -> output.categories.any { it.id == id } }
 
-    var next = form
+    var next = state.form
 
-    reading.walletId?.let { next = next.withWallet(it) }
     categoryId?.let { next = next.withCategory(it) }
     reading.date?.let { next = next.withDate(it) }
     reading.memo?.let { next = next.withStore(it) }

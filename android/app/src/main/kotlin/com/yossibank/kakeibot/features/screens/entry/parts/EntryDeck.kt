@@ -65,6 +65,7 @@ import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.feeChoices
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsItems
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.tags
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.walletTitle
@@ -116,7 +117,7 @@ fun EntryDeck(
                 EntryModel.Field.Wallet -> WalletList(
                     model = model,
                     selection = model.state.form.walletId,
-                    onSelect = model.state::select,
+                    onSelect = { model.select(wallet = it) },
                 )
 
                 EntryModel.Field.ToWallet -> WalletList(

@@ -39,6 +39,7 @@ import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
+import com.yossibank.kakeibot.designsystem.components.notice.noticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.VerticalRule
 import com.yossibank.kakeibot.designsystem.components.surface.card
@@ -55,6 +56,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.model.ReviewModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.features.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -115,6 +117,8 @@ fun ReviewView(
                 )
             }
         }
+
+        noticeBanner(task = model.state.task)
 
         item(key = "period") {
             PeriodStepper(
@@ -177,7 +181,7 @@ private fun TotalsCard(model: ReviewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = if (summary.balance < 0) "収支 · 赤字" else "収支 · 黒字",
+                text = ReviewText.balanceTitle(summary.balance),
                 color = Palette.subtext,
                 style = textFont(style = FontTextStyle.Caption),
             )
@@ -186,7 +190,7 @@ private fun TotalsCard(model: ReviewModel) {
                 amount = summary.balance.clamped,
                 style = displayFont(size = FontSize.Body),
                 sign = AmountText.Sign.Plus,
-                color = if (summary.balance < 0) Palette.rose else Palette.accent,
+                color = ReviewText.balanceColor(summary.balance),
             )
         }
     }
@@ -221,8 +225,11 @@ private fun Total(
 @Composable
 private fun BreakdownCard(model: ReviewModel) {
     val rows = model.output.rows
+    val bars = model.output.balanceBars
+    val isBalance = model.input.kind == ReviewKind.balance
     val scope = rememberCoroutineScope()
-    val difference = model.output.total - model.output.previousTotal
+    val total = model.output.total
+    val difference = total - model.output.previousTotal
 
     Column(
         modifier = Modifier
@@ -237,7 +244,7 @@ private fun BreakdownCard(model: ReviewModel) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "カテゴリごと",
+                text = if (isBalance) "収入と支出" else "カテゴリごと",
                 modifier = Modifier.weight(1f),
                 color = Palette.accent,
                 style = textFont(
@@ -257,22 +264,31 @@ private fun BreakdownCard(model: ReviewModel) {
         }
 
         Box(contentAlignment = Alignment.Center) {
-            ReviewDonut(rows = rows)
+            if (!isBalance) {
+                ReviewDonut(rows = rows)
+            }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = title(of = model.input.kind),
+                    text = if (isBalance) {
+                        ReviewText.balanceTitle(
+                            total,
+                        )
+                    } else {
+                        title(of = model.input.kind)
+                    },
                     color = Palette.subtext,
                     style = textFont(style = FontTextStyle.Caption),
                 )
 
                 AmountText(
-                    amount = model.output.total.clamped,
+                    amount = total.clamped,
                     style = displayFont(
                         size = FontSize.Headline,
                         weight = FontWeight.Bold,
                     ),
-                    color = Palette.accentStrong,
+                    sign = if (isBalance) AmountText.Sign.Plus else AmountText.Sign.Auto,
+                    color = if (isBalance) ReviewText.balanceColor(total) else Palette.accentStrong,
                 )
             }
         }
@@ -286,7 +302,9 @@ private fun BreakdownCard(model: ReviewModel) {
             style = textFont(style = FontTextStyle.Caption),
         )
 
-        if (rows.isEmpty()) {
+        if (isBalance) {
+            ReviewBalanceBars(bars = bars)
+        } else if (rows.isEmpty()) {
             Text(
                 text = "この期間の記録はまだありません",
                 modifier = Modifier.padding(vertical = 8.dp),
@@ -346,7 +364,7 @@ private val scales = listOf(
     ReviewPeriod.Scale.year to "年",
 )
 
-private val kinds = listOf(ReviewKind.expense, ReviewKind.income).map { it to title(of = it) }
+private val kinds = ReviewKind.entries.map { it to title(of = it) }
 
 private fun title(of: ReviewKind): String = when (of) {
     ReviewKind.expense -> "支出"

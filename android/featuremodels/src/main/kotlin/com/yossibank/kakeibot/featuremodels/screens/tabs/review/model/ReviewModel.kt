@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
+import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
@@ -48,9 +49,18 @@ class ReviewModel(
         val ratio: Double,
     )
 
+    data class BalanceBar(
+        val title: String,
+        val type: Entry.Kind,
+        val amount: Long,
+        val ratio: Double,
+    )
+
     class State(
         today: LocalDate,
     ) {
+        val task = ModelTask()
+
         var today: LocalDate by mutableStateOf(today)
 
         var offset: Int by mutableStateOf(0)
@@ -173,6 +183,29 @@ class ReviewModel(
                     }
             }
 
+        val balanceBars: List<BalanceBar>
+            get() {
+                if (input.kind != ReviewKind.balance) {
+                    return emptyList()
+                }
+
+                val income = summary.income.total
+                val expense = summary.expense.total
+                val largest = maxOf(income, expense)
+
+                return listOf(
+                    Triple("収入", Entry.Kind.income, income),
+                    Triple("支出", Entry.Kind.expense, expense),
+                ).map { (title, type, amount) ->
+                    BalanceBar(
+                        title = title,
+                        type = type,
+                        amount = amount,
+                        ratio = if (largest > 0) amount.toDouble() / largest.toDouble() else 0.0,
+                    )
+                }
+            }
+
         private fun total(of: ReviewSummary): Long = when (input.kind) {
             ReviewKind.expense -> of.expense.total
             ReviewKind.income -> of.income.total
@@ -192,17 +225,17 @@ class ReviewModel(
 
         coroutineScope {
             launch {
-                database.settingUpdates(SettingKey.monthStartDay).collect {
+                observe(database.settingUpdates(SettingKey.monthStartDay)) {
                     input.monthStartDay = it
                 }
             }
 
             launch {
-                database.settingUpdates(SettingKey.weekStart).collect { input.weekStart = it }
+                observe(database.settingUpdates(SettingKey.weekStart)) { input.weekStart = it }
             }
 
             launch {
-                dependencies.entryList.collect { input.list = it }
+                observe(dependencies.entryList) { input.list = it }
             }
         }
     }
@@ -210,12 +243,9 @@ class ReviewModel(
     suspend fun loadSelection() {
         val database = dependencies.database
 
-        ModelTask.quiet {
+        state.task.attempt(failure = loadFailedMessage) {
             input.scale = database.setting(SettingKey.reviewScale)
-            input.kind = when (val kind = database.setting(SettingKey.reviewKind)) {
-                ReviewKind.balance -> ReviewKind.expense
-                else -> kind
-            }
+            input.kind = database.setting(SettingKey.reviewKind)
         }
     }
 
@@ -240,6 +270,21 @@ class ReviewModel(
                 key = SettingKey.reviewKind,
                 to = input.kind,
             )
-        }
+        } ?: state.task.show(ModelTask.saveFailed)
+    }
+
+    private suspend fun <Value> observe(
+        values: Flow<Value>,
+        receive: suspend (Value) -> Unit,
+    ) {
+        state.task.observe(
+            values = values,
+            failure = loadFailedMessage,
+            receive = receive,
+        )
+    }
+
+    companion object {
+        const val loadFailedMessage = "記録を読めませんでした"
     }
 }
