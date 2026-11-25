@@ -15,11 +15,11 @@ fun EntryModel.apply(template: EntryTemplate) {
         .cardBill(paidBy = template.walletId)
         ?.billMonth(used = state.form.date, shift = template.billShift)
 
+    state.update { withCategory(template.categoryId).copy(tagId = tagId) }
+    setWallet(template.walletId)
+
     state.update {
         copy(
-            categoryId = template.categoryId,
-            tagId = tagId,
-            walletId = template.walletId,
             memo = template.memo?.takeIf { it.isNotEmpty() } ?: memo,
             billMonth = billMonth,
             templateId = template.id,
@@ -34,7 +34,7 @@ fun EntryModel.apply(template: EntryTemplate) {
 
 fun EntryModel.applyRecent(entry: Entry) {
     output.wallet(of = entry.walletId)?.let { wallet ->
-        state.select(wallet = wallet)
+        setWallet(wallet.id)
     }
 
     val hasCategory = output.categories.any { it.id == entry.categoryId }

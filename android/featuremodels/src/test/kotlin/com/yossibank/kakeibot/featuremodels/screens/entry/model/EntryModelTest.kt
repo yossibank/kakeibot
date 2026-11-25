@@ -246,7 +246,7 @@ class EntryModelTest {
         val daily = options.expenseCategories[1]
         val bank = options.wallets[1]
         model.state.select(daily)
-        model.state.select(bank)
+        model.select(wallet = bank)
         model.press(5)
         model.state.update { copy(memo = "ランチ") }
         model.save()
@@ -259,6 +259,7 @@ class EntryModelTest {
         assertEquals(bank.id, model.state.form.walletId)
         assertEquals(1, model.input.history?.entries?.size)
         assertEquals(listOf("ランチ"), model.input.recentMemos)
+        assertFalse(model.output.isChanged)
     }
 
     @Test

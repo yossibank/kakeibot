@@ -6,6 +6,8 @@ import com.yossibank.kakeibot.store.writes.methods.setHidden
 import com.yossibank.kakeibot.store.writes.types.WalletTable
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class EntryModelWalletTest {
     @Test
@@ -29,6 +31,85 @@ class EntryModelWalletTest {
         model.state.select(categories[1])
 
         assertEquals(wallets[1].id, first)
+        assertEquals(wallets[1].id, model.state.form.walletId)
+    }
+
+    @Test
+    fun startsEachTypeWithItsLastWallet() = modelTest(today = "2026-10-12") { setup ->
+        val wallets = setup.options().wallets
+        setup.save(Entry.Kind.expense, amount = 500, on = setup.today, walletId = wallets[1].id)
+        val model = setup.loadedModel()
+
+        model.select(type = Entry.Kind.income)
+        val income = model.state.form.walletId
+        model.select(type = Entry.Kind.expense)
+
+        assertEquals(wallets[0].id, income)
+        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertFalse(model.output.isChanged)
+    }
+
+    @Test
+    fun keepsWalletWhenSwitchingToTransfer() = modelTest(today = "2026-10-12") { setup ->
+        val wallets = setup.options().wallets
+        setup.save(Entry.Kind.expense, amount = 500, on = setup.today, walletId = wallets[1].id)
+        val model = setup.loadedModel()
+
+        model.select(type = Entry.Kind.transfer)
+
+        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[0].id, model.state.form.toWalletId)
+    }
+
+    @Test
+    fun keepsWalletOfTouchedEntryWhenTypeChanges() = modelTest(today = "2026-10-12") { setup ->
+        val wallets = setup.options().wallets
+        setup.save(Entry.Kind.expense, amount = 500, on = setup.today, walletId = wallets[1].id)
+        val model = setup.loadedModel()
+        model.press(5)
+
+        model.select(type = Entry.Kind.income)
+
+        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertTrue(model.output.isChanged)
+    }
+
+    @Test
+    fun keepsChosenWallet() = modelTest(today = "2026-10-12") { setup ->
+        val options = setup.options()
+        val categories = options.expenseCategories
+        val wallets = options.wallets
+        setup.save(
+            Entry.Kind.expense,
+            amount = 500,
+            on = setup.today,
+            categoryId = categories[1].id,
+            walletId = wallets[0].id,
+        )
+        val model = setup.loadedModel()
+
+        model.state.select(categories[1])
+        model.select(wallet = wallets[1])
+        model.state.select(categories[2])
+        model.select(type = Entry.Kind.income)
+
+        assertEquals(wallets[1].id, model.state.form.walletId)
+    }
+
+    @Test
+    fun startsNextEntryFollowingTypeAgain() = modelTest(today = "2026-10-12") { setup ->
+        val wallets = setup.options().wallets
+        val model = setup.loadedModel()
+        model.select(wallet = wallets[1])
+        model.press(5)
+        model.save()
+
+        model.startNext()
+        model.select(type = Entry.Kind.income)
+        val income = model.state.form.walletId
+        model.select(type = Entry.Kind.expense)
+
+        assertEquals(wallets[0].id, income)
         assertEquals(wallets[1].id, model.state.form.walletId)
     }
 
@@ -79,6 +160,11 @@ class EntryModelWalletTest {
         setup.save(Entry.Kind.expense, amount = 500, on = setup.today, walletId = wallets[1].id)
         val model = setup.loadedModel(editing = entry.id)
 
+        val loaded = model.state.form.walletId
+        model.select(type = Entry.Kind.income)
+        model.select(type = Entry.Kind.expense)
+
+        assertEquals(wallets[0].id, loaded)
         assertEquals(wallets[0].id, model.state.form.walletId)
     }
 }

@@ -23,6 +23,7 @@ class EntryModelTransferTest {
         assertNull(model.state.form.categoryId)
         assertEquals(EntryModel.Field.Transfer, model.state.field)
         assertEquals("財布 → 銀行", model.output.routeText)
+        assertFalse(model.output.isChanged)
     }
 
     @Test
@@ -43,17 +44,59 @@ class EntryModelTransferTest {
     }
 
     @Test
-    fun keepsFirstCategoryWhenComingBackFromTransfer() = modelTest(today = "2026-10-12") { setup ->
+    fun keepsCategoryWhenComingBackFromTransfer() = modelTest(today = "2026-10-12") { setup ->
+        val bank = setup.options().wallets[1]
         val model = setup.loadedModel()
         val category = model.state.form.categoryId
 
         model.select(type = Entry.Kind.transfer)
         val transferCategory = model.state.form.categoryId
+        val destination = model.state.form.toWalletId
         model.select(type = Entry.Kind.expense)
 
         assertNull(transferCategory)
+        assertEquals(bank.id, destination)
         assertEquals(category, model.state.form.categoryId)
-        assertNull(model.state.form.toWalletId)
+        assertEquals(bank.id, model.state.form.toWalletId)
+    }
+
+    @Test
+    fun keepsChosenDestinationAcrossTypes() = modelTest(today = "2026-10-12") { setup ->
+        val card = setup.addWallet(kind = Wallet.Kind.card, name = "カード")
+        val model = setup.transferModel()
+        model.state.selectDestination(card)
+
+        model.select(type = Entry.Kind.income)
+        model.select(type = Entry.Kind.transfer)
+
+        assertEquals(card.id, model.state.form.toWalletId)
+    }
+
+    @Test
+    fun choosesAnotherDestinationWhenSameAsSource() = modelTest(today = "2026-10-12") { setup ->
+        val wallets = setup.options().wallets
+        val model = setup.transferModel()
+        model.select(type = Entry.Kind.expense)
+        model.select(wallet = wallets[1])
+
+        model.select(type = Entry.Kind.transfer)
+
+        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[0].id, model.state.form.toWalletId)
+    }
+
+    @Test
+    fun leavesExpenseWithoutDestinationWhenSaved() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.transferModel()
+        model.select(type = Entry.Kind.expense)
+        model.press(5)
+
+        val saved = model.save()
+        val entry = setup.database.entryList().entries.first()
+
+        assertTrue(saved)
+        assertEquals(Entry.Kind.expense, entry.type)
+        assertNull(entry.toWalletId)
     }
 
     @Test
@@ -109,7 +152,7 @@ class EntryModelTransferTest {
             )
             val model = setup.transferModel()
 
-            model.state.select(card)
+            model.select(wallet = card)
             val empty = model.output.isOverSourceBalance
             model.press(1)
 
@@ -122,7 +165,7 @@ class EntryModelTransferTest {
         val bank = setup.options().wallets[1]
         val loan = setup.addWallet(kind = Wallet.Kind.loan, name = "奨学金", initialBalance = -100_000)
         val model = setup.transferModel()
-        model.state.select(bank)
+        model.select(wallet = bank)
         model.state.selectDestination(loan)
 
         val remaining = model.output.loanRemaining
@@ -258,7 +301,7 @@ class EntryModelTransferTest {
         val model = setup.loadedModel()
 
         model.state.update { copy(billMonth = month("2026-11")) }
-        model.state.select(wallets[1])
+        model.select(wallet = wallets[1])
         val afterWallet = model.state.form.billMonth
         model.state.update { copy(billMonth = month("2026-11")) }
         model.state.select(date = date("2026-10-13"))

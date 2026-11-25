@@ -98,11 +98,6 @@ class EntryModel(
             form = form.copy(tagId = if (form.tagId == id) null else id)
         }
 
-        fun select(wallet: Wallet) {
-            form = form.withWallet(wallet.id)
-            field = if (form.type == Entry.Kind.transfer) Field.Transfer else Field.Amount
-        }
-
         fun selectDestination(wallet: Wallet) {
             form = form.copy(toWalletId = wallet.id)
             field = Field.Transfer
@@ -192,6 +187,8 @@ class EntryModel(
 
         var allTemplates: List<EntryTemplate> by mutableStateOf(emptyList())
             internal set
+
+        internal var baseline: Snapshot? by mutableStateOf(null)
     }
 
     class Output(
@@ -220,6 +217,12 @@ class EntryModel(
             get() = if (state.field == Field.Fee) state.feeCalculator else state.calculator
     }
 
+    internal data class Snapshot(
+        val form: EntryForm,
+        val calculator: AmountCalculator,
+        val feeCalculator: AmountCalculator,
+    )
+
     private class Dependencies(
         val database: AppDatabase,
         val clock: ScreenClock,
@@ -230,7 +233,13 @@ class EntryModel(
             return
         }
 
+        val isUntouched = !output.isEditing && !output.isChanged
+
         state.update { withType(type) }
+
+        if (isUntouched && type != Entry.Kind.transfer) {
+            setWallet(output.usualWalletId)
+        }
 
         val form = state.form
         val categories = output.categories
@@ -242,16 +251,18 @@ class EntryModel(
             else -> categories.firstOrNull()?.id
         }
 
-        val destination = if (type == Entry.Kind.transfer) {
-            form.toWalletId ?: output.wallets.firstOrNull { it.id != form.walletId }?.id
-        } else {
-            null
+        state.update { withCategory(categoryId) }
+
+        if (type == Entry.Kind.transfer) {
+            chooseDestination()
         }
 
-        state.update { withCategory(categoryId).copy(toWalletId = destination) }
         state.focus(output.startField)
-
         state.task.clear()
+
+        if (isUntouched) {
+            input.baseline = output.snapshot
+        }
     }
 
     suspend fun load() {
@@ -285,15 +296,12 @@ class EntryModel(
                 )
                 state.setFee(database.fee(of = entry.id)?.amount ?: 0)
             } else {
-                state.update {
-                    copy(
-                        categoryId = output.categories.firstOrNull()?.id,
-                        walletId = output.usualWalletId,
-                    )
-                }
+                state.update { withCategory(output.categories.firstOrNull()?.id) }
+                setWallet(output.usualWalletId)
             }
 
             state.focus(output.startField)
+            input.baseline = output.snapshot
         }
     }
 
@@ -346,6 +354,8 @@ class EntryModel(
         state.task.attempt(failure = ModelTask.loadFailed) {
             loadHistory()
         }
+
+        input.baseline = output.snapshot
     }
 
     suspend fun reloadTemplates() {

@@ -20,11 +20,10 @@ val EntryModel.Output.tags: List<EntryTag>
     }
 
 val EntryModel.Output.categories: List<EntryCategory>
-    get() = when (state.form.type) {
-        Entry.Kind.expense -> input.options?.expenseCategories ?: emptyList()
-        Entry.Kind.income -> input.options?.incomeCategories ?: emptyList()
-        Entry.Kind.transfer -> emptyList()
-    }
+    get() = categories(of = state.form.type, walletId = state.form.walletId)
+
+internal val EntryModel.Output.isChanged: Boolean
+    get() = input.baseline?.let { it != snapshot } ?: false
 
 val EntryModel.Output.wallets: List<Wallet>
     get() = input.options?.wallets ?: emptyList()
@@ -61,10 +60,47 @@ internal val EntryModel.Output.draft: EntryDraft?
         includesItems = showsItems,
     )
 
-private val EntryModel.Output.allCategories: List<EntryCategory>
+internal val EntryModel.Output.snapshot: EntryModel.Snapshot
+    get() = EntryModel.Snapshot(
+        form = state.form.copy(
+            templateId = null,
+            categoryByType = emptyMap(),
+        ),
+        calculator = state.calculator,
+        feeCalculator = state.feeCalculator,
+    )
+
+internal val EntryModel.Output.allCategories: List<EntryCategory>
     get() = (input.options?.expenseCategories ?: emptyList()) +
         (input.options?.incomeCategories ?: emptyList()) +
         (input.options?.sharedCategories ?: emptyList())
+
+internal fun EntryModel.Output.categories(
+    of: Entry.Kind,
+    walletId: Identifier<Wallet>?,
+): List<EntryCategory> = when (of) {
+    Entry.Kind.expense -> offeredCategories(of = EntryCategory.Kind.expense, walletId = walletId)
+    Entry.Kind.income -> offeredCategories(of = EntryCategory.Kind.income, walletId = walletId)
+    Entry.Kind.transfer -> emptyList()
+}
+
+private fun EntryModel.Output.offeredCategories(
+    of: EntryCategory.Kind,
+    walletId: Identifier<Wallet>?,
+): List<EntryCategory> {
+    val shared = (input.options?.sharedCategories ?: emptyList()).filter { category ->
+        category.walletId != null && category.walletId == walletId
+    }
+
+    if (shared.isNotEmpty()) {
+        return shared.filter { it.kind == of }
+    }
+
+    return when (of) {
+        EntryCategory.Kind.expense -> input.options?.expenseCategories ?: emptyList()
+        EntryCategory.Kind.income -> input.options?.incomeCategories ?: emptyList()
+    }
+}
 
 fun EntryModel.Output.icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
 
