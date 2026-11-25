@@ -36,7 +36,8 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsScreenFlag
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import kotlinx.coroutines.launch
@@ -65,17 +66,18 @@ data class SettingsIntroNote(
 fun SettingsIntroCard(
     icon: Int,
     headline: Pair<String, String>,
-    flag: SettingsScreenFlag,
+    fold: SettingsFoldInput,
+    model: SettingsFoldModel,
     notes: List<SettingsIntroNote> = emptyList(),
 ) {
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(flag) {
-        flag.load()
+    LaunchedEffect(fold) {
+        model.loadFold(fold)
     }
 
     AnimatedVisibility(
-        visible = flag.isLoaded && !flag.isOn,
+        visible = fold.isClosed == false,
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically(),
     ) {
@@ -123,7 +125,14 @@ fun SettingsIntroCard(
 
                 RoundIconButton(
                     icon = R.drawable.ic_close,
-                    onSelect = { scope.launch { flag.set(true) } },
+                    onSelect = {
+                        scope.launch {
+                            model.setFold(
+                                fold = fold,
+                                isClosed = true,
+                            )
+                        }
+                    },
                 )
             }
 
@@ -159,17 +168,27 @@ fun SettingsIntroCard(
 }
 
 @Composable
-fun SettingsHintButton(flag: SettingsScreenFlag) {
+fun SettingsHintButton(
+    fold: SettingsFoldInput,
+    model: SettingsFoldModel,
+) {
     val scope = rememberCoroutineScope()
 
     AnimatedVisibility(
-        visible = flag.isLoaded && flag.isOn,
+        visible = fold.isClosed == true,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
         RoundIconButton(
             icon = R.drawable.ic_help,
-            onSelect = { scope.launch { flag.set(false) } },
+            onSelect = {
+                scope.launch {
+                    model.setFold(
+                        fold = fold,
+                        isClosed = false,
+                    )
+                }
+            },
         )
     }
 }

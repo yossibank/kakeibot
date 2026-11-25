@@ -6,7 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
+import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -19,7 +22,7 @@ import kotlinx.coroutines.launch
 
 class SettingsMenuModel(
     database: AppDatabase,
-) {
+) : SettingsFoldModel {
     val input = Input()
 
     private val dependencies = Dependencies(database)
@@ -33,6 +36,8 @@ class SettingsMenuModel(
 
         var recurringCount: Int by mutableIntStateOf(0)
             internal set
+
+        val monthStartHint = SettingsFoldInput.hint(SettingsScreen.monthStartDay)
     }
 
     private class Dependencies(
@@ -55,6 +60,20 @@ class SettingsMenuModel(
 
             database.recurringUpdates().collect { input.recurringCount = it.size }
         }
+    }
+
+    override suspend fun loadFold(fold: SettingsFoldInput) {
+        fold.load(from = dependencies.database)
+    }
+
+    override suspend fun setFold(
+        fold: SettingsFoldInput,
+        isClosed: Boolean,
+    ) {
+        fold.save(
+            isClosed = isClosed,
+            to = dependencies.database,
+        )
     }
 
     suspend fun <Value> store(

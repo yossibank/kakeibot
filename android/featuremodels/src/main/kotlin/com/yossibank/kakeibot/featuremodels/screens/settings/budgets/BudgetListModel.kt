@@ -11,11 +11,14 @@ import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
+import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.categoryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.monthOverviewUpdates
@@ -36,7 +39,7 @@ class BudgetListModel(
     database: AppDatabase,
     entryList: Flow<EntryList>,
     today: LocalDate,
-) {
+) : SettingsFoldModel {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
@@ -113,6 +116,8 @@ class BudgetListModel(
 
         var categoryList: CategoryList? by mutableStateOf(null)
             internal set
+
+        val hint = SettingsFoldInput.hint(SettingsScreen.budgets)
     }
 
     class Output(
@@ -239,6 +244,20 @@ class BudgetListModel(
                     )
                 }.collect { input.overview = it }
         }
+    }
+
+    override suspend fun loadFold(fold: SettingsFoldInput) {
+        fold.load(from = dependencies.database)
+    }
+
+    override suspend fun setFold(
+        fold: SettingsFoldInput,
+        isClosed: Boolean,
+    ) {
+        fold.save(
+            isClosed = isClosed,
+            to = dependencies.database,
+        )
     }
 
     fun startEditing(target: Target) {
