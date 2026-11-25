@@ -28,7 +28,7 @@ private extension AppModel {
         _ status: ProStatus,
         in database: AppDatabase
     ) async {
-        isPro = status.isUnlocked
+        input.isPro = status.isUnlocked
 
         guard status == .revoked else {
             return
@@ -41,7 +41,7 @@ private extension AppModel {
 
             try await database.turnOffSync()
         } catch {
-            notice.show(Self.stopSyncFailedMessage)
+            state.notice.show(Self.stopSyncFailedMessage)
         }
     }
 }

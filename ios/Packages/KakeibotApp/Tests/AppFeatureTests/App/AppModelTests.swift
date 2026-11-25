@@ -15,15 +15,15 @@ struct AppModelTests {
 
         await model.open()
 
-        guard case .onboarding = model.launch else {
-            Issue.record("Expected onboarding, got \(model.launch)")
+        guard case .onboarding = model.state.launch else {
+            Issue.record("Expected onboarding, got \(model.state.launch)")
             return
         }
 
         model.finishOnboarding()
 
-        guard case .ready = model.launch else {
-            Issue.record("Expected ready, got \(model.launch)")
+        guard case .ready = model.state.launch else {
+            Issue.record("Expected ready, got \(model.state.launch)")
             return
         }
     }
@@ -36,8 +36,8 @@ struct AppModelTests {
 
         await model.open()
 
-        guard case .ready = model.launch else {
-            Issue.record("Expected ready, got \(model.launch)")
+        guard case .ready = model.state.launch else {
+            Issue.record("Expected ready, got \(model.state.launch)")
             return
         }
     }
@@ -111,7 +111,7 @@ struct AppModelTests {
 
         await model.open()
 
-        #expect(model.notice.message == "固定費を自動で記録できませんでした")
+        #expect(model.state.notice.message == "固定費を自動で記録できませんでした")
     }
 
     @Test
@@ -159,7 +159,7 @@ struct AppModelTests {
 
         await model.refreshDay()
 
-        #expect(model.notice.message == nil)
+        #expect(model.state.notice.message == nil)
     }
 
     @Test
@@ -187,8 +187,8 @@ struct AppModelTests {
 
         await model.open()
 
-        guard case .failed = model.launch else {
-            Issue.record("Expected failed, got \(model.launch)")
+        guard case .failed = model.state.launch else {
+            Issue.record("Expected failed, got \(model.state.launch)")
             return
         }
     }
@@ -211,8 +211,8 @@ struct AppModelTests {
         await model.open()
         await model.retryOpen()
 
-        guard case .onboarding = model.launch else {
-            Issue.record("Expected onboarding, got \(model.launch)")
+        guard case .onboarding = model.state.launch else {
+            Issue.record("Expected onboarding, got \(model.state.launch)")
             return
         }
 
@@ -249,12 +249,12 @@ struct AppModelTests {
         let expected = ThemeLook.fixed(ThemePreset.wine.palette)
 
         await ObservationWait.until {
-            model.look == expected
+            model.input.look == expected
         }
 
         task.cancel()
 
-        #expect(model.look == expected)
+        #expect(model.input.look == expected)
     }
 
     @Test
@@ -330,22 +330,6 @@ struct AppModelTests {
 
         #expect(after != before)
         #expect(model.observationID(false) == after)
-    }
-
-    @Test
-    func detectsForegroundAfterInactive() {
-        var foreground = AppForegroundReturn()
-
-        let results = [
-            foreground.receive(.inactive),
-            foreground.receive(.active),
-            foreground.receive(.background),
-            foreground.receive(.inactive),
-            foreground.receive(.active),
-            foreground.receive(.active)
-        ]
-
-        #expect(results == [false, false, false, false, true, false])
     }
 
     @Test

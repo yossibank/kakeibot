@@ -2,33 +2,16 @@ import Core
 import DesignSystem
 import SwiftUI
 
-public struct AppLaunchView: View {
-    @State private var sweep: CGFloat = 0
-    @State private var glow: Double = 0
-    @State private var hasSwept = false
-    @State private var revealSize: CGFloat = 0
-    @State private var isLeaving = false
+struct AppLaunchView: View {
+    @State private var layout = Layout()
 
     @Environment(\.colorScheme) private var colorScheme
 
+    let state: AppModel.State
     let palette: ThemePalette
     let isReady: Bool
-    let onLeave: () -> Void
-    let onFinish: () -> Void
 
-    public init(
-        palette: ThemePalette,
-        isReady: Bool,
-        onLeave: @escaping () -> Void,
-        onFinish: @escaping () -> Void
-    ) {
-        self.palette = palette
-        self.isReady = isReady
-        self.onLeave = onLeave
-        self.onFinish = onFinish
-    }
-
-    public var body: some View {
+    var body: some View {
         ZStack {
             Color(uiColor: .systemBackground)
 
@@ -37,12 +20,12 @@ public struct AppLaunchView: View {
             themed
                 .mask {
                     Circle()
-                        .frame(width: revealSize, height: revealSize)
+                        .frame(width: layout.revealSize, height: layout.revealSize)
                 }
         }
         .ignoresSafeArea()
-        .opacity(screenOpacity)
-        .allowsHitTesting(!isLeaving)
+        .opacity(layout.opacity)
+        .allowsHitTesting(layout.opacity == 1)
         .task {
             await sweepRing()
         }
@@ -60,7 +43,7 @@ private extension AppLaunchView {
         return ZStack {
             Image("LaunchMark", bundle: .main)
 
-            RingSweep(progress: sweep, length: Self.sweepLength)
+            RingSweep(progress: layout.sweep, length: Self.sweepLength)
                 .stroke(
                     sweepColor,
                     style: StrokeStyle(lineWidth: 2.4, lineCap: .round)
@@ -69,7 +52,7 @@ private extension AppLaunchView {
                 .glow(Palette.accent, radius: 6)
         }
         .frame(width: Self.markSize, height: Self.markSize)
-        .glow(Palette.accent.opacity(glow), radius: 24)
+        .glow(Palette.accent.opacity(layout.glow), radius: 24)
         .environment(\.palette, sweepPalette)
     }
 
@@ -93,6 +76,13 @@ private extension AppLaunchView {
 }
 
 private extension AppLaunchView {
+    struct Layout {
+        var sweep: CGFloat = 0
+        var glow: Double = 0
+        var revealSize: CGFloat = 0
+        var opacity: Double = 1
+    }
+
     static let markSize: CGFloat = 160
     static let ringSize: CGFloat = 160 * 694 / 1024
     static let sweepLength: CGFloat = 0.22
@@ -106,42 +96,38 @@ private extension AppLaunchView {
     }
 
     var canReveal: Bool {
-        hasSwept && isReady
-    }
-
-    var screenOpacity: Double {
-        isLeaving ? 0 : 1
+        state.hasSwept && isReady
     }
 
     func sweepRing() async {
         withAnimation(.easeInOut(duration: 0.45)) {
-            sweep = 1 + Self.sweepLength
+            layout.sweep = 1 + Self.sweepLength
         }
 
         withAnimation(.easeOut(duration: 0.25).delay(0.25)) {
-            glow = 0.7
+            layout.glow = 0.7
         }
 
         try? await Task.sleep(for: .milliseconds(450))
 
-        hasSwept = true
+        state.finishSweep()
     }
 
     func revealTheme() {
         withAnimation(.easeIn(duration: 0.25)) {
-            revealSize = Self.revealSize
+            layout.revealSize = Self.revealSize
         } completion: {
             leave()
         }
     }
 
     func leave() {
-        onLeave()
+        state.leaveCurtain()
 
         withAnimation(.easeOut(duration: 0.15)) {
-            isLeaving = true
+            layout.opacity = 0
         } completion: {
-            onFinish()
+            state.finishCurtain()
         }
     }
 }
@@ -187,5 +173,5 @@ private struct RingSweep: Shape {
 }
 
 #Preview {
-    AppLaunchView(palette: .night, isReady: true) {} onFinish: {}
+    AppLaunchView(state: AppModel.State(), palette: .night, isReady: true)
 }

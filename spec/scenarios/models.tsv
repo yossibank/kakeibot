@@ -227,7 +227,13 @@ main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCu
 main.opens-template-route-with-saved-template	MainModelTests/opensTemplateRouteWithSavedTemplate		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-new-template-route-on-home	MainModelTests/opensNewTemplateRouteOnHome		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-receipt-route-and-starts-reading	MainModelTests/opensReceiptRouteAndStartsReading		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
+main.finishes-warming-entry-after-waiting	MainModelTests/finishesWarmingEntryAfterWaiting		iOSのみ	見えない入力シートの下ごしらえは、iOS の初回の描画への対応である
+main.restarts-observation-when-returning-from-background	MainModelTests/restartsObservationWhenReturningFromBackground		未確認	Android は別のブランチで合わせる
+main.restarts-observation-on-retry	MainModelTests/restartsObservationOnRetry		未確認	Android は別のブランチで合わせる
+main.advances-notice-round-to-hide-tab-notices	MainModelTests/advancesNoticeRoundToHideTabNotices		未確認	Android は別のブランチで合わせる
+main.keeps-deletion-for-undo	MainModelTests/keepsDeletionForUndo		未確認	Android は別のブランチで合わせる
 main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	保存した値から作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
+foreground-return.detects-foreground-after-inactive	ForegroundReturnTests/detectsForegroundAfterInactive		未確認	Android は別のブランチで合わせる
 home.opens-picked-day-after-closing-stamp-sheet	HomeModelTests/opensPickedDayAfterClosingStampSheet		未移植	スタンプが、ホームのモデルと画面に無い
 home.starts-shelf-over-after-closing	HomeModelTests/startsShelfOverAfterClosing		未移植	ひな形の棚が、ホームのモデルと画面に無い
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い

@@ -7,24 +7,24 @@ import Sync
 
 extension AppModel {
     func syncChanges(in database: AppDatabase) async {
-        await syncEngine?.stop()
-        await sharedSyncEngine?.stop()
+        await state.syncEngine?.stop()
+        await state.sharedSyncEngine?.stop()
 
-        syncEngine = nil
-        sharedSyncEngine = nil
+        state.syncEngine = nil
+        state.sharedSyncEngine = nil
 
-        guard syncActivity.isActive else {
+        guard input.syncActivity.isActive else {
             return
         }
 
         let engine = SyncEngine(database: database, scope: .private)
         let sharedEngine = SyncEngine(database: database, scope: .shared)
 
-        syncEngine = engine
-        sharedSyncEngine = sharedEngine
+        state.syncEngine = engine
+        state.sharedSyncEngine = sharedEngine
 
-        await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
-        await sharedEngine.start(isSyncEnabled: syncActivity.isSyncEnabled)
+        await engine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
+        await sharedEngine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
 
         await withDiscardingTaskGroup { group in
             group.addTask {
@@ -55,7 +55,7 @@ extension AppModel {
         for metadata in shares {
             do {
                 try await SyncEngine.acceptShare(metadata)
-                notice.inform(Self.joinedMessage(for: metadata))
+                state.notice.inform(Self.joinedMessage(for: metadata))
             } catch is CancellationError {
                 continue
             } catch {
@@ -65,15 +65,15 @@ extension AppModel {
                 Self.logger.error(
                     "\(Self.shareFailedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
                 )
-                notice.show(Self.shareFailedMessage)
+                state.notice.show(Self.shareFailedMessage)
             }
         }
 
-        let engine = sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
+        let engine = state.sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
 
-        sharedSyncEngine = engine
+        state.sharedSyncEngine = engine
 
-        await engine.start(isSyncEnabled: syncActivity.isSyncEnabled)
+        await engine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
         await engine.fetchChanges()
     }
 }

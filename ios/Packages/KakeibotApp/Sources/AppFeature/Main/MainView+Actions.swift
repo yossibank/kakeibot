@@ -54,7 +54,7 @@ extension MainView {
     }
 
     func retry() {
-        observationRound += 1
+        model.state.restartObservation()
     }
 
     func markOpened(_ sheet: MainModel.Sheet?) {

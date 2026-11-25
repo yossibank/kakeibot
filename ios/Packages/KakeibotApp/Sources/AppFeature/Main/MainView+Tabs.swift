@@ -29,7 +29,7 @@ extension MainView {
                 },
                 onOpenOrderMenu: { frame in
                     withAnimation(.snappy(duration: 0.25)) {
-                        orderMenuAnchor = frame
+                        layout.orderMenuAnchor = frame
                     }
                 },
                 onAddTemplate: {
@@ -69,7 +69,7 @@ extension MainView {
                     }
                 },
                 onDeleteAdjustment: { deletion in
-                    undo.state.deletion = deletion
+                    model.state.undo.state.deletion = deletion
                 }
             )
             .loadFailed(records.input.isListFailed, onRetry: retry)

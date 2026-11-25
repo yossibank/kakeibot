@@ -68,7 +68,7 @@ extension MainView {
                     editing: id
                 )
             ) { deletion in
-                undo.state.deletion = deletion
+                model.state.undo.state.deletion = deletion
             }
 
         case let .setup(item):
@@ -104,7 +104,7 @@ extension MainView {
                     editing: id
                 )
             ) { _ in } onDelete: { deletion in
-                undo.state.deletion = deletion
+                model.state.undo.state.deletion = deletion
             }
         }
     }

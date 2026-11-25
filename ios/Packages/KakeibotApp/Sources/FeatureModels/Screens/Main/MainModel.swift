@@ -16,19 +16,27 @@ public final class MainModel: ScreenPerforming {
         self.init(
             parts: parts,
             today: today,
-            closeDelay: Self.sheetCloseDelay
+            closeDelay: Self.sheetCloseDelay,
+            warmupDuration: Self.entryWarmupDuration
         )
     }
 
     init(
         parts: ScreenParts,
         today: LocalDate,
-        closeDelay: Duration
+        closeDelay: Duration,
+        warmupDuration: Duration
     ) {
         let draft = EntryModel(parts: parts, date: today)
+        let undo = DeletionUndo(parts: parts)
 
-        self.state = State(today: today, draft: draft)
-        self.dependencies = Dependencies(parts: parts, closeDelay: closeDelay)
+        self.state = State(today: today, draft: draft, undo: undo)
+
+        self.dependencies = Dependencies(
+            parts: parts,
+            closeDelay: closeDelay,
+            warmupDuration: warmupDuration
+        )
     }
 }
 
@@ -70,18 +78,49 @@ public extension MainModel {
         public private(set) var startsReceipt = false
         public private(set) var today: LocalDate
         public private(set) var draft: EntryModel
+        public private(set) var isWarmingEntry = true
+        public private(set) var noticeRound = 0
+        public private(set) var observationRound = 0
+
+        public let undo: DeletionUndo
+
+        @ObservationIgnored private var foreground = ForegroundReturn()
 
         init(
             today: LocalDate,
-            draft: EntryModel
+            draft: EntryModel,
+            undo: DeletionUndo
         ) {
             self.today = today
             self.draft = draft
+            self.undo = undo
         }
 
         public func select(_ tab: Tab) {
             self.tab = tab
             visitedTabs.insert(tab)
+        }
+
+        public func restartObservation() {
+            observationRound += 1
+        }
+
+        public func changeScene(to phase: ForegroundReturn.Phase) {
+            if foreground.receive(phase) {
+                restartObservation()
+            }
+        }
+
+        public func hideTabNotices() {
+            noticeRound += 1
+        }
+
+        func finishWarmingEntry() {
+            guard isWarmingEntry else {
+                return
+            }
+
+            isWarmingEntry = false
         }
 
         func startReceipt() {
@@ -105,11 +144,13 @@ public extension MainModel {
     }
 
     static let sheetCloseDelay: Duration = .milliseconds(600)
+    static let entryWarmupDuration: Duration = .milliseconds(500)
 }
 
 extension MainModel {
     struct Dependencies {
         let parts: ScreenParts
         let closeDelay: Duration
+        let warmupDuration: Duration
     }
 }

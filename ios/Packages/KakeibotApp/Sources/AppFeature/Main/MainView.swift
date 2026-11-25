@@ -16,15 +16,9 @@ struct MainView: View {
     @State var appIcon = AppIconListModel()
     @State var notice: EntryNoticeModel
     @State var appReview: AppReviewModel
-    @State var undo: DeletionUndo
-    @State var orderMenuAnchor: CGRect?
-    @State var observationRound = 0
+    @State var layout = Layout()
 
     @Environment(\.requestReview) var requestReview
-
-    @State private var isWarmingEntry = true
-    @State private var foreground = AppForegroundReturn()
-    @State private var noticeRound = 0
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
@@ -91,8 +85,6 @@ struct MainView: View {
 
         _appReview = State(initialValue: AppReviewModel(database: database, clock: clock))
 
-        _undo = State(initialValue: DeletionUndo(parts: parts))
-
         self.parts = parts
         self.today = today
         self.route = route
@@ -111,7 +103,7 @@ struct MainView: View {
 
             assetsTab
         }
-        .environment(\.noticeRound, noticeRound)
+        .environment(\.noticeRound, model.state.noticeRound)
         .overlay(alignment: .leading) {
             if hasSidebar {
                 tabBar
@@ -123,13 +115,13 @@ struct MainView: View {
             }
         }
         .overlay {
-            if let orderMenuAnchor {
+            if let orderMenuAnchor = layout.orderMenuAnchor {
                 HomeTemplateOrderMenu(
                     selection: templateOrderBinding,
                     anchor: orderMenuAnchor
                 ) {
                     withAnimation(.snappy(duration: 0.2)) {
-                        self.orderMenuAnchor = nil
+                        layout.orderMenuAnchor = nil
                     }
                 }
                 .transition(.opacity)
@@ -139,7 +131,7 @@ struct MainView: View {
             notices
         }
         .background {
-            if isWarmingEntry {
+            if model.state.isWarmingEntry {
                 entryWarmup
             }
 
@@ -167,19 +159,19 @@ struct MainView: View {
             sheetContent(for: sheet)
                 .presentationSizing(.tallForm)
         }
-        .task(id: observationRound) {
+        .task(id: model.state.observationRound) {
             await home.run()
         }
-        .task(id: observationRound) {
+        .task(id: model.state.observationRound) {
             await records.run()
         }
-        .task(id: observationRound) {
+        .task(id: model.state.observationRound) {
             await review.run()
         }
-        .task(id: observationRound) {
+        .task(id: model.state.observationRound) {
             await assets.run()
         }
-        .task(id: observationRound) {
+        .task(id: model.state.observationRound) {
             await setup.run()
         }
         .task {
@@ -200,9 +192,7 @@ struct MainView: View {
             }
         }
         .onChange(of: scenePhase) { _, phase in
-            if foreground.receive(phase) {
-                observationRound += 1
-            }
+            model.state.changeScene(to: ForegroundReturn.Phase(phase))
         }
         .onChange(of: route) { _, route in
             if isRevealed,
@@ -220,6 +210,12 @@ struct MainView: View {
             assets.setToday(today)
             model.setToday(today)
         }
+    }
+}
+
+extension MainView {
+    struct Layout {
+        var orderMenuAnchor: CGRect?
     }
 }
 
@@ -246,6 +242,8 @@ private extension MainView {
     var notices: some View {
         let noticeAbove = Self.noticeAbove(hasSidebar: hasSidebar)
         let noticeBottom = Self.noticeBottom(hasSidebar: hasSidebar)
+
+        let undo = model.state.undo
 
         return Color.clear
             .padding(.leading, Self.noticeLeading(hasSidebar: hasSidebar))
@@ -281,8 +279,7 @@ private extension MainView {
             .opacity(0)
             .allowsHitTesting(false)
             .task {
-                try? await Task.sleep(for: Self.warmupDuration)
-                isWarmingEntry = false
+                await model.warmUpEntry()
             }
     }
 }
@@ -313,15 +310,15 @@ private extension MainView {
         }
 
         if source != .deletion {
-            undo.state.deletion = nil
+            model.state.undo.state.deletion = nil
         }
 
         if source != .undoError {
-            undo.state.errorNotice.clear()
+            model.state.undo.state.errorNotice.clear()
         }
 
         if source != .tab {
-            noticeRound += 1
+            model.state.hideTabNotices()
         }
     }
 }
