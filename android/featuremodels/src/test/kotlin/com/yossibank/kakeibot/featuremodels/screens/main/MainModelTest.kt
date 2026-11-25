@@ -6,11 +6,14 @@ import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.tabs.assets.model.AssetsModel
+import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.resetMain
@@ -131,6 +134,42 @@ class MainModelTest {
 
         assertEquals(Seen(sheet = recurring, tab = MainModel.Tab.Records), afterSecond)
         assertEquals(Seen(sheet = entry, tab = MainModel.Tab.Home), seen(model))
+    }
+
+    @Test
+    fun restartsObservationWhenReturningFromBackground() {
+        val model = MainModel()
+
+        model.state.changeScene(to = ForegroundReturn.Phase.Inactive)
+        model.state.changeScene(to = ForegroundReturn.Phase.Active)
+        val afterInactive = model.state.observationRound
+        model.state.changeScene(to = ForegroundReturn.Phase.Background)
+        model.state.changeScene(to = ForegroundReturn.Phase.Inactive)
+        model.state.changeScene(to = ForegroundReturn.Phase.Active)
+        val afterBackground = model.state.observationRound
+        model.state.changeScene(to = ForegroundReturn.Phase.Active)
+
+        assertEquals(0, afterInactive)
+        assertEquals(1, afterBackground)
+        assertEquals(1, model.state.observationRound)
+    }
+
+    @Test
+    fun restartsObservationOnRetry() {
+        val model = MainModel()
+
+        val assets = AssetsModel(
+            entryList = emptyFlow(),
+            today = date,
+            round = model.state.observation,
+        )
+
+        model.state.restartObservation()
+        val afterRestart = model.state.observationRound
+        assets.retry()
+
+        assertEquals(1, afterRestart)
+        assertEquals(2, model.state.observationRound)
     }
 
     @Test

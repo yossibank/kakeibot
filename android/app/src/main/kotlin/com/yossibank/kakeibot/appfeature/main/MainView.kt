@@ -8,16 +8,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
 import com.yossibank.kakeibot.designsystem.components.modal.SheetLayer
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.featuremodels.screens.main.MainModel
-import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
@@ -40,7 +41,8 @@ fun MainView(
 ) {
     val model = rememberMainModel()
     val entryList = rememberSharedEntryList(database)
-    val observation = remember { ObservationRound() }
+
+    SceneEffect(model)
 
     LaunchedEffect(link) {
         val route = link?.let { PlannedNotification.Route.of(link = it) } ?: return@LaunchedEffect
@@ -51,13 +53,28 @@ fun MainView(
 
     CompositionLocalProvider(
         LocalEntryList provides entryList,
-        LocalObservationRound provides observation,
+        LocalObservationRound provides model.state.observation,
     ) {
         MainLayers(
             database = database,
             today = today,
             model = model,
         )
+    }
+}
+
+@Composable
+private fun SceneEffect(model: MainModel) {
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        model.state.changeScene(to = ForegroundReturn.Phase.Active)
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+        model.state.changeScene(to = ForegroundReturn.Phase.Inactive)
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
+        model.state.changeScene(to = ForegroundReturn.Phase.Background)
     }
 }
 

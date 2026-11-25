@@ -7,6 +7,8 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
+import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
@@ -59,11 +61,27 @@ class MainModel(
         var visitedTabs: Set<Tab> by mutableStateOf(visitedTabs)
             private set
 
+        val observation = ObservationRound()
+
+        val observationRound: Int
+            get() = observation.count
+
+        private val foreground = ForegroundReturn()
         private var round = 0
 
         fun select(tab: Tab) {
             this.tab = tab
             visitedTabs = visitedTabs + tab
+        }
+
+        fun restartObservation() {
+            observation.restart()
+        }
+
+        fun changeScene(to: ForegroundReturn.Phase) {
+            if (foreground.receive(to)) {
+                restartObservation()
+            }
         }
 
         internal fun openSettings(recurring: Identifier<Recurring>) {

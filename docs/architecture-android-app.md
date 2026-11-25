@@ -92,7 +92,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 共有した見張りの持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
 | 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
 | タブの記録の一覧の失敗 | 4 つのタブのモデルは、記録の一覧を読めなかった時に `state.isListFailed` を立てる。見張りを始め直す時に下ろす |
-| 見張りの回 | `MainView` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
+| 見張りの回 | `MainModel` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
 | 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
 | 開いているシート | `MainModel.Sheet` のように、1 つの sealed interface で持つ |
 | 入口のタブとシート | `featuremodels/screens/main/` の `MainModel` が持つ。通知やリンクの行き先は、`open` が開く |
@@ -157,6 +157,6 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
 | `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
 | `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
-| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainView` が番号を持ち、タブに配らない |
+| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainModel` が番号を持ち、タブに配らない |
 | `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
 | `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |
