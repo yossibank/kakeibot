@@ -1,4 +1,4 @@
-.PHONY: setup open format licenses build test-build test test-model snapshot android-build android-test verify verify-docs
+.PHONY: setup open format licenses build test-build test test-model snapshot android-build android-test scenarios verify verify-docs
 
 SIMULATOR ?= $(shell scripts/find-simulator.sh)
 XCBEAUTIFY = $(shell command -v xcbeautify)
@@ -64,6 +64,9 @@ android-build:
 android-test:
 	$(GRADLE) :core:test :store:jvmTest :featuremodels:testDebugUnitTest
 
+scenarios:
+	@scripts/scenarios-check.py --summary
+
 verify: verify-docs
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
@@ -83,5 +86,7 @@ verify: verify-docs
 verify-docs:
 	scripts/verify.sh docs-check scripts/docs-check.py
 	scripts/verify.sh json-format scripts/json-format.sh check
+	scripts/verify.sh scenarios-check-test scripts/scenarios-check-test.py
+	scripts/verify.sh scenarios-check scripts/scenarios-check.py
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/docs-check.py || { echo "NG claude-config が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh docs-rules python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/docs-check.py $$(git ls-files '*.md')

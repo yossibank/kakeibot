@@ -28,8 +28,9 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | 道具を入れ、hook を入れる | `make setup` |
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
-| 変更の確認（文書・JSON・書き方と設計・余白・iOS の警告・両 OS のテストとビルド。出力は成否と失敗の箇所だけ） | `make verify` |
-| 文書の一致と書き方、JSON の整形だけを確かめる（文書だけの変更） | `make verify-docs` |
+| 変更の確認（文書・JSON・筋書きの一覧・書き方と設計・余白・iOS の警告・両 OS のテストとビルド。出力は成否と失敗の箇所だけ） | `make verify` |
+| 文書の一致と書き方、JSON の整形、テストと筋書きの一覧の一致を確かめる（文書だけの変更） | `make verify-docs` |
+| 筋書きの一覧の、区分ごとの件数と違いの一覧 | `make scenarios` |
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
 | テスト（`ios/Kakeibot.xctestplan`、シミュレーター。出力は `.build/test.log` にも残る） | `make test` |
