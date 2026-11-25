@@ -277,7 +277,7 @@ review.reads-saved-selection-when-observing		ReviewModelTest/readsSavedSelection
 review-notice.shows-notice-when-list-fails		ReviewModelNoticeTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 review-notice.shows-notice-when-selection-cannot-be-read		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeRead	Androidのみ	選択を読めない時の知らせ。iOS も出すがテストは無い
 review-notice.shows-notice-when-selection-cannot-be-saved		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeSaved	Androidのみ	選択を保存できない時の知らせ。iOS も出すがテストは無い
-review-notice.clears-notice-after-saving-again		ReviewModelNoticeTest/clearsNoticeAfterSavingAgain	Androidのみ	次の保存の成功で知らせが消える。iOS は消さず、動きが違う
+review-notice.keeps-list-notice-after-saving		ReviewModelNoticeTest/keepsListNoticeAfterSaving	Androidのみ	保存が通っても、見張りの失敗の知らせを残す
 review-notice.closes-notice-by-hand		ReviewModelNoticeTest/closesNoticeByHand	Androidのみ	知らせを手で閉じる。iOS の ReviewModel にこの筋書きのテストは無い
 review-note-writer-accuracy.*	ReviewNoteWriterAccuracyTests/*		iOSのみ	Apple の FoundationModels でまとめを書く精度の確かめで、Android に相手が無い
 review-text.names-shares	ReviewTextTests/namesShares		違い	割合は四捨五入だけで、合計 100% の調整・99.9%・1% 未満を隠す決まりが無い
