@@ -23,8 +23,8 @@ entry.shows-month-total-of-category-without-budget	EntryModelTests/showsMonthTot
 entry.shows-month-total-of-type-without-category	EntryModelTests/showsMonthTotalOfTypeWithoutCategory		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.replaces-edited-amount-in-month-total	EntryModelTests/replacesEditedAmountInMonthTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.removes-entry-moved-out-of-month-from-total	EntryModelTests/removesEntryMovedOutOfMonthFromTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
-entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		iOSのみ	入力のモデルを開くたびに作って読むので、開き直しの合図（start）が要らない
-entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		iOSのみ	入力のモデルを開くたびに作るので、前の回の知らせが残らない
+entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、開き直しの合図（start）が無い
+entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、始め直しで知らせを消す所が無い
 entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterSaving	対応	Android の結果は変更を持たず、閉じ始めの旗も無い。閉じる結果だけを確かめる
 entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails	EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	対応	
 entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving	EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	対応	Android の結果は変更を持たず、送った回数と保存した 2 件で確かめる
@@ -59,7 +59,7 @@ entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntr
 entry.shows-deck-with-its-direction-and-keypad-target	EntryModelTests/showsDeckWithItsDirectionAndKeypadTarget	EntryModelScreenTest/showsFieldWithItsKeypadTarget	違い	欄と宛先は field 1 つで同じに動くが、進む向きが無く、欄を動かさずに替える
 entry.resets-deck-to-first-field-of-type	EntryModelTests/resetsDeckToFirstFieldOfType	EntryModelScreenTest/startsFromFirstFieldWhenTypeChanges	対応	種類を替える select が、最初の欄と金額の宛先へ戻す
 entry.starts-from-first-field-when-type-changes	EntryModelTests/startsFromFirstFieldWhenTypeChanges	EntryModelScreenTest/startsFromFirstFieldWhenTypeChanges	対応	
-entry.places-deck-without-changing-keypad-target	EntryModelTests/placesDeckWithoutChangingKeypadTarget		iOSのみ	欄と宛先を field 1 つで持ち、欄だけを置く操作が要らない
+entry.places-deck-without-changing-keypad-target	EntryModelTests/placesDeckWithoutChangingKeypadTarget		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、開き直しで欄だけを置く操作が無い
 entry.ends-wallet-editing-when-wallet-deck-opens-again	EntryModelTests/endsWalletEditingWhenWalletDeckOpensAgain		未移植	口座の欄に、並べ替えや編集の状態が無い
 entry.shows-page-of-selected-category	EntryModelTests/showsPageOfSelectedCategory		未移植	カテゴリをページに分けず、縦に送る格子で出す
 entry.chooses-added-wallet-after-wallet-sheet-once	EntryModelTests/choosesAddedWalletAfterWalletSheetOnce		未移植	入力から口座を足す・直すシートが無い
@@ -216,8 +216,8 @@ main.closes-sheet-before-moving-to-tab	MainModelTests/closesSheetBeforeMovingToT
 main.waits-before-moving-even-without-sheet	MainModelTests/waitsBeforeMovingEvenWithoutSheet		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
 main.adds-entry-on-chosen-date	MainModelTests/addsEntryOnChosenDate		未移植	日付を選んで入力を開く所（addEntry）が無く、行き先のほかは今日で開く
 main.adds-transfer-with-draft	MainModelTests/addsTransferWithDraft		未移植	入口に、振替を選んだ入力シートを開く所が無い
-main.replaces-draft-after-sheet-closes	MainModelTests/replacesDraftAfterSheetCloses		iOSのみ	入力のモデルは画面がシートを開くたびに作り、入口が先に持つ下書きが無い
-main.replaces-draft-when-day-changes	MainModelTests/replacesDraftWhenDayChanges		iOSのみ	入力のモデルは画面がシートを開くたびに今日で作り、入口が先に持つ下書きが無い
+main.replaces-draft-after-sheet-closes	MainModelTests/replacesDraftAfterSheetCloses		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、閉じた後に替える下書きが無い
+main.replaces-draft-when-day-changes	MainModelTests/replacesDraftWhenDayChanges		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、日付が変わった時に替える下書きが無い
 main.chooses-launch-tab-from-setting	MainModelTests/choosesLaunchTabFromSetting		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.keeps-home-tab-when-launch-tab-is-not-chosen	MainModelTests/keepsHomeTabWhenLaunchTabIsNotChosen		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.opens-entry-sheet-at-launch	MainModelTests/opensEntrySheetAtLaunch		未移植	起動時に開く画面の設定を読んで、入力シートを開く所が無い
