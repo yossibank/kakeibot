@@ -65,6 +65,7 @@ entry.shows-page-of-selected-category	EntryModelTests/showsPageOfSelectedCategor
 entry.chooses-added-wallet-after-wallet-sheet-once	EntryModelTests/choosesAddedWalletAfterWalletSheetOnce		未確認	Android は別のブランチで合わせる
 entry.skips-wallets-after-other-sheets	EntryModelTests/skipsWalletsAfterOtherSheets		未確認	Android は別のブランチで合わせる
 entry.holds-menu-memo-and-discard-confirmation	EntryModelTests/holdsMenuMemoAndDiscardConfirmation		未確認	Android は別のブランチで合わせる
+entry.keeps-one-shown-at-a-time	EntryModelTests/keepsOneShownAtATime		未確認	Android は別のブランチで合わせる
 entry.opens-and-shows-bills-of-wallet-deck	EntryModelTests/opensAndShowsBillsOfWalletDeck		未確認	Android は別のブランチで合わせる
 entry.tells-when-loading-fails	EntryModelTests/tellsWhenLoadingFails	EntryModelFailureTest/tellsWhenLoadingFails	対応	設定ではなく、記録の表を読めなくして確かめる
 entry.tells-when-deleting-fails	EntryModelTests/tellsWhenDeletingFails	EntryModelFailureTest/tellsWhenDeletingFails	対応	

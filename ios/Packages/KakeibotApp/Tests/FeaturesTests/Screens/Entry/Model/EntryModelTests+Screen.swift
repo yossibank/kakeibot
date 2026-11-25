@@ -142,16 +142,36 @@ extension EntryModelTests {
 
         model.state.openMenu(for: category)
         model.state.editMemo(true)
+        let menu = model.state.screen
         model.state.confirmDiscard()
-        let shown = model.state.screen
+        let discard = model.state.screen
         model.state.closeMenu()
         model.state.editMemo(false)
 
-        #expect(shown.menuCategory == category)
-        #expect(shown.isEditingMemo)
-        #expect(shown.isConfirmingDiscard)
-        #expect(model.state.screen.menuCategory == nil)
+        #expect(menu.menuCategory == category)
+        #expect(menu.isEditingMemo)
+        #expect(discard.isConfirmingDiscard)
+        #expect(discard.menuCategory == nil)
+        #expect(model.state.screen.isConfirmingDiscard)
         #expect(!model.state.screen.isEditingMemo)
+    }
+
+    @Test
+    func keepsOneShownAtATime() async throws {
+        let model = try await Self.newModel()
+        let category = try #require(model.output.categories.first)
+
+        model.state.openMenu(for: category)
+        model.state.open(.editCategory(category))
+        let sheet = model.state.screen
+        model.state.screen.isConfirmingDiscard = false
+        let kept = model.state.screen.shown
+        model.state.screen.sheet = nil
+
+        #expect(sheet.shown == .sheet(.editCategory(category)))
+        #expect(sheet.menuCategory == nil)
+        #expect(kept == .sheet(.editCategory(category)))
+        #expect(model.state.screen.shown == nil)
     }
 
     @Test

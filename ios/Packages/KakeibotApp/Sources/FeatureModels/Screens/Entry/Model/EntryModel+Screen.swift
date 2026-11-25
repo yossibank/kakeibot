@@ -62,19 +62,61 @@ public extension EntryModel {
         public internal(set) var isBillShown = false
     }
 
+    enum Shown: Hashable, Sendable {
+        case sheet(Sheet)
+        case discard
+        case menu(EntryCategory)
+    }
+
     struct Screen {
         public var categoryPage: Int? = 0
-        public var sheet: Sheet?
-        public var isConfirmingDiscard = false
 
+        public internal(set) var shown: Shown?
         public internal(set) var wallets = WalletDeck()
         public internal(set) var deck: Deck
         public internal(set) var isForward = true
         public internal(set) var isEditingMemo = false
-        public internal(set) var menuCategory: EntryCategory?
 
         var addedWallet: AddedWallet?
         var reloadsWallets = false
+
+        public var sheet: Sheet? {
+            get {
+                if case let .sheet(sheet) = shown {
+                    sheet
+                } else {
+                    nil
+                }
+            }
+            set {
+                if let newValue {
+                    shown = .sheet(newValue)
+                } else if sheet != nil {
+                    shown = nil
+                }
+            }
+        }
+
+        public var isConfirmingDiscard: Bool {
+            get {
+                shown == .discard
+            }
+            set {
+                if newValue {
+                    shown = .discard
+                } else if isConfirmingDiscard {
+                    shown = nil
+                }
+            }
+        }
+
+        public var menuCategory: EntryCategory? {
+            if case let .menu(category) = shown {
+                category
+            } else {
+                nil
+            }
+        }
 
         init(deck: Deck) {
             self.deck = deck
@@ -135,12 +177,12 @@ public extension EntryModel.State {
     }
 
     func openMenu(for category: EntryCategory) {
-        screen.menuCategory = category
+        screen.shown = .menu(category)
     }
 
     func closeMenu() {
         if screen.menuCategory != nil {
-            screen.menuCategory = nil
+            screen.shown = nil
         }
     }
 
@@ -161,7 +203,7 @@ public extension EntryModel.State {
     }
 
     func open(_ sheet: EntryModel.Sheet) {
-        screen.sheet = sheet
+        screen.shown = .sheet(sheet)
         screen.reloadsWallets = sheet.isWallet
     }
 
@@ -173,6 +215,6 @@ public extension EntryModel.State {
     }
 
     func confirmDiscard() {
-        screen.isConfirmingDiscard = true
+        screen.shown = .discard
     }
 }
