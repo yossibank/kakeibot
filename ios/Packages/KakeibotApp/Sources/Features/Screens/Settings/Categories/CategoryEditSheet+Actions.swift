@@ -20,32 +20,23 @@ extension CategoryEditSheet {
     }
 
     func addTag() {
-        showTag(.add, name: "")
+        showTag(.add)
     }
 
     func editTag(_ id: UUID) {
-        let name = model.state.tags.first { $0.id == id }?.draft.name ?? ""
-        showTag(.rename(id), name: name)
+        showTag(.rename(id))
     }
 
     func closeTag() {
         isTagFocused = nil
 
-        model.state.clearTagProblem()
-
         withAnimation(.snappy(duration: 0.2)) {
-            tagEdit = nil
+            model.state.closeTag()
         }
     }
 
     func commitTag() {
-        let isDone = switch tagEdit {
-        case .add: model.state.addTag(tagName)
-        case let .rename(id): model.state.renameTag(id, to: tagName)
-        case nil: true
-        }
-
-        guard isDone else {
+        guard model.state.commitTag() else {
             return
         }
 
@@ -66,18 +57,13 @@ extension CategoryEditSheet {
 }
 
 private extension CategoryEditSheet {
-    func showTag(
-        _ edit: TagEdit,
-        name: String
-    ) {
+    func showTag(_ target: TagEdit.Target) {
         focus = nil
-        tagName = name
-        ignoresKeyboard = true
 
-        model.state.clearTagProblem()
+        model.state.ignoresKeyboard = true
 
         withAnimation(.snappy(duration: 0.25)) {
-            tagEdit = edit
+            model.state.showTag(target)
         }
     }
 }
