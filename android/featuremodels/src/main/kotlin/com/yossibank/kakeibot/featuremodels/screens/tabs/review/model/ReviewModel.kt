@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
+import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
@@ -44,6 +45,13 @@ class ReviewModel(
         val icon: Icon?,
         val name: String,
         val color: String?,
+        val amount: Long,
+        val ratio: Double,
+    )
+
+    data class BalanceBar(
+        val title: String,
+        val type: Entry.Kind,
         val amount: Long,
         val ratio: Double,
     )
@@ -173,6 +181,29 @@ class ReviewModel(
                     }
             }
 
+        val balanceBars: List<BalanceBar>
+            get() {
+                if (input.kind != ReviewKind.balance) {
+                    return emptyList()
+                }
+
+                val income = summary.income.total
+                val expense = summary.expense.total
+                val largest = maxOf(income, expense)
+
+                return listOf(
+                    Triple("収入", Entry.Kind.income, income),
+                    Triple("支出", Entry.Kind.expense, expense),
+                ).map { (title, type, amount) ->
+                    BalanceBar(
+                        title = title,
+                        type = type,
+                        amount = amount,
+                        ratio = if (largest > 0) amount.toDouble() / largest.toDouble() else 0.0,
+                    )
+                }
+            }
+
         private fun total(of: ReviewSummary): Long = when (input.kind) {
             ReviewKind.expense -> of.expense.total
             ReviewKind.income -> of.income.total
@@ -212,10 +243,7 @@ class ReviewModel(
 
         ModelTask.quiet {
             input.scale = database.setting(SettingKey.reviewScale)
-            input.kind = when (val kind = database.setting(SettingKey.reviewKind)) {
-                ReviewKind.balance -> ReviewKind.expense
-                else -> kind
-            }
+            input.kind = database.setting(SettingKey.reviewKind)
         }
     }
 
