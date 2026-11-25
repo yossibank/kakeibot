@@ -84,7 +84,11 @@ tasks.withType<Test>().configureEach {
     val (platform, library) = sqliteNativePlatform
     val directory = sqliteNativeDirectory.get().dir("natives/$platform").asFile
 
+    val fixtures = rootDir.resolve("../spec/fixtures")
+
     dependsOn(syncSqliteNatives)
+    inputs.dir(fixtures).withPathSensitivity(PathSensitivity.RELATIVE)
+    systemProperty("fixtures", fixtures.absolutePath)
     systemProperty("androidx.sqlite.driver.bundled.path", directory.absolutePath)
     systemProperty("androidx.sqlite.driver.bundled.name", library)
 }

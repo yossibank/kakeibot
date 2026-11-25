@@ -14,7 +14,7 @@ val EntryModel.Output.isMemoFromVoice: Boolean
     get() = state.voiceFilled?.memo?.let { it.isNotEmpty() && it == state.store } ?: false
 
 val EntryModel.Output.showsVoice: Boolean
-    get() = state.form.type != Entry.Kind.transfer && state.field == EntryModel.Field.Amount
+    get() = state.form.type != Entry.Kind.transfer
 
 val EntryModel.Output.voiceHints: List<String>
     get() {

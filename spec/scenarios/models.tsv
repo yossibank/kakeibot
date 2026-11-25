@@ -4,8 +4,8 @@ entry.shows-budget-over-after-entered-amount	EntryModelTests/showsBudgetOverAfte
 entry.replaces-edited-amount-in-budget-remaining	EntryModelTests/replacesEditedAmountInBudgetRemaining		未移植	入力画面に予算の残り（budgetText）を出す所が無い
 entry.shows-budget-back-within-after-lowering-edited-amount	EntryModelTests/showsBudgetBackWithinAfterLoweringEditedAmount		未移植	入力画面に予算の残り（budgetText）を出す所が無い
 entry.titles-date	EntryModelTests/titlesDate		未移植	日付の見出しは「日付」で固定で、何日前・何日後を添える所が無い
-entry.describes-date	EntryModelTests/describesDate	EntryModelTest/describesDateFromToday	違い	Androidは「今日（月）」で日付を添えず、iOSは「今日 10/12（月）」と出す
-entry.shortens-date	EntryModelTests/shortensDate		未移植	短い日付の文（shortDateText）とそれを出す所が無い
+entry.describes-date	EntryModelTests/describesDate	EntryTextTest/describesDate EntryModelTest/describesDateFromToday	対応	画面の日付の欄は、どちらも短い文に曜日を添えて出す
+entry.shortens-date	EntryModelTests/shortensDate	EntryTextTest/shortensDate	対応	
 entry.labels-keypad-date	EntryModelTests/labelsKeypadDate		未移植	キーパッドの日付のボタン（keypadDateText）が無い
 entry.switches-quick-date	EntryModelTests/switchesQuickDate		未移植	今日と昨日を切り替えるボタン（quickDate）が無い
 entry.saves-items-with-entry	EntryModelTests/savesItemsWithEntry	EntryModelItemTest/savesItemsWithEntry	対応	
@@ -71,7 +71,7 @@ entry.caps-amount-at-nine-digits	EntryModelTests/capsAmountAtNineDigits	EntryMod
 entry.picks-first-category-of-selected-type	EntryModelTests/picksFirstCategoryOfSelectedType	EntryModelTest/picksFirstCategoryOfSelectedType	対応	
 entry.saves-new-entry	EntryModelTests/savesNewEntry	EntryModelTest/savesNewEntry	対応	
 entry.saves-once-when-save-is-tapped-twice	EntryModelTests/savesOnceWhenSaveIsTappedTwice	EntryModelTest/savesOnceWhenSaveIsTappedTwice	対応	
-entry.refuses-zero-amount	EntryModelTests/refusesZeroAmount	EntryModelTest/refusesZeroAmount	対応	保存できるかの印（canSave）は Android に無く確かめていない
+entry.refuses-zero-amount	EntryModelTests/refusesZeroAmount	EntryModelTest/refusesZeroAmount	対応	保存できるかの印（canSave）は確かめていない
 entry.edits-existing-entry	EntryModelTests/editsExistingEntry	EntryModelTest/editsExistingEntry	対応	
 entry.records-edited-entry-again-as-new-entry	EntryModelTests/recordsEditedEntryAgainAsNewEntry		未移植	同じ内容で新しく記録する所（recordAgain）がモデルにも画面にも無い
 entry.describes-expression-and-tax	EntryModelTests/describesExpressionAndTax	EntryModelTest/describesExpressionAndTax	対応	
@@ -84,7 +84,7 @@ entry.ignores-cancelled-load	EntryModelTests/ignoresCancelledLoad		未確認	Mod
 entry.hides-selected-category-and-selects-it-again-on-undo	EntryModelTests/hidesSelectedCategoryAndSelectsItAgainOnUndo		未移植	入力画面からカテゴリを非表示にして戻す所（hideCategory）が無い
 entry.keeps-selection-when-undoing-hidden-other-category	EntryModelTests/keepsSelectionWhenUndoingHiddenOtherCategory		未移植	入力画面からカテゴリを非表示にして戻す所（hideCategory）が無い
 entry.selects-added-category	EntryModelTests/selectsAddedCategory		未移植	入力画面からカテゴリを足して選ぶ所（newCategoryModel）が無い
-entry.labels-save-button-by-state	EntryModelTests/labelsSaveButtonByState		違い	金額が無くてもボタンは「記録する」のままで、iOSは「金額を入れてください」
+entry.labels-save-button-by-state	EntryModelTests/labelsSaveButtonByState	EntryModelEditingTest/labelsSaveButtonByState	対応	
 entry.deletes-existing-entry	EntryModelTests/deletesExistingEntry	EntryModelTest/deletesExistingEntry	対応	
 entry.starts-next-entry-keeping-choices	EntryModelTests/startsNextEntryKeepingChoices	EntryModelTest/startsNextEntryKeepingChoices	対応	
 entry.clears-tag-when-type-changes		EntryModelTest/clearsTagWhenTypeChanges	Androidのみ	種類を行き来してもカテゴリは残りタグは消える、というテストが iOS に無い
@@ -132,9 +132,9 @@ entry-transfer.drops-fee-when-recording-again	EntryModelTransferTests/dropsFeeWh
 entry-transfer.caps-loan-payoff-at-largest-amount	EntryModelTransferTests/capsLoanPayoffAtLargestAmount	EntryModelTransferTest/capsLoanPayoffAtLargestAmount	対応	
 entry-transfer.starts-with-two-different-wallets	EntryModelTransferTests/startsWithTwoDifferentWallets	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	口座の見出し（振替元）は確かめていない
 entry-transfer.loaded-draft-switched-to-transfer-matches-fresh-transfer	EntryModelTransferTests/loadedDraftSwitchedToTransferMatchesFreshTransfer	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	種類を指定して開く形が無く、切り替えた後の値と未変更だけを確かめる
-entry-transfer.saves-swapped-transfer	EntryModelTransferTests/savesSwappedTransfer	EntryModelTransferTest/savesSwappedTransfer	対応	保存ボタンの文（振り替える）は Android に無く、確かめていない
+entry-transfer.saves-swapped-transfer	EntryModelTransferTests/savesSwappedTransfer	EntryModelTransferTest/savesSwappedTransfer	対応	保存ボタンの文（振り替える）は確かめていない
 entry-transfer.keeps-category-when-coming-back-from-transfer	EntryModelTransferTests/keepsCategoryWhenComingBackFromTransfer	EntryModelTransferTest/keepsCategoryWhenComingBackFromTransfer EntryModelTest/remembersCategoryAcrossTransfer	対応	
-entry-transfer.shows-balances-and-missing-destination	EntryModelTransferTests/showsBalancesAndMissingDestination	EntryModelTransferTest/showsBalancesAndMissingDestination	違い	振替先が無いことを保存ボタンの文に出さず、保存を押した後の知らせで出す
+entry-transfer.shows-balances-and-missing-destination	EntryModelTransferTests/showsBalancesAndMissingDestination	EntryModelTransferTest/showsBalancesAndMissingDestination	対応	
 entry-transfer.flags-amount-over-source-balance	EntryModelTransferTests/flagsAmountOverSourceBalance	EntryModelTransferTest/flagsAmountOverSourceBalance	対応	残高を超えても保存できることは確かめていない
 entry-transfer.waits-for-amount-before-warning-over-negative-balance	EntryModelTransferTests/waitsForAmountBeforeWarningOverNegativeBalance	EntryModelTransferTest/waitsForAmountBeforeWarningOverNegativeBalance	対応	
 entry-transfer.pays-off-loan-at-once	EntryModelTransferTests/paysOffLoanAtOnce	EntryModelTransferTest/paysOffLoanAtOnce	対応	
@@ -156,7 +156,7 @@ entry-voice-flow.puts-similar-entries-first-in-examples	EntryVoiceFlowTests/puts
 entry-voice-flow.drops-underline-when-the-field-changes	EntryVoiceFlowTests/dropsUnderlineWhenTheFieldChanges		未確認	EntryModelOutputVoice.isDateFromVoice にあるが、変えた後のテストが無い
 entry-voice-flow.cancel-while-starting-stops-the-source	EntryVoiceFlowTests/cancelWhileStartingStopsTheSource		iOSのみ	始めるのを待つ間の取り消しの話で、Android の start は待たずに始まる
 entry-voice-flow.reads-the-last-result-given-while-finishing	EntryVoiceFlowTests/readsTheLastResultGivenWhileFinishing		未確認	Listener.onResults が最後の候補を読むが、流れのテストが無い
-entry-voice-flow.hides-voice-for-transfers	EntryVoiceFlowTests/hidesVoiceForTransfers	EntryModelVoiceTest/hintsNamesForRecognizer	違い	金額の欄を開いた時だけ声のボタンを出す（iOS は振替以外ならいつも出す）
+entry-voice-flow.hides-voice-for-transfers	EntryVoiceFlowTests/hidesVoiceForTransfers	EntryModelVoiceTest/hidesVoiceForTransfers	対応	
 entry-voice-flow.applies-spoken-fields-and-undoes-them	EntryVoiceFlowTests/appliesSpokenFieldsAndUndoesThem	EntryModelVoiceTest/appliesSpokenFieldsAndUndoesThem EntryVoiceSpeechTest/describesResult	対応	EntryVoiceFlow を通さず、モデルへの反映と知らせの文だけを確かめる
 entry-voice-flow.keeps-keypad-open-when-amount-is-missing	EntryVoiceFlowTests/keepsKeypadOpenWhenAmountIsMissing	EntryModelVoiceTest/keepsAmountWhenSpokenAmountIsMissing EntryVoiceSpeechTest/describesResult	対応	EntryVoiceFlow を通さず、モデルへの反映と知らせの文だけを確かめる
 entry-voice-flow.tells-when-nothing-was-heard	EntryVoiceFlowTests/tellsWhenNothingWasHeard	EntryVoiceSpeechTest/describesResult	対応	知らせの文だけで、何も聞こえずに終える流れは確かめていない
@@ -183,12 +183,12 @@ home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUse
 home.shows-templates-of-selected-type-on-home	HomeModelTests/showsTemplatesOfSelectedTypeOnHome		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.records-from-home-without-archived-tag	HomeModelTests/recordsFromHomeWithoutArchivedTag		未移植	ホームのモデルに、テンプレートから記録する関数が無い
 home.records-from-home-and-undoes	HomeModelTests/recordsFromHomeAndUndoes		未移植	ホームのモデルに、テンプレートから記録する関数が無い
-home.shows-no-records-only-after-list-arrives	HomeModelTests/showsNoRecordsOnlyAfterListArrives	HomeModelTest/showsNothingBeforeOverviewArrives	違い	届く前と空を分ける showsNoRecords が無く、画面は届く前も空の文を出す
+home.shows-no-records-only-after-list-arrives	HomeModelTests/showsNoRecordsOnlyAfterListArrives	HomeModelTest/showsNoRecordsOnlyAfterListArrives	対応	
 home.sums-month-today-and-yesterday	HomeModelTests/sumsMonthTodayAndYesterday	HomeModelTest/sumsMonthTodayAndYesterday	対応	
 home.sums-upcoming-recurring-expense	HomeModelTests/sumsUpcomingRecurringExpense		未確認	値は input.overview（MonthOverview）にあるが、画面に固定費の欄が無くテストも無い
 home.marks-and-records-missing-recurring	HomeModelTests/marksAndRecordsMissingRecurring		未移植	ホームに固定費の欄と、抜けた固定費を記録する関数が無い
 home.shows-remaining-budget-of-period	HomeModelTests/showsRemainingBudgetOfPeriod	HomeModelTest/showsRemainingBudgetOfPeriod	対応	
-home.swaps-middle-figure-by-budget	HomeModelTests/swapsMiddleFigureByBudget		違い	予算が無い時も真ん中は「今月の支出」のままで、「昨日の支出」に替えない
+home.swaps-middle-figure-by-budget	HomeModelTests/swapsMiddleFigureByBudget	HomeModelTest/swapsMiddleFigureByBudget	対応	
 home.lists-recent-entries-newest-first	HomeModelTests/listsRecentEntriesNewestFirst	HomeModelTest/listsRecentEntriesNewestFirst	対応	
 home.shows-notice-when-list-fails		HomeModelTest/showsNoticeWhenListFails	Androidのみ	iOS は共通の observe の失敗だけを確かめ、ホームの文は確かめていない
 home.shows-no-notice-while-list-arrives		HomeModelTest/showsNoNoticeWhileListArrives	Androidのみ	一覧が届く間は知らせが空であることは、iOS にテストが無い
@@ -220,6 +220,7 @@ assets.leaves-out-future-transfers-from-both-wallets		AssetsModelTest/leavesOutF
 assets.leaves-out-future-card-usage-from-debts		AssetsModelTest/leavesOutFutureCardUsageFromDebts	Androidのみ	先の日付のカードの利用を負債から外すことは、iOS にテストが無い
 assets.leaves-out-entries-when-today-goes-back		AssetsModelTest/leavesOutEntriesWhenTodayGoesBack	Androidのみ	今日が戻った時に記録を残高から外すことは、iOS にテストが無い
 assets.leaves-out-hidden-wallets		AssetsModelTest/leavesOutHiddenWallets	Androidのみ	非表示の口座を資産に出さない。iOS は口座の編集を通す流れのテストで確かめる
+assets.describes-breakdown-of-total		AssetsModelTest/describesBreakdownOfTotal	Androidのみ	「手持ち・未払い」の内訳の文。iOS は画面で組み立て、テストが無い
 assets-adjustment.*	AssetsAdjustmentModelTests/*		未移植	残高を手元の額に合わせるモデルと画面が Android に無い
 assets-reward-goal-edit.*	AssetsRewardGoalEditModelTests/*		未移植	ごほうびの目標を編集するモデルと画面が Android に無い
 assets-entry-sheet.*	AssetsEntrySheetTests/*		未移植	カードごとの未払いの記録を並べるシートが Android に無い
@@ -260,9 +261,10 @@ records.shows-upcoming-recurring-on-future-days	RecordsModelTests/showsUpcomingR
 records.lists-upcoming-days-among-recorded-days	RecordsModelTests/listsUpcomingDaysAmongRecordedDays		未移植	一覧に予定の日を混ぜる listDays と見出しが無い
 records.hides-upcoming-recurrings-while-searching	RecordsModelTests/hidesUpcomingRecurringsWhileSearching		未移植	これからの定期の記録も検索も、モデルと画面に無い
 records.describes-rows-with-memo-and-wallet	RecordsModelTests/describesRowsWithMemoAndWallet	RecordsModelTest/describesRowsWithMemoAndWallet	対応	
-records.describes-fee-row-with-transfer-route	RecordsModelTests/describesFeeRowWithTransferRoute	RecordsModelTest/describesTransferRowWithRoute	違い	手数料の行に「銀行 → 財布 の手数料」を出さず、口座の名前だけを出す
+records.describes-fee-row-with-transfer-route	RecordsModelTests/describesFeeRowWithTransferRoute	RecordsModelTest/describesFeeRowWithTransferRoute	対応	
 records.shows-today-until-another-day-is-chosen	RecordsModelTests/showsTodayUntilAnotherDayIsChosen	RecordsModelTest/showsTodayUntilAnotherDayIsChosen	対応	
 records.marks-only-past-days-without-expense	RecordsModelTests/marksOnlyPastDaysWithoutExpense		未移植	使わなかった日の印を付けられるかの判定が無い
+records.starts-week-on-sunday-before-setting-arrives	RecordsModelTests/startsWeekOnSundayBeforeSettingArrives	RecordsModelTest/startsWeekOnSundayBeforeSettingArrives	対応	
 records.describes-month-and-period		RecordsModelTest/describesMonthAndPeriod	Androidのみ	月の見出し（monthTitle）と期間の文。iOS のモデルに monthTitle は無い
 records.shows-notice-when-list-fails		RecordsModelTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 records.shows-notice-when-settings-fail		RecordsModelTest/showsNoticeWhenSettingsFail	Androidのみ	設定の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
@@ -279,11 +281,12 @@ review.marks-store-review-opened	ReviewModelTests/marksStoreReviewOpened		未移
 review.keeps-store-review-unopened-after-closing	ReviewModelTests/keepsStoreReviewUnopenedAfterClosing		未移植	ストアの評価を頼むカードが、モデルにも画面にも無い
 review.compares-with-previous-month	ReviewModelTests/comparesWithPreviousMonth	ReviewModelTest/comparesWithSameDaysOfPreviousMonth	対応	
 review.keeps-notice-after-later-success	ReviewModelTests/keepsNoticeAfterLaterSuccess	ReviewModelNoticeTest/keepsNoticeAfterLaterSuccess	対応	
-review.compares-whole-previous-month-when-finished	ReviewModelTests/comparesWholePreviousMonthWhenFinished	ReviewModelTest/comparesWholePreviousMonthWhenFinished	対応	isComparingPartially が無く、終わった期間でも画面の文は「同じ時点より」のまま
-review.knows-whether-previous-period-has-entries	ReviewModelTests/knowsWhetherPreviousPeriodHasEntries		違い	hasPreviousEntries が無く、前の期間に記録が無くても比べる文を出す
+review.compares-whole-previous-month-when-finished	ReviewModelTests/comparesWholePreviousMonthWhenFinished	ReviewModelTest/comparesWholePreviousMonthWhenFinished	対応	Android は ReviewText.previousName の isPartial で比べる文を出し分ける
+review.knows-whether-previous-period-has-entries	ReviewModelTests/knowsWhetherPreviousPeriodHasEntries	ReviewModelTest/knowsWhetherPreviousPeriodHasEntries	対応	
 review.counts-moves-to-archived-wallet-in-past-period	ReviewModelTests/countsMovesToArchivedWalletInPastPeriod		未移植	返済・積立の動き（moves）が、モデルにも画面にも無い
 review.leaves-out-future-repayments-from-payoff	ReviewModelTests/leavesOutFutureRepaymentsFromPayoff		未移植	返済の動きと完済の見込み（payoff）が無い
 review.cached-moves-still-watch-recurrings	ReviewModelTests/cachedMovesStillWatchRecurrings		未移植	返済の動き（moves）と、定期の記録の読み込みが無い
+review.starts-week-on-sunday-before-setting-arrives	ReviewModelTests/startsWeekOnSundayBeforeSettingArrives	ReviewModelTest/startsWeekOnSetting	対応	
 review.shows-no-rows-without-total		ReviewModelTest/showsNoRowsWithoutTotal	Androidのみ	合計が 0 の種類ではカテゴリの行を出さない。iOS に同じ筋書きのテストは無い
 review.moves-forward-up-to-current-period		ReviewModelTest/movesForwardUpToCurrentPeriod	Androidのみ	戻った分だけ進めて今の期間に戻る。iOS は moveToCurrent の側だけを確かめる
 review.starts-with-month-and-expense-without-selection		ReviewModelTest/startsWithMonthAndExpenseWithoutSelection	Androidのみ	保存が無い時の初めの値（月・支出）。iOS にテストは無い
@@ -294,15 +297,16 @@ review.shows-empty-balance-bars-without-entries		ReviewModelTest/showsEmptyBalan
 review.scales-balance-bars-to-larger-expense		ReviewModelTest/scalesBalanceBarsToLargerExpense	Androidのみ	収支の棒を大きい方に合わせる。balanceBars は iOS のモデルに無い
 review.keeps-selection-only-after-saving		ReviewModelTest/keepsSelectionOnlyAfterSaving	Androidのみ	選んだだけでは保存せず、saveSelection で保存する。iOS にテストは無い
 review.reads-saved-selection-when-observing		ReviewModelTest/readsSavedSelectionWhenObserving	Androidのみ	observe の初めに保存済みの選択を読む。iOS にテストは無い
+review.leaves-out-categories-missing-from-list		ReviewModelTest/leavesOutCategoriesMissingFromList	Androidのみ	一覧に無いカテゴリを内訳から落とす。iOS にテストは無い
 review-notice.shows-notice-when-list-fails		ReviewModelNoticeTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 review-notice.shows-notice-when-selection-cannot-be-read		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeRead	Androidのみ	選択を読めない時の知らせ。iOS も出すがテストは無い
 review-notice.shows-notice-when-selection-cannot-be-saved		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeSaved	Androidのみ	選択を保存できない時の知らせ。iOS も出すがテストは無い
 review-notice.keeps-list-notice-after-saving		ReviewModelNoticeTest/keepsListNoticeAfterSaving	Androidのみ	保存が通っても、見張りの失敗の知らせを残す
 review-notice.closes-notice-by-hand		ReviewModelNoticeTest/closesNoticeByHand	Androidのみ	知らせを手で閉じる。iOS の ReviewModel にこの筋書きのテストは無い
 review-note-writer-accuracy.*	ReviewNoteWriterAccuracyTests/*		iOSのみ	Apple の FoundationModels でまとめを書く精度の確かめで、Android に相手が無い
-review-text.names-shares	ReviewTextTests/namesShares		違い	割合は四捨五入だけで、合計 100% の調整・99.9%・1% 未満を隠す決まりが無い
+review-text.names-shares	ReviewTextTests/namesShares	ReviewTextTest/namesShares	対応	
 review-text.names-budget-usage	ReviewTextTests/namesBudgetUsage		未移植	振り返りに予算の使い方の文が無い（予算を読み込まない）
-review-text.signs-balance	ReviewTextTests/signsBalance		違い	記録の balanceTitle は 0 円で「収支 · 黒字」。振り返りの側は iOS と同じ
+review-text.signs-balance	ReviewTextTests/signsBalance	ReviewTextTest/signsBalance	対応	
 budget-list.sets-total-and-category-budgets-from-period-month	BudgetListModelTests/setsTotalAndCategoryBudgetsFromPeriodMonth	BudgetListModelTest/setsTotalAndCategoryBudgetsFromPeriodMonth	対応	
 budget-list.clears-budget	BudgetListModelTests/clearsBudget	BudgetListModelTest/clearsAndRestoresBudget	対応	
 budget-list.restores-budget-carried-from-earlier-month	BudgetListModelTests/restoresBudgetCarriedFromEarlierMonth	BudgetListModelTest/restoresBudgetCarriedFromEarlierMonth	対応	
@@ -347,8 +351,8 @@ recurring-list.saves-moved-order		RecurringListModelTest/savesMovedOrder	Android
 recurring-list.deletes-and-restores-recurring		RecurringListModelTest/deletesAndRestoresRecurring	Androidのみ	固定費を 1 件削除して元に戻す。iOS にこのテストが無い
 recurring-list.starts-from-first-period-on-later-day		RecurringListModelTest/startsFromFirstPeriodOnLaterDay	Androidのみ	始まりの日より後の最初の予定日を次回に出す。iOS の画面のテストに無い
 template-edit.enters-amount-with-keypad	TemplateEditModelTests/entersAmountWithKeypad	TemplateEditModelTest/entersAmountWithKeypad	対応	Android に typeName（収入・支出の名前）が無く、確かめていない
-template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton		違い	保存のボタンは常に「保存する」で、足りない物は押した後の知らせでだけ出る
-template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	Android に canSave が無く、名前が無い時は save の結果だけで確かめる
+template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton	TemplateEditModelTest/namesWhatIsMissingOnSaveButton	対応	
+template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	名前が無い時は save の結果で確かめる
 template-edit.loads-existing-template-and-tracks-changes	TemplateEditModelTests/loadsExistingTemplateAndTracksChanges		未移植	既にあるテンプレートを編集する入口（editing・isChanged）が無い
 template-edit.chooses-first-category-and-wallet-on-load		TemplateEditModelTest/choosesFirstCategoryAndWalletOnLoad	Androidのみ	読み込みで最初のカテゴリと口座を選ぶ。iOS にこれだけのテストが無い
 template-edit.names-missing-wallet-by-type		TemplateEditModelTest/namesMissingWalletByType	Androidのみ	カテゴリと口座が無い時の知らせの文を確かめる。iOS にテストが無い
@@ -418,8 +422,8 @@ screen-flow.entry-recorded-from-home-template-appears-in-every-tab-until-undone	
 screen-flow.entry-deleted-and-restored-while-sync-is-on-queues-its-latest-state	ScreenFlowTests/entryDeletedAndRestoredWhileSyncIsOnQueuesItsLatestState		未移植	同期の仕組み（pendingSyncChanges）が無い
 bill-page.*	BillPageTests/*		未移植	請求を月ごとにまとめる型（BillPage）と請求の画面が無い
 bill-text.*	BillTextTests/*		未移植	請求の文（BillText）と請求の行の画面が無い
-deletion-notice.names-single-deleted-item	DeletionNoticeTests/namesSingleDeletedItem		違い	固定費を消した知らせが常に「削除しました」で、消した物の名前を出さない
-deletion-notice.falls-back-to-kind-and-count	DeletionNoticeTests/fallsBackToKindAndCount		違い	固定費を消した知らせが常に「削除しました」で、種類と件数を出さない
+deletion-notice.names-single-deleted-item	DeletionNoticeTests/namesSingleDeletedItem	DeletionNoticeTest/namesSingleDeletedItem	対応	
+deletion-notice.falls-back-to-kind-and-count	DeletionNoticeTests/fallsBackToKindAndCount	DeletionNoticeTest/fallsBackToKindAndCount	対応	
 derived.*	DerivedTests/*		iOSのみ	Swift の Observation 用の計算の覚え置きで、Android は derivedStateOf を使う
 device-name.*	DeviceNameTests/*		iOSのみ	iPhone と iPad の呼び分けで、Android に機種の名前を出す文が無い
 entry-list-filter.*	EntryListFilterTests/*		未移植	記録の絞り込み（filterCategories・widened）のモデルと画面が無い
@@ -438,14 +442,14 @@ entry-notice.deletes-selected-entries-and-undoes	EntryNoticeModelTests/deletesSe
 entry-notice.keeps-batch-notice-longer-and-ignores-screen-taps	EntryNoticeModelTests/keepsBatchNoticeLongerAndIgnoresScreenTaps		未移植	まとめての変更の知らせ（EntryBatch）が無い
 entry-notice.restores-no-spend-mark-when-undoing-new-entry	EntryNoticeModelTests/restoresNoSpendMarkWhenUndoingNewEntry		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
 entry-notice.does-not-make-no-spend-mark-when-undoing-entry-on-unmarked-day	EntryNoticeModelTests/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
-entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage		違い	行の detail に請求日を足さず、「カード（3/1払い）」が「カード」になる
-entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown		違い	請求月のある記録でも「（2月払い）」を足さず、口座の名前だけを出す
-entry-row-item.skips-hidden-bill-of-same-card	EntryRowItemTests/skipsHiddenBillOfSameCard		違い	EntryRowItem が list.cardBills を見ず、請求日を出さない
-entry-row-item.keeps-month-when-two-bills-fit	EntryRowItemTests/keepsMonthWhenTwoBillsFit		違い	EntryRowItem が list.cardBills を見ず、請求月も出さない
+entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage	EntryRowItemTest/showsBillDateOfMovedUsage	対応	
+entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown	EntryRowItemTest/keepsMonthWhenBillIsUnknown	対応	
+entry-row-item.skips-hidden-bill-of-same-card	EntryRowItemTests/skipsHiddenBillOfSameCard	EntryRowItemTest/skipsHiddenBillOfSameCard	対応	
+entry-row-item.keeps-month-when-two-bills-fit	EntryRowItemTests/keepsMonthWhenTwoBillsFit	EntryRowItemTest/keepsMonthWhenTwoBillsFit	対応	
 entry-row-item.keeps-tax-mode-of-entry	EntryRowItemTests/keepsTaxModeOfEntry		未移植	行に品目と税の区分（items・taxIncluded）が無く、行で品目を開く画面も無い
 observation-wait.records-timeout-when-ready-without-notice	ObservationWaitTests/recordsTimeoutWhenReadyWithoutNotice		iOSのみ	Swift の Observation の知らせを待つテスト用の道具の確かめ
-period-text.shows-year-only-outside-this-year	PeriodTextTests/showsYearOnlyOutsideThisYear		違い	今年ではない日付に年を付ける PeriodText.day が無く、常に月/日だけを出す
-period-text.shows-year-of-range-outside-this-year	PeriodTextTests/showsYearOfRangeOutsideThisYear		違い	振り返りの週の範囲に年を付けない（PeriodText.range に today が無い）
+period-text.shows-year-only-outside-this-year	PeriodTextTests/showsYearOnlyOutsideThisYear	PeriodTextTest/showsYearOnlyOutsideThisYear	対応	
+period-text.shows-year-of-range-outside-this-year	PeriodTextTests/showsYearOfRangeOutsideThisYear	PeriodTextTest/showsYearOfRangeOutsideThisYear	対応	
 screen.resubscribes-after-failure	ScreenModelTests/resubscribesAfterFailure	ScreenObservationTest/resubscribesAfterFailure	対応	
 screen.stops-at-limit-with-notice	ScreenModelTests/stopsAtLimitWithNotice	ScreenObservationTest/stopsAtLimitWithNotice	対応	
 screen.marks-failure-until-observed-again	ScreenModelTests/marksFailureUntilObservedAgain	ScreenObservationTest/reportsFailureUntilObservedAgain	違い	失敗を observe の戻り値で返すだけで、モデルに旗とやり直しのボタンが無い

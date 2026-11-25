@@ -27,6 +27,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `FeeChoiceRow.defaultChoices` | `amount/FeeChoiceRow.kt` の `object FeeChoiceRow`。Composable は `designsystem/components/row/` に残す |
 | `Weekday+Name` | `datechoice/WeekdayName.kt` |
 | 無い | `notice/UndoNoticeState.kt`。取り消しの知らせの状態で、Android だけにある |
+| Features の `Deletion+Notice` の文 | `notice/DeletionNotice.kt`。削除の知らせの文を出す |
 
 ## 📱 アプリのモジュール
 
@@ -93,6 +94,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 
 テストは、iOS のテストと 1 件ずつ結び付けて [scenarios](../spec/scenarios.md) の一覧に載せる。
 
+入力の値だけで決まる画面の文は、`spec/fixtures` を読んで確かめる。読む部品は `support/ModelFixture.kt` で、iOS も同じファイルを読む。形式は [fixtures](../spec/fixtures.md) にある。
+
 読み書きの失敗は、`support/AppDatabaseFailure.kt` で起こす。記録の一覧の失敗は、失敗する `Flow` をモデルに渡して起こす。
 
 ## 📂 部品とフォルダ
@@ -119,4 +122,5 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
 | `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
 | `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
+| `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
 | `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |

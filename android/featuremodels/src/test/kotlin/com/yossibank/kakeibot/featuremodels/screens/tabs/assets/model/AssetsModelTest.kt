@@ -90,6 +90,25 @@ class AssetsModelTest {
     }
 
     @Test
+    fun describesBreakdownOfTotal() = modelTest(today = "2026-10-17") { setup ->
+        val card = setup.addWallet(kind = Wallet.Kind.card, name = "カード")
+        setup.save(Entry.Kind.income, amount = 50000, on = date("2026-10-01"))
+        val model = setup.observedModel()
+        val plain = model.output.breakdownText
+
+        setup.save(Entry.Kind.expense, amount = 3000, on = date("2026-10-05"), walletId = card.id)
+        ModelWait.until { model.output.holdings.unpaid == 3000L }
+        val unpaid = model.output.breakdownText
+
+        setup.save(Entry.Kind.income, amount = 4000, on = date("2026-10-06"), walletId = card.id)
+        ModelWait.until { model.output.holdings.refund == 1000L }
+
+        assertEquals("手持ち ¥50,000", plain)
+        assertEquals("手持ち ¥50,000・未払い ¥3,000", unpaid)
+        assertEquals("手持ち ¥50,000・返ってくる額 ¥1,000", model.output.breakdownText)
+    }
+
+    @Test
     fun leavesOutHiddenWallets() = modelTest(today = "2026-10-17") { setup ->
         val card = setup.addWallet(kind = Wallet.Kind.card, name = "カード")
         setup.database.setHidden(WalletTable, id = card.id, isHidden = true, at = setup.now)

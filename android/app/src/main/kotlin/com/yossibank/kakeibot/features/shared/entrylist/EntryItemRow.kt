@@ -15,7 +15,7 @@ fun EntryItemRow(
     EntryRow(
         icon = item.icon,
         title = item.title,
-        detail = item.detail,
+        detail = item.place,
         amount = item.amount,
         type = item.type,
         modifier = modifier.clickable(onClick = onOpen),

@@ -4,6 +4,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
@@ -12,7 +13,10 @@ import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.review.ReviewKind
 import com.yossibank.kakeibot.core.concepts.review.ReviewPeriod
 import com.yossibank.kakeibot.core.concepts.review.ReviewSummary
+import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.entryType
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
+import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -28,6 +32,7 @@ import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class ReviewModel(
     database: AppDatabase,
@@ -47,6 +52,7 @@ class ReviewModel(
         val color: String?,
         val amount: Long,
         val ratio: Double,
+        val percent: String?,
     )
 
     data class BalanceBar(
@@ -92,7 +98,7 @@ class ReviewModel(
         var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
             internal set
 
-        var weekStart: Weekday by mutableStateOf(Weekday.monday)
+        var weekStart: Weekday by mutableStateOf(Weekday.sunday)
             internal set
     }
 
@@ -117,7 +123,10 @@ class ReviewModel(
 
                 return when (input.scale) {
                     ReviewPeriod.Scale.week -> {
-                        PeriodText.range(range)
+                        PeriodText.range(
+                            period = range,
+                            today = state.today,
+                        )
                     }
 
                     ReviewPeriod.Scale.month -> {
@@ -152,6 +161,33 @@ class ReviewModel(
                 return total(of = previous)
             }
 
+        val hasPreviousEntries: Boolean
+            get() {
+                val range = period.comparisonRange(today = state.today)
+                return input.list?.entries.orEmpty().any { it.date in range }
+            }
+
+        val comparisonText: String
+            get() {
+                if (!hasPreviousEntries) {
+                    return "比べる記録がまだありません"
+                }
+
+                val previous = ReviewText.previousName(
+                    scale = input.scale,
+                    isPartial = state.today in period.range,
+                )
+
+                val change = total - previousTotal
+                val amount = AmountText.text(abs(change).clamped)
+
+                return when {
+                    change > 0 -> "${previous}より $amount 多い"
+                    change < 0 -> "${previous}より $amount 少ない"
+                    else -> "${previous}と同じ"
+                }
+            }
+
         val total: Long
             get() = total(of = summary)
 
@@ -165,22 +201,28 @@ class ReviewModel(
                     return emptyList()
                 }
 
-                return breakdown.byCategory
-                    .entries
-                    .sortedByDescending { it.value }
-                    .map { (id, amount) ->
-                        val category = list.categories[id]
-                        val icon = category?.let { list.icons[it.iconId] }
+                val shares = breakdown.byCategory
+                    .mapNotNull { (id, amount) -> list.categories[id]?.let { it to amount } }
+                    .sortedWith(
+                        compareByDescending<Pair<EntryCategory, Long>> { it.second }
+                            .thenBy { it.first.sortOrder },
+                    )
 
-                        Row(
-                            key = id.toString(),
-                            icon = icon,
-                            name = category?.name ?: "未分類",
-                            color = icon?.color,
-                            amount = amount,
-                            ratio = amount.toDouble() / breakdown.total.toDouble(),
-                        )
-                    }
+                val percents = ReviewText.shares(shares.map { it.second })
+
+                return shares.zip(percents) { (category, amount), percent ->
+                    val icon = list.icons[category.iconId]
+
+                    Row(
+                        key = category.id.toString(),
+                        icon = icon,
+                        name = category.name,
+                        color = icon?.color,
+                        amount = amount,
+                        ratio = amount.toDouble() / breakdown.total.toDouble(),
+                        percent = percent,
+                    )
+                }
             }
 
         val balanceBars: List<BalanceBar>

@@ -267,7 +267,7 @@ fun TemplateEditSheet(
         )
 
         PrimaryButton(
-            title = "保存する",
+            title = model.output.saveTitle,
             onClick = {
                 focus.clearFocus()
 
@@ -276,6 +276,7 @@ fun TemplateEditSheet(
                 }
             },
             modifier = Modifier.fillMaxWidth(),
+            isEnabled = model.output.canSave,
         )
     }
 }

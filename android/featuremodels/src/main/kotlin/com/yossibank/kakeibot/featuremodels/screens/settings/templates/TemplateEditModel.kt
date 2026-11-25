@@ -127,9 +127,18 @@ class TemplateEditModel(
                 billShift = if (billRecurring == null) 0 else state.form.billShift,
             )
 
+        val problemMessage: String?
+            get() = draft.problems.firstOrNull()?.let(::message)
+
+        val canSave: Boolean
+            get() = problemMessage == null
+
+        val saveTitle: String
+            get() = problemMessage ?: "追加する"
+
         fun icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
 
-        fun message(of: EntryTemplateDraft.Problem): String = when (of) {
+        private fun message(of: EntryTemplateDraft.Problem): String = when (of) {
             EntryTemplateDraft.Problem.emptyName -> "名前を入れてください"
             EntryTemplateDraft.Problem.missingCategory -> "カテゴリを選んでください"
             EntryTemplateDraft.Problem.missingWallet -> "${walletTitle}を選んでください"
@@ -168,10 +177,10 @@ class TemplateEditModel(
         }
 
         val draft = output.draft
-        val problem = draft.problems.firstOrNull()
+        val problem = output.problemMessage
 
         if (problem != null) {
-            state.task.show(output.message(of = problem))
+            state.task.show(problem)
             return null
         }
 

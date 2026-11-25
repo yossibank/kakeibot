@@ -155,7 +155,7 @@ private fun ColumnScope.Listening(
         Chip(
             label = "日付",
             value = reading?.date?.let { date ->
-                EntryText.relativeDate(
+                EntryText.shortDateText(
                     date = date,
                     today = today,
                 )

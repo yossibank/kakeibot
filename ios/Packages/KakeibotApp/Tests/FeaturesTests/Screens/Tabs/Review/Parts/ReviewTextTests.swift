@@ -4,18 +4,10 @@ import DesignSystem
 import Testing
 
 struct ReviewTextTests {
-    @Test(arguments: [
-        ([42400, 36400, 21200], ["43%", "36%", "21%"]),
-        ([11_000_000, 5880], ["99.9%", nil]),
-        ([1000, 5], ["99.5%", nil]),
-        ([99, 1], ["99%", "1%"]),
-        ([100], ["100%"]),
-        ([500, 0], ["100%", "0%"]),
-        ([0, 0], ["0%", "0%"])
-    ] as [([Int], [String?])])
-    func namesShares(amounts: [Int], expected: [String?]) {
-        let texts = ReviewText.shares(amounts)
-        #expect(texts == expected)
+    @Test(arguments: try shareCases)
+    func namesShares(fixture: ShareCase) {
+        let texts = ReviewText.shares(fixture.amounts)
+        #expect(texts == fixture.texts)
     }
 
     @Test(arguments: [
@@ -38,13 +30,36 @@ struct ReviewTextTests {
         #expect(text == expected)
     }
 
-    @Test(arguments: [
-        (1_219_768, "+¥1,219,768", "収支 · 黒字"),
-        (-24800, "−¥24,800", "収支 · 赤字"),
-        (0, "¥0", "収支")
-    ])
-    func signsBalance(amount: Int, expected: String, title: String) {
-        #expect(Yen.text(amount, sign: .plus) == expected)
-        #expect(ReviewText.balanceTitle(amount) == title)
+    @Test(arguments: try balanceCases)
+    func signsBalance(fixture: BalanceCase) {
+        #expect(Yen.text(fixture.amount, sign: .plus) == fixture.text)
+        #expect(ReviewText.balanceTitle(fixture.amount) == fixture.title)
+    }
+}
+
+extension ReviewTextTests {
+    struct ShareCase: Decodable, Sendable {
+        let summary: String
+        let amounts: [Int]
+        let texts: [String?]
+    }
+
+    struct BalanceCase: Decodable, Sendable {
+        let summary: String
+        let amount: Int
+        let title: String
+        let text: String
+    }
+
+    static var shareCases: [ShareCase] {
+        get throws {
+            try FeaturesFixture.cases("review/review-share-text.json")
+        }
+    }
+
+    static var balanceCases: [BalanceCase] {
+        get throws {
+            try FeaturesFixture.cases("review/review-balance-text.json")
+        }
     }
 }

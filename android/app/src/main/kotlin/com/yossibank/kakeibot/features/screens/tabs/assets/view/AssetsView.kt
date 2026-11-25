@@ -125,7 +125,13 @@ private fun TotalCard(model: AssetsModel) {
                 size = FontSize.LargeTitle,
                 weight = FontWeight.Bold,
             ),
-            color = if (model.output.total < 0) Palette.rose else Palette.accentStrong,
+            color = Palette.accentStrong,
+        )
+
+        FittedText(
+            text = model.output.breakdownText,
+            color = Palette.subtext,
+            style = textFont(style = FontTextStyle.Caption),
         )
 
         Hairline()

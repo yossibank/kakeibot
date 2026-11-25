@@ -20,6 +20,24 @@ import kotlin.test.assertTrue
 
 class EntryModelEditingTest {
     @Test
+    fun labelsSaveButtonByState() = modelTest(today = "2026-10-12") { setup ->
+        val entry = setup.save(Entry.Kind.expense, amount = 800, on = setup.today)
+        val model = setup.loadedModel()
+        val editing = setup.loadedModel(editing = entry.id)
+
+        val empty = model.output.saveTitle
+        val opensKeypad = model.output.opensKeypadOnSave
+        model.press(9, 8, 0)
+
+        assertEquals("金額を入れてください", empty)
+        assertTrue(opensKeypad)
+        assertEquals("記録する", model.output.saveTitle)
+        assertTrue(model.output.canSave)
+        assertFalse(model.output.opensKeypadOnSave)
+        assertEquals("変更を保存", editing.output.saveTitle)
+    }
+
+    @Test
     fun keepsHiddenWalletsWhenEditing() = modelTest(today = "2026-10-12") { setup ->
         val wallets = setup.options().wallets
         val cash = wallets[0].id

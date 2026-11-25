@@ -13,12 +13,53 @@ object EntryText {
         Entry.Kind.transfer -> "振替元"
     }
 
-    fun relativeDate(
+    fun dateText(
         date: LocalDate,
         today: LocalDate,
-    ): String = when (date.days(until = today)) {
-        0 -> "今日（${PeriodText.weekday(date)}）"
-        1 -> "昨日（${PeriodText.weekday(date)}）"
-        else -> PeriodText.weekdayDate(date)
+    ): String {
+        val day = PeriodText.day(
+            date = date,
+            today = today,
+        )
+
+        val text = "$day（${PeriodText.weekday(date)}）"
+
+        return when (date) {
+            today -> "今日 $text"
+            today.adding(days = -1) -> "昨日 $text"
+            else -> text
+        }
+    }
+
+    fun shortDateText(
+        date: LocalDate,
+        today: LocalDate,
+    ): String = when (date) {
+        today -> {
+            "今日"
+        }
+
+        today.adding(days = -1) -> {
+            "昨日"
+        }
+
+        else -> {
+            PeriodText.day(
+                date = date,
+                today = today,
+            )
+        }
+    }
+
+    fun dateValue(
+        date: LocalDate,
+        today: LocalDate,
+    ): String {
+        val day = shortDateText(
+            date = date,
+            today = today,
+        )
+
+        return "$day（${PeriodText.weekday(date)}）"
     }
 }

@@ -26,6 +26,9 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.canSave
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.opensKeypadOnSave
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.saveTitle
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,15 +44,20 @@ internal fun ActionBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         PrimaryButton(
-            title = if (model.output.isEditing) "保存する" else "記録する",
+            title = model.output.saveTitle,
             onClick = {
-                scope.launch {
-                    if (model.save()) {
-                        onSaved()
+                if (model.output.opensKeypadOnSave) {
+                    model.state.focus(EntryModel.Field.Amount)
+                } else {
+                    scope.launch {
+                        if (model.save()) {
+                            onSaved()
+                        }
                     }
                 }
             },
             modifier = Modifier.weight(1f),
+            isEnabled = model.output.canSave || model.output.opensKeypadOnSave,
         )
 
         if (model.output.isEditing) {

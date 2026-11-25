@@ -60,6 +60,18 @@ class HomeModel(
         val usage: BudgetUsage?
             get() = input.overview?.budgetUsage
 
+        val middleTitle: String
+            get() = if (usage == null) "昨日の支出" else "今月の支出"
+
+        val middleAmount: Long
+            get() {
+                val overview = input.overview ?: return 0L
+                return if (usage == null) overview.yesterdayExpense else overview.monthExpense
+            }
+
+        val showsNoRecords: Boolean
+            get() = input.overview?.list != null && recentRows.isEmpty()
+
         val recentRows: List<EntryRowItem> by derivedStateOf {
             val list = input.overview?.list
 

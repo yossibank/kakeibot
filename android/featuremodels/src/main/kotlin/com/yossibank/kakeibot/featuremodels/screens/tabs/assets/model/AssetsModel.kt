@@ -11,6 +11,8 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.concepts.wallet.isDebt
 import com.yossibank.kakeibot.core.concepts.wallet.role
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
+import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import kotlinx.coroutines.flow.Flow
@@ -94,6 +96,20 @@ class AssetsModel(
 
         val netWorth: Long
             get() = holdings.netWorth
+
+        val breakdownText: String
+            get() {
+                val holdings = holdings
+                val onHand = "手持ち ${AmountText.text(holdings.onHand.clamped)}"
+                val unpaid = AmountText.text(holdings.unpaid.clamped)
+                val refund = AmountText.text(holdings.refund.clamped)
+
+                return when {
+                    holdings.unpaid > 0 -> "$onHand・未払い $unpaid"
+                    holdings.refund > 0 -> "$onHand・返ってくる額 $refund"
+                    else -> onHand
+                }
+            }
     }
 
     private class Dependencies(
