@@ -15,7 +15,7 @@ extension WalletEditSheet {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.frame(in: .global).maxY
             } action: { maxY in
-                iconBottom = maxY
+                layout.iconBottom = maxY
             }
 
             SettingsField("名前", text: Bindable(model.state).name, focus: $focus, field: .name)
@@ -42,6 +42,7 @@ extension WalletEditSheet {
         }
         .overlay(alignment: .top) {
             SettingsEditHeader(
+                isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
                 title: title,
                 isEditing: model.isEditing,
                 isHidden: model.input.isHidden,
@@ -80,7 +81,7 @@ extension WalletEditSheet {
         ) {
             Button {
                 focus = nil
-                isEditingIcon = true
+                model.state.icon.present()
             } label: {
                 WalletRowIcon(
                     icon: model.state.icon.preview,
@@ -156,8 +157,8 @@ extension WalletEditSheet {
                 .padding(.top, 12)
 
             ForEach(model.input.valuations) { valuation in
-                SwipeRow(id: valuation.id, openId: $openValuationId) {
-                    openValuationId = nil
+                SwipeRow(id: valuation.id, openId: Bindable(model.state).openValuationId) {
+                    model.state.openValuationId = nil
                 } onAction: {
                     model.perform {
                         await $0.deleteValuation(valuation.id)

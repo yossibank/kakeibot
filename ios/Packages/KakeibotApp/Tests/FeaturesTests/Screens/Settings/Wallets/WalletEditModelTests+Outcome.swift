@@ -119,13 +119,13 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let model = try await Self.investment(in: setup)
         model.startValuation()
-        model.state.drawer = .valuation
+        model.state.open(.valuation)
         model.state.pressValuation(.digit(5))
 
         let isSaved = await model.saveValuation()
 
         #expect(isSaved)
-        #expect(model.state.drawer == nil)
+        #expect(model.state.prompt.panel == nil)
     }
 
     @Test
@@ -133,14 +133,14 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let model = try await Self.investment(in: setup)
         model.startValuation()
-        model.state.drawer = .valuation
+        model.state.open(.valuation)
         model.state.pressValuation(.digit(5))
         try await setup.database.failWrites(to: "valuation")
 
         let isSaved = await model.saveValuation()
 
         #expect(!isSaved)
-        #expect(model.state.drawer == .valuation)
+        #expect(model.state.prompt.panel == .valuation)
     }
 
     @Test
