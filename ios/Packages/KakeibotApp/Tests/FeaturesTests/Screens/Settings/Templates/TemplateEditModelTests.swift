@@ -25,6 +25,22 @@ struct TemplateEditModelTests {
     }
 
     @Test
+    func opensOnePanelAtATime() throws {
+        let database = try Self.database()
+        let model = TemplateEditModel(parts: .system(database), type: .expense)
+
+        model.state.open(.amount)
+        model.state.open(.memo)
+        let opened = model.state.prompt.panel
+
+        model.state.closePanel()
+
+        #expect(opened == .memo)
+        #expect(model.state.prompt.panel == nil)
+        #expect(model.state.tagCategory == nil)
+    }
+
+    @Test
     func namesWhatIsMissingOnSaveButton() async throws {
         let database = try Self.database()
         let model = TemplateEditModel(parts: .system(database), type: .expense)

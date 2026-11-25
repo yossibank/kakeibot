@@ -10,21 +10,19 @@ extension View {
 }
 
 private struct BudgetKeypadDrawer: ViewModifier {
-    @State private var isConfirmingDiscard = false
-
     let model: BudgetListModel
 
     func body(content: Content) -> some View {
         content
             .settingsDrawerLayer(item: model.state.editing) {
-                close()
+                model.closeEditing()
             } drawer: { _ in
                 drawer
             }
             .animation(.snappy, value: model.state.editing)
             .confirmsDiscard(
                 when: model.output.isChanged,
-                isPresented: $isConfirmingDiscard
+                isPresented: Bindable(model.state).isConfirmingDiscard
             ) {
                 model.cancelEditing()
             }
@@ -112,16 +110,6 @@ private extension BudgetKeypadDrawer {
             .lineLimit(1)
             .minimumScaleFactor(0.8)
             .padding(.vertical, 4)
-        }
-    }
-}
-
-private extension BudgetKeypadDrawer {
-    func close() {
-        if model.output.isChanged {
-            isConfirmingDiscard = true
-        } else {
-            model.cancelEditing()
         }
     }
 }

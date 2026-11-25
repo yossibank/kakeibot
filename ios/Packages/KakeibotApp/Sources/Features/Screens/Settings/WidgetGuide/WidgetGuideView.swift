@@ -4,11 +4,8 @@ import FeatureModels
 import SwiftUI
 
 public struct WidgetGuideView: View {
-    @State private var place: WidgetGuidePlace
-    @State private var widget: WidgetGuideWidget
-    @State private var size: WidgetGuideSize
+    @State private var model: WidgetGuideModel
     @State private var hintModel: SettingsHintModel
-    @State private var shownSample: WidgetGuideSample?
 
     public init(parts: ScreenParts) {
         self.init(parts: parts, place: .home)
@@ -22,9 +19,9 @@ public struct WidgetGuideView: View {
     ) {
         let hintModel = SettingsHintModel(parts: parts, screen: .widgetGuide)
 
-        _place = State(initialValue: place)
-        _widget = State(initialValue: widget)
-        _size = State(initialValue: size)
+        let sample = WidgetGuideSample(widget: widget, size: size)
+
+        _model = State(initialValue: WidgetGuideModel(place: place, sample: sample))
         _hintModel = State(initialValue: hintModel)
     }
 
@@ -37,7 +34,11 @@ public struct WidgetGuideView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     VStack(spacing: 16) {
-                        CapsulePicker(selection: $place, options: Self.options, size: .wide)
+                        CapsulePicker(
+                            selection: Bindable(model.state).place,
+                            options: Self.options,
+                            size: .wide
+                        )
 
                         if place == .home {
                             carousel
@@ -79,6 +80,26 @@ private extension WidgetGuideView {
 private extension WidgetGuideView {
     static let carouselMargin: CGFloat = 16
 
+    var place: WidgetGuidePlace {
+        model.state.place
+    }
+
+    var widget: WidgetGuideWidget {
+        model.state.sample.widget
+    }
+
+    var size: WidgetGuideSize {
+        model.state.sample.size
+    }
+
+    var shownSample: Binding<WidgetGuideSample?> {
+        Binding {
+            model.state.shownSample
+        } set: { sample in
+            model.state.show(sample)
+        }
+    }
+
     var carousel: some View {
         VStack(spacing: 12) {
             WidgetGuideStage(
@@ -105,15 +126,9 @@ private extension WidgetGuideView {
                         }
                         .scrollTargetLayout()
                     }
-                    .scrollPosition(id: $shownSample)
+                    .scrollPosition(id: shownSample)
                     .onAppear {
-                        shownSample = WidgetGuideSample(widget: widget, size: size)
-                    }
-                    .onChange(of: shownSample) {
-                        if let shownSample {
-                            widget = shownSample.widget
-                            size = shownSample.size
-                        }
+                        model.state.showChosenSample()
                     }
                     .scrollTargetBehavior(.viewAligned)
                     .contentMargins(.horizontal, Self.carouselMargin)
@@ -212,7 +227,7 @@ private extension WidgetGuideView {
     }
 
     func isCurrent(_ item: WidgetGuideSample) -> Bool {
-        item.widget == widget && item.size == size
+        item == model.state.sample
     }
 }
 

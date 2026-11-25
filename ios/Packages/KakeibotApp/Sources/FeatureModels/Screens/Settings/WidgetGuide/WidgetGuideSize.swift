@@ -1,10 +1,10 @@
-enum WidgetGuideSize: Hashable {
+public enum WidgetGuideSize: Hashable, Sendable {
     case small
     case medium
     case large
 }
 
-extension WidgetGuideSize {
+public extension WidgetGuideSize {
     var title: String {
         switch self {
         case .small: "小"

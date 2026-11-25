@@ -5,9 +5,7 @@ import SwiftUI
 
 public struct HomeSectionListView: View {
     @State private var model: HomeSectionListModel
-    @State private var dragging: HomeSection?
-    @State private var dragStart = 0
-    @State private var dragTranslation: CGFloat = 0
+    @State private var layout = Layout()
 
     @GestureState private var isPressing = false
 
@@ -36,7 +34,7 @@ public struct HomeSectionListView: View {
                     .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(dragging != nil)
+            .scrollDisabled(model.state.dragging != nil)
         }
         .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
         .animation(.snappy, value: model.state.layout)
@@ -67,7 +65,7 @@ private extension HomeSectionListView {
                         .overlay(alignment: .top) {
                             if index > 0,
                                slots[index - 1].section != nil,
-                               dragging != section {
+                               model.state.dragging?.section != section {
                                 Hairline()
                                     .padding(.horizontal, 16)
                             }
@@ -122,7 +120,7 @@ private extension HomeSectionListView {
     func row(_ section: HomeSection) -> some View {
         let isHidden = model.state.layout.isHidden(section)
         let opacity = isHidden ? Emphasis.medium.rawValue : 1
-        let isDragging = dragging == section
+        let isDragging = model.state.dragging?.section == section
         let scale = isDragging ? Self.liftScale : 1
 
         return HStack(spacing: 12) {
@@ -158,6 +156,10 @@ private extension HomeSectionListView {
 }
 
 private extension HomeSectionListView {
+    struct Layout {
+        var translation: CGFloat = 0
+    }
+
     static let rowHeight: CGFloat = 56
     static let zoneGap: CGFloat = 16
     static let liftScale: CGFloat = 1.02
@@ -172,17 +174,18 @@ private extension HomeSectionListView {
 
     func offset(of section: HomeSection) -> CGFloat {
         guard
-            dragging == section,
+            let dragging = model.state.dragging,
+            dragging.section == section,
             let index = model.state.layout.slots.firstIndex(of: .section(section))
         else {
             return 0
         }
 
-        return dragTranslation - CGFloat(index - dragStart) * Self.rowHeight
+        return layout.translation - CGFloat(index - dragging.start) * Self.rowHeight
     }
 
     func layer(of section: HomeSection) -> Double {
-        dragging == section ? 1 : 0
+        model.state.dragging?.section == section ? 1 : 0
     }
 
     func dragGesture(_ section: HomeSection) -> some Gesture {
@@ -198,7 +201,7 @@ private extension HomeSectionListView {
 
                 case let .second(true, drag?):
                     startDragging(section)
-                    moveDragging(section, by: drag.translation.height)
+                    moveDragging(by: drag.translation.height)
 
                 default:
                     break
@@ -210,40 +213,35 @@ private extension HomeSectionListView {
     }
 
     func startDragging(_ section: HomeSection) {
-        guard dragging == nil else {
+        guard model.state.dragging == nil else {
             return
         }
 
-        dragStart = model.state.layout.slots.firstIndex(of: .section(section)) ?? 0
-        dragTranslation = 0
+        layout.translation = 0
 
         withAnimation(.snappy) {
-            dragging = section
+            model.startDragging(section)
         }
     }
 
-    func moveDragging(
-        _ section: HomeSection,
-        by translation: CGFloat
-    ) {
+    func moveDragging(by translation: CGFloat) {
         let steps = Int((translation / Self.rowHeight).rounded())
-        let target = dragStart + steps
 
-        dragTranslation = translation
+        layout.translation = translation
 
         withAnimation(.snappy) {
-            model.move(section, toSlot: target)
+            model.moveDragging(bySlots: steps)
         }
     }
 
     func finishDragging() {
-        guard dragging != nil else {
+        guard model.state.dragging != nil else {
             return
         }
 
         withAnimation(.snappy) {
-            dragging = nil
-            dragTranslation = 0
+            model.finishDragging()
+            layout.translation = 0
         }
 
         model.perform {

@@ -3,7 +3,7 @@ import FeatureModels
 import SwiftUI
 
 struct AppIconTile: View {
-    @State private var taps = 0
+    @State private var layout = Layout()
 
     let choice: AppIconChoice
     let isCurrent: Bool
@@ -18,7 +18,7 @@ struct AppIconTile: View {
                 return
             }
 
-            taps += 1
+            layout.pops += 1
 
             onSelect()
         } label: {
@@ -52,6 +52,10 @@ struct AppIconTile: View {
 }
 
 private extension AppIconTile {
+    struct Layout {
+        var pops: Double = 0
+    }
+
     struct Pop {
         var scale = 1.0
         var ring = 1.0
@@ -60,7 +64,7 @@ private extension AppIconTile {
 
     var preview: some View {
         AppIconPreview(choice: choice, size: Self.size)
-            .keyframeAnimator(initialValue: Pop(), trigger: taps) { content, pop in
+            .keyframeAnimator(initialValue: Pop(), trigger: layout.pops) { content, pop in
                 content
                     .scaleEffect(pop.scale)
                     .background {

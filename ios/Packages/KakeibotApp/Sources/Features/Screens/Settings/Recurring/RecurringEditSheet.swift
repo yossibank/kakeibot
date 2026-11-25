@@ -6,8 +6,6 @@ import SwiftUI
 public struct RecurringEditSheet: View {
     @State var model: RecurringEditModel
 
-    @State private var panel: Panel?
-
     @FocusState private var focus: Field?
 
     @Environment(\.dismiss) private var dismiss
@@ -30,7 +28,7 @@ public struct RecurringEditSheet: View {
 
     public var body: some View {
         content
-            .settingsDrawerLayer(item: panel) {
+            .settingsDrawerLayer(item: model.state.prompt.panel) {
                 closePanel()
             } drawer: { panel in
                 SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
@@ -41,6 +39,7 @@ public struct RecurringEditSheet: View {
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
+                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
                     title: headerTitle,
                     isEditing: model.isEditing,
                     isHidden: model.input.isHidden
@@ -99,20 +98,11 @@ extension RecurringEditSheet {
 }
 
 extension RecurringEditSheet {
-    enum Panel: Hashable {
-        case amount
-        case start
-        case end
-        case holiday
-        case closing
-        case fee
-        case count
-        case remind
-    }
+    typealias Panel = RecurringEditModel.Panel
 
     func closePanel() {
         withAnimation(.snappy) {
-            panel = nil
+            model.state.closePanel()
         }
     }
 }
@@ -234,7 +224,7 @@ private extension RecurringEditSheet {
         }
 
         withAnimation(.snappy) {
-            self.panel = panel
+            model.state.open(panel)
         }
     }
 }

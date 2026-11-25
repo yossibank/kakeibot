@@ -20,7 +20,11 @@ public final class ReminderModel {
         authorization: NotificationAuthorization = .allowed,
         permission: NotificationPermission
     ) {
-        let state = State(previewDay: today.weekday)
+        let state = State(
+            previewDay: today.weekday,
+            isPickingTime: time.map { !Self.presets.contains($0) } ?? false
+        )
+
         let input = Input(today: today, time: time, authorization: authorization)
 
         self.state = state
@@ -38,8 +42,20 @@ public extension ReminderModel {
 
         public internal(set) var previewDay: Weekday
 
-        init(previewDay: Weekday) {
+        public private(set) var isPickingTime: Bool
+
+        init(
+            previewDay: Weekday,
+            isPickingTime: Bool
+        ) {
             self.previewDay = previewDay
+            self.isPickingTime = isPickingTime
+        }
+
+        public func pickTime(_ isPicking: Bool) {
+            if isPickingTime != isPicking {
+                isPickingTime = isPicking
+            }
         }
     }
 

@@ -5,9 +5,6 @@ import SwiftUI
 
 public struct SyncView: View {
     @State var model: SyncModel
-    @State var leaving: JoinedShare?
-    @State var stopping: WalletShare?
-    @State var proOffer: ProOffer?
 
     @Environment(\.isPro) var isPro
 
@@ -18,6 +15,8 @@ public struct SyncView: View {
     }
 
     public var body: some View {
+        let asking = model.state.asking
+
         VStack(spacing: 16) {
             SettingsBackHeader("同期と共有", hint: hint)
 
@@ -86,24 +85,24 @@ public struct SyncView: View {
             await model.observe()
         }
         .confirmation(
-            isPresented: isLeavingBinding,
+            isPresented: isAsking(asking?.leaving.map { .leave($0) }),
             systemImage: "person.crop.circle.badge.minus",
             title: "共有から抜けますか",
             message: "この \(DeviceName.current) から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
             keepTitle: "やめる",
             confirmTitle: "抜ける"
-        ) { [leaving] in
-            leave(leaving)
+        ) {
+            leave(asking?.leaving)
         }
         .confirmation(
-            isPresented: isStoppingBinding,
+            isPresented: isAsking(asking?.stopping.map { .stop($0) }),
             systemImage: "person.2.slash",
             title: "共有を終えますか",
             message: "相手の端末から、この口座と記録が消えます。この \(DeviceName.current) には残ります",
             keepTitle: "やめる",
             confirmTitle: "共有を終える"
-        ) { [stopping] in
-            stopSharing(stopping)
+        ) {
+            stopSharing(asking?.stopping)
         }
         .overlay {
             if let choice = model.state.choice {
@@ -126,7 +125,7 @@ public struct SyncView: View {
                     isFailed: model.output.isParticipantsFailed,
                     onInvite: inviteMore,
                     onStop: {
-                        askToStop(opened)
+                        model.askToStop(opened)
                     },
                     onClose: model.closeOpened
                 )
@@ -135,8 +134,8 @@ public struct SyncView: View {
         .animation(.snappy(duration: 0.25), value: model.state.choice)
         .animation(.snappy(duration: 0.25), value: model.state.invitation)
         .animation(.snappy(duration: 0.25), value: model.state.opened)
-        .proOffer(proOffer?.feature) {
-            proOffer = nil
+        .proOffer(asking?.offer?.feature) {
+            model.state.close(asking)
         } onUnlock: {
             unlock()
         }
@@ -145,20 +144,6 @@ public struct SyncView: View {
         }
         .haptic(.success, trigger: model.output.progress) { old, new in
             Self.hasFinishedSyncing(from: old, to: new)
-        }
-    }
-}
-
-extension SyncView {
-    enum ProOffer: Equatable {
-        case sync
-        case share(WalletShare)
-
-        var feature: String {
-            switch self {
-            case .sync: "端末間の同期"
-            case .share: "家族との共有"
-            }
         }
     }
 }
@@ -210,32 +195,12 @@ private extension SyncView {
         model.input.isOn || model.output.isAvailable
     }
 
-    var isLeavingBinding: Binding<Bool> {
-        Binding {
-            leaving != nil
-        } set: { isPresented in
-            if !isPresented {
-                leaving = nil
-            }
-        }
-    }
-
-    var isStoppingBinding: Binding<Bool> {
-        Binding {
-            stopping != nil
-        } set: { isPresented in
-            if !isPresented {
-                stopping = nil
-            }
-        }
-    }
-
     var onBinding: Binding<Bool> {
         Binding {
             model.output.shownOn
         } set: { isOn in
             guard !isOn || isPro else {
-                proOffer = .sync
+                model.state.ask(.offer(.sync))
                 return
             }
 
@@ -257,6 +222,16 @@ private extension SyncView {
         return true
     }
 
+    func isAsking(_ asking: SyncModel.Asking?) -> Binding<Bool> {
+        Binding {
+            asking != nil
+        } set: { isPresented in
+            if !isPresented {
+                model.state.close(asking)
+            }
+        }
+    }
+
     func turn(_ isOn: Bool) {
         guard model.request(isOn) else {
             return
@@ -268,11 +243,11 @@ private extension SyncView {
     }
 
     func unlock() {
-        guard let offer = proOffer else {
+        guard let offer = model.state.asking?.offer else {
             return
         }
 
-        proOffer = nil
+        model.state.close(.offer(offer))
 
         switch offer {
         case .sync:
@@ -293,11 +268,6 @@ private extension SyncView {
         model.perform {
             await $0.leave(item)
         }
-    }
-
-    func askToStop(_ item: WalletShare) {
-        model.closeOpened()
-        stopping = item
     }
 
     func stopSharing(_ item: WalletShare?) {

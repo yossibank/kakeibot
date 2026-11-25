@@ -35,7 +35,7 @@ private extension TemplateEditSheet {
                 model.state.toggleTag(id)
             },
             onAdd: {
-                tagCategory = model.output.selectedCategory
+                model.state.tagCategory = model.output.selectedCategory
             }
         )
     }

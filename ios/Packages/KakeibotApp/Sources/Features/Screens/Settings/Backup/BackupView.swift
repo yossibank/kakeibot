@@ -5,8 +5,6 @@ import UniformTypeIdentifiers
 
 public struct BackupView: View {
     @State private var model: BackupModel
-    @State private var isImporting = false
-    @State private var pressed: String?
 
     public init(model: BackupModel) {
         _model = State(initialValue: model)
@@ -25,6 +23,7 @@ public struct BackupView: View {
 
                         VStack(spacing: 0) {
                             actionButton(
+                                .export(.json),
                                 "書き出す",
                                 systemImage: "square.and.arrow.up",
                                 detail: "すべての記録と設定を保存します"
@@ -35,6 +34,7 @@ public struct BackupView: View {
                             Hairline()
 
                             actionButton(
+                                .export(.csv),
                                 "表計算用に書き出す",
                                 systemImage: "tablecells",
                                 detail: "CSV で保存します。読み込めません"
@@ -51,6 +51,7 @@ public struct BackupView: View {
 
                         VStack(spacing: 0) {
                             actionButton(
+                                .importFile,
                                 "読み込む",
                                 systemImage: "square.and.arrow.down",
                                 detail: "ファイルから戻します"
@@ -62,6 +63,7 @@ public struct BackupView: View {
                                 Hairline()
 
                                 actionButton(
+                                    .previous(item),
                                     model.output.previousTitle(of: item),
                                     systemImage: "arrow.uturn.backward",
                                     detail: "読み込む前に退避したデータです"
@@ -111,13 +113,8 @@ public struct BackupView: View {
             await model.loadPrevious()
         }
         .animation(.snappy, value: model.state.doneMessage)
-        .onChange(of: model.state.isWorking) { _, isWorking in
-            if !isWorking {
-                pressed = nil
-            }
-        }
         .fileExporter(
-            isPresented: Bindable(model.state).isExporting,
+            isPresented: isPicking(.exporter),
             document: document,
             contentType: exportType,
             defaultFilename: model.state.file?.name
@@ -127,7 +124,7 @@ public struct BackupView: View {
             }
         }
         .fileImporter(
-            isPresented: $isImporting,
+            isPresented: isPicking(.importer),
             allowedContentTypes: [.json]
         ) { result in
             model.perform {
@@ -153,15 +150,16 @@ public struct BackupView: View {
 
 private extension BackupView {
     func actionButton(
+        _ row: BackupModel.Row,
         _ title: String,
         systemImage: String,
         detail: String,
         action: @escaping () -> Void
     ) -> some View {
-        let isWorking = model.state.isWorking && pressed == title
+        let isWorking = model.state.isWorking && model.state.pressed == row
 
         return Button {
-            pressed = title
+            model.state.press(row)
             action()
         } label: {
             HStack(spacing: 12) {
@@ -221,7 +219,17 @@ private extension BackupView {
     }
 
     func importFile() {
-        isImporting = true
+        model.state.pick(.importer)
+    }
+
+    func isPicking(_ picker: BackupModel.Picker) -> Binding<Bool> {
+        Binding {
+            model.state.picker == picker
+        } set: { isPresented in
+            if !isPresented {
+                model.state.close(picker)
+            }
+        }
     }
 
     func restorePrevious(_ item: BackupModel.Previous) {

@@ -5,9 +5,7 @@ import SwiftUI
 
 public struct RewardRuleEditSheet: View {
     @State private var model: RewardRuleEditModel
-    @State private var panel: Panel?
-    @State private var isEditingIcon = false
-    @State private var iconBottom: CGFloat = 0
+    @State private var layout = Layout()
 
     @FocusState private var focus: Field?
 
@@ -30,20 +28,20 @@ public struct RewardRuleEditSheet: View {
 
     public var body: some View {
         content
-            .settingsDrawerLayer(item: panel) {
+            .settingsDrawerLayer(item: model.state.prompt.panel) {
                 closePanel()
             } drawer: { panel in
                 drawerView(panel)
             }
             .iconEditorDrawer(
-                isPresented: $isEditingIcon,
                 model: model.state.icon,
                 focus: $focus,
                 textField: .text,
-                below: iconBottom
+                below: layout.iconBottom
             )
             .overlay(alignment: .top) {
                 SettingsEditHeader(
+                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
                     title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
                     isEditing: model.isEditing,
                     isHidden: model.input.isHidden,
@@ -100,7 +98,7 @@ private extension RewardRuleEditSheet {
             SettingsPreviewSection(note: "ごほうび貯金箱では、このタイルで並びます") {
                 Button {
                     focus = nil
-                    isEditingIcon = true
+                    model.state.icon.present()
                 } label: {
                     RewardRuleTile(
                         icon: model.state.icon.preview,
@@ -111,7 +109,7 @@ private extension RewardRuleEditSheet {
                     )
                     .frame(width: 172, height: 156)
                     .overlay {
-                        if isEditingIcon {
+                        if model.state.icon.isPresented {
                             RoundedRectangle(cornerRadius: corner.radius(16))
                                 .stroke(Palette.accent, lineWidth: 2)
                         }
@@ -127,7 +125,7 @@ private extension RewardRuleEditSheet {
             .onGeometryChange(for: CGFloat.self) { proxy in
                 proxy.frame(in: .global).maxY
             } action: { maxY in
-                iconBottom = maxY
+                layout.iconBottom = maxY
             }
 
             SettingsField(
@@ -185,9 +183,11 @@ private extension RewardRuleEditSheet {
         case text
     }
 
-    enum Panel: Hashable {
-        case amount
+    struct Layout {
+        var iconBottom: CGFloat = 0
     }
+
+    typealias Panel = RewardRuleEditModel.Panel
 
     var amountPrompt: String? {
         model.output.amount == nil ? "金額を入れる" : nil
@@ -233,13 +233,13 @@ private extension RewardRuleEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            self.panel = panel
+            model.state.open(panel)
         }
     }
 
     func hidePanel() {
         withAnimation(.snappy) {
-            panel = nil
+            model.state.closePanel()
         }
     }
 

@@ -39,13 +39,14 @@ public extension BackupModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var isExporting = false
         public var isConfirmingRestore = false
 
         public internal(set) var file: BackupFile?
         public internal(set) var pending: ExportV1?
         public internal(set) var doneMessage: String?
         public internal(set) var isWorking = false
+        public internal(set) var picker: Picker?
+        public internal(set) var pressed: Row?
     }
 
     @MainActor
@@ -160,7 +161,7 @@ public extension BackupModel {
         state.doneMessage = nil
 
         defer {
-            state.isWorking = false
+            state.finishWorking()
         }
 
         do {
@@ -168,12 +169,12 @@ public extension BackupModel {
             let name = Self.fileName(of: kind, at: date)
 
             state.file = BackupFile(kind: kind, data: data, name: name)
-            state.isExporting = true
+            state.pick(.exporter)
 
             return true
         } catch {
             state.errorNotice.show(Self.exportFailedMessage)
-            state.isExporting = false
+            state.close(.exporter)
 
             return false
         }
@@ -264,7 +265,7 @@ public extension BackupModel {
         state.isWorking = true
 
         defer {
-            state.isWorking = false
+            state.finishWorking()
         }
 
         do {

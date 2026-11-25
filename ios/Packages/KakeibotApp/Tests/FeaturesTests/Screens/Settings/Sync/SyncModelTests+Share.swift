@@ -182,3 +182,47 @@ private extension SyncModelTests {
         return try await firstShare(in: database)
     }
 }
+
+extension SyncModelTests {
+    @Test
+    func asksOneThingAtATime() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+
+        model.state.ask(.offer(.sync))
+        let feature = model.state.asking?.offer?.feature
+
+        model.state.ask(.offer(.share(item)))
+        model.state.close(.offer(.sync))
+        let kept = model.state.asking
+
+        model.state.close(kept)
+
+        #expect(feature == "端末間の同期")
+        #expect(kept == .offer(.share(item)))
+        #expect(kept?.offer?.feature == "家族との共有")
+        #expect(model.state.asking == nil)
+    }
+
+    @Test
+    func closesSharedCardBeforeAskingToStop() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+        await model.open(item)
+        await model.confirmInvitation()
+        let shared = try await firstShare(in: setup.database)
+        await model.open(shared)
+        let opened = model.state.opened
+
+        model.askToStop(shared)
+
+        #expect(opened == shared)
+        #expect(model.state.opened == nil)
+        #expect(model.state.asking?.stopping == shared)
+        #expect(model.state.asking?.leaving == nil)
+    }
+}

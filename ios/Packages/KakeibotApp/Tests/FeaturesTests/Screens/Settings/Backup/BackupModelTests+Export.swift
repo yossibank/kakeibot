@@ -143,3 +143,35 @@ private extension BackupModelTests {
         calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? .distantPast
     }
 }
+
+extension BackupModelTests {
+    @Test
+    func marksPressedRowUntilWorkEnds() async throws {
+        let setup = try Setup()
+        let model = setup.exporter()
+
+        model.state.press(.export(.csv))
+        let pressed = model.state.pressed
+
+        await model.makeFile(.csv)
+
+        #expect(pressed == .export(.csv))
+        #expect(model.state.pressed == nil)
+        #expect(!model.state.isWorking)
+    }
+
+    @Test
+    func showsOneFilePickerAtATime() throws {
+        let setup = try Setup()
+        let model = setup.exporter()
+
+        model.state.pick(.importer)
+        model.state.close(.exporter)
+        let kept = model.state.picker
+
+        model.state.close(.importer)
+
+        #expect(kept == .importer)
+        #expect(model.state.picker == nil)
+    }
+}
