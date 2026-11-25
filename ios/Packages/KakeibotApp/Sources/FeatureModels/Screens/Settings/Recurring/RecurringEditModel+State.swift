@@ -61,11 +61,17 @@ public extension RecurringEditModel {
         }
     }
 
+    struct Calculators {
+        public internal(set) var amount = AmountCalculator()
+        public internal(set) var fee = AmountCalculator()
+    }
+
     @MainActor
     @Observable
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var categoryId: EntryCategory.ID?
         public var toWalletId: Wallet.ID?
@@ -74,8 +80,7 @@ public extension RecurringEditModel {
         public var schedule: Schedule
 
         public private(set) var walletId: Wallet.ID?
-        public private(set) var calculator = AmountCalculator()
-        public private(set) var feeCalculator = AmountCalculator()
+        public private(set) var calculators = Calculators()
 
         public internal(set) var type: Entry.Kind
 
@@ -108,22 +113,22 @@ public extension RecurringEditModel.State {
     }
 
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        calculators.amount.press(key)
     }
 
     func pressFee(_ key: AmountCalculator.Key) {
-        feeCalculator.press(key)
+        calculators.fee.press(key)
     }
 
     func setFee(_ amount: Int) {
-        feeCalculator = AmountCalculator(amount: amount)
+        calculators.fee = AmountCalculator(amount: amount)
     }
 }
 
 extension RecurringEditModel.State {
     func apply(_ draft: RecurringDraft) {
         type = draft.type
-        calculator = AmountCalculator(amount: draft.amount)
+        calculators.amount = AmountCalculator(amount: draft.amount)
         categoryId = draft.categoryId
         walletId = draft.walletId
         toWalletId = draft.toWalletId
@@ -133,7 +138,7 @@ extension RecurringEditModel.State {
         schedule.day = draft.day
         schedule.load(draft.holidayShift)
         schedule.closingDay = draft.closingDay
-        feeCalculator = AmountCalculator(amount: draft.fee)
+        calculators.fee = AmountCalculator(amount: draft.fee)
         billShift = draft.billShift
         schedule.startDate = draft.startDate
         schedule.endDate = draft.endDate

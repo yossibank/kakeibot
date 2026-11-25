@@ -38,8 +38,10 @@ public final class AssetsRewardGoalEditModel: ScreenPerforming {
 public extension AssetsRewardGoalEditModel {
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
+        public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var name: String
 
@@ -125,6 +127,7 @@ public extension AssetsRewardGoalEditModel {
         }
     }
 
+    @discardableResult
     func save() async -> Bool {
         do {
             try await dependencies.database.saveRewardGoal(
@@ -133,6 +136,8 @@ public extension AssetsRewardGoalEditModel {
                 at: dependencies.clock.now
             )
 
+            state.outcome.send(SettingsEditOutcome(saved: ()))
+
             return true
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
@@ -140,6 +145,7 @@ public extension AssetsRewardGoalEditModel {
         }
     }
 
+    @discardableResult
     func delete() async -> Bool {
         guard let editing = input.editing else {
             return false
@@ -147,6 +153,9 @@ public extension AssetsRewardGoalEditModel {
 
         do {
             try await dependencies.database.deleteRewardGoal(editing.id)
+
+            state.outcome.send(SettingsEditOutcome())
+
             return true
         } catch {
             state.errorNotice.show(Self.deleteFailedMessage, for: error)

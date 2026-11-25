@@ -118,6 +118,9 @@ public struct RecordsView: View {
                 finishSelecting()
             }
         }
+        .onOutcome(model.state.outcome) { deletion in
+            onDeleteAdjustment(deletion)
+        }
         .onChange(of: model.input.layout) {
             finishSelecting()
         }
@@ -369,10 +372,8 @@ private extension RecordsView {
     }
 
     func deleteAdjustment(_ id: Adjustment.ID) {
-        Task {
-            if let deletion = await model.deleteAdjustment(id) {
-                onDeleteAdjustment(deletion)
-            }
+        model.perform {
+            await $0.deleteAdjustment(id)
         }
     }
 }

@@ -5,9 +5,7 @@ import UniformTypeIdentifiers
 
 public struct BackupView: View {
     @State private var model: BackupModel
-    @State private var isExporting = false
     @State private var isImporting = false
-    @State private var isConfirmingRestore = false
     @State private var pressed: String?
 
     public init(model: BackupModel) {
@@ -119,7 +117,7 @@ public struct BackupView: View {
             }
         }
         .fileExporter(
-            isPresented: $isExporting,
+            isPresented: Bindable(model.state).isExporting,
             document: document,
             contentType: exportType,
             defaultFilename: model.state.file?.name
@@ -132,12 +130,12 @@ public struct BackupView: View {
             isPresented: $isImporting,
             allowedContentTypes: [.json]
         ) { result in
-            Task {
-                isConfirmingRestore = await model.read(result)
+            model.perform {
+                await $0.read(result)
             }
         }
         .confirmation(
-            isPresented: $isConfirmingRestore,
+            isPresented: Bindable(model.state).isConfirmingRestore,
             systemImage: "arrow.triangle.2.circlepath",
             title: "データを置き換えますか",
             message: model.output.pendingSummary ?? "",
@@ -217,8 +215,8 @@ private extension BackupView {
     }
 
     func exportFile(_ kind: BackupModel.FileKind) {
-        Task {
-            isExporting = await model.makeFile(kind)
+        model.perform {
+            await $0.makeFile(kind)
         }
     }
 
@@ -227,8 +225,8 @@ private extension BackupView {
     }
 
     func restorePrevious(_ item: BackupModel.Previous) {
-        Task {
-            isConfirmingRestore = await model.readPrevious(item)
+        model.perform {
+            await $0.readPrevious(item)
         }
     }
 }

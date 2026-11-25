@@ -12,9 +12,16 @@ public extension RecordsModel {
         }
     }
 
+    @discardableResult
     func deleteAdjustment(_ id: Adjustment.ID) async -> Deletion? {
         do {
-            return try await dependencies.database.deleteAdjustment(id)
+            let deletion = try await dependencies.database.deleteAdjustment(id)
+
+            if let deletion {
+                state.outcome.send(deletion)
+            }
+
+            return deletion
         } catch {
             state.errorNotice.show(Self.deleteAdjustmentFailedMessage, for: error)
             return nil

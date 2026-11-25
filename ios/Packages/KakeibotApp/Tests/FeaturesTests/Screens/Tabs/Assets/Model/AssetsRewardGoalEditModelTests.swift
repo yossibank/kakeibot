@@ -83,6 +83,7 @@ struct AssetsRewardGoalEditModelTests {
         let goals = try await database.rewardBank().waitingGoals
 
         #expect(isDeleted)
+        #expect(model.state.outcome.value?.closes == true)
         #expect(goals.isEmpty)
     }
 
@@ -100,6 +101,7 @@ struct AssetsRewardGoalEditModelTests {
 
         #expect(isDeleted == false)
         #expect(isNewDeleted == false)
+        #expect(model.state.outcome.value == nil)
         #expect(model.state.errorNotice.message == "目標を削除できませんでした")
         #expect(adding.state.errorNotice.message == nil)
     }

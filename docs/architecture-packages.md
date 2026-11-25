@@ -187,6 +187,7 @@ KakeibotApp/
 │   │       ├── Bill/
 │   │       ├── DateChoice/
 │   │       ├── FeatureArt/
+│   │       ├── Model/
 │   │       ├── Notice/
 │   │       ├── Notification/
 │   │       ├── Period/
@@ -221,6 +222,7 @@ KakeibotApp/
 | `FeatureModels/Shared/DateChoice/` | 休日のずらしと曜日の表示の名前 |
 | `FeatureModels/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
 | `FeatureModels/Shared/Model/` | 画面のモデルの見張り（失敗で見張り直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、`ScreenClock`、値を覚える `Derived`・`DerivedTable` も置く |
+| `FeatureModels/Shared/Model/` の `ScreenOutcome` | 保存できた・消した、の結果をモデルの `state` に置く型 |
 | `FeatureModels/Shared/Model/` の `ScreenParts` | DB と時計を包んで、画面からモデルへ渡す型。中の DB は `FeatureModels` だけが読む |
 | `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、削除の取り消し（`DeletionUndo`）。保存の失敗が空き容量不足かの見分けも置く |
 | `FeatureModels/Shared/Notification/` | 通知の許可の窓口 |
@@ -240,6 +242,7 @@ KakeibotApp/
 | `Features/Shared/Bill/` | これからの引き落としの行・月のページ送りとタブ・見込みと確定の印と、その言葉 |
 | `Features/Shared/DateChoice/` | 月の始まりの日を選ぶ部品 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
+| `Features/Shared/Model/` | モデルが `state` に置いた結果の変化を、画面が受ける modifier |
 | `Features/Shared/Notice/` | 記録・削除の知らせの帯と取り消し。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可が無いときの帯と、許可の窓口を画面に渡す値 |
 | `Features/Shared/Period/` | 期間のカード、期間を送る行と今に戻るボタン |

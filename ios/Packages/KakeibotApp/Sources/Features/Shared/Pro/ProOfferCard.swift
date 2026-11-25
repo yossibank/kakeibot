@@ -36,6 +36,9 @@ struct ProOfferCard: View {
         .padding(16)
         .floatingCard()
         .errorBanner(Bindable(model.state).errorNotice)
+        .onOutcome(model.state.outcome) { _ in
+            onUnlock()
+        }
         .task {
             await model.load()
         }
@@ -44,10 +47,8 @@ struct ProOfferCard: View {
 
 private extension ProOfferCard {
     func purchase() {
-        Task {
-            if await model.purchase() {
-                onUnlock()
-            }
+        model.perform {
+            await $0.purchase()
         }
     }
 }

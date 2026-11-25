@@ -36,6 +36,7 @@ public extension RewardRuleEditModel {
     final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public var name = ""
 
@@ -121,6 +122,7 @@ public extension RewardRuleEditModel {
         }
     }
 
+    @discardableResult
     func save() async -> Bool {
         do {
             try await dependencies.database.save(
@@ -128,6 +130,8 @@ public extension RewardRuleEditModel {
                 editing: input.editingId,
                 at: dependencies.clock.now
             )
+
+            await finishSave()
 
             return true
         } catch {

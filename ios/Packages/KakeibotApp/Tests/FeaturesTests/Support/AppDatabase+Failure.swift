@@ -20,6 +20,21 @@ extension AppDatabase {
         }
     }
 
+    func failUpdates(
+        to table: String,
+        changing column: String
+    ) async throws {
+        try await writer.write { db in
+            try db.execute(
+                sql: """
+                CREATE TRIGGER fail_\(table)_\(column) BEFORE UPDATE ON \(table)
+                WHEN NEW.\(column) IS NOT OLD.\(column)
+                BEGIN SELECT RAISE(ABORT, 'failing for tests'); END
+                """
+            )
+        }
+    }
+
     func fillStorage() async throws {
         try await writer.writeWithoutTransaction { db in
             let pages = try Int.fetchOne(db, sql: "PRAGMA page_count") ?? 0

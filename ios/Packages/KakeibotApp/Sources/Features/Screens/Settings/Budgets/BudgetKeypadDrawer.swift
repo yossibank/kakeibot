@@ -4,22 +4,12 @@ import FeatureModels
 import SwiftUI
 
 extension View {
-    func budgetKeypad(
-        _ model: BudgetListModel,
-        cleared: Binding<BudgetListModel.Cleared?> = .constant(nil)
-    ) -> some View {
-        modifier(
-            BudgetKeypadDrawer(
-                cleared: cleared,
-                model: model
-            )
-        )
+    func budgetKeypad(_ model: BudgetListModel) -> some View {
+        modifier(BudgetKeypadDrawer(model: model))
     }
 }
 
 private struct BudgetKeypadDrawer: ViewModifier {
-    @Binding var cleared: BudgetListModel.Cleared?
-
     @State private var isConfirmingDiscard = false
 
     let model: BudgetListModel
@@ -80,10 +70,8 @@ private extension BudgetKeypadDrawer {
 
                 if model.output.editingAmount != nil {
                     Button {
-                        Task {
-                            if let result = await model.clear() {
-                                cleared = result
-                            }
+                        model.perform {
+                            await $0.clear()
                         }
                     } label: {
                         Text("予算をなくす")

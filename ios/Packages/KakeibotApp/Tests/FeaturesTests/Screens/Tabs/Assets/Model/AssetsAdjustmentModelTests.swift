@@ -39,6 +39,7 @@ struct AssetsAdjustmentModelTests {
 
         #expect(adjust.output.difference == 37700)
         #expect(saved)
+        #expect(adjust.state.outcome.value?.closes == true)
         #expect(model.output.rows.first?.balance == 120)
         #expect(model.output.rows.first?.needsAdjustment == false)
         #expect(list.adjustments.map(\.date) == [setup.today])
@@ -58,6 +59,7 @@ struct AssetsAdjustmentModelTests {
 
         #expect(!adjust.output.canSave)
         #expect(!saved)
+        #expect(adjust.state.outcome.value == nil)
         #expect(list.adjustments.isEmpty)
     }
 

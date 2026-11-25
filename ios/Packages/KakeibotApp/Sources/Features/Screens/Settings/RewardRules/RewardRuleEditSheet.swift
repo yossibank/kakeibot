@@ -8,7 +8,6 @@ public struct RewardRuleEditSheet: View {
     @State private var panel: Panel?
     @State private var isEditingIcon = false
     @State private var iconBottom: CGFloat = 0
-    @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
 
@@ -54,7 +53,7 @@ public struct RewardRuleEditSheet: View {
                 } onHide: {
                     edit.toggleHidden()
                 } onDelete: {
-                    isConfirmingDelete = true
+                    model.state.prompt.isConfirmingDelete = true
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -69,7 +68,7 @@ public struct RewardRuleEditSheet: View {
             .errorBanner(Bindable(model.state).errorNotice)
             .settingsEditConfirmations(edit)
             .confirmation(
-                isPresented: $isConfirmingDelete,
+                isPresented: Bindable(model.state).prompt.isConfirmingDelete,
                 systemImage: deleteImage,
                 title: deleteTitle,
                 message: deleteMessage,
@@ -80,9 +79,7 @@ public struct RewardRuleEditSheet: View {
                 if model.input.hasLogs {
                     edit.toggleHidden()
                 } else {
-                    Task {
-                        await edit.delete()
-                    }
+                    edit.delete()
                 }
             }
             .onChange(of: focus) {
@@ -162,9 +159,7 @@ private extension RewardRuleEditSheet {
 
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
-            Task {
-                await edit.save()
-            }
+            edit.save()
         }
         .disabled(!model.canSave)
     }
@@ -229,7 +224,7 @@ private extension RewardRuleEditSheet {
             onHide: onHide,
             onDelete: onDelete,
             onSave: {
-                await model.save()
+                await $0.save()
             }
         )
     }
@@ -253,8 +248,6 @@ private extension RewardRuleEditSheet {
         hidePanel()
     }
 }
-
-extension RewardRuleEditModel: SettingsEditing {}
 
 #Preview {
     if let parts = ScreenParts.preview() {

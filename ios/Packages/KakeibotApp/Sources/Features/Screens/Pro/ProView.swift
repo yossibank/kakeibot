@@ -47,6 +47,9 @@ public struct ProView: View {
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .interactiveDismissDisabled(model.output.isWorking)
+        .onOutcome(model.state.outcome) { _ in
+            finish()
+        }
         .task {
             await model.load()
         }
@@ -130,18 +133,14 @@ private extension ProView {
     }
 
     func purchase() {
-        Task {
-            if await model.purchase() {
-                finish()
-            }
+        model.perform {
+            await $0.purchase()
         }
     }
 
     func restore() {
-        Task {
-            if await model.restore() {
-                finish()
-            }
+        model.perform {
+            await $0.restore()
         }
     }
 

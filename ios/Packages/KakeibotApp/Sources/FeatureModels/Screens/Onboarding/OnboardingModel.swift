@@ -57,6 +57,7 @@ public extension OnboardingModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+        public var outcome = ScreenOutcome<Void>()
 
         public internal(set) var page: Page = .welcome
         public internal(set) var route: Route?
@@ -163,6 +164,7 @@ public extension OnboardingModel {
         state.page = previous
     }
 
+    @discardableResult
     func finish() async -> Bool {
         let version = state.setup.input.newsVersion
 
@@ -174,6 +176,9 @@ public extension OnboardingModel {
             }
 
             try await dependencies.database.setSetting(.onboardingCompleted, to: true)
+
+            state.outcome.send(())
+
             return true
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)

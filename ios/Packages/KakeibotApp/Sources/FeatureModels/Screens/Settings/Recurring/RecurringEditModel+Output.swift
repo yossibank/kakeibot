@@ -20,7 +20,7 @@ public extension RecurringEditModel {
 
 public extension RecurringEditModel.Output {
     var amount: Int {
-        state.calculator.amount
+        state.calculators.amount.amount
     }
 
     var walletTitle: String {
@@ -73,7 +73,7 @@ public extension RecurringEditModel.Output {
     }
 
     var fee: Int {
-        state.feeCalculator.amount
+        state.calculators.fee.amount
     }
 
     var isCardBill: Bool {

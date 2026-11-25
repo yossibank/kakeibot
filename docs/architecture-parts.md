@@ -17,7 +17,7 @@
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardListModel` | 一覧を DB から読み、見張るモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardDatabaseModel` | `ScreenParts` だけで作れる一覧のモデル。`SettingsBoardSpec` の `makeModel()` の既定の実装を使える | `FeatureModels/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並びと知らせを持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並びと知らせと、非表示にした行・消した物（`removed`）を持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardInput` | 一覧のモデルの入力で、DB から読んだ一覧と、説明カード・非表示の一覧を閉じたかを持つ。それだけの時は `SettingsBoardSnapshotInput` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardOutput` | 一覧のモデルの出力。出す行・非表示の行・並べ替え中の行を出す | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardSpec` | 一覧の画面ごとの設定（題・文言・並びの形・タイル・編集画面・確認）。画面ごとに 1 つ書く | `Features/Shared/SettingsParts/Board/` |
@@ -26,13 +26,23 @@
 | `SettingsEditInput` | 編集のモデルの入力。変わる前の値と、編集中の id を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditHidingInput` | 非表示にできるものの、編集のモデルの入力。非表示かどうかも持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `SettingsEditModel` | 1 件を編集するモデル。状態と入力のまとまりを持ち、下書きと、保存できるかを出す | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditing` | 編集の画面がモデルに頼む操作（非表示・削除）と、確認中かを持つ状態 | `Features/Shared/SettingsParts/Input/` |
-| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足す。状態は `SettingsEditState` にする | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditState` | 非表示と削除のできる編集のモデルの状態。知らせと、破棄・非表示の確認中か（`SettingsEditPrompt`）を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足し、状態は `SettingsEditState` にする。保存できた時は、モデルの `save` が `finishSave` を呼んで結果を置く | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsEditState` | 編集のモデルの状態。知らせと、破棄・非表示・削除の確認中か（`SettingsEditPrompt`）と、結果（`outcome`）を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |
 | `Draft` | 保存前の下書き。`problems` を返し、`validate()` が最初の問題を投げる | `Core/Shared/` |
+
+## 📱 モデルから画面へ返す型
+
+モデルの `state` に置き、画面が変化を受ける型である。受け方は、[architecture-screens](architecture-screens.md) の「モデルから画面へ結果を返す」にある。
+
+| 仕組み | 使いどころ | 置き場所 |
+| --- | --- | --- |
+| `ScreenOutcome` | 保存できた・消した、の結果を 1 つ持つ。等しさは通し番号で比べる | `FeatureModels/Shared/Model/` |
+| `SettingsEditOutcome` | 編集シートの結果。保存した値・非表示にしたか・消した物・閉じるかを持つ | `FeatureModels/Shared/SettingsParts/Input/` |
+| `SettingsBoardRemoved` | 設定の一覧で、非表示にした行・消した物・まとめて消した結果を持つ。取り消しの知らせに使う | `FeatureModels/Shared/SettingsParts/Board/` |
+| `onOutcome` | 画面が `ScreenOutcome` の変化を受ける modifier | `Features/Shared/Model/` |
 
 ## 🗺️ 画面の部品
 

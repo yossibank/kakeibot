@@ -37,8 +37,10 @@ public final class AssetsAdjustmentModel: ScreenPerforming {
 public extension AssetsAdjustmentModel {
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
+        public var prompt = SettingsEditPrompt()
+        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public private(set) var calculator = AmountCalculator()
 
@@ -107,6 +109,7 @@ public extension AssetsAdjustmentModel {
         }
     }
 
+    @discardableResult
     func save() async -> Bool {
         guard output.canSave else {
             return false
@@ -119,6 +122,8 @@ public extension AssetsAdjustmentModel {
                 on: input.today,
                 at: dependencies.clock.now
             )
+
+            state.outcome.send(SettingsEditOutcome(saved: ()))
 
             return true
         } catch {

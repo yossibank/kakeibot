@@ -33,6 +33,48 @@ struct SettingsBoardModelTests {
     }
 
     @Test
+    func keepsHiddenItemInStateAfterHiding() async {
+        let board = FakeBoard(visible: ["a", "b"])
+
+        let isHidden = await board.hide("b")
+
+        #expect(isHidden)
+        #expect(board.state.removed.hiddenId == "b")
+    }
+
+    @Test
+    func keepsDeletionInStateAfterDeleting() async {
+        let board = FakeBoard(visible: ["a", "b"])
+
+        let deletion = await board.delete("b")
+
+        #expect(deletion != nil)
+        #expect(board.state.removed.deletion?.id == deletion?.id)
+    }
+
+    @Test
+    func clearsDeletionInStateWhenDeletingFails() async {
+        let board = FakeBoard(visible: ["a", "b"], failing: ["b"])
+        _ = await board.delete("a")
+
+        let deletion = await board.delete("b")
+
+        #expect(deletion == nil)
+        #expect(board.state.removed.deletion == nil)
+        #expect(board.state.errorNotice.message == "削除できませんでした")
+    }
+
+    @Test
+    func keepsBulkDeletionInStateAfterDeletingHidden() async {
+        let board = FakeBoard(visible: ["a"], hidden: ["x", "y"], inUse: ["y"])
+
+        let result = await board.deleteHidden()
+
+        #expect(board.state.removed.deletion?.id == result.deletion?.id)
+        #expect(board.state.removed.bulkDelete?.keptCount == 1)
+    }
+
+    @Test
     func deletesNothingWhenNoneAreHidden() async {
         let board = FakeBoard(visible: ["a"])
 

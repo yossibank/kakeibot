@@ -7,28 +7,13 @@ struct SettingsBoardController<Model: SettingsBoardModel> {
     let model: Model
     let drag: SettingsDrag<Model.Item.ID>
     let grid: SettingsBoardGrid
-    let hiddenId: Binding<Model.Item.ID?>
-    let deletion: Binding<Deletion?>
-    let bulkDelete: Binding<SettingsBulkDelete?>
-
-    init(
-        model: Model,
-        drag: SettingsDrag<Model.Item.ID>,
-        grid: SettingsBoardGrid,
-        hiddenId: Binding<Model.Item.ID?>,
-        deletion: Binding<Deletion?>,
-        bulkDelete: Binding<SettingsBulkDelete?> = .constant(nil)
-    ) {
-        self.model = model
-        self.drag = drag
-        self.grid = grid
-        self.hiddenId = hiddenId
-        self.deletion = deletion
-        self.bulkDelete = bulkDelete
-    }
 }
 
 extension SettingsBoardController {
+    var removed: Binding<SettingsBoardRemoved<Model.Item.ID>> {
+        Bindable(model.state).removed
+    }
+
     func follow(
         _ id: Model.Item.ID,
         to location: CGPoint
@@ -88,10 +73,8 @@ extension SettingsBoardController {
     }
 
     func hide(_ id: Model.Item.ID) {
-        Task {
-            if await model.hide(id) {
-                hiddenId.wrappedValue = id
-            }
+        model.perform {
+            await $0.hide(id)
         }
     }
 
@@ -102,17 +85,14 @@ extension SettingsBoardController {
     }
 
     func delete(_ id: Model.Item.ID) {
-        Task {
-            deletion.wrappedValue = await model.delete(id)
+        model.perform {
+            await $0.delete(id)
         }
     }
 
     func deleteHidden() {
-        Task {
-            let result = await model.deleteHidden()
-
-            bulkDelete.wrappedValue = result
-            deletion.wrappedValue = result.deletion
+        model.perform {
+            await $0.deleteHidden()
         }
     }
 

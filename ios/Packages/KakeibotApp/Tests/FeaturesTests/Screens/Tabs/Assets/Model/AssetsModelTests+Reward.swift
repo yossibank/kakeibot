@@ -43,6 +43,25 @@ extension AssetsModelTests {
     }
 
     @Test
+    func keepsBoughtGoalInStateAfterPurchase() async throws {
+        let setup = try await Setup()
+        let rule = try await setup.saveRule(amount: 1000)
+        try await setup.achieve(rule, on: "2026-10-01")
+        let goal = try await setup.saveGoal(target: 1000)
+        let model = AssetsModel(parts: .system(setup.database), today: setup.today)
+
+        let isSaved = await model.setPurchased(goal.id, isPurchased: true)
+        let bought = model.state.boughtId
+        model.state.boughtId = nil
+        let isUndone = await model.setPurchased(goal.id, isPurchased: false)
+
+        #expect(isSaved)
+        #expect(bought == goal.id)
+        #expect(isUndone)
+        #expect(model.state.boughtId == nil)
+    }
+
+    @Test
     func tellsWhenPurchaseCannotBeSaved() async throws {
         let setup = try await Setup()
         let rule = try await setup.saveRule(amount: 1000)
@@ -54,6 +73,7 @@ extension AssetsModelTests {
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
 
         #expect(isSaved == false)
+        #expect(model.state.boughtId == nil)
         #expect(model.state.errorNotice.message == "目標を保存できませんでした")
     }
 

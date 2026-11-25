@@ -66,6 +66,8 @@ public extension BudgetListModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+        public var cleared: Cleared?
+        public var resetFrom: YearMonth?
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
@@ -121,13 +123,17 @@ public extension BudgetListModel {
         await saveCarryoverFrom(start)
     }
 
+    @discardableResult
     func resetCarryover() async -> YearMonth? {
         guard
             let previous = input.carryoverFrom,
             output.carryover != 0,
             await saveCarryoverFrom(input.month) else {
+            state.resetFrom = nil
             return nil
         }
+
+        state.resetFrom = previous
 
         return previous
     }
@@ -167,6 +173,7 @@ public extension BudgetListModel {
         await setBudget(state.calculator.amount)
     }
 
+    @discardableResult
     func clear() async -> Cleared? {
         guard
             let editing = state.editing,
@@ -175,11 +182,15 @@ public extension BudgetListModel {
             return nil
         }
 
-        return Cleared(
+        let cleared = Cleared(
             target: editing,
             amount: amount,
             month: input.month
         )
+
+        state.cleared = cleared
+
+        return cleared
     }
 
     func restore(_ cleared: Cleared) async {

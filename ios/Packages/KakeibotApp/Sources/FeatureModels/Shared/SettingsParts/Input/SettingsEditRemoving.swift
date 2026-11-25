@@ -29,6 +29,7 @@ public extension SettingsEditRemoving {
         nil
     }
 
+    @discardableResult
     func setHidden(_ isHidden: Bool) async -> Bool {
         guard let editingId = input.editingId else {
             return false
@@ -36,6 +37,7 @@ public extension SettingsEditRemoving {
 
         do {
             try await saveHidden(editingId, isHidden: isHidden)
+            state.outcome.send(SettingsEditOutcome(isHidden: isHidden))
             return true
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
@@ -43,13 +45,24 @@ public extension SettingsEditRemoving {
         }
     }
 
+    func saveTogglingHidden(_ save: @MainActor (Self) async -> Void) async {
+        state.prompt.togglesHiddenAfterSave = true
+
+        await save(self)
+
+        state.prompt.togglesHiddenAfterSave = false
+    }
+
+    @discardableResult
     func delete() async -> Deletion? {
         guard let editingId = input.editingId else {
             return nil
         }
 
         do {
-            return try await remove(editingId)
+            let deletion = try await remove(editingId)
+            state.outcome.send(SettingsEditOutcome(deletion: deletion))
+            return deletion
         } catch {
             if let message = deleteFailedMessage(for: error) {
                 state.errorNotice.show(message)
@@ -59,5 +72,35 @@ public extension SettingsEditRemoving {
 
             return nil
         }
+    }
+}
+
+extension SettingsEditRemoving {
+    func finishSave(_ saved: State.Saved) async {
+        guard
+            state.prompt.togglesHiddenAfterSave,
+            let editingId = input.editingId
+        else {
+            state.outcome.send(SettingsEditOutcome(saved: saved))
+            return
+        }
+
+        state.prompt.togglesHiddenAfterSave = false
+
+        let isHidden = !input.isHidden
+
+        do {
+            try await saveHidden(editingId, isHidden: isHidden)
+            state.outcome.send(SettingsEditOutcome(saved: saved, isHidden: isHidden))
+        } catch {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.outcome.send(SettingsEditOutcome(saved: saved, closes: false))
+        }
+    }
+}
+
+extension SettingsEditRemoving where State.Saved == Void {
+    func finishSave() async {
+        await finishSave(())
     }
 }

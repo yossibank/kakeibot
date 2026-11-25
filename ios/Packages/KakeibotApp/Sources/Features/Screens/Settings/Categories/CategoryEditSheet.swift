@@ -14,7 +14,6 @@ public struct CategoryEditSheet: View {
 
     @Environment(\.dismiss) var dismiss
 
-    @State private var isConfirmingDelete = false
     @State private var isMovingTag = false
     @State private var isEditingIcon = false
     @State private var iconBottom: CGFloat = 0
@@ -65,7 +64,7 @@ public struct CategoryEditSheet: View {
         .errorBanner(Bindable(model.state).errorNotice)
         .settingsEditConfirmations(edit)
         .confirmation(
-            isPresented: $isConfirmingDelete,
+            isPresented: Bindable(model.state).prompt.isConfirmingDelete,
             systemImage: deleteImage,
             title: deleteTitle,
             message: deleteMessage,
@@ -76,9 +75,7 @@ public struct CategoryEditSheet: View {
             if model.input.hasEntries {
                 edit.toggleHidden()
             } else {
-                Task {
-                    await edit.delete()
-                }
+                edit.delete()
             }
         }
         .onChange(of: focus) {
@@ -131,9 +128,7 @@ private extension CategoryEditSheet {
             }
         } save: {
             PrimaryButton(model.saveTitle) {
-                Task {
-                    await edit.save()
-                }
+                edit.save()
             }
             .disabled(!model.canSave)
         }
@@ -162,7 +157,7 @@ private extension CategoryEditSheet {
         } onHide: {
             edit.toggleHidden()
         } onDelete: {
-            isConfirmingDelete = true
+            model.state.prompt.isConfirmingDelete = true
         }
     }
 
@@ -284,8 +279,6 @@ private extension CategoryEditSheet {
         }
     }
 }
-
-extension CategoryEditModel: SettingsEditing {}
 
 #Preview {
     if let parts = ScreenParts.preview() {

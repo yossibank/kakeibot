@@ -12,13 +12,9 @@ extension CategoryEditSheet {
             },
             onHide: onHide,
             onDelete: onDelete,
+            onSaved: onSave,
             onSave: {
-                guard let category = await model.save() else {
-                    return false
-                }
-
-                onSave(category)
-                return true
+                await $0.save()
             }
         )
     }
@@ -56,9 +52,7 @@ extension CategoryEditSheet {
         closeTag()
 
         if startsAddingTag {
-            Task {
-                await edit.save()
-            }
+            edit.save()
         }
     }
 

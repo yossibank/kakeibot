@@ -34,6 +34,7 @@ public extension AssetsModel {
         public var errorNotice = ErrorNotice()
 
         public var billPage = 0
+        public var boughtId: RewardGoal.ID?
     }
 
     @MainActor

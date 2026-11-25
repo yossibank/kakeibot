@@ -5,8 +5,6 @@ import SwiftUI
 
 public struct BudgetListView: View {
     @State private var model: BudgetListModel
-    @State private var cleared: BudgetListModel.Cleared?
-    @State private var resetFrom: YearMonth?
 
     public init(model: BudgetListModel) {
         _model = State(initialValue: model)
@@ -15,7 +13,7 @@ public struct BudgetListView: View {
     public var body: some View {
         content
             .errorBanner(Bindable(model.state).errorNotice)
-            .budgetKeypad(model, cleared: $cleared)
+            .budgetKeypad(model)
             .toolbar(.hidden, for: .navigationBar)
             .haptic(.selection, trigger: model.input.budgets)
             .task {
@@ -94,7 +92,7 @@ private extension BudgetListView {
             }
             .scrollIndicators(.hidden)
             .settingsHideNotice(
-                $cleared,
+                Bindable(model.state).cleared,
                 message: clearedMessage,
                 systemImage: "chart.bar"
             ) { cleared in
@@ -103,7 +101,7 @@ private extension BudgetListView {
                 }
             }
             .settingsHideNotice(
-                $resetFrom,
+                Bindable(model.state).resetFrom,
                 message: "繰越を 0 に戻しました",
                 systemImage: "arrow.counterclockwise"
             ) { start in
@@ -151,8 +149,8 @@ private extension BudgetListView {
 
                         if usage.carryover != 0 {
                             Button("0 に戻す") {
-                                Task {
-                                    resetFrom = await model.resetCarryover()
+                                model.perform {
+                                    await $0.resetCarryover()
                                 }
                             }
                             .textFont(.caption2, weight: .semibold)
@@ -350,7 +348,7 @@ private extension BudgetListView {
     }
 
     var clearedMessage: String {
-        cleared.map { "\($0.target.title)をなくしました" } ?? ""
+        model.state.cleared.map { "\($0.target.title)をなくしました" } ?? ""
     }
 
     func openDrawer(_ target: BudgetListModel.Target) {

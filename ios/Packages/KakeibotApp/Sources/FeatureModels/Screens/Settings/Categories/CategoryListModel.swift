@@ -35,6 +35,7 @@ public extension CategoryListModel {
 
         public var kind: EntryCategory.Kind
         public var movingOrder: [EntryCategory.ID]?
+        public var removed = SettingsBoardRemoved<EntryCategory.ID>()
 
         init(kind: EntryCategory.Kind) {
             self.kind = kind

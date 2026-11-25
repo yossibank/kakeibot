@@ -57,6 +57,7 @@ extension RecordsModelTests {
         #expect(Yen.text(row.adjustment.amount, sign: .plus) == "+¥700")
         #expect(deleted.isEmpty)
         #expect(restored.map(\.id) == [row.id])
+        #expect(model.state.outcome.value?.id == deletion.id)
     }
 }
 

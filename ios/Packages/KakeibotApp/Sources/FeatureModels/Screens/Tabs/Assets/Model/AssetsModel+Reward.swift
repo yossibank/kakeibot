@@ -28,6 +28,10 @@ public extension AssetsModel {
                 at: dependencies.clock.now
             )
 
+            if isPurchased {
+                state.boughtId = id
+            }
+
             return true
         } catch {
             state.errorNotice.show(Self.goalFailedMessage, for: error)

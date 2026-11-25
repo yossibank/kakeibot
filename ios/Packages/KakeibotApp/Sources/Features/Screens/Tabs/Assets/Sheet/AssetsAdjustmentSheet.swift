@@ -5,7 +5,6 @@ import SwiftUI
 
 struct AssetsAdjustmentSheet: View {
     @State private var model: AssetsAdjustmentModel
-    @State private var isConfirmingDiscard = false
 
     @Environment(\.dismiss) private var dismiss
 
@@ -19,13 +18,16 @@ struct AssetsAdjustmentSheet: View {
         }
         .errorBanner(Bindable(model.state).errorNotice)
         .confirmation(
-            isPresented: $isConfirmingDiscard,
+            isPresented: Bindable(model.state).prompt.isConfirmingDiscard,
             systemImage: "pencil.slash",
             title: "保存せずに閉じますか",
             message: "入力した内容は残りません",
             keepTitle: "入力に戻る",
             confirmTitle: "保存せずに閉じる"
         ) {
+            dismiss()
+        }
+        .onOutcome(model.state.outcome) { _ in
             dismiss()
         }
     }
@@ -165,14 +167,8 @@ private extension AssetsAdjustmentSheet {
 private extension AssetsAdjustmentSheet {
     func close() {
         if model.output.isChanged {
-            isConfirmingDiscard = true
+            model.state.prompt.isConfirmingDiscard = true
         } else {
-            dismiss()
-        }
-    }
-
-    func save() async {
-        if await model.save() {
             dismiss()
         }
     }
@@ -191,8 +187,8 @@ extension AssetsAdjustmentSheet {
             )
 
             PrimaryButton(model.output.saveTitle) {
-                Task {
-                    await save()
+                model.perform {
+                    await $0.save()
                 }
             }
             .disabled(!model.output.canSave)

@@ -41,6 +41,8 @@ public extension ProPurchaseModel {
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
 
+        public var outcome = ScreenOutcome<Work>()
+
         public internal(set) var working: Work?
     }
 
@@ -88,6 +90,7 @@ public extension ProPurchaseModel {
         input.price = price
     }
 
+    @discardableResult
     func purchase() async -> Bool {
         let status = await work(
             .purchase,
@@ -96,9 +99,16 @@ public extension ProPurchaseModel {
             try await dependencies.store.purchase()
         }
 
-        return status?.isUnlocked == true
+        guard status?.isUnlocked == true else {
+            return false
+        }
+
+        state.outcome.send(.purchase)
+
+        return true
     }
 
+    @discardableResult
     func restore() async -> Bool {
         let status = await work(
             .restore,
@@ -111,11 +121,14 @@ public extension ProPurchaseModel {
             return false
         }
 
-        if !status.isUnlocked {
+        guard status.isUnlocked else {
             state.errorNotice.inform(Self.nothingToRestoreMessage)
+            return false
         }
 
-        return status.isUnlocked
+        state.outcome.send(.restore)
+
+        return true
     }
 }
 

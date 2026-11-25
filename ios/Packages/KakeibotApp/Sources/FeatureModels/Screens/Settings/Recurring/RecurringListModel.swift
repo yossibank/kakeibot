@@ -35,6 +35,7 @@ public extension RecurringListModel {
 
         public var type: Entry.Kind = .expense
         public var movingOrder: [Recurring.ID]?
+        public var removed = SettingsBoardRemoved<Recurring.ID>()
     }
 
     @MainActor
