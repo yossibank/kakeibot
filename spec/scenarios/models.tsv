@@ -59,7 +59,7 @@ entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntr
 entry.tells-when-loading-fails	EntryModelTests/tellsWhenLoadingFails	EntryModelFailureTest/tellsWhenLoadingFails	対応	設定ではなく、記録の表を読めなくして確かめる
 entry.tells-when-deleting-fails	EntryModelTests/tellsWhenDeletingFails	EntryModelFailureTest/tellsWhenDeletingFails	対応	
 entry.keeps-notice-when-input-changes	EntryModelTests/keepsNoticeWhenInputChanges	EntryModelFailureTest/keepsNoticeWhenInputChanges	対応	
-entry.tells-when-i-phone-storage-is-full	EntryModelTests/tellsWhenIPhoneStorageIsFull	EntryModelFailureTest/tellsWhenStorageIsFull	対応	テストでは画面の幅を読めず、呼び名は「スマホ」になる
+entry.tells-when-i-phone-storage-is-full	EntryModelTests/tellsWhenIPhoneStorageIsFull	EntryModelFailureTest/tellsWhenStorageIsFull	対応	Android は呼び分けず「端末」と書き、文は「端末の空き容量が足りません」になる
 entry.shows-template-icon-while-shared-wallet-is-chosen	EntryModelTests/showsTemplateIconWhileSharedWalletIsChosen		未確認	EntryRecentRow が category(of:) で全カテゴリから探すがテストが無い
 entry.applies-template-to-entry	EntryModelTests/appliesTemplateToEntry	EntryModelTest/appliesTemplateToEntry	対応	選んだひな形の目印（isApplied）は Android に無く確かめていない
 entry.keeps-typed-amount-and-memo-when-template-lacks-them	EntryModelTests/keepsTypedAmountAndMemoWhenTemplateLacksThem	EntryModelTest/keepsTypedAmountAndMemoWhenTemplateLacksThem	対応	ひな形のカテゴリに変わる所を確かめていない
@@ -472,8 +472,7 @@ bill-text.*	BillTextTests/*		未移植	請求の文（BillText）と請求の行
 deletion-notice.names-single-deleted-item	DeletionNoticeTests/namesSingleDeletedItem	DeletionNoticeTest/namesSingleDeletedItem	対応	
 deletion-notice.falls-back-to-kind-and-count	DeletionNoticeTests/fallsBackToKindAndCount	DeletionNoticeTest/fallsBackToKindAndCount	対応	
 derived.*	DerivedTests/*		iOSのみ	Swift の Observation 用の計算の覚え置きで、Android は derivedStateOf を使う
-device-name.names-pad-models-as-pad	DeviceNameTests/namesPadModelsAsPad	DeviceNameTest/namesWideScreensAsTablet	対応	機種の名前ではなく、画面の短い辺の幅（600dp 以上）で見分ける
-device-name.names-other-models-as-phone	DeviceNameTests/namesOtherModelsAsPhone	DeviceNameTest/namesOtherScreensAsPhone	対応	機種の名前ではなく、画面の短い辺の幅で見分ける
+device-name.*	DeviceNameTests/*		iOSのみ	iPhone と iPad の呼び分けで、Android は呼び分けず「端末」と書く
 entry-list-filter.*	EntryListFilterTests/*		未移植	記録の絞り込み（filterCategories・widened）のモデルと画面が無い
 entry-notice.undoes-new-entry	EntryNoticeModelTests/undoesNewEntry		未移植	記録の後の知らせと取り消しが無く、save は Boolean を返すだけ
 entry-notice.restores-fee-deleted-from-stale-list	EntryNoticeModelTests/restoresFeeDeletedFromStaleList		未移植	一覧からの削除と、手数料を含む取り消しが無い
