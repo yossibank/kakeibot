@@ -4,7 +4,7 @@ import SwiftUI
 
 struct EntryCategoryCell: View {
     @State private var isPressing = false
-    @State private var frame = FrameHolder()
+    @State private var layout = Layout()
 
     let category: EntryCategory
     let icon: Icon?
@@ -26,11 +26,11 @@ struct EntryCategoryCell: View {
         .onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .named(EntrySheet.coordinateSpace))
         } action: { rect in
-            frame.rect = rect
+            layout.frame = rect
         }
         .onTapGesture(perform: onSelect)
         .onLongPressGesture(minimumDuration: Self.menuPressDuration) {
-            onMenu(frame.rect)
+            onMenu(layout.frame)
         } onPressingChanged: { isPressing in
             self.isPressing = isPressing
         }
@@ -49,8 +49,8 @@ extension EntryCategoryCell: Equatable {
 }
 
 private extension EntryCategoryCell {
-    final class FrameHolder {
-        var rect: CGRect = .zero
+    struct Layout {
+        var frame: CGRect = .zero
     }
 
     static let menuPressDuration = 0.4
