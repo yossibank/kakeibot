@@ -257,8 +257,8 @@ private extension MainView {
             .padding(.leading, Self.noticeLeading(hasSidebar: hasSidebar))
             .entryNotice(notice, above: noticeAbove)
             .deletionNotice(Bindable(undo.state).deletion, bottom: noticeBottom) { deletion in
-                Task {
-                    await undo.restore(deletion)
+                undo.perform {
+                    await $0.restore(deletion)
                 }
             }
             .errorBanner(undo.state.errorNotice, bottom: noticeBottom) {

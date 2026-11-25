@@ -102,8 +102,8 @@ private extension SyncView {
                     return
                 }
 
-                Task {
-                    await model.open(item)
+                model.perform {
+                    await $0.open(item)
                 }
             } label: {
                 shareLabel(

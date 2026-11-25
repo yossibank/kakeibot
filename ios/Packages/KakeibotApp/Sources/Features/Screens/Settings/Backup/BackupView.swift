@@ -124,8 +124,8 @@ public struct BackupView: View {
             contentType: exportType,
             defaultFilename: model.state.file?.name
         ) { result in
-            Task {
-                await model.finishExport(result)
+            model.perform {
+                await $0.finishExport(result)
             }
         }
         .fileImporter(
@@ -146,8 +146,8 @@ public struct BackupView: View {
         ) {
             model.cancelRestore()
         } onConfirm: {
-            Task {
-                await model.restore()
+            model.perform {
+                await $0.restore()
             }
         }
     }

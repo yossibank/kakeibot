@@ -30,8 +30,8 @@ public struct MonthStartDayView: View {
                     PeriodCard(periodText: model.output.periodText, month: model.output.month)
 
                     MonthStartDayGrid(selection: model.input.startDay) { day in
-                        Task {
-                            await model.choose(day)
+                        model.perform {
+                            await $0.choose(day)
                         }
                     }
 
@@ -60,8 +60,8 @@ private extension MonthStartDayView {
             HStack(spacing: 8) {
                 ForEach(HolidayShift.allCases, id: \.self) { shift in
                     SettingsChoice(shift.title, isSelected: model.input.startDay.shift == shift) {
-                        Task {
-                            await model.choose(shift)
+                        model.perform {
+                            await $0.choose(shift)
                         }
                     }
                 }

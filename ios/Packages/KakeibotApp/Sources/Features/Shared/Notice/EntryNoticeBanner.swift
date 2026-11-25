@@ -63,8 +63,8 @@ private extension EntryNoticeBanner {
                 change: change,
                 seconds: notice.seconds
             ) {
-                Task {
-                    await model.undo()
+                model.perform {
+                    await $0.undo()
                 }
             }
             .id(notice)
@@ -75,8 +75,8 @@ private extension EntryNoticeBanner {
                 systemImage: "checkmark",
                 actionTitle: "取り消す"
             ) {
-                Task {
-                    await model.undo()
+                model.perform {
+                    await $0.undo()
                 }
             }
 

@@ -221,8 +221,8 @@ private extension HomeView {
                 isSheetOpen: isSheetOpen,
                 onOpen: onOpenSetup,
                 onClose: {
-                    Task {
-                        await model.hide(.customize)
+                    model.perform {
+                        await $0.hide(.customize)
                     }
                 }
             )

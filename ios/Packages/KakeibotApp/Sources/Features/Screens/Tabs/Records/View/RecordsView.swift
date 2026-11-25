@@ -138,12 +138,12 @@ public struct RecordsView: View {
             ) { icon in
                 stampCount += 1
 
-                Task {
-                    await model.stamp(icon, on: target.date)
+                model.perform {
+                    await $0.stamp(icon, on: target.date)
                 }
             } onRemove: {
-                Task {
-                    await model.removeStamp(on: target.date)
+                model.perform {
+                    await $0.removeStamp(on: target.date)
                 }
             }
         }
@@ -295,8 +295,8 @@ private extension RecordsView {
             PageSlide.run($slide, forward: to > from) {
                 model.chooseLayout(layout)
 
-                Task {
-                    await model.saveLayout()
+                model.perform {
+                    await $0.saveLayout()
                 }
             }
         }

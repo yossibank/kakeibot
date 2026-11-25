@@ -238,8 +238,8 @@ private extension TemplateEditSheet {
     }
 
     func reloadTags() {
-        Task {
-            await model.reloadTags()
+        model.perform {
+            await $0.reloadTags()
         }
     }
 

@@ -63,8 +63,8 @@ extension SettingsBoardController {
             onHide(id)
 
         case .move:
-            Task {
-                await model.finishMoving()
+            model.perform {
+                await $0.finishMoving()
             }
 
         case nil:
@@ -96,8 +96,8 @@ extension SettingsBoardController {
     }
 
     func show(_ id: Model.Item.ID) {
-        Task {
-            await model.show(id)
+        model.perform {
+            await $0.show(id)
         }
     }
 
@@ -117,8 +117,8 @@ extension SettingsBoardController {
     }
 
     func restore(_ deletion: Deletion) {
-        Task {
-            await model.restore(deletion)
+        model.perform {
+            await $0.restore(deletion)
         }
     }
 }

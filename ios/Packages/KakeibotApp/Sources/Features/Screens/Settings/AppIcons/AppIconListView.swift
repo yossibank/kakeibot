@@ -64,8 +64,8 @@ private extension AppIconListView {
                         choice: choice,
                         isCurrent: choice == model.input.current,
                         onSelect: {
-                            Task {
-                                await model.select(choice)
+                            model.perform {
+                                await $0.select(choice)
                             }
                         }
                     )

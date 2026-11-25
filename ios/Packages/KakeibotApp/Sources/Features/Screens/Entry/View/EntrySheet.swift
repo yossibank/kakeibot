@@ -102,9 +102,9 @@ public struct EntrySheet: View {
                 model.state.errorNotice.clear()
             }
             .deletionNotice($deletion, bottom: bannerBottom) { deletion in
-                Task {
-                    await model.restore(deletion)
-                    await model.reloadWallets()
+                model.perform {
+                    await $0.restore(deletion)
+                    await $0.reloadWallets()
                 }
             }
             .settingsHideNotice($hiddenCategory, bottom: bannerBottom) { hidden in
@@ -120,8 +120,8 @@ public struct EntrySheet: View {
             )
             .onChange(of: notice.state.notice) {
                 if notice.state.notice == .undone {
-                    Task {
-                        await model.reloadWallets()
+                    model.perform {
+                        await $0.reloadWallets()
                     }
                 }
             }
@@ -162,8 +162,8 @@ public struct EntrySheet: View {
             }
             .modifier(EntryTodayFollower(model: model))
             .onDisappear {
-                Task {
-                    await voice.cancel()
+                voice.perform {
+                    await $0.cancel()
                 }
             }
         }

@@ -95,8 +95,8 @@ private extension RecordsRewardSheet {
         let stroke = isAchieved ? Palette.accent : Palette.line
 
         return Button {
-            Task {
-                await model.toggleReward(rule, on: date)
+            model.perform {
+                await $0.toggleReward(rule, on: date)
             }
         } label: {
             HStack(spacing: 12) {

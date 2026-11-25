@@ -246,8 +246,8 @@ private extension HomeSectionListView {
             dragTranslation = 0
         }
 
-        Task {
-            await model.save()
+        model.perform {
+            await $0.save()
         }
     }
 }

@@ -49,7 +49,9 @@ private extension BudgetListView {
                         systemImage: "arrow.turn.down.right",
                         isOn: model.output.isCarryoverOn
                     ) { isOn in
-                        await model.setCarryover(isOn)
+                        model.perform {
+                            await $0.setCarryover(isOn)
+                        }
                     }
 
                     if !budgeted.isEmpty {
@@ -96,8 +98,8 @@ private extension BudgetListView {
                 message: clearedMessage,
                 systemImage: "chart.bar"
             ) { cleared in
-                Task {
-                    await model.restore(cleared)
+                model.perform {
+                    await $0.restore(cleared)
                 }
             }
             .settingsHideNotice(
@@ -105,8 +107,8 @@ private extension BudgetListView {
                 message: "繰越を 0 に戻しました",
                 systemImage: "arrow.counterclockwise"
             ) { start in
-                Task {
-                    await model.restoreCarryover(from: start)
+                model.perform {
+                    await $0.restoreCarryover(from: start)
                 }
             }
         }

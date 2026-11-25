@@ -118,8 +118,8 @@ extension ReviewView {
     func select(_ kind: ReviewKind) {
         model.setKind(kind)
 
-        Task {
-            await model.saveSelection()
+        model.perform {
+            await $0.saveSelection()
         }
     }
 }

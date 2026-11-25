@@ -198,8 +198,8 @@ extension WalletEditSheet {
             return
         }
 
-        Task {
-            await model.loadPayment()
+        model.perform {
+            await $0.loadPayment()
         }
     }
 

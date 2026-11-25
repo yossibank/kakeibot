@@ -66,8 +66,8 @@ private extension EntrySheet {
 
 private extension EntrySheet {
     func saveReceiptGuideChoice() {
-        Task {
-            await receipt.saveGuideChoice(for: model)
+        receipt.perform {
+            await $0.saveGuideChoice(for: model)
         }
     }
 

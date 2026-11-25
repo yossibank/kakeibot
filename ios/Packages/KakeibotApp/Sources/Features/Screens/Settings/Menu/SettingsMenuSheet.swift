@@ -97,8 +97,8 @@ public struct SettingsMenuSheet: View {
             keepTitle: "やめる",
             confirmTitle: "削除する"
         ) {
-            Task {
-                await recordReset.deleteAll()
+            recordReset.perform {
+                await $0.deleteAll()
             }
         }
         .onChange(of: scenePhase) { _, phase in

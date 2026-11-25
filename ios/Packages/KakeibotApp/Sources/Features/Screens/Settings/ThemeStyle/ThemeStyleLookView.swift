@@ -28,7 +28,9 @@ public struct ThemeStyleLookView: View {
             ) { corner in
                 cornerMark(corner)
             } choose: { corner in
-                await model.choose(corner)
+                model.perform {
+                    await $0.choose(corner)
+                }
             }
 
             ThemeStyleChoices(
@@ -40,7 +42,9 @@ public struct ThemeStyleLookView: View {
             ) { spacing in
                 spacingMark(spacing)
             } choose: { spacing in
-                await model.choose(spacing)
+                model.perform {
+                    await $0.choose(spacing)
+                }
             }
 
             ThemeStyleChoices(
@@ -53,7 +57,9 @@ public struct ThemeStyleLookView: View {
                 IconSeal(.styleSample(.star), size: Self.markSize)
                     .environment(\.themeStyle.stampShape, shape)
             } choose: { shape in
-                await model.choose(shape)
+                model.perform {
+                    await $0.choose(shape)
+                }
             }
 
             ThemeStyleChoices(
@@ -66,7 +72,9 @@ public struct ThemeStyleLookView: View {
                 ThemeStyleTabBar()
                     .environment(\.themeStyle.showsTabTitles, showsTitles)
             } choose: { showsTitles in
-                await model.choose(showsTabTitles: showsTitles)
+                model.perform {
+                    await $0.choose(showsTabTitles: showsTitles)
+                }
             }
 
             ThemeStyleChoices(
@@ -78,7 +86,9 @@ public struct ThemeStyleLookView: View {
             ) { backdrop in
                 ThemeStyleBackdrop(backdrop: backdrop)
             } choose: { backdrop in
-                await model.choose(backdrop)
+                model.perform {
+                    await $0.choose(backdrop)
+                }
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -90,7 +100,9 @@ public struct ThemeStyleLookView: View {
                     systemImage: "waveform",
                     isOn: model.output.style.haptics
                 ) { isOn in
-                    await model.choose(haptics: isOn)
+                    model.perform {
+                        await $0.choose(haptics: isOn)
+                    }
                 }
 
                 SettingsSwitch(
@@ -99,7 +111,9 @@ public struct ThemeStyleLookView: View {
                     systemImage: "sparkle",
                     isOn: model.output.style.decorations
                 ) { isOn in
-                    await model.choose(decorations: isOn)
+                    model.perform {
+                        await $0.choose(decorations: isOn)
+                    }
                 }
             }
             .environment(\.themeStyle.decorations, model.output.style.decorations)
