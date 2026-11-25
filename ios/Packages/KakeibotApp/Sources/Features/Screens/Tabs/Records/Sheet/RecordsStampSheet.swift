@@ -4,7 +4,7 @@ import FeatureModels
 import SwiftUI
 
 struct RecordsStampSheet: View {
-    @State private var isAddingStamp = false
+    @Binding var isAdding: Bool
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
@@ -28,7 +28,7 @@ struct RecordsStampSheet: View {
                         message: "スタンプを作ると、ここから押せます",
                         actionTitle: "スタンプを追加"
                     ) {
-                        isAddingStamp = true
+                        isAdding = true
                     }
                 } else {
                     LazyVGrid(columns: Self.columns, spacing: 12) {
@@ -54,7 +54,7 @@ struct RecordsStampSheet: View {
                 }
             }
         }
-        .sheet(isPresented: $isAddingStamp) {
+        .sheet(isPresented: $isAdding) {
             StampEditSheet(model: editModel())
         }
     }
@@ -69,7 +69,7 @@ private extension RecordsStampSheet {
                 SheetHeaderSlot()
             } else {
                 RingButton(systemImage: "plus") {
-                    isAddingStamp = true
+                    isAdding = true
                 }
             }
         }

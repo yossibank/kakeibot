@@ -228,6 +228,8 @@ main.opens-template-route-with-saved-template	MainModelTests/opensTemplateRouteW
 main.opens-new-template-route-on-home	MainModelTests/opensNewTemplateRouteOnHome		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-receipt-route-and-starts-reading	MainModelTests/opensReceiptRouteAndStartsReading		未移植	レシートを撮って読み取る流れが Android のモデルと画面に無い
 main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	保存した値から作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
+home.opens-picked-day-after-closing-stamp-sheet	HomeModelTests/opensPickedDayAfterClosingStampSheet		未確認	Android は別のブランチで合わせる
+home.starts-shelf-over-after-closing	HomeModelTests/startsShelfOverAfterClosing		未確認	Android は別のブランチで合わせる
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
@@ -258,6 +260,9 @@ assets.reaches-goal-at-zero-remaining	AssetsModelTests/reachesGoalAtZeroRemainin
 assets.keeps-bought-goal-in-state-after-purchase	AssetsModelTests/keepsBoughtGoalInStateAfterPurchase		未移植	資産のモデルと画面に、ごほうびの機能が無い
 assets.tells-when-purchase-cannot-be-saved	AssetsModelTests/tellsWhenPurchaseCannotBeSaved		未移植	資産のモデルと画面に、ごほうびの機能が無い
 assets.refuses-purchase-short-of-balance	AssetsModelTests/refusesPurchaseShortOfBalance		未移植	資産のモデルと画面に、ごほうびの機能が無い
+assets.opens-reward-sheet-from-its-first-look	AssetsModelTests/opensRewardSheetFromItsFirstLook		未確認	Android は別のブランチで合わせる
+assets.shows-goal-editor-or-rules-in-reward-sheet	AssetsModelTests/showsGoalEditorOrRulesInRewardSheet		未確認	Android は別のブランチで合わせる
+assets.hands-over-pending-opening-once	AssetsModelTests/handsOverPendingOpeningOnce		未確認	Android は別のブランチで合わせる
 assets.counts-loan-repaid-from-zero-to-overpaid	AssetsModelTests/countsLoanRepaidFromZeroToOverpaid		未移植	資産の行に、借入の返済の割合が無い
 assets.sums-balances-by-wallet-and-month	AssetsModelTests/sumsBalancesByWalletAndMonth	AssetsModelTest/sumsBalancesByWallet	対応	先月との差と 6 か月の月ごとの合計は Android に無く、確かめていない
 assets.leaves-out-future-entries-from-balances	AssetsModelTests/leavesOutFutureEntriesFromBalances	AssetsModelTest/leavesOutFutureEntriesFromBalances	対応	
@@ -300,6 +305,11 @@ records.remembers-searched-words	RecordsModelTests/remembersSearchedWords		未�
 records.restores-cleared-searches	RecordsModelTests/restoresClearedSearches		未移植	検索の履歴を消す・戻す機能が無い
 records.counts-search-results-hidden-by-filter	RecordsModelTests/countsSearchResultsHiddenByFilter		未移植	検索と絞り込みが無く、隠れた件数の出力も無い
 records.counts-shown-entries	RecordsModelTests/countsShownEntries		未移植	表示中の件数（shownEntryCount）と、検索・絞り込みが無い
+records.presents-one-thing-at-a-time	RecordsModelTests/presentsOneThingAtATime		未確認	Android は別のブランチで合わせる
+records.starts-each-sheet-from-its-first-look	RecordsModelTests/startsEachSheetFromItsFirstLook		未確認	Android は別のブランチで合わせる
+records.keeps-selection-until-finished	RecordsModelTests/keepsSelectionUntilFinished		未確認	Android は別のブランチで合わせる
+records.opens-and-closes-items-of-each-entry	RecordsModelTests/opensAndClosesItemsOfEachEntry		未確認	Android は別のブランチで合わせる
+records.remembers-direction-of-last-move	RecordsModelTests/remembersDirectionOfLastMove		未確認	Android は別のブランチで合わせる
 records.selects-and-clears-whole-day	RecordsModelTests/selectsAndClearsWholeDay		未移植	日ごとにまとめて選ぶ・外す機能が、モデルにも画面にも無い
 records.toggles-one-entry	RecordsModelTests/togglesOneEntry		未移植	記録を選ぶ機能（選択の状態）が、モデルにも画面にも無い
 records.selects-all-shown-in-month	RecordsModelTests/selectsAllShownInMonth		未移植	月の記録を全部選ぶ機能が、モデルにも画面にも無い
@@ -332,6 +342,9 @@ review.moves-only-up-to-current-period	ReviewModelTests/movesOnlyUpToCurrentPeri
 review.moves-back-to-current-period	ReviewModelTests/movesBackToCurrentPeriod		未移植	今の期間へ戻る moveToCurrent・isCurrentPeriod が無く、ボタンも無い
 review.remembers-selection	ReviewModelTests/remembersSelection	ReviewModelTest/remembersSelection	対応	
 review.lists-days-of-stamp	ReviewModelTests/listsDaysOfStamp		未移植	スタンプの集計と押した日の一覧が、モデルと画面に無い
+review.opens-chosen-entry-after-closing-share-sheet	ReviewModelTests/opensChosenEntryAfterClosingShareSheet		未確認	Android は別のブランチで合わせる
+review.closes-analysis-and-its-share-before-opening	ReviewModelTests/closesAnalysisAndItsShareBeforeOpening		未確認	Android は別のブランチで合わせる
+review.opens-picked-day-after-closing-stamp-sheet	ReviewModelTests/opensPickedDayAfterClosingStampSheet		未確認	Android は別のブランチで合わせる
 review.shows-store-review-card-after-ten-entries	ReviewModelTests/showsStoreReviewCardAfterTenEntries		未移植	ストアの評価を頼むカードが、モデルにも画面にも無い
 review.hides-store-review-card-after-closing	ReviewModelTests/hidesStoreReviewCardAfterClosing		未移植	ストアの評価を頼むカードと、閉じた記憶が無い
 review.marks-store-review-opened	ReviewModelTests/marksStoreReviewOpened		未移植	ストアの評価を開いた記憶（storeReviewOpened）が無い

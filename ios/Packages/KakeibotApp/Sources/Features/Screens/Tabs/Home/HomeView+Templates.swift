@@ -46,42 +46,14 @@ private extension HomeView {
             Spacer()
 
             if model.output.templates.count > 1 {
-                orderButton
-                    .layoutPriority(1)
+                HomeTemplateOrderButton(
+                    title: model.input.templateOrder.title,
+                    onOpen: onOpenOrderMenu
+                )
+                .layoutPriority(1)
             }
 
             ToolButton(systemImage: "plus", action: onAddTemplate)
-        }
-    }
-
-    var orderButton: some View {
-        Button {
-            onOpenOrderMenu(orderButtonFrame)
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "arrow.up.arrow.down")
-                    .sansFont(.caption, weight: .light)
-
-                Text(model.input.templateOrder.title)
-                    .textFont(.caption2)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .foregroundStyle(Palette.accent)
-            .padding(.horizontal, 12)
-            .frame(height: 32)
-            .overlay {
-                Capsule()
-                    .stroke(Self.toolStroke, lineWidth: 1)
-            }
-            .frame(height: 40)
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .global)
-        } action: { frame in
-            orderButtonFrame = frame
         }
     }
 
@@ -102,7 +74,7 @@ private extension HomeView {
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.width
         } action: { width in
-            shelfWidth = width - Self.shelfMargin * 2
+            layout.shelfWidth = width - Self.shelfMargin * 2
         }
         .scrollIndicators(.hidden)
         .contentMargins(.horizontal, Self.shelfMargin, for: .scrollContent)
@@ -135,7 +107,6 @@ private extension HomeView {
 private extension HomeView {
     static let shadowRoom: CGFloat = 32
     static let shelfMargin: CGFloat = 16
-    static let toolStroke = Palette.accent.opacity(.muted)
 
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
@@ -156,6 +127,6 @@ private extension HomeView {
     }
 
     var shelfCardWidth: CGFloat {
-        shelfWidth > 0 ? shelfWidth * 0.85 : .infinity
+        layout.shelfWidth > 0 ? layout.shelfWidth * 0.85 : .infinity
     }
 }

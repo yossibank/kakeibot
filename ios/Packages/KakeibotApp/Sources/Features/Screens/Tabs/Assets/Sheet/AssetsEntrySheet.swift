@@ -66,6 +66,13 @@ extension AssetsEntrySheet {
 }
 
 extension AssetsEntrySheet.Content {
+    init(_ source: AssetsModel.EntrySource) {
+        switch source {
+        case let .moved(row): self = .moved(row)
+        case let .unpaid(rows): self = .unpaid(of: rows)
+        }
+    }
+
     static func moved(_ row: AssetsModel.UpcomingBill) -> Self {
         let count = row.movedIn.count + row.movedOut.count
         let day = PeriodText.weekdayDate(row.bill.date)

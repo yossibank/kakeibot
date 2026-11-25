@@ -78,7 +78,7 @@ private extension RecordsView {
                 .fixedSize()
 
             ChipButton(isSelected: selectsAll) {
-                self.selection = selectsAll ? [] : model.output.selectingAllShown(in: selection)
+                model.state.select(selectsAll ? [] : model.output.selectingAllShown(in: selection))
             } content: {
                 HStack(spacing: 4) {
                     Image(systemName: systemImage)
@@ -109,7 +109,7 @@ private extension RecordsView {
                 isStacked: isStacked
             ) {
                 if let type {
-                    batchTarget = .category(type)
+                    model.state.present(.batch(.category(type)))
                 }
             }
 
@@ -119,7 +119,7 @@ private extension RecordsView {
                 block: model.output.batchWalletBlock(of: selection),
                 isStacked: isStacked
             ) {
-                batchTarget = .wallet
+                model.state.present(.batch(.wallet))
             }
 
             barButton(

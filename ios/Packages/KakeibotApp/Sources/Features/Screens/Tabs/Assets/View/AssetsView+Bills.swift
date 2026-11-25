@@ -74,7 +74,7 @@ private extension AssetsView {
         ) {
             if let moves = Self.movesText(of: row) {
                 Button {
-                    entrySheet = .moved(row)
+                    model.state.present(.entries(.moved(row)))
                 } label: {
                     HStack(spacing: 4) {
                         Label(

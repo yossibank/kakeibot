@@ -51,7 +51,7 @@ extension ReviewView {
                             amount: model.output.total
                         ),
                         onOpen: { share in
-                            openShare = share
+                            model.state.sheet = .share(share)
                         }
                     )
                     .layoutColumn(.trailing)
@@ -62,7 +62,7 @@ extension ReviewView {
                         shares: walletShares,
                         total: nil,
                         onOpen: { share in
-                            openShare = share
+                            model.state.sheet = .share(share)
                         }
                     )
                 }
@@ -75,7 +75,7 @@ extension ReviewView {
                     tallies: tallies,
                     emptyText: "この期間に押したスタンプはありません",
                     onOpen: { tally in
-                        openStamp = tally
+                        model.state.sheet = .stamp(tally)
                     }
                 )
                 .layoutColumn(.trailing)

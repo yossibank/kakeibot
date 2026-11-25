@@ -4,8 +4,6 @@ import FeatureModels
 import SwiftUI
 
 public struct RecordsRewardSheet: View {
-    @State private var isAddingRule = false
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
@@ -32,7 +30,7 @@ public struct RecordsRewardSheet: View {
                         message: "決まりを作ると、ここで達成を付けられます",
                         actionTitle: "決まりを追加"
                     ) {
-                        isAddingRule = true
+                        model.state.screen.isAddingMark = true
                     }
                 } else {
                     VStack(spacing: 8) {
@@ -46,8 +44,11 @@ public struct RecordsRewardSheet: View {
                 }
             }
         }
-        .sheet(isPresented: $isAddingRule) {
+        .sheet(isPresented: Bindable(model.state).screen.isAddingMark) {
             RewardRuleEditSheet(model: model.rewardRuleEditModel())
+        }
+        .onAppear {
+            model.state.finishAddingMark()
         }
         .haptic(.success, trigger: model.output.rewardTotal(on: date))
     }
@@ -62,7 +63,7 @@ private extension RecordsRewardSheet {
                 SheetHeaderSlot()
             } else {
                 RingButton(systemImage: "plus") {
-                    isAddingRule = true
+                    model.state.screen.isAddingMark = true
                 }
             }
         }

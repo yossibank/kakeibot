@@ -6,33 +6,22 @@ import SwiftUI
 public struct RecordsView: View {
     @Bindable var model: RecordsModel
 
-    @State var stampTarget: StampTarget?
-    @State var rewardTarget: StampTarget?
-    @State var markMenu: MarkMenu?
-    @State var selection: Set<Entry.ID>?
-    @State var batchTarget: RecordsBatchSheet.Target?
-    @State var isFiltering = false
-    @State var openItemIds: Set<Entry.ID> = []
-    @State var openAdjustment: RecordsModel.AdjustmentRow?
-    @State var isCalendarWide = false
+    @State var layout = Layout()
 
     @FocusState var isSearchFocused: Bool
 
-    @State private var isMovingForward = true
     @State private var slide = PageSlide()
-    @State private var stampCount = 0
 
     let onOpenEntry: (Entry.ID) -> Void
     let onAddEntry: (LocalDate) -> Void
     let onOpenRecurring: (Recurring.ID) -> Void
     let onDeleteEntries: ([Entry.ID]) -> Void
+    let onChangeEntries: ([Entry.ID], EntryBatchChange) -> Void
 
-    private let onChangeEntries: ([Entry.ID], EntryBatchChange) -> Void
     private let onDeleteAdjustment: (Deletion) -> Void
 
     public init(
         model: RecordsModel,
-        selection: Set<Entry.ID>? = nil,
         onOpenEntry: @escaping (Entry.ID) -> Void,
         onAddEntry: @escaping (LocalDate) -> Void,
         onOpenRecurring: @escaping (Recurring.ID) -> Void,
@@ -41,7 +30,6 @@ public struct RecordsView: View {
         onDeleteAdjustment: @escaping (Deletion) -> Void = { _ in }
     ) {
         self.model = model
-        _selection = State(initialValue: selection)
         self.onOpenEntry = onOpenEntry
         self.onAddEntry = onAddEntry
         self.onOpenRecurring = onOpenRecurring
@@ -132,35 +120,19 @@ public struct RecordsView: View {
         }
         .haptic(.selection, trigger: model.state.month)
         .haptic(.selection, trigger: model.state.selectedDate)
-        .sheet(item: $stampTarget) { target in
-            RecordsStampSheet(
-                date: target.date,
-                choices: model.output.stampChoices,
-                current: model.output.stampIcon(on: target.date),
-                editModel: model.stampEditModel
-            ) { icon in
-                stampCount += 1
-
-                model.perform {
-                    await $0.stamp(icon, on: target.date)
-                }
-            } onRemove: {
-                model.perform {
-                    await $0.removeStamp(on: target.date)
-                }
-            }
-        }
-        .sheet(item: $rewardTarget) { target in
-            RecordsRewardSheet(model: model, date: target.date)
+        .sheet(item: Bindable(model.state).sheet) { sheet in
+            sheetContent(sheet)
         }
         .overlay {
-            if let markMenu {
-                RecordsMarkMenu(anchor: markMenu.anchor) {
-                    closeMarkMenu()
-                    stampTarget = StampTarget(date: markMenu.date)
+            if let date = model.state.markMenuDate {
+                RecordsMarkMenu(anchor: layout.markAnchor) {
+                    withAnimation(.snappy(duration: 0.2)) {
+                        model.state.present(.stamp(date))
+                    }
                 } onReward: {
-                    closeMarkMenu()
-                    rewardTarget = StampTarget(date: markMenu.date)
+                    withAnimation(.snappy(duration: 0.2)) {
+                        model.state.present(.reward(date))
+                    }
                 } onClose: {
                     closeMarkMenu()
                 }
@@ -168,28 +140,26 @@ public struct RecordsView: View {
             }
         }
         .onDisappear {
-            markMenu = nil
+            model.state.closeMarkMenu()
         }
-        .sheet(item: $batchTarget) { target in
-            RecordsBatchSheet(
-                model: model,
-                target: target,
-                count: selection?.count ?? 0
-            ) { change in
-                onChangeEntries(Array(selection ?? []), change)
-                finishSelecting()
-            }
-        }
-        .sheet(isPresented: $isFiltering) {
-            RecordsFilterSheet(model: model)
-        }
-        .sheet(item: $openAdjustment) { row in
-            RecordsAdjustmentSheet(row: row) {
-                deleteAdjustment(row.id)
-            }
-        }
-        .haptic(.success, trigger: stampCount)
+        .haptic(.success, trigger: layout.stampPulse)
         .backdrop()
+    }
+}
+
+extension RecordsView {
+    struct Layout {
+        var markAnchor: CGRect = .zero
+        var calendarWidth: CGFloat = 0
+        var stampPulse: Double = 0
+    }
+
+    var selection: Set<Entry.ID>? {
+        model.state.screen.selection
+    }
+
+    var isCalendarWide: Bool {
+        layout.calendarWidth >= Self.wideCalendarWidth
     }
 }
 
@@ -216,7 +186,7 @@ private extension RecordsView {
     var filterLine: some View {
         if let title = model.output.filterTitle {
             RecordsFilterLine(title: title) {
-                isFiltering = true
+                model.state.present(.filter)
             } onClear: {
                 clearFilter()
             }
@@ -263,10 +233,10 @@ private extension RecordsView {
                 shownDayCard
                     .layoutColumn(.trailing)
             }
-            .onGeometryChange(for: Bool.self) { proxy in
-                proxy.size.width >= Self.wideCalendarWidth
-            } action: { isWide in
-                isCalendarWide = isWide
+            .onGeometryChange(for: CGFloat.self) { proxy in
+                proxy.size.width
+            } action: { width in
+                layout.calendarWidth = width
             }
         }
     }
@@ -278,7 +248,7 @@ private extension RecordsView {
         let isSelecting: Bool
     }
 
-    nonisolated static let wideCalendarWidth: CGFloat = 560
+    static let wideCalendarWidth: CGFloat = 560
 
     static let listWidth: CGFloat = 720
 
@@ -311,7 +281,7 @@ private extension RecordsView {
     }
 
     var monthTextTransition: ContentTransition {
-        .numericText(countsDown: !isMovingForward)
+        .numericText(countsDown: !model.state.screen.isMovingForward)
     }
 
     var canSwipeMonth: Bool {
@@ -354,7 +324,7 @@ private extension RecordsView {
     }
 
     func move(months: Int) {
-        isMovingForward = months > 0
+        model.state.head(forward: months > 0)
 
         PageSlide.run($slide, forward: months > 0) {
             model.state.move(months: months)
@@ -364,16 +334,10 @@ private extension RecordsView {
     func moveToCurrentMonth() {
         let isForward = model.state.month < model.output.currentMonth
 
-        isMovingForward = isForward
+        model.state.head(forward: isForward)
 
         PageSlide.run($slide, forward: isForward) {
             model.openCurrentMonth()
-        }
-    }
-
-    func deleteAdjustment(_ id: Adjustment.ID) {
-        model.perform {
-            await $0.deleteAdjustment(id)
         }
     }
 }

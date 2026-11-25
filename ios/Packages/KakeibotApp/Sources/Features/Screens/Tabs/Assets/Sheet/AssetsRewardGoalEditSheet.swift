@@ -5,7 +5,6 @@ import SwiftUI
 
 struct AssetsRewardGoalEditSheet: View {
     @State private var model: AssetsRewardGoalEditModel
-    @State private var panel: Panel?
 
     @FocusState private var focus: Field?
 
@@ -13,12 +12,11 @@ struct AssetsRewardGoalEditSheet: View {
 
     init(model: AssetsRewardGoalEditModel) {
         _model = State(initialValue: model)
-        _panel = State(initialValue: model.output.isEditing ? nil : .amount)
     }
 
     var body: some View {
         content
-            .settingsDrawerLayer(item: panel) {
+            .settingsDrawerLayer(item: model.state.panel) {
                 closePanel()
             } drawer: { panel in
                 drawerView(panel)
@@ -146,9 +144,7 @@ private extension AssetsRewardGoalEditSheet {
         case name
     }
 
-    enum Panel: Hashable {
-        case amount
-    }
+    typealias Panel = AssetsRewardGoalEditModel.Panel
 
     static let fade: CGFloat = 16
 
@@ -169,13 +165,13 @@ private extension AssetsRewardGoalEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            self.panel = panel
+            model.state.open(panel)
         }
     }
 
     func hidePanel() {
         withAnimation(.snappy) {
-            panel = nil
+            model.state.closePanel()
         }
     }
 

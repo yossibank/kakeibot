@@ -22,7 +22,7 @@ extension ReviewView {
                 VStack(alignment: .leading, spacing: 0) {
                     if let recurring = model.output.recurringTotal {
                         Button {
-                            openShare = model.output.recurringShare
+                            model.state.sheet = model.output.recurringShare.map { .share($0) }
                         } label: {
                             HStack(spacing: 4) {
                                 Label(recurringText(recurring), systemImage: "repeat")

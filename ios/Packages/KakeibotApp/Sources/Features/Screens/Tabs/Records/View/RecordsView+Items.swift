@@ -7,7 +7,7 @@ extension RecordsView {
     @ViewBuilder
     func itemList(_ row: EntryRowItem) -> some View {
         if !row.items.isEmpty {
-            let isOpen = openItemIds.contains(row.id)
+            let isOpen = model.state.screen.openItemIds.contains(row.id)
 
             VStack(alignment: .leading, spacing: 8) {
                 itemToggle(row, isOpen: isOpen)
@@ -72,11 +72,7 @@ private extension RecordsView {
 private extension RecordsView {
     func toggleItems(_ id: Entry.ID) {
         withAnimation(.smooth(duration: 0.36)) {
-            if openItemIds.contains(id) {
-                openItemIds.remove(id)
-            } else {
-                openItemIds.insert(id)
-            }
+            model.state.toggleItems(of: id)
         }
     }
 }

@@ -4,11 +4,6 @@ import FeatureModels
 import SwiftUI
 
 struct AssetsRewardSheet: View {
-    @State var goalTarget: GoalTarget?
-
-    @State private var isEditingRules = false
-    @State private var isGuideOpen = false
-
     @Environment(\.dismiss) private var dismiss
 
     let model: AssetsModel
@@ -42,11 +37,11 @@ struct AssetsRewardSheet: View {
             .padding(.top, 20)
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(isPresented: $isEditingRules) {
+            .navigationDestination(isPresented: Bindable(model.state).isEditingRules) {
                 RewardRuleListView(parts: model.childParts())
             }
         }
-        .sheet(item: $goalTarget) { target in
+        .sheet(item: Bindable(model.state).goalTarget) { target in
             AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: target.goal))
         }
         .settingsHideNotice(
@@ -62,12 +57,6 @@ struct AssetsRewardSheet: View {
             model.state.boughtId = nil
         }
         .presentationSizing(.tallForm)
-    }
-}
-
-extension AssetsRewardSheet {
-    struct GoalTarget {
-        let goal: RewardGoal?
     }
 }
 
@@ -123,7 +112,7 @@ private extension AssetsRewardSheet {
             if isSetUp {
                 Button {
                     withAnimation(.snappy) {
-                        isGuideOpen.toggle()
+                        model.state.toggleGuide()
                     }
                 } label: {
                     HStack(spacing: 8) {
@@ -132,7 +121,7 @@ private extension AssetsRewardSheet {
                         Image(systemName: "chevron.down")
                             .sansFont(.micro, weight: .semibold)
                             .foregroundStyle(Palette.accent)
-                            .rotationEffect(.degrees(isGuideOpen ? 180 : 0))
+                            .rotationEffect(.degrees(model.state.reward.isGuideOpen ? 180 : 0))
 
                         Spacer()
                     }
@@ -143,7 +132,7 @@ private extension AssetsRewardSheet {
                 SectionTitle("使い方")
             }
 
-            if !isSetUp || isGuideOpen {
+            if !isSetUp || model.state.reward.isGuideOpen {
                 guideCard
             }
         }
@@ -183,13 +172,13 @@ private extension AssetsRewardSheet {
                 Spacer()
 
                 ToolButton(systemImage: "pencil") {
-                    isEditingRules = true
+                    model.state.isEditingRules = true
                 }
             }
 
             if model.output.rewardRules.isEmpty {
                 AddButton("決まりを追加") {
-                    isEditingRules = true
+                    model.state.isEditingRules = true
                 }
             } else {
                 VStack(spacing: 12) {
@@ -284,11 +273,5 @@ private extension AssetsRewardSheet {
                 color: Palette.accent
             )
         }
-    }
-}
-
-extension AssetsRewardSheet.GoalTarget: Identifiable {
-    var id: String {
-        goal?.id.description ?? "new"
     }
 }

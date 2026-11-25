@@ -35,6 +35,7 @@ extension RecordsView {
 
         if EntrySearch(model.state.searchText).isEmpty {
             RecordsSearchHistory(
+                clearedWords: Bindable(model.state).screen.clearedSearches,
                 words: model.input.recentSearches,
                 onSelect: selectRecent,
                 onClear: clearRecent,

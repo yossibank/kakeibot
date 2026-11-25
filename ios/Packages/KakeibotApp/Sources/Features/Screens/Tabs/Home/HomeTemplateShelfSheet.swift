@@ -6,9 +6,6 @@ import SwiftUI
 public struct HomeTemplateShelfSheet: View {
     @Bindable private var model: HomeModel
 
-    @State private var query = ""
-    @State private var isEditing = false
-
     @FocusState private var isSearching: Bool
 
     @Environment(\.dismiss) private var dismiss
@@ -38,7 +35,7 @@ public struct HomeTemplateShelfSheet: View {
 
                 SearchField(
                     "名前で探す",
-                    text: $query,
+                    text: Bindable(model.state).shelf.query,
                     focus: $isSearching
                 )
 
@@ -68,9 +65,12 @@ public struct HomeTemplateShelfSheet: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(isPresented: $isEditing) {
+            .navigationDestination(isPresented: Bindable(model.state).shelf.isEditing) {
                 TemplateListView(parts: parts)
             }
+        }
+        .onDisappear {
+            model.state.closeShelf()
         }
     }
 }
@@ -82,7 +82,7 @@ private extension HomeTemplateShelfSheet {
         } trailing: {
             RingButton(systemImage: "slider.horizontal.3", label: "編集") {
                 isSearching = false
-                isEditing = true
+                model.state.shelf.isEditing = true
             }
         }
     }
@@ -113,6 +113,10 @@ private extension HomeTemplateShelfSheet {
         .init("支出", value: .expense),
         .init("収入", value: .income)
     ]
+
+    var query: String {
+        model.state.shelf.query
+    }
 
     var sections: [HomeModel.TemplateSection] {
         model.output.templateSections(matching: query)

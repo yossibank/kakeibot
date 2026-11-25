@@ -9,15 +9,7 @@ public struct ReviewView: View {
 
     @Bindable private(set) var model: ReviewModel
 
-    @State var openShare: ReviewModel.Share?
-    @State var openStamp: StampBook.Tally?
-    @State var showsAnalysis = false
-    @State var analysisShare: ReviewModel.Share?
     @State var slide = PageSlide()
-
-    @State private var pendingEntry: Entry.ID?
-    @State private var pendingRecurring: Recurring.ID?
-    @State private var pendingDay: LocalDate?
 
     let onAddEntry: (LocalDate) -> Void
     let onOpenRecurrings: () -> Void
@@ -69,22 +61,8 @@ public struct ReviewView: View {
         .task(id: model.input.list?.entries.count) {
             await model.refreshStoreReviewCard()
         }
-        .sheet(item: $openShare, onDismiss: openPendingEntry) { share in
-            shareSheet(share)
-        }
-        .sheet(isPresented: $showsAnalysis, onDismiss: openPendingEntry) {
-            analysisSheet
-        }
-        .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
-            StampDaysSheet(
-                tally: tally,
-                periodTitle: periodTitle,
-                days: model.output.stampDays(of: tally),
-                entryDay: model.output.day(on:)
-            ) { date in
-                pendingDay = date
-                openStamp = nil
-            }
+        .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in
+            sheetView(sheet)
         }
         .errorBanner(model.state.errorNotice) {
             model.state.errorNotice.clear()
@@ -123,7 +101,28 @@ extension ReviewView {
             periodTitle: periodTitle,
             rows: model.output.rows(for: share)
         ) { id in
-            choose(id, in: share)
+            model.choose(id, in: share)
+        }
+    }
+
+    @ViewBuilder
+    func sheetView(_ sheet: ReviewModel.Sheet) -> some View {
+        switch sheet {
+        case let .share(share):
+            shareSheet(share)
+
+        case .analysis:
+            analysisSheet
+
+        case let .stamp(tally):
+            StampDaysSheet(
+                tally: tally,
+                periodTitle: periodTitle,
+                days: model.output.stampDays(of: tally),
+                entryDay: model.output.day(on:)
+            ) { date in
+                model.state.open(afterSheet: .day(date))
+            }
         }
     }
 
@@ -131,20 +130,13 @@ extension ReviewView {
         direction == .forward ? 1 : -1
     }
 
-    func openPendingEntry() {
-        if let pendingRecurring {
-            self.pendingRecurring = nil
-            onOpenRecurring(pendingRecurring)
-            return
+    func openPending() {
+        switch model.state.takePending() {
+        case let .entry(id): onOpenEntry(id)
+        case let .recurring(id): onOpenRecurring(id)
+        case let .day(date): onOpenDay(date)
+        case nil: break
         }
-
-        guard let pendingEntry else {
-            return
-        }
-
-        self.pendingEntry = nil
-
-        onOpenEntry(pendingEntry)
     }
 
     func move(_ direction: PageSwipeDirection) {
@@ -224,36 +216,5 @@ private extension ReviewView {
         case .week: nil
         case .month, .year: PeriodText.range(model.output.period.range)
         }
-    }
-
-    func choose(
-        _ id: Entry.ID,
-        in share: ReviewModel.Share
-    ) {
-        let isRecurring = share.id == ReviewModel.recurringShareId
-
-        if isRecurring,
-           let recurringId = model.output.recurringId(of: id) {
-            pendingRecurring = recurringId
-        } else {
-            pendingEntry = id
-        }
-
-        if analysisShare == nil {
-            openShare = nil
-        } else {
-            analysisShare = nil
-            showsAnalysis = false
-        }
-    }
-
-    func openPendingDay() {
-        guard let pendingDay else {
-            return
-        }
-
-        self.pendingDay = nil
-
-        onOpenDay(pendingDay)
     }
 }

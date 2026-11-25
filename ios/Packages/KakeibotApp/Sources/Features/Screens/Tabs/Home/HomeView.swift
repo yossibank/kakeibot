@@ -6,12 +6,7 @@ import SwiftUI
 public struct HomeView: View {
     @Bindable var model: HomeModel
 
-    @State var orderButtonFrame: CGRect = .zero
-    @State var shelfWidth: CGFloat = 0
-
-    @State private var openId: Entry.ID?
-    @State private var openStamp: StampBook.Tally?
-    @State private var pendingDay: LocalDate?
+    @State var layout = Layout()
 
     let onUseTemplate: (EntryTemplate) -> Void
     let onShowAllTemplates: () -> Void
@@ -102,18 +97,23 @@ public struct HomeView: View {
             .animation(.snappy, value: model.output.homeLayout)
         }
         .errorBanner(Bindable(model.state).errorNotice)
-        .sheet(item: $openStamp, onDismiss: openPendingDay) { tally in
+        .sheet(item: Bindable(model.state).openStamp, onDismiss: openPendingDay) { tally in
             StampDaysSheet(
                 tally: tally,
                 periodTitle: periodTitle,
                 days: model.output.stampDays(of: tally),
                 entryDay: model.output.day(on:)
             ) { date in
-                pendingDay = date
-                openStamp = nil
+                model.state.pickStampDay(date)
             }
         }
         .backdrop()
+    }
+}
+
+extension HomeView {
+    struct Layout {
+        var shelfWidth: CGFloat = 0
     }
 }
 
@@ -166,7 +166,7 @@ private extension HomeView {
                 )
             } else {
                 ForEach(model.output.recentRows) { row in
-                    SwipeRow(id: row.id, openId: $openId) {
+                    SwipeRow(id: row.id, openId: Bindable(model.state).openRowId) {
                         onOpenEntry(row.id)
                     } onAction: {
                         onDeleteEntry(row.id)
@@ -198,7 +198,7 @@ private extension HomeView {
             tallies: model.output.stampTallies,
             emptyText: "今月はまだスタンプを押していません",
             onOpen: { tally in
-                openStamp = tally
+                model.state.openStamp = tally
             }
         )
     }
@@ -216,6 +216,7 @@ private extension HomeView {
         switch section {
         case .customize:
             HomeCustomizeCard(
+                changed: Bindable(model.state).customized,
                 model: setup,
                 appIcon: appIcon,
                 isSheetOpen: isSheetOpen,
@@ -265,12 +266,8 @@ private extension HomeView {
     }
 
     func openPendingDay() {
-        guard let pendingDay else {
-            return
+        if let date = model.state.takePendingDay() {
+            onOpenDay(date)
         }
-
-        self.pendingDay = nil
-
-        onOpenDay(pendingDay)
     }
 }

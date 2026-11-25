@@ -2,7 +2,7 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsSearchHistory: View {
-    @State private var clearedWords: [String]?
+    @Binding var clearedWords: [String]?
 
     let words: [String]
     let onSelect: (String) -> Void
@@ -29,6 +29,11 @@ struct RecordsSearchHistory: View {
             }
 
             withAnimation(.snappy) {
+                clearedWords = nil
+            }
+        }
+        .onDisappear {
+            if clearedWords != nil {
                 clearedWords = nil
             }
         }
@@ -141,6 +146,7 @@ private extension RecordsSearchHistory {
 
 #Preview {
     RecordsSearchHistory(
+        clearedWords: .constant(nil),
         words: ["ランチ", "本", "¥500"],
         onSelect: { _ in },
         onClear: {},

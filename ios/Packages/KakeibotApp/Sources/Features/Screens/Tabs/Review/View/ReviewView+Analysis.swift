@@ -19,7 +19,7 @@ extension ReviewView {
                 model.move(by: -1)
             }
 
-            showsAnalysis = true
+            model.state.sheet = .analysis
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: bannerSymbol)
@@ -80,7 +80,7 @@ extension ReviewView {
     var analysisSheet: some View {
         VStack(spacing: 12) {
             SheetHeader {
-                showsAnalysis = false
+                model.state.sheet = nil
             } title: {
                 Text("ふりかえり")
                     .displayFont(.body)
@@ -124,7 +124,7 @@ extension ReviewView {
         .task(id: model.output.noteTrigger) {
             await model.refreshNotes()
         }
-        .sheet(item: $analysisShare) { share in
+        .sheet(item: Bindable(model.state).analysisShare) { share in
             shareSheet(share)
         }
         .backdrop()
@@ -146,10 +146,10 @@ private extension ReviewView {
                 previousName: model.output.period.previous.displayName,
                 unit: model.input.scale.unitName,
                 onOpenGoal: { item in
-                    analysisShare = model.output.goalShare(of: item)
+                    model.state.analysisShare = model.output.goalShare(of: item)
                 },
                 onOpenWhy: { row, why in
-                    analysisShare = model.output.whyShare(of: row, why: why)
+                    model.state.analysisShare = model.output.whyShare(of: row, why: why)
                 }
             )
             .task(id: model.output.period) {
@@ -179,7 +179,7 @@ private extension ReviewView {
                 move(by: -1)
             },
             onOpenMonth: { month in
-                analysisShare = model.output.monthShare(of: month)
+                model.state.analysisShare = model.output.monthShare(of: month)
             }
         )
     }
