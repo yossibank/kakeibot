@@ -22,14 +22,6 @@ suspend fun AppDatabase.failWrites(to: String) {
     }
 }
 
-suspend fun AppDatabase.allowWrites(to: String) {
-    useWriterConnection { connection ->
-        for (event in listOf("insert", "update", "delete")) {
-            connection.usePrepared("DROP TRIGGER fail_${to}_$event") { it.step() }
-        }
-    }
-}
-
 suspend fun AppDatabase.failReads(of: String) {
     useWriterConnection { connection ->
         connection.usePrepared("DROP TABLE $of") { it.step() }
