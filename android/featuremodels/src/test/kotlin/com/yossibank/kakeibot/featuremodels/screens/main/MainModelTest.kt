@@ -5,38 +5,81 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.featuremodels.support.modelTest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainModelTest {
     private val date = checkNotNull(LocalDate.parse("2026-10-15"))
+    private val entry = MainModel.Sheet.Entry(editing = null, date = date)
 
-    @Test
-    fun opensHomeRoute() {
-        val model = MainModel()
-        model.state.select(MainModel.Tab.Records)
+    @Before
+    fun setMain() {
+        Dispatchers.setMain(StandardTestDispatcher())
+    }
 
-        model.open(PlannedNotification.Route.Home)
-
-        assertEquals(MainModel.Tab.Home, model.state.tab)
-        assertNull(model.state.sheet)
-        assertEquals(setOf(MainModel.Tab.Home, MainModel.Tab.Records), model.state.visitedTabs)
+    @After
+    fun resetMain() {
+        Dispatchers.resetMain()
     }
 
     @Test
-    fun opensEntryRouteOnCurrentTab() {
+    fun opensHomeRouteWithoutWaiting() = runTest {
+        val model = MainModel()
+        model.state.select(MainModel.Tab.Records)
+        var tabAfterRoute: MainModel.Tab? = null
+
+        val route = model.perform { it.open(PlannedNotification.Route.Home) }
+        val probe = model.perform { tabAfterRoute = it.state.tab }
+
+        route.join()
+        probe.join()
+
+        assertEquals(MainModel.Tab.Home, tabAfterRoute)
+        assertNull(model.state.sheet)
+        assertEquals(setOf(MainModel.Tab.Home, MainModel.Tab.Records), model.state.visitedTabs)
+        assertEquals(0, currentTime)
+    }
+
+    @Test
+    fun opensEntryRouteOnHomeWithDate() = modelTest(today = "2026-10-17") { setup ->
         val model = MainModel()
         model.state.select(MainModel.Tab.Assets)
 
         model.open(PlannedNotification.Route.Entry(date = date))
 
-        assertEquals(MainModel.Tab.Assets, model.state.tab)
-        assertEquals(MainModel.Sheet.Entry(editing = null), model.state.sheet)
+        val sheet = model.state.sheet as? MainModel.Sheet.Entry
+
+        val entry = EntryModel(
+            database = setup.database,
+            clock = ScreenClock.fixed(setup.now),
+            today = setup.today,
+            editing = sheet?.editing,
+            date = sheet?.date ?: setup.today,
+        )
+
+        assertEquals(MainModel.Tab.Home, model.state.tab)
+        assertEquals(MainModel.Sheet.Entry(editing = null, date = date), sheet)
+        assertEquals(date, entry.state.form.date)
+        assertEquals(setup.today, entry.state.today)
     }
 
     @Test
-    fun opensRecurringRouteOnCurrentTab() {
+    fun opensRecurringRouteOnCurrentTab() = runTest {
         val model = MainModel()
         val id = Identifier<Recurring>()
         model.state.select(MainModel.Tab.Review)
@@ -51,14 +94,43 @@ class MainModelTest {
     }
 
     @Test
-    fun replacesOpenSheetWithRouteAtOnce() {
+    fun closesOpenSheetBeforeOpeningRoute() = runTest {
         val model = MainModel(sheet = MainModel.Sheet.Settings())
         model.state.select(MainModel.Tab.Records)
+        var whileWaiting: Seen? = null
 
-        model.open(PlannedNotification.Route.Entry(date = date))
+        val route = model.perform { it.open(PlannedNotification.Route.Entry(date = date)) }
+        val probe = model.perform { whileWaiting = seen(it) }
 
-        assertEquals(MainModel.Tab.Records, model.state.tab)
-        assertEquals(MainModel.Sheet.Entry(editing = null), model.state.sheet)
+        route.join()
+        probe.join()
+
+        assertEquals(Seen(sheet = null, tab = MainModel.Tab.Records), whileWaiting)
+        assertEquals(Seen(sheet = entry, tab = MainModel.Tab.Home), seen(model))
+        assertEquals(MainModel.sheetCloseDelay.inWholeMilliseconds, currentTime)
+    }
+
+    @Test
+    fun opensSecondRouteWhileFirstWaits() = runTest {
+        val model = MainModel(sheet = MainModel.Sheet.Settings())
+        val id = Identifier<Recurring>()
+        model.state.select(MainModel.Tab.Records)
+        var afterSecond: Seen? = null
+
+        val first = model.perform { it.open(PlannedNotification.Route.Entry(date = date)) }
+
+        val second = model.perform {
+            it.open(PlannedNotification.Route.Recurring(id = id))
+            afterSecond = seen(it)
+        }
+
+        first.join()
+        second.join()
+
+        val recurring = MainModel.Sheet.Settings(recurring = id, round = 1)
+
+        assertEquals(Seen(sheet = recurring, tab = MainModel.Tab.Records), afterSecond)
+        assertEquals(Seen(sheet = entry, tab = MainModel.Tab.Home), seen(model))
     }
 
     @Test
@@ -71,6 +143,7 @@ class MainModelTest {
 
         val saved = model.saved()
         val restored = MainModel.restore(saved)
+        val dated = MainModel(sheet = entry)
 
         restored.state.select(MainModel.Tab.Assets)
 
@@ -80,5 +153,16 @@ class MainModelTest {
             restored.state.visitedTabs,
         )
         assertEquals(MainModel.Sheet.Entry(editing = id), restored.state.sheet)
+        assertEquals(entry, MainModel.restore(dated.saved()).state.sheet)
     }
 }
+
+private data class Seen(
+    val sheet: MainModel.Sheet?,
+    val tab: MainModel.Tab,
+)
+
+private fun seen(model: MainModel): Seen = Seen(
+    sheet = model.state.sheet,
+    tab = model.state.tab,
+)

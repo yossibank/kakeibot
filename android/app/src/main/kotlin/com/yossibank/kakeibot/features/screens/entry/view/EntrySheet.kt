@@ -86,14 +86,16 @@ fun EntrySheet(
     database: AppDatabase,
     today: LocalDate,
     editing: Identifier<Entry>?,
+    date: LocalDate?,
     onClose: () -> Unit,
 ) {
-    val model = remember(database, editing) {
+    val model = remember(database, editing, date) {
         EntryModel(
             database = database,
             clock = ScreenClock.system,
             today = today,
             editing = editing,
+            date = date ?: today,
         )
     }
 

@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.screens.main
 
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.shared.Identifier
 
 private const val ENTRY = "entry"
@@ -23,15 +24,28 @@ fun MainModel.Companion.restore(saved: List<String>): MainModel = MainModel(
 )
 
 private fun saved(sheet: MainModel.Sheet?): List<String> = when (sheet) {
-    is MainModel.Sheet.Entry -> listOfNotNull(ENTRY, sheet.editing?.toString())
+    is MainModel.Sheet.Entry -> listOf(
+        ENTRY,
+        sheet.editing?.toString().orEmpty(),
+        sheet.date?.toString().orEmpty(),
+    )
+
     MainModel.Sheet.Budget -> listOf(BUDGET)
+
     is MainModel.Sheet.Settings -> listOf(SETTINGS)
+
     null -> emptyList()
 }
 
 private fun sheet(names: List<String>): MainModel.Sheet? = when (names.firstOrNull()) {
-    ENTRY -> MainModel.Sheet.Entry(editing = names.getOrNull(1)?.let { Identifier.parse(it) })
+    ENTRY -> MainModel.Sheet.Entry(
+        editing = names.getOrNull(1)?.let { Identifier.parse(it) },
+        date = names.getOrNull(2)?.let { LocalDate.parse(it) },
+    )
+
     BUDGET -> MainModel.Sheet.Budget
+
     SETTINGS -> MainModel.Sheet.Settings()
+
     else -> null
 }

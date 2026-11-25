@@ -3,17 +3,25 @@ package com.yossibank.kakeibot.featuremodels.screens.main
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import com.yossibank.kakeibot.core.concepts.entry.Entry as Record
 
 class MainModel(
     tab: Tab = Tab.Home,
     visitedTabs: Set<Tab> = setOf(Tab.Home),
     sheet: Sheet? = null,
-) {
+    closeDelay: Duration = sheetCloseDelay,
+) : ScreenPerforming {
     val state = State(tab, visitedTabs, sheet)
+
+    private val dependencies = Dependencies(closeDelay)
 
     enum class Tab(
         val title: String,
@@ -29,6 +37,7 @@ class MainModel(
 
         data class Entry(
             val editing: Identifier<Record>?,
+            val date: LocalDate? = null,
         ) : Sheet
 
         data class Settings(
@@ -67,13 +76,28 @@ class MainModel(
         }
     }
 
-    fun open(route: PlannedNotification.Route) {
-        state.sheet = null
+    private class Dependencies(
+        val closeDelay: Duration,
+    )
+
+    suspend fun open(route: PlannedNotification.Route) {
+        if (state.sheet != null) {
+            closeSheet()
+        }
 
         when (route) {
-            is PlannedNotification.Route.Recurring -> state.openSettings(recurring = route.id)
-            is PlannedNotification.Route.Entry -> openEntry(editing = null)
-            else -> state.select(Tab.Home)
+            is PlannedNotification.Route.Recurring -> {
+                state.openSettings(recurring = route.id)
+            }
+
+            is PlannedNotification.Route.Entry -> {
+                state.select(Tab.Home)
+                state.sheet = Sheet.Entry(editing = null, date = route.date)
+            }
+
+            else -> {
+                state.select(Tab.Home)
+            }
         }
     }
 
@@ -81,5 +105,12 @@ class MainModel(
         state.sheet = Sheet.Entry(editing = editing)
     }
 
-    companion object
+    private suspend fun closeSheet() {
+        state.sheet = null
+        delay(dependencies.closeDelay)
+    }
+
+    companion object {
+        val sheetCloseDelay: Duration = 600.milliseconds
+    }
 }

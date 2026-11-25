@@ -18,6 +18,7 @@ import com.yossibank.kakeibot.designsystem.components.modal.SheetLayer
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.featuremodels.screens.main.MainModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.menu.SettingsMenuSheet
@@ -45,7 +46,7 @@ fun MainView(
         val route = link?.let { PlannedNotification.Route.of(link = it) } ?: return@LaunchedEffect
 
         onOpenLink()
-        model.open(route)
+        model.perform { it.open(route) }
     }
 
     CompositionLocalProvider(
@@ -136,6 +137,7 @@ private fun MainLayers(
                 database = database,
                 today = today,
                 editing = entry.editing,
+                date = entry.date,
                 onClose = close,
             )
         }

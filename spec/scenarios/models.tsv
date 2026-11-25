@@ -210,19 +210,19 @@ entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScroll
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
-main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute	MainModelTest/replacesOpenSheetWithRouteAtOnce	違い	開いたシートが閉じるのを待たず、すぐに行き先のシートへ替える
-main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits		違い	待たないので、続けて来た行き先は、後から来た物が残る
+main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute	MainModelTest/closesOpenSheetBeforeOpeningRoute	対応	
+main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits	MainModelTest/opensSecondRouteWhileFirstWaits	対応	
 main.closes-sheet-before-moving-to-tab	MainModelTests/closesSheetBeforeMovingToTab		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
 main.waits-before-moving-even-without-sheet	MainModelTests/waitsBeforeMovingEvenWithoutSheet		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
-main.adds-entry-on-chosen-date	MainModelTests/addsEntryOnChosenDate		未移植	入口のシートに日付を渡す所が無く、入力は今日で開く
+main.adds-entry-on-chosen-date	MainModelTests/addsEntryOnChosenDate		未移植	日付を選んで入力を開く所（addEntry）が無く、行き先のほかは今日で開く
 main.adds-transfer-with-draft	MainModelTests/addsTransferWithDraft		未移植	入口に、振替を選んだ入力シートを開く所が無い
-main.replaces-draft-after-sheet-closes	MainModelTests/replacesDraftAfterSheetCloses		iOSのみ	入力の下書きを先に作って持つ仕組みで、Android は開く時に作る
-main.replaces-draft-when-day-changes	MainModelTests/replacesDraftWhenDayChanges		iOSのみ	入力の下書きを先に作って持つ仕組みで、Android は開く時に作る
+main.replaces-draft-after-sheet-closes	MainModelTests/replacesDraftAfterSheetCloses		iOSのみ	入力のモデルは画面がシートを開くたびに作り、入口が先に持つ下書きが無い
+main.replaces-draft-when-day-changes	MainModelTests/replacesDraftWhenDayChanges		iOSのみ	入力のモデルは画面がシートを開くたびに今日で作り、入口が先に持つ下書きが無い
 main.chooses-launch-tab-from-setting	MainModelTests/choosesLaunchTabFromSetting		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.keeps-home-tab-when-launch-tab-is-not-chosen	MainModelTests/keepsHomeTabWhenLaunchTabIsNotChosen		未移植	起動時に開く画面の設定を読んで、タブを選ぶ所が無い
 main.opens-entry-sheet-at-launch	MainModelTests/opensEntrySheetAtLaunch		未移植	起動時に開く画面の設定を読んで、入力シートを開く所が無い
-main.opens-home-route-without-waiting	MainModelTests/opensHomeRouteWithoutWaiting	MainModelTest/opensHomeRoute	対応	
-main.opens-entry-route-on-home-with-date	MainModelTests/opensEntryRouteOnHomeWithDate	MainModelTest/opensEntryRouteOnCurrentTab	違い	タブをホームへ切り替えず、行き先の日付も入力に渡さない
+main.opens-home-route-without-waiting	MainModelTests/opensHomeRouteWithoutWaiting	MainModelTest/opensHomeRouteWithoutWaiting	対応	
+main.opens-entry-route-on-home-with-date	MainModelTests/opensEntryRouteOnHomeWithDate	MainModelTest/opensEntryRouteOnHomeWithDate	対応	
 main.opens-recurring-route-on-current-tab	MainModelTests/opensRecurringRouteOnCurrentTab	MainModelTest/opensRecurringRouteOnCurrentTab	対応	固定費は、設定のシートの中で開く
 main.opens-template-route-with-saved-template	MainModelTests/opensTemplateRouteWithSavedTemplate		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
 main.opens-new-template-route-on-home	MainModelTests/opensNewTemplateRouteOnHome		未移植	テンプレートの行き先を開く所が無く、ホームへ切り替えるだけ
