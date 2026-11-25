@@ -25,10 +25,10 @@ entry.replaces-edited-amount-in-month-total	EntryModelTests/replacesEditedAmount
 entry.removes-entry-moved-out-of-month-from-total	EntryModelTests/removesEntryMovedOutOfMonthFromTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		未確認	Android は別のブランチで合わせる
 entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		未確認	Android は別のブランチで合わせる
-entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing		未確認	Android は別のブランチで合わせる
-entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails		未確認	Android は別のブランチで合わせる
-entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving		未確認	Android は別のブランチで合わせる
-entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing		未確認	Android は別のブランチで合わせる
+entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterSaving	対応	Android の結果は変更を持たず、閉じ始めの旗も無い。閉じる結果だけを確かめる
+entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails	EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	対応	
+entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving	EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	対応	Android の結果は変更を持たず、送った回数と保存した 2 件で確かめる
+entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterDeleting	対応	Android の結果は変更を持たず、閉じ始めの旗も無い。閉じる結果だけを確かめる
 entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未確認	Android は別のブランチで合わせる
 entry.places-hidden-category-and-moves-back-on-undo	EntryModelTests/placesHiddenCategoryAndMovesBackOnUndo		未確認	Android は別のブランチで合わせる
 entry.clears-hidden-category-when-hiding-fails	EntryModelTests/clearsHiddenCategoryWhenHidingFails		未確認	Android は別のブランチで合わせる
@@ -190,10 +190,6 @@ entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields	
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
-entry-outcome.places-closed-after-saving		EntryModelOutcomeTest/placesClosedAfterSaving	Androidのみ	保存できた時に、閉じる結果を state に置く。iOS の行は後で結び付ける
-entry-outcome.places-no-outcome-when-saving-fails		EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	Androidのみ	保存に失敗した時は、結果を置かない。iOS の行は後で結び付ける
-entry-outcome.continues-with-next-entry-after-saving		EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	Androidのみ	続けて記録した時に、続きの結果を置く。iOS の行は後で結び付ける
-entry-outcome.places-closed-after-deleting		EntryModelOutcomeTest/placesClosedAfterDeleting	Androidのみ	削除できた時に、閉じる結果を state に置く。iOS の行は後で結び付ける
 main.closes-open-sheet-before-opening-route	MainModelTests/closesOpenSheetBeforeOpeningRoute		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
 main.opens-second-route-while-first-waits	MainModelTests/opensSecondRouteWhileFirstWaits		iOSのみ	シートが閉じる動きを待つ話で、Android は待たずに切り替える
 main.closes-sheet-before-moving-to-tab	MainModelTests/closesSheetBeforeMovingToTab		未移植	お知らせの「試す」からタブやシートへ移る流れが無い
@@ -389,7 +385,6 @@ recurring-list.hides-and-shows-recurring	RecurringListModelTests/hidesAndShowsRe
 recurring-list.tells-when-recurrings-cannot-be-read	RecurringListModelTests/tellsWhenRecurringsCannotBeRead	RecurringListModelTest/tellsWhenRecurringsCannotBeRead	対応	固定費の表ではなく、共有の記録の一覧を失敗させて確かめる
 recurring-list.names-failed-action	RecurringListModelTests/namesFailedAction	RecurringListModelTest/namesFailedAction	対応	
 recurring-list.saves-moved-order		RecurringListModelTest/savesMovedOrder	Androidのみ	固定費の並べ替えを保存する。iOS は別の一覧（カテゴリ・スタンプ）でだけ確かめている
-recurring-list.deletes-and-restores-recurring		RecurringListModelTest/deletesAndRestoresRecurring	Androidのみ	固定費を 1 件削除して元に戻す。iOS にこのテストが無い
 recurring-list.starts-from-first-period-on-later-day		RecurringListModelTest/startsFromFirstPeriodOnLaterDay	Androidのみ	始まりの日より後の最初の予定日を次回に出す。iOS の画面のテストに無い
 template-edit.enters-amount-with-keypad	TemplateEditModelTests/entersAmountWithKeypad	TemplateEditModelTest/entersAmountWithKeypad	対応	Android に typeName（収入・支出の名前）が無く、確かめていない
 template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton	TemplateEditModelTest/namesWhatIsMissingOnSaveButton	対応	
@@ -426,10 +421,10 @@ month-start-day.ends-asset-months-at-period-end	MonthStartDayModelTests/endsAsse
 settings-list-screen.*	SettingsListScreenTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-board.keeps-move-inside-the-board	SettingsBoardModelTests/keepsMoveInsideTheBoard		未確認	RecurringListModel.State.move が端で丸めるが、端を越える移動のテストが無い
 settings-board.ignores-move-to-same-place-or-unknown-item	SettingsBoardModelTests/ignoresMoveToSamePlaceOrUnknownItem	RecurringListModelTest/ignoresMoveToSamePlaceOrUnknownRecurring	対応	
-settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/keepsHiddenItemInStateAfterHiding		未確認	Android は別のブランチで合わせる
-settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting		未確認	Android は別のブランチで合わせる
-settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails		未確認	Android は別のブランチで合わせる
-settings-board.keeps-bulk-deletion-in-state-after-deleting-hidden	SettingsBoardModelTests/keepsBulkDeletionInStateAfterDeletingHidden		未確認	Android は別のブランチで合わせる
+settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/keepsHiddenItemInStateAfterHiding	RecurringListModelTest/hidesAndShowsRecurring	対応	
+settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting	RecurringListModelTest/deletesAndRestoresRecurring	対応	Android は、削除を元に戻す所まで 1 つのテストで確かめる
+settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails		違い	削除に失敗しても、前の削除の知らせ（state.deleted）を消さない
+settings-board.keeps-bulk-deletion-in-state-after-deleting-hidden	SettingsBoardModelTests/keepsBulkDeletionInStateAfterDeletingHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	残した件数（keptCount）は Android に無く、確かめていない
 settings-board.deletes-nothing-when-none-are-hidden	SettingsBoardModelTests/deletesNothingWhenNoneAreHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	
 settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHiddenItem	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	並べ替え中の順を消すことは確かめていない
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
