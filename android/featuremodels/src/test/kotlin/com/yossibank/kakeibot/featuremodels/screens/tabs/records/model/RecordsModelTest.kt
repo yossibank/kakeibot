@@ -23,6 +23,7 @@ import com.yossibank.kakeibot.store.records.settingkeys.recordsLayout
 import com.yossibank.kakeibot.store.records.settingkeys.weekStart
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 import com.yossibank.kakeibot.store.writes.methods.setSetting
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.junit.Test
@@ -70,6 +71,23 @@ class RecordsModelTest {
         assertEquals(listOf("2026-09-30"), model.output.days.map { it.date.toString() })
         assertEquals(500L, model.output.expenseTotal)
         assertEquals("収支 · 赤字", model.output.balanceTitle)
+    }
+
+    @Test
+    fun keepsMonthWhenObservingAgain() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.recordsModel()
+        val first = backgroundScope.launch { model.observe() }
+        ModelWait.until { model.input.isLoaded }
+
+        first.cancelAndJoin()
+        model.move(months = -1)
+        setup.save(Entry.Kind.expense, amount = 500, on = date("2026-09-30"))
+        backgroundScope.launch { model.observe() }
+        ModelWait.until { model.output.days.size == 1 }
+        setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.monday)
+        ModelWait.until { model.input.weekStart == Weekday.monday }
+
+        assertEquals("2026-09", model.state.month.toString())
     }
 
     @Test

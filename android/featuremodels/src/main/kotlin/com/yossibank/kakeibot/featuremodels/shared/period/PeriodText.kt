@@ -42,10 +42,40 @@ object PeriodText {
         return if (startDay.shift == HolidayShift.none) day else "$day・${startDay.shift.title}"
     }
 
+    fun current(
+        startingOn: MonthStartDay,
+        today: LocalDate,
+    ): String {
+        val month = today.periodMonth(startingOn = startingOn)
+        return range(month.period(startingOn = startingOn))
+    }
+
+    fun shiftNote(
+        startingOn: MonthStartDay,
+        today: LocalDate,
+    ): String {
+        if (startingOn.shift == HolidayShift.none) {
+            return "土日・祝日でも、そのまま数えます"
+        }
+
+        val month = today.periodMonth(startingOn = startingOn)
+        val start = month.period(startingOn = startingOn).start
+        val plain = startingOn.shifted(by = HolidayShift.none)
+        val unshifted = month.period(startingOn = plain).start
+
+        if (start == unshifted) {
+            return "今の期間の始まりは、平日です"
+        }
+
+        return "${weekdayDate(unshifted)}を ${weekdayDate(start)}にずらしています"
+    }
+
     fun weekday(date: LocalDate): String = date.weekday.shortName
 
     fun weekdayDate(date: LocalDate): String = "${date.monthDayText}（${weekday(date)}）"
 }
+
+fun MonthStartDay.keepingShift(of: MonthStartDay): MonthStartDay = shifted(by = of.shift)
 
 val HolidayShift.title: String
     get() = when (this) {
