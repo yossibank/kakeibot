@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.templates
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -39,6 +40,21 @@ class TemplateEditModelTest {
         assertEquals(options.incomeCategories.first().id, model.state.form.categoryId)
         assertEquals(options.wallets.first().id, model.state.form.walletId)
         assertEquals(options.incomeCategories, model.output.categories)
+    }
+
+    @Test
+    fun namesWhatIsMissingOnSaveButton() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.templateModel(type = Entry.Kind.expense)
+        model.load()
+
+        val empty = model.output.saveTitle
+        val canSaveWithoutName = model.output.canSave
+        model.state.update { copy(name = "ランチ") }
+
+        assertEquals("名前を入れてください", empty)
+        assertFalse(canSaveWithoutName)
+        assertEquals("追加する", model.output.saveTitle)
+        assertTrue(model.output.canSave)
     }
 
     @Test

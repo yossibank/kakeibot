@@ -283,14 +283,17 @@ class EntryModelTest {
     fun describesDateFromToday() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
 
-        val today = model.output.dateText
+        val today = model.output.dateValue
         model.state.select(date = date("2026-10-11"))
-        val yesterday = model.output.dateText
+        val yesterday = model.output.dateValue
         model.state.select(date = date("2026-10-01"))
+        val earlier = model.output.dateValue
+        model.state.select(date = date("2025-12-31"))
 
         assertEquals("今日（月）", today)
         assertEquals("昨日（日）", yesterday)
-        assertEquals("10/1（木）", model.output.dateText)
+        assertEquals("10/1（木）", earlier)
+        assertEquals("2025/12/31（水）", model.output.dateValue)
     }
 
     @Test

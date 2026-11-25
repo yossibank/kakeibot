@@ -108,11 +108,13 @@ class EntryModelTransferTest {
         model.press(5)
 
         val balance = model.output.balance(of = bank)
+        val ready = model.output.saveTitle
         model.state.update { copy(toWalletId = null) }
-        model.save()
 
         assertEquals(5000L, balance)
-        assertEquals("振替先を選んでください", model.state.task.message)
+        assertEquals("振り替える", ready)
+        assertEquals("振替先を選んでください", model.output.saveTitle)
+        assertFalse(model.output.canSave)
     }
 
     @Test

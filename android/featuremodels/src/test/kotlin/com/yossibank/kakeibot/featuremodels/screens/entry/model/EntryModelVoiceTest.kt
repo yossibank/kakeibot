@@ -64,6 +64,19 @@ class EntryModelVoiceTest {
         assertTrue("財布" in hints)
         assertTrue("コンビニ" in hints)
         assertFalse("特売" in hints)
+    }
+
+    @Test
+    fun hidesVoiceForTransfers() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        val expense = model.output.showsVoice
+        model.state.focus(EntryModel.Field.Amount)
+        val keypad = model.output.showsVoice
+
+        model.select(Entry.Kind.transfer)
+
+        assertTrue(expense)
+        assertTrue(keypad)
         assertFalse(model.output.showsVoice)
     }
 }

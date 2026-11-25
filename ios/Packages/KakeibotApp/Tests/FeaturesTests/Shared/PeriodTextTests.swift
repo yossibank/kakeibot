@@ -4,32 +4,44 @@ import Core
 import Testing
 
 struct PeriodTextTests {
-    @Test(arguments: [
-        ("2026-03-05", "3/5"),
-        ("2025-03-05", "2025/3/5"),
-        ("2027-01-02", "2027/1/2")
-    ])
-    func showsYearOnlyOutsideThisYear(text: String, expected: String) throws {
-        let today = try #require(LocalDate("2026-10-17"))
-        let date = try #require(LocalDate(text))
-        let day = PeriodText.day(date, today: today)
-        #expect(day == expected)
+    @Test(arguments: try dayCases)
+    func showsYearOnlyOutsideThisYear(fixture: DayCase) {
+        let day = PeriodText.day(fixture.date, today: fixture.today)
+        #expect(day == fixture.text)
     }
 
-    @Test(arguments: [
-        ("2026-09-25", "2026-10-24", "9/25〜10/24"),
-        ("2025-12-29", "2026-01-04", "2025/12/29〜1/4"),
-        ("2025-03-01", "2025-03-31", "2025/3/1〜2025/3/31")
-    ])
-    func showsYearOfRangeOutsideThisYear(
-        lower: String,
-        upper: String,
-        expected: String
-    ) throws {
-        let today = try #require(LocalDate("2026-10-17"))
-        let lowerBound = try #require(LocalDate(lower))
-        let upperBound = try #require(LocalDate(upper))
-        let range = PeriodText.range(lowerBound...upperBound, today: today)
-        #expect(range == expected)
+    @Test(arguments: try rangeCases)
+    func showsYearOfRangeOutsideThisYear(fixture: RangeCase) {
+        let range = PeriodText.range(fixture.lower...fixture.upper, today: fixture.today)
+        #expect(range == fixture.text)
+    }
+}
+
+extension PeriodTextTests {
+    struct DayCase: Decodable, Sendable {
+        let summary: String
+        let today: LocalDate
+        let date: LocalDate
+        let text: String
+    }
+
+    struct RangeCase: Decodable, Sendable {
+        let summary: String
+        let today: LocalDate
+        let lower: LocalDate
+        let upper: LocalDate
+        let text: String
+    }
+
+    static var dayCases: [DayCase] {
+        get throws {
+            try FeaturesFixture.cases("date/period-text-day.json")
+        }
+    }
+
+    static var rangeCases: [RangeCase] {
+        get throws {
+            try FeaturesFixture.cases("date/period-text-range.json")
+        }
     }
 }

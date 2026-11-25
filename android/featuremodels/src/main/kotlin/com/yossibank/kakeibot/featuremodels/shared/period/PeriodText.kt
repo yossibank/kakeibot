@@ -9,6 +9,34 @@ object PeriodText {
     fun range(period: ClosedRange<LocalDate>): String =
         "${period.start.monthDayText}〜${period.endInclusive.monthDayText}"
 
+    fun range(
+        period: ClosedRange<LocalDate>,
+        today: LocalDate,
+    ): String {
+        val lower = day(
+            date = period.start,
+            today = today,
+        )
+
+        val upper = day(
+            date = period.endInclusive,
+            today = today,
+        )
+
+        return "$lower〜$upper"
+    }
+
+    fun day(
+        date: LocalDate,
+        today: LocalDate,
+    ): String {
+        if (date.year == today.year) {
+            return date.monthDayText
+        }
+
+        return "${date.year}/${date.monthDayText}"
+    }
+
     fun startDay(startDay: MonthStartDay): String {
         val day = if (startDay.isLastDay) "毎月末日" else "毎月 ${startDay.day} 日"
         return if (startDay.shift == HolidayShift.none) day else "$day・${startDay.shift.title}"

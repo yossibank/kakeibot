@@ -50,7 +50,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.categories
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.category
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.categoryText
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.dateText
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.dateValue
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.expressionText
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.icon
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.isDateFromVoice
@@ -130,7 +130,7 @@ fun EntrySlip(
 
         SlipRow(
             title = "日付",
-            value = model.output.dateText,
+            value = model.output.dateValue,
             isFromVoice = model.output.isDateFromVoice,
             isActive = model.state.field == EntryModel.Field.Date,
             onSelect = { model.state.focus(EntryModel.Field.Date) },

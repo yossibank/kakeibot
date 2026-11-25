@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
+import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.symbol
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryText
@@ -8,11 +9,41 @@ import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryText
 val EntryModel.Output.walletTitle: String
     get() = EntryText.walletTitle(state.form.type)
 
-val EntryModel.Output.dateText: String
-    get() = EntryText.relativeDate(
+val EntryModel.Output.dateValue: String
+    get() = EntryText.dateValue(
         date = state.form.date,
         today = state.today,
     )
+
+val EntryModel.Output.canSave: Boolean
+    get() = draft?.problems?.isEmpty() == true
+
+val EntryModel.Output.opensKeypadOnSave: Boolean
+    get() = state.field != EntryModel.Field.Amount && isBlank
+
+val EntryModel.Output.saveTitle: String
+    get() {
+        if (isEditing) {
+            return saveAction
+        }
+
+        if (amount <= 0) {
+            return "金額を入れてください"
+        }
+
+        if (state.form.type == Entry.Kind.transfer && state.form.toWalletId == null) {
+            return "${EntryText.destinationTitle}を選んでください"
+        }
+
+        return saveAction
+    }
+
+private val EntryModel.Output.saveAction: String
+    get() = when {
+        isEditing -> "変更を保存"
+        state.form.type == Entry.Kind.transfer -> "振り替える"
+        else -> "記録する"
+    }
 
 val EntryModel.Output.expressionText: String?
     get() {

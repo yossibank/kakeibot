@@ -1,7 +1,8 @@
 # fixtures の形式
 
 > [!NOTE]
-> Core の計算を iOS と Android で同じ結果にそろえる、fixtures の JSON の形式が分かる。
+> Core の計算と画面の文を、iOS と Android で同じ結果にそろえる fixtures がある。
+> その JSON の形式が分かる。
 > 置き場所とファイル名の付け方は、[architecture-naming の「名前の決まり」](../docs/architecture-naming.md#-名前の決まり)にある。
 
 ## 📏 共通の決まり
@@ -21,3 +22,22 @@
 | 表計算の見本 | `export/export-v1.csv` は、JSON の見本の記録を表計算用に書き出した結果である。形は [export-format.md](export-format.md) にある |
 | 設定の行の見本 | `export/export-v1-setting.json` は、`settings` の行の判定である |
 | `voice/voice-reading.json` | `today`・`categories`・`wallets` は全ケースで使う。`modelCategory`・`modelWallet` は精度を測る時だけ使う |
+
+## 🖥️ 画面の文の fixtures
+
+同じ入力から同じ文字を出す画面の文も、fixtures でそろえる。読むのは、画面のモデルのテストである。
+
+| 対象 | 場所 |
+| --- | --- |
+| iOS | `FeaturesTests` の `Support/FeaturesFixture.swift` |
+| Android | `:featuremodels` のテストの `support/ModelFixture.kt` |
+
+文の fixtures は、次のとおりである。どれも計算の fixtures の形で書き、出るはずの文字をそのまま持つ。
+
+| ファイル | 中身 |
+| --- | --- |
+| `date/period-text-day.json` | 今日と違う年の日付にだけ年を付ける、日付の文 |
+| `date/period-text-range.json` | 今日と違う年の日付にだけ年を付ける、期間の文 |
+| `entry/entry-date-text.json` | 入力の画面の日付の文。`text` は曜日を添えた文、`short` は短い文 |
+
+載せるのは、入力の値だけで文字が決まる関数である。DB や画面の状態が要る文は、テストを写してそろえる。
