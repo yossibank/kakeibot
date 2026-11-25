@@ -509,6 +509,8 @@ screen-observation.keeps-earlier-message-while-observing		ScreenObservationTest/
 screen-observation.counts-each-notice-and-keeps-it-after-success		ScreenObservationTest/countsEachNoticeAndKeepsItAfterSuccess	Androidのみ	知らせを数え、後の成功で消さない。iOS は ReviewModel で確かめる
 screen-observation.shares-values-after-source-recovers		ScreenObservationTest/sharesValuesAfterSourceRecovers	Androidのみ	監視を分け合う ScreenObservation.share は Android だけにある
 screen-observation.shares-failure-with-each-subscriber		ScreenObservationTest/sharesFailureWithEachSubscriber	Androidのみ	監視を分け合う ScreenObservation.share は Android だけにある
+shared-observation.shares-one-source-between-subscribers		SharedObservationTest/sharesOneSourceBetweenSubscribers	Androidのみ	見張りを分け合う持ち主の SharedObservation は Android だけにある
+shared-observation.stops-source-when-stopped		SharedObservationTest/stopsSourceWhenStopped	Androidのみ	止めると元の見張りも止まる。SharedObservation は Android だけにある
 observation-round.observes-again-when-restarted		ObservationRoundTest/observesAgainWhenRestarted	Androidのみ	見張りの回を数える ObservationRound は Android だけにある
 observation-round.restarts-every-model-sharing-round		ObservationRoundTest/restartsEveryModelSharingRound	Androidのみ	iOS は MainView の 1 つの番号で全タブを読み直し、テストは無い
 app-icon-list.*	AppIconListModelTests/*		未移植	アプリのアイコンを選ぶ画面が無い
