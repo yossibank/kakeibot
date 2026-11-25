@@ -2,7 +2,7 @@ import Core
 import Store
 
 @MainActor
-public protocol SettingsFoldModel: AnyObject {
+public protocol SettingsFoldModel: ScreenPerforming {
     associatedtype Input
 
     var input: Input { get }

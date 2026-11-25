@@ -5,7 +5,7 @@ import Store
 
 @MainActor
 @Observable
-public final class DeletionUndo {
+public final class DeletionUndo: ScreenPerforming {
     public let state: State
 
     let dependencies: Dependencies

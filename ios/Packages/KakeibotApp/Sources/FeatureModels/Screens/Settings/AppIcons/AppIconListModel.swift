@@ -3,7 +3,7 @@ import Observation
 
 @MainActor
 @Observable
-public final class AppIconListModel {
+public final class AppIconListModel: ScreenPerforming {
     public let state = NoticeState()
     public let input: Input
 

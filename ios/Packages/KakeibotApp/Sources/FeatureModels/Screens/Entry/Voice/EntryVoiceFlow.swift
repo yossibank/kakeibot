@@ -4,7 +4,7 @@ import Observation
 
 @MainActor
 @Observable
-public final class EntryVoiceFlow {
+public final class EntryVoiceFlow: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
