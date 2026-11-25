@@ -79,7 +79,7 @@ model.perform {
 | Pro の見張り | AppModel が StoreKit の購入の状態を見張り、Pro が無くなったら同期を止める。見張り直しはしない |
 | 回数 | 1 回の見張りの中で数え、値を受けても戻さない |
 | RootView | DB が使えるかどうかと今日が変わるたびに、AppModel の見張りを張り直す |
-| 前面に戻った時 | MainView が各画面の見張りを始め直す。AppModel の見張りは、止まったものがあるときだけ RootView が始め直す |
+| 前面に戻った時 | MainModel が `changeScene` で各画面の見張りを始め直す。AppModel は `changeScene` で、止まった見張りだけを始め直す |
 | 裏に回った印 | モデルの `ForegroundReturn` が覚え、inactive を挟んで戻っても検出する |
 | 止まった画面 | ホーム・記録・振り返り・資産は、「読めませんでした」と「もう一度読み込む」を出す |
 

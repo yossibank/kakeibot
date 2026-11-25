@@ -208,7 +208,7 @@ KakeibotApp/
 | フォルダ | 中身 |
 | --- | --- |
 | `AppFeature/App/` | アプリの入口と起動、起動の印の動き、入力の準備、レビューのお願い。Pro が無くなったら同期を止める |
-| `AppFeature/Bridge/` | Pro の購入を StoreKit で確かめる。iCloud のアカウントと共有の参加者を CloudKit で読む |
+| `AppFeature/Bridge/` | Pro の購入を StoreKit で、iCloud のアカウントと共有の参加者を CloudKit で読む。`ScenePhase` をモデルの型に変える |
 | `AppFeature/Main/` | 4 つのタブと入力シートなどのシートを組む |
 | `AppWidget/Intents/` | すぐ記録の記録と取り消し、コントロールの「記録する」 |
 | `AppWidget/Shared/` | ウィジェットをまたいで使う読み出し・書体・テーマ・タイムライン |
