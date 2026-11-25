@@ -4,18 +4,18 @@ import Store
 
 extension AppModel {
     func observePro(in database: AppDatabase) async {
-        let status = await proStore.status()
+        let status = await dependencies.proStore.status()
         await apply(status, in: database)
 
         if !status.isUnlocked {
-            let store = proStore
+            let store = dependencies.proStore
 
             Task {
                 _ = try? await store.price()
             }
         }
 
-        for await status in proStore.updates() {
+        for await status in dependencies.proStore.updates() {
             await apply(status, in: database)
         }
     }

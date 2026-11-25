@@ -27,15 +27,7 @@ final class AppModel {
     private(set) var observationRound = 0
     private(set) var syncActivity = SyncActivity(isSyncEnabled: false, isSharing: false)
 
-    let clock: ScreenClock
-    let proStore: ProStore
-    let shareInbox: SyncShareInbox
-
-    private let openDatabase: @Sendable () throws -> AppDatabase
-    private let currentDay: @Sendable () -> LocalDate
-    private let scheduler: NotificationScheduler
-    private let router: NotificationRouter
-    private let retryDelays: [Duration]
+    let dependencies: Dependencies
 
     private var hasStoppedObservation = false
     private var widgetReload: Task<Void, Never>?
@@ -48,17 +40,45 @@ final class AppModel {
         proStore: ProStore = .live,
         retryDelays: [Duration] = ScreenObservation.retryDelays,
         clock: ScreenClock = .system,
-        currentDay: @escaping @Sendable () -> LocalDate = AppModel.deviceDay
+        currentDay: (@Sendable () -> LocalDate)? = nil
     ) {
+        let currentDay = currentDay ?? {
+            clock.today
+        }
+
         self.today = currentDay()
-        self.openDatabase = openDatabase
-        self.currentDay = currentDay
-        self.scheduler = scheduler
-        self.router = router
-        self.shareInbox = shareInbox
-        self.proStore = proStore
-        self.retryDelays = retryDelays
-        self.clock = clock
+
+        self.dependencies = Dependencies(
+            openDatabase: openDatabase,
+            clock: clock,
+            currentDay: currentDay,
+            scheduler: scheduler,
+            router: router,
+            shareInbox: shareInbox,
+            proStore: proStore,
+            retryDelays: retryDelays
+        )
+    }
+}
+
+extension AppModel {
+    struct Dependencies {
+        let openDatabase: @Sendable () throws -> AppDatabase
+        let clock: ScreenClock
+        let currentDay: @Sendable () -> LocalDate
+        let scheduler: NotificationScheduler
+        let router: NotificationRouter
+        let shareInbox: SyncShareInbox
+        let proStore: ProStore
+        let retryDelays: [Duration]
+    }
+
+    func screenParts(for database: AppDatabase) -> ScreenParts {
+        ScreenParts(database: database, clock: dependencies.clock)
+    }
+
+    func screenProStore() -> ProStore {
+        dependencies.proStore
     }
 }
 
@@ -82,15 +102,11 @@ extension AppModel {
     }
 
     var route: PlannedNotification.Route? {
-        router.route
+        dependencies.router.route
     }
 
     var receivedShareCount: Int {
-        shareInbox.receivedCount
-    }
-
-    nonisolated static func deviceDay() -> LocalDate {
-        LocalDate(Date(), in: .current)
+        dependencies.shareInbox.receivedCount
     }
 
     func open() async {
@@ -98,7 +114,7 @@ extension AppModel {
             return
         }
 
-        let openDatabase = openDatabase
+        let openDatabase = dependencies.openDatabase
 
         do {
             let database = try await Task.detached {
@@ -128,11 +144,11 @@ extension AppModel {
     }
 
     func open(_ url: URL) {
-        router.open(url)
+        dependencies.router.open(url)
     }
 
     func finishRoute() {
-        router.finish()
+        dependencies.router.finish()
     }
 
     func finishOnboarding() {
@@ -151,7 +167,7 @@ extension AppModel {
     }
 
     func refreshDay() async {
-        today = currentDay()
+        today = dependencies.currentDay()
 
         guard let database = launch.database else {
             return
@@ -237,7 +253,7 @@ extension AppModel {
     ) async -> Bool {
         let isFailed = await ScreenObservation.retry(
             values(),
-            retryDelays: retryDelays,
+            retryDelays: dependencies.retryDelays,
             receive: receive
         )
 
@@ -313,12 +329,12 @@ private extension AppModel {
 
     func schedule(_ input: NotificationInput) async {
         let plan = input.plan(today: today)
-        await scheduler.apply(plan, now: Date(), timeZone: .current)
+        await dependencies.scheduler.apply(plan, now: dependencies.clock.now, timeZone: .current)
     }
 
     func generateRecurring(in database: AppDatabase) async {
         do {
-            try await database.generateRecurringEntries(through: today, at: Date())
+            try await database.generateRecurringEntries(through: today, at: dependencies.clock.now)
         } catch {
             guard !AppDatabase.isInterrupted(error) else {
                 return

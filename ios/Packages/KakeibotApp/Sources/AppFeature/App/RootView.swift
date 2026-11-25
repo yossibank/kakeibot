@@ -78,7 +78,7 @@ public struct RootView: View {
             }
         )
         .environment(\.syncCloud, .live)
-        .environment(\.proStore, model.proStore)
+        .environment(\.proStore, model.screenProStore())
         .environment(\.isPro, model.isPro)
         .environment(\.canScanReceipt, VNDocumentCameraViewController.isSupported)
         .palette(shownLook)
@@ -98,7 +98,7 @@ private extension RootView {
 
         case let .onboarding(database):
             OnboardingView(
-                parts: ScreenParts(database: database, clock: model.clock),
+                parts: model.screenParts(for: database),
                 today: model.today
             ) {
                 withAnimation(.snappy) {
@@ -110,7 +110,7 @@ private extension RootView {
         case let .ready(database):
             MainView(
                 database: database,
-                clock: model.clock,
+                clock: model.screenParts(for: database).clock,
                 today: model.today,
                 route: model.route,
                 isRevealed: !isLaunching

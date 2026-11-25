@@ -46,7 +46,7 @@ extension AppModel {
     }
 
     func acceptShares(in database: AppDatabase) async {
-        let shares = shareInbox.take()
+        let shares = dependencies.shareInbox.take()
 
         guard !shares.isEmpty else {
             return
