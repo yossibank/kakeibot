@@ -259,7 +259,7 @@ records.shows-upcoming-recurring-on-future-days	RecordsModelTests/showsUpcomingR
 records.lists-upcoming-days-among-recorded-days	RecordsModelTests/listsUpcomingDaysAmongRecordedDays		未移植	一覧に予定の日を混ぜる listDays と見出しが無い
 records.hides-upcoming-recurrings-while-searching	RecordsModelTests/hidesUpcomingRecurringsWhileSearching		未移植	これからの定期の記録も検索も、モデルと画面に無い
 records.describes-rows-with-memo-and-wallet	RecordsModelTests/describesRowsWithMemoAndWallet	RecordsModelTest/describesRowsWithMemoAndWallet	対応	
-records.describes-fee-row-with-transfer-route	RecordsModelTests/describesFeeRowWithTransferRoute	RecordsModelTest/describesTransferRowWithRoute	違い	手数料の行に「銀行 → 財布 の手数料」を出さず、口座の名前だけを出す
+records.describes-fee-row-with-transfer-route	RecordsModelTests/describesFeeRowWithTransferRoute	RecordsModelTest/describesFeeRowWithTransferRoute	対応	
 records.shows-today-until-another-day-is-chosen	RecordsModelTests/showsTodayUntilAnotherDayIsChosen	RecordsModelTest/showsTodayUntilAnotherDayIsChosen	対応	
 records.marks-only-past-days-without-expense	RecordsModelTests/marksOnlyPastDaysWithoutExpense		未移植	使わなかった日の印を付けられるかの判定が無い
 records.describes-month-and-period		RecordsModelTest/describesMonthAndPeriod	Androidのみ	月の見出し（monthTitle）と期間の文。iOS のモデルに monthTitle は無い
@@ -404,8 +404,8 @@ screen-flow.entry-recorded-from-home-template-appears-in-every-tab-until-undone	
 screen-flow.entry-deleted-and-restored-while-sync-is-on-queues-its-latest-state	ScreenFlowTests/entryDeletedAndRestoredWhileSyncIsOnQueuesItsLatestState		未移植	同期の仕組み（pendingSyncChanges）が無い
 bill-page.*	BillPageTests/*		未移植	請求を月ごとにまとめる型（BillPage）と請求の画面が無い
 bill-text.*	BillTextTests/*		未移植	請求の文（BillText）と請求の行の画面が無い
-deletion-notice.names-single-deleted-item	DeletionNoticeTests/namesSingleDeletedItem		違い	固定費を消した知らせが常に「削除しました」で、消した物の名前を出さない
-deletion-notice.falls-back-to-kind-and-count	DeletionNoticeTests/fallsBackToKindAndCount		違い	固定費を消した知らせが常に「削除しました」で、種類と件数を出さない
+deletion-notice.names-single-deleted-item	DeletionNoticeTests/namesSingleDeletedItem	DeletionNoticeTest/namesSingleDeletedItem	対応	
+deletion-notice.falls-back-to-kind-and-count	DeletionNoticeTests/fallsBackToKindAndCount	DeletionNoticeTest/fallsBackToKindAndCount	対応	
 derived.*	DerivedTests/*		iOSのみ	Swift の Observation 用の計算の覚え置きで、Android は derivedStateOf を使う
 device-name.*	DeviceNameTests/*		iOSのみ	iPhone と iPad の呼び分けで、Android に機種の名前を出す文が無い
 entry-list-filter.*	EntryListFilterTests/*		未移植	記録の絞り込み（filterCategories・widened）のモデルと画面が無い
@@ -424,10 +424,10 @@ entry-notice.deletes-selected-entries-and-undoes	EntryNoticeModelTests/deletesSe
 entry-notice.keeps-batch-notice-longer-and-ignores-screen-taps	EntryNoticeModelTests/keepsBatchNoticeLongerAndIgnoresScreenTaps		未移植	まとめての変更の知らせ（EntryBatch）が無い
 entry-notice.restores-no-spend-mark-when-undoing-new-entry	EntryNoticeModelTests/restoresNoSpendMarkWhenUndoingNewEntry		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
 entry-notice.does-not-make-no-spend-mark-when-undoing-entry-on-unmarked-day	EntryNoticeModelTests/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
-entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage		違い	行の detail に請求日を足さず、「カード（3/1払い）」が「カード」になる
-entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown		違い	請求月のある記録でも「（2月払い）」を足さず、口座の名前だけを出す
-entry-row-item.skips-hidden-bill-of-same-card	EntryRowItemTests/skipsHiddenBillOfSameCard		違い	EntryRowItem が list.cardBills を見ず、請求日を出さない
-entry-row-item.keeps-month-when-two-bills-fit	EntryRowItemTests/keepsMonthWhenTwoBillsFit		違い	EntryRowItem が list.cardBills を見ず、請求月も出さない
+entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage	EntryRowItemTest/showsBillDateOfMovedUsage	対応	
+entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown	EntryRowItemTest/keepsMonthWhenBillIsUnknown	対応	
+entry-row-item.skips-hidden-bill-of-same-card	EntryRowItemTests/skipsHiddenBillOfSameCard	EntryRowItemTest/skipsHiddenBillOfSameCard	対応	
+entry-row-item.keeps-month-when-two-bills-fit	EntryRowItemTests/keepsMonthWhenTwoBillsFit	EntryRowItemTest/keepsMonthWhenTwoBillsFit	対応	
 entry-row-item.keeps-tax-mode-of-entry	EntryRowItemTests/keepsTaxModeOfEntry		未移植	行に品目と税の区分（items・taxIncluded）が無く、行で品目を開く画面も無い
 observation-wait.records-timeout-when-ready-without-notice	ObservationWaitTests/recordsTimeoutWhenReadyWithoutNotice		iOSのみ	Swift の Observation の知らせを待つテスト用の道具の確かめ
 period-text.shows-year-only-outside-this-year	PeriodTextTests/showsYearOnlyOutsideThisYear	PeriodTextTest/showsYearOnlyOutsideThisYear	対応	

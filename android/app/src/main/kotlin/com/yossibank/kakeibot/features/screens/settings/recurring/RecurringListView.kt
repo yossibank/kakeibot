@@ -79,6 +79,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.notice.DeletionNotice
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
@@ -203,7 +204,7 @@ fun RecurringListView(
 
                 deletedNotice.current?.let { current ->
                     SettingsUndoNotice(
-                        message = "削除しました",
+                        message = DeletionNotice.message(current),
                         icon = R.drawable.ic_trash,
                         onUndo = { scope.launch { model.restore(current) } },
                         onClose = deletedNotice::dismiss,

@@ -157,7 +157,7 @@ class RecordsModelTest {
     }
 
     @Test
-    fun describesTransferRowWithRoute() = modelTest(today = "2026-10-17") { setup ->
+    fun describesFeeRowWithTransferRoute() = modelTest(today = "2026-10-17") { setup ->
         val options = setup.options()
 
         val draft = EntryDraft(
@@ -174,9 +174,10 @@ class RecordsModelTest {
         val model = setup.observedModel()
 
         val day = checkNotNull(model.output.days.firstOrNull())
-        val details = model.output.rows(of = day).map { it.detail }
+        val routes = model.output.rows(of = day).mapNotNull { it.route?.text }
 
-        assertTrue("銀行 → 財布" in details)
+        assertTrue("銀行 → 財布 の手数料" in routes)
+        assertTrue("銀行 → 財布" in routes)
         assertEquals(110L, model.output.expenseTotal)
     }
 
