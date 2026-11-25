@@ -7,30 +7,30 @@ struct SettingsIntroCard: View {
     private let systemImage: String
     private let headline: (String, String)
     private let notes: [Note]
-    private let flag: SettingsScreenFlag?
+    private let hint: SettingsFold?
 
     init(
         systemImage: String,
         headline: (String, String),
         notes: [Note] = [],
-        flag: SettingsScreenFlag? = nil
+        hint: SettingsFold? = nil
     ) {
         self.systemImage = systemImage
         self.headline = headline
         self.notes = notes
-        self.flag = flag
+        self.hint = hint
     }
 
     var body: some View {
-        if let flag {
+        if let hint {
             VStack(spacing: 0) {
-                if !flag.isOn {
+                if hint.input.isClosed == false {
                     card
                         .transition(Self.transition)
                 }
             }
             .task {
-                await flag.load()
+                await hint.load()
             }
         } else {
             card
@@ -81,13 +81,13 @@ private extension SettingsIntroCard {
                 .minimumScaleFactor(0.8)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                if let flag {
+                if let hint {
                     RingButton(
                         systemImage: "xmark",
                         size: .small
                     ) {
                         withAnimation(.snappy) {
-                            _ = flag.set(true)
+                            hint.setClosed(true)
                         }
                     }
                 }

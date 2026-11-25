@@ -7,11 +7,11 @@ struct SettingsBackHeader: View {
     @Environment(\.isSettingsSheetRoot) private var isSheetRoot
 
     private let title: String
-    private let hint: SettingsScreenFlag?
+    private let hint: SettingsFold?
 
     init(
         _ title: String,
-        hint: SettingsScreenFlag? = nil
+        hint: SettingsFold? = nil
     ) {
         self.title = title
         self.hint = hint
@@ -31,11 +31,10 @@ struct SettingsBackHeader: View {
 
             ZStack {
                 if let hint,
-                   hint.isLoaded,
-                   hint.isOn {
+                   hint.isClosed {
                     RingButton(systemImage: "questionmark") {
                         withAnimation(.snappy) {
-                            _ = hint.set(false)
+                            hint.setClosed(false)
                         }
                     }
                     .transition(.opacity)

@@ -3,7 +3,7 @@ import FeatureModels
 import SwiftUI
 
 struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
-    let flag: SettingsScreenFlag
+    let fold: SettingsFold
     let title: String
     let items: [Item]
     let drag: SettingsDrag<Item.ID>
@@ -19,13 +19,13 @@ struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: layout == .tiles ? 8 : 12) {
             SettingsHiddenTitle(
-                flag: flag,
+                fold: fold,
                 title: title,
                 count: items.count,
                 onDeleteAll: onDeleteAll
             )
 
-            if flag.isOn {
+            if !fold.isClosed {
                 if layout == .tiles {
                     LazyVGrid(columns: columns, spacing: grid.spacing) {
                         ForEach(items) { item in
@@ -84,7 +84,7 @@ private extension SettingsHiddenTiles {
 
 extension SettingsHiddenTiles {
     init<Model: SettingsBoardModel>(
-        flag: SettingsScreenFlag,
+        fold: SettingsFold,
         title: String,
         grid: SettingsBoardGrid,
         controller: SettingsBoardController<Model>,
@@ -95,7 +95,7 @@ extension SettingsHiddenTiles {
         onDeleteAll: @escaping () -> Void
     ) where Model.Item == Item {
         self.init(
-            flag: flag,
+            fold: fold,
             title: title,
             items: controller.model.output.hidden,
             drag: controller.drag,

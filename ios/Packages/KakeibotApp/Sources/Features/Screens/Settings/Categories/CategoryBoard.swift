@@ -17,10 +17,6 @@ extension CategoryBoard: SettingsBoardSpec {
 
     typealias Editor = CategoryEditSheet
 
-    var screen: SettingsScreen {
-        .categories
-    }
-
     var title: String {
         "カテゴリ"
     }
@@ -81,7 +77,7 @@ extension CategoryBoard: SettingsBoardSpec {
     }
 
     func intro(
-        flag: SettingsScreenFlag,
+        hint: SettingsFold,
         in _: CategoryListModel
     ) -> SettingsIntroCard {
         SettingsIntroCard(
@@ -92,7 +88,7 @@ extension CategoryBoard: SettingsBoardSpec {
                 .init("number", "開くと、タグで細かく分けられます"),
                 .arrange
             ],
-            flag: flag
+            hint: hint
         )
     }
 

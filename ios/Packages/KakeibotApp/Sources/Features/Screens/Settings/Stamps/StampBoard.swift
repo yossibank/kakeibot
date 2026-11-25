@@ -12,10 +12,6 @@ extension StampBoard: SettingsBoardSpec {
     typealias Destination = SettingsBoardDestination<ShelfIcon.ID>
     typealias Editor = StampEditSheet
 
-    var screen: SettingsScreen {
-        .stamps
-    }
-
     var title: String {
         "スタンプ"
     }
@@ -57,7 +53,7 @@ extension StampBoard: SettingsBoardSpec {
     }
 
     func intro(
-        flag: SettingsScreenFlag,
+        hint: SettingsFold,
         in _: StampListModel
     ) -> SettingsIntroCard {
         SettingsIntroCard(
@@ -67,7 +63,7 @@ extension StampBoard: SettingsBoardSpec {
                 .init("hand.tap", "押すと、絵と名前を変えられます"),
                 .arrange
             ],
-            flag: flag
+            hint: hint
         )
     }
 

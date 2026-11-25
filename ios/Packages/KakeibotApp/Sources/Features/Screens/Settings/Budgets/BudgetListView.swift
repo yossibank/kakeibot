@@ -5,15 +5,11 @@ import SwiftUI
 
 public struct BudgetListView: View {
     @State private var model: BudgetListModel
-    @State private var hintFlag: SettingsScreenFlag
     @State private var cleared: BudgetListModel.Cleared?
     @State private var resetFrom: YearMonth?
 
     public init(model: BudgetListModel) {
-        let hintFlag = model.hintFlag()
-
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
@@ -31,7 +27,7 @@ public struct BudgetListView: View {
 private extension BudgetListView {
     var content: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("予算", hint: hintFlag)
+            SettingsBackHeader("予算", hint: hint)
 
             SettingsIntroCard(
                 systemImage: "chart.bar",
@@ -40,7 +36,7 @@ private extension BudgetListView {
                     .init("calendar", "変えた額はこの月から使います"),
                     .init("clock.arrow.circlepath", "前の月の額はそのまま残ります")
                 ],
-                flag: hintFlag
+                hint: hint
             )
 
             ScrollView {
@@ -359,6 +355,12 @@ private extension BudgetListView {
         withAnimation(.snappy) {
             model.startEditing(target)
         }
+    }
+}
+
+private extension BudgetListView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
     }
 }
 

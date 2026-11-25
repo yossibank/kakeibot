@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 
 @MainActor
-public protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel {
+public protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel, SettingsFoldModel {
     associatedtype Snapshot
     associatedtype Input: SettingsBoardInput where Input.Snapshot == Snapshot
     associatedtype Updates: AsyncSequence where Updates.Element == Snapshot
@@ -16,12 +16,16 @@ public protocol SettingsBoardListModel: SettingsBoardModel, ScreenModel {
     func observe() async
 }
 
-extension SettingsBoardListModel {
-    public func restoreRemoved(_ deletion: Deletion) async throws {
+public extension SettingsBoardListModel {
+    func restoreRemoved(_ deletion: Deletion) async throws {
         try await dependencies.database.restore(deletion)
     }
 
-    func load(into snapshot: ReferenceWritableKeyPath<Self, Snapshot?>) async {
+    func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
+    }
+
+    internal func load(into snapshot: ReferenceWritableKeyPath<Self, Snapshot?>) async {
         do {
             self[keyPath: snapshot] = try await read()
         } catch {

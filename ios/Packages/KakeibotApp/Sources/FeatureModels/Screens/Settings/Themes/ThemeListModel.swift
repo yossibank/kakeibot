@@ -38,6 +38,8 @@ public extension ThemeListModel {
     final class Input {
         public internal(set) var current: ThemeChoice = .system
         public internal(set) var customThemes: [Theme] = []
+
+        public let hint = SettingsFoldInput.hint(.themes)
     }
 
     @MainActor
@@ -131,4 +133,10 @@ extension ThemeListModel {
 
 private extension ThemeListModel {
     static let restoreFailedMessage = "元に戻せませんでした"
+}
+
+extension ThemeListModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
+    }
 }

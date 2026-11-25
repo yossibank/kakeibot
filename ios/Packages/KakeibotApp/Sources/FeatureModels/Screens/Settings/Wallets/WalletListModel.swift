@@ -15,7 +15,7 @@ public final class WalletListModel {
 
     public init(parts: ScreenParts) {
         let state = SettingsBoardMovingState<Wallet.ID>()
-        let input = SettingsBoardSnapshotInput<EntryList>()
+        let input = SettingsBoardSnapshotInput<EntryList>(screen: .wallets)
 
         self.state = state
         self.input = input

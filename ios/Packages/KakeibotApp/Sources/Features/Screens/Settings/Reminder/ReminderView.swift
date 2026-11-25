@@ -8,22 +8,18 @@ public struct ReminderView: View {
 
     @Environment(\.themeStyle.corner) var corner
 
-    @State private var hintFlag: SettingsScreenFlag
     @State private var isPickingTime = false
 
     @Environment(\.scenePhase) private var scenePhase
 
     public init(model: ReminderModel) {
-        let hintFlag = model.hintFlag()
-
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
         _isPickingTime = State(initialValue: model.output.isCustom)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("記録忘れの通知", hint: hintFlag)
+            SettingsBackHeader("記録忘れの通知", hint: hint)
 
             SettingsIntroCard(
                 systemImage: "bell",
@@ -32,7 +28,7 @@ public struct ReminderView: View {
                     .init("checkmark.circle", "記録か「支出なし」の日は届きません"),
                     .init("repeat", recurringText)
                 ],
-                flag: hintFlag
+                hint: hint
             )
 
             ScrollView {
@@ -251,6 +247,12 @@ private extension ReminderView {
                 await model.choose(time)
             }
         }
+    }
+}
+
+private extension ReminderView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
     }
 }
 

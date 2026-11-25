@@ -15,7 +15,7 @@ public final class RewardRuleListModel {
 
     public init(parts: ScreenParts) {
         let state = SettingsBoardMovingState<RewardRule.ID>()
-        let input = SettingsBoardSnapshotInput<RewardRuleList>()
+        let input = SettingsBoardSnapshotInput<RewardRuleList>(screen: .rewards)
 
         self.state = state
         self.input = input

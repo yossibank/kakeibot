@@ -15,7 +15,6 @@ public struct ThemeListView: View {
     @Environment(\.isPro) var isPro
     @Environment(\.themeStyle.corner) var corner
 
-    @State private var hintFlag: SettingsScreenFlag
     @State private var deletion: Deletion?
 
     private let parts: ScreenParts
@@ -26,10 +25,8 @@ public struct ThemeListView: View {
         appIcon: AppIconListModel
     ) {
         let model = ThemeListModel(parts: parts, appIcon: appIcon)
-        let hintFlag = SettingsScreenFlag.closedHint(.themes, in: parts)
 
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
 
         self.parts = parts
         self.appIcon = appIcon
@@ -38,13 +35,13 @@ public struct ThemeListView: View {
     public var body: some View {
         ZStack(alignment: .topLeading) {
             VStack(spacing: SettingsSpacing.header) {
-                SettingsBackHeader("テーマ", hint: hintFlag)
+                SettingsBackHeader("テーマ", hint: hint)
 
                 SettingsIntroCard(
                     systemImage: "paintpalette",
                     headline: ("アプリの色を", "好みに変えられます"),
                     notes: notes,
-                    flag: hintFlag
+                    hint: hint
                 )
 
                 ScrollView {
@@ -343,5 +340,11 @@ private extension ThemeListView {
         Task {
             await model.restore(deletion)
         }
+    }
+}
+
+private extension ThemeListView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
     }
 }

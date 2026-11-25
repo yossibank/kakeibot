@@ -11,22 +11,17 @@ public struct SyncView: View {
 
     @Environment(\.isPro) var isPro
 
-    @State private var hintFlag: SettingsScreenFlag
-
     @Environment(\.scenePhase) private var scenePhase
 
     public init(model: SyncModel) {
-        let hintFlag = model.hintFlag()
-
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: 16) {
-            SettingsBackHeader("同期と共有", hint: hintFlag)
+            SettingsBackHeader("同期と共有", hint: hint)
 
-            SyncIntroCard(flag: hintFlag)
+            SyncIntroCard(hint: hint)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
@@ -337,6 +332,12 @@ private extension SyncView {
         Task {
             await model.useCloudData()
         }
+    }
+}
+
+private extension SyncView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
     }
 }
 

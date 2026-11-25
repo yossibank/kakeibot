@@ -5,20 +5,16 @@ import SwiftUI
 
 public struct ThemeStyleLookView: View {
     @State private var model: ThemeStyleModel
-    @State private var hintFlag: SettingsScreenFlag
 
     public init(model: ThemeStyleModel) {
-        let hintFlag = model.closedHint(.themeLook)
-
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         ThemeStyleFrame(
             title: "形と動き",
             intro: Self.intro,
-            hint: hintFlag,
+            hint: hint,
             model: model
         ) {
             preview
@@ -218,5 +214,11 @@ private extension ThemeStyleLookView {
 
     static func tabTitle(_ showsTitles: Bool) -> String {
         showsTitles ? "出す" : "出さない"
+    }
+}
+
+private extension ThemeStyleLookView {
+    var hint: SettingsFold {
+        SettingsFold(\.lookHint, in: model)
     }
 }

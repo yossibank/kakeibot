@@ -3,10 +3,10 @@ import FeatureModels
 import SwiftUI
 
 struct BackupIntroCard: View {
-    private let flag: SettingsScreenFlag?
+    private let hint: SettingsFold?
 
-    init(flag: SettingsScreenFlag? = nil) {
-        self.flag = flag
+    init(hint: SettingsFold? = nil) {
+        self.hint = hint
     }
 
     var body: some View {
@@ -19,7 +19,7 @@ struct BackupIntroCard: View {
                 .init("tablecells", "記録は、表計算用にも書き出せます"),
                 .init("arrow.uturn.backward", "読み込む前のデータは退避します")
             ],
-            flag: flag
+            hint: hint
         )
     }
 }

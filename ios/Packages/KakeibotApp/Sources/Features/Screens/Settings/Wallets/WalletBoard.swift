@@ -12,10 +12,6 @@ extension WalletBoard: SettingsBoardSpec {
     typealias Destination = SettingsBoardDestination<Wallet.ID>
     typealias Editor = WalletEditSheet
 
-    var screen: SettingsScreen {
-        .wallets
-    }
-
     var title: String {
         "口座"
     }
@@ -72,7 +68,7 @@ extension WalletBoard: SettingsBoardSpec {
     }
 
     func intro(
-        flag: SettingsScreenFlag,
+        hint: SettingsFold,
         in _: WalletListModel
     ) -> SettingsIntroCard {
         SettingsIntroCard(
@@ -84,7 +80,7 @@ extension WalletBoard: SettingsBoardSpec {
                 .arrange,
                 .swipeDelete
             ],
-            flag: flag
+            hint: hint
         )
     }
 

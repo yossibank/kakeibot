@@ -8,25 +8,18 @@ public struct HomeSectionListView: View {
     @State private var dragging: HomeSection?
     @State private var dragStart = 0
     @State private var dragTranslation: CGFloat = 0
-    @State private var hintFlag: SettingsScreenFlag
 
     @GestureState private var isPressing = false
 
     @Environment(\.themeStyle.corner) private var corner
 
-    public init(
-        model: HomeSectionListModel,
-        parts: ScreenParts
-    ) {
-        let hintFlag = SettingsScreenFlag.closedHint(.homeSections, in: parts)
-
+    public init(model: HomeSectionListModel) {
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("ホームに出すもの", hint: hintFlag)
+            SettingsBackHeader("ホームに出すもの", hint: hint)
 
             SettingsIntroCard(
                 systemImage: "rectangle.grid.1x2",
@@ -35,7 +28,7 @@ public struct HomeSectionListView: View {
                     .init("list.number", "この順でホームに並びます"),
                     .arrange
                 ],
-                flag: hintFlag
+                hint: hint
             )
 
             ScrollView {
@@ -259,13 +252,16 @@ private extension HomeSectionListView {
     }
 }
 
+private extension HomeSectionListView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+}
+
 #Preview {
     if let parts = ScreenParts.preview() {
         NavigationStack {
-            HomeSectionListView(
-                model: HomeSectionListModel(parts: parts),
-                parts: parts
-            )
+            HomeSectionListView(model: HomeSectionListModel(parts: parts))
         }
     }
 }

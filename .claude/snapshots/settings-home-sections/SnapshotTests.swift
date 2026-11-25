@@ -36,7 +36,7 @@ struct SnapshotTests {
         .frame(width: 344, height: 184, alignment: .topLeading)
 
         for variant in Self.variants {
-            let view = HomeSectionListView(model: model, parts: .system(database))
+            let view = HomeSectionListView(model: model)
 
             try Self.write(view, variant: variant, title: "設定 › ホームの並び", to: "home-sections")
             try Self.write(
