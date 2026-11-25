@@ -9,13 +9,13 @@ extension EntrySheet {
         switch sheet {
         case let .newWallet(role):
             WalletEditSheet(model: model.newWalletModel()) { wallet in
-                addedWallet = AddedWallet(wallet: wallet, role: role)
+                addedWallet = EntryModel.AddedWallet(wallet: wallet, role: role)
             }
 
         case let .editWallet(id):
             WalletEditSheet(model: model.editWalletModel(id)) { _ in
             } onDelete: { deletion in
-                self.deletion = deletion
+                model.state.results.deletion = deletion
             }
 
         case .items:
@@ -26,15 +26,15 @@ extension EntrySheet {
 
         case .newCategory:
             CategoryEditSheet(model: model.newCategoryModel()) { category in
-                Task {
-                    await addCategory(category)
+                model.perform {
+                    await $0.addCategory(category.id)
                 }
             }
 
         case let .editCategory(category):
             CategoryEditSheet(model: model.editCategoryModel(category)) { _ in
             } onDelete: { deletion in
-                self.deletion = deletion
+                model.state.results.deletion = deletion
             }
 
         case let .addTag(category):
@@ -43,7 +43,7 @@ extension EntrySheet {
                 startsAddingTag: true
             ) { _ in
             } onDelete: { deletion in
-                self.deletion = deletion
+                model.state.results.deletion = deletion
             }
 
         case .newTemplate:
@@ -85,11 +85,6 @@ extension EntrySheet {
         }
     }
 
-    struct AddedWallet {
-        let wallet: Wallet
-        let role: EntryWalletDeck.Role
-    }
-
     func open(_ sheet: Sheet) {
         self.sheet = sheet
 
@@ -103,19 +98,39 @@ extension EntrySheet {
         addedWallet = nil
         reloadsWallets = false
 
-        Task {
-            await model.reloadCategories()
-            await model.reloadTemplates()
+        model.perform {
+            await $0.reloadAfterSheet(wallets: needsWallets, adding: added)
+        }
+    }
 
-            guard needsWallets else {
-                return
+    func receive(_ outcome: EntryModel.Outcome) {
+        switch outcome {
+        case let .ready(isFirst):
+            start(isFirst: isFirst)
+
+        case let .closed(change):
+            finish(change)
+
+        case let .continued(change):
+            showNext(after: change)
+
+        case .categoryMoved:
+            showSelectedCategory()
+
+        case .categoryAdded:
+            withAnimation(.snappy) {
+                showSelectedCategory()
             }
 
-            await model.reloadWallets()
+        case .walletChosen:
+            showTransferDeck()
+        }
+    }
 
-            if let added {
-                choose(added.wallet, as: added.role)
-            }
+    func receive(_ outcome: EntryReceiptFlow.Outcome) {
+        if case let .read(itemCount, _) = outcome,
+           itemCount > 0 {
+            open(.items)
         }
     }
 }

@@ -11,18 +11,24 @@ public final class EntryReceiptFlow: ScreenPerforming {
     let dependencies: Dependencies
 
     public convenience init() {
-        self.init(read: EntryReceiptReader.read)
+        self.init(read: EntryReceiptReader.read, itemsDelay: Self.coverDismissDelay)
     }
 
     init(
         read: @escaping ([CGImage]) async -> ReceiptReading,
-        prepare: @escaping @MainActor () -> Void = EntryReceiptReader.prepare
+        prepare: @escaping @MainActor () -> Void = EntryReceiptReader.prepare,
+        itemsDelay: Duration = .zero
     ) {
         let state = State()
 
         self.state = state
         self.output = Output(state: state)
-        self.dependencies = Dependencies(read: read, prepare: prepare)
+
+        self.dependencies = Dependencies(
+            read: read,
+            prepare: prepare,
+            itemsDelay: itemsDelay
+        )
     }
 }
 
@@ -45,6 +51,8 @@ public extension EntryReceiptFlow {
 
         public private(set) var step: Step?
         public private(set) var offer: String?
+
+        public internal(set) var outcome = ScreenOutcome<Outcome>()
 
         func showOffer(_ feature: String) {
             offer = feature
@@ -85,7 +93,10 @@ public extension EntryReceiptFlow {
     internal struct Dependencies {
         let read: ([CGImage]) async -> ReceiptReading
         let prepare: @MainActor () -> Void
+        let itemsDelay: Duration
     }
+
+    internal static let coverDismissDelay: Duration = .milliseconds(400)
 
     internal static let offerFeature = "4 回目からのレシートの読み取り"
     internal static let unreadMessage = "レシートを読めませんでした。明るい所で撮り直してください"
@@ -125,6 +136,7 @@ public extension EntryReceiptFlow {
         state.closeOffer()
     }
 
+    @discardableResult
     func scan(
         _ pages: [CGImage],
         into model: EntryModel
@@ -146,7 +158,15 @@ public extension EntryReceiptFlow {
             model.state.errorNotice.inform(Self.totalMessage)
         }
 
-        return .read(itemCount: reading.items.count, hasAmount: hasAmount)
+        let outcome = Outcome.read(itemCount: reading.items.count, hasAmount: hasAmount)
+
+        if !reading.items.isEmpty {
+            try? await Task.sleep(for: dependencies.itemsDelay)
+        }
+
+        state.outcome.send(outcome)
+
+        return outcome
     }
 }
 

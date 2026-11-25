@@ -183,6 +183,24 @@ struct EntryReceiptFlowTests {
     }
 
     @Test
+    func placesReadOutcomeInState() async throws {
+        let setup = try await EntryModelTests.Setup()
+        let model = EntryModel(parts: .system(setup.database), date: setup.date)
+        await model.load()
+        let flow = EntryReceiptFlow { _ in
+            ReceiptReading(items: [EntryItem.Draft(name: "牛乳", amount: 396)])
+        }
+
+        let outcome = await flow.scan([], into: model)
+        let first = flow.state.outcome
+        await flow.scan([], into: model)
+
+        #expect(first.value == outcome)
+        #expect(first.value == .read(itemCount: 1, hasAmount: true))
+        #expect(flow.state.outcome != first)
+    }
+
+    @Test
     func keepsKeypadWhenAmountIsUnread() async throws {
         let setup = try await EntryModelTests.Setup()
         let model = EntryModel(parts: .system(setup.database), date: setup.date)
@@ -211,6 +229,7 @@ struct EntryReceiptFlowTests {
         let outcome = await flow.scan([], into: model)
 
         #expect(outcome == .unread)
+        #expect(flow.state.outcome.value == nil)
         #expect(flow.state.step == nil)
         #expect(model.state.errorNotice.message == EntryReceiptFlow.unreadMessage)
         #expect(model.output.amount == 0)

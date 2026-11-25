@@ -9,6 +9,24 @@ public extension EntryModel {
         public let wallets: [Wallet]
     }
 
+    enum WalletRole: Hashable, Sendable {
+        case source
+        case destination
+    }
+
+    struct AddedWallet: Sendable {
+        public let wallet: Wallet
+        public let role: WalletRole
+
+        public init(
+            wallet: Wallet,
+            role: WalletRole
+        ) {
+            self.wallet = wallet
+            self.role = role
+        }
+    }
+
     struct BillChoice: Hashable {
         public let date: LocalDate
         public let title: String
@@ -22,6 +40,35 @@ public extension EntryModel {
             allCategories: output.allCategories,
             allTags: output.allTags
         )
+    }
+
+    func choose(
+        _ id: Wallet.ID,
+        as role: WalletRole
+    ) {
+        switch role {
+        case .source: setWallet(id)
+        case .destination: state.setDestination(id)
+        }
+    }
+
+    func reloadAfterSheet(
+        wallets needsWallets: Bool,
+        adding added: AddedWallet?
+    ) async {
+        await reloadCategories()
+        await reloadTemplates()
+
+        guard needsWallets else {
+            return
+        }
+
+        await reloadWallets()
+
+        if let added {
+            choose(added.wallet.id, as: added.role)
+            state.results.outcome.send(.walletChosen)
+        }
     }
 
     func newWalletModel() -> WalletEditModel {
@@ -82,7 +129,7 @@ public extension EntryModel {
         do {
             for try await list in dependencies.database.entryListUpdates() {
                 guard
-                    !state.isClosing,
+                    !state.progress.isClosing,
                     list != input.history
                 else {
                     continue

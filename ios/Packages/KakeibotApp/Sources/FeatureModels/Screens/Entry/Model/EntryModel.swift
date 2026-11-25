@@ -31,6 +31,16 @@ public final class EntryModel: ScreenPerforming {
 }
 
 public extension EntryModel {
+    func start() async {
+        let isFirst = !output.isLoaded
+
+        if isFirst {
+            await load()
+        }
+
+        state.results.outcome.send(.ready(isFirst: isFirst))
+    }
+
     func load() async {
         do {
             let database = dependencies.database
@@ -111,50 +121,29 @@ public extension EntryModel {
         }
     }
 
+    @discardableResult
     func save() async -> EntryChange? {
-        guard
-            !state.isSaving,
-            let draft = output.draft
-        else {
+        guard let change = await store() else {
             return nil
         }
 
-        state.isSaving = true
+        beginClosing()
+        state.results.outcome.send(.closed(change))
 
-        do {
-            let database = dependencies.database
+        return change
+    }
 
-            let saved = try await database.saveEntryResult(
-                draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
-
-            let entry = saved.entry
-
-            await finishReceipt()
-
-            let fee = try await database.fee(of: entry.id)
-            let title = output.label(for: entry)
-
-            let kind: EntryChange.Kind = if let original = input.original {
-                .edited(previous: original, previousFee: input.originalFee)
-            } else {
-                .recorded
-            }
-
-            return EntryChange(
-                kind: kind,
-                entry: entry,
-                label: title,
-                fee: fee,
-                clearedNoSpendDays: saved.clearedNoSpendDays
-            )
-        } catch {
-            state.isSaving = false
-            report(error)
+    @discardableResult
+    func saveAndContinue() async -> EntryChange? {
+        guard let change = await store() else {
             return nil
         }
+
+        await startNext()
+
+        state.results.outcome.send(.continued(change))
+
+        return change
     }
 
     func startNext() async {
@@ -167,7 +156,7 @@ public extension EntryModel {
         }
 
         input.baseline = output.snapshot
-        state.isSaving = false
+        state.progress.isSaving = false
     }
 
     func recordAgain() async {
@@ -210,11 +199,13 @@ public extension EntryModel {
         }
 
         input.baseline = output.snapshot
-        state.isSaving = false
+        state.progress.isSaving = false
 
         state.errorNotice.inform(Self.recordAgainMessage)
+        state.results.outcome.send(.categoryMoved)
     }
 
+    @discardableResult
     func delete() async -> EntryChange? {
         guard let original = input.original else {
             return nil
@@ -228,12 +219,17 @@ public extension EntryModel {
 
             let title = output.label(for: original)
 
-            return EntryChange(
+            let change = EntryChange(
                 kind: .deleted,
                 entry: original,
                 label: title,
                 fee: deleted.first { $0.transferId == original.id }
             )
+
+            beginClosing()
+            state.results.outcome.send(.closed(change))
+
+            return change
         } catch {
             report(error)
             return nil
@@ -241,7 +237,7 @@ public extension EntryModel {
     }
 
     func beginClosing() {
-        state.isClosing = true
+        state.progress.isClosing = true
     }
 
     func newNoticeModel() -> EntryNoticeModel {
@@ -265,6 +261,52 @@ extension EntryModel {
 
 private extension EntryModel {
     static let recordAgainMessage = "同じ内容で新しい記録にしました"
+
+    func store() async -> EntryChange? {
+        guard
+            !state.progress.isSaving,
+            let draft = output.draft
+        else {
+            return nil
+        }
+
+        state.progress.isSaving = true
+
+        do {
+            let database = dependencies.database
+
+            let saved = try await database.saveEntryResult(
+                draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+
+            let entry = saved.entry
+
+            await finishReceipt()
+
+            let fee = try await database.fee(of: entry.id)
+            let title = output.label(for: entry)
+
+            let kind: EntryChange.Kind = if let original = input.original {
+                .edited(previous: original, previousFee: input.originalFee)
+            } else {
+                .recorded
+            }
+
+            return EntryChange(
+                kind: kind,
+                entry: entry,
+                label: title,
+                fee: fee,
+                clearedNoSpendDays: saved.clearedNoSpendDays
+            )
+        } catch {
+            state.progress.isSaving = false
+            report(error)
+            return nil
+        }
+    }
 
     func startNew() {
         state.setCategory(output.categories.first?.id)

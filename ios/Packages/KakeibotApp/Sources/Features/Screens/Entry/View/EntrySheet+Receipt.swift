@@ -50,8 +50,8 @@ extension EntrySheet {
 
     var receiptCamera: some View {
         EntryReceiptCamera { pages in
-            Task {
-                await scanReceipt(pages)
+            receipt.perform {
+                await $0.scan(pages, into: model)
             }
         } onCancel: {
             receipt.cancel()
@@ -61,25 +61,9 @@ extension EntrySheet {
 }
 
 private extension EntrySheet {
-    static let coverDismissDelay: Duration = .milliseconds(400)
-}
-
-private extension EntrySheet {
     func saveReceiptGuideChoice() {
         receipt.perform {
             await $0.saveGuideChoice(for: model)
         }
-    }
-
-    func scanReceipt(_ pages: [CGImage]) async {
-        let outcome = await receipt.scan(pages, into: model)
-
-        guard case let .read(itemCount, _) = outcome, itemCount > 0 else {
-            return
-        }
-
-        try? await Task.sleep(for: Self.coverDismissDelay)
-
-        open(.items)
     }
 }

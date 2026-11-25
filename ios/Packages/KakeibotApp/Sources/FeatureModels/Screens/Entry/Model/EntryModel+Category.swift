@@ -55,6 +55,12 @@ public extension EntryModel {
         }
     }
 
+    func addCategory(_ id: EntryCategory.ID) async {
+        await reloadCategories(selecting: id)
+
+        state.results.outcome.send(.categoryAdded)
+    }
+
     func reloadCategories(selecting id: EntryCategory.ID? = nil) async {
         do {
             input.options = try await dependencies.database.entryOptions()
@@ -117,6 +123,7 @@ public extension EntryModel {
         }
     }
 
+    @discardableResult
     func hideCategory(_ category: EntryCategory) async -> HiddenCategory? {
         let hidden = HiddenCategory(
             id: category.id,
@@ -132,9 +139,12 @@ public extension EntryModel {
 
             await reloadCategories()
 
+            state.results.hiddenCategory = hidden
+
             return hidden
         } catch {
             report(error)
+            state.results.hiddenCategory = nil
             return nil
         }
     }
@@ -148,6 +158,8 @@ public extension EntryModel {
             )
 
             await reloadCategories(selecting: hidden.wasSelected ? hidden.id : nil)
+
+            state.results.outcome.send(.categoryMoved)
         } catch {
             state.errorNotice.show(Self.restoreFailedMessage, for: error)
         }
