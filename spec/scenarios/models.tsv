@@ -71,7 +71,7 @@ entry.caps-amount-at-nine-digits	EntryModelTests/capsAmountAtNineDigits	EntryMod
 entry.picks-first-category-of-selected-type	EntryModelTests/picksFirstCategoryOfSelectedType	EntryModelTest/picksFirstCategoryOfSelectedType	対応	
 entry.saves-new-entry	EntryModelTests/savesNewEntry	EntryModelTest/savesNewEntry	対応	
 entry.saves-once-when-save-is-tapped-twice	EntryModelTests/savesOnceWhenSaveIsTappedTwice	EntryModelTest/savesOnceWhenSaveIsTappedTwice	対応	
-entry.refuses-zero-amount	EntryModelTests/refusesZeroAmount	EntryModelTest/refusesZeroAmount	対応	保存できるかの印（canSave）は Android に無く確かめていない
+entry.refuses-zero-amount	EntryModelTests/refusesZeroAmount	EntryModelTest/refusesZeroAmount	対応	保存できるかの印（canSave）は確かめていない
 entry.edits-existing-entry	EntryModelTests/editsExistingEntry	EntryModelTest/editsExistingEntry	対応	
 entry.records-edited-entry-again-as-new-entry	EntryModelTests/recordsEditedEntryAgainAsNewEntry		未移植	同じ内容で新しく記録する所（recordAgain）がモデルにも画面にも無い
 entry.describes-expression-and-tax	EntryModelTests/describesExpressionAndTax	EntryModelTest/describesExpressionAndTax	対応	
@@ -132,7 +132,7 @@ entry-transfer.drops-fee-when-recording-again	EntryModelTransferTests/dropsFeeWh
 entry-transfer.caps-loan-payoff-at-largest-amount	EntryModelTransferTests/capsLoanPayoffAtLargestAmount	EntryModelTransferTest/capsLoanPayoffAtLargestAmount	対応	
 entry-transfer.starts-with-two-different-wallets	EntryModelTransferTests/startsWithTwoDifferentWallets	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	口座の見出し（振替元）は確かめていない
 entry-transfer.loaded-draft-switched-to-transfer-matches-fresh-transfer	EntryModelTransferTests/loadedDraftSwitchedToTransferMatchesFreshTransfer	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	種類を指定して開く形が無く、切り替えた後の値と未変更だけを確かめる
-entry-transfer.saves-swapped-transfer	EntryModelTransferTests/savesSwappedTransfer	EntryModelTransferTest/savesSwappedTransfer	対応	保存ボタンの文（振り替える）は Android に無く、確かめていない
+entry-transfer.saves-swapped-transfer	EntryModelTransferTests/savesSwappedTransfer	EntryModelTransferTest/savesSwappedTransfer	対応	保存ボタンの文（振り替える）は確かめていない
 entry-transfer.keeps-category-when-coming-back-from-transfer	EntryModelTransferTests/keepsCategoryWhenComingBackFromTransfer	EntryModelTransferTest/keepsCategoryWhenComingBackFromTransfer EntryModelTest/remembersCategoryAcrossTransfer	対応	
 entry-transfer.shows-balances-and-missing-destination	EntryModelTransferTests/showsBalancesAndMissingDestination	EntryModelTransferTest/showsBalancesAndMissingDestination	対応	
 entry-transfer.flags-amount-over-source-balance	EntryModelTransferTests/flagsAmountOverSourceBalance	EntryModelTransferTest/flagsAmountOverSourceBalance	対応	残高を超えても保存できることは確かめていない
@@ -280,7 +280,7 @@ review.marks-store-review-opened	ReviewModelTests/marksStoreReviewOpened		未移
 review.keeps-store-review-unopened-after-closing	ReviewModelTests/keepsStoreReviewUnopenedAfterClosing		未移植	ストアの評価を頼むカードが、モデルにも画面にも無い
 review.compares-with-previous-month	ReviewModelTests/comparesWithPreviousMonth	ReviewModelTest/comparesWithSameDaysOfPreviousMonth	対応	
 review.keeps-notice-after-later-success	ReviewModelTests/keepsNoticeAfterLaterSuccess	ReviewModelNoticeTest/keepsNoticeAfterLaterSuccess	対応	
-review.compares-whole-previous-month-when-finished	ReviewModelTests/comparesWholePreviousMonthWhenFinished	ReviewModelTest/comparesWholePreviousMonthWhenFinished	対応	isComparingPartially が無く、終わった期間でも画面の文は「同じ時点より」のまま
+review.compares-whole-previous-month-when-finished	ReviewModelTests/comparesWholePreviousMonthWhenFinished	ReviewModelTest/comparesWholePreviousMonthWhenFinished	対応	Android は ReviewText.previousName の isPartial で比べる文を出し分ける
 review.knows-whether-previous-period-has-entries	ReviewModelTests/knowsWhetherPreviousPeriodHasEntries	ReviewModelTest/knowsWhetherPreviousPeriodHasEntries	対応	
 review.counts-moves-to-archived-wallet-in-past-period	ReviewModelTests/countsMovesToArchivedWalletInPastPeriod		未移植	返済・積立の動き（moves）が、モデルにも画面にも無い
 review.leaves-out-future-repayments-from-payoff	ReviewModelTests/leavesOutFutureRepaymentsFromPayoff		未移植	返済の動きと完済の見込み（payoff）が無い
@@ -351,7 +351,7 @@ recurring-list.deletes-and-restores-recurring		RecurringListModelTest/deletesAnd
 recurring-list.starts-from-first-period-on-later-day		RecurringListModelTest/startsFromFirstPeriodOnLaterDay	Androidのみ	始まりの日より後の最初の予定日を次回に出す。iOS の画面のテストに無い
 template-edit.enters-amount-with-keypad	TemplateEditModelTests/entersAmountWithKeypad	TemplateEditModelTest/entersAmountWithKeypad	対応	Android に typeName（収入・支出の名前）が無く、確かめていない
 template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton	TemplateEditModelTest/namesWhatIsMissingOnSaveButton	対応	
-template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	Android に canSave が無く、名前が無い時は save の結果だけで確かめる
+template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	名前が無い時は save の結果で確かめる
 template-edit.loads-existing-template-and-tracks-changes	TemplateEditModelTests/loadsExistingTemplateAndTracksChanges		未移植	既にあるテンプレートを編集する入口（editing・isChanged）が無い
 template-edit.chooses-first-category-and-wallet-on-load		TemplateEditModelTest/choosesFirstCategoryAndWalletOnLoad	Androidのみ	読み込みで最初のカテゴリと口座を選ぶ。iOS にこれだけのテストが無い
 template-edit.names-missing-wallet-by-type		TemplateEditModelTest/namesMissingWalletByType	Androidのみ	カテゴリと口座が無い時の知らせの文を確かめる。iOS にテストが無い
