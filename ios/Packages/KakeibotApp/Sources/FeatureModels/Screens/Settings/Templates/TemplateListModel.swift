@@ -32,6 +32,7 @@ public extension TemplateListModel {
 
         public var type: Entry.Kind = .expense
         public var movingOrder: [EntryTemplate.ID]?
+        public var removed = SettingsBoardRemoved<EntryTemplate.ID>()
     }
 
     @MainActor

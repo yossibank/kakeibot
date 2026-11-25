@@ -68,8 +68,9 @@ struct SettingsBoardScreen<
     var body: some View {
         let drag = controller.drag
         let model = controller.model
-        let bulkNote = controller.bulkDelete.wrappedValue?
-            .note(for: controller.deletion.wrappedValue)
+        let removed = controller.removed
+        let bulkNote = removed.wrappedValue.bulkDelete?
+            .note(for: removed.wrappedValue.deletion)
 
         VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader(title, hint: hint)
@@ -107,10 +108,10 @@ struct SettingsBoardScreen<
             .scrollDisabled(drag.isLifting)
             .settingsAutoScroll(drag.autoScroll)
             .settingsDropZones(Bindable(drag).zones, showing: drag.showZone)
-            .settingsHideNotice(controller.hiddenId, message: hideMessage) { id in
+            .settingsHideNotice(removed.hiddenId, message: hideMessage) { id in
                 controller.show(id)
             }
-            .deletionNotice(controller.deletion, note: bulkNote) { deletion in
+            .deletionNotice(removed.deletion, note: bulkNote) { deletion in
                 controller.restore(deletion)
             }
 

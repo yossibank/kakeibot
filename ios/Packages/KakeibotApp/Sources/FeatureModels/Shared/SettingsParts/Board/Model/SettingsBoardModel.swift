@@ -91,6 +91,9 @@ public extension SettingsBoardModel {
         do {
             try await saveHidden(id, isHidden: true)
             await reload()
+
+            state.removed.hiddenId = id
+
             return true
         } catch {
             let message = hideFailedMessage(for: error) ?? Self.hideFailedText
@@ -114,10 +117,15 @@ public extension SettingsBoardModel {
         do {
             let deletion = try await remove(id)
             await reload()
+
+            state.removed.deletion = deletion
+
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error) ?? Self.deleteFailedText
             state.errorNotice.show(message, for: error)
+            state.removed.deletion = nil
+
             return nil
         }
     }
@@ -140,6 +148,9 @@ public extension SettingsBoardModel {
         } else if let message = result.infoMessage {
             state.errorNotice.inform(message)
         }
+
+        state.removed.bulkDelete = result
+        state.removed.deletion = result.deletion
 
         return result
     }

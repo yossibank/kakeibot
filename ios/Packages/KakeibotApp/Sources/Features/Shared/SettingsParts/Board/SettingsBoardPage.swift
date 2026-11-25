@@ -8,12 +8,9 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
 
     @State private var drag = SettingsDrag<Spec.Model.Item.ID>()
     @State private var destination: Spec.Destination?
-    @State private var hiddenId: Spec.Model.Item.ID?
     @State private var openId: Spec.Model.Item.ID?
     @State private var hiding: Spec.Model.Item?
     @State private var deleting: Spec.Model.Item?
-    @State private var deletion: Deletion?
-    @State private var bulkDelete: SettingsBulkDelete?
     @State private var isConfirmingHide = false
     @State private var isConfirmingDelete = false
     @State private var isConfirmingDeleteHidden = false
@@ -96,10 +93,7 @@ private extension SettingsBoardPage {
         SettingsBoardController(
             model: model,
             drag: drag,
-            grid: grid,
-            hiddenId: $hiddenId,
-            deletion: $deletion,
-            bulkDelete: $bulkDelete
+            grid: grid
         )
     }
 
@@ -199,10 +193,10 @@ private extension SettingsBoardPage {
 
     func editor(for destination: Spec.Destination) -> some View {
         spec.editor(for: destination) { deletion in
-            self.deletion = deletion
+            model.state.removed.deletion = deletion
         } onHide: {
             if let id = spec.itemID(of: destination) {
-                hiddenId = id
+                model.state.removed.hiddenId = id
             }
         }
         .toolbar(.hidden, for: .navigationBar)
