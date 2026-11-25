@@ -4,8 +4,9 @@ import FeatureModels
 import SwiftUI
 
 struct HomeCustomizeCard: View {
-    @State private var changed: SetupItem?
-    @State private var glowing: SetupItem?
+    @Binding var changed: SetupItem?
+
+    @State private var layout = Layout()
 
     @Environment(\.themeStyle) private var themeStyle
 
@@ -62,15 +63,15 @@ struct HomeCustomizeCard: View {
 
             glow(changed)
         }
-        .task(id: glowing) {
-            guard glowing != nil else {
+        .task(id: layout.glow) {
+            guard !layout.glow.isEmpty else {
                 return
             }
 
             try? await Task.sleep(for: Self.glowDuration)
 
             withAnimation(.easeOut(duration: 0.6)) {
-                glowing = nil
+                layout.glow = [:]
             }
         }
     }
@@ -112,6 +113,10 @@ private extension HomeCustomizeCard {
 }
 
 private extension HomeCustomizeCard {
+    struct Layout {
+        var glow: [SetupItem: Double] = [:]
+    }
+
     static let tileSize = CGSize(width: 116, height: 96)
     static let cornerRadius: CGFloat = 20
     static let textScale: CGFloat = 0.8
@@ -130,12 +135,12 @@ private extension HomeCustomizeCard {
     }
 
     func glowOpacity(_ item: SetupItem) -> Double {
-        glowing == item ? 1 : 0
+        layout.glow[item] ?? 0
     }
 
     func glow(_ item: SetupItem) {
         withAnimation(.easeOut(duration: 0.25)) {
-            glowing = item
+            layout.glow = [item: 1]
         }
     }
 }

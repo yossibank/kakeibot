@@ -56,15 +56,6 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGui
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: View の @State に置けるのは、モデルと layout だけにする: shownSample。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: View の @State に置けるのは、モデルと layout だけにする: size。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: View の @State に置けるのは、モデルと layout だけにする: widget。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeCustomizeCard.swift: View の @State に置けるのは、モデルと layout だけにする: changed。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeCustomizeCard.swift: View の @State に置けるのは、モデルと layout だけにする: glowing。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeTemplateShelfSheet.swift: View の @State に置けるのは、モデルと layout だけにする: isEditing。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeTemplateShelfSheet.swift: View の @State に置けるのは、モデルと layout だけにする: query。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: openId。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: openStamp。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: orderButtonFrame。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: pendingDay。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView.swift: View の @State に置けるのは、モデルと layout だけにする: shelfWidth。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: slide。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: View の @State に置けるのは、モデルと layout だけにする: analysisShare。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: View の @State に置けるのは、モデルと layout だけにする: openShare。意味のある状態は、モデルの state に移す
