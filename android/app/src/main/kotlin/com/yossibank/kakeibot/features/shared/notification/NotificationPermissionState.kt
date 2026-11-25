@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.features.shared.notification
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -45,7 +46,14 @@ class NotificationPermissionState(
         context.startActivity(intent)
     }
 
-    internal fun receive(isGranted: Boolean) {
+    internal fun receive(
+        isGranted: Boolean,
+        isAnswered: Boolean,
+    ) {
+        if (isAnswered) {
+            store.edit { putBoolean(KEY_ASKED, true) }
+        }
+
         answer?.complete(isGranted)
     }
 
@@ -63,7 +71,6 @@ class NotificationPermissionState(
         val waiting = CompletableDeferred<Boolean>()
 
         answer = waiting
-        store.edit { putBoolean(KEY_ASKED, true) }
         launch()
 
         return waiting.await()
@@ -82,8 +89,12 @@ fun rememberNotificationPermission(): NotificationPermissionState {
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
-        onResult = state::receive,
-    )
+    ) { isGranted ->
+        val isDenied = (context as? Activity)
+            ?.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) == true
+
+        state.receive(isGranted = isGranted, isAnswered = isGranted || isDenied)
+    }
 
     state.launch = {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -92,7 +103,7 @@ fun rememberNotificationPermission(): NotificationPermissionState {
     }
 
     DisposableEffect(state) {
-        onDispose { state.receive(isGranted = false) }
+        onDispose { state.receive(isGranted = false, isAnswered = false) }
     }
 
     return state
