@@ -56,6 +56,16 @@ entry.lists-no-recent-entries-for-transfers	EntryModelTests/listsNoRecentEntries
 entry.applies-recent-entry	EntryModelTests/appliesRecentEntry	EntryModelRecentTest/appliesRecentEntry	対応	
 entry.drops-recent-tag-outside-offered-categories	EntryModelTests/dropsRecentTagOutsideOfferedCategories	EntryModelRecentTest/dropsRecentTagOutsideOfferedCategories	対応	
 entry.leaves-edited-entry-out-of-recent-entries	EntryModelTests/leavesEditedEntryOutOfRecentEntries	EntryModelRecentTest/leavesEditedEntryOutOfRecentEntries	対応	
+entry.shows-deck-with-its-direction-and-keypad-target	EntryModelTests/showsDeckWithItsDirectionAndKeypadTarget		未確認	Android は別のブランチで合わせる
+entry.resets-deck-to-first-field-of-type	EntryModelTests/resetsDeckToFirstFieldOfType		未確認	Android は別のブランチで合わせる
+entry.starts-from-first-field-when-type-changes	EntryModelTests/startsFromFirstFieldWhenTypeChanges		未確認	Android は別のブランチで合わせる
+entry.places-deck-without-changing-keypad-target	EntryModelTests/placesDeckWithoutChangingKeypadTarget		未確認	Android は別のブランチで合わせる
+entry.ends-wallet-editing-when-wallet-deck-opens-again	EntryModelTests/endsWalletEditingWhenWalletDeckOpensAgain		未確認	Android は別のブランチで合わせる
+entry.shows-page-of-selected-category	EntryModelTests/showsPageOfSelectedCategory		未確認	Android は別のブランチで合わせる
+entry.chooses-added-wallet-after-wallet-sheet-once	EntryModelTests/choosesAddedWalletAfterWalletSheetOnce		未確認	Android は別のブランチで合わせる
+entry.skips-wallets-after-other-sheets	EntryModelTests/skipsWalletsAfterOtherSheets		未確認	Android は別のブランチで合わせる
+entry.holds-menu-memo-and-discard-confirmation	EntryModelTests/holdsMenuMemoAndDiscardConfirmation		未確認	Android は別のブランチで合わせる
+entry.opens-and-shows-bills-of-wallet-deck	EntryModelTests/opensAndShowsBillsOfWalletDeck		未確認	Android は別のブランチで合わせる
 entry.tells-when-loading-fails	EntryModelTests/tellsWhenLoadingFails	EntryModelFailureTest/tellsWhenLoadingFails	対応	設定ではなく、記録の表を読めなくして確かめる
 entry.tells-when-deleting-fails	EntryModelTests/tellsWhenDeletingFails	EntryModelFailureTest/tellsWhenDeletingFails	対応	
 entry.keeps-notice-when-input-changes	EntryModelTests/keepsNoticeWhenInputChanges	EntryModelFailureTest/keepsNoticeWhenInputChanges	対応	
@@ -110,7 +120,6 @@ entry-change.ignores-applied-template-id-and-remembered-categories		EntryModelCh
 entry-change.closes-unchanged-entry-without-asking		EntryModelChangeTest/closesUnchangedEntryWithoutAsking	Androidのみ	変更が無ければ確かめずに閉じる。iOS は画面の EntrySheet が決める
 entry-change.asks-before-closing-changed-entry		EntryModelChangeTest/asksBeforeClosingChangedEntry	Androidのみ	変更があれば閉じる前に確かめる。iOS は画面の EntrySheet が決める
 entry-change.closes-without-asking-after-starting-next		EntryModelChangeTest/closesWithoutAskingAfterStartingNext	Androidのみ	続けて記録の後は確かめずに閉じる。iOS にテストが無い
-entry-item.drops-items-from-transfer		EntryModelItemTest/dropsItemsFromTransfer	Androidのみ	振替で保存すると品目を落とす、というテストが iOS に無い
 entry-shared-wallet.offers-shared-categories-of-selected-type		EntryModelSharedWalletTest/offersSharedCategoriesOfSelectedType	Androidのみ	共有の口座で収入に切り替えた時のカテゴリのテストが iOS に無い
 entry-shared-wallet.moves-tag-to-same-name-of-shared-category		EntryModelSharedWalletTest/movesTagToSameNameOfSharedCategory	Androidのみ	共有のカテゴリの同じ名前のタグへ移すテストが iOS に無い
 entry-shared-wallet.falls-back-to-first-shared-category-without-same-name		EntryModelSharedWalletTest/fallsBackToFirstSharedCategoryWithoutSameName	Androidのみ	同じ名前が無い時に先頭の共有カテゴリにするテストが iOS に無い

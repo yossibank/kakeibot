@@ -15,6 +15,8 @@ struct SnapshotTests {
     func render() async throws {
         let model = try await Self.model()
 
+        model.state.toggleWalletEditing()
+
         let view = EntrySheet(model: model, deck: .wallet(.source))
             .frame(width: Self.phone.width, height: Self.phone.height)
             .background(Color(uiColor: .systemBackground))

@@ -49,7 +49,7 @@ extension EntrySheet {
     func startVoice() {
         voice.perform {
             await $0.start(for: model, today: today) {
-                showSelectedCategory()
+                model.showSelectedCategory()
             }
         }
     }

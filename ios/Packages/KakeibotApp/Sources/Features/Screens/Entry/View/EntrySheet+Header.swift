@@ -42,8 +42,8 @@ private extension EntrySheet {
 
                 withTransaction(transaction) {
                     model.select(type)
-                    resetDeck()
-                    showSelectedCategory()
+                    model.state.resetDeck()
+                    model.showSelectedCategory()
                 }
             }
         )

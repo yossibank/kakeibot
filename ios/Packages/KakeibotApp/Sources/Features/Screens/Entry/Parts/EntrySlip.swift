@@ -9,13 +9,13 @@ struct EntrySlip: View {
     @Environment(\.isPro) private var isPro
 
     let model: EntryModel
-    let deck: EntryDeck
+    let deck: EntryModel.Deck
     let today: LocalDate
     let isMemoActive: Bool
     let listening: EntryVoiceFlow?
     let preview: VoiceReading?
     let growth: CGFloat
-    let onSelect: (EntryDeck) -> Void
+    let onSelect: (EntryModel.Deck) -> Void
     let onMemo: () -> Void
     let onOpenItems: () -> Void
     let onReceipt: (() -> Void)?
@@ -263,7 +263,7 @@ private extension EntrySlip {
     func row(
         _ title: String,
         value: String,
-        target: EntryDeck,
+        target: EntryModel.Deck,
         isChanged: Bool = false,
         isFromVoice: Bool = false,
         @ViewBuilder mark: () -> some View

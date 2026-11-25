@@ -89,7 +89,7 @@ struct SnapshotTests {
             to: "entry-mini-large.png"
         )
 
-        let tallCases: [(String, String, CGSize, EntryDeck)] = [
+        let tallCases: [(String, String, CGSize, EntryModel.Deck)] = [
             ("entry-tall-expense", "支出の金額", Self.tall, .amount),
             ("entry-tall-date", "日付の選択", Self.tall, .date),
             ("entry-mini-date", "日付の選択", Self.mini, .date),
@@ -599,7 +599,7 @@ private extension SnapshotTests {
     static let largeDigits = (2...9).reversed().map(AmountCalculator.Key.digit)
     static let itemDigits: [AmountCalculator.Key] = [.digit(6), .digit(6), .digit(6)]
 
-    static let cases: [(String, String, Entry.Kind, [AmountCalculator.Key], EntryDeck)] = [
+    static let cases: [(String, String, Entry.Kind, [AmountCalculator.Key], EntryModel.Deck)] = [
         ("entry-expense", "支出の金額", .expense, smallDigits, .amount),
         ("entry-category", "カテゴリの選択", .expense, [], .category),
         ("entry-wallet", "口座の選択", .expense, smallDigits, .wallet(.source)),

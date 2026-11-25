@@ -152,7 +152,7 @@ extension EntrySlip {
         listening != nil
     }
 
-    func isSelected(_ target: EntryDeck) -> Bool {
+    func isSelected(_ target: EntryModel.Deck) -> Bool {
         deck.field(for: model.state.type) == target
     }
 }

@@ -13,10 +13,10 @@ extension EntrySheet {
             model: model,
             deck: deck,
             today: today,
-            isMemoActive: isEditingMemo,
+            isMemoActive: model.state.screen.isEditingMemo,
             listening: voice.state.step == .listening ? voice : nil,
             preview: voice.input.preview,
-            growth: slipGrowth,
+            growth: layout.slipGrowth,
             onSelect: { next in
                 show(next)
             },

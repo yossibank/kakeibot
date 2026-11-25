@@ -39,7 +39,10 @@ extension EntrySheet {
     }
 
     @ViewBuilder
-    func categoryMenuLayer(_ menu: CategoryMenu) -> some View {
+    func categoryMenuLayer(
+        _ category: EntryCategory,
+        at frame: CGRect
+    ) -> some View {
         Scrim(.menu)
             .ignoresSafeArea()
             .onTapGesture {
@@ -48,61 +51,48 @@ extension EntrySheet {
             .transition(.opacity)
 
         EntryCategoryFace(
-            category: menu.category,
-            icon: model.output.icon(for: menu.category),
+            category: category,
+            icon: model.output.icon(for: category),
             isLit: true,
             isLifted: true
         )
-        .frame(width: menu.frame.width, height: menu.frame.height)
+        .frame(width: frame.width, height: frame.height)
         .scaleEffect(1.06)
         .glow(Palette.glow.opacity(.muted), radius: 12)
-        .position(x: menu.frame.midX, y: menu.frame.midY)
+        .position(x: frame.midX, y: frame.midY)
         .allowsHitTesting(false)
         .transition(.opacity)
 
         Color.clear
-            .frame(height: max(menu.frame.minY - 12, 0))
+            .frame(height: max(frame.minY - 12, 0))
             .frame(maxWidth: .infinity)
             .overlay(alignment: .bottomLeading) {
                 EntryCategoryMenu(
-                    icon: model.output.icon(for: menu.category),
-                    name: menu.category.name,
+                    icon: model.output.icon(for: category),
+                    name: category.name,
                     onEdit: {
                         closeCategoryMenu()
-                        open(.editCategory(menu.category))
+                        open(.editCategory(category))
                     },
                     onHide: {
                         closeCategoryMenu()
 
                         model.perform {
-                            await $0.hideCategory(menu.category)
+                            await $0.hideCategory(category)
                         }
                     }
                 )
-                .offset(x: menuX(for: menu))
+                .offset(x: menuX(for: frame))
             }
             .transition(Self.menuTransition)
     }
 }
 
 extension EntrySheet {
-    struct CategoryMenu: Equatable {
-        let category: EntryCategory
-        let frame: CGRect
-    }
-
-    func showSelectedCategory() {
-        let page = model.output.categoryPages.firstIndex { page in
-            page.contains { $0.categoryId == model.state.category.id }
-        }
-
-        categoryPage = page ?? 0
-    }
-
     func useTemplate(_ template: EntryTemplate) {
         withAnimation(.snappy) {
             model.apply(template)
-            showSelectedCategory()
+            model.showSelectedCategory()
         }
 
         if template.amount == nil {
@@ -129,7 +119,7 @@ private extension EntrySheet {
                 .scrollTargetLayout()
             }
             .scrollTargetBehavior(.paging)
-            .scrollPosition(id: $categoryPage)
+            .scrollPosition(id: Bindable(model.state).screen.categoryPage)
             .scrollIndicators(.hidden)
             .frame(height: Self.pagerHeight + Self.liftInset * 2)
             .padding(-Self.liftInset)
@@ -138,7 +128,7 @@ private extension EntrySheet {
             if model.output.categoryPages.count > 1 {
                 PageDots(
                     count: model.output.categoryPages.count,
-                    current: categoryPage ?? 0
+                    current: model.state.screen.categoryPage ?? 0
                 )
             }
         }
@@ -255,11 +245,11 @@ private extension EntrySheet {
         open(.addTag(category))
     }
 
-    func menuX(for menu: CategoryMenu) -> CGFloat {
+    func menuX(for frame: CGRect) -> CGFloat {
         let width = EntryCategoryMenu.width
         let inset = Self.menuInset
-        let preferred = menu.frame.midX - width / 2
-        return min(max(preferred, inset), sheetWidth - width - inset)
+        let preferred = frame.midX - width / 2
+        return min(max(preferred, inset), layout.sheetWidth - width - inset)
     }
 
     func select(_ category: EntryCategory) {
@@ -272,13 +262,14 @@ private extension EntrySheet {
         at frame: CGRect
     ) {
         withAnimation(.snappy(duration: 0.25)) {
-            categoryMenu = CategoryMenu(category: category, frame: frame)
+            layout.menuFrame = frame
+            model.state.openMenu(for: category)
         }
     }
 
     func closeCategoryMenu() {
         withAnimation(.snappy(duration: 0.2)) {
-            categoryMenu = nil
+            model.state.closeMenu()
         }
     }
 }

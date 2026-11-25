@@ -100,6 +100,7 @@ public extension EntryModel {
         state.category.remember(for: state.type)
         state.type = type
         state.keypad.target = .amount
+        state.place(Deck.start(for: type))
 
         if isUntouched,
            type != .transfer {
@@ -340,6 +341,7 @@ private extension EntryModel {
         input.originalFee = try await database.fee(of: entry.id)
         input.original = entry
         state.type = entry.type
+        state.place(Deck.start(for: entry.type))
         state.keypad.setAmount(entry.amount)
         state.setDate(entry.date)
         state.setCategory(entry.categoryId)

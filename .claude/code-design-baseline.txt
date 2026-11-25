@@ -30,10 +30,6 @@ ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: View の @State
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryCategoryCell.swift: View の @State に置けるのは、モデルと layout だけにする: isPressing。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryGuideCard.swift: View の @State に置けるのは、モデルと layout だけにする: isShown。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryTypeSwitch.swift: View の @State に置けるのは、モデルと layout だけにする: tapCount。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: View の @State に置けるのは、モデルと layout だけにする: isBillOpen。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: View の @State に置けるのは、モデルと layout だけにする: isBillShown。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: View の @State に置けるのは、モデルと layout だけにする: isEditing。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: View の @State に置けるのは、モデルと layout だけにする: scrollPosition。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptArt.swift: View の @State に置けるのは、モデルと layout だけにする: isScanning。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: View の @State に置けるのは、モデルと layout だけにする: barHeight。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: View の @State に置けるのは、モデルと layout だけにする: editingIndex。意味のある状態は、モデルの state に移す
@@ -52,20 +48,7 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swi
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: View の @State に置けるのは、モデルと layout だけにする: target。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: View の @State に置けるのは、モデルと layout だけにする: taxRate。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: View の @State に置けるのは、モデルと layout だけにする: unit。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: addedWallet。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: bottomInset。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: categoryMenu。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: categoryPage。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: deckEdge。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: deck。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: isConfirmingDiscard。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: isEditingMemo。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: panelHeight。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: receipt。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: reloadsWallets。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: sheetWidth。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: sheet。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: slipGrowth。見た目の値は、入れ子の struct Layout にまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: voice。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Onboarding/OnboardingView.swift: View の @State に置けるのは、モデルと layout だけにする: path。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Onboarding/OnboardingView.swift: View の @State に置けるのは、モデルと layout だけにする: slide。意味のある状態は、モデルの state に移す

@@ -155,6 +155,7 @@ public extension EntryModel {
 
         public var memo = ""
         public var today: LocalDate
+        public var screen: Screen
 
         public internal(set) var type: Entry.Kind
         public internal(set) var payment: Payment
@@ -172,6 +173,7 @@ public extension EntryModel {
             self.type = type
             self.payment = Payment(date: date)
             self.today = today
+            self.screen = Screen(deck: EntryModel.Deck.start(for: type))
         }
     }
 }
