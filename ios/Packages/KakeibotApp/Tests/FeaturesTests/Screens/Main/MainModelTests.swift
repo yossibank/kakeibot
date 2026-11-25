@@ -163,7 +163,8 @@ extension MainModelTests {
         MainModel(
             parts: .system(setup.database),
             today: setup.date,
-            closeDelay: .zero
+            closeDelay: .zero,
+            warmupDuration: .zero
         )
     }
 

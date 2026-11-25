@@ -5,9 +5,8 @@ import SwiftUI
 public struct WhatsNewSheet: View {
     @Environment(\.dismiss) private var dismiss
 
-    @State private var version: String
+    @State private var model: WhatsNewModel
 
-    private let seenVersion: String?
     private let revealsSteps: Bool
     private let onTry: (WhatsNewRelease.Action) -> Void
 
@@ -17,9 +16,10 @@ public struct WhatsNewSheet: View {
         revealsSteps: Bool = true,
         onTry: @escaping (WhatsNewRelease.Action) -> Void
     ) {
-        _version = State(initialValue: version)
+        let model = WhatsNewModel(seenVersion: seenVersion, version: version)
 
-        self.seenVersion = seenVersion
+        _model = State(initialValue: model)
+
         self.revealsSteps = revealsSteps
         self.onTry = onTry
     }
@@ -32,7 +32,7 @@ public struct WhatsNewSheet: View {
 
             ScrollViewReader { proxy in
                 ScrollView {
-                    if let release {
+                    if let release = model.output.release {
                         section(release) { id in
                             withAnimation(.smooth) {
                                 proxy.scrollTo(id, anchor: .top)
@@ -41,28 +41,18 @@ public struct WhatsNewSheet: View {
                         .padding(.vertical, 8)
                     }
                 }
-                .id(version)
+                .id(model.state.version)
                 .transition(.opacity)
                 .scrollIndicators(.hidden)
                 .contentMargins(.horizontal, 20, for: .scrollContent)
                 .padding(.horizontal, -20)
             }
-            .animation(.snappy, value: version)
+            .animation(.snappy, value: model.state.version)
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .backdrop()
-    }
-}
-
-private extension WhatsNewSheet {
-    var release: WhatsNewRelease? {
-        WhatsNewRelease.all.first { $0.version == version } ?? WhatsNewRelease.all.first
-    }
-
-    func isNew(_ release: WhatsNewRelease) -> Bool {
-        AppVersion.isNewer(release.version, than: seenVersion)
     }
 }
 
@@ -90,24 +80,24 @@ private extension WhatsNewSheet {
             }
             .padding(.vertical, 2)
         }
-        .haptic(.selection, trigger: version)
+        .haptic(.selection, trigger: model.state.version)
         .scrollIndicators(.hidden)
         .contentMargins(.horizontal, 20, for: .scrollContent)
         .padding(.horizontal, -20)
     }
 
     func versionChip(_ release: WhatsNewRelease) -> some View {
-        let isSelected = release.version == version
+        let isSelected = release.version == model.state.version
 
         return Button {
-            version = release.version
+            model.state.choose(release.version)
         } label: {
             HStack(spacing: 8) {
                 Text(release.version)
                     .textFont(.subheadline, weight: isSelected ? .bold : .medium)
                     .monospacedDigit()
 
-                if isNew(release) {
+                if model.output.isNew(release) {
                     Circle()
                         .fill(isSelected ? Palette.backgroundTop : Palette.rose)
                         .frame(width: 8, height: 8)

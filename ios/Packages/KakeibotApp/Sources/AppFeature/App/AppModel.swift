@@ -15,22 +15,9 @@ import WidgetKit
 @MainActor
 @Observable
 final class AppModel: ScreenPerforming {
-    var notice = ErrorNotice()
-    var isPro = false
-    var syncEngine: SyncEngine?
-    var sharedSyncEngine: SyncEngine?
-
-    private(set) var launch: Launch = .opening
-    private(set) var today: LocalDate
-    private(set) var look: ThemeLook = .followsDevice
-    private(set) var style: ThemeStyle = .standard
-    private(set) var observationRound = 0
-    private(set) var syncActivity = SyncActivity(isSyncEnabled: false, isSharing: false)
-
+    let state = State()
+    let input: Input
     let dependencies: Dependencies
-
-    private var hasStoppedObservation = false
-    private var widgetReload: Task<Void, Never>?
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
@@ -46,7 +33,7 @@ final class AppModel: ScreenPerforming {
             clock.today
         }
 
-        self.today = currentDay()
+        self.input = Input(today: currentDay())
 
         self.dependencies = Dependencies(
             openDatabase: openDatabase,
@@ -83,22 +70,8 @@ extension AppModel {
 }
 
 extension AppModel {
-    enum Launch {
-        case opening
-        case onboarding(AppDatabase)
-        case ready(AppDatabase)
-        case failed
-
-        var database: AppDatabase? {
-            switch self {
-            case let .onboarding(database), let .ready(database): database
-            case .opening, .failed: nil
-            }
-        }
-    }
-
     var hasDatabase: Bool {
-        launch.database != nil
+        state.launch.database != nil
     }
 
     var route: PlannedNotification.Route? {
@@ -110,7 +83,7 @@ extension AppModel {
     }
 
     func open() async {
-        guard case .opening = launch else {
+        guard case .opening = state.launch else {
             return
         }
 
@@ -125,20 +98,20 @@ extension AppModel {
 
             let completed = try await database.setting(.onboardingCompleted)
 
-            look = await (try? database.themeLook()) ?? .followsDevice
-            style = await (try? database.style()) ?? .standard
-            launch = completed ? .ready(database) : .onboarding(database)
+            input.look = await (try? database.themeLook()) ?? .followsDevice
+            input.style = await (try? database.style()) ?? .standard
+            state.setLaunch(completed ? .ready(database) : .onboarding(database))
         } catch {
-            launch = .failed
+            state.setLaunch(.failed)
         }
     }
 
     func retryOpen() async {
-        guard case .failed = launch else {
+        guard case .failed = state.launch else {
             return
         }
 
-        launch = .opening
+        state.setLaunch(.opening)
 
         await open()
     }
@@ -152,11 +125,11 @@ extension AppModel {
     }
 
     func finishOnboarding() {
-        guard case let .onboarding(database) = launch else {
+        guard case let .onboarding(database) = state.launch else {
             return
         }
 
-        launch = .ready(database)
+        state.setLaunch(.ready(database))
     }
 
     func changeScene(to phase: ScenePhase) {
@@ -164,12 +137,16 @@ extension AppModel {
         case .background: AppDatabase.suspend()
         default: AppDatabase.resume()
         }
+
+        if state.receiveScene(ForegroundReturn.Phase(phase)) {
+            returnToForeground()
+        }
     }
 
     func refreshDay() async {
-        today = dependencies.currentDay()
+        input.today = dependencies.currentDay()
 
-        guard let database = launch.database else {
+        guard let database = state.launch.database else {
             return
         }
 
@@ -180,7 +157,7 @@ extension AppModel {
     }
 
     func rescheduleNotifications() async {
-        guard let database = launch.database else {
+        guard let database = state.launch.database else {
             return
         }
 
@@ -188,7 +165,7 @@ extension AppModel {
     }
 
     func observeTheme() async {
-        guard let database = launch.database else {
+        guard let database = state.launch.database else {
             return
         }
 
@@ -220,7 +197,7 @@ extension AppModel {
     }
 
     func observeNotifications(in database: AppDatabase) async {
-        let today = today
+        let today = input.today
 
         await watch(database.notificationInputUpdates(from: today)) { input in
             await self.schedule(input)
@@ -229,21 +206,16 @@ extension AppModel {
 
     func observeSync(in database: AppDatabase) async {
         await watch(database.syncActivityUpdates()) { activity in
-            self.syncActivity = activity
+            self.input.syncActivity = activity
         }
     }
 
     func observationID<Base: Hashable>(_ base: Base) -> ObservationID<Base> {
-        ObservationID(base: base, round: observationRound)
+        ObservationID(base: base, round: state.observationRound)
     }
 
     func returnToForeground() {
-        guard hasStoppedObservation else {
-            return
-        }
-
-        hasStoppedObservation = false
-        observationRound += 1
+        state.restartStoppedObservation()
     }
 
     @discardableResult
@@ -258,7 +230,7 @@ extension AppModel {
         )
 
         if isFailed {
-            hasStoppedObservation = true
+            state.markObservationStopped()
         }
 
         return isFailed
@@ -271,20 +243,20 @@ private extension AppModel {
 
     func observeLook(in database: AppDatabase) async {
         await watch(database.themeLookUpdates()) { look in
-            self.look = look
+            self.input.look = look
             self.reloadWidgets()
         }
     }
 
     func observeStyle(in database: AppDatabase) async {
         await watch(database.styleUpdates()) { style in
-            self.style = style
+            self.input.style = style
             self.reloadWidgets()
         }
     }
 
     func observeOverviewForWidgets(in database: AppDatabase) async {
-        let today = today
+        let today = input.today
 
         await watch(database.monthOverviewUpdates(on: today)) { _ in
             self.reloadWidgets()
@@ -304,9 +276,9 @@ private extension AppModel {
     }
 
     func reloadWidgets() {
-        widgetReload?.cancel()
+        state.widgetReload?.cancel()
 
-        widgetReload = Task {
+        state.widgetReload = Task {
             try? await Task.sleep(for: Self.widgetReloadDelay)
 
             guard !Task.isCancelled else {
@@ -318,7 +290,7 @@ private extension AppModel {
     }
 
     func scheduleNotifications(in database: AppDatabase) async {
-        let input = try? await database.notificationInput(from: today)
+        let input = try? await database.notificationInput(from: input.today)
 
         guard let input else {
             return
@@ -328,19 +300,22 @@ private extension AppModel {
     }
 
     func schedule(_ input: NotificationInput) async {
-        let plan = input.plan(today: today)
+        let plan = input.plan(today: self.input.today)
         await dependencies.scheduler.apply(plan, now: dependencies.clock.now, timeZone: .current)
     }
 
     func generateRecurring(in database: AppDatabase) async {
         do {
-            try await database.generateRecurringEntries(through: today, at: dependencies.clock.now)
+            try await database.generateRecurringEntries(
+                through: input.today,
+                at: dependencies.clock.now
+            )
         } catch {
             guard !AppDatabase.isInterrupted(error) else {
                 return
             }
 
-            notice.show(Self.recurringFailedMessage, for: error)
+            state.notice.show(Self.recurringFailedMessage, for: error)
         }
     }
 }

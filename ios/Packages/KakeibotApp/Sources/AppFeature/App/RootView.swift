@@ -11,10 +11,6 @@ import VisionKit
 
 public struct RootView: View {
     @State private var model = AppModel(openDatabase: AppDatabase.appGroup)
-    @State private var isLaunching = true
-    @State private var isRevealed = false
-    @State private var isHomeLoaded = false
-    @State private var foreground = AppForegroundReturn()
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
@@ -28,20 +24,17 @@ public struct RootView: View {
                 .overlay {
                     Color.clear
                         .padding(.leading, MainView.noticeLeading(hasSidebar: hasSidebar))
-                        .errorBanner(model.notice, bottom: noticeBottom) {
-                            model.notice.clear()
+                        .errorBanner(model.state.notice, bottom: noticeBottom) {
+                            model.state.notice.clear()
                         }
                 }
 
-            if isLaunching {
+            if model.state.curtain.isShown {
                 AppLaunchView(
+                    state: model.state,
                     palette: themePalette,
                     isReady: isLaunchReady
-                ) {
-                    isRevealed = true
-                } onFinish: {
-                    isLaunching = false
-                }
+                )
             }
         }
         .task {
@@ -55,10 +48,6 @@ public struct RootView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             model.changeScene(to: phase)
-
-            if foreground.receive(phase) {
-                model.returnToForeground()
-            }
 
             if phase == .active {
                 model.perform {
@@ -79,7 +68,7 @@ public struct RootView: View {
         )
         .environment(\.syncCloud, .live)
         .environment(\.proStore, model.screenProStore())
-        .environment(\.isPro, model.isPro)
+        .environment(\.isPro, model.input.isPro)
         .environment(\.canScanReceipt, VNDocumentCameraViewController.isSupported)
         .palette(shownLook)
         .environment(\.palette, shownPalette)
@@ -92,14 +81,14 @@ public struct RootView: View {
 private extension RootView {
     @ViewBuilder
     var content: some View {
-        switch model.launch {
+        switch model.state.launch {
         case .opening:
             ProgressView()
 
         case let .onboarding(database):
             OnboardingView(
                 parts: model.screenParts(for: database),
-                today: model.today
+                today: model.input.today
             ) {
                 withAnimation(.snappy) {
                     model.finishOnboarding()
@@ -111,24 +100,24 @@ private extension RootView {
             MainView(
                 database: database,
                 clock: model.screenParts(for: database).clock,
-                today: model.today,
+                today: model.input.today,
                 route: model.route,
-                isRevealed: !isLaunching
+                isRevealed: !model.state.curtain.isShown
             ) {
                 model.finishRoute()
             } onLoad: {
-                isHomeLoaded = true
+                model.state.markHomeLoaded()
             }
-            .task(id: model.observationID(model.today)) {
+            .task(id: model.observationID(model.input.today)) {
                 await model.observeNotifications(in: database)
             }
-            .task(id: model.observationID(model.today)) {
+            .task(id: model.observationID(model.input.today)) {
                 await model.observeWidgets(in: database)
             }
-            .task(id: model.observationID(model.today)) {
+            .task(id: model.observationID(model.input.today)) {
                 await model.observeSync(in: database)
             }
-            .task(id: model.observationID(model.syncActivity)) {
+            .task(id: model.observationID(model.input.syncActivity)) {
                 await model.syncChanges(in: database)
             }
             .task(id: model.observationID(model.receivedShareCount)) {
@@ -154,34 +143,34 @@ private extension RootView {
 
 private extension RootView {
     var isLaunchReady: Bool {
-        switch model.launch {
+        switch model.state.launch {
         case .opening: false
-        case .ready: isHomeLoaded
+        case .ready: model.state.isHomeLoaded
         case .onboarding, .failed: true
         }
     }
 
     var hasSidebar: Bool {
-        switch model.launch {
+        switch model.state.launch {
         case .ready: MainView.hasSidebar(horizontalSizeClass)
         case .opening, .onboarding, .failed: false
         }
     }
 
     var noticeBottom: CGFloat {
-        switch model.launch {
+        switch model.state.launch {
         case .ready: MainView.noticeBottom(hasSidebar: hasSidebar)
         case .opening, .onboarding, .failed: 12
         }
     }
 
     var shownLook: ThemeLook {
-        isRevealed ? model.look : .followsDevice
+        model.state.curtain.isRevealed ? model.input.look : .followsDevice
     }
 
     var themePalette: ThemePalette {
         let isDark = colorScheme == .dark
-        return model.look.palette(isDark: isDark)
+        return model.input.look.palette(isDark: isDark)
     }
 
     var shownPalette: ThemePalette {
@@ -190,7 +179,7 @@ private extension RootView {
     }
 
     var shownStyle: ThemeStyle {
-        isRevealed ? model.style : .standard
+        model.state.curtain.isRevealed ? model.input.style : .standard
     }
 }
 

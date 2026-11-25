@@ -110,7 +110,7 @@ private extension OnboardingView {
                 .padding(.leading, 8)
 
             SetupList(items, model: model.state.setup) { item in
-                path.append(item)
+                model.state.open(item)
             }
             .padding(.horizontal, 16)
             .card()

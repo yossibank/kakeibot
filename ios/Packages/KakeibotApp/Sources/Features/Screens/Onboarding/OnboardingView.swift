@@ -5,9 +5,7 @@ import SwiftUI
 
 public struct OnboardingView: View {
     @State var model: OnboardingModel
-    @State var path: [SetupItem] = []
 
-    @State private var slide = PageSlide()
     @State private var appIcon = AppIconListModel()
 
     private let parts: ScreenParts
@@ -33,17 +31,19 @@ public struct OnboardingView: View {
     }
 
     public var body: some View {
-        NavigationStack(path: $path) {
-            content
-                .toolbar(.hidden, for: .navigationBar)
-                .navigationDestination(for: SetupItem.self) { item in
-                    SetupDestination(
-                        item,
-                        parts: parts,
-                        today: today,
-                        appIcon: appIcon
-                    )
-                }
+        NavigationStack(path: Bindable(model.state).path) {
+            PageSlideReader { slide in
+                content(slide)
+            }
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(for: SetupItem.self) { item in
+                SetupDestination(
+                    item,
+                    parts: parts,
+                    today: today,
+                    appIcon: appIcon
+                )
+            }
         }
         .onOutcome(model.state.outcome) { _ in
             onFinish()
@@ -63,23 +63,23 @@ public struct OnboardingView: View {
 private extension OnboardingView {
     static let contentWidth: CGFloat = 580
 
-    var content: some View {
+    func content(_ slide: PageSlideProxy) -> some View {
         VStack(spacing: 20) {
-            topBar
+            topBar(slide)
 
-            page
+            page(slide)
                 .pageSlide(slide)
                 .frame(maxHeight: .infinity, alignment: .top)
                 .contentShape(.rect)
-                .onPageSwipe(following: $slide) { direction in
+                .onPageSwipe(following: slide) { direction in
                     model.canTurn(forward: direction == .forward)
                 } perform: { direction in
-                    turnPage(direction)
+                    turnPage(direction, with: slide)
                 }
 
             if !model.output.isFirstPage {
                 PrimaryButton(model.output.nextTitle) {
-                    next()
+                    next(with: slide)
                 }
             }
         }
@@ -94,14 +94,14 @@ private extension OnboardingView {
         .haptic(.selection, trigger: model.state.page)
     }
 
-    var topBar: some View {
+    func topBar(_ slide: PageSlideProxy) -> some View {
         HStack {
             if model.output.isFirstPage {
                 Color.clear
                     .frame(width: 44, height: 44)
             } else {
                 RingButton(systemImage: "chevron.left") {
-                    turnPage(.backward)
+                    turnPage(.backward, with: slide)
                 }
             }
 
@@ -135,16 +135,16 @@ private extension OnboardingView {
     }
 
     @ViewBuilder
-    var page: some View {
+    func page(_ slide: PageSlideProxy) -> some View {
         switch model.state.page {
-        case .welcome: welcomePage
+        case .welcome: welcomePage(slide)
         case .monthStart: monthStartPage
         case .budget: budgetPage
         case .setup: setupPage
         }
     }
 
-    var welcomePage: some View {
+    func welcomePage(_ slide: PageSlideProxy) -> some View {
         VStack(spacing: 12) {
             Spacer()
 
@@ -169,7 +169,7 @@ private extension OnboardingView {
                     duration: "5 分"
                 ) {
                     model.choose(.full)
-                    turnPage(.forward)
+                    turnPage(.forward, with: slide)
                 }
 
                 Hairline()
@@ -191,7 +191,7 @@ private extension OnboardingView {
 
             PrimaryButton("予算を決めて始める", detail: "1 分") {
                 model.choose(.minimal)
-                turnPage(.forward)
+                turnPage(.forward, with: slide)
             }
 
             Text("どれも、あとで設定から変えられます")
@@ -246,9 +246,9 @@ private extension OnboardingView {
 }
 
 private extension OnboardingView {
-    func next() {
+    func next(with slide: PageSlideProxy) {
         guard model.output.isLastPage else {
-            turnPage(.forward)
+            turnPage(.forward, with: slide)
             return
         }
 
@@ -257,14 +257,17 @@ private extension OnboardingView {
         }
     }
 
-    func turnPage(_ direction: PageSwipeDirection) {
+    func turnPage(
+        _ direction: PageSwipeDirection,
+        with slide: PageSlideProxy
+    ) {
         let forward = direction == .forward
 
         guard model.canTurn(forward: forward) else {
             return
         }
 
-        PageSlide.run($slide, forward: forward) {
+        slide.run(forward: forward) {
             switch direction {
             case .forward: model.next()
             case .backward: model.back()

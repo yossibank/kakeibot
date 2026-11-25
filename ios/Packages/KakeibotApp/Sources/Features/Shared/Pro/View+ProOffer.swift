@@ -20,7 +20,7 @@ public extension View {
 }
 
 private struct ProOfferModifier: ViewModifier {
-    @State private var isShowingPro = false
+    @State private var model = ProOfferModel()
 
     @Environment(\.isPro) private var isPro
     @Environment(\.proStore) private var store
@@ -39,7 +39,7 @@ private struct ProOfferModifier: ViewModifier {
                         feature: feature,
                         onUnlock: onUnlock,
                         onLearnMore: {
-                            isShowingPro = true
+                            model.showPro()
                         },
                         onCancel: onCancel
                     )
@@ -57,11 +57,11 @@ private struct ProOfferModifier: ViewModifier {
                     return
                 }
 
-                isShowingPro = false
+                model.closePro()
                 onUnlock()
             }
             .proDestination(
-                isPresented: $isShowingPro,
+                isPresented: Bindable(model.state).isShowingPro,
                 inSheet: presentsInSheet
             ) {
                 ProView(

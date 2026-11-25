@@ -13,7 +13,7 @@ extension AppModelTests {
 
         await model.observePro(in: database)
 
-        #expect(model.isPro)
+        #expect(model.input.isPro)
     }
 
     @Test
@@ -23,7 +23,7 @@ extension AppModelTests {
 
         await model.observePro(in: database)
 
-        #expect(!model.isPro)
+        #expect(!model.input.isPro)
     }
 
     @Test
@@ -37,7 +37,7 @@ extension AppModelTests {
 
         await model.observePro(in: database)
 
-        #expect(model.isPro)
+        #expect(model.input.isPro)
     }
 
     @Test
@@ -49,8 +49,8 @@ extension AppModelTests {
         await model.observePro(in: database)
 
         #expect(try await database.isSyncEnabled() == false)
-        #expect(!model.isPro)
-        #expect(model.notice.message == nil)
+        #expect(!model.input.isPro)
+        #expect(model.state.notice.message == nil)
     }
 
     @Test
@@ -66,7 +66,7 @@ extension AppModelTests {
         await model.observePro(in: database)
 
         #expect(try await database.isSyncEnabled() == false)
-        #expect(!model.isPro)
+        #expect(!model.input.isPro)
     }
 
     @Test
@@ -77,8 +77,8 @@ extension AppModelTests {
         await model.observePro(in: database)
 
         #expect(try await database.isSyncEnabled() == false)
-        #expect(!model.isPro)
-        #expect(model.notice.message == nil)
+        #expect(!model.input.isPro)
+        #expect(model.state.notice.message == nil)
     }
 
     @Test
@@ -100,8 +100,8 @@ extension AppModelTests {
         await model.observePro(in: database)
 
         #expect(try await database.isSyncEnabled())
-        #expect(!model.isPro)
-        #expect(model.notice.message == "同期を止められませんでした。設定の「同期と共有」から止めてください")
+        #expect(!model.input.isPro)
+        #expect(model.state.notice.message == "同期を止められませんでした。設定の「同期と共有」から止めてください")
     }
 
     @Test

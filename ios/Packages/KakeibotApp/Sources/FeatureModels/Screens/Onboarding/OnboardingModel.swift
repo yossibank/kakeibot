@@ -58,6 +58,7 @@ public extension OnboardingModel {
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
         public var outcome = ScreenOutcome<Void>()
+        public var path: [SetupItem] = []
 
         public internal(set) var page: Page = .welcome
         public internal(set) var route: Route?
@@ -74,6 +75,10 @@ public extension OnboardingModel {
             self.monthStart = monthStart
             self.budget = budget
             self.setup = setup
+        }
+
+        public func open(_ item: SetupItem) {
+            path.append(item)
         }
     }
 

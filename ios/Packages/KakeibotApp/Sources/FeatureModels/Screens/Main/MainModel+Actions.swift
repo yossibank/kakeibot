@@ -12,6 +12,11 @@ public extension MainModel {
         input.launchScreen = screen
     }
 
+    func warmUpEntry() async {
+        try? await Task.sleep(for: dependencies.warmupDuration)
+        state.finishWarmingEntry()
+    }
+
     func openLaunchSheet(preferring sheet: Sheet?) {
         if let sheet {
             state.sheet = sheet

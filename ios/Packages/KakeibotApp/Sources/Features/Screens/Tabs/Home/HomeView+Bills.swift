@@ -24,13 +24,14 @@ extension HomeView {
                     .padding(.bottom, 4)
                 }
 
-                BillPager(
+                ResizingPager(
                     current: Binding {
                         model.output.billPage
                     } set: { page in
                         model.state.billPage = page
                     },
                     pages: model.output.billPages,
+                    id: \.month,
                     inset: Self.billInset
                 ) { page in
                     billList(page)

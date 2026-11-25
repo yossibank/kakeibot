@@ -9,8 +9,6 @@ public struct ReviewView: View {
 
     @Bindable private(set) var model: ReviewModel
 
-    @State var slide = PageSlide()
-
     let onAddEntry: (LocalDate) -> Void
     let onOpenRecurrings: () -> Void
 
@@ -35,11 +33,19 @@ public struct ReviewView: View {
     }
 
     public var body: some View {
+        PageSlideReader { slide in
+            screen(slide)
+        }
+    }
+}
+
+private extension ReviewView {
+    func screen(_ slide: PageSlideProxy) -> some View {
         ScrollView {
             VStack(spacing: 12) {
-                header
+                header(slide)
 
-                periodBar
+                periodBar(slide)
 
                 analysisBanner
 
@@ -50,8 +56,8 @@ public struct ReviewView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .onPageSwipe(following: $slide, canMove: canMove) { direction in
-            move(direction)
+        .onPageSwipe(following: slide, canMove: canMove) { direction in
+            move(direction, with: slide)
         }
         .haptic(.selection, trigger: model.output.period)
         .haptic(.selection, trigger: model.input.kind)
@@ -62,7 +68,7 @@ public struct ReviewView: View {
             await model.refreshStoreReviewCard()
         }
         .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in
-            sheetView(sheet)
+            sheetView(sheet, slide: slide)
         }
         .errorBanner(model.state.errorNotice) {
             model.state.errorNotice.clear()
@@ -106,13 +112,16 @@ extension ReviewView {
     }
 
     @ViewBuilder
-    func sheetView(_ sheet: ReviewModel.Sheet) -> some View {
+    func sheetView(
+        _ sheet: ReviewModel.Sheet,
+        slide: PageSlideProxy
+    ) -> some View {
         switch sheet {
         case let .share(share):
             shareSheet(share)
 
         case .analysis:
-            analysisSheet
+            analysisSheet(slide)
 
         case let .stamp(tally):
             StampDaysSheet(
@@ -139,39 +148,45 @@ extension ReviewView {
         }
     }
 
-    func move(_ direction: PageSwipeDirection) {
-        move(by: Self.count(of: direction))
+    func move(
+        _ direction: PageSwipeDirection,
+        with slide: PageSlideProxy
+    ) {
+        move(by: Self.count(of: direction), with: slide)
     }
 
     func canMove(_ direction: PageSwipeDirection) -> Bool {
         model.output.canMove(by: Self.count(of: direction))
     }
 
-    func move(by count: Int) {
+    func move(
+        by count: Int,
+        with slide: PageSlideProxy
+    ) {
         guard model.output.canMove(by: count) else {
             return
         }
 
-        PageSlide.run($slide, forward: count > 0) {
+        slide.run(forward: count > 0) {
             model.move(by: count)
         }
     }
 
-    func moveToCurrentPeriod() {
-        PageSlide.run($slide, forward: true) {
+    func moveToCurrentPeriod(with slide: PageSlideProxy) {
+        slide.run(forward: true) {
             model.moveToCurrent()
         }
     }
 }
 
 private extension ReviewView {
-    var header: some View {
+    func header(_ slide: PageSlideProxy) -> some View {
         TabHeader("振り返り") {
-            CapsulePicker(selection: scaleBinding, options: Self.scaleOptions)
+            CapsulePicker(selection: scaleBinding(slide), options: Self.scaleOptions)
         }
     }
 
-    var periodBar: some View {
+    func periodBar(_ slide: PageSlideProxy) -> some View {
         PeriodStepper(
             title: periodTitle,
             subtitle: periodSubtitle,
@@ -179,9 +194,11 @@ private extension ReviewView {
             transition: periodTextTransition,
             canMoveForward: model.output.canMoveForward,
             onMove: { count in
-                move(by: count)
+                move(by: count, with: slide)
             },
-            onCurrent: moveToCurrentPeriod
+            onCurrent: {
+                moveToCurrentPeriod(with: slide)
+            }
         )
     }
 }
@@ -193,7 +210,14 @@ private extension ReviewView {
         .init("年", value: .year)
     ]
 
-    var scaleBinding: Binding<ReviewPeriod.Scale> {
+    var periodSubtitle: String? {
+        switch model.input.scale {
+        case .week: nil
+        case .month, .year: PeriodText.range(model.output.period.range)
+        }
+    }
+
+    func scaleBinding(_ slide: PageSlideProxy) -> Binding<ReviewPeriod.Scale> {
         Binding {
             model.input.scale
         } set: { scale in
@@ -201,20 +225,13 @@ private extension ReviewView {
             let from = scales.firstIndex(of: model.input.scale) ?? 0
             let to = scales.firstIndex(of: scale) ?? 0
 
-            PageSlide.run($slide, forward: to > from) {
+            slide.run(forward: to > from) {
                 model.setScale(scale)
 
                 model.perform {
                     await $0.saveSelection()
                 }
             }
-        }
-    }
-
-    var periodSubtitle: String? {
-        switch model.input.scale {
-        case .week: nil
-        case .month, .year: PeriodText.range(model.output.period.range)
         }
     }
 }

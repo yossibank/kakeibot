@@ -1,11 +1,17 @@
-import SwiftUI
-
-struct AppForegroundReturn {
+public struct ForegroundReturn: Sendable {
     private var wasBackground = false
+
+    public init() {}
 }
 
-extension AppForegroundReturn {
-    mutating func receive(_ phase: ScenePhase) -> Bool {
+public extension ForegroundReturn {
+    enum Phase: Sendable {
+        case active
+        case inactive
+        case background
+    }
+
+    mutating func receive(_ phase: Phase) -> Bool {
         switch phase {
         case .background:
             wasBackground = true
@@ -18,7 +24,7 @@ extension AppForegroundReturn {
 
             return wasBackground
 
-        default:
+        case .inactive:
             return false
         }
     }

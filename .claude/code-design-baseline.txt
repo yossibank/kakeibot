@@ -1,33 +1,6 @@
-ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: glow。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: hasSwept。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: isLeaving。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: revealSize。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: sweep。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: View の @State に置けるのは、モデルと layout だけにする: foreground。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: View の @State に置けるのは、モデルと layout だけにする: isHomeLoaded。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: View の @State に置けるのは、モデルと layout だけにする: isLaunching。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: View の @State に置けるのは、モデルと layout だけにする: isRevealed。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: foreground。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: isWarmingEntry。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: noticeRound。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: observationRound。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: orderMenuAnchor。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: undo。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: receipt。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: View の @State に置けるのは、モデルと layout だけにする: voice。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Onboarding/OnboardingView.swift: View の @State に置けるのは、モデルと layout だけにする: path。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Onboarding/OnboardingView.swift: View の @State に置けるのは、モデルと layout だけにする: slide。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/AppIcons/AppIconTile.swift: View の @State に置けるのは、モデルと layout だけにする: taps。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: View の @State に置けるのは、モデルと layout だけにする: slide。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: View の @State に置けるのは、モデルと layout だけにする: slide。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewCard.swift: View の @State に置けるのは、モデルと layout だけにする: shownSteps。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewCard.swift: View の @State に置けるのは、モデルと layout だけにする: stepsWidth。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewSheet.swift: View の @State に置けるのは、モデルと layout だけにする: version。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillPager.swift: View の @State に置けるのは、モデルと layout だけにする: heights。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillPager.swift: View の @State に置けるのは、モデルと layout だけにする: position。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillPager.swift: View の @State に置けるのは、モデルと layout だけにする: progress。見た目の値は、入れ子の struct Layout にまとめる
-ios/Packages/KakeibotApp/Sources/Features/Shared/Notice/EntryDeletionBanner.swift: View の @State に置けるのは、モデルと layout だけにする: remaining。意味のある状態は、モデルの state に移す
-ios/Packages/KakeibotApp/Sources/Features/Shared/Pro/View+ProOffer.swift: View の @State に置けるのは、モデルと layout だけにする: isShowingPro。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: View の @State に置けるのは、モデルと layout だけにする: drag。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsZoneBox.swift: View の @State に置けるのは、モデルと layout だけにする: isOpen。意味のある状態は、モデルの state に移す
 ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsZoneBox.swift: View の @State に置けるのは、モデルと layout だけにする: showsOnLabel。意味のある状態は、モデルの state に移す

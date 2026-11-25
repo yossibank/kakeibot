@@ -50,7 +50,7 @@ extension AppModelTests {
         let after = try database.snapshot().entries
 
         #expect(before.isEmpty)
-        #expect(model.today == next)
+        #expect(model.input.today == next)
         #expect(after.map(\.recurringDate) == [next])
     }
 
@@ -90,7 +90,7 @@ extension AppModelTests {
         clock.set(first.adding(days: 1))
         await model.refreshDay()
 
-        #expect(model.today == first.adding(days: 1))
+        #expect(model.input.today == first.adding(days: 1))
         #expect(model.hasDatabase == false)
     }
 }

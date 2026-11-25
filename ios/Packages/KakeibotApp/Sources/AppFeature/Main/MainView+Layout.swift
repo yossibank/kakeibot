@@ -21,8 +21,6 @@ extension MainView {
 }
 
 extension MainView {
-    static let warmupDuration: Duration = .milliseconds(500)
-
     static let tabItems: [FloatingTabBar<MainModel.Tab>.Item] = [
         .init("ホーム", systemImage: "house", value: .home),
         .init("記録", systemImage: "calendar", value: .records),
