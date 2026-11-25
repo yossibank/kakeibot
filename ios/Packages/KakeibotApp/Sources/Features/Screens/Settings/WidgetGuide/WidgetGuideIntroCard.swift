@@ -3,10 +3,10 @@ import FeatureModels
 import SwiftUI
 
 struct WidgetGuideIntroCard: View {
-    private let flag: SettingsScreenFlag?
+    private let hint: SettingsFold?
 
-    init(flag: SettingsScreenFlag? = nil) {
-        self.flag = flag
+    init(hint: SettingsFold? = nil) {
+        self.hint = hint
     }
 
     var body: some View {
@@ -18,7 +18,7 @@ struct WidgetGuideIntroCard: View {
                 .init("yensign.circle", "今月あといくら使えるかを見られます"),
                 .init("lock", "ロック画面などにも置けます")
             ],
-            flag: flag
+            hint: hint
         )
     }
 }

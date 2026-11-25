@@ -90,16 +90,14 @@ public extension BudgetListModel {
         public internal(set) var recurrings: [Recurring] = []
         public internal(set) var carryoverFrom: YearMonth?
 
+        public let hint = SettingsFoldInput.hint(.budgets)
+
         let today: LocalDate
 
         init(today: LocalDate) {
             self.today = today
             self.month = today.yearMonth
         }
-    }
-
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.budgets, in: dependencies.database)
     }
 
     func load() async {
@@ -247,5 +245,11 @@ private extension BudgetListModel {
             state.errorNotice.show(failure, for: error)
             return false
         }
+    }
+}
+
+extension BudgetListModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }

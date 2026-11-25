@@ -54,12 +54,10 @@ public extension SyncModel {
         public internal(set) var shares: [WalletShare] = []
         public internal(set) var joined: [JoinedShare] = []
 
+        public let hint = SettingsFoldInput.hint(.sync)
+
         var members: Loadable<[SyncParticipant]> = .loading
         var pending: Loadable<Int> = .loading
-    }
-
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.sync, in: dependencies.database)
     }
 
     func load() async {
@@ -243,5 +241,11 @@ private extension SyncModel {
         }
 
         state.isWorking = false
+    }
+}
+
+extension SyncModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }

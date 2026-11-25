@@ -61,7 +61,6 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.title
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
-import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
@@ -81,7 +80,6 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.Recurring
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsScreenFlag
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
@@ -141,15 +139,9 @@ fun RecurringListView(
     val hiddenNotice = remember { UndoNoticeState<Identifier<Recurring>>() }
     val deletedNotice = remember { UndoNoticeState<Deletion>() }
     val lift = remember { RecurringLift() }
-    val hint =
-        remember(database) { SettingsScreenFlag.closedHint(SettingsScreen.recurrings, database) }
-    val hiddenList =
-        remember(database) {
-            SettingsScreenFlag.openHiddenList(SettingsScreen.recurrings, database)
-        }
 
-    LaunchedEffect(hiddenList) {
-        hiddenList.load()
+    LaunchedEffect(model) {
+        model.loadFold(model.input.hiddenList)
     }
 
     LaunchedEffect(model) {
@@ -180,7 +172,12 @@ fun RecurringListView(
         title = "固定費",
         isRoot = false,
         onBack = onBack,
-        trailing = { SettingsHintButton(flag = hint) },
+        trailing = {
+            SettingsHintButton(
+                fold = model.input.hint,
+                model = model,
+            )
+        },
         overlay = {
             Column(
                 modifier = Modifier
@@ -249,7 +246,8 @@ fun RecurringListView(
         SettingsIntroCard(
             icon = R.drawable.ic_repeat,
             headline = "決まった日の記録を" to "ひとりでに入れます",
-            flag = hint,
+            fold = model.input.hint,
+            model = model,
             notes = buildList {
                 add(SettingsIntroNote(R.drawable.ic_calendar, "休日なら、前後の平日にずらせます"))
                 add(SettingsIntroNote(R.drawable.ic_bell, "前もって通知で知らせられます"))
@@ -299,8 +297,8 @@ fun RecurringListView(
             if (model.output.hiddenRows.isNotEmpty()) {
                 RecurringHiddenSection(
                     rows = model.output.hiddenRows,
-                    isOpen = hiddenList.isOn,
-                    onToggle = { scope.launch { hiddenList.set(!hiddenList.isOn) } },
+                    isOpen = model.input.hiddenList.isClosed != true,
+                    onToggle = { scope.launch { model.toggleHiddenList() } },
                     onDeleteAll = { deleting = DeleteTarget.AllHidden },
                     onEdit = actions.onEdit,
                     onShow = { id -> scope.launch { model.show(id) } },

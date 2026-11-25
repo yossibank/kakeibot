@@ -10,7 +10,7 @@ struct SettingsBoardScreen<
     Floating: View
 >: View {
     let title: String
-    let hint: SettingsScreenFlag
+    let hint: SettingsFold
     let intro: SettingsIntroCard
     let emptyNote: EmptyNote
     let addTitle: String
@@ -29,7 +29,7 @@ struct SettingsBoardScreen<
 
     init(
         title: String,
-        hint: SettingsScreenFlag,
+        hint: SettingsFold,
         intro: SettingsIntroCard,
         emptyNote: EmptyNote,
         addTitle: String,

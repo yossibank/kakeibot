@@ -29,6 +29,8 @@ public extension HomeSectionListModel {
     @Observable
     final class Input {
         public internal(set) var isLoaded = false
+
+        public let hint = SettingsFoldInput.hint(.homeSections)
     }
 
     func load() async {
@@ -64,5 +66,11 @@ public extension HomeSectionListModel {
 extension HomeSectionListModel {
     struct Dependencies {
         let database: AppDatabase
+    }
+}
+
+extension HomeSectionListModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }

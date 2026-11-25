@@ -6,7 +6,6 @@ extension CategoryEditSheet {
     var edit: SettingsEditController<CategoryEditModel> {
         SettingsEditController(
             model: model,
-            prompt: $prompt,
             dismiss: dismiss,
             onRest: {
                 focus = nil

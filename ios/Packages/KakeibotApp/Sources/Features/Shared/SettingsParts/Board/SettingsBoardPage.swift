@@ -7,8 +7,6 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
     @State var model: Spec.Model
 
     @State private var drag = SettingsDrag<Spec.Model.Item.ID>()
-    @State private var hintFlag: SettingsScreenFlag
-    @State private var hiddenList: SettingsScreenFlag
     @State private var destination: Spec.Destination?
     @State private var hiddenId: Spec.Model.Item.ID?
     @State private var openId: Spec.Model.Item.ID?
@@ -24,12 +22,7 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
     private let spec: Spec
 
     init(_ spec: Spec) {
-        let hintFlag = SettingsScreenFlag.closedHint(spec.screen, in: spec.parts)
-        let hiddenList = SettingsScreenFlag.openHiddenList(spec.screen, in: spec.parts)
-
         _model = State(initialValue: spec.makeModel())
-        _hintFlag = State(initialValue: hintFlag)
-        _hiddenList = State(initialValue: hiddenList)
         _grid = State(initialValue: spec.grid)
 
         self.spec = spec
@@ -38,8 +31,8 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
     var body: some View {
         SettingsBoardScreen(
             title: spec.title,
-            hint: hintFlag,
-            intro: spec.intro(flag: hintFlag, in: model),
+            hint: hint,
+            intro: spec.intro(hint: hint, in: model),
             emptyNote: .init(
                 systemImage: emptyNote.systemImage,
                 text: emptyNote.text
@@ -110,6 +103,10 @@ private extension SettingsBoardPage {
         )
     }
 
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+
     var emptyNote: (systemImage: String, text: String) {
         spec.emptyNote(in: model)
     }
@@ -158,7 +155,7 @@ private extension SettingsBoardPage {
 
     var hiddenSection: some View {
         SettingsHiddenTiles(
-            flag: hiddenList,
+            fold: SettingsFold(\.hiddenList, in: model),
             title: spec.hiddenTitle,
             grid: grid,
             controller: controller,

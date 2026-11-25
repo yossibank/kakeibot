@@ -11,6 +11,7 @@ public extension RecurringEditModel {
         public var startDate: LocalDate
         public var endDate: LocalDate?
         public var remindDaysBefore: Int?
+        public var isOpen = false
 
         public private(set) var holidayShift: HolidayShift = .none
 
@@ -62,14 +63,14 @@ public extension RecurringEditModel {
 
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: SettingsEditState {
         public var errorNotice = ErrorNotice()
+        public var prompt = SettingsEditPrompt()
 
         public var categoryId: EntryCategory.ID?
         public var toWalletId: Wallet.ID?
         public var memo = ""
         public var billShift = 0
-        public var isScheduleOpen: Bool
         public var schedule: Schedule
 
         public private(set) var walletId: Wallet.ID?
@@ -86,8 +87,12 @@ public extension RecurringEditModel {
             isScheduleOpen: Bool
         ) {
             self.type = type
-            self.isScheduleOpen = isScheduleOpen
-            self.schedule = Schedule(month: today.month, day: today.day, startDate: today)
+            self.schedule = Schedule(
+                month: today.month,
+                day: today.day,
+                startDate: today,
+                isOpen: isScheduleOpen
+            )
         }
     }
 }

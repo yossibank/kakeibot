@@ -29,10 +29,6 @@ extension RecurringBoard: SettingsBoardSpec {
 
     typealias Editor = RecurringEditSheet
 
-    var screen: SettingsScreen {
-        .recurrings
-    }
-
     var title: String {
         "固定費"
     }
@@ -116,14 +112,14 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func intro(
-        flag: SettingsScreenFlag,
+        hint: SettingsFold,
         in model: RecurringListModel
     ) -> SettingsIntroCard {
         SettingsIntroCard(
             systemImage: "repeat",
             headline: ("決まった日の記録を", "ひとりでに入れます"),
             notes: notes(in: model),
-            flag: flag
+            hint: hint
         )
     }
 

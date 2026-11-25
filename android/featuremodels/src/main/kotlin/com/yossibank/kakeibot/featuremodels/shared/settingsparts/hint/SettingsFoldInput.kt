@@ -11,69 +11,54 @@ import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.closedHiddenLists
 import com.yossibank.kakeibot.store.records.settingkeys.closedHints
 import com.yossibank.kakeibot.store.writes.methods.setSetting
-import kotlinx.coroutines.CancellationException
 
-class SettingsScreenFlag(
-    private val database: AppDatabase,
+class SettingsFoldInput internal constructor(
     private val key: SettingKey<Set<SettingsScreen>>,
     private val screen: SettingsScreen,
-    isOn: Boolean = false,
-    private val savesOn: Boolean = true,
 ) {
-    var isOn: Boolean by mutableStateOf(isOn)
+    var isClosed: Boolean? by mutableStateOf(null)
         private set
 
-    var isLoaded: Boolean by mutableStateOf(false)
-        private set
+    internal suspend fun load(from: AppDatabase) {
+        val screens = read(from) ?: emptySet()
 
-    suspend fun load() {
-        val screens = read() ?: emptySet()
-
-        isOn = (screen in screens) == savesOn
-        isLoaded = true
+        isClosed = screen in screens
     }
 
-    suspend fun set(isOn: Boolean) {
-        this.isOn = isOn
+    internal suspend fun save(
+        isClosed: Boolean,
+        to: AppDatabase,
+    ) {
+        this.isClosed = isClosed
 
-        val screens = read()?.toMutableSet() ?: mutableSetOf()
+        val screens = read(to)?.toMutableSet() ?: mutableSetOf()
 
-        if (isOn == savesOn) {
+        if (isClosed) {
             screens.add(screen)
         } else {
             screens.remove(screen)
         }
 
         ModelTask.quiet {
-            database.setSetting(
+            to.setSetting(
                 key = key,
                 to = screens,
             )
         }
     }
 
-    private suspend fun read(): Set<SettingsScreen>? = ModelTask.quiet { database.setting(key) }
+    private suspend fun read(from: AppDatabase): Set<SettingsScreen>? =
+        ModelTask.quiet { from.setting(key) }
 
     companion object {
-        fun closedHint(
-            screen: SettingsScreen,
-            database: AppDatabase,
-        ): SettingsScreenFlag = SettingsScreenFlag(
-            database = database,
+        internal fun hint(screen: SettingsScreen): SettingsFoldInput = SettingsFoldInput(
             key = SettingKey.closedHints,
             screen = screen,
-            isOn = true,
         )
 
-        fun openHiddenList(
-            screen: SettingsScreen,
-            database: AppDatabase,
-        ): SettingsScreenFlag = SettingsScreenFlag(
-            database = database,
+        internal fun hiddenList(screen: SettingsScreen): SettingsFoldInput = SettingsFoldInput(
             key = SettingKey.closedHiddenLists,
             screen = screen,
-            isOn = true,
-            savesOn = false,
         )
     }
 }

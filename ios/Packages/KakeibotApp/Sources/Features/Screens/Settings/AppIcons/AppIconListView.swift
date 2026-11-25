@@ -6,21 +6,21 @@ import SwiftUI
 public struct AppIconListView: View {
     @Bindable private var model: AppIconListModel
 
-    @State private var hintFlag: SettingsScreenFlag
+    @State private var hintModel: SettingsHintModel
 
     public init(
         model: AppIconListModel,
         parts: ScreenParts
     ) {
-        let hintFlag = SettingsScreenFlag.closedHint(.appIcons, in: parts)
+        let hintModel = SettingsHintModel(parts: parts, screen: .appIcons)
 
         self.model = model
-        _hintFlag = State(initialValue: hintFlag)
+        _hintModel = State(initialValue: hintModel)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("アプリアイコン", hint: hintFlag)
+            SettingsBackHeader("アプリアイコン", hint: hint)
 
             SettingsIntroCard(
                 systemImage: "app.badge",
@@ -29,7 +29,7 @@ public struct AppIconListView: View {
                     .init("arrow.triangle.2.circlepath", "押すと、すぐに切り替わります"),
                     .init("circle.lefthalf.filled", "ライト用とダーク用から選べます")
                 ],
-                flag: hintFlag
+                hint: hint
             )
 
             ScrollView {
@@ -47,6 +47,10 @@ public struct AppIconListView: View {
 }
 
 private extension AppIconListView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: hintModel)
+    }
+
     func section(
         _ title: String,
         isLight: Bool

@@ -12,10 +12,6 @@ extension RewardRuleBoard: SettingsBoardSpec {
     typealias Destination = SettingsBoardDestination<RewardRule.ID>
     typealias Editor = RewardRuleEditSheet
 
-    var screen: SettingsScreen {
-        .rewards
-    }
-
     var title: String {
         "ごほうびの決まり"
     }
@@ -63,7 +59,7 @@ extension RewardRuleBoard: SettingsBoardSpec {
     }
 
     func intro(
-        flag: SettingsScreenFlag,
+        hint: SettingsFold,
         in _: RewardRuleListModel
     ) -> SettingsIntroCard {
         SettingsIntroCard(
@@ -73,7 +69,7 @@ extension RewardRuleBoard: SettingsBoardSpec {
                 .init("banknote", "口座の残高は変わりません"),
                 .arrange
             ],
-            flag: flag
+            hint: hint
         )
     }
 

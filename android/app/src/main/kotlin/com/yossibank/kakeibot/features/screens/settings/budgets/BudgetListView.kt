@@ -42,7 +42,6 @@ import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
-import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.designsystem.components.budget.BudgetUsageBar
 import com.yossibank.kakeibot.designsystem.components.budget.carryoverText
 import com.yossibank.kakeibot.designsystem.components.budget.remainingText
@@ -60,7 +59,6 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsScreenFlag
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
@@ -94,8 +92,6 @@ fun BudgetListView(
         model.state.today = today
     }
 
-    val hint =
-        remember(database) { SettingsScreenFlag.closedHint(SettingsScreen.budgets, database) }
     val scope = rememberCoroutineScope()
 
     val cleared = remember { UndoNoticeState<BudgetListModel.Cleared>() }
@@ -114,7 +110,12 @@ fun BudgetListView(
         title = "予算",
         isRoot = false,
         onBack = onBack,
-        trailing = { SettingsHintButton(flag = hint) },
+        trailing = {
+            SettingsHintButton(
+                fold = model.input.hint,
+                model = model,
+            )
+        },
         overlay = {
             BudgetNotices(
                 model = model,
@@ -132,7 +133,8 @@ fun BudgetListView(
         SettingsIntroCard(
             icon = R.drawable.ic_glyph_budget,
             headline = "月に使う額を" to "カテゴリ別に決めます",
-            flag = hint,
+            fold = model.input.hint,
+            model = model,
             notes = listOf(
                 SettingsIntroNote(R.drawable.ic_calendar, "変えた額はこの月から使います"),
                 SettingsIntroNote(R.drawable.ic_repeat, "前の月の額はそのまま残ります"),

@@ -3,7 +3,7 @@ import FeatureModels
 import SwiftUI
 
 struct SettingsHiddenTitle: View {
-    let flag: SettingsScreenFlag
+    let fold: SettingsFold
     let title: String
     let count: Int
 
@@ -14,7 +14,7 @@ struct SettingsHiddenTitle: View {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Button {
                     withAnimation(.snappy) {
-                        _ = flag.set(!flag.isOn)
+                        fold.setClosed(!fold.isClosed)
                     }
                 } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -32,7 +32,7 @@ struct SettingsHiddenTitle: View {
 
                 Spacer()
 
-                if flag.isOn,
+                if !fold.isClosed,
                    let onDeleteAll {
                     Button(action: onDeleteAll) {
                         Label("まとめて削除", systemImage: "trash")
@@ -45,21 +45,21 @@ struct SettingsHiddenTitle: View {
                 }
             }
 
-            if flag.isOn {
+            if !fold.isClosed {
                 Text("長押しで上に動かすと戻せます")
                     .textFont(.caption2)
                     .foregroundStyle(Palette.subtext)
             }
         }
-        .animation(.snappy, value: flag.isOn)
+        .animation(.snappy, value: fold.isClosed)
         .task {
-            await flag.load()
+            await fold.load()
         }
     }
 }
 
 private extension SettingsHiddenTitle {
     var chevronAngle: Angle {
-        .degrees(flag.isOn ? 90 : 0)
+        .degrees(fold.isClosed ? 0 : 90)
     }
 }

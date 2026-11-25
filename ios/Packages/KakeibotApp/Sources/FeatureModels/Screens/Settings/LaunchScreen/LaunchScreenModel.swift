@@ -21,10 +21,8 @@ public extension LaunchScreenModel {
     @Observable
     final class Input {
         public internal(set) var screen: LaunchScreen = .home
-    }
 
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.launchScreen, in: dependencies.database)
+        public let hint = SettingsFoldInput.hint(.launchScreen)
     }
 
     func load() async {
@@ -49,5 +47,11 @@ public extension LaunchScreenModel {
 extension LaunchScreenModel {
     struct Dependencies {
         let database: AppDatabase
+    }
+}
+
+extension LaunchScreenModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }

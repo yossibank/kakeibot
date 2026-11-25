@@ -7,7 +7,7 @@ public struct WidgetGuideView: View {
     @State private var place: WidgetGuidePlace
     @State private var widget: WidgetGuideWidget
     @State private var size: WidgetGuideSize
-    @State private var hintFlag: SettingsScreenFlag
+    @State private var hintModel: SettingsHintModel
     @State private var shownSample: WidgetGuideSample?
 
     public init(parts: ScreenParts) {
@@ -20,19 +20,19 @@ public struct WidgetGuideView: View {
         widget: WidgetGuideWidget = .quickRecord,
         size: WidgetGuideSize = .medium
     ) {
-        let hintFlag = SettingsScreenFlag.closedHint(.widgetGuide, in: parts)
+        let hintModel = SettingsHintModel(parts: parts, screen: .widgetGuide)
 
         _place = State(initialValue: place)
         _widget = State(initialValue: widget)
         _size = State(initialValue: size)
-        _hintFlag = State(initialValue: hintFlag)
+        _hintModel = State(initialValue: hintModel)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("ウィジェットの置き方", hint: hintFlag)
+            SettingsBackHeader("ウィジェットの置き方", hint: hint)
 
-            WidgetGuideIntroCard(flag: hintFlag)
+            WidgetGuideIntroCard(hint: hint)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
@@ -213,6 +213,12 @@ private extension WidgetGuideView {
 
     func isCurrent(_ item: WidgetGuideSample) -> Bool {
         item.widget == widget && item.size == size
+    }
+}
+
+private extension WidgetGuideView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: hintModel)
     }
 }
 

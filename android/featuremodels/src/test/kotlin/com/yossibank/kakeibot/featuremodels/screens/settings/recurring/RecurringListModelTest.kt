@@ -135,6 +135,38 @@ class RecurringListModelTest {
         assertEquals("2026-11-05", model.output.rows.first().next.toString())
     }
 
+    @Test
+    fun remembersClosedHintAndHiddenList() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.observedModel(count = 0)
+        val unread = model.input.hint.isClosed
+
+        model.loadFold(model.input.hint)
+        model.loadFold(model.input.hiddenList)
+        val hintFirst = model.input.hint.isClosed
+        val listFirst = model.input.hiddenList.isClosed
+
+        model.setFold(
+            fold = model.input.hint,
+            isClosed = true,
+        )
+        model.toggleHiddenList()
+
+        val reopened = setup.observedModel(count = 0)
+        reopened.loadFold(reopened.input.hint)
+        reopened.loadFold(reopened.input.hiddenList)
+        val hintSaved = reopened.input.hint.isClosed
+        val listSaved = reopened.input.hiddenList.isClosed
+
+        reopened.toggleHiddenList()
+
+        assertNull(unread)
+        assertEquals(false, hintFirst)
+        assertEquals(false, listFirst)
+        assertEquals(true, hintSaved)
+        assertEquals(true, listSaved)
+        assertEquals(false, reopened.input.hiddenList.isClosed)
+    }
+
     private suspend fun ModelTestSetup.observedModel(count: Int = 1): RecurringListModel {
         val model = RecurringListModel(
             database = database,

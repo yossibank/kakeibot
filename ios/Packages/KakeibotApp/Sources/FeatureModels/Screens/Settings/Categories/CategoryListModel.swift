@@ -18,7 +18,7 @@ public final class CategoryListModel {
         kind: EntryCategory.Kind = .expense
     ) {
         let state = State(kind: kind)
-        let input = SettingsBoardSnapshotInput<CategoryList>()
+        let input = SettingsBoardSnapshotInput<CategoryList>(screen: .categories)
 
         self.state = state
         self.input = input

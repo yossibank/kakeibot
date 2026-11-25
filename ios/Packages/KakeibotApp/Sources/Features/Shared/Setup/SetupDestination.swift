@@ -83,10 +83,7 @@ public struct SetupDestination: View {
             ThemeStyleLookView(model: ThemeStyleModel(parts: parts))
 
         case .homeSections:
-            HomeSectionListView(
-                model: HomeSectionListModel(parts: parts),
-                parts: parts
-            )
+            HomeSectionListView(model: HomeSectionListModel(parts: parts))
         }
     }
 }

@@ -9,10 +9,13 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.nextDate
 import com.yossibank.kakeibot.core.concepts.recurring.total
+import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -39,7 +42,7 @@ class RecurringListModel(
     clock: ScreenClock,
     entryList: Flow<EntryList>,
     today: LocalDate,
-) {
+) : SettingsFoldModel {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
@@ -96,6 +99,9 @@ class RecurringListModel(
 
         var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
             internal set
+
+        val hint = SettingsFoldInput.hint(SettingsScreen.recurrings)
+        val hiddenList = SettingsFoldInput.hiddenList(SettingsScreen.recurrings)
     }
 
     class Output(
@@ -220,6 +226,27 @@ class RecurringListModel(
             id = id,
             to = to,
             among = output.visible.map { it.id },
+        )
+    }
+
+    override suspend fun loadFold(fold: SettingsFoldInput) {
+        fold.load(from = dependencies.database)
+    }
+
+    override suspend fun setFold(
+        fold: SettingsFoldInput,
+        isClosed: Boolean,
+    ) {
+        fold.save(
+            isClosed = isClosed,
+            to = dependencies.database,
+        )
+    }
+
+    suspend fun toggleHiddenList() {
+        setFold(
+            fold = input.hiddenList,
+            isClosed = input.hiddenList.isClosed != true,
         )
     }
 

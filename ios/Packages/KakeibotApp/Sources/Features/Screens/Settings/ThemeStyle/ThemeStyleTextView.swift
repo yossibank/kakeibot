@@ -5,24 +5,20 @@ import SwiftUI
 
 public struct ThemeStyleTextView: View {
     @State private var model: ThemeStyleModel
-    @State private var hintFlag: SettingsScreenFlag
     @State private var fontOffer: FontOffer?
 
     @Environment(\.isPro) private var isPro
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     public init(model: ThemeStyleModel) {
-        let hintFlag = model.closedHint(.themeText)
-
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         ThemeStyleFrame(
             title: "文字",
             intro: Self.intro,
-            hint: hintFlag,
+            hint: hint,
             model: model
         ) {
             preview
@@ -249,4 +245,10 @@ private extension ThemeStyleTextView {
     static let sampleRest = 125_560
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
+}
+
+private extension ThemeStyleTextView {
+    var hint: SettingsFold {
+        SettingsFold(\.textHint, in: model)
+    }
 }

@@ -10,7 +10,7 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
 
     let title: String
     let intro: ThemeStyleIntroContent
-    let hint: SettingsScreenFlag
+    let hint: SettingsFold
     let model: ThemeStyleModel
 
     @ViewBuilder let preview: Preview
@@ -31,7 +31,7 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
                         systemImage: intro.systemImage,
                         headline: intro.headline,
                         notes: intro.notes,
-                        flag: hint
+                        hint: hint
                     )
 
                     content

@@ -39,6 +39,9 @@ public extension TemplateListModel {
     final class Input: SettingsBoardInput {
         public internal(set) var snapshot: [EntryTemplate]?
         public internal(set) var list: EntryList?
+
+        public let hint = SettingsFoldInput.hint(.templates)
+        public let hiddenList = SettingsFoldInput.hiddenList(.templates)
     }
 
     @MainActor

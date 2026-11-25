@@ -5,18 +5,14 @@ import SwiftUI
 
 public struct LaunchScreenView: View {
     @State private var model: LaunchScreenModel
-    @State private var hintFlag: SettingsScreenFlag
 
     public init(model: LaunchScreenModel) {
-        let hintFlag = model.hintFlag()
-
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("起動時に開く画面", hint: hintFlag)
+            SettingsBackHeader("起動時に開く画面", hint: hint)
 
             SettingsIntroCard(
                 systemImage: "iphone",
@@ -25,7 +21,7 @@ public struct LaunchScreenView: View {
                     .init("power", "立ち上げたときに、選んだ画面から始まります"),
                     .init("arrow.uturn.backward", "途中から戻ったときは、前の画面のままです")
                 ],
-                flag: hintFlag
+                hint: hint
             )
 
             ScrollView {
@@ -56,5 +52,11 @@ public struct LaunchScreenView: View {
         .task {
             await model.load()
         }
+    }
+}
+
+private extension LaunchScreenView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
     }
 }

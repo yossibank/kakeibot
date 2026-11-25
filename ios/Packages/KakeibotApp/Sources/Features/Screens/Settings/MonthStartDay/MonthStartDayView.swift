@@ -5,18 +5,14 @@ import SwiftUI
 
 public struct MonthStartDayView: View {
     @State private var model: MonthStartDayModel
-    @State private var hintFlag: SettingsScreenFlag
 
     public init(model: MonthStartDayModel) {
-        let hintFlag = model.hintFlag()
-
         _model = State(initialValue: model)
-        _hintFlag = State(initialValue: hintFlag)
     }
 
     public var body: some View {
         VStack(spacing: SettingsSpacing.header) {
-            SettingsBackHeader("月の始まり", hint: hintFlag)
+            SettingsBackHeader("月の始まり", hint: hint)
 
             SettingsIntroCard(
                 systemImage: "calendar",
@@ -26,7 +22,7 @@ public struct MonthStartDayView: View {
                     .init("calendar.badge.exclamationmark", "29〜31 日が無い月は、月末からです"),
                     .init("arrow.left.arrow.right", "土日・祝日は、平日にずらせます")
                 ],
-                flag: hintFlag
+                hint: hint
             )
 
             ScrollView {
@@ -82,6 +78,12 @@ private extension MonthStartDayView {
         .padding(16)
         .card()
         .animation(.snappy, value: model.output.shiftNote)
+    }
+}
+
+private extension MonthStartDayView {
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
     }
 }
 

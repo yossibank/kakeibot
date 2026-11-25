@@ -8,7 +8,6 @@ public struct RewardRuleEditSheet: View {
     @State private var panel: Panel?
     @State private var isEditingIcon = false
     @State private var iconBottom: CGFloat = 0
-    @State private var prompt = SettingsEditPrompt()
     @State private var isConfirmingDelete = false
 
     @FocusState private var focus: Field?
@@ -222,7 +221,6 @@ private extension RewardRuleEditSheet {
     var edit: SettingsEditController<RewardRuleEditModel> {
         SettingsEditController(
             model: model,
-            prompt: $prompt,
             dismiss: dismiss,
             restsOnHide: true,
             onRest: {

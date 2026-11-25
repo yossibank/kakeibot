@@ -57,7 +57,7 @@ extension AppModelTests {
     @Test
     func reschedulesNotificationsWhenDateChanges() async throws {
         let database = try AppDatabase.inMemory()
-        let first = AppModel.deviceDay()
+        let first = LocalDate(Date(), in: .current)
         let next = first.adding(days: 1)
         let lastReminder = next.adding(days: NotificationPlan.reminderDays - 1)
         let lastIdentifier = "\(NotificationScheduler.prefix)reminder|\(lastReminder)|"

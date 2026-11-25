@@ -27,10 +27,6 @@ extension ThemeStyleModel {
     struct Dependencies {
         let database: AppDatabase
     }
-
-    public func closedHint(_ screen: SettingsScreen) -> SettingsScreenFlag {
-        .closedHint(screen, in: dependencies.database)
-    }
 }
 
 public extension ThemeStyleModel {
@@ -61,6 +57,9 @@ public extension ThemeStyleModel {
     @Observable
     final class Input {
         public internal(set) var style: ThemeStyle = .standard
+
+        public let textHint = SettingsFoldInput.hint(.themeText)
+        public let lookHint = SettingsFoldInput.hint(.themeLook)
     }
 
     @MainActor
@@ -170,5 +169,11 @@ private extension ThemeStyleModel {
         at keyPath: WritableKeyPath<ThemeStyle, Value>
     ) {
         state.show(value, at: keyPath, over: input.style)
+    }
+}
+
+extension ThemeStyleModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }

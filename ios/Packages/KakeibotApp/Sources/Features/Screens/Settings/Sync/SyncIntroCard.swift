@@ -3,10 +3,10 @@ import FeatureModels
 import SwiftUI
 
 struct SyncIntroCard: View {
-    private let flag: SettingsScreenFlag?
+    private let hint: SettingsFold?
 
-    init(flag: SettingsScreenFlag? = nil) {
-        self.flag = flag
+    init(hint: SettingsFold? = nil) {
+        self.hint = hint
     }
 
     var body: some View {
@@ -19,7 +19,7 @@ struct SyncIntroCard: View {
                 .init("iphone.and.arrow.forward", "機種変更しても、記録が残ります"),
                 .init("lock", "記録は暗号化して iCloud に置きます")
             ],
-            flag: flag
+            hint: hint
         )
     }
 }

@@ -51,6 +51,8 @@ public extension BackupModel {
     final class Input {
         public internal(set) var isSyncActive = false
         public internal(set) var previous: [Previous] = []
+
+        public let hint = SettingsFoldInput.hint(.backup)
     }
 
     @MainActor
@@ -128,10 +130,6 @@ public extension BackupModel {
         }
 
         return months < 12 ? "\(months) か月前" : "\(months / 12) 年前"
-    }
-
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.backup, in: dependencies.database)
     }
 
     func observeSync() async {
@@ -365,5 +363,11 @@ private extension ExportV1.Tables {
         let hasReminder = settings.contains { $0.key == .reminderTime }
         let hasNotice = recurrings.contains { $0.archivedAt == nil && $0.remindDaysBefore != nil }
         return hasReminder || hasNotice
+    }
+}
+
+extension BackupModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }

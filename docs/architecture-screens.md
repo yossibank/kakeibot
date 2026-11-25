@@ -11,7 +11,8 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | 型 | 持つもの |
 | --- | --- |
 | AppModel | 最初の設定が済んでいなければ Onboarding を出す。今日は RootView が MainView と Onboarding に渡す |
-| DB と時計の受け渡し | AppFeature が `ScreenParts` に包んで画面に渡す。画面は、子の画面とモデルの init へそのまま渡す |
+| AppModel の持ち物 | DB を開く関数・時計・通知・Pro の窓口は、`dependencies` にまとめる。今の時刻は、その時計から受け取る |
+| DB と時計の受け渡し | AppModel の `screenParts(for:)` が `ScreenParts` を作り、RootView が渡す。画面は、子の画面とモデルの init へそのまま渡す |
 | 子の画面に渡す `ScreenParts` | モデルから開く画面には、モデルの `childParts()` が返す |
 | MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが見張りを始め、全部を読み終えるまで起動画面を出す |
 | MainView のタブの切り替え | 開いたことのあるタブを重ねて持ち、見えるかどうかだけを切り替える。`TabView` は切り替えのたびに中身の大きさを測り直して重いため使わない |
@@ -93,7 +94,9 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | 対象 | 決まり |
 | --- | --- |
 | 中身 | 見出しと、短い説明（`SettingsIntroCard.Note`）を 2 つ以上付ける |
-| 閉じる | すべての画面で閉じられる。`flag` に `hintFlag` を渡し、ヘッダーにも `hint:` を渡す |
+| 閉じる | すべての画面で閉じられる。閉じたかは、画面のモデルの `input` の `SettingsFoldInput` が持つ |
+| 渡し方 | 画面が `SettingsFold(\.hint, in: model)` を作り、カードとヘッダーの `hint:` に渡す |
+| モデルが DB を持たない画面 | 「アプリアイコン」「ウィジェットの置き方」は、`SettingsHintModel` を子のモデルとして持つ |
 | 置き場所 | 見出しとスクロールの間に置き、並べ替えの座標に入れない |
 | 見本を固定した画面 | 「文字」「形と動き」は、カードを見本の下のスクロールの先頭に置く |
 

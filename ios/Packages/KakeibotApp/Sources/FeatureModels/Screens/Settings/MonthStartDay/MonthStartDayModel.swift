@@ -31,6 +31,8 @@ public extension MonthStartDayModel {
     final class Input {
         public internal(set) var startDay: MonthStartDay = .first
 
+        public let hint = SettingsFoldInput.hint(.monthStartDay)
+
         let today: LocalDate
 
         init(today: LocalDate) {
@@ -45,10 +47,6 @@ public extension MonthStartDayModel {
         init(input: Input) {
             self.input = input
         }
-    }
-
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.monthStartDay, in: dependencies.database)
     }
 
     func load() async {
@@ -113,5 +111,11 @@ private extension MonthStartDayModel {
         await saveSetting(startDay, for: .monthStartDay, in: dependencies.database) {
             input.startDay = previous
         }
+    }
+}
+
+extension MonthStartDayModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }

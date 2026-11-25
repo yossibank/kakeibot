@@ -14,7 +14,6 @@ protocol SettingsBoardSpec {
     associatedtype Editor: SettingsEditSheet
 
     var parts: ScreenParts { get }
-    var screen: SettingsScreen { get }
     var title: String { get }
     var hiddenTitle: String { get }
     var deleteHiddenTitle: String { get }
@@ -27,7 +26,7 @@ protocol SettingsBoardSpec {
     var scrollMargin: CGFloat { get }
 
     func makeModel() -> Model
-    func intro(flag: SettingsScreenFlag, in model: Model) -> SettingsIntroCard
+    func intro(hint: SettingsFold, in model: Model) -> SettingsIntroCard
     func emptyNote(in model: Model) -> (systemImage: String, text: String)
     func addTitle(in model: Model) -> String
     func header(in model: Model) -> Header

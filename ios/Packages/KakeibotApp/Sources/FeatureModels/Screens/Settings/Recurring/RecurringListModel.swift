@@ -44,6 +44,8 @@ public extension RecurringListModel {
         public internal(set) var list: EntryList?
         public internal(set) var monthStartDay: MonthStartDay = .first
 
+        public let hint = SettingsFoldInput.hint(.recurrings)
+        public let hiddenList = SettingsFoldInput.hiddenList(.recurrings)
         public let today: LocalDate
 
         init(today: LocalDate) {

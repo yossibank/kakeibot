@@ -50,6 +50,8 @@ public extension ReminderModel {
         public internal(set) var authorization: NotificationAuthorization
         public internal(set) var isLoaded = false
 
+        public let hint = SettingsFoldInput.hint(.reminder)
+
         var lastTime: ReminderTime
         var notifications: NotificationInput?
 
@@ -93,10 +95,6 @@ public extension ReminderModel {
         }
 
         return authorization == .denied ? "許可が必要" : time.description
-    }
-
-    func hintFlag() -> SettingsScreenFlag {
-        .closedHint(.reminder, in: dependencies.database)
     }
 
     func showPreview(on day: Weekday) {
@@ -213,4 +211,10 @@ private extension ReminderModel {
     static let noticeCount = 3
     static let loadFailedMessage = "通知の設定を読めませんでした"
     static let saveFailedMessage = "通知の設定を保存できませんでした"
+}
+
+extension ReminderModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
+    }
 }

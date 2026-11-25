@@ -16,10 +16,6 @@ extension TemplateBoard: SettingsBoardSpec {
 
     typealias Editor = TemplateEditSheet
 
-    var screen: SettingsScreen {
-        .templates
-    }
-
     var title: String {
         "テンプレート"
     }
@@ -84,14 +80,14 @@ extension TemplateBoard: SettingsBoardSpec {
     }
 
     func intro(
-        flag: SettingsScreenFlag,
+        hint: SettingsFold,
         in model: TemplateListModel
     ) -> SettingsIntroCard {
         SettingsIntroCard(
             systemImage: "rectangle.stack",
             headline: ("よく使う入力を", "1 回で記録できます"),
             notes: notes(in: model),
-            flag: flag
+            hint: hint
         )
     }
 

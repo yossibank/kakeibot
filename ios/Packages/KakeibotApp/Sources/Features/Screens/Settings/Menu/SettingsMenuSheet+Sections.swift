@@ -98,10 +98,7 @@ extension SettingsMenuSheet {
     var homeSection: some View {
         section("ホームと通知") {
             NavigationLink {
-                HomeSectionListView(
-                    model: HomeSectionListModel(parts: parts),
-                    parts: parts
-                )
+                HomeSectionListView(model: HomeSectionListModel(parts: parts))
             } label: {
                 row("ホームに出すもの", systemImage: "rectangle.grid.1x2")
             }

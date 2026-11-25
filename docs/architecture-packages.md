@@ -226,7 +226,7 @@ KakeibotApp/
 | `FeatureModels/Shared/Notification/` | 通知の許可の窓口 |
 | `FeatureModels/Shared/Period/` | 期間の範囲と月の始まりの文言 |
 | `FeatureModels/Shared/Pro/` | Pro を買ったかと、購入の窓口。StoreKit の中身は AppFeature が渡す |
-| `FeatureModels/Shared/SettingsParts/` | 設定の画面で使うモデル（Board・Hint・Icon・Input）。並べ替えと編集とアイコンの選びを受け持つ |
+| `FeatureModels/Shared/SettingsParts/` | 設定の画面で使うモデル（Board・Hint・Icon・Input）。並べ替え・編集・アイコンの選びと、説明カードを閉じたかを受け持つ |
 | `FeatureModels/Shared/Setup/` | 残りの設定とカスタマイズの項目と進み具合 |
 | `FeatureModels/Shared/Stamp/` | スタンプを押した日の数え上げ |
 | `Features/Screens/Entry/` | 記録の入力シート |

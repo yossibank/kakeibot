@@ -1,11 +1,11 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 @MainActor
 struct SettingsEditController<Model: SettingsEditing> {
     let model: Model
-    let prompt: Binding<SettingsEditPrompt>
     let dismiss: DismissAction
     let restsOnHide: Bool
     let onRest: () -> Void
@@ -15,7 +15,6 @@ struct SettingsEditController<Model: SettingsEditing> {
 
     init(
         model: Model,
-        prompt: Binding<SettingsEditPrompt>,
         dismiss: DismissAction,
         restsOnHide: Bool = false,
         onRest: @escaping () -> Void,
@@ -24,7 +23,6 @@ struct SettingsEditController<Model: SettingsEditing> {
         onSave: @escaping () async -> Bool
     ) {
         self.model = model
-        self.prompt = prompt
         self.dismiss = dismiss
         self.restsOnHide = restsOnHide
         self.onRest = onRest
@@ -39,7 +37,7 @@ extension SettingsEditController {
         onRest()
 
         if model.isChanged {
-            prompt.wrappedValue.isConfirmingDiscard = true
+            model.state.prompt.isConfirmingDiscard = true
         } else {
             dismiss()
         }
@@ -74,7 +72,7 @@ extension SettingsEditController {
             return
         }
 
-        prompt.wrappedValue.isConfirmingHideChanges = true
+        model.state.prompt.isConfirmingHideChanges = true
     }
 
     func setHidden(_ isHidden: Bool) async {
@@ -106,7 +104,7 @@ extension View {
         confirmsUnsavedHide(
             isHidden: controller.model.isHidden,
             canSave: controller.model.canSave,
-            isPresented: controller.prompt.isConfirmingHideChanges
+            isPresented: Bindable(controller.model.state).prompt.isConfirmingHideChanges
         ) {
             Task {
                 await controller.save(hiding: true)
@@ -118,7 +116,7 @@ extension View {
         }
         .confirmsDiscard(
             when: controller.model.isChanged,
-            isPresented: controller.prompt.isConfirmingDiscard
+            isPresented: Bindable(controller.model.state).prompt.isConfirmingDiscard
         ) {
             controller.dismiss()
         }

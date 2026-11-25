@@ -26,12 +26,10 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
-import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsScreenFlag
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.title
@@ -82,10 +80,6 @@ fun SettingsMenuSheet(
         model.observe()
     }
 
-    val monthStartHint = remember(database) {
-        SettingsScreenFlag.closedHint(SettingsScreen.monthStartDay, database)
-    }
-
     fun back() {
         when (screen) {
             Screen.Menu -> onClose()
@@ -102,7 +96,10 @@ fun SettingsMenuSheet(
         followsKeyboard = true,
         trailing = {
             if (screen == Screen.MonthStart) {
-                SettingsHintButton(flag = monthStartHint)
+                SettingsHintButton(
+                    fold = model.input.monthStartHint,
+                    model = model,
+                )
             }
         },
     ) {
@@ -151,7 +148,8 @@ fun SettingsMenuSheet(
                 SettingsIntroCard(
                     icon = R.drawable.ic_calendar,
                     headline = "給料日に合わせて" to "1 か月を数えられます",
-                    flag = monthStartHint,
+                    fold = model.input.monthStartHint,
+                    model = model,
                     notes = listOf(
                         SettingsIntroNote(R.drawable.ic_chevron_right, "給料日から、次の給料日の前日までです"),
                         SettingsIntroNote(R.drawable.ic_calendar, "29〜31 日が無い月は、月末からです"),
