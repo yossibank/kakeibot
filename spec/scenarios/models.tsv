@@ -178,6 +178,10 @@ entry-deck.orders-decks-by-their-fields	EntryDeckTests/ordersDecksByTheirFields	
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
+entry-outcome.places-closed-after-saving		EntryModelOutcomeTest/placesClosedAfterSaving	Androidのみ	保存できた時に、閉じる結果を state に置く。iOS の行は後で結び付ける
+entry-outcome.places-no-outcome-when-saving-fails		EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	Androidのみ	保存に失敗した時は、結果を置かない。iOS の行は後で結び付ける
+entry-outcome.continues-with-next-entry-after-saving		EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	Androidのみ	続けて記録した時に、続きの結果を置く。iOS の行は後で結び付ける
+entry-outcome.places-closed-after-deleting		EntryModelOutcomeTest/placesClosedAfterDeleting	Androidのみ	削除できた時に、閉じる結果を state に置く。iOS の行は後で結び付ける
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い

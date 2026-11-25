@@ -15,6 +15,8 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
 import com.yossibank.kakeibot.store.queries.methods.entry
@@ -38,7 +40,7 @@ class EntryModel(
     clock: ScreenClock,
     today: LocalDate,
     editing: Identifier<Entry>? = null,
-) {
+) : ScreenPerforming {
     val state = State(today)
     val input = Input(editing)
     val output = Output(input, state)
@@ -55,10 +57,16 @@ class EntryModel(
         Transfer,
     }
 
+    enum class Outcome {
+        Closed,
+        Continued,
+    }
+
     class State(
         today: LocalDate,
     ) {
         val task = ModelTask()
+        val outcome = ScreenOutcome<Outcome>()
 
         var today: LocalDate by mutableStateOf(today)
 
@@ -236,42 +244,6 @@ class EntryModel(
         val clock: ScreenClock,
     )
 
-    fun select(type: Entry.Kind) {
-        if (state.form.type == type) {
-            return
-        }
-
-        val isUntouched = !output.isEditing && !output.isChanged
-
-        state.update { withType(type) }
-
-        if (isUntouched && type != Entry.Kind.transfer) {
-            setWallet(output.usualWalletId)
-        }
-
-        val form = state.form
-        val categories = output.categories
-        val remembered = form.categoryByType[type]
-
-        val categoryId = when {
-            categories.any { it.id == remembered } -> remembered
-            categories.any { it.id == form.categoryId } -> form.categoryId
-            else -> categories.firstOrNull()?.id
-        }
-
-        state.update { withCategory(categoryId) }
-
-        if (type == Entry.Kind.transfer) {
-            chooseDestination()
-        }
-
-        state.focus(output.startField)
-
-        if (isUntouched) {
-            input.baseline = output.snapshot
-        }
-    }
-
     suspend fun load() {
         val database = dependencies.database
 
@@ -306,6 +278,27 @@ class EntryModel(
     }
 
     suspend fun save(): Boolean {
+        if (!store()) {
+            return false
+        }
+
+        state.outcome.send(Outcome.Closed)
+
+        return true
+    }
+
+    suspend fun saveAndContinue(): Boolean {
+        if (!store()) {
+            return false
+        }
+
+        startNext()
+        state.outcome.send(Outcome.Continued)
+
+        return true
+    }
+
+    private suspend fun store(): Boolean {
         val draft = output.draft
 
         if (draft == null || state.task.isRunning) {
@@ -342,6 +335,10 @@ class EntryModel(
                 id = original.id,
                 at = dependencies.clock.now,
             )
+        }
+
+        if (deleted != null) {
+            state.outcome.send(Outcome.Closed)
         }
 
         return deleted != null
