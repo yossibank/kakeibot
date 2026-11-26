@@ -31,7 +31,7 @@ public extension AssetsModel {
             )
 
             if isPurchased {
-                state.boughtId = id
+                state.bought.show(id)
             }
 
             return true

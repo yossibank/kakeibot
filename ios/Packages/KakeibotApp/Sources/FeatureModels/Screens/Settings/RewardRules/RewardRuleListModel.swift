@@ -13,7 +13,7 @@ public final class RewardRuleListModel {
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
-        let state = SettingsBoardMovingState<RewardRule.ID>()
+        let state = SettingsBoardMovingState<RewardRule.ID>(wait: parts.wait)
         let input = SettingsBoardSnapshotInput<RewardRuleList>(screen: .rewards)
 
         self.state = state

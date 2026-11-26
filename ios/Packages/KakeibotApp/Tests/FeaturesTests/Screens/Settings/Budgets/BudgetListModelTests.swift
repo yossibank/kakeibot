@@ -62,7 +62,7 @@ struct BudgetListModelTests {
         #expect(current == 50000)
         #expect(afterClear == nil)
         #expect(cleared.target.title == "月全体の予算")
-        #expect(model.state.cleared == cleared)
+        #expect(model.state.cleared.current == cleared)
         #expect(model.output.totalAmount == 50000)
         #expect(budgets.count == 1)
     }
@@ -217,7 +217,7 @@ struct BudgetListModelTests {
         let restoredStart = try await setup.database.setting(.budgetCarryoverFrom)
 
         #expect(previous == start)
-        #expect(model.state.resetFrom == previous)
+        #expect(model.state.resetFrom.current == previous)
         #expect(reset == 0)
         #expect(resetStart == model.input.month)
         #expect(model.output.carryover == 70000)
@@ -239,7 +239,7 @@ struct BudgetListModelTests {
         #expect(off == nil)
         #expect(model.output.carryover == 0)
         #expect(zero == nil)
-        #expect(model.state.resetFrom == nil)
+        #expect(model.state.resetFrom.current == nil)
         #expect(stored == model.input.month)
     }
 

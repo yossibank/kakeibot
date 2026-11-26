@@ -110,7 +110,7 @@ private extension MainView {
                 editing: id
             )
         ) { deletion in
-            model.state.undo.state.deletion = deletion
+            model.receive(deletion)
         }
     }
 
@@ -134,7 +134,7 @@ private extension MainView {
                 editing: id
             )
         ) { _ in } onDelete: { deletion in
-            model.state.undo.state.deletion = deletion
+            model.receive(deletion)
         }
     }
 }

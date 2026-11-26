@@ -18,7 +18,7 @@ public final class WalletEditModel: ScreenPerforming {
         editing id: Wallet.ID? = nil,
         kind: Wallet.Kind = .cash
     ) {
-        let state = State(kind: kind)
+        let state = State(kind: kind, wait: parts.wait)
         let input = Input(editingId: id)
         let output = Output(input: input, state: state)
 

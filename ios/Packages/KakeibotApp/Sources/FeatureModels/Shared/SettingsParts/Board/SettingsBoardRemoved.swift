@@ -1,9 +1,22 @@
 import Core
+import Observation
 
-public struct SettingsBoardRemoved<ID: Sendable>: Sendable {
-    public var hiddenId: ID?
-    public var deletion: Deletion?
-    public var bulkDelete: SettingsBulkDelete?
+@MainActor
+@Observable
+public final class SettingsBoardRemoved<ID: Sendable> {
+    public internal(set) var bulkDelete: SettingsBulkDelete?
 
-    public init() {}
+    public let hidden: UndoNotice<ID>
+    public let deletion: UndoNotice<Deletion>
+
+    public init(wait: ScreenWait) {
+        self.hidden = UndoNotice(wait: wait)
+        self.deletion = UndoNotice(wait: wait)
+    }
+}
+
+public extension SettingsBoardRemoved {
+    var bulkNote: String? {
+        bulkDelete?.note(for: deletion.current)
+    }
 }

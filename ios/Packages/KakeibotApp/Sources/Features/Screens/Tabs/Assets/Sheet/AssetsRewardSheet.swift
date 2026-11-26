@@ -44,8 +44,8 @@ struct AssetsRewardSheet: View {
         .sheet(item: Bindable(model.state).goalTarget) { target in
             AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: target.goal))
         }
-        .settingsHideNotice(
-            Bindable(model.state).boughtId,
+        .undoNotice(
+            model.state.bought,
             message: "買ったものに移しました",
             systemImage: "bag"
         ) { id in
@@ -54,7 +54,7 @@ struct AssetsRewardSheet: View {
             }
         }
         .onDisappear {
-            model.state.boughtId = nil
+            model.state.bought.dismiss()
         }
         .presentationSizing(.tallForm)
     }

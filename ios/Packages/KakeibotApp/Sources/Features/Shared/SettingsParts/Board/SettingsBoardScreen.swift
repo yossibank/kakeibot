@@ -106,8 +106,6 @@ private extension SettingsBoardScreen {
         let drag = controller.drag
         let model = controller.model
         let removed = controller.removed
-        let bulkNote = removed.wrappedValue.bulkDelete?
-            .note(for: removed.wrappedValue.deletion)
 
         return ScrollView {
             VStack(alignment: .leading, spacing: SettingsSpacing.section) {
@@ -138,10 +136,10 @@ private extension SettingsBoardScreen {
         .scrollDisabled(drag.isLifting)
         .settingsAutoScroll(drag.autoScroll)
         .settingsDropZones(Bindable(drag).zones, showing: drag.showZone)
-        .settingsHideNotice(removed.hiddenId, message: hideMessage) { id in
+        .undoNotice(removed.hidden, message: hideMessage) { id in
             controller.show(id)
         }
-        .deletionNotice(removed.deletion, note: bulkNote) { deletion in
+        .deletionNotice(removed.deletion, note: removed.bulkNote) { deletion in
             controller.restore(deletion)
         }
     }

@@ -13,7 +13,7 @@ public final class StampListModel {
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
-        let state = SettingsBoardMovingState<ShelfIcon.ID>()
+        let state = SettingsBoardMovingState<ShelfIcon.ID>(wait: parts.wait)
         let input = SettingsBoardSnapshotInput<ShelfIconList>(screen: .stamps)
 
         self.state = state

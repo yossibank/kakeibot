@@ -13,7 +13,7 @@ public final class WalletListModel {
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
-        let state = SettingsBoardMovingState<Wallet.ID>()
+        let state = SettingsBoardMovingState<Wallet.ID>(wait: parts.wait)
         let input = SettingsBoardSnapshotInput<EntryList>(screen: .wallets)
 
         self.state = state

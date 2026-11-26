@@ -55,16 +55,6 @@ extension WalletEditSheet {
         return payment + loan
     }
 
-    var valuationDeletion: Binding<Deletion?> {
-        Binding {
-            model.state.valuationDeletion
-        } set: { deletion in
-            if deletion == nil {
-                model.state.dismissValuationDeletion()
-            }
-        }
-    }
-
     var noteColor: Color {
         Color(hex: model.state.icon.color) ?? Palette.subtext
     }

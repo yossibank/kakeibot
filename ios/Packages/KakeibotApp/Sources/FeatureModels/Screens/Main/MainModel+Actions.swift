@@ -73,6 +73,10 @@ public extension MainModel {
         }
     }
 
+    func receive(_ deletion: Deletion) {
+        state.undo.state.deletion.show(deletion)
+    }
+
     func addEntry(on date: LocalDate) {
         state.draft.state.setDate(date)
         state.sheet = .new

@@ -16,7 +16,7 @@ public final class RecurringListModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(today: today)
 
         self.state = state
@@ -38,8 +38,13 @@ public extension RecurringListModel {
         public var errorNotice = ErrorNotice()
         public var type: Entry.Kind = .expense
         public var movingOrder: [Recurring.ID]?
-        public var removed = SettingsBoardRemoved<Recurring.ID>()
         public var shown = SettingsBoardShown<Recurring.ID, Destination>()
+
+        public let removed: SettingsBoardRemoved<Recurring.ID>
+
+        init(wait: ScreenWait) {
+            self.removed = SettingsBoardRemoved(wait: wait)
+        }
     }
 
     @MainActor

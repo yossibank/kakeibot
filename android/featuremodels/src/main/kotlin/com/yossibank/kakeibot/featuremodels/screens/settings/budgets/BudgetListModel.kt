@@ -16,7 +16,8 @@ import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
-import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
+import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -39,7 +40,7 @@ class BudgetListModel(
     parts: ScreenParts,
     today: LocalDate,
 ) : SettingsFoldModel {
-    val state = State(today)
+    val state = State(today, parts.wait)
     val input = Input()
     val output = Output(input, state)
     val flow = EditFlow(task = state.task, source = Source())
@@ -77,10 +78,11 @@ class BudgetListModel(
 
     class State(
         today: LocalDate,
+        wait: ScreenWait,
     ) {
         val task = ModelTask()
-        val cleared = UndoNoticeState<Cleared>()
-        val resetFrom = UndoNoticeState<YearMonth>()
+        val cleared = UndoNotice<Cleared>(wait)
+        val resetFrom = UndoNotice<YearMonth>(wait)
 
         var today: LocalDate by mutableStateOf(today)
             internal set

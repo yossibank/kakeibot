@@ -39,13 +39,17 @@ public extension WalletEditModel {
         public private(set) var isNegative: Bool
 
         public internal(set) var valuation = AmountCalculator()
-        public internal(set) var valuationDeletion: Deletion?
 
         public let icon: SettingsIconEditorModel
+        public let valuationDeletion: UndoNotice<Deletion>
 
-        init(kind: Wallet.Kind) {
+        init(
+            kind: Wallet.Kind,
+            wait: ScreenWait
+        ) {
             self.kind = kind
             self.isNegative = kind.isDebt
+            self.valuationDeletion = UndoNotice(wait: wait)
 
             self.icon = SettingsIconEditorModel(
                 glyph: WalletEditModel.glyph(for: kind),
@@ -58,10 +62,6 @@ public extension WalletEditModel {
 public extension WalletEditModel.State {
     func setNegative(_ isNegative: Bool) {
         self.isNegative = isNegative
-    }
-
-    func dismissValuationDeletion() {
-        valuationDeletion = nil
     }
 
     func setKind(_ kind: Wallet.Kind) {

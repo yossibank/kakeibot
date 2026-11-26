@@ -476,6 +476,8 @@ settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/k
 settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting	RecurringListModelTest/deletesAndRestoresRecurring	対応	Android は、削除を元に戻す所まで 1 つのテストで確かめる
 settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails	RecurringListModelTest/clearsDeletionInStateWhenDeletingFails	対応	
 settings-board.keeps-bulk-deletion-in-state-after-deleting-hidden	SettingsBoardModelTests/keepsBulkDeletionInStateAfterDeletingHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	残した件数（keptCount）は Android に無く、確かめていない
+settings-board.receives-deletion-from-editor	SettingsBoardModelTests/receivesDeletionFromEditor	RecurringListModelTest/receivesDeletionFromEditor	対応	
+settings-board.receives-hidden-from-editor	SettingsBoardModelTests/receivesHiddenFromEditor	RecurringListModelTest/receivesHiddenFromEditor	対応	
 settings-board.deletes-nothing-when-none-are-hidden	SettingsBoardModelTests/deletesNothingWhenNoneAreHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	
 settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHiddenItem	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	並べ替え中の順を消すことは確かめていない
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
@@ -586,6 +588,9 @@ observation-round.restarts-every-model-sharing-round	ObservationRoundTests/resta
 loadable.holds-value-only-when-loaded	LoadableTests/holdsValueOnlyWhenLoaded	LoadableTest/holdsValueOnlyWhenLoaded	対応	
 loadable.settles-when-loaded-or-failed	LoadableTests/settlesWhenLoadedOrFailed	LoadableTest/settlesWhenLoadedOrFailed	対応	
 loadable.retries-only-from-failure	LoadableTests/retriesOnlyFromFailure	LoadableTest/retriesOnlyFromFailure	対応	
+undo-notice.clears-after-duration	UndoNoticeTests/clearsAfterDuration	UndoNoticeTest/clearsAfterDuration	対応	
+undo-notice.keeps-later-notice-when-earlier-time-ends	UndoNoticeTests/keepsLaterNoticeWhenEarlierTimeEnds	UndoNoticeTest/keepsLaterNoticeWhenEarlierTimeEnds	対応	
+undo-notice.takes-item-and-clears	UndoNoticeTests/takesItemAndClears	UndoNoticeTest/takesItemAndClears	対応	
 app-icon-list.*	AppIconListModelTests/*		未移植	アプリのアイコンを選ぶ画面が無い
 backup.*	BackupModelTests/*		未移植	書き出しと読み込みの画面が無い
 category-edit.*	CategoryEditModelTests/*		未移植	カテゴリを編集する画面が無い

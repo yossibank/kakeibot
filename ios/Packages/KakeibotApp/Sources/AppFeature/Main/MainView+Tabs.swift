@@ -69,9 +69,7 @@ extension MainView {
                         await $0.deleteEntries(ids)
                     }
                 },
-                onDeleteAdjustment: { deletion in
-                    model.state.undo.state.deletion = deletion
-                }
+                onDeleteAdjustment: model.receive
             )
             .loadFailed(records.input.list.isFailed, onRetry: retry)
             .tabContent()

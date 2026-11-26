@@ -11,7 +11,7 @@ public final class DeletionUndo: ScreenPerforming {
     let dependencies: Dependencies
 
     public init(parts: ScreenParts) {
-        self.state = State()
+        self.state = State(wait: parts.wait)
         self.dependencies = Dependencies(database: parts.database)
     }
 }
@@ -21,7 +21,12 @@ public extension DeletionUndo {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var deletion: Deletion?
+
+        public let deletion: UndoNotice<Deletion>
+
+        init(wait: ScreenWait) {
+            self.deletion = UndoNotice(wait: wait)
+        }
     }
 }
 

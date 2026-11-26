@@ -13,8 +13,9 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.Shown
-import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
+import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -38,7 +39,7 @@ class RecurringListModel(
     today: LocalDate,
     opening: Identifier<Recurring>? = null,
 ) : SettingsFoldModel {
-    val state = State(today, opening?.let { Editing.Existing(it) })
+    val state = State(today, opening?.let { Editing.Existing(it) }, parts.wait)
     val input = Input()
     val output = Output(input, state)
 
@@ -63,10 +64,11 @@ class RecurringListModel(
     class State(
         today: LocalDate,
         editing: Editing?,
+        wait: ScreenWait,
     ) {
         val task = ModelTask()
-        val hidden = UndoNoticeState<Identifier<Recurring>>()
-        val deleted = UndoNoticeState<Deletion>()
+        val hidden = UndoNotice<Identifier<Recurring>>(wait)
+        val deleted = UndoNotice<Deletion>(wait)
         val editing = Shown(editing)
         val deleting = Shown<DeleteTarget>()
 
@@ -295,6 +297,14 @@ class RecurringListModel(
         deletion?.let(state.deleted::show)
 
         return deletion
+    }
+
+    fun receive(deletion: Deletion) {
+        state.deleted.show(deletion)
+    }
+
+    fun receiveHidden(id: Identifier<Recurring>) {
+        state.hidden.show(id)
     }
 
     suspend fun restore(deletion: Deletion) {

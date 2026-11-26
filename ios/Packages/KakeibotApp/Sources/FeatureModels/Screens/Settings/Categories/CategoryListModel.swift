@@ -16,7 +16,7 @@ public final class CategoryListModel {
         parts: ScreenParts,
         kind: EntryCategory.Kind = .expense
     ) {
-        let state = State(kind: kind)
+        let state = State(kind: kind, wait: parts.wait)
         let input = SettingsBoardSnapshotInput<CategoryList>(screen: .categories)
 
         self.state = state
@@ -38,11 +38,16 @@ public extension CategoryListModel {
         public var errorNotice = ErrorNotice()
         public var kind: EntryCategory.Kind
         public var movingOrder: [EntryCategory.ID]?
-        public var removed = SettingsBoardRemoved<EntryCategory.ID>()
         public var shown = SettingsBoardShown<EntryCategory.ID, Destination>()
 
-        init(kind: EntryCategory.Kind) {
+        public let removed: SettingsBoardRemoved<EntryCategory.ID>
+
+        init(
+            kind: EntryCategory.Kind,
+            wait: ScreenWait
+        ) {
             self.kind = kind
+            self.removed = SettingsBoardRemoved(wait: wait)
         }
     }
 

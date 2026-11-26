@@ -6,7 +6,7 @@ import Store
 @MainActor
 @Observable
 public final class ThemeListModel {
-    public let state = State()
+    public let state: State
     public let input: Input
     public let output: Output
 
@@ -18,6 +18,7 @@ public final class ThemeListModel {
     ) {
         let input = Input()
 
+        self.state = State(wait: parts.wait)
         self.input = input
         self.output = Output(input: input)
         self.dependencies = Dependencies(database: parts.database, appIcon: appIcon)
@@ -29,11 +30,16 @@ public extension ThemeListModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var deletion: Deletion?
 
         public internal(set) var suggestedIcon: AppIconChoice?
         public internal(set) var presented: Presented?
         public internal(set) var pressing: ThemeChoice?
+
+        public let deletion: UndoNotice<Deletion>
+
+        init(wait: ScreenWait) {
+            self.deletion = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor
@@ -109,6 +115,10 @@ public extension ThemeListModel {
 
     func dismissSuggestion() {
         state.suggestedIcon = nil
+    }
+
+    func receive(_ deletion: Deletion) {
+        state.deletion.show(deletion)
     }
 
     func restore(_ deletion: Deletion) async {

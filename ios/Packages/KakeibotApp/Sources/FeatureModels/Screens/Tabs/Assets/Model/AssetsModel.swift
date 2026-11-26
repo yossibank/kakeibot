@@ -17,7 +17,7 @@ public final class AssetsModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(today: today)
 
         self.state = state
@@ -33,11 +33,16 @@ public extension AssetsModel {
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
         public var billPage = 0
-        public var boughtId: RewardGoal.ID?
         public var sheet: Sheet?
 
         public internal(set) var reward = RewardSheet()
         public internal(set) var pending: Opening?
+
+        public let bought: UndoNotice<RewardGoal.ID>
+
+        init(wait: ScreenWait) {
+            self.bought = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor

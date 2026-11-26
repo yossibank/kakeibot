@@ -154,7 +154,7 @@ extension WalletEditModelTests {
         let deletion = await model.deleteValuation(valuation.id)
 
         #expect(deletion != nil)
-        #expect(model.state.valuationDeletion?.id == deletion?.id)
+        #expect(model.state.valuationDeletion.current?.id == deletion?.id)
     }
 }
 

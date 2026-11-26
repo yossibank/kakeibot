@@ -18,6 +18,7 @@ class ScreenPartsShared(
         database = parts.database,
         clock = parts.clock,
         entryList = entryList.values,
+        wait = parts.wait,
     )
 
     fun stop() {

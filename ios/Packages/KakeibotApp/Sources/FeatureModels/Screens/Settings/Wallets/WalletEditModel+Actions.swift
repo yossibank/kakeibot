@@ -39,12 +39,17 @@ public extension WalletEditModel {
             let deletion = try await dependencies.database.deleteValuation(id)
 
             await loadBalance()
-            state.valuationDeletion = deletion
+
+            if let deletion {
+                state.valuationDeletion.show(deletion)
+            } else {
+                state.valuationDeletion.dismiss()
+            }
 
             return deletion
         } catch {
             state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
-            state.valuationDeletion = nil
+            state.valuationDeletion.dismiss()
             return nil
         }
     }

@@ -121,8 +121,6 @@ fun RecurringListView(
     }
 
     model.state.task.Timer()
-    hiddenNotice.Timer()
-    deletedNotice.Timer()
     BackHandler(onBack = onBack)
 
     val actions = RecurringRowActions(
@@ -200,8 +198,8 @@ fun RecurringListView(
                         type = model.state.type,
                         editingId = (current as? Editing.Existing)?.id,
                         onClose = { model.state.editing.close(current) },
-                        onDelete = deletedNotice::show,
-                        onHide = { (current as? Editing.Existing)?.id?.let(hiddenNotice::show) },
+                        onDelete = model::receive,
+                        onHide = { (current as? Editing.Existing)?.id?.let(model::receiveHidden) },
                     )
                 }
             }
