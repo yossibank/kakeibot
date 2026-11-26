@@ -1,0 +1,428 @@
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/app/AppModel.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/app/AppModel.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/app/AppModel.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/app/AppModel.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/app/AppModel.kt: K7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/app/RootView.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/date/MonthCalendar.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/date/MonthCalendar.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/date/MonthCalendar.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/date/MonthCalendar.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/dial/HalfDial.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/entry/EntryRow.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/modal/BottomDrawer.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/modal/UndoNotice.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K3: クラスの中の順が違う。「入れ子の型」は「internal の関数と計算プロパティ」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/row/SwipeRow.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/row/SwipeRow.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/row/SwipeRow.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/tag/TagCard.kt: K1: ファイルの区画の順が違う。「ほかの公開の型」は「公開と internal の値・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/tag/TagCard.kt: K1: ファイルの区画の順が違う。「ほかの公開の型」は「公開と internal の値・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/tag/TagCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/tag/TagLine.kt: K1: ファイルの区画の順が違う。「ほかの公開の型」は「公開と internal の値・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/theme/ViewPalette.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryDeck.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryDeck.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryDeck.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryDeck.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryRecentRow.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntrySlip.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntrySlip.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryTransferPanel.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryTransferPanel.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryTransferRoutes.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryTransferRoutes.kt: K7: 複数行の文の前後には、空行を入れる
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryTypeSwitch.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemLines.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemLines.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemLines.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemReceipt.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemSheet.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemSlip.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K7: 複数行の文の前後には、空行を入れる
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「効果」は「組み立て」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「効果」は「組み立て」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「効果」は「組み立て」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/voice/EntryVoiceCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/voice/EntryVoiceCard.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「派生の val」は「組み立て」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/voice/EntryVoiceFinishButton.kt: K7: 複数行の文の前後には、空行を入れる
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetKeypadDrawer.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetListRows.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetListRows.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetListView.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetListView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetTotalCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/menu/SettingsMenuSheet.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K1: ファイルの区画の順が違う。「ほかの公開の型」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K7: 複数行の文の前後には、空行を入れる
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「効果」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「効果」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringHiddenSection.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringLift.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringLift.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringLift.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「効果」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringLoanPlan.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringPanelBody.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringQuickCard.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringQuickCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringQuickCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringRowCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/templates/TemplateEditSheet.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/assets/view/AssetsView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/assets/view/AssetsView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/home/view/HomeView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/home/view/HomeView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/home/view/HomeView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsCalendarCard.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsCalendarCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsDayCard.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsDayCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsView.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/review/view/ReviewView.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/review/view/ReviewView.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/review/view/ReviewView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/review/view/ReviewView.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/shared/notification/NotificationPermissionState.kt: K3: クラスの中の順が違う。「internal の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/shared/notification/NotificationPermissionState.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/app/src/main/kotlin/com/yossibank/kakeibot/features/shared/settingsparts/hint/SettingsIntroCard.kt: K8: 1 つの関数は 60 行までにする
+android/app/src/main/kotlin/com/yossibank/kakeibot/notifications/NotificationBootReceiver.kt: K7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+android/app/src/main/kotlin/com/yossibank/kakeibot/notifications/NotificationScheduler.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/budget/Budget.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryCategoryDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryCategoryDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryCategoryDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryCategoryDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryCategoryDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryCategoryDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryCategoryDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryTagDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryTagDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryTagDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/category/EntryTagDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/LocalDate.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「internal の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/LocalDate.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「internal の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/LocalDate.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「internal の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/LocalDate.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「internal の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/LocalDate.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「internal の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/LocalDate.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「internal の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/LocalDate.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「internal の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/YearMonth.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/YearMonth.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/YearMonth.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/YearMonth.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/date/YearMonth.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/entry/AmountCalculator.kt: K7: 複数行の文の前後には、空行を入れる
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/entry/EntryDay.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/entry/EntryDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/entry/EntryDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/entry/EntryDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/entry/EntryTemplateDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/entry/EntryTemplateDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportJson.kt: K8: 1 つの関数は 60 行までにする
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/IconDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/IconDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/IconDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/IconDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/icon/IconDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/notification/NotificationPlan.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/notification/NotificationPlan.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/notification/NotificationPlan.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/notification/NotificationPlan.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/notification/PlannedNotification.kt: K3: クラスの中の順が違う。「入れ子の型」は「公開の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/notification/PlannedNotificationURL.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/notification/PlannedNotificationURL.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/CardBill.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/recurring/RecurringSchedule.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/review/ReviewSummary.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardGoalDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardGoalDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardGoalDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardGoalDraft.kt: K7: 複数行の文の前後には、空行を入れる
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/reward/RewardRuleDraft.kt: K7: 複数行の文の前後には、空行を入れる
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/setting/HomeLayout.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/setting/HomeLayout.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/setting/Setting.kt: K3: クラスの中の順が違う。「入れ子の型」は「公開の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemeDraft.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemeHex.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteContrast.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteContrast.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteSemantic.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteSemantic.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteSemantic.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteSemantic.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteSemantic.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteSemantic.kt: K7: 複数行の文の前後には、空行を入れる
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePreset.kt: K8: 1 つの関数は 60 行までにする
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceText.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceText.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceText.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceText.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceText.kt: K7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K7: 複数行の文の前後には、空行を入れる
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K8: 1 つの関数は 60 行までにする
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletBalance.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/wallet/WalletDraft.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryItemEditor.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModel.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModel.kt: K7: 複数行の文の前後には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelApply.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelItem.kt: K7: 値を返すブロックの最後の式の前には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputOptions.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputOptions.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputOptions.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputOptions.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputOptions.kt: K2: 拡張だけのファイルは、公開・internal・private の順に並べる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputOptions.kt: K2: 拡張だけのファイルは、公開・internal・private の順に並べる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputOptions.kt: K2: 拡張だけのファイルは、公開・internal・private の順に並べる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputRecent.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputText.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputText.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelOutputText.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelTransfer.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelType.kt: K2: 拡張だけのファイルは、公開・internal・private の順に並べる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelType.kt: K2: 拡張だけのファイルは、公開・internal・private の順に並べる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelType.kt: K2: 拡張だけのファイルは、公開・internal・private の順に並べる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelVoice.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/model/EntryModelWallet.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/voice/EntryVoiceFlow.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/voice/EntryVoiceFlow.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/voice/EntryVoiceSpeech.kt: K7: 複数行の文の前後には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/main/MainModel.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/main/MainModel.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/main/MainModelSaved.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/main/MainModelSaved.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/main/MainModelSaved.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/main/MainModelSaved.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModel.kt: K7: 複数行の文の前後には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModelOutputSpent.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModelOutputSpent.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModelOutputSpent.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModelOutputSpent.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModelOutputSpent.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/budgets/BudgetListModelOutputSpent.kt: K7: 複数行の文の前後には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/menu/SettingsMenuModel.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/menu/SettingsMenuModel.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/recurring/RecurringEditModel.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/recurring/RecurringEditModelOutputDraft.kt: K7: 複数行の文の前後には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/recurring/RecurringEditModelPreset.kt: K7: 同じ段落の 1 行の文の間に、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/recurring/RecurringListModel.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/settings/recurring/RecurringListModel.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/records/model/RecordsModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/review/model/ReviewModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/review/model/ReviewModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/review/model/ReviewModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/review/model/ReviewModel.kt: K3: クラスの中の順が違う。「公開の関数と計算プロパティ」は「private の関数と計算プロパティ」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/tabs/review/model/ReviewModel.kt: K7: 複数行の文の前後には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/amount/AmountText.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/amount/AmountText.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/model/ForegroundReturn.kt: K7: 値を返すブロックの最後の式の前には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/model/ForegroundReturn.kt: K7: 値を返すブロックの最後の式の前には、空行を入れる
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/model/ModelTask.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/notice/UndoNoticeState.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/notice/UndoNoticeState.kt: K3: クラスの中の順が違う。「保存プロパティと要求」は「入れ子の型」より前に置く
+android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/shared/settingsparts/hint/SettingsFoldInput.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/AppDatabaseChecks.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/AppDatabaseDefaults.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/AppDatabaseDefaults.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/AppDatabaseDefaults.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/AppDatabaseDefaults.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/AppDatabaseDefaults.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/AppDatabaseDefaults.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/database/Seed.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/methods/AppDatabaseEntryList.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/methods/AppDatabaseEntryList.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/methods/AppDatabaseMonthOverview.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/methods/AppDatabaseMonthOverview.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/methods/AppDatabaseMonthOverview.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryList.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryListTemplate.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryListTemplate.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryListTemplate.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryListTemplate.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryListTemplate.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryListTemplate.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/EntryListTemplate.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/MonthOverview.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/MonthOverview.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/MonthOverview.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/MonthOverview.kt: K6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/ArchivableTable.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/IconBackedTable.kt: K3: クラスの中の順が違う。「override の関数と計算プロパティ」は「公開の関数と計算プロパティ」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/IconBackedTable.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/StoreRecord.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/StoreRecord.kt: K1: ファイルの区画の順が違う。「ほかの公開の型」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/StoreRecord.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/StoreRecord.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/protocols/StoreRecord.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/BudgetRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/BudgetRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/EntryRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/EntryRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/EntryRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/EntryRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/EntryRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/EntryRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/RecurringRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/records/rows/RecurringRecord.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseBudget.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseCardBill.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseCardBill.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseCardBill.kt: K1: ファイルの区画の順が違う。「private の型・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseCardBill.kt: K8: 1 つの関数は 60 行までにする
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseDeletion.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseDeletion.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の値」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntry.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntry.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryCategory.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryCategory.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryCategory.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryCategory.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryCategory.kt: K8: 1 つの関数は 60 行までにする
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryItem.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryTag.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryTag.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseRecurringEntries.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseRecurringEntries.kt: K8: 1 つの関数は 60 行までにする
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseRewardGoal.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseRewardGoal.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseRewardLog.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseTheme.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseTheme.kt: K7: 1 行の文が 3 つまでのブロックには、空行を入れない
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseWallet.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseWallet.kt: K1: ファイルの区画の順が違う。「公開と internal の値・拡張・関数」は「private の型・拡張・関数」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseWallet.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseWallet.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseWallet.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseWidgetEntry.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseWidgetEntry.kt: K7: 複数行の文の前後には、空行を入れる
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/types/DeletionSubject.kt: K3: クラスの中の順が違う。「init と副コンストラクタ」は「入れ子の型」より前に置く
+android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/types/DeletionSubject.kt: K8: 1 つの関数は 60 行までにする
