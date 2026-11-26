@@ -9,13 +9,14 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.loadedModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.store
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallets
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceResult.Outcome
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
-import com.yossibank.kakeibot.featuremodels.support.ModelTestDatabase
+import com.yossibank.kakeibot.featuremodels.support.FakeVoiceClock
+import com.yossibank.kakeibot.featuremodels.support.FakeVoiceSource
+import com.yossibank.kakeibot.featuremodels.support.VOICE_NOTICE_MILLIS
+import com.yossibank.kakeibot.featuremodels.support.VOICE_SILENCE_MILLIS
 import com.yossibank.kakeibot.featuremodels.support.modelTest
-import kotlinx.coroutines.CancellableContinuation
+import com.yossibank.kakeibot.featuremodels.support.voiceFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
@@ -23,8 +24,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.time.Instant
-import kotlin.coroutines.resume
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -112,21 +111,6 @@ class EntryVoiceFlowTest {
     }
 
     @Test
-    fun readsTheLastResultGivenWhileFinishing() = modelTest(today = "2026-10-12") { setup ->
-        val model = setup.loadedModel()
-        val source = FakeVoiceSource()
-        val flow = voiceFlow(source)
-        source.finalCandidates = listOf("コンビニで", "コンビニで980円")
-
-        flow.start(model, today = setup.today)
-        source.say("コンビニで")
-        flow.finish()
-
-        assertEquals(980, model.output.amount)
-        assertEquals(Outcome.Applied, flow.state.notice?.outcome)
-    }
-
-    @Test
     fun finishesAfterSilence() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
         val source = FakeVoiceSource()
@@ -136,7 +120,7 @@ class EntryVoiceFlowTest {
         flow.start(model, today = setup.today)
         source.say("500円")
         runCurrent()
-        clock.advance(millis = SILENCE_MILLIS)
+        clock.advance(millis = VOICE_SILENCE_MILLIS)
         runCurrent()
 
         assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
@@ -182,7 +166,7 @@ class EntryVoiceFlowTest {
         flow.cancel()
 
         assertNull(before)
-        assertEquals(SILENCE_MILLIS, flow.input.silenceMillis)
+        assertEquals(VOICE_SILENCE_MILLIS, flow.input.silenceMillis)
         assertNotNull(first)
         assertNull(cleared)
         assertNotNull(second)
@@ -202,7 +186,7 @@ class EntryVoiceFlowTest {
         source.hear(0f)
         val counting = flow.output.listening?.silenceStart != null
         runCurrent()
-        clock.advance(millis = SILENCE_MILLIS)
+        clock.advance(millis = VOICE_SILENCE_MILLIS)
         runCurrent()
 
         assertTrue(counting)
@@ -249,7 +233,7 @@ class EntryVoiceFlowTest {
         flow.finish()
         runCurrent()
         val shown = flow.state.notice != null
-        clock.advance(millis = NOTICE_MILLIS)
+        clock.advance(millis = VOICE_NOTICE_MILLIS)
         runCurrent()
 
         assertTrue(shown)
@@ -288,105 +272,5 @@ class EntryVoiceFlowTest {
         assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
         assertFalse(flow.output.isActive)
         assertEquals(listOf(0, 0), listOf(flow.state.startCount, flow.state.endCount))
-    }
-}
-
-private const val SILENCE_MILLIS = 100L
-private const val NOTICE_MILLIS = 100L
-
-private fun voiceFlow(
-    source: FakeVoiceSource,
-    clock: FakeVoiceClock = FakeVoiceClock(),
-): EntryVoiceFlow = EntryVoiceFlow(
-    isAvailable = true,
-    clock = clock.screenClock,
-    makeSource = { source },
-    sleep = clock::sleep,
-    silenceMillis = SILENCE_MILLIS,
-    noticeMillis = NOTICE_MILLIS,
-)
-
-private class FakeVoiceSource : EntryVoiceSource {
-    var isFinished = false
-        private set
-
-    var isCancelled = false
-        private set
-
-    var finalCandidates: List<String>? = null
-
-    private var receive: ((EntryVoiceEvent) -> Unit)? = null
-    private var said: String? = null
-
-    override fun start(
-        hints: List<String>,
-        receive: (EntryVoiceEvent) -> Unit,
-    ) {
-        this.receive = receive
-    }
-
-    override fun finish() {
-        isFinished = true
-        receive?.invoke(EntryVoiceEvent.Results(finalCandidates ?: listOfNotNull(said)))
-    }
-
-    override fun cancel() {
-        isCancelled = true
-    }
-
-    override fun close() = Unit
-
-    override fun download(): Outcome = Outcome.Unsupported
-
-    fun hear(level: Float) {
-        receive?.invoke(EntryVoiceEvent.Level(level))
-    }
-
-    fun say(text: String) {
-        said = text
-        receive?.invoke(EntryVoiceEvent.Partial(text))
-    }
-}
-
-private class FakeVoiceClock {
-    val screenClock = ScreenClock { time }
-
-    private val sleepers = mutableMapOf<Int, Sleeper>()
-    private var time: Instant = ModelTestDatabase.now
-    private var nextId = 0
-
-    val isSleeping: Boolean
-        get() = sleepers.isNotEmpty()
-
-    private class Sleeper(
-        val deadline: Instant,
-        val continuation: CancellableContinuation<Unit>,
-    )
-
-    suspend fun sleep(millis: Long) {
-        val id = nextId
-        val deadline = time.plusMillis(millis)
-
-        nextId += 1
-
-        suspendCancellableCoroutine { continuation ->
-            sleepers[id] = Sleeper(
-                deadline = deadline,
-                continuation = continuation,
-            )
-
-            continuation.invokeOnCancellation {
-                sleepers.remove(id)
-            }
-        }
-    }
-
-    fun advance(millis: Long) {
-        time = time.plusMillis(millis)
-
-        val woken = sleepers.filterValues { it.deadline <= time }
-
-        woken.keys.forEach(sleepers::remove)
-        woken.values.forEach { it.continuation.resume(Unit) }
     }
 }

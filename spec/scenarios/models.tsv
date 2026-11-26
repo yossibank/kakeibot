@@ -178,12 +178,12 @@ entry-transfer.keeps-fee-only-for-transfer		EntryModelTransferTest/keepsFeeOnlyF
 entry-transfer.clears-bill-month-when-wallet-or-date-changes		EntryModelTransferTest/clearsBillMonthWhenWalletOrDateChanges	Androidのみ	口座か日付を変えると請求月を消す。iOS は請求を選ぶテストの末尾で日付だけ確かめる
 entry-voice-flow.uses-the-model-choice-for-category	EntryVoiceFlowTests/usesTheModelChoiceForCategory		iOSのみ	端末の中のモデルにカテゴリを選ばせる仕組みで、Android は文から読むだけ
 entry-voice-flow.passes-own-words-as-hints	EntryVoiceFlowTests/passesOwnWordsAsHints	EntryModelVoiceTest/hintsNamesForRecognizer	対応	認識の側へ渡すことと、重複が無いことは確かめていない
-entry-voice-flow.reads-the-amount-from-an-alternative	EntryVoiceFlowTests/readsTheAmountFromAnAlternative	EntryVoiceSpeechTest/picksFirstReadableCandidate	対応	候補を選ぶ所だけで、選んだ文が下書きに入る所は確かめていない
+entry-voice-flow.reads-the-amount-from-an-alternative	EntryVoiceFlowTests/readsTheAmountFromAnAlternative	EntryVoiceFlowInterpretationTest/readsTheAmountFromAnAlternative EntryVoiceSpeechTest/picksFirstReadableCandidate	対応	
 entry-voice-flow.asks-the-model-with-recent-examples	EntryVoiceFlowTests/asksTheModelWithRecentExamples		iOSのみ	端末の中のモデルへ渡す例文の話で、Android に voiceExamples は無い
 entry-voice-flow.puts-similar-entries-first-in-examples	EntryVoiceFlowTests/putsSimilarEntriesFirstInExamples		iOSのみ	端末の中のモデルへ渡す例文の話で、Android に voiceExamples は無い
 entry-voice-flow.drops-underline-when-the-field-changes	EntryVoiceFlowTests/dropsUnderlineWhenTheFieldChanges	EntryModelVoiceTest/dropsUnderlineWhenTheFieldChanges	対応	
 entry-voice-flow.cancel-while-starting-stops-the-source	EntryVoiceFlowTests/cancelWhileStartingStopsTheSource		iOSのみ	始めるのを待つ間の取り消しの話で、Android の start は待たずに始まる
-entry-voice-flow.reads-the-last-result-given-while-finishing	EntryVoiceFlowTests/readsTheLastResultGivenWhileFinishing	EntryVoiceFlowTest/readsTheLastResultGivenWhileFinishing	対応	
+entry-voice-flow.reads-the-last-result-given-while-finishing	EntryVoiceFlowTests/readsTheLastResultGivenWhileFinishing	EntryVoiceFlowInterpretationTest/readsTheLastResultGivenWhileFinishing	対応	
 entry-voice-flow.hides-voice-for-transfers	EntryVoiceFlowTests/hidesVoiceForTransfers	EntryModelVoiceTest/hidesVoiceForTransfers	対応	
 entry-voice-flow.applies-spoken-fields-and-undoes-them	EntryVoiceFlowTests/appliesSpokenFieldsAndUndoesThem	EntryVoiceFlowTest/appliesSpokenFieldsAndUndoesThem EntryModelVoiceTest/appliesSpokenFieldsAndUndoesThem EntryVoiceSpeechTest/describesResult	対応	
 entry-voice-flow.keeps-keypad-open-when-amount-is-missing	EntryVoiceFlowTests/keepsKeypadOpenWhenAmountIsMissing	EntryVoiceFlowTest/keepsKeypadOpenWhenAmountIsMissing EntryModelVoiceTest/keepsAmountWhenSpokenAmountIsMissing EntryVoiceSpeechTest/describesResult	対応	
