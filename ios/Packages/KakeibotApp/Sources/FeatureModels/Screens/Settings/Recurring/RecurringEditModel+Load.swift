@@ -60,9 +60,9 @@ extension RecurringEditModel {
 
         if destination?.kind == .card {
             state.schedule.closingDay = Self.billClosingDay
-            state.memo = name
+            state.fields.memo = name
         } else {
-            state.memo = "\(name)の返済"
+            state.fields.memo = "\(name)の返済"
         }
     }
 

@@ -66,7 +66,7 @@ class EntryModelChangeTest {
         val closes = model.close()
 
         assertTrue(closes)
-        assertNull(model.state.presented)
+        assertNull(model.state.presented.current)
     }
 
     @Test
@@ -75,12 +75,12 @@ class EntryModelChangeTest {
         model.press(5)
 
         val closes = model.close()
-        val asked = model.state.presented == EntryModel.Presented.Discard
-        model.state.dismiss()
+        val asked = model.state.presented.current == EntryModel.Presented.Discard
+        model.state.presented.closeAll()
 
         assertFalse(closes)
         assertTrue(asked)
-        assertNull(model.state.presented)
+        assertNull(model.state.presented.current)
         assertEquals(5, model.output.amount)
     }
 

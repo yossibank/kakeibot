@@ -66,7 +66,7 @@ fun SettingsMenuSheet(
     fun back() {
         when (screen) {
             Screen.Menu -> onClose()
-            else -> model.state.screen = Screen.Menu
+            else -> model.state.open(Screen.Menu)
         }
     }
 
@@ -105,7 +105,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "予算",
                         value = "",
-                        onSelect = { model.state.screen = Screen.Budgets },
+                        onSelect = { model.state.open(Screen.Budgets) },
                     )
 
                     SettingsDivider()
@@ -113,7 +113,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "固定費",
                         value = "${model.input.recurringCount} 件",
-                        onSelect = { model.state.screen = Screen.Recurrings },
+                        onSelect = { model.state.open(Screen.Recurrings) },
                     )
 
                     SettingsDivider()
@@ -121,7 +121,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "月の始まり",
                         value = model.input.monthStartDay.title,
-                        onSelect = { model.state.screen = Screen.MonthStart },
+                        onSelect = { model.state.open(Screen.MonthStart) },
                     )
 
                     SettingsDivider()
@@ -129,7 +129,7 @@ fun SettingsMenuSheet(
                     SettingsRow(
                         title = "週の始まり",
                         value = model.input.weekStart.title,
-                        onSelect = { model.state.screen = Screen.WeekStart },
+                        onSelect = { model.state.open(Screen.WeekStart) },
                     )
                 }
             }

@@ -13,6 +13,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
@@ -66,12 +67,13 @@ class RecurringListModel(
         val task = ModelTask()
         val hidden = UndoNoticeState<Identifier<Recurring>>()
         val deleted = UndoNoticeState<Deletion>()
+        val editing = Shown(editing)
+        val deleting = Shown<DeleteTarget>()
 
         var today: LocalDate by mutableStateOf(today)
-        var editing: Editing? by mutableStateOf(editing)
-        var openId: Identifier<Recurring>? by mutableStateOf(null)
+            internal set
 
-        var deleting: DeleteTarget? by mutableStateOf(null)
+        var openId: Identifier<Recurring>? by mutableStateOf(null)
             private set
 
         var type: Entry.Kind by mutableStateOf(Entry.Kind.expense)
@@ -107,14 +109,8 @@ class RecurringListModel(
             movingOrder = null
         }
 
-        fun ask(target: DeleteTarget) {
-            deleting = target
-        }
-
-        fun closePrompt(target: DeleteTarget) {
-            if (deleting == target) {
-                deleting = null
-            }
+        fun open(id: Identifier<Recurring>?) {
+            openId = id
         }
 
         fun select(type: Entry.Kind) {
@@ -196,6 +192,10 @@ class RecurringListModel(
             isClosed = isClosed,
             to = dependencies.database,
         )
+    }
+
+    fun setToday(today: LocalDate) {
+        state.today = today
     }
 
     suspend fun observe() {

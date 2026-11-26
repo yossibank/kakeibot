@@ -14,7 +14,7 @@ struct StampEditModelTests {
         model.state.icon.markKind = .emoji
         model.state.icon.inputEmoji("🎉")
 
-        let isSaved = await model.save()
+        let isSaved = await model.save() != nil
         let shelf = try await database.shelfIconList()
         let last = try #require(shelf.shelfIcons.last)
 
@@ -30,8 +30,8 @@ struct StampEditModelTests {
 
         model.state.icon.markKind = .text
 
-        #expect(!model.canSave)
-        #expect(model.saveTitle == "アイコンを選んでください")
+        #expect(!model.flow.output.canSave)
+        #expect(model.flow.output.saveTitle == "アイコンを選んでください")
     }
 
     @Test
@@ -42,11 +42,11 @@ struct StampEditModelTests {
 
         await model.load()
         let loadedGlyph = model.state.icon.glyph
-        let changedBeforeEdit = model.isChanged
+        let changedBeforeEdit = model.flow.output.isChanged
 
         model.state.icon.color = "#4A6FA5"
-        let changedAfterEdit = model.isChanged
-        let isSaved = await model.save()
+        let changedAfterEdit = model.flow.output.isChanged
+        let isSaved = await model.save() != nil
         let shelf = try await database.shelfIconList()
 
         #expect(loadedGlyph == .star)
@@ -64,11 +64,11 @@ struct StampEditModelTests {
         let model = StampEditModel(parts: .system(database), editing: first.id)
         await model.load()
 
-        let isHidden = await model.setHidden(true)
+        await model.flow.setHidden(true).value
         let shelf = try await database.shelfIconList()
 
-        #expect(isHidden)
-        #expect(model.input.isHidden)
+        #expect(model.flow.state.outcome.value?.isHidden == true)
+        #expect(model.flow.output.isHidden)
         #expect(shelf.shelfIcons.first?.archivedAt != nil)
     }
 }

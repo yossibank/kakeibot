@@ -5,10 +5,11 @@ import Store
 
 @MainActor
 @Observable
-public final class WalletEditModel {
+public final class WalletEditModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
+    public let flow: EditFlow<Wallet>
 
     let dependencies: ScreenParts
 
@@ -21,12 +22,15 @@ public final class WalletEditModel {
         let input = Input(editingId: id)
         let output = Output(input: input, state: state)
 
-        input.baseline = output.draft
-
         self.state = state
         self.input = input
         self.output = output
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        input.baseline = output.draft
+
+        flow.connect(self)
     }
 }
 
@@ -58,47 +62,72 @@ extension WalletEditModel {
     }
 }
 
-extension WalletEditModel: SettingsEditRemoving {
-    public var edited: WalletDraft {
-        output.draft
+extension WalletEditModel: EditFlowSource {
+    var isEditing: Bool {
+        input.editingId != nil
     }
 
-    public var problemMessage: String? {
+    var isChanged: Bool {
+        input.baseline.map { $0 != output.draft } ?? false
+    }
+
+    var problem: String? {
         output.draft.problems.first?.message
     }
 
-    public func remove(_ id: Wallet.ID) async throws -> Deletion {
-        try await dependencies.database.deleteWallet(
-            id,
-            at: dependencies.clock.now
-        )
+    var isHidden: Bool {
+        input.isHidden
     }
 
-    public func deleteFailedMessage(for error: any Error) -> String? {
-        switch error as? AppDatabase.WalletWriteError {
-        case .hasEntries: AppDatabase.WalletWriteError.hasEntriesMessage
-        case .lastShownWallet: AppDatabase.WalletWriteError.lastShownDeleteMessage
-        default: nil
+    var asksBeforeHiding: Bool {
+        input.totalBalance != 0
+    }
+
+    func store() async -> Wallet? {
+        await save()
+    }
+
+    func keepsOpen(after saved: Wallet) -> Bool {
+        state.payment.addedWallet?.id == saved.id
+    }
+
+    func storeHidden(_ isHidden: Bool) async throws {
+        guard let editingId = input.editingId else {
+            return
         }
-    }
 
-    public func hideFailedMessage(for error: any Error) -> String? {
-        switch error as? AppDatabase.WalletWriteError {
-        case .lastShownWallet: AppDatabase.WalletWriteError.lastShownMessage
-        default: nil
-        }
-    }
-
-    public func saveHidden(
-        _ id: Wallet.ID,
-        isHidden: Bool
-    ) async throws {
         try await dependencies.database.setHidden(
-            id,
+            editingId,
             isHidden: isHidden,
             at: dependencies.clock.now
         )
 
         input.isHidden = isHidden
+    }
+
+    func remove() async throws -> Deletion? {
+        guard let editingId = input.editingId else {
+            return nil
+        }
+
+        return try await dependencies.database.deleteWallet(
+            editingId,
+            at: dependencies.clock.now
+        )
+    }
+
+    func hideFailedMessage(for error: any Error) -> String {
+        switch error as? AppDatabase.WalletWriteError {
+        case .lastShownWallet: AppDatabase.WalletWriteError.lastShownMessage
+        default: SettingsEditMessage.saveFailed
+        }
+    }
+
+    func deleteFailedMessage(for error: any Error) -> String {
+        switch error as? AppDatabase.WalletWriteError {
+        case .hasEntries: AppDatabase.WalletWriteError.hasEntriesMessage
+        case .lastShownWallet: AppDatabase.WalletWriteError.lastShownDeleteMessage
+        default: SettingsEditMessage.deleteFailed
+        }
     }
 }

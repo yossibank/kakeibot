@@ -77,11 +77,11 @@ struct CategoryEditModelTests {
     func savesNewCategory() async throws {
         let database = try Self.database()
         let model = CategoryEditModel(parts: .system(database), kind: .income)
-        model.state.name = "配当"
+        model.state.fields.name = "配当"
         model.state.icon.glyph = .invest
 
-        let canSaveBeforeName = CategoryEditModel(parts: .system(database), kind: .income)
-            .canSave
+        let empty = CategoryEditModel(parts: .system(database), kind: .income)
+        let canSaveBeforeName = empty.flow.output.canSave
         let saved = await model.save()
         let list = try await database.categoryList()
         let category = list.categories.first { $0.name == "配当" }
@@ -105,13 +105,13 @@ struct CategoryEditModelTests {
 
         await model.load()
 
-        #expect(model.isEditing)
-        #expect(model.state.name == "食費")
+        #expect(model.flow.output.isEditing)
+        #expect(model.state.fields.name == "食費")
         #expect(model.state.icon.markKind == .glyph)
         #expect(model.state.icon.glyph == .food)
         #expect(model.state.icon.color == "#E07A5F")
-        #expect(!model.input.isHidden)
-        #expect(!model.isChanged)
+        #expect(!model.flow.output.isHidden)
+        #expect(!model.flow.output.isChanged)
     }
 
     @Test
@@ -154,13 +154,13 @@ struct CategoryEditModelTests {
     func tracksChangesFromStart() throws {
         let database = try Self.database()
         let model = CategoryEditModel(parts: .system(database), kind: .expense)
-        let start = model.isChanged
+        let start = model.flow.output.isChanged
 
-        model.state.name = "外食"
-        let named = model.isChanged
+        model.state.fields.name = "外食"
+        let named = model.flow.output.isChanged
 
-        model.state.name = ""
-        let cleared = model.isChanged
+        model.state.fields.name = ""
+        let cleared = model.flow.output.isChanged
 
         #expect(model.state.icon.glyph == .food)
         #expect(!start)
@@ -192,7 +192,7 @@ struct CategoryEditModelTests {
         let snack = try #require(model.state.tags.last)
         model.state.moveTag(snack.id, to: 0)
 
-        let changed = model.isChanged
+        let changed = model.flow.output.isChanged
         _ = await model.save()
         let saved = try await database.categoryList().tags
 
@@ -241,7 +241,7 @@ struct CategoryEditModelTests {
 
         _ = model.state.addTag(" 朝ごはん ")
         _ = model.state.addTag("昼ごはん")
-        let changed = model.isChanged
+        let changed = model.flow.output.isChanged
         let discarded = try await database.categoryList().tags
 
         _ = await model.save()
@@ -275,7 +275,7 @@ struct CategoryEditModelTests {
         let tag = try #require(reopened.state.tags.first)
 
         reopened.state.removeTag(tag.id)
-        let changed = reopened.isChanged
+        let changed = reopened.flow.output.isChanged
         let stored = try await database.categoryList().tags
 
         #expect(changed)
@@ -287,7 +287,7 @@ struct CategoryEditModelTests {
     func savesTagsWithNewCategory() async throws {
         let database = try Self.database()
         let model = CategoryEditModel(parts: .system(database), kind: .expense)
-        model.state.name = "外食"
+        model.state.fields.name = "外食"
 
         _ = model.state.addTag("朝ごはん")
         let before = try await database.categoryList().tags
@@ -316,7 +316,7 @@ struct CategoryEditModelTests {
 
         #expect(adding.state.ready != start)
         #expect(editing.state.ready != start)
-        #expect(editing.state.name == category.name)
+        #expect(editing.state.fields.name == category.name)
     }
 }
 

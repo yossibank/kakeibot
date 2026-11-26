@@ -120,7 +120,7 @@ fun EntrySheet(
     )
 
     SideEffect {
-        model.state.today = today
+        model.setToday(today)
     }
 
     LaunchedEffect(model) {
@@ -211,7 +211,7 @@ fun EntrySheet(
 
             EntrySlip(
                 model = model,
-                onOpenItems = { model.state.present(EntryModel.Presented.Items) },
+                onOpenItems = { model.state.presented.show(EntryModel.Presented.Items) },
                 onVoice = startVoice.takeIf {
                     voice.input.isAvailable && model.output.showsVoice && !voice.output.isActive
                 },
@@ -239,9 +239,9 @@ fun EntrySheet(
                 } else {
                     EntryDeck(
                         model = model,
-                        onOpenItems = { model.state.present(EntryModel.Presented.Items) },
+                        onOpenItems = { model.state.presented.show(EntryModel.Presented.Items) },
                         onSaveTemplate = {
-                            model.state.present(
+                            model.state.presented.show(
                                 EntryModel.Presented.Template(model.output.newTemplateDraft()),
                             )
                         },
@@ -291,37 +291,37 @@ fun EntrySheet(
             )
         }
 
-        (model.state.presented as? EntryModel.Presented.Template)?.let { template ->
+        (model.state.presented.current as? EntryModel.Presented.Template)?.let { template ->
             TemplateEditSheet(
                 parts = parts,
                 draft = template.draft,
                 onSave = {
-                    model.state.dismiss()
+                    model.state.presented.closeAll()
                     model.perform { it.reloadTemplates() }
                 },
-                onClose = model.state::dismiss,
+                onClose = model.state.presented::closeAll,
             )
         }
 
         AnimatedVisibility(
-            visible = model.state.presented == EntryModel.Presented.Items,
+            visible = model.state.presented.current == EntryModel.Presented.Items,
             enter = slideInVertically { it },
             exit = slideOutVertically { it },
         ) {
             EntryItemSheet(
                 model = model,
-                onClose = model.state::dismiss,
+                onClose = model.state.presented::closeAll,
             )
         }
     }
 
-    if (model.state.presented == EntryModel.Presented.Discard) {
+    if (model.state.presented.current == EntryModel.Presented.Discard) {
         DiscardDialog(
             onDiscard = {
-                model.state.dismiss()
+                model.state.presented.closeAll()
                 onClose()
             },
-            onKeep = model.state::dismiss,
+            onKeep = model.state.presented::closeAll,
         )
     }
 }

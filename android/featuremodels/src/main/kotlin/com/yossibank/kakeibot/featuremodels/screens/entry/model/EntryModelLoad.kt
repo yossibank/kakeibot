@@ -8,7 +8,7 @@ import com.yossibank.kakeibot.store.writes.methods.EntryWriteException
 
 fun EntryModel.close(): Boolean {
     if (output.isChanged) {
-        state.present(EntryModel.Presented.Discard)
+        state.presented.show(EntryModel.Presented.Discard)
         return false
     }
 

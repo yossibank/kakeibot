@@ -72,7 +72,10 @@ private extension TemplateQuickCard {
                 }
 
                 if model.output.billRecurring != nil {
-                    SettingsBillShiftPicker(shift: Bindable(model.state).billShift, dates: [])
+                    SettingsBillShiftPicker(
+                        shift: Bindable(model.state).fields.billShift,
+                        dates: []
+                    )
                 }
             }
         }

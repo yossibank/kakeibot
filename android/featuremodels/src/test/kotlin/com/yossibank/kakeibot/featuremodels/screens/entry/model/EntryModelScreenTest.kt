@@ -50,12 +50,12 @@ class EntryModelScreenTest {
     fun keepsOneShownAtATime() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
 
-        model.state.present(EntryModel.Presented.Items)
-        model.state.present(EntryModel.Presented.Discard)
-        val discard = model.state.presented
-        model.state.dismiss()
+        model.state.presented.show(EntryModel.Presented.Items)
+        model.state.presented.show(EntryModel.Presented.Discard)
+        val discard = model.state.presented.current
+        model.state.presented.closeAll()
 
         assertEquals(EntryModel.Presented.Discard, discard)
-        assertNull(model.state.presented)
+        assertNull(model.state.presented.current)
     }
 }

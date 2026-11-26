@@ -88,7 +88,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 見張りの失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、それでも読めなければ `task` に文を出す |
 | 今の時刻 | `featuremodels/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
 | 説明カードを閉じたか | `settingsparts/hint/` の `SettingsFoldInput` を、モデルの `Input` に置く。読み書きは、`SettingsFoldModel` の `loadFold`・`setFold` に通す |
-| 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる。`AssetsModel` だけは iOS と同じく `input.today` に持ち、画面が `setToday` で入れる |
+| 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` でモデルの `setToday` を呼ぶ。`AssetsModel` だけは iOS と同じく `input.today` に持つ |
 | 記録の一覧の見張り | `MainView` が 1 本を共有し、`ScreenParts` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 共有した見張りの持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
 | 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
@@ -98,12 +98,15 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 知らせの入れ替え | 記録の知らせが出ると、`MainModel` の `noticeRound` を進める。タブは `TabNoticeRound` で、失敗の知らせを消す |
 | タブの失敗の知らせ | `TabNoticeRound` が `LocalTabNoticeShown` を呼び、出ている記録の知らせを消す |
 | 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
-| 開いているシート | `MainModel.Sheet` のように、1 つの sealed interface で持つ |
+| 開いているシート | `MainModel.Sheet` のように 1 つの sealed interface にし、`Shown` で持つ |
 | 入口のタブとシート | `featuremodels/screens/main/` の `MainModel` が持つ。通知やリンクの行き先は、`open` が開く |
 | 行き先を開く前の待ち | シートが出ていれば閉じ、`MainModel.sheetCloseDelay` だけ待ってから開く。長さは iOS と同じ 600 ミリ秒で、`SheetLayer` が下がりきる |
 | 行き先の日付 | 入力の行き先は、`MainModel.Sheet.Entry` の `date` に入れる。`EntrySheet` が `EntryModel` に渡す |
 | 入口の状態の引き継ぎ | `appfeature/main/` の `rememberMainModel` が、タブとシートを保存する。保存の形は `MainModel` の `saved` と `restore` にある |
 | 確認・引き出し・選んだ行 | モデルの `State` に置く。`EntryModel.Presented`・`RecurringPanel` が当たる |
+| 画面が書いてよい値 | `State` の値のうち、`ScreenEditable` の型か、シートなどの enum・sealed の値だけ。ほかは `private set` か `internal set` にし、画面は `State` かモデルの関数を呼ぶ |
+| 表示中のもの | `featuremodels/shared/model/` の `Shown<値>` に、出している 1 つを持つ。`show`・`close`（前に出ている時だけ閉じる）・`closeAll` で変える |
+| 同時に出る物 | パネルと確認のように重なって出る物は、`Shown` を 2 つ持つ。1 つに混ぜない |
 | 画面の見た目の値 | 画面のファイルの `class Layout` に置く。Composable の関数で `mutableStateOf` を作らない |
 
 ## 🪝 画面とモデルのやり取り
@@ -120,7 +123,14 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 出口 | 保存できた・消した、の結果は、モデルの `state` の `outcome` に置く。画面は戻り値を見ない |
 | 結果の型 | `ScreenOutcome<値>`。値と送った回数を持ち、同じ値を続けて置いても届く |
 | 受ける所 | 画面は、`features/shared/model/` の `OnOutcome` を 1 か所に書く。閉じる・親に知らせるだけを書く |
-| 編集シートの結果 | `SettingsEditOutcome`。保存した値・非表示にしたか・消した物・閉じるかを持つ |
+| 編集シートの結果 | `EditFlow.Outcome`。保存した値・非表示にしたか・消した物・閉じるかを持つ |
+| 編集シートの流れ | `shared/model/` の `EditFlow` を、モデルが `val flow` で持つ。画面は `model.flow.output.x` を読み、`model.flow.close()` などを呼ぶ |
+| 流れが持つ物 | 確認（`EditFlow.Prompt`）の `Shown` と、親と分け合う `ModelTask` を持つ。`output` は保存できるかと保存の題を出し、結果は `outcome` に置く |
+| 流れの元 | モデルは `EditFlowSource` を private の入れ子の型で書く。隠す・消すの無いシートは既定の実装のままにし、失敗は投げて流れに知らせを出させる |
+| 閉じる操作 | 変わっていれば捨てる確認を出し、変わっていなければ閉じる結果を `outcome` に置く。戻るは、開いている枠を `rest` で先に閉じる |
+| 二度押し | 保存・削除・非表示は、`task` が動いている間は受けない |
+| 画面の側 | `features/shared/model/` の `EditSheet` を書く。確認と戻るを持ち、結果で `onSaved`・`onClose` などを呼ぶ |
+| 当てた画面 | 固定費の編集・テンプレートの追加・予算の数字の引き出し |
 | 取り消しの知らせ | モデルが、`state` の `UndoNoticeState` に出す。予算と固定費の一覧が当たる |
 | 入力の結果 | `EntryModel.Outcome` の `Closed` と `Continued` が、`EntryChange` を持つ |
 | 残す `rememberCoroutineScope` | `designsystem` の動きだけが持つ。画面のファイルには書かない |

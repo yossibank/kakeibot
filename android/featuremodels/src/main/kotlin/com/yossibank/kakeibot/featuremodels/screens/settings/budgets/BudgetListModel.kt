@@ -12,6 +12,8 @@ import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
@@ -40,6 +42,7 @@ class BudgetListModel(
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
+    val flow = EditFlow(task = state.task, source = Source())
 
     private val dependencies = Dependencies(parts.database, parts.entryList)
 
@@ -80,14 +83,13 @@ class BudgetListModel(
         val resetFrom = UndoNoticeState<YearMonth>()
 
         var today: LocalDate by mutableStateOf(today)
+            internal set
 
         var editing: Target? by mutableStateOf(null)
             private set
 
         var calculator by mutableStateOf(AmountCalculator())
             private set
-
-        var isConfirmingDiscard: Boolean by mutableStateOf(false)
 
         fun startEditing(
             target: Target,
@@ -99,7 +101,6 @@ class BudgetListModel(
 
         fun cancelEditing() {
             editing = null
-            isConfirmingDiscard = false
         }
 
         fun choose(suggestion: Suggestion) {
@@ -195,6 +196,22 @@ class BudgetListModel(
         val entryList: Flow<EntryList>,
     )
 
+    private inner class Source : EditFlowSource<Unit> {
+        override val isEditing: Boolean
+            get() = output.editingAmount != null
+
+        override val isChanged: Boolean
+            get() = output.isChanged
+
+        override val problem: String?
+            get() = if (output.canSave) null else "金額を入れてください"
+
+        override val readyTitle: String
+            get() = "${output.month?.month ?: ""}月からこの額にする"
+
+        override suspend fun store(): Unit? = if (setBudget(state.calculator.amount)) Unit else null
+    }
+
     override suspend fun loadFold(fold: SettingsFoldInput) {
         fold.load(from = dependencies.database)
     }
@@ -236,12 +253,8 @@ class BudgetListModel(
         )
     }
 
-    suspend fun save() {
-        if (!output.canSave) {
-            return
-        }
-
-        setBudget(state.calculator.amount)
+    fun setToday(today: LocalDate) {
+        state.today = today
     }
 
     suspend fun finishEditing() {

@@ -34,20 +34,6 @@ val RecurringEditModel.Output.draft: RecurringDraft
         )
     }
 
-val RecurringEditModel.Output.canSave: Boolean
-    get() = draft.problems.isEmpty()
-
-val RecurringEditModel.Output.saveTitle: String
-    get() {
-        val problem =
-            draft.problems.firstOrNull() ?: return if (isEditing) "変更を保存" else "追加する"
-
-        return message(problem)
-    }
-
-val RecurringEditModel.Output.isChanged: Boolean
-    get() = input.baseline?.let { it != draft } ?: false
-
 val RecurringEditModel.Output.suggestedHolidayShift: HolidayShift
     get() {
         if (state.form.type == Entry.Kind.transfer) {
@@ -86,3 +72,9 @@ fun RecurringEditModel.Output.recurring(
         updatedAt = Instant.EPOCH,
     )
 }
+
+internal val RecurringEditModel.Output.problem: String?
+    get() = draft.problems.firstOrNull()?.let { message(it) }
+
+internal val RecurringEditModel.Output.isChanged: Boolean
+    get() = input.baseline?.let { it != draft } ?: false

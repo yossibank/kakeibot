@@ -98,10 +98,10 @@ class EntryModelItemTest {
     fun editsStoreAsFirstMemoLine() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
 
-        model.state.store = "青葉"
+        model.state.setStore("青葉")
         val added = model.state.form.memo
         model.state.update { copy(memo = "若葉\n特売") }
-        model.state.store = "青葉\n本店"
+        model.state.setStore("青葉\n本店")
 
         assertEquals("青葉", added)
         assertEquals("青葉 本店\n特売", model.state.form.memo)

@@ -8,7 +8,6 @@ public struct RecurringEditSheet: View {
 
     @FocusState private var focus: Field?
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.notificationPermission) private var permission
     @Environment(\.scenePhase) private var scenePhase
 
@@ -28,7 +27,7 @@ public struct RecurringEditSheet: View {
 
     public var body: some View {
         content
-            .settingsDrawerLayer(item: model.state.prompt.panel) {
+            .settingsDrawerLayer(item: model.state.panel.current) {
                 closePanel()
             } drawer: { panel in
                 SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
@@ -39,16 +38,17 @@ public struct RecurringEditSheet: View {
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
-                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
+                    isMenuOpen: Bindable(model.flow.state).prompt[.menu],
                     title: headerTitle,
-                    isEditing: model.isEditing,
-                    isHidden: model.input.isHidden
+                    isEditing: model.flow.output.isEditing,
+                    isHidden: model.flow.output.isHidden
                 ) {
-                    edit.close()
+                    closePanel()
+                    model.flow.close()
                 } onHide: {
-                    edit.toggleHidden()
+                    model.flow.toggleHidden()
                 } onDelete: {
-                    model.state.prompt.isConfirmingDelete = true
+                    model.flow.state.prompt.show(.delete)
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -61,17 +61,13 @@ public struct RecurringEditSheet: View {
                         focus = nil
                     }
             }
-            .settingsEditConfirmations(edit)
-            .confirmation(
-                isPresented: Bindable(model.state).prompt.isConfirmingDelete,
-                systemImage: "trash",
-                title: "この固定費を削除しますか",
-                message: "これまでに作った記録は残ります",
-                keepTitle: "やめる",
-                confirmTitle: "削除する"
-            ) {
-                edit.delete()
-            }
+            .editSheet(
+                model.flow,
+                deleting: "この固定費を削除しますか",
+                note: "これまでに作った記録は残ります",
+                onHide: onHide,
+                onDelete: onDelete
+            )
             .animation(.snappy, value: model.output.isNotificationDenied)
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
@@ -100,15 +96,16 @@ private extension RecurringEditSheet {
 
 extension RecurringEditSheet {
     var saveButton: some View {
-        PrimaryButton(model.saveTitle) {
-            edit.save()
+        PrimaryButton(model.flow.output.saveTitle) {
+            closePanel()
+            model.flow.save()
         }
-        .disabled(!model.canSave)
+        .disabled(!model.flow.output.canSave)
     }
 
     func closePanel() {
         withAnimation(.snappy) {
-            model.state.closePanel()
+            model.state.panel.closeAll()
         }
     }
 }
@@ -116,7 +113,7 @@ extension RecurringEditSheet {
 private extension RecurringEditSheet {
     var content: some View {
         SettingsEditForm(showsSave: focus == nil) {
-            if !model.isEditing {
+            if !model.flow.output.isEditing {
                 CapsulePicker(selection: typeBinding, options: Self.typeOptions)
                     .frame(maxWidth: .infinity)
             }
@@ -127,7 +124,12 @@ private extension RecurringEditSheet {
                     .sharesTextScale(id: model.output.previewRow.place)
             }
 
-            SettingsField(namePrompt, text: Bindable(model.state).memo, focus: $focus, field: .name)
+            SettingsField(
+                namePrompt,
+                text: Bindable(model.state).fields.memo,
+                focus: $focus,
+                field: .name
+            )
 
             RecurringQuickCard(model: model) { panel in
                 open(panel)
@@ -175,7 +177,7 @@ private extension RecurringEditSheet {
     }
 
     var headerTitle: String {
-        model.isEditing ? "固定費を編集" : "固定費を追加"
+        model.flow.output.isEditing ? "固定費を編集" : "固定費を追加"
     }
 
     var typeBinding: Binding<Entry.Kind> {
@@ -184,21 +186,6 @@ private extension RecurringEditSheet {
         } set: { type in
             model.select(type)
         }
-    }
-
-    var edit: SettingsEditController<RecurringEditModel> {
-        SettingsEditController(
-            model: model,
-            dismiss: dismiss,
-            onRest: {
-                closePanel()
-            },
-            onHide: onHide,
-            onDelete: onDelete,
-            onSave: { [permission] in
-                await $0.save(permission: permission)
-            }
-        )
     }
 
     func showsDone(for panel: Panel) -> Bool {
@@ -226,7 +213,7 @@ private extension RecurringEditSheet {
         }
 
         withAnimation(.snappy) {
-            model.state.open(panel)
+            model.state.panel.show(panel)
         }
     }
 }

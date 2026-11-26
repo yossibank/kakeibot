@@ -9,31 +9,37 @@ public extension WalletEditModel {
         case loanAmount
     }
 
-    struct Payment: Sendable {
-        public var isAsking = false
-        public var isEditing = false
+    enum PaymentStep: Hashable, Sendable {
+        case asking
+        case editing
+    }
+
+    struct Fields: ScreenEditable {
+        public var name = ""
+    }
+
+    struct Payment: ScreenEditable {
+        public var shown = Shown<PaymentStep>()
 
         public internal(set) var addedWallet: Wallet?
     }
 
     @MainActor
     @Observable
-    final class State: SettingsEditState {
-        public var name = ""
-        public var isNegative: Bool
-        public var openValuationId: Valuation.ID?
-        public var valuationDeletion: Deletion?
+    final class State: NoticeHolding {
+        public var errorNotice = ErrorNotice()
+        public var fields = Fields()
+        public var panel = Shown<Drawer>()
+        public var openValuation = Shown<Valuation.ID>()
         public var payment = Payment()
-        public var prompt = SettingsEditPrompt<Drawer>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<Wallet>>()
 
         public private(set) var kind: Wallet.Kind
         public private(set) var calculator = AmountCalculator()
         public private(set) var loanAmount = AmountCalculator()
+        public private(set) var isNegative: Bool
 
         public internal(set) var valuation = AmountCalculator()
-
-        public var errorNotice = ErrorNotice()
+        public internal(set) var valuationDeletion: Deletion?
 
         public let icon: SettingsIconEditorModel
 
@@ -50,6 +56,14 @@ public extension WalletEditModel {
 }
 
 public extension WalletEditModel.State {
+    func setNegative(_ isNegative: Bool) {
+        self.isNegative = isNegative
+    }
+
+    func dismissValuationDeletion() {
+        valuationDeletion = nil
+    }
+
     func setKind(_ kind: Wallet.Kind) {
         let oldKind = self.kind
 
@@ -90,7 +104,7 @@ public extension WalletEditModel.State {
 
 extension WalletEditModel.State {
     func apply(_ draft: WalletDraft) {
-        name = draft.name
+        fields.name = draft.name
         kind = draft.kind
         icon.apply(draft.icon)
         isNegative = draft.initialBalance < 0

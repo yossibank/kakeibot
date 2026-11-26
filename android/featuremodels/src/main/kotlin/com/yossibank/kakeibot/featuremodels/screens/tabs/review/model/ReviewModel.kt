@@ -71,6 +71,7 @@ class ReviewModel(
         val task = ModelTask()
 
         var today: LocalDate by mutableStateOf(today)
+            internal set
 
         var offset: Int by mutableStateOf(0)
             private set
@@ -268,6 +269,10 @@ class ReviewModel(
         val entryList: Flow<EntryList>,
         val round: ObservationRound,
     )
+
+    fun setToday(today: LocalDate) {
+        state.today = today
+    }
 
     suspend fun observe() {
         dependencies.round.each { observeAll() }

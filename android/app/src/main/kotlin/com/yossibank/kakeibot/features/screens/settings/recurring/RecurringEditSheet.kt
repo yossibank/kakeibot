@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -78,23 +77,20 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
-import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditPrompt
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringPanel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringText
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.autoPlan
-import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.canSave
-import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isChanged
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isLoanRepayment
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isNotificationDenied
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.open
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.plannedTotal
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.previewRow
-import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.saveTitle
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.select
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.shared.notice.Deletion
-import com.yossibank.kakeibot.features.shared.model.OnOutcome
+import com.yossibank.kakeibot.features.shared.model.EditSheet
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
@@ -112,29 +108,30 @@ fun RecurringEditSheet(
     onDelete: (Deletion) -> Unit,
     onHide: () -> Unit,
 ) {
+    val notification = rememberNotificationPermission()
+    val focus = LocalFocusManager.current
+
     val model = remember(parts, editingId) {
         RecurringEditModel(
             parts = parts,
             today = today,
             type = type,
             editingId = editingId,
+            permission = notification.permission,
         )
     }
 
     SideEffect {
-        model.state.today = today
+        model.setToday(today)
     }
-
-    val focus = LocalFocusManager.current
-    val notification = rememberNotificationPermission()
 
     LaunchedEffect(model) {
         model.load()
-        model.refreshAuthorization(notification.permission)
+        model.refreshAuthorization()
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        model.refreshAuthorization(notification.permission)
+        model.refreshAuthorization()
     }
 
     model.state.task.Timer()
@@ -144,88 +141,45 @@ fun RecurringEditSheet(
         model.open(next)
     }
 
-    fun close() {
-        model.state.panel = null
-
-        if (model.output.isChanged) {
-            model.state.ask(RecurringEditPrompt.Discard)
-        } else {
-            onClose()
-        }
-    }
-
-    fun setHidden(isHidden: Boolean) {
-        model.perform { it.setHidden(isHidden) }
-    }
-
-    fun save(hiding: Boolean = false) {
-        model.state.panel = null
-
-        model.perform {
-            if (hiding) {
-                it.saveTogglingHidden(notification.permission)
-            } else {
-                it.save(notification.permission)
-            }
-        }
-    }
-
-    OnOutcome(model.state.outcome) { outcome ->
-        if (outcome.isHidden == true) {
-            onHide()
-        }
-
-        outcome.deletion?.let(onDelete)
-
-        if (outcome.closes) {
-            onClose()
-        }
-    }
-
-    BackHandler {
-        if (model.state.panel != null) {
-            model.state.panel = null
-        } else {
-            close()
-        }
-    }
+    EditSheet(
+        flow = model.flow,
+        deleting = "この固定費を削除しますか",
+        note = "これまでに作った記録は残ります",
+        onHide = onHide,
+        onDelete = onDelete,
+        onClose = onClose,
+    )
 
     SettingsFrame(
-        title = if (model.output.isEditing) "固定費を編集" else "固定費を追加",
+        title = if (model.flow.output.isEditing) "固定費を編集" else "固定費を追加",
         isRoot = false,
-        onBack = ::close,
+        onBack = model.flow::close,
         followsKeyboard = true,
         trailing = {
-            if (model.output.isEditing) {
+            if (model.flow.output.isEditing) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     HideButton(
-                        isHidden = model.input.isHidden,
-                        onSelect = {
-                            if (model.output.isChanged) {
-                                model.state.ask(RecurringEditPrompt.Hide)
-                            } else {
-                                setHidden(!model.input.isHidden)
-                            }
-                        },
+                        isHidden = model.flow.output.isHidden,
+                        onSelect = { model.flow.perform { it.toggleHidden() } },
                     )
 
                     RoundIconButton(
                         icon = R.drawable.ic_trash,
-                        onSelect = { model.state.ask(RecurringEditPrompt.Delete) },
+                        onSelect = { model.flow.state.prompt.show(EditFlow.Prompt.delete) },
                     )
                 }
             }
         },
         overlay = {
             BottomDrawer(
-                item = model.state.panel,
+                item = model.state.panel.current,
                 title = { it.title },
-                onClose = { model.state.panel = null },
+                onClose = model.state.panel::closeAll,
             ) { current ->
                 RecurringPanelBody(
                     panel = current,
                     model = model,
-                    onClose = { model.state.panel = null },
+                    onClose = model.state.panel::closeAll,
                 )
             }
         },
@@ -236,7 +190,7 @@ fun RecurringEditSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            if (!model.output.isEditing) {
+            if (!model.flow.output.isEditing) {
                 SegmentSwitch(
                     selection = model.state.form.type,
                     options = typeOptions,
@@ -296,23 +250,12 @@ fun RecurringEditSheet(
         }
 
         PrimaryButton(
-            title = model.output.saveTitle,
-            onClick = { save() },
+            title = model.flow.output.saveTitle,
+            onClick = { model.flow.perform { it.save() } },
             modifier = Modifier.fillMaxWidth(),
-            isEnabled = model.output.canSave,
+            isEnabled = model.flow.output.canSave,
         )
     }
-
-    RecurringEditDialogs(
-        prompt = model.state.prompt,
-        isHidden = model.input.isHidden,
-        canSave = model.output.canSave,
-        onDismiss = model.state::closePrompt,
-        onDiscard = onClose,
-        onDelete = { model.perform { it.delete() } },
-        onSaveHiding = { save(hiding = true) },
-        onDiscardHiding = { setHidden(!model.input.isHidden) },
-    )
 }
 
 private val previewSpacing = 6.dp

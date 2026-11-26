@@ -86,7 +86,7 @@ extension EntryModelTests {
 
         for index in 0..<EntryModel.categoriesPerPage {
             let editor = model.newCategoryModel()
-            editor.state.name = "追加\(index)"
+            editor.state.fields.name = "追加\(index)"
             added = try #require(await editor.save()).id
         }
 
@@ -105,7 +105,7 @@ extension EntryModelTests {
     func choosesAddedWalletAfterWalletSheetOnce() async throws {
         let model = try await Self.newModel()
         let editor = model.newWalletModel()
-        editor.state.name = "へそくり"
+        editor.state.fields.name = "へそくり"
         let wallet = try #require(await editor.save())
 
         model.state.open(.newWallet(.source))

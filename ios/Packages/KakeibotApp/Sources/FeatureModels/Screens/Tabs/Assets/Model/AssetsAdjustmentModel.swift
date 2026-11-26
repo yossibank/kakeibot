@@ -10,6 +10,7 @@ public final class AssetsAdjustmentModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
+    public let flow: EditFlow<Void>
 
     let dependencies: ScreenParts
 
@@ -20,28 +21,24 @@ public final class AssetsAdjustmentModel: ScreenPerforming {
         today: LocalDate
     ) {
         let state = State()
-
-        let input = Input(
-            wallet: wallet,
-            balance: balance,
-            today: today,
-            openingAmount: state.calculator.amount
-        )
+        let input = Input(wallet: wallet, balance: balance, today: today)
+        let output = Output(input: input, state: state)
 
         self.state = state
         self.input = input
-        self.output = Output(input: input, state: state)
+        self.output = output
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        flow.connect(self)
     }
 }
 
 public extension AssetsAdjustmentModel {
     @MainActor
     @Observable
-    final class State: SettingsEditState {
+    final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Never>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public private(set) var calculator = AmountCalculator()
     }
@@ -53,18 +50,15 @@ public extension AssetsAdjustmentModel {
         public let balance: Int
 
         let today: LocalDate
-        let openingAmount: Int
 
         init(
             wallet: Wallet,
             balance: Int,
-            today: LocalDate,
-            openingAmount: Int
+            today: LocalDate
         ) {
             self.wallet = wallet
             self.balance = balance
             self.today = today
-            self.openingAmount = openingAmount
         }
     }
 
@@ -85,9 +79,9 @@ public extension AssetsAdjustmentModel {
 
 public extension AssetsAdjustmentModel {
     @discardableResult
-    func save() async -> Bool {
+    func save() async -> Void? {
         guard output.canSave else {
-            return false
+            return nil
         }
 
         do {
@@ -98,12 +92,10 @@ public extension AssetsAdjustmentModel {
                 at: dependencies.clock.now
             )
 
-            state.outcome.send(SettingsEditOutcome(saved: ()))
-
-            return true
+            return ()
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
-            return false
+            return nil
         }
     }
 }
@@ -119,10 +111,6 @@ public extension AssetsAdjustmentModel.Output {
 
     var canSave: Bool {
         difference != 0
-    }
-
-    var isChanged: Bool {
-        state.calculator.amount != input.openingAmount
     }
 
     var differenceText: String {
@@ -141,5 +129,23 @@ public extension AssetsAdjustmentModel.Output {
 public extension AssetsAdjustmentModel.State {
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
+    }
+}
+
+extension AssetsAdjustmentModel: EditFlowSource {
+    var isEditing: Bool {
+        false
+    }
+
+    var isChanged: Bool {
+        state.calculator.amount != 0
+    }
+
+    var problem: String? {
+        output.canSave ? nil : output.differenceNote
+    }
+
+    func store() async -> Void? {
+        await save()
     }
 }

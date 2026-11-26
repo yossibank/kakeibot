@@ -9,15 +9,16 @@ extension WalletEditModelTests {
     func placesSavedWalletInOutcome() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(parts: .system(setup.database))
-        model.state.name = "へそくり"
+        model.state.fields.name = "へそくり"
 
-        let saved = await model.save()
-        let outcome = try #require(model.state.outcome.value)
+        await model.flow.save().value
+        let outcome = try #require(model.flow.state.outcome.value)
+        let wallets = try await setup.database.entryOptions().wallets
 
-        #expect(saved != nil)
-        #expect(outcome.saved?.id == saved?.id)
+        #expect(wallets.contains { $0.id == outcome.saved?.id })
+        #expect(outcome.saved?.name == "へそくり")
         #expect(outcome.closes)
-        #expect(!model.state.payment.isAsking)
+        #expect(!model.state.payment.shown.isShowing(.asking))
         #expect(model.state.payment.addedWallet == nil)
     }
 
@@ -25,14 +26,15 @@ extension WalletEditModelTests {
     func asksPaymentBeforeClosingAddedCard() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(parts: .system(setup.database))
-        model.state.name = "楽天カード"
+        model.state.fields.name = "楽天カード"
         model.state.setKind(.card)
 
-        let saved = try #require(await model.save())
-        let asked = model.state.outcome.value
-        let isAsking = model.state.payment.isAsking
+        await model.flow.save().value
+        let saved = try #require(model.state.payment.addedWallet)
+        let asked = model.flow.state.outcome.value
+        let isAsking = model.state.payment.shown.isShowing(.asking)
         model.finishAddedWallet()
-        let outcome = try #require(model.state.outcome.value)
+        let outcome = try #require(model.flow.state.outcome.value)
 
         #expect(asked == nil)
         #expect(isAsking)
@@ -45,15 +47,15 @@ extension WalletEditModelTests {
     func placesNoOutcomeWhenSavingFails() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(parts: .system(setup.database))
-        model.state.name = "楽天カード"
+        model.state.fields.name = "楽天カード"
         model.state.setKind(.card)
         try await setup.database.failWrites(to: "wallet")
 
-        let saved = await model.save()
+        await model.flow.save().value
 
-        #expect(saved == nil)
-        #expect(model.state.outcome.value == nil)
-        #expect(!model.state.payment.isAsking)
+        #expect(model.state.payment.addedWallet == nil)
+        #expect(model.flow.state.outcome.value == nil)
+        #expect(!model.state.payment.shown.isShowing(.asking))
         #expect(model.state.errorNotice.message == "保存できませんでした")
     }
 
@@ -63,17 +65,15 @@ extension WalletEditModelTests {
         let bank = try await setup.wallet(named: "銀行")
         let model = WalletEditModel(parts: .system(setup.database), editing: bank.id)
         await model.load()
-        model.state.name = "メインバンク"
+        model.state.fields.name = "メインバンク"
 
-        await model.saveTogglingHidden {
-            await $0.save()
-        }
-        let outcome = try #require(model.state.outcome.value)
+        await model.flow.saveTogglingHidden().value
+        let outcome = try #require(model.flow.state.outcome.value)
 
         #expect(outcome.saved?.name == "メインバンク")
         #expect(outcome.isHidden == true)
         #expect(outcome.closes)
-        #expect(model.input.isHidden)
+        #expect(model.flow.output.isHidden)
     }
 
     @Test
@@ -89,11 +89,10 @@ extension WalletEditModelTests {
         let model = WalletEditModel(parts: .system(setup.database), editing: last.id)
         await model.load()
 
-        let isHidden = await model.setHidden(true)
+        await model.flow.setHidden(true).value
 
-        #expect(!isHidden)
-        #expect(model.state.outcome.value == nil)
-        #expect(!model.input.isHidden)
+        #expect(model.flow.state.outcome.value == nil)
+        #expect(!model.flow.output.isHidden)
         #expect(model.state.errorNotice.message == "最後の 1 つの口座は非表示にできません")
     }
 
@@ -101,16 +100,17 @@ extension WalletEditModelTests {
     func placesDeletionInOutcome() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "へそくり"
+        adding.state.fields.name = "へそくり"
         let saved = try #require(await adding.save())
         let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
 
-        let deletion = await model.delete()
-        let outcome = try #require(model.state.outcome.value)
+        await model.flow.delete().value
+        let outcome = try #require(model.flow.state.outcome.value)
+        let wallets = try await setup.database.entryOptions().wallets
 
-        #expect(deletion != nil)
-        #expect(outcome.deletion?.id == deletion?.id)
+        #expect(outcome.deletion != nil)
+        #expect(!wallets.contains { $0.id == saved.id })
         #expect(outcome.closes)
     }
 
@@ -119,13 +119,13 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let model = try await Self.investment(in: setup)
         model.startValuation()
-        model.state.open(.valuation)
+        model.state.panel.show(.valuation)
         model.state.pressValuation(.digit(5))
 
         let isSaved = await model.saveValuation()
 
         #expect(isSaved)
-        #expect(model.state.prompt.panel == nil)
+        #expect(model.state.panel.current == nil)
     }
 
     @Test
@@ -133,14 +133,14 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let model = try await Self.investment(in: setup)
         model.startValuation()
-        model.state.open(.valuation)
+        model.state.panel.show(.valuation)
         model.state.pressValuation(.digit(5))
         try await setup.database.failWrites(to: "valuation")
 
         let isSaved = await model.saveValuation()
 
         #expect(!isSaved)
-        #expect(model.state.prompt.panel == .valuation)
+        #expect(model.state.panel.current == .valuation)
     }
 
     @Test
@@ -162,7 +162,7 @@ private extension WalletEditModelTests {
     static func investment(in setup: Setup) async throws -> WalletEditModel {
         let adding = WalletEditModel(parts: .system(setup.database))
 
-        adding.state.name = "積立"
+        adding.state.fields.name = "積立"
         adding.state.setKind(.investment)
 
         let saved = try #require(await adding.save())

@@ -172,8 +172,8 @@ extension EntryModelTests {
         let editor = model.newTemplateModel()
 
         #expect(editor.output.amount == 450)
-        #expect(editor.state.memo == "カフェ")
+        #expect(editor.state.fields.memo == "カフェ")
         #expect(editor.state.categoryId == model.state.category.id)
-        #expect(editor.state.name.isEmpty)
+        #expect(editor.state.fields.name.isEmpty)
     }
 }

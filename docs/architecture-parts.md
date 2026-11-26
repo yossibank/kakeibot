@@ -23,11 +23,8 @@
 | `SettingsBoardSpec` | 一覧の画面ごとの設定（題・文言・並びの形・タイル・編集画面・確認）。画面ごとに 1 つ書く | `Features/Shared/SettingsParts/Board/` |
 | `SettingsFoldModel` | 説明カードと非表示の一覧を閉じたかを、DB から読み書きするモデル。値は `input` の `SettingsFoldInput` に置き、モデルは `foldStore()` だけ書く | `FeatureModels/Shared/SettingsParts/Hint/` |
 | `SettingsEditSheet` | 1 件を編集する画面。モデルと、削除・非表示の受け取りだけで作れる | `Features/Shared/SettingsParts/Input/` |
-| `SettingsEditInput` | 編集のモデルの入力。変わる前の値と、編集中の id を持つ | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditHidingInput` | 非表示にできるものの、編集のモデルの入力。非表示かどうかも持つ | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditModel` | 1 件を編集するモデル。状態と入力のまとまりを持ち、下書きと、保存できるかを出す | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditRemoving` | 編集のモデルに、非表示と削除を足し、状態は `SettingsEditState` にする。`save` が `finishSave` で結果を置き、失敗の文は `hideFailedMessage` などで替える | `FeatureModels/Shared/SettingsParts/Input/` |
-| `SettingsEditState` | 編集のモデルの状態で、知らせ・出している物（`SettingsEditPrompt`）・結果（`outcome`）を持つ。パネルの型は、画面ごとの `Panel` で決める | `FeatureModels/Shared/SettingsParts/Input/` |
+| `ScreenEditable` | 画面が書いてよい値の型の印。`State` の `public var` は、これに従う型かシートの `enum` だけにする | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `EditFlowSource` | `EditFlow` に渡す元で、変わったか・問題の文・保存・非表示・削除を返す。Swift はモデルが従って `connect` し、Kotlin は入れ子の `Source` で書く | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |
@@ -40,7 +37,7 @@
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
 | `ScreenOutcome` | 保存できた・消した、の結果を 1 つ持つ。等しさは通し番号で比べる | `FeatureModels/Shared/Model/` |
-| `SettingsEditOutcome` | 編集シートの結果。保存した値・非表示にしたか・消した物・閉じるかを持つ | `FeatureModels/Shared/SettingsParts/Input/` |
+| `EditFlow.Outcome` | 編集シートの結果。保存した値・非表示にしたか・消した物・閉じるかを持つ | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `SettingsBoardRemoved` | 設定の一覧で、非表示にした行・消した物・まとめて消した結果を持つ。取り消しの知らせに使う | `FeatureModels/Shared/SettingsParts/Board/` |
 | `onOutcome` | 画面が `ScreenOutcome` の変化を受ける modifier | `Features/Shared/Model/` |
 | `MainOutcomeSignal` | `MainView` が結果を受ける、見えない画面。`MainView` の `body` は、結果の値を読まずに済む | `AppFeature/Main/` |
@@ -54,7 +51,10 @@
 | `SettingsConfirmation` | 行を非表示・削除する前の確認の文言。`SettingsBoardSpec` が返す | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardDestination` | 新規と編集だけの行き先。`SettingsBoardMovingState` が使い、`SettingsBoardSpec` の既定の実装がある | `FeatureModels/Shared/SettingsParts/Board/` |
 | `SettingsBoardShown` | 一覧の画面が出している物。行き先・開いている行・確認（`SettingsBoardPrompt`）を持つ | `FeatureModels/Shared/SettingsParts/Board/` |
-| `SettingsEditPrompt` | 編集シートが出している物。開いているパネルと、メニュー・破棄・非表示・削除の確認のどれか 1 つを持つ | `FeatureModels/Shared/SettingsParts/Input/` |
+| `Shown` | 出している物（シート・確認・メニュー・パネル）を 1 つの値で持つ。Swift は確認に `shown[.delete]` で `Binding` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `ModelTask` | 保存などの実行中の印。`attempt` は実行中でも走らせ、二度押しは呼ぶ側が `isRunning` で止める | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `EditFlow` | 編集シートの流れの子のモデル。確認の `Shown`・`ModelTask`・保存の題・結果を持ち、モデルが `flow` で持つ | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `editSheet`・`EditSheet` | 編集シートの確認一式と結果の受け取り。Swift は `dismiss` を呼ぶ modifier、Kotlin は `onClose` と戻るを持つ | `Features/Shared/Model/`・`features/shared/model/` |
 | `SettingsBoardScreen` | `SettingsBoardPage` の中で使う、設定の一覧の外枠。説明カード・タイルの並び・追加ボタンを組む | `Features/Shared/SettingsParts/Board/` |
 | `PageSlideReader` | 頁めくりの入れ物。動きの値を中に持って中身に `PageSlideProxy` を渡し、画面は値を持たない | `DesignSystem/Components/Navigation/` |
 | `PageSlideProxy` | 頁めくりの口。`pageSlide` と `onPageSwipe` に渡し、ボタンからは `run(forward:)` で頁を送る | `DesignSystem/Components/Navigation/` |

@@ -146,10 +146,10 @@ class ScreenFlowTest {
         }
 
         editor.state.update { copy(memo = "家賃", day = 10, startDate = date("2026-09-01")) }
-        val isSaved = editor.save()
+        val saved = editor.flow.save()
         ModelWait.until { tabs.amounts.all { it == listOf(78000, 78000) } }
 
-        assertTrue(isSaved)
+        assertNotNull(saved)
         assertEquals(listOf("2026-10-10"), tabs.records.output.days.map { it.date.toString() })
         assertEquals(78000L, tabs.review.output.total)
         assertEquals(-156_000L, tabs.balance(of = cash))
@@ -218,7 +218,7 @@ class ScreenFlowTest {
             settings.state.press(AmountCalculator.Key.Digit(digit))
         }
 
-        settings.save()
+        settings.flow.save()
         ModelWait.until { tabs.home.output.usage != null }
 
         assertEquals(28800L, tabs.home.output.usage?.remaining)

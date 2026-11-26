@@ -50,6 +50,7 @@ class RecordsModel(
         val task = ModelTask()
 
         var today: LocalDate by mutableStateOf(today)
+            internal set
 
         var month: YearMonth? by mutableStateOf(null)
             private set
@@ -164,6 +165,10 @@ class RecordsModel(
         val entryList: Flow<EntryList>,
         val round: ObservationRound,
     )
+
+    fun setToday(today: LocalDate) {
+        state.today = today
+    }
 
     suspend fun observe() {
         dependencies.round.each { observeAll() }

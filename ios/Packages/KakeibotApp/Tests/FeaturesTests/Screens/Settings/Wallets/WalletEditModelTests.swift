@@ -11,7 +11,7 @@ struct WalletEditModelTests {
     func addsCardWithNegativeBalance() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(parts: .system(setup.database))
-        model.state.name = "楽天カード"
+        model.state.fields.name = "楽天カード"
         model.state.setKind(.card)
         model.state.press(.digit(3))
         model.state.press(.digit(8))
@@ -36,32 +36,32 @@ struct WalletEditModelTests {
         let editing = WalletEditModel(parts: .system(setup.database), editing: bank.id)
         await editing.load()
 
-        let empty = model.saveTitle
-        model.state.name = "楽天カード"
-        let named = model.saveTitle
+        let empty = model.flow.output.saveTitle
+        model.state.fields.name = "楽天カード"
+        let named = model.flow.output.saveTitle
         model.state.icon.markKind = .emoji
-        let noMark = model.saveTitle
+        let noMark = model.flow.output.saveTitle
 
         #expect(empty == "名前を入れてください")
         #expect(named == "追加する")
         #expect(noMark == "アイコンを選んでください")
-        #expect(editing.saveTitle == "変更を保存")
+        #expect(editing.flow.output.saveTitle == "変更を保存")
     }
 
     @Test
     func tracksChangesFromStart() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(parts: .system(setup.database))
-        let start = model.isChanged
+        let start = model.flow.output.isChanged
 
-        model.state.name = "楽天カード"
-        let named = model.isChanged
+        model.state.fields.name = "楽天カード"
+        let named = model.flow.output.isChanged
 
-        model.state.name = ""
-        let cleared = model.isChanged
+        model.state.fields.name = ""
+        let cleared = model.flow.output.isChanged
 
         model.state.setKind(.bank)
-        let kindChanged = model.isChanged
+        let kindChanged = model.flow.output.isChanged
 
         #expect(!start)
         #expect(named)
@@ -92,7 +92,7 @@ struct WalletEditModelTests {
         let card = model.state.isNegative
         model.state.setKind(.bank)
         let bank = model.state.isNegative
-        model.state.isNegative = true
+        model.state.setNegative(true)
         model.state.setKind(.cash)
 
         #expect(card)
@@ -133,7 +133,7 @@ struct WalletEditModelTests {
 
         model.state.setKind(.loan)
         let loan = model.state.isNegative
-        model.state.isNegative = false
+        model.state.setNegative(false)
         model.state.setKind(.card)
         let overpaid = model.state.isNegative
 
@@ -226,7 +226,7 @@ struct WalletEditModelTests {
         await model.load()
 
         #expect(model.input.balance == 0)
-        #expect(model.output.needsHideConfirmation)
+        #expect(model.flow.output.asksBeforeHiding)
     }
 
     @Test

@@ -77,7 +77,7 @@ fun ReviewView(
     }
 
     SideEffect {
-        model.state.today = today
+        model.setToday(today)
     }
 
     LaunchedEffect(model) {

@@ -26,7 +26,7 @@ public extension WalletEditModel.Output {
 
         return WalletDraft(
             kind: state.kind,
-            name: state.name,
+            name: state.fields.name,
             mark: state.icon.mark,
             color: state.icon.color,
             initialBalance: initialBalance,
@@ -34,10 +34,6 @@ public extension WalletEditModel.Output {
             recordedKind: input.recordedKind,
             hasValuations: input.hasValuations
         )
-    }
-
-    var needsHideConfirmation: Bool {
-        !input.isHidden && input.totalBalance != 0
     }
 }
 

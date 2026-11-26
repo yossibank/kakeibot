@@ -8,30 +8,28 @@ struct AssetsRewardGoalEditSheet: View {
 
     @FocusState private var focus: Field?
 
-    @Environment(\.dismiss) private var dismiss
-
     init(model: AssetsRewardGoalEditModel) {
         _model = State(initialValue: model)
     }
 
     var body: some View {
         content
-            .settingsDrawerLayer(item: model.state.prompt.panel) {
+            .settingsDrawerLayer(item: model.state.panel.current) {
                 closePanel()
             } drawer: { panel in
                 drawerView(panel)
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
-                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-                    title: model.output.isEditing ? "目標を編集" : "目標を決める",
-                    isEditing: model.output.isEditing,
+                    isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+                    title: model.flow.output.isEditing ? "目標を編集" : "目標を決める",
+                    isEditing: model.flow.output.isEditing,
                     isHidden: false,
                     canHide: false
                 ) {
                     close()
                 } onHide: {} onDelete: {
-                    model.state.prompt.isConfirmingDelete = true
+                    model.flow.state.prompt.show(.delete)
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -44,27 +42,11 @@ struct AssetsRewardGoalEditSheet: View {
                     }
             }
             .errorBanner(Bindable(model.state).errorNotice)
-            .confirmsDiscard(
-                when: model.output.isChanged,
-                isPresented: Bindable(model.state).prompt.isConfirmingDiscard
-            ) {
-                dismiss()
-            }
-            .confirmation(
-                isPresented: Bindable(model.state).prompt.isConfirmingDelete,
-                systemImage: "trash",
-                title: "この目標を削除しますか",
-                message: "貯金箱の額はそのまま残ります",
-                keepTitle: "やめる",
-                confirmTitle: "削除する"
-            ) {
-                model.perform {
-                    await $0.delete()
-                }
-            }
-            .onOutcome(model.state.outcome) { _ in
-                dismiss()
-            }
+            .editSheet(
+                model.flow,
+                deleting: "この目標を削除しますか",
+                note: "貯金箱の額はそのまま残ります"
+            )
             .onChange(of: focus) {
                 if focus != nil {
                     hidePanel()
@@ -91,16 +73,16 @@ private extension AssetsRewardGoalEditSheet {
             ScrollView {
                 VStack(spacing: SettingsSpacing.form) {
                     AssetsRewardGoalCard(
-                        name: model.state.name.isEmpty ? "欲しい物" : model.state.name,
+                        name: model.state.fields.name.isEmpty ? "欲しい物" : model.state.fields.name,
                         targetAmount: model.state.calculator.amount,
                         remaining: model.output.remaining,
                         progress: model.output.progress
                     )
-                    .sharesTextScale(id: model.state.name)
+                    .sharesTextScale(id: model.state.fields.name)
 
                     SettingsField(
                         "欲しい物（例：新しい靴）",
-                        text: Bindable(model.state).name,
+                        text: Bindable(model.state).fields.name,
                         focus: $focus,
                         field: .name
                     )
@@ -125,10 +107,10 @@ private extension AssetsRewardGoalEditSheet {
     }
 
     var saveButton: some View {
-        PrimaryButton(model.output.saveTitle) {
+        PrimaryButton(model.flow.output.saveTitle) {
             save()
         }
-        .disabled(!model.output.canSave)
+        .disabled(!model.flow.output.canSave)
     }
 
     func drawerView(_ panel: Panel) -> some View {
@@ -168,13 +150,13 @@ private extension AssetsRewardGoalEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            model.state.open(panel)
+            model.state.panel.show(panel)
         }
     }
 
     func hidePanel() {
         withAnimation(.snappy) {
-            model.state.closePanel()
+            model.state.panel.closeAll()
         }
     }
 
@@ -185,19 +167,11 @@ private extension AssetsRewardGoalEditSheet {
 
     func close() {
         closePanel()
-
-        if model.output.isChanged {
-            model.state.prompt.isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
+        model.flow.close()
     }
 
     func save() {
         closePanel()
-
-        model.perform {
-            await $0.save()
-        }
+        model.flow.save()
     }
 }

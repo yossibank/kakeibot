@@ -18,7 +18,12 @@ extension WalletEditSheet {
                 layout.iconBottom = maxY
             }
 
-            SettingsField("名前", text: Bindable(model.state).name, focus: $focus, field: .name)
+            SettingsField(
+                "名前",
+                text: Bindable(model.state).fields.name,
+                focus: $focus,
+                field: .name
+            )
 
             SettingsFormCard {
                 kindChooser
@@ -41,22 +46,7 @@ extension WalletEditSheet {
             saveButton
         }
         .overlay(alignment: .top) {
-            SettingsEditHeader(
-                isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-                title: title,
-                isEditing: model.isEditing,
-                isHidden: model.input.isHidden,
-                canDelete: !(model.input.isHidden && model.input.hasEntries)
-            ) {
-                edit.close()
-            } onHide: {
-                toggleHidden()
-            } onDelete: {
-                focus = nil
-                model.state.prompt.isConfirmingDelete = true
-            }
-            .padding(.horizontal, SettingsSpacing.side)
-            .padding(.top, SettingsSpacing.top)
+            header
         }
         .contentShape(.rect)
         .onTapGesture {
@@ -65,11 +55,32 @@ extension WalletEditSheet {
         .backdrop()
     }
 
-    var saveButton: some View {
-        PrimaryButton(model.saveTitle) {
-            edit.save()
+    var header: some View {
+        SettingsEditHeader(
+            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            title: title,
+            isEditing: model.flow.output.isEditing,
+            isHidden: model.flow.output.isHidden,
+            canDelete: !(model.flow.output.isHidden && model.input.hasEntries)
+        ) {
+            focus = nil
+            model.flow.close()
+        } onHide: {
+            focus = nil
+            model.flow.toggleHidden()
+        } onDelete: {
+            focus = nil
+            model.flow.state.prompt.show(.delete)
         }
-        .disabled(!model.canSave)
+        .padding(.horizontal, SettingsSpacing.side)
+        .padding(.top, SettingsSpacing.top)
+    }
+
+    var saveButton: some View {
+        PrimaryButton(model.flow.output.saveTitle) {
+            save()
+        }
+        .disabled(!model.flow.output.canSave)
     }
 
     var preview: some View {
@@ -157,8 +168,8 @@ extension WalletEditSheet {
                 .padding(.top, 12)
 
             ForEach(model.input.valuations) { valuation in
-                SwipeRow(id: valuation.id, openId: Bindable(model.state).openValuationId) {
-                    model.state.openValuationId = nil
+                SwipeRow(id: valuation.id, openId: Bindable(model.state).openValuation.item) {
+                    model.state.openValuation.closeAll()
                 } onAction: {
                     model.perform {
                         await $0.deleteValuation(valuation.id)
@@ -260,7 +271,7 @@ extension WalletEditSheet {
 
         return Button {
             withAnimation(.snappy) {
-                model.state.isNegative = isNegative
+                model.state.setNegative(isNegative)
             }
         } label: {
             VStack(alignment: .leading, spacing: 2) {

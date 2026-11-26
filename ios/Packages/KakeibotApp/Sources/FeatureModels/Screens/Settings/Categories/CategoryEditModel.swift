@@ -6,10 +6,11 @@ import Store
 
 @MainActor
 @Observable
-public final class CategoryEditModel {
+public final class CategoryEditModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
+    public let flow: EditFlow<EntryCategory>
 
     let dependencies: ScreenParts
 
@@ -22,12 +23,15 @@ public final class CategoryEditModel {
         let input = Input(kind: kind, editingId: id)
         let output = Output(input: input, state: state)
 
-        input.baseline = output.snapshot
-
         self.state = state
         self.input = input
         self.output = output
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        input.baseline = output.snapshot
+
+        flow.connect(self)
     }
 }
 
@@ -40,14 +44,12 @@ public extension CategoryEditModel {
 
     @MainActor
     @Observable
-    final class Input: SettingsEditHidingInput {
-        public internal(set) var isHidden = false
+    final class Input {
         public internal(set) var hasEntries = false
+        public internal(set) var baseline: Snapshot?
+        public internal(set) var isHidden = false
 
         public let kind: EntryCategory.Kind
-
-        public internal(set) var baseline: Snapshot?
-
         public let editingId: EntryCategory.ID?
 
         init(
@@ -107,8 +109,8 @@ public extension CategoryEditModel {
             let tags = list.tags.filter { $0.categoryId == editingId }
 
             state.apply(loaded, tags: tags.map(EditingTag.init))
-            input.isHidden = category.archivedAt != nil
             input.hasEntries = entries.contains { $0.categoryId == editingId }
+            input.isHidden = category.archivedAt != nil
             input.baseline = output.snapshot
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
@@ -118,16 +120,12 @@ public extension CategoryEditModel {
     @discardableResult
     func save() async -> EntryCategory? {
         do {
-            let category = try await dependencies.database.saveCategory(
+            return try await dependencies.database.saveCategory(
                 output.draft,
                 tags: state.tags.map(\.draft),
                 editing: input.editingId,
                 at: dependencies.clock.now
             )
-
-            await finishSave(category)
-
-            return category
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
@@ -144,7 +142,7 @@ public extension CategoryEditModel.Output {
     var draft: EntryCategoryDraft {
         EntryCategoryDraft(
             kind: input.kind,
-            name: state.name,
+            name: state.fields.name,
             mark: state.icon.mark,
             color: state.icon.color
         )
@@ -166,35 +164,52 @@ extension CategoryEditModel.EditingTag {
     }
 }
 
-extension CategoryEditModel: SettingsEditRemoving {
-    public var edited: Snapshot {
-        output.snapshot
+extension CategoryEditModel: EditFlowSource {
+    var isEditing: Bool {
+        input.editingId != nil
     }
 
-    public var problemMessage: String? {
+    var isChanged: Bool {
+        input.baseline.map { $0 != output.snapshot } ?? false
+    }
+
+    var problem: String? {
         output.draft.problems.first?.message
     }
 
-    public func remove(_ id: EntryCategory.ID) async throws -> Deletion {
-        try await dependencies.database.deleteCategory(
-            id,
+    var isHidden: Bool {
+        input.isHidden
+    }
+
+    func store() async -> EntryCategory? {
+        await save()
+    }
+
+    func remove() async throws -> Deletion? {
+        guard let editingId = input.editingId else {
+            return nil
+        }
+
+        return try await dependencies.database.deleteCategory(
+            editingId,
             at: dependencies.clock.now
         )
     }
 
-    public func deleteFailedMessage(for error: any Error) -> String? {
+    func deleteFailedMessage(for error: any Error) -> String {
         switch error {
         case AppDatabase.CategoryWriteError.hasEntries: Self.inUseMessage
-        default: nil
+        default: SettingsEditMessage.deleteFailed
         }
     }
 
-    public func saveHidden(
-        _ id: EntryCategory.ID,
-        isHidden: Bool
-    ) async throws {
+    func storeHidden(_ isHidden: Bool) async throws {
+        guard let editingId = input.editingId else {
+            return
+        }
+
         try await dependencies.database.setHidden(
-            id,
+            editingId,
             isHidden: isHidden,
             at: dependencies.clock.now
         )

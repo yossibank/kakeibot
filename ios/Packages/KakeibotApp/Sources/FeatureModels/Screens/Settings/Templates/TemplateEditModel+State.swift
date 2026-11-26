@@ -9,16 +9,19 @@ public extension TemplateEditModel {
         case memo
     }
 
-    @MainActor
-    @Observable
-    final class State: SettingsEditState {
-        public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Panel>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<EntryTemplate>>()
+    struct Fields: ScreenEditable {
         public var name = ""
         public var memo = ""
         public var billShift = 0
-        public var tagCategory: EntryCategory?
+    }
+
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public var errorNotice = ErrorNotice()
+        public var panel = Shown<Panel>()
+        public var tagCategory = Shown<EntryCategory>()
+        public var fields = Fields()
 
         public private(set) var walletId: Wallet.ID?
         public private(set) var categoryId: EntryCategory.ID?
@@ -39,7 +42,7 @@ public extension TemplateEditModel.State {
         }
 
         walletId = id
-        billShift = 0
+        fields.billShift = 0
     }
 
     func setCategory(_ id: EntryCategory.ID?) {
@@ -62,13 +65,13 @@ public extension TemplateEditModel.State {
 
 extension TemplateEditModel.State {
     func apply(_ draft: EntryTemplateDraft) {
-        name = draft.name
+        fields.name = draft.name
         type = draft.type
         calculator = AmountCalculator(amount: draft.amount ?? 0)
         categoryId = draft.categoryId
         tagId = draft.tagId
         walletId = draft.walletId
-        memo = draft.memo
-        billShift = draft.billShift
+        fields.memo = draft.memo
+        fields.billShift = draft.billShift
     }
 }

@@ -137,6 +137,7 @@ class ModelTask {
     companion object {
         const val MILLIS = 6_000L
         const val saveFailed = "保存できませんでした"
+        const val deleteFailed = "削除できませんでした"
         const val settingSaveFailed = "設定を保存できませんでした"
         const val restoreFailed = "元に戻せませんでした"
         const val loadFailed = "読み込めませんでした"

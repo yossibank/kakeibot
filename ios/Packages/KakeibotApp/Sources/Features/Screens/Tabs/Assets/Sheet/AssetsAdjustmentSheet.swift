@@ -6,8 +6,6 @@ import SwiftUI
 struct AssetsAdjustmentSheet: View {
     @State private var model: AssetsAdjustmentModel
 
-    @Environment(\.dismiss) private var dismiss
-
     init(model: AssetsAdjustmentModel) {
         _model = State(initialValue: model)
     }
@@ -17,19 +15,7 @@ struct AssetsAdjustmentSheet: View {
             content
         }
         .errorBanner(Bindable(model.state).errorNotice)
-        .confirmation(
-            isPresented: Bindable(model.state).prompt.isConfirmingDiscard,
-            systemImage: "pencil.slash",
-            title: "保存せずに閉じますか",
-            message: "入力した内容は残りません",
-            keepTitle: "入力に戻る",
-            confirmTitle: "保存せずに閉じる"
-        ) {
-            dismiss()
-        }
-        .onOutcome(model.state.outcome) { _ in
-            dismiss()
-        }
+        .editSheet(model.flow)
     }
 }
 
@@ -46,11 +32,9 @@ extension AssetsAdjustmentSheet {
             )
 
             PrimaryButton(model.output.saveTitle) {
-                model.perform {
-                    await $0.save()
-                }
+                model.flow.save()
             }
-            .disabled(!model.output.canSave)
+            .disabled(!model.flow.output.canSave)
         }
     }
 }
@@ -59,7 +43,7 @@ private extension AssetsAdjustmentSheet {
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
-                close()
+                model.flow.close()
             }
             .frame(width: Self.slotSize, alignment: .leading)
 
@@ -181,13 +165,5 @@ private extension AssetsAdjustmentSheet {
 
     var differenceColor: Color {
         model.output.difference < 0 ? Palette.rose : Palette.accent
-    }
-
-    func close() {
-        if model.output.isChanged {
-            model.state.prompt.isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
     }
 }

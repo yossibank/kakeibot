@@ -38,7 +38,7 @@ public extension RecurringEditModel.Output {
             categoryId: state.categoryId,
             walletId: state.walletId,
             toWalletId: state.toWalletId,
-            memo: state.memo,
+            memo: state.fields.memo,
             frequency: schedule.frequency,
             month: schedule.month,
             day: schedule.day,
@@ -46,7 +46,7 @@ public extension RecurringEditModel.Output {
             closingDay: closing,
             fee: transferFee,
             finalAmount: finalAmount ?? 0,
-            billShift: billRecurring == nil ? 0 : state.billShift,
+            billShift: billRecurring == nil ? 0 : state.fields.billShift,
             startDate: schedule.startDate,
             endDate: scheduledEndDate,
             remindDaysBefore: schedule.remindDaysBefore

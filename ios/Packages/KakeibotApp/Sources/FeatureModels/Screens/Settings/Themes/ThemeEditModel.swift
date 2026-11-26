@@ -6,10 +6,11 @@ import Store
 
 @MainActor
 @Observable
-public final class ThemeEditModel {
+public final class ThemeEditModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
+    public let flow: EditFlow<Void>
 
     let dependencies: ScreenParts
 
@@ -22,20 +23,22 @@ public final class ThemeEditModel {
         let state = State(draft: draft)
 
         self.state = state
-        self.input = Input(baseline: draft, editingId: theme?.id)
+        self.input = Input(editingId: theme?.id, baseline: draft)
         self.output = Output(state: state)
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        flow.connect(self)
     }
 }
 
 public extension ThemeEditModel {
     @MainActor
     @Observable
-    final class State: SettingsEditState {
+    final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Never>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-        public var draft: ThemeDraft
+
+        public internal(set) var draft: ThemeDraft
 
         init(draft: ThemeDraft) {
             self.draft = draft
@@ -44,16 +47,16 @@ public extension ThemeEditModel {
 
     @MainActor
     @Observable
-    final class Input: SettingsEditInput {
-        public let baseline: ThemeDraft?
+    final class Input {
         public let editingId: Theme.ID?
+        public let baseline: ThemeDraft
 
         init(
-            baseline: ThemeDraft,
-            editingId: Theme.ID?
+            editingId: Theme.ID?,
+            baseline: ThemeDraft
         ) {
-            self.baseline = baseline
             self.editingId = editingId
+            self.baseline = baseline
         }
     }
 
@@ -77,7 +80,7 @@ public extension ThemeEditModel {
 
 public extension ThemeEditModel {
     @discardableResult
-    func save() async -> Bool {
+    func save() async -> Void? {
         do {
             let theme = try await dependencies.database.saveTheme(
                 state.draft,
@@ -89,27 +92,9 @@ public extension ThemeEditModel {
                 try await dependencies.database.setSetting(.theme, to: .custom(theme.id))
             }
 
-            state.outcome.send(SettingsEditOutcome(saved: ()))
-
-            return true
+            return ()
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return false
-        }
-    }
-
-    @discardableResult
-    func delete() async -> Deletion? {
-        guard let editingId = input.editingId else {
-            return nil
-        }
-
-        do {
-            let deletion = try await dependencies.database.deleteTheme(editingId)
-            state.outcome.send(SettingsEditOutcome(deletion: deletion))
-            return deletion
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
             return nil
         }
     }
@@ -170,6 +155,10 @@ public extension ThemeEditModel.Output {
 }
 
 public extension ThemeEditModel.State {
+    func rename(_ name: String) {
+        draft.name = name
+    }
+
     func choose(
         _ hex: String,
         for slot: ThemeEditModel.Slot
@@ -270,12 +259,28 @@ public extension ThemeEditModel.Slot {
     }
 }
 
-extension ThemeEditModel: SettingsEditModel {
-    public var edited: ThemeDraft {
-        state.draft
+extension ThemeEditModel: EditFlowSource {
+    var isEditing: Bool {
+        input.editingId != nil
     }
 
-    public var problemMessage: String? {
+    var isChanged: Bool {
+        input.baseline != state.draft
+    }
+
+    var problem: String? {
         state.draft.problems.first?.message
+    }
+
+    func store() async -> Void? {
+        await save()
+    }
+
+    func remove() async throws -> Deletion? {
+        guard let editingId = input.editingId else {
+            return nil
+        }
+
+        return try await dependencies.database.deleteTheme(editingId)
     }
 }

@@ -6,10 +6,11 @@ import Store
 
 @MainActor
 @Observable
-public final class RewardRuleEditModel {
+public final class RewardRuleEditModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
+    public let flow: EditFlow<Void>
 
     let dependencies: ScreenParts
 
@@ -18,15 +19,15 @@ public final class RewardRuleEditModel {
         editing id: RewardRule.ID? = nil
     ) {
         let state = State()
-        let input = Input(editingId: id)
         let output = Output(state: state)
 
-        input.baseline = output.draft
-
         self.state = state
-        self.input = input
+        self.input = Input(editingId: id, baseline: output.draft)
         self.output = output
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        flow.connect(self)
     }
 }
 
@@ -35,13 +36,16 @@ public extension RewardRuleEditModel {
         case amount
     }
 
+    struct Fields: ScreenEditable {
+        public var name = ""
+    }
+
     @MainActor
     @Observable
-    final class State: SettingsEditState {
+    final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Panel>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-        public var name = ""
+        public var panel = Shown<Panel>()
+        public var fields = Fields()
 
         public private(set) var calculator = AmountCalculator()
 
@@ -50,15 +54,19 @@ public extension RewardRuleEditModel {
 
     @MainActor
     @Observable
-    final class Input: SettingsEditHidingInput {
-        public internal(set) var isHidden = false
+    final class Input {
         public internal(set) var hasLogs = false
         public internal(set) var baseline: RewardRuleDraft?
+        public internal(set) var isHidden = false
 
         public let editingId: RewardRule.ID?
 
-        init(editingId: RewardRule.ID?) {
+        init(
+            editingId: RewardRule.ID?,
+            baseline: RewardRuleDraft
+        ) {
             self.editingId = editingId
+            self.baseline = baseline
         }
     }
 
@@ -91,8 +99,8 @@ public extension RewardRuleEditModel {
             }
 
             state.apply(rule, icon: saved)
-            input.isHidden = !rule.isActive
             input.hasLogs = list.total(of: rule) != nil
+            input.isHidden = !rule.isActive
             input.baseline = output.draft
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
@@ -100,7 +108,7 @@ public extension RewardRuleEditModel {
     }
 
     @discardableResult
-    func save() async -> Bool {
+    func save() async -> Void? {
         do {
             try await dependencies.database.save(
                 output.draft,
@@ -108,12 +116,10 @@ public extension RewardRuleEditModel {
                 at: dependencies.clock.now
             )
 
-            await finishSave()
-
-            return true
+            return ()
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return false
+            return nil
         }
     }
 }
@@ -129,7 +135,7 @@ public extension RewardRuleEditModel.Output {
 
     var draft: RewardRuleDraft {
         RewardRuleDraft(
-            name: state.name,
+            name: state.fields.name,
             amount: state.calculator.amount,
             icon: state.icon.draft
         )
@@ -147,35 +153,52 @@ extension RewardRuleEditModel.State {
         _ rule: RewardRule,
         icon saved: Icon
     ) {
-        name = rule.name
+        fields.name = rule.name
         calculator = AmountCalculator(amount: rule.amount)
         icon.apply(saved)
     }
 }
 
-extension RewardRuleEditModel: SettingsEditRemoving {
-    public var edited: RewardRuleDraft {
-        output.draft
+extension RewardRuleEditModel: EditFlowSource {
+    var isEditing: Bool {
+        input.editingId != nil
     }
 
-    public var problemMessage: String? {
+    var isChanged: Bool {
+        input.baseline.map { $0 != output.draft } ?? false
+    }
+
+    var problem: String? {
         output.draft.problems.first?.message
     }
 
-    public func remove(_ id: RewardRule.ID) async throws -> Deletion {
-        try await dependencies.database.deleteRewardRule(id)
+    var isHidden: Bool {
+        input.isHidden
     }
 
-    public func saveHidden(
-        _ id: RewardRule.ID,
-        isHidden: Bool
-    ) async throws {
+    func store() async -> Void? {
+        await save()
+    }
+
+    func storeHidden(_ isHidden: Bool) async throws {
+        guard let editingId = input.editingId else {
+            return
+        }
+
         try await dependencies.database.setHidden(
-            id,
+            editingId,
             isHidden: isHidden,
             at: dependencies.clock.now
         )
 
         input.isHidden = isHidden
+    }
+
+    func remove() async throws -> Deletion? {
+        guard let editingId = input.editingId else {
+            return nil
+        }
+
+        return try await dependencies.database.deleteRewardRule(editingId)
     }
 }

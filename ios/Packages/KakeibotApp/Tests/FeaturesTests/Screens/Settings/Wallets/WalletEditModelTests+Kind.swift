@@ -28,7 +28,7 @@ extension WalletEditModelTests {
         #expect(card.state.kind == .card)
         #expect(card.state.isNegative)
         #expect(card.state.icon.glyph == .card)
-        #expect(!card.isChanged)
+        #expect(!card.flow.output.isChanged)
         #expect(investment.state.kind == .investment)
         #expect(!investment.state.isNegative)
         #expect(investment.state.icon.glyph == .invest)
@@ -54,7 +54,7 @@ extension WalletEditModelTests {
     func savesGivenKindWithNegativeBalance() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(parts: .system(setup.database), kind: .card)
-        model.state.name = "楽天カード"
+        model.state.fields.name = "楽天カード"
         model.state.press(.digit(5))
         model.state.press(.doubleZero)
 

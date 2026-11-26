@@ -11,7 +11,7 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let today = LocalDate(Date(), in: .current)
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "積立"
+        adding.state.fields.name = "積立"
         adding.state.setKind(.investment)
         let saved = try #require(await adding.save())
         try await setup.database.saveValuation(150_000, of: saved.id, on: today, at: Date())
@@ -27,7 +27,7 @@ extension WalletEditModelTests {
     func locksKindRightAfterAddingValuation() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "積立"
+        adding.state.fields.name = "積立"
         adding.state.setKind(.investment)
         let saved = try #require(await adding.save())
         let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
@@ -35,11 +35,11 @@ extension WalletEditModelTests {
 
         model.state.pressValuation(.digit(5))
         _ = await model.saveValuation()
-        let isChanged = model.isChanged
+        let isChanged = model.flow.output.isChanged
         model.state.setKind(.bank)
 
         #expect(!isChanged)
-        #expect(!model.canSave)
+        #expect(!model.flow.output.canSave)
         #expect(model.output.draft.problems == [.valuedKindLocked])
     }
 
@@ -48,7 +48,7 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let today = LocalDate(Date(), in: .current)
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "積立"
+        adding.state.fields.name = "積立"
         adding.state.setKind(.investment)
         let saved = try #require(await adding.save())
         try await setup.database.saveValuation(5, of: saved.id, on: today, at: Date())
@@ -57,18 +57,18 @@ extension WalletEditModelTests {
         let valuation = try #require(model.input.valuations.first)
 
         _ = await model.deleteValuation(valuation.id)
-        let isChanged = model.isChanged
+        let isChanged = model.flow.output.isChanged
         model.state.setKind(.bank)
 
         #expect(!isChanged)
-        #expect(model.canSave)
+        #expect(model.flow.output.canSave)
     }
 
     @Test
     func setsInvestmentValuation() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "つみたて"
+        adding.state.fields.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(1))
         adding.state.press(.doubleZero)
@@ -102,7 +102,7 @@ extension WalletEditModelTests {
     func deletesValuationAndCountsFromStart() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "つみたて"
+        adding.state.fields.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(5))
         adding.state.press(.doubleZero)
@@ -127,7 +127,7 @@ extension WalletEditModelTests {
     func restoresDeletedValuationOnUndo() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "つみたて"
+        adding.state.fields.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(5))
         adding.state.press(.doubleZero)
@@ -151,7 +151,7 @@ extension WalletEditModelTests {
     func offersNoUndoWhenValuationIsAlreadyGone() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "つみたて"
+        adding.state.fields.name = "つみたて"
         adding.state.setKind(.investment)
         adding.state.press(.digit(5))
         adding.state.press(.doubleZero)

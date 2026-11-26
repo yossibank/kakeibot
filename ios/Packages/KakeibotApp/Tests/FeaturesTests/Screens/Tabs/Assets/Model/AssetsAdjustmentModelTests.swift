@@ -33,13 +33,12 @@ struct AssetsAdjustmentModelTests {
             adjust.state.press(key)
         }
 
-        let saved = await adjust.save()
+        await adjust.flow.save().value
         await model.load()
         let list = try await setup.database.entryList()
 
         #expect(adjust.output.difference == 37700)
-        #expect(saved)
-        #expect(adjust.state.outcome.value?.closes == true)
+        #expect(adjust.flow.state.outcome.value?.closes == true)
         #expect(model.output.rows.first?.balance == 120)
         #expect(model.output.rows.first?.needsAdjustment == false)
         #expect(list.adjustments.map(\.date) == [setup.today])
@@ -54,12 +53,11 @@ struct AssetsAdjustmentModelTests {
         let row = try #require(model.output.rows.first)
         let adjust = model.adjustModel(for: row)
 
-        let saved = await adjust.save()
+        await adjust.flow.save().value
         let list = try await setup.database.entryList()
 
-        #expect(!adjust.output.canSave)
-        #expect(!saved)
-        #expect(adjust.state.outcome.value == nil)
+        #expect(!adjust.flow.output.canSave)
+        #expect(adjust.flow.state.outcome.value == nil)
         #expect(list.adjustments.isEmpty)
     }
 
@@ -71,14 +69,14 @@ struct AssetsAdjustmentModelTests {
         let row = try #require(model.output.rows.first)
         let adjust = model.adjustModel(for: row)
 
-        let opened = adjust.output.isChanged
+        let opened = adjust.flow.output.isChanged
         adjust.state.press(.digit(5))
-        let typed = adjust.output.isChanged
+        let typed = adjust.flow.output.isChanged
         adjust.state.press(.delete)
 
         #expect(!opened)
         #expect(typed)
-        #expect(!adjust.output.isChanged)
+        #expect(!adjust.flow.output.isChanged)
     }
 
     @Test

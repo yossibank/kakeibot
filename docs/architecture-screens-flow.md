@@ -34,7 +34,7 @@ model.perform {
 | 置く時 | モデルの関数が、できた時だけ置く。1 回の操作で 1 回だけ置き、戻り値でも同じ結果を返す |
 | 受ける所 | 画面は、`onOutcome` を 1 か所に書く。閉じる・親に知らせるだけを書く |
 | 閉じた後 | 閉じた画面には、結果が届かない |
-| 編集シート | 結果は `SettingsEditOutcome` で持つ。`SettingsEditController` の `receive` が受ける |
+| 編集シート | 結果は `EditFlow` の `Outcome` で持つ。`editSheet` が受ける |
 | 知らせと確認 | 取り消しの知らせの値と、結果で出す確認は、モデルが `state` の値を書いて出す |
 | 結果が何種類もある画面 | 結果を 1 つの `enum` にして、`ScreenOutcome` に入れる。入力シートの `EntryModel.Outcome` が当たる |
 | 読み込みの後 | `.task` は、モデルの `start` だけを呼ぶ。読み込みの後に画面の値を組む時は、モデルが結果を置く |

@@ -72,6 +72,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasItemAdjustment
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.itemCount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.itemTotals
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.setStore
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.setTaxIncluded
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.store
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
@@ -244,7 +245,7 @@ private fun StoreField(model: EntryModel) {
 
     PlaceholderTextField(
         value = model.state.store,
-        onChange = { model.state.store = it },
+        onChange = model.state::setStore,
         placeholder = "店名を入れる",
         style = style,
         modifier = Modifier.fillMaxWidth(),

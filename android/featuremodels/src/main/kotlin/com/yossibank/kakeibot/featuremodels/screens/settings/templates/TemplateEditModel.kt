@@ -14,12 +14,12 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.cardBill
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.recurrings
@@ -33,6 +33,7 @@ class TemplateEditModel(
     val state = State(draft)
     val input = Input()
     val output = Output(input, state)
+    val flow = EditFlow(task = state.task, source = Source())
 
     private val dependencies = Dependencies(parts.database, parts.clock)
 
@@ -40,7 +41,6 @@ class TemplateEditModel(
         draft: EntryTemplateDraft,
     ) {
         val task = ModelTask()
-        val outcome = ScreenOutcome<SettingsEditOutcome<EntryTemplate>>()
 
         var form: EntryTemplateDraft by mutableStateOf(draft)
             private set
@@ -131,12 +131,6 @@ class TemplateEditModel(
         val problemMessage: String?
             get() = draft.problems.firstOrNull()?.let(::message)
 
-        val canSave: Boolean
-            get() = problemMessage == null
-
-        val saveTitle: String
-            get() = problemMessage ?: "追加する"
-
         fun icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
 
         private fun message(of: EntryTemplateDraft.Problem): String = when (of) {
@@ -151,6 +145,25 @@ class TemplateEditModel(
         val database: AppDatabase,
         val clock: ScreenClock,
     )
+
+    private inner class Source : EditFlowSource<EntryTemplate> {
+        override val isEditing: Boolean = false
+        override val isChanged: Boolean = false
+
+        override val problem: String?
+            get() = output.problemMessage
+
+        override suspend fun store(): EntryTemplate? {
+            val draft = output.draft
+
+            return state.task.attempt(failure = ModelTask.saveFailed) {
+                dependencies.database.saveTemplate(
+                    draft = draft,
+                    at = dependencies.clock.now,
+                )
+            }
+        }
+    }
 
     suspend fun load() {
         state.task.attempt(failure = "テンプレートを読めませんでした") {
@@ -170,31 +183,6 @@ class TemplateEditModel(
                 }
             }
         }
-    }
-
-    suspend fun save(): EntryTemplate? {
-        if (state.task.isRunning) {
-            return null
-        }
-
-        val draft = output.draft
-        val problem = output.problemMessage
-
-        if (problem != null) {
-            state.task.show(problem)
-            return null
-        }
-
-        val saved = state.task.attempt(failure = ModelTask.saveFailed) {
-            dependencies.database.saveTemplate(
-                draft = draft,
-                at = dependencies.clock.now,
-            )
-        }
-
-        saved?.let { state.outcome.send(SettingsEditOutcome(saved = it)) }
-
-        return saved
     }
 }
 

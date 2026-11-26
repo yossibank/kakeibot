@@ -46,14 +46,14 @@ class TemplateEditModelTest {
         val model = setup.templateModel(type = Entry.Kind.expense)
         model.load()
 
-        val empty = model.output.saveTitle
-        val canSaveWithoutName = model.output.canSave
+        val empty = model.flow.output.saveTitle
+        val canSaveWithoutName = model.flow.output.canSave
         model.state.update { copy(name = "ランチ") }
 
         assertEquals("名前を入れてください", empty)
         assertFalse(canSaveWithoutName)
-        assertEquals("追加する", model.output.saveTitle)
-        assertTrue(model.output.canSave)
+        assertEquals("追加する", model.flow.output.saveTitle)
+        assertTrue(model.flow.output.canSave)
     }
 
     @Test
@@ -61,13 +61,13 @@ class TemplateEditModelTest {
         val model = setup.templateModel(type = Entry.Kind.expense)
         model.load()
 
-        val refused = model.save()
+        val refused = model.flow.save()
         val refusal = model.state.task.message
         model.state.update { copy(name = "ランチ") }
         model.state.press(AmountCalculator.Key.Digit(9))
         model.state.press(AmountCalculator.Key.Digit(8))
         model.state.press(AmountCalculator.Key.Digit(0))
-        val saved = model.save()
+        val saved = model.flow.save()
         val templates = setup.database.templates()
 
         assertNull(refused)
@@ -81,7 +81,7 @@ class TemplateEditModelTest {
     fun keepsNoticeWhenInputChanges() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.templateModel(type = Entry.Kind.expense)
         model.load()
-        model.save()
+        model.flow.save()
 
         model.state.press(AmountCalculator.Key.Digit(9))
 
@@ -93,11 +93,11 @@ class TemplateEditModelTest {
         val model = setup.templateModel(type = Entry.Kind.income)
         model.state.update { copy(name = "給料", categoryId = null, walletId = null) }
 
-        model.save()
+        model.flow.save()
         val category = model.state.task.message
         model.load()
         model.state.update { copy(walletId = null) }
-        model.save()
+        model.flow.save()
 
         assertEquals("カテゴリを選んでください", category)
         assertEquals("入金先を選んでください", model.state.task.message)

@@ -13,13 +13,14 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.RecurringDraft
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import com.yossibank.kakeibot.featuremodels.shared.notification.NotificationPermission
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.latestEntryList
@@ -35,12 +36,14 @@ class RecurringEditModel(
     today: LocalDate,
     type: Entry.Kind = Entry.Kind.expense,
     editingId: Identifier<Recurring>? = null,
+    permission: NotificationPermission = NotificationPermission.allowed,
 ) : ScreenPerforming {
     val state = State(today, type, isScheduleOpen = editingId == null)
     val input = Input(editingId)
     val output = Output(input, state)
+    val flow = EditFlow(task = state.task, source = Source())
 
-    private val dependencies = Dependencies(parts.database, parts.clock)
+    private val dependencies = Dependencies(parts.database, parts.clock, permission)
 
     class State(
         today: LocalDate,
@@ -48,13 +51,12 @@ class RecurringEditModel(
         isScheduleOpen: Boolean,
     ) {
         val task = ModelTask()
-        val outcome = ScreenOutcome<SettingsEditOutcome<Unit>>()
+        val panel = Shown<RecurringPanel>()
 
         var today: LocalDate by mutableStateOf(today)
-        var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
-        var panel: RecurringPanel? by mutableStateOf(null)
+            internal set
 
-        var prompt: RecurringEditPrompt? by mutableStateOf(null)
+        var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
             private set
 
         var form: RecurringEditForm by mutableStateOf(
@@ -77,14 +79,8 @@ class RecurringEditModel(
         var isHolidayShiftChosen = false
             private set
 
-        fun ask(prompt: RecurringEditPrompt) {
-            this.prompt = prompt
-        }
-
-        fun closePrompt(prompt: RecurringEditPrompt) {
-            if (this.prompt == prompt) {
-                this.prompt = null
-            }
+        fun toggleSchedule() {
+            isScheduleOpen = !isScheduleOpen
         }
 
         fun update(change: RecurringEditForm.() -> RecurringEditForm) {
@@ -162,9 +158,6 @@ class RecurringEditModel(
         internal val input: Input,
         internal val state: State,
     ) {
-        val isEditing: Boolean
-            get() = input.editingId != null
-
         val amount: Int
             get() = state.calculator.amount
 
@@ -172,12 +165,46 @@ class RecurringEditModel(
             get() = state.feeCalculator.amount
 
         fun icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
+
+        internal val isEditing: Boolean
+            get() = input.editingId != null
     }
 
     private class Dependencies(
         val database: AppDatabase,
         val clock: ScreenClock,
+        val permission: NotificationPermission,
     )
+
+    private inner class Source : EditFlowSource<Unit> {
+        override val isEditing: Boolean
+            get() = output.isEditing
+
+        override val isChanged: Boolean
+            get() = output.isChanged
+
+        override val problem: String?
+            get() = output.problem
+
+        override val isHidden: Boolean
+            get() = input.isHidden
+
+        override fun rest(): Boolean {
+            val isOpen = state.panel.current != null
+            state.panel.closeAll()
+            return isOpen
+        }
+
+        override suspend fun store(): Unit? = save()
+
+        override suspend fun storeHidden(isHidden: Boolean) {
+            hide(isHidden)
+        }
+
+        override suspend fun remove(): Deletion? = delete()
+
+        override fun deleteFailedMessage(error: Exception): String = ModelTask.saveFailed
+    }
 
     suspend fun load() {
         state.task.attempt(failure = LOAD_FAILED) {
@@ -202,77 +229,15 @@ class RecurringEditModel(
         }
     }
 
-    fun refreshAuthorization(permission: NotificationPermission) {
-        input.authorization = permission.authorization()
+    fun setToday(today: LocalDate) {
+        state.today = today
     }
 
-    suspend fun save(permission: NotificationPermission = NotificationPermission.allowed): Boolean {
-        if (!store(permission)) {
-            return false
-        }
-
-        state.outcome.send(SettingsEditOutcome(saved = Unit))
-
-        return true
+    fun refreshAuthorization() {
+        input.authorization = dependencies.permission.authorization()
     }
 
-    suspend fun saveTogglingHidden(
-        permission: NotificationPermission = NotificationPermission.allowed,
-    ): Boolean {
-        if (!store(permission)) {
-            return false
-        }
-
-        val isHidden = !input.isHidden
-
-        val outcome = if (hide(isHidden)) {
-            SettingsEditOutcome(saved = Unit, isHidden = isHidden)
-        } else {
-            SettingsEditOutcome(saved = Unit, closes = false)
-        }
-
-        state.outcome.send(outcome)
-
-        return true
-    }
-
-    suspend fun delete(): Deletion? {
-        val id = input.editingId ?: return null
-
-        val deletion = state.task.attempt(failure = ModelTask.saveFailed) {
-            dependencies.database.deleteRecurring(
-                id = id,
-                at = dependencies.clock.now,
-            )
-        }
-
-        deletion?.let { state.outcome.send(SettingsEditOutcome(deletion = it)) }
-
-        return deletion
-    }
-
-    suspend fun setHidden(isHidden: Boolean): Boolean {
-        if (!hide(isHidden)) {
-            return false
-        }
-
-        state.outcome.send(SettingsEditOutcome(isHidden = isHidden))
-
-        return true
-    }
-
-    private suspend fun store(permission: NotificationPermission): Boolean {
-        val problem = output.draft.problems.firstOrNull()
-
-        if (problem != null) {
-            state.task.show(output.message(problem))
-            return false
-        }
-
-        if (state.task.isRunning) {
-            return false
-        }
-
+    private suspend fun save(): Unit? {
         val saved = state.task.attempt(failure = ModelTask.saveFailed) {
             dependencies.database.saveRecurring(
                 draft = output.draft,
@@ -282,30 +247,37 @@ class RecurringEditModel(
             )
         }
 
-        if (saved != null && state.form.remindDaysBefore != null) {
-            permission.requestIfUndecided()
+        if (saved == null) {
+            return null
         }
 
-        return saved != null
+        if (state.form.remindDaysBefore != null) {
+            dependencies.permission.requestIfUndecided()
+        }
+
+        return Unit
     }
 
-    private suspend fun hide(isHidden: Boolean): Boolean {
-        val id = input.editingId ?: return false
+    private suspend fun delete(): Deletion? {
+        val id = input.editingId ?: return null
 
-        val done = state.task.attempt(failure = ModelTask.saveFailed) {
-            dependencies.database.setRecurringHidden(
-                id = id,
-                isHidden = isHidden,
-                today = state.today,
-                at = dependencies.clock.now,
-            )
-        }
+        return dependencies.database.deleteRecurring(
+            id = id,
+            at = dependencies.clock.now,
+        )
+    }
 
-        if (done != null) {
-            input.isHidden = isHidden
-        }
+    private suspend fun hide(isHidden: Boolean) {
+        val id = input.editingId ?: return
 
-        return done != null
+        dependencies.database.setRecurringHidden(
+            id = id,
+            isHidden = isHidden,
+            today = state.today,
+            at = dependencies.clock.now,
+        )
+
+        input.isHidden = isHidden
     }
 
     private suspend fun loadLoanBalances() {
