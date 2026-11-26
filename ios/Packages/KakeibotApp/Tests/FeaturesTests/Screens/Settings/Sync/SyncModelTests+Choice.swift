@@ -16,7 +16,7 @@ extension SyncModelTests {
 
         await model.setOn(true)
 
-        let choice = try #require(model.state.choice)
+        let choice = try #require(model.output.choice)
         #expect(choice.local.entryCount == 1)
         #expect(choice.cloud == cloudSummary)
         #expect(choice.newer == .cloud)

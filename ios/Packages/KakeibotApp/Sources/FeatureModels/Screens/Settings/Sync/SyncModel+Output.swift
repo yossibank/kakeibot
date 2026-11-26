@@ -39,8 +39,20 @@ public extension SyncModel.Output {
         input.members.isFailed
     }
 
+    var choice: SyncChoice? {
+        state.presented.current?.choice
+    }
+
+    var invitation: WalletShare? {
+        state.presented.current?.invitation
+    }
+
+    var opened: WalletShare? {
+        state.presented.current?.opened
+    }
+
     var isChoosing: Bool {
-        state.choice != nil
+        choice != nil
     }
 
     var shownOn: Bool {
@@ -52,7 +64,7 @@ public extension SyncModel.Output {
     }
 
     var progress: SyncProgress? {
-        if state.isWorking {
+        if state.task.isRunning {
             return .switching
         }
 

@@ -6,7 +6,10 @@ public extension SyncModel {
         case share(WalletShare)
     }
 
-    enum Asking: Hashable, Sendable {
+    enum Presented: Hashable, Sendable {
+        case choice(SyncChoice)
+        case invitation(WalletShare)
+        case opened(WalletShare)
         case leave(JoinedShare)
         case stop(WalletShare)
         case offer(Offer)
@@ -16,11 +19,35 @@ public extension SyncModel {
 public extension SyncModel {
     func askToStop(_ item: WalletShare) {
         closeOpened()
-        state.ask(.stop(item))
+        state.presented.show(.stop(item))
     }
 }
 
-public extension SyncModel.Asking {
+public extension SyncModel.Presented {
+    var choice: SyncChoice? {
+        guard case let .choice(choice) = self else {
+            return nil
+        }
+
+        return choice
+    }
+
+    var invitation: WalletShare? {
+        guard case let .invitation(item) = self else {
+            return nil
+        }
+
+        return item
+    }
+
+    var opened: WalletShare? {
+        guard case let .opened(item) = self else {
+            return nil
+        }
+
+        return item
+    }
+
     var leaving: JoinedShare? {
         guard case let .leave(item) = self else {
             return nil
@@ -55,17 +82,10 @@ public extension SyncModel.Offer {
     }
 }
 
-public extension SyncModel.State {
-    func ask(_ asking: SyncModel.Asking) {
-        if self.asking != asking {
-            self.asking = asking
-        }
-    }
-
-    func close(_ asking: SyncModel.Asking?) {
-        if self.asking == asking,
-           asking != nil {
-            self.asking = nil
+extension SyncModel.State {
+    func closeChoice() {
+        if let choice = presented.current?.choice {
+            presented.close(.choice(choice))
         }
     }
 }

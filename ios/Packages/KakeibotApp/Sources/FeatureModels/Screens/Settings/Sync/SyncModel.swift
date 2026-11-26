@@ -32,13 +32,12 @@ public extension SyncModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+        public var presented = Shown<Presented>()
 
-        public internal(set) var isWorking = false
-        public internal(set) var choice: SyncChoice?
         public internal(set) var workingWallet: Wallet.ID?
-        public internal(set) var invitation: WalletShare?
-        public internal(set) var opened: WalletShare?
-        public internal(set) var asking: Asking?
+
+        public let task = ModelTask()
+        public let shareTask = ModelTask()
 
         var requestedOn: Bool?
     }
@@ -112,7 +111,7 @@ public extension SyncModel {
 
     func request(_ isOn: Bool) -> Bool {
         guard
-            !state.isWorking,
+            !state.task.isRunning,
             !output.isSwitching
         else {
             return false
@@ -134,7 +133,7 @@ public extension SyncModel {
             }
         }
 
-        if state.choice == nil {
+        if !output.isChoosing {
             state.requestedOn = nil
         }
     }
@@ -144,7 +143,7 @@ public extension SyncModel {
             return
         }
 
-        state.choice = nil
+        state.closeChoice()
 
         await work {
             try await dependencies.database.turnOnSyncReplacingLocal()
@@ -158,7 +157,7 @@ public extension SyncModel {
             return
         }
 
-        state.choice = nil
+        state.closeChoice()
 
         await work {
             try await dependencies.cloud.deleteData()
@@ -169,7 +168,7 @@ public extension SyncModel {
     }
 
     func cancelChoice() {
-        state.choice = nil
+        state.closeChoice()
         state.requestedOn = nil
     }
 }
@@ -205,43 +204,44 @@ private extension SyncModel {
     }
 
     func turnOn() async {
-        state.isWorking = true
-        input.account = await dependencies.cloud.account()
+        await state.task.attempt {
+            input.account = await dependencies.cloud.account()
 
-        guard output.isAvailable else {
-            state.isWorking = false
-            return
-        }
-
-        await work {
-            guard let cloudSummary = try await dependencies.cloud.summary() else {
-                try await dependencies.database.turnOnSync()
+            guard output.isAvailable else {
                 return
             }
 
-            let localSummary = try await dependencies.database.syncSummary()
+            await work {
+                guard let cloudSummary = try await dependencies.cloud.summary() else {
+                    try await dependencies.database.turnOnSync()
+                    return
+                }
 
-            guard localSummary.entryCount > 0 else {
-                try await dependencies.database.turnOnSyncReplacingLocal()
-                return
+                let localSummary = try await dependencies.database.syncSummary()
+
+                guard localSummary.entryCount > 0 else {
+                    try await dependencies.database.turnOnSyncReplacingLocal()
+                    return
+                }
+
+                let choice = SyncChoice(local: localSummary, cloud: cloudSummary)
+
+                state.presented.show(.choice(choice))
             }
-
-            state.choice = SyncChoice(local: localSummary, cloud: cloudSummary)
         }
     }
 
     func work(_ operation: () async throws -> Void) async {
-        state.isWorking = true
         state.errorNotice.clear()
 
         do {
-            try await operation()
-            input.isOn = try await dependencies.database.isSyncEnabled()
+            try await state.task.attempt {
+                try await operation()
+                input.isOn = try await dependencies.database.isSyncEnabled()
+            }
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
         }
-
-        state.isWorking = false
     }
 }
 
