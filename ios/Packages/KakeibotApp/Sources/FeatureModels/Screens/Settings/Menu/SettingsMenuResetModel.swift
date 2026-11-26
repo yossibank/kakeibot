@@ -23,11 +23,17 @@ public final class SettingsMenuResetModel: ScreenPerforming {
 }
 
 public extension SettingsMenuResetModel {
+    enum Prompt: Hashable, Sendable {
+        case deleteAll
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var isConfirming = false
+        public var prompt = Shown<Prompt>()
+
+        public let task = ModelTask()
     }
 
     @MainActor
@@ -50,27 +56,42 @@ public extension SettingsMenuResetModel {
 public extension SettingsMenuResetModel {
     @discardableResult
     func prepare() async -> Bool {
-        do {
-            input.count = try await dependencies.database.deletableRecordCount()
-            input.hasSharedWallets = try await sharesWallets()
-        } catch {
-            state.errorNotice.show(Self.loadFailedMessage, for: error)
-            state.isConfirming = false
+        guard !state.task.isRunning else {
             return false
         }
 
-        if input.count == 0 {
-            state.errorNotice.inform(Self.emptyMessage)
+        do {
+            try await state.task.attempt {
+                input.count = try await dependencies.database.deletableRecordCount()
+                input.hasSharedWallets = try await sharesWallets()
+            }
+        } catch {
+            state.errorNotice.show(Self.loadFailedMessage, for: error)
+            state.prompt.close(.deleteAll)
+            return false
         }
 
-        state.isConfirming = input.count > 0
+        guard input.count > 0 else {
+            state.errorNotice.inform(Self.emptyMessage)
+            state.prompt.close(.deleteAll)
+            return false
+        }
 
-        return state.isConfirming
+        state.prompt.show(.deleteAll)
+
+        return true
     }
 
     func deleteAll() async {
+        guard !state.task.isRunning else {
+            return
+        }
+
         do {
-            try await dependencies.database.deleteAllRecords(at: dependencies.clock.now)
+            try await state.task.attempt {
+                try await dependencies.database.deleteAllRecords(at: dependencies.clock.now)
+            }
+
             state.errorNotice.inform(Self.deletedMessage)
         } catch {
             state.errorNotice.show(Self.deleteFailedMessage, for: error)

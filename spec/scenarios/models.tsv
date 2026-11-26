@@ -453,6 +453,7 @@ settings-menu-link.*	SettingsMenuLinkTests/*		未移植	問い合わせのフォ
 settings-menu-reset.asks-to-confirm-when-records-exist	SettingsMenuResetModelTests/asksToConfirmWhenRecordsExist		未移植	記録をすべて消す機能が、設定のメニューに無い
 settings-menu-reset.tells-instead-of-confirming-when-nothing-to-delete	SettingsMenuResetModelTests/tellsInsteadOfConfirmingWhenNothingToDelete		未移植	記録をすべて消す機能が、設定のメニューに無い
 settings-menu-reset.closes-confirmation-when-counting-fails	SettingsMenuResetModelTests/closesConfirmationWhenCountingFails		未移植	記録をすべて消す機能が、設定のメニューに無い
+settings-menu-reset.ignores-preparing-while-running	SettingsMenuResetModelTests/ignoresPreparingWhileRunning		未移植	記録をすべて消す機能が、設定のメニューに無い
 settings-menu-sample-data.*	SettingsMenuSampleDataTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sample.*	SettingsMenuSampleModelTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sheet.*	SettingsMenuSheetTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない

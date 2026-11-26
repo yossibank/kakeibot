@@ -32,7 +32,6 @@ android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/voice/
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetKeypadDrawer.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetListView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetTotalCard.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/menu/SettingsMenuSheet.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringHiddenSection.kt: K8: 1 つの関数は 60 行までにする
