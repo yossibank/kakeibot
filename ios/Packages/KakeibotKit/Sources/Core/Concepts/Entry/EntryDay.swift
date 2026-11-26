@@ -32,29 +32,6 @@ public extension EntryDay {
     }
 }
 
-public extension Sequence<EntryDay> {
-    var expenseTotal: Int {
-        reduce(0) { $0 + $1.expenseTotal }
-    }
-
-    var incomeTotal: Int {
-        reduce(0) { $0 + $1.incomeTotal }
-    }
-}
-
-public extension [EntryDay] {
-    func within(_ range: ClosedRange<LocalDate>) -> [EntryDay] {
-        filter { range.contains($0.date) }
-    }
-
-    func filtered(by isIncluded: (Entry) -> Bool) -> [EntryDay] {
-        compactMap { day in
-            let entries = day.entries.filter(isIncluded)
-            return entries.isEmpty ? nil : EntryDay(date: day.date, entries: entries)
-        }
-    }
-}
-
 private extension EntryDay {
     static func isBefore(
         _ lhs: Entry,
@@ -83,6 +60,7 @@ private extension EntryDay {
         }
 
         let kind = category.kind == .expense ? 0 : 1
+
         return (kind, category.sortOrder)
     }
 
@@ -104,5 +82,28 @@ private extension EntryDay {
         entries
             .filter { $0.type == type }
             .reduce(0) { $0 + $1.amount }
+    }
+}
+
+public extension Sequence<EntryDay> {
+    var expenseTotal: Int {
+        reduce(0) { $0 + $1.expenseTotal }
+    }
+
+    var incomeTotal: Int {
+        reduce(0) { $0 + $1.incomeTotal }
+    }
+}
+
+public extension [EntryDay] {
+    func within(_ range: ClosedRange<LocalDate>) -> [EntryDay] {
+        filter { range.contains($0.date) }
+    }
+
+    func filtered(by isIncluded: (Entry) -> Bool) -> [EntryDay] {
+        compactMap { day in
+            let entries = day.entries.filter(isIncluded)
+            return entries.isEmpty ? nil : EntryDay(date: day.date, entries: entries)
+        }
     }
 }

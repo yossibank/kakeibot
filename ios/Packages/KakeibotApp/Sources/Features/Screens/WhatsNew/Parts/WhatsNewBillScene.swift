@@ -46,17 +46,9 @@ private extension WhatsNewBillScene {
         let name: String
         let amount: Int
     }
+}
 
-    static let unpaidEntries = [
-        UnpaidEntry(name: "スーパー", amount: 3280),
-        UnpaidEntry(name: "ドラッグストア", amount: 1460),
-        UnpaidEntry(name: "本屋", amount: 1760)
-    ]
-
-    static var unpaidTotal: Int {
-        unpaidEntries.map(\.amount).reduce(0, +)
-    }
-
+private extension WhatsNewBillScene {
     var unpaidRow: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 4) {
@@ -205,5 +197,17 @@ private extension WhatsNewBillScene {
                 Capsule()
                     .stroke(SettingsTileStyle.stroke(isSelected: isSelected), lineWidth: 1)
             }
+    }
+}
+
+private extension WhatsNewBillScene {
+    static let unpaidEntries = [
+        UnpaidEntry(name: "スーパー", amount: 3280),
+        UnpaidEntry(name: "ドラッグストア", amount: 1460),
+        UnpaidEntry(name: "本屋", amount: 1760)
+    ]
+
+    static var unpaidTotal: Int {
+        unpaidEntries.map(\.amount).reduce(0, +)
     }
 }

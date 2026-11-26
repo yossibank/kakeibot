@@ -3,8 +3,10 @@ public enum ThemeCorner: String, CaseIterable, Codable, Sendable {
     case small
     case standard
     case large
+}
 
-    public var scale: Double {
+public extension ThemeCorner {
+    var scale: Double {
         switch self {
         case .square: 0
         case .small: 0.6

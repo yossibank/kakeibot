@@ -100,7 +100,6 @@ public extension HomeModel {
         var layout = output.homeLayout
 
         layout.setHidden(section, true)
-
         input.homeSections = layout.order
         input.homeHiddenSections = layout.hidden
 

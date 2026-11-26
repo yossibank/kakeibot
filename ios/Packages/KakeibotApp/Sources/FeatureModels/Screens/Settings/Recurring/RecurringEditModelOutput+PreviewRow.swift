@@ -7,11 +7,13 @@ public extension RecurringEditModel.Output {
     var previewRow: RecurringListModel.Row {
         let schedule = state.schedule
         let type = state.type
+
         let text = RecurringText.schedule(
             schedule.frequency,
             month: schedule.month,
             day: schedule.day
         )
+
         let holiday = RecurringText.holidayNote(schedule.holidayShift)
         let detail = [text, holiday].rowDetail ?? text
         let closing = canUseClosingDay ? schedule.closingDay.map(RecurringText.closingNote) : nil

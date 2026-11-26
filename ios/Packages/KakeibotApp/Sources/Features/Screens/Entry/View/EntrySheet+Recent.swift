@@ -71,7 +71,9 @@ private extension EntrySheet {
             }
         )
     }
+}
 
+private extension EntrySheet {
     func detail(
         category: String?,
         walletId: Wallet.ID?

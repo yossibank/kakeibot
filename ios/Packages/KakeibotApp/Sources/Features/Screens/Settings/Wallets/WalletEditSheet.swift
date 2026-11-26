@@ -126,12 +126,6 @@ public struct WalletEditSheet: View {
     }
 }
 
-#Preview {
-    if let parts = ScreenParts.preview() {
-        WalletEditSheet(model: WalletEditModel(parts: parts))
-    }
-}
-
 extension WalletEditSheet: SettingsEditSheet {
     init(
         model: WalletEditModel,
@@ -144,5 +138,11 @@ extension WalletEditSheet: SettingsEditSheet {
             onDelete: onDelete,
             onHide: onHide
         )
+    }
+}
+
+#Preview {
+    if let parts = ScreenParts.preview() {
+        WalletEditSheet(model: WalletEditModel(parts: parts))
     }
 }

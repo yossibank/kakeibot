@@ -63,7 +63,9 @@ private extension EntryDeletionBanner {
     struct Layout {
         var remaining: Double = 1
     }
+}
 
+private extension EntryDeletionBanner {
     var subject: some View {
         Text(change.subject)
             .lineLimit(1)

@@ -10,14 +10,28 @@ public extension ReviewModel {
         public let amount: Int
         public let balance: Int
         public let payoff: LoanPayoff?
-
-        public var id: Wallet.ID {
-            wallet.id
-        }
     }
+}
 
+extension ReviewModel {
+    struct MoveKey: Hashable {
+        let walletId: Wallet.ID
+    }
+}
+
+public extension ReviewModel {
     static func total(of moves: [Move]) -> Int {
         moves.reduce(0) { $0 + $1.amount }
+    }
+}
+
+private extension ReviewModel {
+    static let moveRoles: [Wallet.Kind.Role] = [.loan, .investment]
+}
+
+public extension ReviewModel.Move {
+    var id: Wallet.ID {
+        wallet.id
     }
 }
 
@@ -25,7 +39,6 @@ public extension ReviewModel.Output {
     var moves: [ReviewModel.Move] {
         moveLists.value(for: period.range) {
             _ = input.recurrings
-
             return input.list.map { moves(in: $0) } ?? []
         }
     }
@@ -52,12 +65,6 @@ public extension ReviewModel.Output {
     }
 }
 
-extension ReviewModel {
-    struct MoveKey: Hashable {
-        let walletId: Wallet.ID
-    }
-}
-
 extension ReviewModel.Output {
     func moveRows(to walletId: Wallet.ID) -> [EntryRowItem] {
         guard
@@ -73,10 +80,6 @@ extension ReviewModel.Output {
                 EntryRowItem.dated(entry, in: list)
             }
     }
-}
-
-private extension ReviewModel {
-    static let moveRoles: [Wallet.Kind.Role] = [.loan, .investment]
 }
 
 private extension ReviewModel.Output {

@@ -28,8 +28,6 @@ struct ThemeStyleMarks: View {
 }
 
 private extension ThemeStyleMarks {
-    static let size: CGFloat = 18
-
     var cornerMark: some View {
         ThemeStyleCornerMark(corner: corner, color: Palette.subtext, size: Self.size)
     }
@@ -49,4 +47,8 @@ private extension ThemeStyleMarks {
                     .strokeBorder(Palette.line, lineWidth: 1)
             }
     }
+}
+
+private extension ThemeStyleMarks {
+    static let size: CGFloat = 18
 }

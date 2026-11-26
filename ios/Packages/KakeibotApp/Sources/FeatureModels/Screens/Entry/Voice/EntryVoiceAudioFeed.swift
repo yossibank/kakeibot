@@ -32,7 +32,17 @@ final class EntryVoiceAudioFeed: @unchecked Sendable {
 
         self.levelFrames = max(Int(inputFormat.sampleRate * Self.levelInterval), 1)
     }
+}
 
+@available(iOS 26.0, *)
+private extension EntryVoiceAudioFeed {
+    enum FeedError: Error {
+        case unconvertible
+    }
+}
+
+@available(iOS 26.0, *)
+extension EntryVoiceAudioFeed {
     static func level(rms: Float) -> Double {
         guard rms > 0 else {
             return 0
@@ -40,6 +50,7 @@ final class EntryVoiceAudioFeed: @unchecked Sendable {
 
         let decibels = 20 * log10(Double(rms))
         let level = (decibels - quietDecibels) / (loudDecibels - quietDecibels)
+
         return min(max(level, 0), 1)
     }
 
@@ -58,10 +69,6 @@ final class EntryVoiceAudioFeed: @unchecked Sendable {
 
 @available(iOS 26.0, *)
 private extension EntryVoiceAudioFeed {
-    enum FeedError: Error {
-        case unconvertible
-    }
-
     static let levelInterval = 0.08
     static let quietDecibels = -55.0
     static let loudDecibels = -20.0
@@ -110,6 +117,7 @@ private extension EntryVoiceAudioFeed {
 
             isSupplied = true
             inputStatus.pointee = .haveData
+
             return buffer
         }
 

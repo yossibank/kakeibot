@@ -4,10 +4,6 @@ public struct WhatsNewRelease: Identifiable, Sendable {
     let version: String
     let month: String
     let features: [Feature]
-
-    public var id: String {
-        version
-    }
 }
 
 public extension WhatsNewRelease {
@@ -17,10 +13,6 @@ public extension WhatsNewRelease {
         case review
         case assets
         case setup(SetupItem)
-    }
-
-    static var latestVersion: String {
-        all.first?.version ?? "0"
     }
 }
 
@@ -37,17 +29,25 @@ extension WhatsNewRelease {
         let steps: [Step]
         let action: Action?
         let actionTitle: String
-
-        var id: String {
-            title
-        }
     }
 
     struct Step: Hashable, Sendable {
         let scene: WhatsNewScene.Kind
         let caption: String
     }
+}
 
+public extension WhatsNewRelease {
+    static var latestVersion: String {
+        all.first?.version ?? "0"
+    }
+
+    var id: String {
+        version
+    }
+}
+
+extension WhatsNewRelease {
     static let all = [
         v1_9_0,
         v1_8_0,
@@ -59,4 +59,10 @@ extension WhatsNewRelease {
         v1_2_0,
         v1_1_0
     ]
+}
+
+extension WhatsNewRelease.Feature {
+    var id: String {
+        title
+    }
 }

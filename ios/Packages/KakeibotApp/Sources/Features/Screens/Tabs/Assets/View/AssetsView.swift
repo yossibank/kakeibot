@@ -159,29 +159,6 @@ private extension AssetsView {
             }
         }
     }
-}
-
-private extension AssetsView {
-    var breakdownText: String {
-        let holdings = model.output.holdings
-        let onHand = "手持ち \(Yen.text(holdings.onHand))"
-
-        if holdings.unpaid > 0 {
-            return "\(onHand)・未払い \(Yen.text(holdings.unpaid))"
-        }
-
-        if holdings.refund > 0 {
-            return "\(onHand)・返ってくる額 \(Yen.text(holdings.refund))"
-        }
-
-        return onHand
-    }
-
-    var changeText: String {
-        let change = model.output.changeFromLastMonth
-        let sign = change > 0 ? "+" : ""
-        return "先月末より \(sign)\(Yen.text(change))"
-    }
 
     @ViewBuilder
     func sheetContent(_ sheet: AssetsModel.Sheet) -> some View {
@@ -214,6 +191,29 @@ private extension AssetsView {
                 model.state.open(afterSheet: .entry(id))
             }
         }
+    }
+}
+
+private extension AssetsView {
+    var breakdownText: String {
+        let holdings = model.output.holdings
+        let onHand = "手持ち \(Yen.text(holdings.onHand))"
+
+        if holdings.unpaid > 0 {
+            return "\(onHand)・未払い \(Yen.text(holdings.unpaid))"
+        }
+
+        if holdings.refund > 0 {
+            return "\(onHand)・返ってくる額 \(Yen.text(holdings.refund))"
+        }
+
+        return onHand
+    }
+
+    var changeText: String {
+        let change = model.output.changeFromLastMonth
+        let sign = change > 0 ? "+" : ""
+        return "先月末より \(sign)\(Yen.text(change))"
     }
 
     static func isOwed(_ role: Wallet.Kind.Role) -> Bool {

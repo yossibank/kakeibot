@@ -180,7 +180,6 @@ private extension ReminderView {
     func showPreview(by step: Int) {
         let index = Self.days.firstIndex(of: model.state.previewDay) ?? 0
         let next = (index + step + Self.days.count) % Self.days.count
-
         model.showPreview(on: Self.days[next])
     }
 }

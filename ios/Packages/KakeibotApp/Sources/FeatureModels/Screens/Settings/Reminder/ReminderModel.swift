@@ -51,12 +51,6 @@ public extension ReminderModel {
             self.previewDay = previewDay
             self.isPickingTime = isPickingTime
         }
-
-        public func pickTime(_ isPicking: Bool) {
-            if isPickingTime != isPicking {
-                isPickingTime = isPicking
-            }
-        }
     }
 
     @MainActor
@@ -98,7 +92,16 @@ public extension ReminderModel {
             self.state = state
         }
     }
+}
 
+extension ReminderModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let permission: NotificationPermission
+    }
+}
+
+public extension ReminderModel {
     static let presets: [ReminderTime] = [19, 20, 21, 22, 23]
         .compactMap { ReminderTime(hour: $0, minute: 0) }
 
@@ -123,7 +126,6 @@ public extension ReminderModel {
         do {
             let time = try await dependencies.database.setting(.reminderTime)
             let notifications = try await dependencies.database.notificationInput(from: input.today)
-
             loaded = (time, notifications)
         } catch {
             loaded = nil
@@ -150,7 +152,6 @@ public extension ReminderModel {
     func choose(_ time: ReminderTime?) async {
         input.time = time
         input.lastTime = time ?? input.lastTime
-
         state.errorNotice.clear()
 
         do {
@@ -164,12 +165,25 @@ public extension ReminderModel {
         }
 
         await dependencies.permission.requestIfUndecided()
-
         input.authorization = await dependencies.permission.authorization()
     }
 
     func refreshAuthorization() async {
         input.authorization = await dependencies.permission.authorization()
+    }
+}
+
+private extension ReminderModel {
+    static let noticeCount = 3
+    static let loadFailedMessage = "通知の設定を読めませんでした"
+    static let saveFailedMessage = "通知の設定を保存できませんでした"
+}
+
+public extension ReminderModel.State {
+    func pickTime(_ isPicking: Bool) {
+        if isPickingTime != isPicking {
+            isPickingTime = isPicking
+        }
     }
 }
 
@@ -214,19 +228,6 @@ public extension ReminderModel.Output {
     var previewMessage: ReminderMessage {
         ReminderMessage(on: state.previewDay)
     }
-}
-
-extension ReminderModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let permission: NotificationPermission
-    }
-}
-
-private extension ReminderModel {
-    static let noticeCount = 3
-    static let loadFailedMessage = "通知の設定を読めませんでした"
-    static let saveFailedMessage = "通知の設定を保存できませんでした"
 }
 
 extension ReminderModel: SettingsFoldModel {

@@ -69,7 +69,9 @@ private extension DonutChart {
         let end: CGFloat
         let color: Color
     }
+}
 
+private extension DonutChart {
     static var gap: CGFloat {
         0.006
     }
@@ -86,7 +88,6 @@ private extension DonutChart {
         }
 
         let gap = slices.count > 1 ? Self.gap : 0
-
         var start: CGFloat = 0
 
         return slices.map { slice in

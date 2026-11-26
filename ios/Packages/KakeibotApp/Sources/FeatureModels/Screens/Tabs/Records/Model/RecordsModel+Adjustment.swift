@@ -6,12 +6,10 @@ public extension RecordsModel {
     struct AdjustmentRow: Equatable, Identifiable {
         public let adjustment: Adjustment
         public let walletName: String
-
-        public var id: Adjustment.ID {
-            adjustment.id
-        }
     }
+}
 
+public extension RecordsModel {
     @discardableResult
     func deleteAdjustment(_ id: Adjustment.ID) async -> Deletion? {
         do {
@@ -31,4 +29,10 @@ public extension RecordsModel {
 
 private extension RecordsModel {
     static let deleteAdjustmentFailedMessage = "残高の調整を削除できませんでした"
+}
+
+public extension RecordsModel.AdjustmentRow {
+    var id: Adjustment.ID {
+        adjustment.id
+    }
 }

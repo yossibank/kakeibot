@@ -7,7 +7,9 @@ public extension AppDatabase {
         case entryNotFound
         case tagMismatch
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func saveEntry(
         _ draft: EntryDraft,
@@ -37,7 +39,6 @@ public extension AppDatabase {
             for (index, draft) in drafts.enumerated() {
                 let steps = Double(index - drafts.count + 1)
                 let savedAt = now.addingTimeInterval(steps * Self.batchStep)
-
                 try Self.saveEntry(draft, editing: nil, change: &change, in: db, at: savedAt)
             }
 
@@ -108,7 +109,6 @@ public extension AppDatabase {
                 }
 
                 entry.updatedAt = now
-
                 try Self.fitCategory(of: &entry, in: db)
                 try entry.update(db)
                 touched.after.append(entry)
@@ -134,7 +134,6 @@ extension AppDatabase {
         at now: Date
     ) throws -> SavedEntry {
         var change = CardBillChange()
-
         let saved = try saveEntry(draft, editing: id, change: &change, in: db, at: now)
 
         try recalculateCardBills(change, in: db, at: now)
@@ -223,7 +222,6 @@ extension AppDatabase {
         fee.walletId = transfer.walletId
         fee.billMonth = nil
         fee.updatedAt = now
-
         try fitCategory(of: &fee, in: db)
         try fee.save(db)
 

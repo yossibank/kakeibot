@@ -2,6 +2,14 @@ import Core
 import Foundation
 import GRDB
 
+private extension AppDatabase {
+    struct Seed {
+        let name: String
+        let glyph: Icon.Glyph
+        let color: String
+    }
+}
+
 public extension AppDatabase {
     func insertDefaultsIfEmpty(at now: Date) throws {
         try writer.write { db in
@@ -116,12 +124,6 @@ extension AppDatabase {
 }
 
 private extension AppDatabase {
-    struct Seed {
-        let name: String
-        let glyph: Icon.Glyph
-        let color: String
-    }
-
     static let wallets: [(Seed, Wallet.Kind)] = [
         (Seed(name: "財布", glyph: .cash, color: "#C9A465"), .cash),
         (Seed(name: "銀行", glyph: .bank, color: "#4A6FA5"), .bank)

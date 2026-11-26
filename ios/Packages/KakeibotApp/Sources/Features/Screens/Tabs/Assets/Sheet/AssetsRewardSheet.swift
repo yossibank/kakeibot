@@ -61,10 +61,6 @@ struct AssetsRewardSheet: View {
 }
 
 private extension AssetsRewardSheet {
-    var isSetUp: Bool {
-        !model.output.rewardRules.isEmpty && model.output.rewardGoal != nil
-    }
-
     var header: some View {
         SheetHeader("ごほうび貯金箱") {
             dismiss()
@@ -273,5 +269,11 @@ private extension AssetsRewardSheet {
                 color: Palette.accent
             )
         }
+    }
+}
+
+private extension AssetsRewardSheet {
+    var isSetUp: Bool {
+        !model.output.rewardRules.isEmpty && model.output.rewardGoal != nil
     }
 }

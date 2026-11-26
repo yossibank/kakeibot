@@ -20,7 +20,9 @@ extension VoiceText {
         let value: Value
         let range: Range<String.Index>
     }
+}
 
+extension VoiceText {
     func contains(_ name: String) -> Bool {
         range(of: name) != nil
     }
@@ -92,7 +94,6 @@ private extension VoiceText {
     ]
 
     static let payments: Set = ["現金", "クレカ", "クレジット", "クレジットカード", "カード払い", "電子マネー", "現金払い"]
-
     static let fillers: Set = ["えっと", "えーと", "えー", "あの", "あと", "それと", "から", "より"]
 
     static func fold(_ text: String) -> String {

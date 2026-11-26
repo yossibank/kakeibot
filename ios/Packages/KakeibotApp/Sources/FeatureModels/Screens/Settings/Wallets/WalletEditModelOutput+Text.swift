@@ -33,6 +33,7 @@ public extension WalletEditModel.Output {
             borrowed: borrowed,
             balance: isEditing ? input.balance : initialBalance
         )
+
         let percent = Percent.floor(repaid, of: borrowed)
 
         return "\(Yen.text(repaid)) 返済済み（\(percent)%）"

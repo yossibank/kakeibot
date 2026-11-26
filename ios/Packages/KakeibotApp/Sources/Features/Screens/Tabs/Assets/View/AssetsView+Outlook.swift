@@ -3,6 +3,20 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
+private extension AssetsView {
+    struct OutlookLine: Identifiable {
+        let id: Int
+        let label: String
+        let detail: String
+        let amount: Int
+    }
+
+    struct OutlookNote {
+        let text: String
+        let color: Color
+    }
+}
+
 extension AssetsView {
     var outlookButton: some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(12))
@@ -41,20 +55,6 @@ extension AssetsView {
             .contentShape(shape)
         }
         .buttonStyle(.plain)
-    }
-}
-
-private extension AssetsView {
-    struct OutlookLine: Identifiable {
-        let id: Int
-        let label: String
-        let detail: String
-        let amount: Int
-    }
-
-    struct OutlookNote {
-        let text: String
-        let color: Color
     }
 }
 
@@ -115,6 +115,7 @@ private extension AssetsView {
         let incomes = outlook.incomes
         let recurrings = outlook.recurringExpenses
         let plans = outlook.planExpenses
+
         let incomeLine = incomes.isEmpty
             ? nil
             : OutlookLine(

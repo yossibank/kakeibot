@@ -24,7 +24,15 @@ public extension LaunchScreenModel {
 
         public let hint = SettingsFoldInput.hint(.launchScreen)
     }
+}
 
+extension LaunchScreenModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+}
+
+public extension LaunchScreenModel {
     func load() async {
         do {
             input.screen = try await dependencies.database.setting(.launchScreen)
@@ -41,12 +49,6 @@ public extension LaunchScreenModel {
         await saveSetting(screen, for: .launchScreen, in: dependencies.database) {
             input.screen = previous
         }
-    }
-}
-
-extension LaunchScreenModel {
-    struct Dependencies {
-        let database: AppDatabase
     }
 }
 

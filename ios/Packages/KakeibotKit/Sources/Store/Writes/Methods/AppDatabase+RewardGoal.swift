@@ -7,7 +7,9 @@ public extension AppDatabase {
         case goalNotFound
         case shortOfBalance
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func saveRewardGoal(
         _ draft: RewardGoalDraft,
@@ -56,7 +58,6 @@ public extension AppDatabase {
 
             goal.purchasedAt = isPurchased ? now : nil
             goal.updatedAt = now
-
             try goal.update(db)
         }
     }

@@ -50,7 +50,9 @@ extension ReceiptLine {
         var isReduced = false
         var isIncluded = false
     }
+}
 
+extension ReceiptLine {
     var isNamed: Bool {
         guard case let .text(text) = kind else {
             return false

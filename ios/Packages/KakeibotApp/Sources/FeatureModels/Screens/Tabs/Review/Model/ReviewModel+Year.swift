@@ -6,6 +6,10 @@ public extension ReviewModel {
     }
 }
 
+private extension ReviewModel {
+    static let yearMonths = 12
+}
+
 public extension ReviewModel.Output {
     var yearProgress: ReviewYearProgress? {
         guard
@@ -18,8 +22,10 @@ public extension ReviewModel.Output {
         let range = period.range
         let comparison = period.comparisonRange(today: state.today)
         let hasPrevious = entries.contains { comparison.contains($0.date) }
+
         let spent = ReviewSummary(entries: entries, in: range.lowerBound...state.today).expense
             .total
+
         let previousSpent = ReviewSummary(entries: entries, in: comparison).expense.total
 
         let first = ReviewPeriod(
@@ -67,10 +73,6 @@ public extension ReviewModel.Output {
                 EntryRowItem.dated(entry, in: list)
             }
     }
-}
-
-private extension ReviewModel {
-    static let yearMonths = 12
 }
 
 private extension ReviewModel.Output {

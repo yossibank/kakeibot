@@ -62,10 +62,6 @@ public extension MainModel {
         case setup(SetupItem)
         case reward
         case whatsNew(seenVersion: String?)
-
-        public var id: Self {
-            self
-        }
     }
 
     @MainActor
@@ -95,46 +91,6 @@ public extension MainModel {
             self.draft = draft
             self.undo = undo
         }
-
-        public func select(_ tab: Tab) {
-            self.tab = tab
-            visitedTabs.insert(tab)
-        }
-
-        public func restartObservation() {
-            observationRound += 1
-        }
-
-        public func changeScene(to phase: ForegroundReturn.Phase) {
-            if foreground.receive(phase) {
-                restartObservation()
-            }
-        }
-
-        public func hideTabNotices() {
-            noticeRound += 1
-        }
-
-        func finishWarmingEntry() {
-            guard isWarmingEntry else {
-                return
-            }
-
-            isWarmingEntry = false
-        }
-
-        func startReceipt() {
-            startsReceipt = true
-        }
-
-        func setToday(_ today: LocalDate) {
-            self.today = today
-        }
-
-        func replaceDraft(with draft: EntryModel) {
-            startsReceipt = false
-            self.draft = draft
-        }
     }
 
     @MainActor
@@ -142,9 +98,6 @@ public extension MainModel {
     final class Input {
         public internal(set) var launchScreen: LaunchScreen?
     }
-
-    static let sheetCloseDelay: Duration = .milliseconds(600)
-    static let entryWarmupDuration: Duration = .milliseconds(500)
 }
 
 extension MainModel {
@@ -152,5 +105,60 @@ extension MainModel {
         let parts: ScreenParts
         let closeDelay: Duration
         let warmupDuration: Duration
+    }
+}
+
+public extension MainModel {
+    static let sheetCloseDelay: Duration = .milliseconds(600)
+    static let entryWarmupDuration: Duration = .milliseconds(500)
+}
+
+public extension MainModel.State {
+    func select(_ tab: MainModel.Tab) {
+        self.tab = tab
+        visitedTabs.insert(tab)
+    }
+
+    func restartObservation() {
+        observationRound += 1
+    }
+
+    func changeScene(to phase: ForegroundReturn.Phase) {
+        if foreground.receive(phase) {
+            restartObservation()
+        }
+    }
+
+    func hideTabNotices() {
+        noticeRound += 1
+    }
+}
+
+extension MainModel.State {
+    func finishWarmingEntry() {
+        guard isWarmingEntry else {
+            return
+        }
+
+        isWarmingEntry = false
+    }
+
+    func startReceipt() {
+        startsReceipt = true
+    }
+
+    func setToday(_ today: LocalDate) {
+        self.today = today
+    }
+
+    func replaceDraft(with draft: EntryModel) {
+        startsReceipt = false
+        self.draft = draft
+    }
+}
+
+public extension MainModel.Sheet {
+    var id: Self {
+        self
     }
 }

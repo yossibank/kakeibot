@@ -7,16 +7,18 @@ public struct ReviewGoalItem: Identifiable {
     let categoryName: String
 
     public let progress: ReviewGoal.Progress
+}
 
-    public var id: ReviewGoal.ID {
+public extension ReviewGoalItem {
+    var id: ReviewGoal.ID {
         goal.id
     }
 
-    public func title(unit: String) -> String {
+    func title(unit: String) -> String {
         ReviewEmphasisPart.text(of: titleParts(unit: unit))
     }
 
-    public func titleParts(unit: String) -> [ReviewEmphasisPart] {
+    func titleParts(unit: String) -> [ReviewEmphasisPart] {
         switch goal.kind {
         case .count:
             [
@@ -36,7 +38,7 @@ public struct ReviewGoalItem: Identifiable {
         }
     }
 
-    public func value(_ number: Int) -> String {
+    func value(_ number: Int) -> String {
         switch goal.kind {
         case .count: "\(number) 回"
         case .average: ReviewYen.text(number)

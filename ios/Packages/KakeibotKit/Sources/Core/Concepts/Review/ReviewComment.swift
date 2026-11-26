@@ -71,6 +71,25 @@ public extension ReviewComment {
     }
 }
 
+private extension ReviewComment {
+    static let adviceEndings = ["ましょう", "ください"]
+    static let cutMarks = ["```", "」}", "\"}", "}", "{"]
+
+    static let trimmed = CharacterSet.whitespacesAndNewlines
+        .union(CharacterSet(charactersIn: "「」\""))
+
+    static func numbers(in text: String) -> Set<Int> {
+        let matches = text.matches(of: #/[0-9０-９][0-9０-９,，]*/#)
+
+        let values = matches.compactMap { match in
+            let digits = match.output.compactMap(\.wholeNumberValue)
+            return digits.isEmpty ? nil : digits.reduce(0) { $0 * 10 + $1 }
+        }
+
+        return Set(values)
+    }
+}
+
 public extension ReviewPeriod {
     var commentKey: String {
         "\(scale.rawValue):\(range.lowerBound)"
@@ -84,23 +103,5 @@ public extension ReviewPeriod.Scale {
         case .month: "月"
         case .year: "年"
         }
-    }
-}
-
-private extension ReviewComment {
-    static let adviceEndings = ["ましょう", "ください"]
-    static let cutMarks = ["```", "」}", "\"}", "}", "{"]
-    static let trimmed = CharacterSet.whitespacesAndNewlines
-        .union(CharacterSet(charactersIn: "「」\""))
-
-    static func numbers(in text: String) -> Set<Int> {
-        let matches = text.matches(of: #/[0-9０-９][0-9０-９,，]*/#)
-
-        let values = matches.compactMap { match in
-            let digits = match.output.compactMap(\.wholeNumberValue)
-            return digits.isEmpty ? nil : digits.reduce(0) { $0 * 10 + $1 }
-        }
-
-        return Set(values)
     }
 }

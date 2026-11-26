@@ -11,13 +11,24 @@ public enum ReceiptSuspect {
 
         return items.indices.filter { index in
             let item = items[index]
-
             return isExtra(item, difference: difference) || isMisread(item, difference: difference)
         }
     }
 }
 
 private extension ReceiptSuspect {
+    static let confusedDigits: Set<Set<Character>> = [
+        ["0", "6"],
+        ["0", "8"],
+        ["0", "9"],
+        ["1", "7"],
+        ["3", "8"],
+        ["5", "6"],
+        ["5", "8"],
+        ["6", "8"],
+        ["8", "9"]
+    ]
+
     static func isExtra(
         _ item: EntryItem.Draft,
         difference: Int
@@ -57,18 +68,4 @@ private extension ReceiptSuspect {
 
         return confusedDigits.contains([pair.0, pair.1])
     }
-}
-
-private extension ReceiptSuspect {
-    static let confusedDigits: Set<Set<Character>> = [
-        ["0", "6"],
-        ["0", "8"],
-        ["0", "9"],
-        ["1", "7"],
-        ["3", "8"],
-        ["5", "6"],
-        ["5", "8"],
-        ["6", "8"],
-        ["8", "9"]
-    ]
 }

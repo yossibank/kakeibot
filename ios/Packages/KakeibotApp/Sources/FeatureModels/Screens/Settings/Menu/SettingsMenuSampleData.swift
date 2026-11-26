@@ -57,7 +57,6 @@ enum SettingsMenuSampleData {
         let loan = try await database.save(loanDraft, at: now)
         let options = try await database.entryOptions()
         let book = try Book(options: options, card: card.id, loan: loan.id)
-
         var drafts: [EntryDraft] = []
         var noSpendDays: [LocalDate] = []
 
@@ -86,7 +85,6 @@ enum SettingsMenuSampleData {
     ) throws -> Day {
         let seed = date.year * 400 + date.month * 32 + date.day
         let isNoSpend = seed % 9 == 0
-
         var drafts = try fixedDrafts(on: date, today: today, book: book)
 
         if !isNoSpend {
@@ -104,7 +102,6 @@ enum SettingsMenuSampleData {
         book: Book
     ) throws -> [EntryDraft] {
         let isWeekday = date.weekday != .saturday && date.weekday != .sunday
-
         var drafts: [EntryDraft] = []
 
         func add(

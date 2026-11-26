@@ -42,7 +42,9 @@ public extension ReceiptLabels {
             self.taxRate = taxRate
         }
     }
+}
 
+public extension ReceiptLabels {
     func shifted(by offset: Int) -> ReceiptLabels {
         ReceiptLabels(
             storeLine: storeLine.map { $0 + offset },

@@ -10,7 +10,6 @@ public final class WalletListModel {
     public let state: SettingsBoardMovingState<Wallet.ID>
     public let input: SettingsBoardSnapshotInput<EntryList>
     public let output: Output
-
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
@@ -31,11 +30,6 @@ public extension WalletListModel {
 
         let input: SettingsBoardSnapshotInput<EntryList>
 
-        public var items: [Wallet] {
-            let wallets = input.snapshot?.wallets.values ?? [:].values
-            return wallets.sorted { $0.sortOrder < $1.sortOrder }
-        }
-
         init(
             input: SettingsBoardSnapshotInput<EntryList>,
             state: SettingsBoardMovingState<Wallet.ID>
@@ -43,35 +37,42 @@ public extension WalletListModel {
             self.input = input
             self.state = state
         }
-
-        public func icon(for wallet: Wallet) -> Icon? {
-            input.snapshot?.icons[wallet.iconId]
-        }
-
-        public func needsHideConfirmation(of wallet: Wallet) -> Bool {
-            (input.snapshot?.balance(of: wallet) ?? wallet.balance(with: [])) != 0
-        }
-
-        public func hasEntries(_ wallet: Wallet) -> Bool {
-            input.snapshot.map { WalletEditModel.hasEntries(of: wallet, in: $0) } ?? false
-        }
-
-        public func balance(
-            of wallet: Wallet,
-            through today: LocalDate
-        ) -> Int {
-            input.snapshot?.balance(of: wallet, through: today) ?? wallet.balance(with: [])
-        }
-
-        public func isShared(_ wallet: Wallet) -> Bool {
-            input.snapshot?.isShared(wallet) == true
-        }
     }
 }
 
 public extension WalletListModel {
     func balance(of wallet: Wallet) -> Int {
         output.balance(of: wallet, through: dependencies.clock.today)
+    }
+}
+
+public extension WalletListModel.Output {
+    var items: [Wallet] {
+        let wallets = input.snapshot?.wallets.values ?? [:].values
+        return wallets.sorted { $0.sortOrder < $1.sortOrder }
+    }
+
+    func icon(for wallet: Wallet) -> Icon? {
+        input.snapshot?.icons[wallet.iconId]
+    }
+
+    func needsHideConfirmation(of wallet: Wallet) -> Bool {
+        (input.snapshot?.balance(of: wallet) ?? wallet.balance(with: [])) != 0
+    }
+
+    func hasEntries(_ wallet: Wallet) -> Bool {
+        input.snapshot.map { WalletEditModel.hasEntries(of: wallet, in: $0) } ?? false
+    }
+
+    func balance(
+        of wallet: Wallet,
+        through today: LocalDate
+    ) -> Int {
+        input.snapshot?.balance(of: wallet, through: today) ?? wallet.balance(with: [])
+    }
+
+    func isShared(_ wallet: Wallet) -> Bool {
+        input.snapshot?.isShared(wallet) == true
     }
 }
 

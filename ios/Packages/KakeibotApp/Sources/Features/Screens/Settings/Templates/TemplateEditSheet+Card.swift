@@ -4,6 +4,10 @@ import FeatureModels
 import SwiftUI
 
 extension TemplateEditSheet {
+    var amountValue: String {
+        model.output.amount.map { Yen.text($0) } ?? "毎回入れる"
+    }
+
     var preview: some View {
         VStack(spacing: 16) {
             card
@@ -84,12 +88,6 @@ extension TemplateEditSheet {
         .task {
             focus = .memo
         }
-    }
-}
-
-extension TemplateEditSheet {
-    var amountValue: String {
-        model.output.amount.map { Yen.text($0) } ?? "毎回入れる"
     }
 }
 

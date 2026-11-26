@@ -6,7 +6,9 @@ public extension AppDatabase {
     enum RecurringWriteError: Error, Equatable {
         case recurringNotFound
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func saveRecurring(
         _ draft: RecurringDraft,
@@ -24,7 +26,6 @@ public extension AppDatabase {
                 }
 
                 recurring = try draft.applied(to: current, at: now)
-
                 try recurring.update(db)
 
                 try Self.generateEarlierEntries(
@@ -98,7 +99,6 @@ public extension AppDatabase {
     ) async throws -> Deletion {
         try await writer.write { db in
             let recurrings = Recurring.filter(id: id)
-
             return try Self.deleteRecurrings(recurrings, in: db, at: now)
         }
     }
@@ -115,7 +115,6 @@ public extension AppDatabase {
             }
 
             let occurrence = recurring.occurrence(on: date)
-
             var change = CardBillChange()
 
             let entry = try Self.generateEntry(

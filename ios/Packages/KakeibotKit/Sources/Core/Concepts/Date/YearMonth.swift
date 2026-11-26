@@ -61,9 +61,11 @@ extension YearMonth {
         let previousYear = year - 1
         let leapDays = Self.leapDays(through: previousYear)
         let daysBeforeYear = previousYear * 365 + leapDays
+
         let leapDayThisYear = month > 2 && isLeapYear
             ? 1
             : 0
+
         let commonDays = Self.daysBeforeMonthInCommonYear[month - 1]
         let daysBeforeMonth = commonDays + leapDayThisYear
 

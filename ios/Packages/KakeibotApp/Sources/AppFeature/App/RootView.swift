@@ -182,6 +182,42 @@ private extension RootView {
     }
 }
 
+private struct InputWarmup: UIViewRepresentable {
+    func makeUIView(context: Context) -> WarmupView {
+        WarmupView()
+    }
+
+    func updateUIView(
+        _ uiView: WarmupView,
+        context: Context
+    ) {}
+}
+
+private final class WarmupView: UIView {
+    private var isWarmedUp = false
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+
+        guard
+            let window,
+            !isWarmedUp
+        else {
+            return
+        }
+
+        let field = UITextField()
+
+        isWarmedUp = true
+        window.addSubview(field)
+        field.becomeFirstResponder()
+        field.resignFirstResponder()
+        field.removeFromSuperview()
+        UISelectionFeedbackGenerator().prepare()
+        UIImpactFeedbackGenerator(style: .light).prepare()
+    }
+}
+
 extension NotificationPermission {
     static func live(reschedule: @escaping Reschedule) -> Self {
         Self {
@@ -214,7 +250,6 @@ extension SyncCloud {
         )
     } participants: { walletID, title in
         let share = try await SyncEngine.share(walletID: walletID, title: title)
-
         return share.participants.compactMap(SyncParticipant.init)
     } deleteShare: { walletID in
         try await SyncEngine.deleteShare(walletID: walletID)
@@ -226,43 +261,6 @@ extension SyncCloud {
 extension View {
     func warmsUpInput() -> some View {
         background(InputWarmup())
-    }
-}
-
-private struct InputWarmup: UIViewRepresentable {
-    func makeUIView(context: Context) -> WarmupView {
-        WarmupView()
-    }
-
-    func updateUIView(
-        _ uiView: WarmupView,
-        context: Context
-    ) {}
-}
-
-private final class WarmupView: UIView {
-    private var isWarmedUp = false
-
-    override func didMoveToWindow() {
-        super.didMoveToWindow()
-
-        guard
-            let window,
-            !isWarmedUp
-        else {
-            return
-        }
-
-        let field = UITextField()
-
-        isWarmedUp = true
-
-        window.addSubview(field)
-        field.becomeFirstResponder()
-        field.resignFirstResponder()
-        field.removeFromSuperview()
-        UISelectionFeedbackGenerator().prepare()
-        UIImpactFeedbackGenerator(style: .light).prepare()
     }
 }
 

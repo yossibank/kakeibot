@@ -33,11 +33,9 @@ private extension RecordsMarkMenu {
     struct Layout {
         var panelHeight: CGFloat = 0
     }
+}
 
-    static let width: CGFloat = 248
-    static let inset: CGFloat = 16
-    static let gap: CGFloat = 6
-
+private extension RecordsMarkMenu {
     var panel: some View {
         MenuPanel(width: Self.width) {
             MenuHeader("この日に付けるもの") {
@@ -69,6 +67,12 @@ private extension RecordsMarkMenu {
             layout.panelHeight = height
         }
     }
+}
+
+private extension RecordsMarkMenu {
+    static let width: CGFloat = 248
+    static let inset: CGFloat = 16
+    static let gap: CGFloat = 6
 
     func panelX(
         for anchor: CGRect,

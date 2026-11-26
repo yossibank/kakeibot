@@ -15,7 +15,9 @@ extension EntryModel {
         let items: [EntryItem.Draft]
         let taxIncluded: Bool
     }
+}
 
+extension EntryModel {
     static let recentMemoLimit = 6
     static let recentItemNameLimit = 50
 

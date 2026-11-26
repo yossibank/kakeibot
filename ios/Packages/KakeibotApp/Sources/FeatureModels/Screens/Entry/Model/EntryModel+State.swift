@@ -13,26 +13,6 @@ public extension EntryModel {
         init(date: LocalDate) {
             self.date = date
         }
-
-        mutating func setDate(_ date: LocalDate) {
-            guard date != self.date else {
-                return
-            }
-
-            self.date = date
-            billMonth = nil
-        }
-
-        fileprivate mutating func setWallet(_ id: Wallet.ID?) -> Bool {
-            guard id != walletId else {
-                return false
-            }
-
-            walletId = id
-            billMonth = nil
-
-            return true
-        }
     }
 
     struct CategoryChoice: Equatable {
@@ -41,30 +21,6 @@ public extension EntryModel {
         public private(set) var id: EntryCategory.ID?
 
         private(set) var byType: [Entry.Kind: EntryCategory.ID] = [:]
-
-        mutating func select(_ id: EntryCategory.ID?) {
-            guard id != self.id else {
-                return
-            }
-
-            self.id = id
-            tagId = nil
-        }
-
-        mutating func toggleTag(_ id: EntryTag.ID) {
-            tagId = tagId == id ? nil : id
-        }
-
-        mutating func remember(for type: Entry.Kind) {
-            byType[type] = id
-        }
-
-        func tags(in allTags: [EntryTag]) -> [EntryTag] {
-            allTags.filter { tag in
-                tag.categoryId == id
-                    && (tag.archivedAt == nil || tag.id == tagId)
-            }
-        }
     }
 
     enum KeypadTarget: Hashable {
@@ -76,25 +32,6 @@ public extension EntryModel {
         public internal(set) var calculator = AmountCalculator()
         public internal(set) var feeCalculator = AmountCalculator()
         public internal(set) var target: KeypadTarget = .amount
-
-        public var active: AmountCalculator {
-            target == .fee ? feeCalculator : calculator
-        }
-
-        mutating func press(_ key: AmountCalculator.Key) {
-            switch target {
-            case .amount: calculator.press(key)
-            case .fee: feeCalculator.press(key)
-            }
-        }
-
-        mutating func setAmount(_ amount: Int) {
-            calculator = AmountCalculator(amount: amount)
-        }
-
-        mutating func setFee(_ amount: Int) {
-            feeCalculator = AmountCalculator(amount: amount)
-        }
     }
 
     struct Items: Equatable {
@@ -103,20 +40,6 @@ public extension EntryModel {
 
         var receiptStore: String?
         var isReceiptRead = false
-
-        public var totals: EntryItemTotal {
-            EntryItemTotal(list, taxIncluded: taxIncluded)
-        }
-
-        var canAdjust: Bool {
-            (0...AmountCalculator.maxValue).contains(totals.total)
-        }
-
-        mutating func forgetReadNames() {
-            for index in list.indices {
-                list[index].readName = nil
-            }
-        }
     }
 
     struct Filled {
@@ -152,7 +75,6 @@ public extension EntryModel {
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
         public var results = Results()
-
         public var memo = ""
         public var today: LocalDate
         public var screen: Screen
@@ -175,6 +97,97 @@ public extension EntryModel {
             self.today = today
             self.screen = Screen(deck: EntryModel.Deck.start(for: type))
         }
+    }
+}
+
+public extension EntryModel.Items {
+    var totals: EntryItemTotal {
+        EntryItemTotal(list, taxIncluded: taxIncluded)
+    }
+}
+
+extension EntryModel.Items {
+    var canAdjust: Bool {
+        (0...AmountCalculator.maxValue).contains(totals.total)
+    }
+
+    mutating func forgetReadNames() {
+        for index in list.indices {
+            list[index].readName = nil
+        }
+    }
+}
+
+public extension EntryModel.Keypad {
+    var active: AmountCalculator {
+        target == .fee ? feeCalculator : calculator
+    }
+}
+
+extension EntryModel.Keypad {
+    mutating func press(_ key: AmountCalculator.Key) {
+        switch target {
+        case .amount: calculator.press(key)
+        case .fee: feeCalculator.press(key)
+        }
+    }
+
+    mutating func setAmount(_ amount: Int) {
+        calculator = AmountCalculator(amount: amount)
+    }
+
+    mutating func setFee(_ amount: Int) {
+        feeCalculator = AmountCalculator(amount: amount)
+    }
+}
+
+extension EntryModel.CategoryChoice {
+    mutating func select(_ id: EntryCategory.ID?) {
+        guard id != self.id else {
+            return
+        }
+
+        self.id = id
+        tagId = nil
+    }
+
+    mutating func toggleTag(_ id: EntryTag.ID) {
+        tagId = tagId == id ? nil : id
+    }
+
+    mutating func remember(for type: Entry.Kind) {
+        byType[type] = id
+    }
+
+    func tags(in allTags: [EntryTag]) -> [EntryTag] {
+        allTags.filter { tag in
+            tag.categoryId == id
+                && (tag.archivedAt == nil || tag.id == tagId)
+        }
+    }
+}
+
+extension EntryModel.Payment {
+    mutating func setDate(_ date: LocalDate) {
+        guard date != self.date else {
+            return
+        }
+
+        self.date = date
+        billMonth = nil
+    }
+}
+
+private extension EntryModel.Payment {
+    mutating func setWallet(_ id: Wallet.ID?) -> Bool {
+        guard id != walletId else {
+            return false
+        }
+
+        walletId = id
+        billMonth = nil
+
+        return true
     }
 }
 

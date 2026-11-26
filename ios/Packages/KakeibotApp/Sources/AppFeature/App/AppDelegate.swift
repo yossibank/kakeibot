@@ -2,8 +2,10 @@ import CloudKit
 import Sync
 import UIKit
 
-public final class AppDelegate: NSObject, UIApplicationDelegate {
-    public func application(
+public final class AppDelegate: NSObject, UIApplicationDelegate {}
+
+public extension AppDelegate {
+    func application(
         _ application: UIApplication,
         configurationForConnecting connectingSceneSession: UISceneSession,
         options: UIScene.ConnectionOptions
@@ -14,11 +16,14 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
         )
 
         configuration.delegateClass = AppSceneDelegate.self
+
         return configuration
     }
 }
 
-private final class AppSceneDelegate: NSObject, UIWindowSceneDelegate {
+private final class AppSceneDelegate: NSObject, UIWindowSceneDelegate {}
+
+extension AppSceneDelegate {
     func scene(
         _ scene: UIScene,
         willConnectTo session: UISceneSession,

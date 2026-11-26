@@ -4,7 +4,24 @@ import VisionKit
 struct EntryReceiptCamera: UIViewControllerRepresentable {
     let onScan: ([CGImage]) -> Void
     let onCancel: () -> Void
+}
 
+extension EntryReceiptCamera {
+    final class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
+        let onScan: ([CGImage]) -> Void
+        let onCancel: () -> Void
+
+        init(
+            onScan: @escaping ([CGImage]) -> Void,
+            onCancel: @escaping () -> Void
+        ) {
+            self.onScan = onScan
+            self.onCancel = onCancel
+        }
+    }
+}
+
+extension EntryReceiptCamera {
     func makeUIViewController(context: Context) -> VNDocumentCameraViewController {
         let camera = VNDocumentCameraViewController()
         camera.delegate = context.coordinator
@@ -21,40 +38,27 @@ struct EntryReceiptCamera: UIViewControllerRepresentable {
     }
 }
 
-extension EntryReceiptCamera {
-    final class Coordinator: NSObject, VNDocumentCameraViewControllerDelegate {
-        let onScan: ([CGImage]) -> Void
-        let onCancel: () -> Void
-
-        init(
-            onScan: @escaping ([CGImage]) -> Void,
-            onCancel: @escaping () -> Void
-        ) {
-            self.onScan = onScan
-            self.onCancel = onCancel
+extension EntryReceiptCamera.Coordinator {
+    func documentCameraViewController(
+        _ controller: VNDocumentCameraViewController,
+        didFinishWith scan: VNDocumentCameraScan
+    ) {
+        let pages = (0..<scan.pageCount).compactMap { index in
+            scan.imageOfPage(at: index).cgImage
         }
 
-        func documentCameraViewController(
-            _ controller: VNDocumentCameraViewController,
-            didFinishWith scan: VNDocumentCameraScan
-        ) {
-            let pages = (0..<scan.pageCount).compactMap { index in
-                scan.imageOfPage(at: index).cgImage
-            }
+        onScan(pages)
+    }
 
-            onScan(pages)
-        }
+    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+        onCancel()
+    }
 
-        func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-            onCancel()
-        }
-
-        func documentCameraViewController(
-            _ controller: VNDocumentCameraViewController,
-            didFailWithError error: any Error
-        ) {
-            onCancel()
-        }
+    func documentCameraViewController(
+        _ controller: VNDocumentCameraViewController,
+        didFailWithError error: any Error
+    ) {
+        onCancel()
     }
 }
 

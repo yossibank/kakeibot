@@ -25,15 +25,6 @@ public extension View {
     }
 }
 
-public extension NoticeBanner {
-    nonisolated static let bottomMargin: CGFloat = 12
-    nonisolated static let sideMargin: CGFloat = 16
-}
-
-public extension EnvironmentValues {
-    @Entry var noticeRound = 0
-}
-
 private struct ErrorBanner: ViewModifier {
     @Environment(\.noticeRound) private var noticeRound
 
@@ -80,4 +71,13 @@ private extension ErrorBanner {
         case .error: "exclamationmark"
         }
     }
+}
+
+public extension NoticeBanner {
+    nonisolated static let bottomMargin: CGFloat = 12
+    nonisolated static let sideMargin: CGFloat = 16
+}
+
+public extension EnvironmentValues {
+    @Entry var noticeRound = 0
 }

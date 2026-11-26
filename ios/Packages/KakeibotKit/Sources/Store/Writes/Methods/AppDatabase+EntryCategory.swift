@@ -9,7 +9,9 @@ public extension AppDatabase {
         case tagNotFound
         case hasEntries
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func saveCategory(
         _ draft: EntryCategoryDraft,
@@ -93,7 +95,6 @@ private extension AppDatabase {
         at now: Date
     ) throws -> [EntryTag] {
         let existing = try EntryTag.filter(Column("category_id") == categoryId).fetchAll(db)
-
         let names = drafts.map(\.name.trimmed)
 
         guard Set(names).count == names.count else {
@@ -132,7 +133,6 @@ private extension AppDatabase {
 
             tag.archivedAt = now
             tag.updatedAt = now
-
             try tag.update(db)
         }
 

@@ -104,22 +104,15 @@ public struct TemplateEditSheet: View {
 }
 
 extension TemplateEditSheet {
-    var saveButton: some View {
-        PrimaryButton(model.saveTitle) {
-            edit.save()
-        }
-        .disabled(!model.canSave)
-    }
-}
-
-extension TemplateEditSheet {
     enum Field: Hashable {
         case name
         case memo
     }
 
     typealias Panel = TemplateEditModel.Panel
+}
 
+extension TemplateEditSheet {
     var drawerPanel: Panel? {
         model.state.prompt.panel == .memo ? nil : model.state.prompt.panel
     }
@@ -138,6 +131,13 @@ extension TemplateEditSheet {
                 await $0.save()
             }
         )
+    }
+
+    var saveButton: some View {
+        PrimaryButton(model.saveTitle) {
+            edit.save()
+        }
+        .disabled(!model.canSave)
     }
 
     func open(_ panel: Panel) {
@@ -235,17 +235,6 @@ private extension TemplateEditSheet {
     }
 }
 
-#Preview {
-    if let parts = ScreenParts.preview() {
-        TemplateEditSheet(
-            model: TemplateEditModel(
-                parts: parts,
-                type: .expense
-            )
-        )
-    }
-}
-
 extension TemplateEditSheet: SettingsEditSheet {
     init(
         model: TemplateEditModel,
@@ -257,6 +246,17 @@ extension TemplateEditSheet: SettingsEditSheet {
             onSave: { _ in },
             onDelete: onDelete,
             onHide: onHide
+        )
+    }
+}
+
+#Preview {
+    if let parts = ScreenParts.preview() {
+        TemplateEditSheet(
+            model: TemplateEditModel(
+                parts: parts,
+                type: .expense
+            )
         )
     }
 }

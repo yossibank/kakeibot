@@ -38,6 +38,7 @@ public struct ReviewCompare: Hashable, Sendable {
 
         self.periods = recorded.count
         self.special = special
+
         self.rows = recorded.isEmpty
             ? []
             : categories
@@ -74,7 +75,9 @@ public extension ReviewCompare {
         case less
         case usual
     }
+}
 
+public extension ReviewCompare {
     static let specialMinimum = 10000
     static let usualMinimum = 500
 
@@ -93,16 +96,6 @@ public extension ReviewCompare {
     }
 }
 
-public extension ReviewCompare.Row {
-    var difference: Int {
-        amount - average
-    }
-
-    var tone: ReviewCompare.Tone {
-        ReviewCompare.tone(amount: amount, average: average)
-    }
-}
-
 private extension ReviewCompare {
     static func special(
         in entries: [Entry],
@@ -114,5 +107,15 @@ private extension ReviewCompare {
                 return entry.amount >= specialMinimum && entry.amount >= average * 2
             }
             .max { $0.amount < $1.amount }
+    }
+}
+
+public extension ReviewCompare.Row {
+    var difference: Int {
+        amount - average
+    }
+
+    var tone: ReviewCompare.Tone {
+        ReviewCompare.tone(amount: amount, average: average)
     }
 }

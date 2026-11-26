@@ -19,14 +19,6 @@ public extension SettingsMenuSampleModel {
         case inserting
         case inserted
         case failed
-
-        public var message: String? {
-            switch self {
-            case .inserting: nil
-            case .inserted: "テストデータを入れました"
-            case .failed: "テストデータを入れられませんでした"
-            }
-        }
     }
 
     @MainActor
@@ -54,3 +46,13 @@ public extension SettingsMenuSampleModel {
     }
 }
 #endif
+
+public extension SettingsMenuSampleModel.Progress {
+    var message: String? {
+        switch self {
+        case .inserting: nil
+        case .inserted: "テストデータを入れました"
+        case .failed: "テストデータを入れられませんでした"
+        }
+    }
+}

@@ -49,7 +49,6 @@ extension MainView {
 
     func showDay(_ date: LocalDate) {
         records.open(date)
-
         model.state.select(.records)
     }
 

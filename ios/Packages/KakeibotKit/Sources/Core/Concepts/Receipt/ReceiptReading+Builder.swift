@@ -39,7 +39,6 @@ extension ReceiptReading.Builder {
         if case let .taxBase(rate, amount) = line.kind {
             taxBases[rate] = amount
             isSummary = true
-
             return
         }
 

@@ -35,14 +35,9 @@ private extension WhatsNewRecurringScene {
         let amount: Int
         let day: String
     }
+}
 
-    static let kinds = ["支出", "収入", "振替"]
-
-    static let incomes = [
-        Income(name: "給料", amount: 250_000, day: "毎月 25 日"),
-        Income(name: "副業", amount: 30000, day: "毎月 10 日")
-    ]
-
+private extension WhatsNewRecurringScene {
     var row: some View {
         HStack(spacing: 8) {
             Image(systemName: "repeat")
@@ -109,4 +104,13 @@ private extension WhatsNewRecurringScene {
         }
         .padding(.horizontal, 8)
     }
+}
+
+private extension WhatsNewRecurringScene {
+    static let kinds = ["支出", "収入", "振替"]
+
+    static let incomes = [
+        Income(name: "給料", amount: 250_000, day: "毎月 25 日"),
+        Income(name: "副業", amount: 30000, day: "毎月 10 日")
+    ]
 }

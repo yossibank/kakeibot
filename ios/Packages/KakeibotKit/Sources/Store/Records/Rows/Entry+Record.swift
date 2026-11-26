@@ -1,10 +1,6 @@
 import Core
 import GRDB
 
-extension Entry: StoreRecord {
-    public static let databaseTableName = "entry"
-}
-
 extension Entry {
     static let recurrenceSearchDays = 40
 
@@ -27,6 +23,10 @@ extension Entry {
         let expenses = filter(Column("date") == date).filter(Column("type") == Kind.expense)
         return try expenses.fetchCount(db) > 0
     }
+}
+
+extension Entry: StoreRecord {
+    public static let databaseTableName = "entry"
 }
 
 extension Entry.Kind: DatabaseValueConvertible {}

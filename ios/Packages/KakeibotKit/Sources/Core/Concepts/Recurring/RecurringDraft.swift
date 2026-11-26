@@ -95,7 +95,9 @@ public extension RecurringDraft {
         case remindOutOfRange
         case feeNegative
     }
+}
 
+public extension RecurringDraft {
     static let remindRange = 0...30
 
     var problems: [Problem] {
@@ -176,7 +178,6 @@ public extension RecurringDraft {
         at now: Date
     ) throws -> Recurring {
         let fields = try validated()
-
         var updated = recurring
 
         updated.type = type

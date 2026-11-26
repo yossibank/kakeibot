@@ -12,12 +12,10 @@ public extension AppDatabase {
     ) async throws {
         try await writer.write { db in
             let restored = [entry] + [fee].compactMap(\.self)
-
             var change = CardBillChange()
 
             change.before = try Self.existingRows(of: restored, in: db)
             change.after = restored
-
             try Self.restore([entry], in: db, at: now)
             try Self.restoreItems(items, of: [entry.id], in: db)
 
@@ -45,7 +43,6 @@ public extension AppDatabase {
 
             change.before = try Self.existingRows(of: entries, in: db)
             change.after = entries
-
             try Self.restore(entries, in: db, at: now)
             try Self.restoreItems(items, of: entries.map(\.id), in: db)
             try Self.recalculateCardBills(change, in: db, at: now)

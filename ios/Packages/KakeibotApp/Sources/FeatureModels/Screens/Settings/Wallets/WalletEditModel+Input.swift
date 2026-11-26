@@ -13,7 +13,6 @@ public extension WalletEditModel {
         public internal(set) var recordedKind: Wallet.Kind?
         public internal(set) var hasValuations = false
         public internal(set) var hasEntries = false
-
         public internal(set) var baseline: WalletDraft?
 
         public let editingId: Wallet.ID?

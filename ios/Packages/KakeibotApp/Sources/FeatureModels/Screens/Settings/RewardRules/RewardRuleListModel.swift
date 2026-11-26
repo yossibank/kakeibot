@@ -10,7 +10,6 @@ public final class RewardRuleListModel {
     public let state: SettingsBoardMovingState<RewardRule.ID>
     public let input: SettingsBoardSnapshotInput<RewardRuleList>
     public let output: Output
-
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
@@ -31,10 +30,6 @@ public extension RewardRuleListModel {
 
         let input: SettingsBoardSnapshotInput<RewardRuleList>
 
-        public var items: [RewardRule] {
-            input.snapshot?.rules ?? []
-        }
-
         init(
             input: SettingsBoardSnapshotInput<RewardRuleList>,
             state: SettingsBoardMovingState<RewardRule.ID>
@@ -42,18 +37,24 @@ public extension RewardRuleListModel {
             self.input = input
             self.state = state
         }
+    }
+}
 
-        public func icon(for rule: RewardRule) -> Icon? {
-            input.snapshot?.icons[rule.iconId]
-        }
+public extension RewardRuleListModel.Output {
+    var items: [RewardRule] {
+        input.snapshot?.rules ?? []
+    }
 
-        public func total(for rule: RewardRule) -> RewardRuleList.Total? {
-            input.snapshot?.total(of: rule)
-        }
+    func icon(for rule: RewardRule) -> Icon? {
+        input.snapshot?.icons[rule.iconId]
+    }
 
-        public func isHidden(_ item: RewardRule) -> Bool {
-            !item.isActive
-        }
+    func total(for rule: RewardRule) -> RewardRuleList.Total? {
+        input.snapshot?.total(of: rule)
+    }
+
+    func isHidden(_ item: RewardRule) -> Bool {
+        !item.isActive
     }
 }
 

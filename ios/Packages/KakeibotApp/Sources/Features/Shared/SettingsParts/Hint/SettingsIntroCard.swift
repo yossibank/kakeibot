@@ -53,11 +53,6 @@ extension SettingsIntroCard {
     }
 }
 
-extension SettingsIntroCard.Note {
-    static let arrange = Self("hand.draw", "長押しで並べ替え・非表示にできます")
-    static let swipeDelete = Self("hand.point.left", "横に払うと、非表示と削除を選べます")
-}
-
 private extension SettingsIntroCard {
     var card: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -128,6 +123,11 @@ private extension SettingsIntroCard {
     static var transition: AnyTransition {
         .opacity.combined(with: .scale(scale: 0.96, anchor: .top))
     }
+}
+
+extension SettingsIntroCard.Note {
+    static let arrange = Self("hand.draw", "長押しで並べ替え・非表示にできます")
+    static let swipeDelete = Self("hand.point.left", "横に払うと、非表示と削除を選べます")
 }
 
 extension SettingsIntroCard.Note: Identifiable {

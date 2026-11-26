@@ -92,9 +92,7 @@ extension WalletEditModel.State {
     func apply(_ draft: WalletDraft) {
         name = draft.name
         kind = draft.kind
-
         icon.apply(draft.icon)
-
         isNegative = draft.initialBalance < 0
         calculator = AmountCalculator(amount: abs(draft.initialBalance))
         loanAmount = AmountCalculator(amount: draft.loanAmount ?? 0)

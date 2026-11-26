@@ -34,23 +34,7 @@ extension SettingKey {
             try setting.save(db)
         }
     }
-}
 
-extension SettingKey where Value: RawRepresentable, Value.RawValue == String {
-    init(
-        _ key: Setting.Key,
-        default defaultValue: Value
-    ) {
-        self.init(
-            key,
-            default: defaultValue,
-            decode: { Value(rawValue: $0) },
-            encode: { $0.rawValue }
-        )
-    }
-}
-
-extension SettingKey {
     init<Wrapped: LosslessStringConvertible>(optional key: Setting.Key) where Value == Wrapped? {
         self.init(
             key,
@@ -75,9 +59,22 @@ extension SettingKey {
             },
             encode: { elements in
                 let names = elements.map(\.rawValue).sorted()
-
                 return names.isEmpty ? nil : names.joined(separator: ",")
             }
+        )
+    }
+}
+
+extension SettingKey where Value: RawRepresentable, Value.RawValue == String {
+    init(
+        _ key: Setting.Key,
+        default defaultValue: Value
+    ) {
+        self.init(
+            key,
+            default: defaultValue,
+            decode: { Value(rawValue: $0) },
+            encode: { $0.rawValue }
         )
     }
 }

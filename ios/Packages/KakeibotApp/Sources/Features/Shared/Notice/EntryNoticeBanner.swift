@@ -2,22 +2,6 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
-public extension View {
-    func entryNotice(
-        _ model: EntryNoticeModel,
-        above inset: CGFloat,
-        clearsOnTap: Bool = true
-    ) -> some View {
-        modifier(
-            EntryNoticeBanner(
-                model: model,
-                inset: inset,
-                clearsOnTap: clearsOnTap
-            )
-        )
-    }
-}
-
 private struct EntryNoticeBanner: ViewModifier {
     let model: EntryNoticeModel
     let inset: CGFloat
@@ -116,5 +100,21 @@ private extension EntryNoticeBanner {
         }
 
         model.clear()
+    }
+}
+
+public extension View {
+    func entryNotice(
+        _ model: EntryNoticeModel,
+        above inset: CGFloat,
+        clearsOnTap: Bool = true
+    ) -> some View {
+        modifier(
+            EntryNoticeBanner(
+                model: model,
+                inset: inset,
+                clearsOnTap: clearsOnTap
+            )
+        )
     }
 }

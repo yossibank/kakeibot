@@ -16,17 +16,11 @@ extension ReceiptLine {
     ]
 
     static let amountBlockers: Set<Character> = ["#"]
-
     static let maxDigits = 7
-
     static let minMarkedAmount = 10
-
     static let misreadMarks: Set<Character> = ["0", "6"]
-
     static let reducedMarks: Set<Character> = ["※", "*", "軽"]
-
     static let numberJoints: Set<Character> = [":", "-", "/", "."]
-
     static let nameTrimmed = CharacterSet(charactersIn: "※*").union(.whitespaces)
 
     static let halfwidth: [Character: Character] = [

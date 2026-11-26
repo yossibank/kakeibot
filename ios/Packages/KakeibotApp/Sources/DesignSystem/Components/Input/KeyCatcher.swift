@@ -7,9 +7,7 @@ struct KeyCatcher: UIViewRepresentable {
 
     func makeUIView(context: Context) -> KeyCatcherView {
         let view = KeyCatcherView()
-
         view.onType = onType
-
         return view
     }
 

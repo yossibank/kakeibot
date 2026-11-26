@@ -59,14 +59,6 @@ extension AppModel {
         let proStore: ProStore
         let retryDelays: [Duration]
     }
-
-    static func live() -> AppModel {
-        AppModel(openDatabase: AppDatabase.appGroup)
-    }
-
-    func screenProStore() -> ProStore {
-        dependencies.proStore
-    }
 }
 
 extension AppModel {
@@ -80,6 +72,14 @@ extension AppModel {
 
     var receivedShareCount: Int {
         dependencies.shareInbox.receivedCount
+    }
+
+    static func live() -> AppModel {
+        AppModel(openDatabase: AppDatabase.appGroup)
+    }
+
+    func screenProStore() -> ProStore {
+        dependencies.proStore
     }
 
     func open() async {
@@ -116,7 +116,6 @@ extension AppModel {
         }
 
         state.setLaunch(.opening)
-
         await open()
     }
 
@@ -155,7 +154,6 @@ extension AppModel {
         }
 
         try? await database.reloadAfterOtherProcesses()
-
         await generateRecurring(in: database)
         await scheduleNotifications(in: database)
     }

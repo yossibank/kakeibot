@@ -23,7 +23,9 @@ extension SyncRoute {
         let problem: SyncSendProblem?
         let updatesProblem: Bool
     }
+}
 
+extension SyncRoute {
     static let goneCodes: Set<CKError.Code> = [.unknownItem, .zoneNotFound]
 
     func settle(

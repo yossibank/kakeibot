@@ -62,40 +62,11 @@ public extension BackupModel {
     final class Output {
         let state: State
 
-        public var pendingSummary: String? {
-            guard let pending = state.pending else {
-                return nil
-            }
-
-            let data = pending.data
-            let date = BackupModel.dayText(pending.exportedAt)
-            let counts = "記録 \(data.entries.count) 件・口座 \(data.wallets.count) 件"
-
-            return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
-        }
-
         init(state: State) {
             self.state = state
         }
-
-        public func previousTitle(of item: Previous) -> String {
-            let text = BackupModel.dayTimeText(item.date)
-            return "\(text) の退避に戻す"
-        }
     }
-}
 
-extension BackupModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
-        let stash: BackupStash
-        let appVersion: String
-        let permission: NotificationPermission
-    }
-}
-
-public extension BackupModel {
     struct BackupFile: Equatable, Sendable {
         public let kind: FileKind
         public let data: Data
@@ -111,7 +82,19 @@ public extension BackupModel {
         case json
         case csv
     }
+}
 
+extension BackupModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+        let stash: BackupStash
+        let appVersion: String
+        let permission: NotificationPermission
+    }
+}
+
+public extension BackupModel {
     static func exportAgeText(
         exportedAt: Date?,
         firstCreatedAt: Date? = nil,
@@ -175,7 +158,6 @@ public extension BackupModel {
         } catch {
             state.errorNotice.show(Self.exportFailedMessage)
             state.close(.exporter)
-
             return false
         }
     }
@@ -208,7 +190,6 @@ public extension BackupModel {
         guard case let .success(url) = result else {
             state.errorNotice.show(Self.readFailedMessage)
             state.isConfirmingRestore = false
-
             return false
         }
 
@@ -281,7 +262,6 @@ public extension BackupModel {
             }
 
             try? await dependencies.database.setSetting(.backupExportedAt, to: pending.exportedAt)
-
             state.doneMessage = Self.restoredMessage
 
             if pending.data.needsNotifications {
@@ -328,12 +308,10 @@ private extension BackupModel {
         do {
             state.pending = try export.get()
             state.isConfirmingRestore = true
-
             return true
         } catch {
             state.errorNotice.show(Self.readMessage(for: error))
             state.isConfirmingRestore = false
-
             return false
         }
     }
@@ -365,9 +343,34 @@ private extension BackupModel {
     }
 }
 
+public extension BackupModel.Output {
+    var pendingSummary: String? {
+        guard let pending = state.pending else {
+            return nil
+        }
+
+        let data = pending.data
+        let date = BackupModel.dayText(pending.exportedAt)
+        let counts = "記録 \(data.entries.count) 件・口座 \(data.wallets.count) 件"
+
+        return "\(date) に書き出した\(counts)に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます"
+    }
+
+    func previousTitle(of item: BackupModel.Previous) -> String {
+        let text = BackupModel.dayTimeText(item.date)
+        return "\(text) の退避に戻す"
+    }
+}
+
 extension BackupModel.Previous: Identifiable {
     public var id: URL {
         url
+    }
+}
+
+extension BackupModel: SettingsFoldModel {
+    public func foldStore() -> SettingsFoldStore {
+        SettingsFoldStore(dependencies.database)
     }
 }
 
@@ -376,11 +379,5 @@ private extension ExportV1.Tables {
         let hasReminder = settings.contains { $0.key == .reminderTime }
         let hasNotice = recurrings.contains { $0.archivedAt == nil && $0.remindDaysBefore != nil }
         return hasReminder || hasNotice
-    }
-}
-
-extension BackupModel: SettingsFoldModel {
-    public func foldStore() -> SettingsFoldStore {
-        SettingsFoldStore(dependencies.database)
     }
 }

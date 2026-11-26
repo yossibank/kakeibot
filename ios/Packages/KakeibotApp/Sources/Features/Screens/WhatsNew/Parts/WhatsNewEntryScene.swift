@@ -33,18 +33,9 @@ private extension WhatsNewEntryScene {
         let detail: String
         let amount: Int
     }
+}
 
-    static let keys = [
-        ["7", "8", "9"],
-        ["4", "5", "6"],
-        ["1", "2", "3"]
-    ]
-
-    static let shortcuts = [
-        Shortcut(systemImage: "fork.knife", name: "ランチ", detail: "食費・財布", amount: 900),
-        Shortcut(systemImage: "tram.fill", name: "電車", detail: "交通・財布", amount: 440)
-    ]
-
+private extension WhatsNewEntryScene {
     var slip: some View {
         VStack(spacing: 0) {
             row("カテゴリ", value: "食費")
@@ -161,4 +152,17 @@ private extension WhatsNewEntryScene {
         .frame(height: 40)
         .card(cornerRadius: 12)
     }
+}
+
+private extension WhatsNewEntryScene {
+    static let keys = [
+        ["7", "8", "9"],
+        ["4", "5", "6"],
+        ["1", "2", "3"]
+    ]
+
+    static let shortcuts = [
+        Shortcut(systemImage: "fork.knife", name: "ランチ", detail: "食費・財布", amount: 900),
+        Shortcut(systemImage: "tram.fill", name: "電車", detail: "交通・財布", amount: 440)
+    ]
 }

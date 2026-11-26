@@ -35,7 +35,6 @@ public extension AppDatabase {
 
             item.name = name
             item.updatedAt = now
-
             try item.save(db)
         }
     }
@@ -145,7 +144,6 @@ private extension AppDatabase {
             }
 
             item.updatedAt = now
-
             try item.save(db)
         }
 

@@ -61,8 +61,6 @@ public struct OnboardingView: View {
 }
 
 private extension OnboardingView {
-    static let contentWidth: CGFloat = 580
-
     func content(_ slide: PageSlideProxy) -> some View {
         VStack(spacing: 20) {
             topBar(slide)
@@ -246,6 +244,8 @@ private extension OnboardingView {
 }
 
 private extension OnboardingView {
+    static let contentWidth: CGFloat = 580
+
     func next(with slide: PageSlideProxy) {
         guard model.output.isLastPage else {
             turnPage(.forward, with: slide)

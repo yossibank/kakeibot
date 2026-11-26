@@ -35,7 +35,6 @@ public extension ThemeEditModel {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt<Never>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-
         public var draft: ThemeDraft
 
         init(draft: ThemeDraft) {
@@ -62,64 +61,11 @@ public extension ThemeEditModel {
     final class Output {
         let state: State
 
-        public var palette: ThemePalette {
-            state.draft.palette ?? .night
-        }
-
         init(state: State) {
             self.state = state
         }
-
-        public func isAvailable(
-            _ hex: String,
-            for slot: Slot
-        ) -> Bool {
-            if slot == .surface {
-                return ThemeEditModel.isLight(hex) == ThemeEditModel.isLight(state.draft.background)
-            }
-
-            var draft = state.draft
-
-            draft[keyPath: slot.keyPath] = hex
-
-            return ThemeEditModel.isReadable(draft, slot)
-        }
     }
-}
 
-public extension ThemeEditModel.State {
-    func choose(
-        _ hex: String,
-        for slot: ThemeEditModel.Slot
-    ) {
-        var next = draft
-
-        next[keyPath: slot.keyPath] = hex
-
-        if slot == .background,
-           ThemeEditModel.isLight(next.surface) != ThemeEditModel.isLight(hex) {
-            next.surface = ThemeEditModel.pairedSurface(for: hex)
-        }
-
-        for other in ThemeEditModel.Slot.allCases where !ThemeEditModel.isReadable(next, other) {
-            let readable = other.swatches.first { swatch in
-                var candidate = next
-
-                candidate[keyPath: other.keyPath] = swatch
-
-                return ThemeEditModel.isReadable(candidate, other)
-            }
-
-            if let readable {
-                next[keyPath: other.keyPath] = readable
-            }
-        }
-
-        draft = next
-    }
-}
-
-public extension ThemeEditModel {
     enum Slot: CaseIterable, Sendable {
         case background
         case surface
@@ -127,7 +73,9 @@ public extension ThemeEditModel {
         case subtext
         case accent
     }
+}
 
+public extension ThemeEditModel {
     @discardableResult
     func save() async -> Bool {
         do {
@@ -158,14 +106,96 @@ public extension ThemeEditModel {
 
         do {
             let deletion = try await dependencies.database.deleteTheme(editingId)
-
             state.outcome.send(SettingsEditOutcome(deletion: deletion))
-
             return deletion
         } catch {
             state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
             return nil
         }
+    }
+}
+
+private extension ThemeEditModel {
+    static func isLight(_ hex: String) -> Bool {
+        let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
+        let onBlack = ThemePalette.contrast(rgb, 0x000000)
+        let onWhite = ThemePalette.contrast(rgb, 0xFFFFFF)
+        return onBlack > onWhite
+    }
+
+    static func pairedSurface(for background: String) -> String {
+        let backgrounds = Slot.background.swatches
+        let surfaces = Slot.surface.swatches
+
+        if let index = backgrounds.firstIndex(of: background) {
+            return surfaces[index]
+        }
+
+        let isLight = isLight(background)
+
+        return surfaces.first { Self.isLight($0) == isLight } ?? background
+    }
+
+    static func isReadable(
+        _ draft: ThemeDraft,
+        _ slot: Slot
+    ) -> Bool {
+        guard let palette = draft.palette else {
+            return false
+        }
+
+        return slot.roles.isDisjoint(with: palette.unreadableRoles)
+    }
+}
+
+public extension ThemeEditModel.Output {
+    var palette: ThemePalette {
+        state.draft.palette ?? .night
+    }
+
+    func isAvailable(
+        _ hex: String,
+        for slot: ThemeEditModel.Slot
+    ) -> Bool {
+        if slot == .surface {
+            return ThemeEditModel.isLight(hex) == ThemeEditModel.isLight(state.draft.background)
+        }
+
+        var draft = state.draft
+
+        draft[keyPath: slot.keyPath] = hex
+
+        return ThemeEditModel.isReadable(draft, slot)
+    }
+}
+
+public extension ThemeEditModel.State {
+    func choose(
+        _ hex: String,
+        for slot: ThemeEditModel.Slot
+    ) {
+        var next = draft
+
+        next[keyPath: slot.keyPath] = hex
+
+        if slot == .background,
+           ThemeEditModel.isLight(next.surface) != ThemeEditModel.isLight(hex) {
+            next.surface = ThemeEditModel.pairedSurface(for: hex)
+        }
+
+        for other in ThemeEditModel.Slot.allCases where !ThemeEditModel.isReadable(next, other) {
+            let readable = other.swatches.first { swatch in
+                var candidate = next
+                candidate[keyPath: other.keyPath] = swatch
+                return ThemeEditModel.isReadable(candidate, other)
+            }
+
+            if let readable {
+                next[keyPath: other.keyPath] = readable
+            }
+        }
+
+        draft = next
     }
 }
 
@@ -237,39 +267,6 @@ public extension ThemeEditModel.Slot {
                 "#B4572E", "#2F7A8C", "#A8456E"
             ]
         }
-    }
-}
-
-private extension ThemeEditModel {
-    static func isLight(_ hex: String) -> Bool {
-        let rgb = UInt32(hex.dropFirst(), radix: 16) ?? 0
-        let onBlack = ThemePalette.contrast(rgb, 0x000000)
-        let onWhite = ThemePalette.contrast(rgb, 0xFFFFFF)
-        return onBlack > onWhite
-    }
-
-    static func pairedSurface(for background: String) -> String {
-        let backgrounds = Slot.background.swatches
-        let surfaces = Slot.surface.swatches
-
-        if let index = backgrounds.firstIndex(of: background) {
-            return surfaces[index]
-        }
-
-        let isLight = isLight(background)
-
-        return surfaces.first { Self.isLight($0) == isLight } ?? background
-    }
-
-    static func isReadable(
-        _ draft: ThemeDraft,
-        _ slot: Slot
-    ) -> Bool {
-        guard let palette = draft.palette else {
-            return false
-        }
-
-        return slot.roles.isDisjoint(with: palette.unreadableRoles)
     }
 }
 

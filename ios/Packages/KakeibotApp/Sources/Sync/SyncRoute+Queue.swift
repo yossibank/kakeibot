@@ -12,13 +12,14 @@ extension SyncRoute {
         let removed: [Pending]
         let dropped: [SyncChange]
     }
+}
 
+extension SyncRoute {
     func enqueue(
         _ changes: [SyncChange],
         pending: Set<Pending>
     ) -> Enqueue {
         let saving = Dictionary(grouping: pending.compactMap(\.saved), by: \.key)
-
         var added: [Pending] = []
         var removed: [Pending] = []
         var dropped: [SyncChange] = []
@@ -49,6 +50,34 @@ extension SyncRoute {
     }
 }
 
+private extension SyncRoute {
+    func targets(
+        of change: SyncChange,
+        queued: [SyncRecordID]
+    ) -> [Pending] {
+        var targets: [Pending] = []
+
+        if let zone = change.saveZone,
+           sends(to: zone) {
+            targets.append(.save(SyncRecordID(key: change.key, zoneName: zone)))
+        }
+
+        for zone in change.deleteZones where sends(to: zone) {
+            targets.append(.delete(SyncRecordID(key: change.key, zoneName: zone)))
+        }
+
+        guard change.isDeletion else {
+            return targets
+        }
+
+        for id in queued where sends(to: id.zoneName) && !targets.contains(.delete(id)) {
+            targets.append(.delete(id))
+        }
+
+        return targets
+    }
+}
+
 extension SyncRoute.Pending {
     var opposite: Self {
         switch self {
@@ -76,34 +105,6 @@ extension SyncRoute.Pending {
         @unknown default:
             return nil
         }
-    }
-}
-
-private extension SyncRoute {
-    func targets(
-        of change: SyncChange,
-        queued: [SyncRecordID]
-    ) -> [Pending] {
-        var targets: [Pending] = []
-
-        if let zone = change.saveZone,
-           sends(to: zone) {
-            targets.append(.save(SyncRecordID(key: change.key, zoneName: zone)))
-        }
-
-        for zone in change.deleteZones where sends(to: zone) {
-            targets.append(.delete(SyncRecordID(key: change.key, zoneName: zone)))
-        }
-
-        guard change.isDeletion else {
-            return targets
-        }
-
-        for id in queued where sends(to: id.zoneName) && !targets.contains(.delete(id)) {
-            targets.append(.delete(id))
-        }
-
-        return targets
     }
 }
 

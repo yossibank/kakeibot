@@ -80,7 +80,6 @@ public extension ReceiptReading {
 
         for index in reading.items.indices {
             let read = reading.items[index].readName ?? reading.items[index].name
-
             reading.items[index].readName = read
             reading.items[index].name = names[read] ?? reading.items[index].name
         }

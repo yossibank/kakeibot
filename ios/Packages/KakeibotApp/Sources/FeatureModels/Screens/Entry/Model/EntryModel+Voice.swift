@@ -17,7 +17,9 @@ public extension EntryModel {
         let billMonth: YearMonth?
         let memo: String
     }
+}
 
+public extension EntryModel {
     @discardableResult
     func apply(_ reading: VoiceReading) -> VoiceUndo {
         let undo = VoiceUndo(

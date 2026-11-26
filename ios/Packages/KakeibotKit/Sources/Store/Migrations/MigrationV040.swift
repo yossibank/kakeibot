@@ -12,7 +12,6 @@ enum MigrationV040 {
         }
 
         try db.create(index: "adjustment_wallet_id", on: "adjustment", columns: ["wallet_id"])
-
         try MigrationSyncTriggers.create(on: "adjustment", key: "id", in: db)
     }
 }

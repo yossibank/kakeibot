@@ -9,7 +9,17 @@ final class EntryVoiceListener: EntryVoiceSource {
 
     private var analyzer: SpeechAnalyzer?
     private var resultsTask: Task<Void, Never>?
+}
 
+@available(iOS 26.0, *)
+private extension EntryVoiceListener {
+    enum ListenError: Error {
+        case unsupported
+    }
+}
+
+@available(iOS 26.0, *)
+extension EntryVoiceListener {
     func start(
         hints: [String],
         _ onEvent: @escaping @MainActor (EntryVoiceEvent) -> Void
@@ -41,6 +51,7 @@ final class EntryVoiceListener: EntryVoiceSource {
 
         context.contextualStrings[.general] = Array(hints.prefix(Self.maxHints))
         try? await analyzer.setContext(context)
+
         let (stream, continuation) = AsyncStream.makeStream(of: AnalyzerInput.self)
 
         self.analyzer = analyzer
@@ -84,7 +95,6 @@ final class EntryVoiceListener: EntryVoiceSource {
 
     func finish() async {
         await mic.stop()
-
         try? await analyzer?.finalizeAndFinishThroughEndOfInput()
 
         if let resultsTask {
@@ -104,13 +114,8 @@ final class EntryVoiceListener: EntryVoiceSource {
 
 @available(iOS 26.0, *)
 private extension EntryVoiceListener {
-    enum ListenError: Error {
-        case unsupported
-    }
-
     static let maxHints = 100
     static let maxCandidates = 8
-
     static let finishTimeout: Duration = .seconds(2)
 
     static func candidates(of segments: [[String]]) -> [String] {

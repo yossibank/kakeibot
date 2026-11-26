@@ -1,13 +1,6 @@
 import SwiftUI
 
 public struct DisclosureMark: View {
-    public enum Style {
-        case row
-        case link
-        case strongLink
-        case band
-    }
-
     private let style: Style
 
     public init(_ style: Style = .row) {
@@ -33,6 +26,15 @@ public struct DisclosureMark: View {
             image
                 .sansFont(.small, weight: .bold)
         }
+    }
+}
+
+public extension DisclosureMark {
+    enum Style {
+        case row
+        case link
+        case strongLink
+        case band
     }
 }
 

@@ -11,7 +11,9 @@ extension ReviewClosingView {
         let detail: String
         let value: String
     }
+}
 
+extension ReviewClosingView {
     var goodItems: [GoodItem] {
         let less = content.rows
             .filter { $0.row.tone == .less }
@@ -89,29 +91,6 @@ extension ReviewClosingView {
 }
 
 private extension ReviewClosingView {
-    static let goodLimit = 2
-
-    static var specialFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.amber.opacity(.medium), Palette.amber],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    static var specialGlow: LinearGradient {
-        LinearGradient(
-            colors: [Palette.amber.opacity(.subtle), Palette.amber.opacity(.faint)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    var compareScale: Int {
-        let largest = content.rows.map { max($0.row.amount, $0.row.average) }.max() ?? 0
-        return max(largest * 5 / 4, 1)
-    }
-
     func compareRow(
         _ item: ReviewClosing.CompareRow,
         scale: Int
@@ -362,6 +341,31 @@ private extension ReviewClosingView {
                 .fill(Palette.line)
                 .frame(height: 1)
         }
+    }
+}
+
+private extension ReviewClosingView {
+    static let goodLimit = 2
+
+    static var specialFill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.amber.opacity(.medium), Palette.amber],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var specialGlow: LinearGradient {
+        LinearGradient(
+            colors: [Palette.amber.opacity(.subtle), Palette.amber.opacity(.faint)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    var compareScale: Int {
+        let largest = content.rows.map { max($0.row.amount, $0.row.average) }.max() ?? 0
+        return max(largest * 5 / 4, 1)
     }
 
     static func color(of tone: ReviewCompare.Tone) -> Color {

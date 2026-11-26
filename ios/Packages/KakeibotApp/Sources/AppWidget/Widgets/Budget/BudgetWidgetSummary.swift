@@ -16,7 +16,9 @@ extension BudgetWidgetSummary {
         let date: LocalDate
         let amount: Int
     }
+}
 
+extension BudgetWidgetSummary {
     init(
         _ overview: MonthOverview,
         weekStart: Weekday

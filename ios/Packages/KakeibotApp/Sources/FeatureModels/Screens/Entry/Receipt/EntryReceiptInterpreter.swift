@@ -16,6 +16,7 @@ enum EntryReceiptInterpreter {
         }
 
         let session = makeSession()
+
         session.prewarm()
         prepared = session
     }
@@ -30,6 +31,7 @@ enum EntryReceiptInterpreter {
 
         let lines = pages.flatMap(\.self)
         let session = prepared ?? makeSession()
+
         prepared = nil
 
         do {
@@ -89,9 +91,11 @@ private extension EntryReceiptInterpreter {
         @Guide(description: "税率。軽減税率の印（※・軽・*）か 8% 対象の欄なら 8、10% 対象の欄なら 10、分からなければ 0")
         var taxRate: Int
     }
+}
 
+@available(iOS 26.0, *)
+private extension EntryReceiptInterpreter {
     static let locale = Locale(identifier: "ja_JP")
-
     static let options = GenerationOptions(samplingMode: .greedy)
 
     static let instructions = """

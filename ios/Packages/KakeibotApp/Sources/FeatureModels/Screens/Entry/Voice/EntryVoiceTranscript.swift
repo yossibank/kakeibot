@@ -5,12 +5,14 @@ public struct EntryVoiceTranscript: Equatable, Sendable {
     public var pending = ""
 
     var alternatives: [String] = []
+}
 
-    public var text: String {
+public extension EntryVoiceTranscript {
+    var text: String {
         settled + pending
     }
 
-    public var isEmpty: Bool {
+    var isEmpty: Bool {
         text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

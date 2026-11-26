@@ -25,6 +25,7 @@ open:
 	open "$(CHECKOUT)/ios/Kakeibot.xcworkspace"
 
 format:
+	python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py --fix $$(git ls-files --cached --others --exclude-standard '*.swift')
 	mint run swiftformat .
 	$(KTLINT) --format
 	scripts/json-format.sh write

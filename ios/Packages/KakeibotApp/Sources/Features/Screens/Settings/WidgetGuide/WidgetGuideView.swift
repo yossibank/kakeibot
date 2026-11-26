@@ -72,34 +72,6 @@ public struct WidgetGuideView: View {
 }
 
 private extension WidgetGuideView {
-    static let options = WidgetGuidePlace.allCases.map { place in
-        CapsulePicker<WidgetGuidePlace>.Option(place.title, value: place)
-    }
-}
-
-private extension WidgetGuideView {
-    static let carouselMargin: CGFloat = 16
-
-    var place: WidgetGuidePlace {
-        model.state.place
-    }
-
-    var widget: WidgetGuideWidget {
-        model.state.sample.widget
-    }
-
-    var size: WidgetGuideSize {
-        model.state.sample.size
-    }
-
-    var shownSample: Binding<WidgetGuideSample?> {
-        Binding {
-            model.state.shownSample
-        } set: { sample in
-            model.state.show(sample)
-        }
-    }
-
     var carousel: some View {
         VStack(spacing: 12) {
             WidgetGuideStage(
@@ -225,15 +197,41 @@ private extension WidgetGuideView {
             .card()
         }
     }
-
-    func isCurrent(_ item: WidgetGuideSample) -> Bool {
-        item == model.state.sample
-    }
 }
 
 private extension WidgetGuideView {
+    static let options = WidgetGuidePlace.allCases.map { place in
+        CapsulePicker<WidgetGuidePlace>.Option(place.title, value: place)
+    }
+
+    static let carouselMargin: CGFloat = 16
+
+    var place: WidgetGuidePlace {
+        model.state.place
+    }
+
+    var widget: WidgetGuideWidget {
+        model.state.sample.widget
+    }
+
+    var size: WidgetGuideSize {
+        model.state.sample.size
+    }
+
+    var shownSample: Binding<WidgetGuideSample?> {
+        Binding {
+            model.state.shownSample
+        } set: { sample in
+            model.state.show(sample)
+        }
+    }
+
     var hint: SettingsFold {
         SettingsFold(\.hint, in: hintModel)
+    }
+
+    func isCurrent(_ item: WidgetGuideSample) -> Bool {
+        item == model.state.sample
     }
 }
 

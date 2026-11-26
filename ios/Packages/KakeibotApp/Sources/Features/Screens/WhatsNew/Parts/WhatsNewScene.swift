@@ -45,8 +45,6 @@ extension WhatsNewScene {
 }
 
 private extension WhatsNewScene {
-    static let size: CGFloat = 140
-
     @ViewBuilder
     var content: some View {
         switch kind {
@@ -108,6 +106,10 @@ private extension WhatsNewScene {
             WhatsNewReviewScene(step: step)
         }
     }
+}
+
+private extension WhatsNewScene {
+    static let size: CGFloat = 140
 }
 
 extension View {

@@ -34,18 +34,6 @@ struct AssetsBillSchedule: View {
 }
 
 private extension AssetsBillSchedule {
-    static let widestDate = "00/00払い"
-
-    static func status(of bill: CardBill) -> String {
-        bill.isOpen ? BillText.estimate(of: bill) : BillText.settled
-    }
-
-    static func shortStatus(of bill: CardBill) -> String {
-        bill.isOpen ? BillText.estimate : BillText.settled
-    }
-}
-
-private extension AssetsBillSchedule {
     func mark(of bill: CardBill) -> some View {
         VStack(spacing: 0) {
             connector(isShown: bill != bills.first)
@@ -104,5 +92,17 @@ private extension AssetsBillSchedule {
             .textFont(.caption2, weight: bill.isOpen ? .regular : .semibold)
             .foregroundStyle(bill.isOpen ? Palette.hint : Palette.accent)
             .fixedSize()
+    }
+}
+
+private extension AssetsBillSchedule {
+    static let widestDate = "00/00払い"
+
+    static func status(of bill: CardBill) -> String {
+        bill.isOpen ? BillText.estimate(of: bill) : BillText.settled
+    }
+
+    static func shortStatus(of bill: CardBill) -> String {
+        bill.isOpen ? BillText.estimate : BillText.settled
     }
 }

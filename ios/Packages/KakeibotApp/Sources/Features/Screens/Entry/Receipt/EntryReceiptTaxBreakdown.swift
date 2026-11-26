@@ -58,7 +58,9 @@ private extension EntryReceiptTaxBreakdown {
                 .gridColumnAlignment(.trailing)
         }
     }
+}
 
+private extension EntryReceiptTaxBreakdown {
     func taxTitle(isCompact: Bool) -> String {
         switch (taxIncluded, isCompact) {
         case (true, false): "うち消費税"

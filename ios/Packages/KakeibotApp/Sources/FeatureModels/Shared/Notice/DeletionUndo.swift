@@ -21,22 +21,23 @@ public extension DeletionUndo {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-
         public var deletion: Deletion?
-    }
-
-    func restore(_ deletion: Deletion) async {
-        do {
-            try await dependencies.database.restore(deletion)
-        } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
-        }
     }
 }
 
 extension DeletionUndo {
     struct Dependencies {
         let database: AppDatabase
+    }
+}
+
+public extension DeletionUndo {
+    func restore(_ deletion: Deletion) async {
+        do {
+            try await dependencies.database.restore(deletion)
+        } catch {
+            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+        }
     }
 }
 

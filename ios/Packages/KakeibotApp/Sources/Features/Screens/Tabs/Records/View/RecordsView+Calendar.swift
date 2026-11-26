@@ -140,7 +140,9 @@ private extension RecordsView {
         }
         .buttonStyle(.plain)
     }
+}
 
+private extension RecordsView {
     static func heat(
         of expense: Int,
         peak: Int
@@ -151,9 +153,7 @@ private extension RecordsView {
 
         return (Double(expense) / Double(peak)).squareRoot()
     }
-}
 
-private extension RecordsView {
     func dayColor(
         _ date: LocalDate,
         isShown: Bool

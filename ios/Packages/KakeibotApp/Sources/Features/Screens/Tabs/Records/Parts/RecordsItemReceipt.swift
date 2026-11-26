@@ -76,32 +76,6 @@ struct RecordsItemReceipt: View {
 }
 
 private extension RecordsItemReceipt {
-    static let tooth: CGFloat = 8
-}
-
-private extension RecordsItemReceipt {
-    var totals: EntryItemTotal {
-        EntryItemTotal(items.map(EntryItem.Draft.init), taxIncluded: taxIncluded)
-    }
-
-    var itemCount: Int {
-        items.reduce(0) { $0 + $1.quantity }
-    }
-
-    var showsRates: Bool {
-        Set(items.map(\.taxRate)).count > 1
-    }
-
-    var adjustment: Int {
-        amount - totals.total
-    }
-
-    var paper: EntryReceiptShape {
-        EntryReceiptShape(tooth: Self.tooth, hasTopEdge: true)
-    }
-}
-
-private extension RecordsItemReceipt {
     func itemLine(_ item: EntryItem) -> some View {
         ViewThatFits(in: .horizontal) {
             itemLine(item, style: .caption, fitsName: true)
@@ -157,5 +131,29 @@ private extension RecordsItemReceipt {
         }
         .textFont(.caption)
         .foregroundStyle(color)
+    }
+}
+
+private extension RecordsItemReceipt {
+    static let tooth: CGFloat = 8
+
+    var totals: EntryItemTotal {
+        EntryItemTotal(items.map(EntryItem.Draft.init), taxIncluded: taxIncluded)
+    }
+
+    var itemCount: Int {
+        items.reduce(0) { $0 + $1.quantity }
+    }
+
+    var showsRates: Bool {
+        Set(items.map(\.taxRate)).count > 1
+    }
+
+    var adjustment: Int {
+        amount - totals.total
+    }
+
+    var paper: EntryReceiptShape {
+        EntryReceiptShape(tooth: Self.tooth, hasTopEdge: true)
     }
 }

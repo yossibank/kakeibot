@@ -10,6 +10,7 @@ extension AppModel {
         }
 
         let status = await dependencies.proStore.status()
+
         await apply(status, in: database)
 
         if !status.isUnlocked {

@@ -30,7 +30,9 @@ public extension SettingsMenuModel {
         public internal(set) var usesFun: Bool?
         public internal(set) var authorization: NotificationAuthorization = .allowed
     }
+}
 
+public extension SettingsMenuModel {
     func run() async {
         let database = dependencies.database
 
@@ -125,7 +127,6 @@ private extension SettingsMenuModel {
         do {
             let calendar = try await dependencies.database.stampBook()
             let rules = try await dependencies.database.rewardRuleList()
-
             input.usesFun = !calendar.stamps.isEmpty || !rules.rules.isEmpty
         } catch {
             input.usesFun = true

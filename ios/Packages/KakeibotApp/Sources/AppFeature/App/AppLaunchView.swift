@@ -36,6 +36,15 @@ struct AppLaunchView: View {
 }
 
 private extension AppLaunchView {
+    struct Layout {
+        var sweep: CGFloat = 0
+        var glow: Double = 0
+        var revealSize: CGFloat = 0
+        var opacity: Double = 1
+    }
+}
+
+private extension AppLaunchView {
     var mark: some View {
         let isDark = colorScheme == .dark
         let sweepColor = isDark ? Palette.accentStrong : Palette.accent
@@ -76,13 +85,6 @@ private extension AppLaunchView {
 }
 
 private extension AppLaunchView {
-    struct Layout {
-        var sweep: CGFloat = 0
-        var glow: Double = 0
-        var revealSize: CGFloat = 0
-        var opacity: Double = 1
-    }
-
     static let markSize: CGFloat = 160
     static let ringSize: CGFloat = 160 * 694 / 1024
     static let sweepLength: CGFloat = 0.22
@@ -109,7 +111,6 @@ private extension AppLaunchView {
         }
 
         try? await Task.sleep(for: .milliseconds(450))
-
         state.finishSweep()
     }
 
@@ -137,15 +138,6 @@ private struct RingSweep: Shape {
 
     let length: CGFloat
 
-    var animatableData: CGFloat {
-        get {
-            progress
-        }
-        set {
-            progress = newValue
-        }
-    }
-
     func path(in rect: CGRect) -> Path {
         let start = min(max(progress - length, 0), 1)
         let end = min(max(progress, 0), 1)
@@ -153,7 +145,6 @@ private struct RingSweep: Shape {
         let radius = min(rect.width, rect.height) / 2
         let startAngle = Angle.degrees(360 * start - 90)
         let endAngle = Angle.degrees(360 * end - 90)
-
         var path = Path()
 
         guard end > start else {
@@ -169,6 +160,17 @@ private struct RingSweep: Shape {
         )
 
         return path
+    }
+}
+
+extension RingSweep {
+    var animatableData: CGFloat {
+        get {
+            progress
+        }
+        set {
+            progress = newValue
+        }
     }
 }
 

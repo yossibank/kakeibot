@@ -46,7 +46,6 @@ public extension AssetsRewardGoalEditModel {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-
         public var name: String
 
         public private(set) var calculator: AmountCalculator
@@ -59,10 +58,6 @@ public extension AssetsRewardGoalEditModel {
             self.name = name
             self.calculator = AmountCalculator(amount: amount)
             prompt.panel = panel
-        }
-
-        public func press(_ key: AmountCalculator.Key) {
-            calculator.press(key)
         }
     }
 
@@ -89,41 +84,6 @@ public extension AssetsRewardGoalEditModel {
         let input: Input
         let state: State
 
-        public var isEditing: Bool {
-            input.editing != nil
-        }
-
-        public var draft: RewardGoalDraft {
-            RewardGoalDraft(name: state.name, targetAmount: state.calculator.amount)
-        }
-
-        public var isChanged: Bool {
-            draft != input.baseline
-        }
-
-        public var canSave: Bool {
-            draft.problems.isEmpty
-        }
-
-        public var remaining: Int {
-            max(state.calculator.amount - input.balance, 0)
-        }
-
-        public var progress: Double {
-            guard state.calculator.amount > 0 else {
-                return 0
-            }
-
-            return Double(input.balance) / Double(state.calculator.amount)
-        }
-
-        public var saveTitle: String {
-            SettingsSaveTitle.text(
-                problem: draft.problems.first?.message,
-                isEditing: isEditing
-            )
-        }
-
         init(
             input: Input,
             state: State
@@ -132,7 +92,9 @@ public extension AssetsRewardGoalEditModel {
             self.state = state
         }
     }
+}
 
+public extension AssetsRewardGoalEditModel {
     @discardableResult
     func save() async -> Bool {
         do {
@@ -159,9 +121,7 @@ public extension AssetsRewardGoalEditModel {
 
         do {
             try await dependencies.database.deleteRewardGoal(editing.id)
-
             state.outcome.send(SettingsEditOutcome())
-
             return true
         } catch {
             state.errorNotice.show(Self.deleteFailedMessage, for: error)
@@ -173,4 +133,47 @@ public extension AssetsRewardGoalEditModel {
 private extension AssetsRewardGoalEditModel {
     static let saveFailedMessage = "目標を保存できませんでした"
     static let deleteFailedMessage = "目標を削除できませんでした"
+}
+
+public extension AssetsRewardGoalEditModel.Output {
+    var isEditing: Bool {
+        input.editing != nil
+    }
+
+    var draft: RewardGoalDraft {
+        RewardGoalDraft(name: state.name, targetAmount: state.calculator.amount)
+    }
+
+    var isChanged: Bool {
+        draft != input.baseline
+    }
+
+    var canSave: Bool {
+        draft.problems.isEmpty
+    }
+
+    var remaining: Int {
+        max(state.calculator.amount - input.balance, 0)
+    }
+
+    var progress: Double {
+        guard state.calculator.amount > 0 else {
+            return 0
+        }
+
+        return Double(input.balance) / Double(state.calculator.amount)
+    }
+
+    var saveTitle: String {
+        SettingsSaveTitle.text(
+            problem: draft.problems.first?.message,
+            isEditing: isEditing
+        )
+    }
+}
+
+public extension AssetsRewardGoalEditModel.State {
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
+    }
 }

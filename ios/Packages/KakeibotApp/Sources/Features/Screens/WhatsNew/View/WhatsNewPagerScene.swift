@@ -28,9 +28,6 @@ extension WhatsNewPagerScene {
 }
 
 private extension WhatsNewPagerScene {
-    static let firstTotal = 32400
-    static let nextTotal = 18600
-
     var swipe: some View {
         page(isNext: false)
             .offset(x: -24)
@@ -110,4 +107,9 @@ private extension WhatsNewPagerScene {
         .textFont(size: .micro, weight: .semibold)
         .frame(height: 20)
     }
+}
+
+private extension WhatsNewPagerScene {
+    static let firstTotal = 32400
+    static let nextTotal = 18600
 }

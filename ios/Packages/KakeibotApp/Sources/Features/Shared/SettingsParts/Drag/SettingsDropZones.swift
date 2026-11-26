@@ -58,25 +58,6 @@ private extension SettingsDropZones {
     }
 }
 
-extension View {
-    func settingsDropZones(
-        _ zones: Binding<SettingsDropZones>,
-        showing: Bool?
-    ) -> some View {
-        overlay(alignment: .top) {
-            if let showing {
-                SettingsShowZone(isTargeted: showing)
-                    .onGeometryChange(for: CGRect.self) { proxy in
-                        proxy.frame(in: .global)
-                    } action: { frame in
-                        zones.wrappedValue.show = frame
-                    }
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
-    }
-}
-
 private struct SettingsShowZone: View {
     let isTargeted: Bool
 
@@ -94,5 +75,24 @@ private struct SettingsShowZone: View {
                 title: "離すと表示に戻ります"
             )
         )
+    }
+}
+
+extension View {
+    func settingsDropZones(
+        _ zones: Binding<SettingsDropZones>,
+        showing: Bool?
+    ) -> some View {
+        overlay(alignment: .top) {
+            if let showing {
+                SettingsShowZone(isTargeted: showing)
+                    .onGeometryChange(for: CGRect.self) { proxy in
+                        proxy.frame(in: .global)
+                    } action: { frame in
+                        zones.wrappedValue.show = frame
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
     }
 }

@@ -103,6 +103,7 @@ public enum NotificationPlan {
 
         return recurring.dates(from: start, through: end).map { date in
             let amount = usesCardBill ? nil : recurring.scheduledAmount(paidOn: date)
+
             let shortage = shortages.first { shortage in
                 shortage.recurringId == recurring.id && shortage.date == date
             }
@@ -153,7 +154,6 @@ public enum NotificationPlan {
     private static func grouped(_ amount: Int) -> String {
         let absolute = abs(amount)
         let digits = Array(String(absolute))
-
         var text = ""
 
         for (index, digit) in digits.enumerated() {

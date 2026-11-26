@@ -61,7 +61,9 @@ private extension LoanPayoff {
         let date: LocalDate
         let amount: Int
     }
+}
 
+private extension LoanPayoff {
     static let searchYears = 100
     static let daysPerSearch = 365
 }

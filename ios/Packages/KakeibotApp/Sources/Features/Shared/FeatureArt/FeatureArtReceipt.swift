@@ -54,21 +54,17 @@ struct FeatureArtReceipt: View {
 }
 
 private extension FeatureArtReceipt {
-    static let ink = Color(white: 0.2)
-    static let paper = Color(white: 0.985)
-
-    static var scanBeam: LinearGradient {
-        LinearGradient(
-            colors: [
-                Palette.accent.opacity(0),
-                Palette.accent.opacity(0.35),
-                Palette.accent.opacity(0)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
+    struct Line: Shape {
+        func path(in rect: CGRect) -> Path {
+            Path { path in
+                path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+                path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+            }
+        }
     }
+}
 
+private extension FeatureArtReceipt {
     var rule: some View {
         Line()
             .stroke(Self.ink.opacity(0.4), style: StrokeStyle(lineWidth: 0.6, dash: [2, 2]))
@@ -91,12 +87,18 @@ private extension FeatureArtReceipt {
 }
 
 private extension FeatureArtReceipt {
-    struct Line: Shape {
-        func path(in rect: CGRect) -> Path {
-            Path { path in
-                path.move(to: CGPoint(x: rect.minX, y: rect.midY))
-                path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
-            }
-        }
+    static let ink = Color(white: 0.2)
+    static let paper = Color(white: 0.985)
+
+    static var scanBeam: LinearGradient {
+        LinearGradient(
+            colors: [
+                Palette.accent.opacity(0),
+                Palette.accent.opacity(0.35),
+                Palette.accent.opacity(0)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 }

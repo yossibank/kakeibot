@@ -47,7 +47,6 @@ public extension SyncModel {
         }
 
         state.invitation = nil
-
         await show(item, creates: true)
     }
 
@@ -57,7 +56,6 @@ public extension SyncModel {
         }
 
         closeOpened()
-
         await show(item, creates: false)
     }
 
@@ -131,6 +129,7 @@ private extension SyncModel {
             Self.logger.error(
                 "\(failure, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
             )
+
             state.errorNotice.show(failure, for: error)
         }
 

@@ -52,6 +52,16 @@ public extension SetupModel {
             self.input = input
         }
     }
+}
+
+extension SetupModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+}
+
+public extension SetupModel {
+    static let loadFailedMessage = "設定を読めませんでした"
 
     func run() async {
         let database = dependencies.database
@@ -112,13 +122,36 @@ public extension SetupModel {
         }
 
         input.isEntryOpened = true
-
         await save(.entryOpened, to: true)
     }
 
     func closeCard() async {
         input.cardClosed = true
         await save(.setupCardClosed, to: true)
+    }
+}
+
+private extension SetupModel {
+    static let saveFailedMessage = "設定を保存できませんでした"
+
+    func observeSeenNews() async {
+        await observe(
+            dependencies.database.settingUpdates(.whatsNewSeenVersion),
+            failure: Self.loadFailedMessage
+        ) { version in
+            input.seenNews = .loaded(version)
+        }
+    }
+
+    func save(
+        _ key: SettingKey<Bool>,
+        to value: Bool
+    ) async {
+        do {
+            try await dependencies.database.setSetting(key, to: value)
+        } catch {
+            state.errorNotice.show(Self.saveFailedMessage, for: error)
+        }
     }
 }
 
@@ -160,37 +193,5 @@ public extension SetupModel.Output {
 
     func isDone(_ item: SetupItem) -> Bool {
         input.progress.map(item.isDone) ?? false
-    }
-}
-
-extension SetupModel {
-    struct Dependencies {
-        let database: AppDatabase
-    }
-
-    public static let loadFailedMessage = "設定を読めませんでした"
-}
-
-private extension SetupModel {
-    static let saveFailedMessage = "設定を保存できませんでした"
-
-    func observeSeenNews() async {
-        await observe(
-            dependencies.database.settingUpdates(.whatsNewSeenVersion),
-            failure: Self.loadFailedMessage
-        ) { version in
-            input.seenNews = .loaded(version)
-        }
-    }
-
-    func save(
-        _ key: SettingKey<Bool>,
-        to value: Bool
-    ) async {
-        do {
-            try await dependencies.database.setSetting(key, to: value)
-        } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
-        }
     }
 }

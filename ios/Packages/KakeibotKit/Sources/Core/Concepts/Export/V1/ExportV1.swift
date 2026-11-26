@@ -114,7 +114,19 @@ public extension ExportV1 {
             self.settings = settings
         }
     }
+}
 
+private extension ExportV1 {
+    enum CodingKeys: String, CodingKey {
+        case format
+        case version
+        case exportedAt
+        case app
+        case data
+    }
+}
+
+public extension ExportV1 {
     static let format = "kakeibot-export"
     static let version = 1
 
@@ -133,13 +145,11 @@ public extension ExportV1 {
     }
 }
 
-private extension ExportV1 {
-    enum CodingKeys: String, CodingKey {
-        case format
-        case version
-        case exportedAt
-        case app
-        case data
+private extension ExportV1.Tables {
+    var hasTransferForEveryFee: Bool {
+        let transferIds = entries.filter { $0.type == .transfer }.map(\.id)
+        let transfers = Set(transferIds)
+        return entries.compactMap(\.transferId).allSatisfy(transfers.contains)
     }
 }
 
@@ -176,14 +186,6 @@ extension ExportV1: Codable {
         try container.encode(exportedAt, forKey: .exportedAt)
         try container.encode(app, forKey: .app)
         try container.encode(data, forKey: .data)
-    }
-}
-
-private extension ExportV1.Tables {
-    var hasTransferForEveryFee: Bool {
-        let transferIds = entries.filter { $0.type == .transfer }.map(\.id)
-        let transfers = Set(transferIds)
-        return entries.compactMap(\.transferId).allSatisfy(transfers.contains)
     }
 }
 

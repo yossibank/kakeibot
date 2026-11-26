@@ -28,24 +28,6 @@ extension WhatsNewReviewScene {
 }
 
 private extension WhatsNewReviewScene {
-    static var samplePace: ReviewPace? {
-        guard
-            let start = LocalDate(year: 2026, month: 11, day: 1),
-            let end = LocalDate(year: 2026, month: 11, day: 30),
-            let today = LocalDate(year: 2026, month: 11, day: 15)
-        else {
-            return nil
-        }
-
-        return ReviewPace(
-            limit: 60000,
-            basis: .budget,
-            spent: 28000,
-            range: start...end,
-            today: today
-        )
-    }
-
     @ViewBuilder
     var pace: some View {
         if let pace = Self.samplePace {
@@ -157,5 +139,25 @@ private extension WhatsNewReviewScene {
         }
         .card(cornerRadius: 12)
         .padding(.horizontal, 4)
+    }
+}
+
+private extension WhatsNewReviewScene {
+    static var samplePace: ReviewPace? {
+        guard
+            let start = LocalDate(year: 2026, month: 11, day: 1),
+            let end = LocalDate(year: 2026, month: 11, day: 30),
+            let today = LocalDate(year: 2026, month: 11, day: 15)
+        else {
+            return nil
+        }
+
+        return ReviewPace(
+            limit: 60000,
+            basis: .budget,
+            spent: 28000,
+            range: start...end,
+            today: today
+        )
     }
 }

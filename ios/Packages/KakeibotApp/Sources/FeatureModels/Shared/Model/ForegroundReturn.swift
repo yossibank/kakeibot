@@ -10,7 +10,9 @@ public extension ForegroundReturn {
         case inactive
         case background
     }
+}
 
+public extension ForegroundReturn {
     mutating func receive(_ phase: Phase) -> Bool {
         switch phase {
         case .background:

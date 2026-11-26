@@ -46,7 +46,9 @@ extension SettingsDrag {
         case hide(ID)
         case move
     }
+}
 
+extension SettingsDrag {
     var isLifting: Bool {
         lift != nil || hiddenLift != nil
     }
@@ -146,7 +148,6 @@ extension SettingsDrag {
 
         current.location = location
         lift = current
-
         arm(isInsideHide, flag: \.isOverHide)
 
         autoScroll.follow(
@@ -201,7 +202,6 @@ extension SettingsDrag {
         let isInsideShow = zones.isOverShow(location, from: origin)
 
         hiddenLift?.location = location
-
         arm(isInsideShow, flag: \.isOverShow)
     }
 

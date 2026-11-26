@@ -2,8 +2,10 @@ public enum ThemeRowSpacing: String, CaseIterable, Codable, Sendable {
     case compact
     case standard
     case relaxed
+}
 
-    public var padding: Double {
+public extension ThemeRowSpacing {
+    var padding: Double {
         switch self {
         case .compact: 4
         case .standard: 8
@@ -11,7 +13,7 @@ public enum ThemeRowSpacing: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    public var minHeight: Double {
+    var minHeight: Double {
         switch self {
         case .compact: 40
         case .standard: 48

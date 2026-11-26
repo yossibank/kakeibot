@@ -31,24 +31,6 @@ public extension BudgetListModel {
     enum Target: Hashable, Identifiable {
         case total
         case category(EntryCategory)
-
-        public var id: EntryCategory.ID? {
-            categoryId
-        }
-
-        public var categoryId: EntryCategory.ID? {
-            switch self {
-            case .total: nil
-            case let .category(category): category.id
-            }
-        }
-
-        public var title: String {
-            switch self {
-            case let .category(category): "\(category.name)の予算"
-            case .total: "月全体の予算"
-            }
-        }
     }
 
     struct Cleared: Hashable {
@@ -72,14 +54,6 @@ public extension BudgetListModel {
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
-
-        public func choose(_ suggestion: Suggestion) {
-            calculator = AmountCalculator(amount: suggestion.amount)
-        }
-
-        public func press(_ key: AmountCalculator.Key) {
-            calculator.press(key)
-        }
     }
 
     @MainActor
@@ -102,7 +76,15 @@ public extension BudgetListModel {
             self.month = today.yearMonth
         }
     }
+}
 
+extension BudgetListModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+}
+
+public extension BudgetListModel {
     func load() async {
         let database = dependencies.database
 
@@ -145,7 +127,6 @@ public extension BudgetListModel {
 
     func startEditing(_ target: Target) {
         let amount = output.amount(for: target.categoryId) ?? 0
-
         state.calculator = AmountCalculator(amount: amount)
         state.editing = target
     }
@@ -221,12 +202,6 @@ public extension BudgetListModel {
     }
 }
 
-extension BudgetListModel {
-    struct Dependencies {
-        let database: AppDatabase
-    }
-}
-
 private extension BudgetListModel {
     static let loadFailedMessage = "予算を読めませんでした"
     static let saveFailedMessage = "予算を保存できませんでした"
@@ -263,11 +238,40 @@ private extension BudgetListModel {
         do {
             try await dependencies.database.setSetting(.budgetCarryoverFrom, to: start)
             input.carryoverFrom = start
-
             return true
         } catch {
             state.errorNotice.show(failure, for: error)
             return false
+        }
+    }
+}
+
+public extension BudgetListModel.State {
+    func choose(_ suggestion: BudgetListModel.Suggestion) {
+        calculator = AmountCalculator(amount: suggestion.amount)
+    }
+
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
+    }
+}
+
+public extension BudgetListModel.Target {
+    var id: EntryCategory.ID? {
+        categoryId
+    }
+
+    var categoryId: EntryCategory.ID? {
+        switch self {
+        case .total: nil
+        case let .category(category): category.id
+        }
+    }
+
+    var title: String {
+        switch self {
+        case let .category(category): "\(category.name)の予算"
+        case .total: "月全体の予算"
         }
     }
 }

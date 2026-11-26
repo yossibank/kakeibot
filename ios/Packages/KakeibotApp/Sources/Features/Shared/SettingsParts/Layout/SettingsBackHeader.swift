@@ -45,12 +45,12 @@ struct SettingsBackHeader: View {
     }
 }
 
-public extension EnvironmentValues {
-    @Entry var isSettingsSheetRoot = false
-}
-
 private extension SettingsBackHeader {
     var closeImage: String {
         isSheetRoot ? "xmark" : "chevron.left"
     }
+}
+
+public extension EnvironmentValues {
+    @Entry var isSettingsSheetRoot = false
 }

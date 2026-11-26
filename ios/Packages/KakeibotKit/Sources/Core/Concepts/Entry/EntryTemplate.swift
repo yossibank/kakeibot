@@ -49,7 +49,9 @@ public struct EntryTemplate: Hashable, Identifiable, Sendable {
 
 public extension EntryTemplate {
     typealias ID = Identifier<EntryTemplate>
+}
 
+public extension EntryTemplate {
     func entryDraft(on date: LocalDate) -> EntryDraft? {
         guard let amount else {
             return nil

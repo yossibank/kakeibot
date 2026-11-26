@@ -28,8 +28,11 @@ public struct EntryCategoryDraft: NamedIconDraft, Hashable, Sendable {
 
 public extension EntryCategoryDraft {
     typealias Mark = IconDraft.Mark
-    typealias Problem = DraftProblem
 
+    typealias Problem = DraftProblem
+}
+
+public extension EntryCategoryDraft {
     static let maxTextLength = IconDraft.maxTextLength
 
     var problems: [Problem] {

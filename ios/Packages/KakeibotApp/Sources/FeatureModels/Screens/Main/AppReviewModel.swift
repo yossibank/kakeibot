@@ -36,7 +36,17 @@ public extension AppReviewModel {
     final class State {
         public var outcome = ScreenOutcome<Void>()
     }
+}
 
+extension AppReviewModel {
+    struct Dependencies {
+        let request: AppReviewRequest
+        let clock: ScreenClock
+        let askDelay: Duration
+    }
+}
+
+public extension AppReviewModel {
     func ask(after change: EntryChange) async {
         let now = dependencies.clock.now
 
@@ -46,13 +56,5 @@ public extension AppReviewModel {
 
         try? await Task.sleep(for: dependencies.askDelay)
         state.outcome.send(())
-    }
-}
-
-extension AppReviewModel {
-    struct Dependencies {
-        let request: AppReviewRequest
-        let clock: ScreenClock
-        let askDelay: Duration
     }
 }

@@ -16,7 +16,9 @@ public extension Icon {
             }
         }
     }
+}
 
+public extension Icon {
     var mark: Mark {
         Mark(self)
     }

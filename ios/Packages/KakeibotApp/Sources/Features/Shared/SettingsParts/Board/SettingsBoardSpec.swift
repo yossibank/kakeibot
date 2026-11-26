@@ -62,7 +62,9 @@ protocol SettingsBoardSpec {
 
 extension SettingsBoardSpec {
     typealias Destination = Model.State.Destination
+}
 
+extension SettingsBoardSpec {
     var layout: SettingsBoardLayout {
         .tiles
     }
@@ -96,9 +98,7 @@ extension SettingsBoardSpec {
     ) -> SettingsConfirmation? {
         nil
     }
-}
 
-extension SettingsBoardSpec {
     func addTitle(in _: Model) -> String {
         "\(title)を追加"
     }

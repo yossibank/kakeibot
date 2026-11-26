@@ -39,44 +39,6 @@ public struct ReviewView: View {
     }
 }
 
-private extension ReviewView {
-    func screen(_ slide: PageSlideProxy) -> some View {
-        ScrollView {
-            VStack(spacing: 12) {
-                header(slide)
-
-                periodBar(slide)
-
-                analysisBanner
-
-                content
-                    .pageSlide(slide, page: model.output.period)
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 24)
-        }
-        .onPageSwipe(following: slide, canMove: canMove) { direction in
-            move(direction, with: slide)
-        }
-        .haptic(.selection, trigger: model.output.period)
-        .haptic(.selection, trigger: model.input.kind)
-        .task(id: model.output.goalTrigger) {
-            await model.refreshGoals()
-        }
-        .task(id: model.input.list?.entries.count) {
-            await model.refreshStoreReviewCard()
-        }
-        .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in
-            sheetView(sheet, slide: slide)
-        }
-        .errorBanner(model.state.errorNotice) {
-            model.state.errorNotice.clear()
-        }
-        .backdrop()
-    }
-}
-
 extension ReviewView {
     var periodTextTransition: ContentTransition {
         .numericText(countsDown: !model.state.isMovingForward)
@@ -180,6 +142,42 @@ extension ReviewView {
 }
 
 private extension ReviewView {
+    func screen(_ slide: PageSlideProxy) -> some View {
+        ScrollView {
+            VStack(spacing: 12) {
+                header(slide)
+
+                periodBar(slide)
+
+                analysisBanner
+
+                content
+                    .pageSlide(slide, page: model.output.period)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
+        }
+        .onPageSwipe(following: slide, canMove: canMove) { direction in
+            move(direction, with: slide)
+        }
+        .haptic(.selection, trigger: model.output.period)
+        .haptic(.selection, trigger: model.input.kind)
+        .task(id: model.output.goalTrigger) {
+            await model.refreshGoals()
+        }
+        .task(id: model.input.list?.entries.count) {
+            await model.refreshStoreReviewCard()
+        }
+        .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in
+            sheetView(sheet, slide: slide)
+        }
+        .errorBanner(model.state.errorNotice) {
+            model.state.errorNotice.clear()
+        }
+        .backdrop()
+    }
+
     func header(_ slide: PageSlideProxy) -> some View {
         TabHeader("振り返り") {
             CapsulePicker(selection: scaleBinding(slide), options: Self.scaleOptions)

@@ -4,10 +4,6 @@ struct ProFeature: Identifiable {
     let name: String
     let headline: String
     let points: [String]
-
-    var id: String {
-        name
-    }
 }
 
 extension ProFeature {
@@ -68,4 +64,8 @@ extension ProFeature {
             ]
         )
     ]
+
+    var id: String {
+        name
+    }
 }

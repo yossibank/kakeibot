@@ -21,6 +21,48 @@ extension RecurringBoard {
     }
 }
 
+private extension RecurringBoard {
+    func totalCard(in model: RecurringListModel) -> some View {
+        VStack(spacing: 4) {
+            Text("今月の\(model.state.type.name)")
+                .textFont(.caption2)
+                .tracking(2)
+                .foregroundStyle(Palette.accent)
+
+            AmountText(model.output.monthTotal, font: .size(.headline), color: Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .card()
+    }
+}
+
+private extension RecurringBoard {
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income),
+        .init("振替", value: .transfer)
+    ]
+
+    func notes(in model: RecurringListModel) -> [SettingsIntroCard.Note] {
+        let purpose: [SettingsIntroCard.Note] = [
+            .init("calendar", "休日なら、前後の平日にずらせます"),
+            .init("bell", "前もって通知で知らせられます")
+        ]
+
+        if model.output.rows.isEmpty {
+            return purpose
+        }
+
+        return purpose + [
+            .init("hand.draw", "長押しで並べ替え・止めて非表示にできます"),
+            .swipeDelete
+        ]
+    }
+}
+
 extension RecurringBoard: SettingsBoardSpec {
     typealias Destination = RecurringListModel.Destination
     typealias Editor = RecurringEditSheet
@@ -156,45 +198,5 @@ extension RecurringBoard: SettingsBoardSpec {
         in _: RecurringListModel
     ) -> SettingsConfirmation? {
         .delete(title: "この固定費を削除しますか", message: "これまでに作った記録は残ります")
-    }
-}
-
-private extension RecurringBoard {
-    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income),
-        .init("振替", value: .transfer)
-    ]
-
-    func totalCard(in model: RecurringListModel) -> some View {
-        VStack(spacing: 4) {
-            Text("今月の\(model.state.type.name)")
-                .textFont(.caption2)
-                .tracking(2)
-                .foregroundStyle(Palette.accent)
-
-            AmountText(model.output.monthTotal, font: .size(.headline), color: Palette.accentStrong)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .card()
-    }
-
-    func notes(in model: RecurringListModel) -> [SettingsIntroCard.Note] {
-        let purpose: [SettingsIntroCard.Note] = [
-            .init("calendar", "休日なら、前後の平日にずらせます"),
-            .init("bell", "前もって通知で知らせられます")
-        ]
-
-        if model.output.rows.isEmpty {
-            return purpose
-        }
-
-        return purpose + [
-            .init("hand.draw", "長押しで並べ替え・止めて非表示にできます"),
-            .swipeDelete
-        ]
     }
 }

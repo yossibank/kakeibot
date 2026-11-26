@@ -36,6 +36,18 @@ struct EntryCategoryCell: View {
     }
 }
 
+private extension EntryCategoryCell {
+    struct Layout {
+        var frame: CGRect = .zero
+        var scale: CGFloat = 1
+    }
+}
+
+private extension EntryCategoryCell {
+    static let menuPressDuration = 0.4
+    static let pressedScale: CGFloat = 0.93
+}
+
 extension EntryCategoryCell: Equatable {
     nonisolated static func == (
         lhs: EntryCategoryCell,
@@ -45,14 +57,4 @@ extension EntryCategoryCell: Equatable {
             && lhs.icon == rhs.icon
             && lhs.isSelected == rhs.isSelected
     }
-}
-
-private extension EntryCategoryCell {
-    struct Layout {
-        var frame: CGRect = .zero
-        var scale: CGFloat = 1
-    }
-
-    static let menuPressDuration = 0.4
-    static let pressedScale: CGFloat = 0.93
 }

@@ -75,6 +75,14 @@ struct AssetsRewardGoalEditSheet: View {
 }
 
 private extension AssetsRewardGoalEditSheet {
+    enum Field: Hashable {
+        case name
+    }
+
+    typealias Panel = AssetsRewardGoalEditModel.Panel
+}
+
+private extension AssetsRewardGoalEditSheet {
     var content: some View {
         VStack(spacing: 16) {
             Color.clear
@@ -141,12 +149,6 @@ private extension AssetsRewardGoalEditSheet {
 }
 
 private extension AssetsRewardGoalEditSheet {
-    enum Field: Hashable {
-        case name
-    }
-
-    typealias Panel = AssetsRewardGoalEditModel.Panel
-
     static let fade: CGFloat = 16
 
     var rowItems: [SettingsRowList<Panel>.Item] {

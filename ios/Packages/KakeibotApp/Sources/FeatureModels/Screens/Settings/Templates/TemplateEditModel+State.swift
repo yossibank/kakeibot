@@ -15,7 +15,6 @@ public extension TemplateEditModel {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<EntryTemplate>>()
-
         public var name = ""
         public var memo = ""
         public var billShift = 0

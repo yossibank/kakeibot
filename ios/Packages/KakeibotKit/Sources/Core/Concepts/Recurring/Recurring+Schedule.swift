@@ -11,7 +11,9 @@ public extension Recurring {
             self.date = date
         }
     }
+}
 
+public extension Recurring {
     static let maxCount = 1200
 
     var finalDate: LocalDate? {
@@ -80,14 +82,17 @@ public extension Recurring {
         }
 
         var open = self
+
         open.endDate = nil
 
         let from = max(start ?? startDate, startDate)
         let months = frequency == .monthly ? count + 2 : (count + 1) * 12
+
         let horizon = LocalDate(
             yearMonth: from.yearMonth.adding(months: months),
             clampedDay: 31
         )
+
         let dates = open.dates(from: from, through: horizon)
 
         return dates.count >= count ? dates[count - 1] : nil

@@ -15,9 +15,7 @@ extension IconDraft: IconBackedDraft {
         at now: Date
     ) throws -> ShelfIcon {
         var updated = record
-
         updated.updatedAt = now
-
         return updated
     }
 }

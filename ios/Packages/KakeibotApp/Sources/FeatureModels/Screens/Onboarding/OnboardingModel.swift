@@ -43,14 +43,6 @@ public extension OnboardingModel {
         case quick
         case minimal
         case full
-
-        var pages: [Page] {
-            switch self {
-            case .quick: [.welcome]
-            case .minimal: [.welcome, .monthStart, .budget]
-            case .full: Page.allCases
-            }
-        }
     }
 
     @MainActor
@@ -76,10 +68,6 @@ public extension OnboardingModel {
             self.budget = budget
             self.setup = setup
         }
-
-        public func open(_ item: SetupItem) {
-            path.append(item)
-        }
     }
 
     @MainActor
@@ -92,31 +80,13 @@ public extension OnboardingModel {
     final class Output {
         let state: State
 
-        public var pages: [Page] {
-            state.route?.pages ?? [.welcome]
-        }
-
-        public var stepPages: [Page] {
-            pages.filter { $0 != .welcome }
-        }
-
-        public var isFirstPage: Bool {
-            state.page == .welcome
-        }
-
-        public var isLastPage: Bool {
-            state.page == pages.last
-        }
-
-        public var nextTitle: String {
-            isLastPage ? "はじめる" : "次へ"
-        }
-
         init(state: State) {
             self.state = state
         }
     }
+}
 
+public extension OnboardingModel {
     func load() async {
         await state.monthStart.load()
         await state.budget.load()
@@ -181,7 +151,6 @@ public extension OnboardingModel {
             }
 
             try await dependencies.database.setSetting(.onboardingCompleted, to: true)
-
             state.outcome.send(())
 
             return true
@@ -207,5 +176,43 @@ private extension OnboardingModel {
         let target = index + offset
 
         return pages.indices.contains(target) ? pages[target] : nil
+    }
+}
+
+public extension OnboardingModel.Output {
+    var pages: [OnboardingModel.Page] {
+        state.route?.pages ?? [.welcome]
+    }
+
+    var stepPages: [OnboardingModel.Page] {
+        pages.filter { $0 != .welcome }
+    }
+
+    var isFirstPage: Bool {
+        state.page == .welcome
+    }
+
+    var isLastPage: Bool {
+        state.page == pages.last
+    }
+
+    var nextTitle: String {
+        isLastPage ? "はじめる" : "次へ"
+    }
+}
+
+public extension OnboardingModel.State {
+    func open(_ item: SetupItem) {
+        path.append(item)
+    }
+}
+
+extension OnboardingModel.Route {
+    var pages: [OnboardingModel.Page] {
+        switch self {
+        case .quick: [.welcome]
+        case .minimal: [.welcome, .monthStart, .budget]
+        case .full: OnboardingModel.Page.allCases
+        }
     }
 }

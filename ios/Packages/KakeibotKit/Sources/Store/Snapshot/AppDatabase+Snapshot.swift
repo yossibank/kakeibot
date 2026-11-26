@@ -6,7 +6,9 @@ public extension AppDatabase {
     enum RestoreError: Error, Equatable {
         case sharing
     }
+}
 
+public extension AppDatabase {
     func snapshot() throws -> ExportV1.Tables {
         try writer.read { db in
             try ExportV1.Tables(fetchingFrom: db)

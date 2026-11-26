@@ -61,10 +61,6 @@ extension SettingsRowList {
 }
 
 private extension SettingsRowList {
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(20))
-    }
-
     func rowButton(_ item: Item) -> some View {
         let isAmount = item.isAmount && !item.isEmpty
         let amountFont = Font.display(.headline, in: themeFont, scale: textScale)
@@ -126,5 +122,9 @@ private extension SettingsRowList {
 private extension SettingsRowList {
     static var markWidth: CGFloat {
         16
+    }
+
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(20))
     }
 }

@@ -5,14 +5,6 @@ public extension ReviewModel {
         case share(Share)
         case analysis
         case stamp(StampBook.Tally)
-
-        public var id: Key {
-            switch self {
-            case let .share(share): .share(share.id)
-            case .analysis: .analysis
-            case let .stamp(tally): .stamp(tally.id)
-            }
-        }
     }
 
     enum Opening: Equatable, Sendable {
@@ -20,7 +12,9 @@ public extension ReviewModel {
         case recurring(Recurring.ID)
         case day(LocalDate)
     }
+}
 
+public extension ReviewModel {
     func choose(
         _ id: Entry.ID,
         in share: Share
@@ -41,6 +35,16 @@ public extension ReviewModel.Sheet {
         case share(AnyHashable)
         case analysis
         case stamp(Icon.ID)
+    }
+}
+
+public extension ReviewModel.Sheet {
+    var id: Key {
+        switch self {
+        case let .share(share): .share(share.id)
+        case .analysis: .analysis
+        case let .stamp(tally): .stamp(tally.id)
+        }
     }
 }
 

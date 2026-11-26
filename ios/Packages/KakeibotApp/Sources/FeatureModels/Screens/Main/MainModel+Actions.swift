@@ -98,7 +98,6 @@ public extension MainModel {
     func setToday(_ today: LocalDate) -> Task<Void, Never> {
         state.draft.state.today = today
         state.setToday(today)
-
         return prepareDraft()
     }
 }

@@ -9,6 +9,7 @@ public enum DeviceName {
         }
 
         var info = utsname()
+
         uname(&info)
 
         return withUnsafeBytes(of: &info.machine) { bytes in

@@ -33,7 +33,9 @@ public extension EntryChange {
         case edited(previous: Entry, previousFee: Entry?)
         case deleted
     }
+}
 
+public extension EntryChange {
     var isDeletion: Bool {
         kind == .deleted
     }

@@ -32,7 +32,6 @@ public extension AssetsModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-
         public var billPage = 0
         public var boughtId: RewardGoal.ID?
         public var sheet: Sheet?
@@ -60,8 +59,11 @@ public extension AssetsModel {
             self.summary = AssetsSummary(latest)
         }
     }
+}
 
+public extension AssetsModel {
     static let monthCount = AssetsSummary.Input.monthCount
+    static let loadFailedMessage = "残高を読めませんでした"
 
     func setToday(_ today: LocalDate) {
         guard today != input.latest.today else {
@@ -118,10 +120,6 @@ public extension AssetsModel {
 
         await refresh()
     }
-}
-
-public extension AssetsModel {
-    static let loadFailedMessage = "残高を読めませんでした"
 }
 
 private extension AssetsModel {

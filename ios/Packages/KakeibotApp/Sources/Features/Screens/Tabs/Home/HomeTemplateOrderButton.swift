@@ -43,6 +43,8 @@ private extension HomeTemplateOrderButton {
     struct Layout {
         var frame: CGRect = .zero
     }
+}
 
+private extension HomeTemplateOrderButton {
     static let stroke = Palette.accent.opacity(.muted)
 }

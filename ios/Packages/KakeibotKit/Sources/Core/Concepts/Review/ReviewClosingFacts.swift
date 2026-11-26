@@ -30,7 +30,9 @@ public extension ReviewClosingFacts {
         case less
         case usual
     }
+}
 
+public extension ReviewClosingFacts {
     var basis: String {
         let lines = [verdict.map { "\($0)" } ?? "none", detail]
         return lines.filter { !$0.isEmpty }.joined(separator: "\n")

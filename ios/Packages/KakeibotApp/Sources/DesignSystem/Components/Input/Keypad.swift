@@ -59,6 +59,24 @@ public struct Keypad: View {
     }
 }
 
+public extension Keypad {
+    struct Accessory {
+        let title: String
+        let isActive: Bool
+        let action: () -> Void
+
+        public init(
+            _ title: String,
+            isActive: Bool = false,
+            action: @escaping () -> Void
+        ) {
+            self.title = title
+            self.isActive = isActive
+            self.action = action
+        }
+    }
+}
+
 extension Keypad {
     nonisolated static func key(typed characters: String) -> AmountCalculator.Key? {
         if let operation = typedOperations[characters] {
@@ -82,36 +100,6 @@ extension Keypad {
         }
 
         return .digit(digit)
-    }
-}
-
-private extension Keypad {
-    nonisolated static let typedEquals: Set = ["=", "\r"]
-    nonisolated static let typedDeletes: Set = ["\u{8}", "\u{7F}"]
-
-    nonisolated static let typedOperations: [String: AmountCalculator.Operation] = [
-        "+": .add,
-        "-": .subtract,
-        "*": .multiply,
-        "/": .divide
-    ]
-}
-
-public extension Keypad {
-    struct Accessory {
-        let title: String
-        let isActive: Bool
-        let action: () -> Void
-
-        public init(
-            _ title: String,
-            isActive: Bool = false,
-            action: @escaping () -> Void
-        ) {
-            self.title = title
-            self.isActive = isActive
-            self.action = action
-        }
     }
 }
 
@@ -236,6 +224,16 @@ private extension Keypad {
 }
 
 private extension Keypad {
+    nonisolated static let typedEquals: Set = ["=", "\r"]
+    nonisolated static let typedDeletes: Set = ["\u{8}", "\u{7F}"]
+
+    nonisolated static let typedOperations: [String: AmountCalculator.Operation] = [
+        "+": .add,
+        "-": .subtract,
+        "*": .multiply,
+        "/": .divide
+    ]
+
     static let clearPressDuration = 0.5
 
     static let rows: [[AmountCalculator.Key]] = [

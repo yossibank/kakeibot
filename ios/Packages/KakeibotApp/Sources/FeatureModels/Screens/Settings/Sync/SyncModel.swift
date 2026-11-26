@@ -60,6 +60,18 @@ public extension SyncModel {
         var members: Loadable<[SyncParticipant]> = .loading
         var pending: Loadable<Int> = .loading
     }
+}
+
+extension SyncModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let clock: ScreenClock
+        let cloud: SyncCloud
+    }
+}
+
+public extension SyncModel {
+    static let loadFailedMessage = "同期の状態を読めませんでした"
 
     func load() async {
         do {
@@ -107,6 +119,7 @@ public extension SyncModel {
         }
 
         state.requestedOn = isOn
+
         return true
     }
 
@@ -159,18 +172,6 @@ public extension SyncModel {
         state.choice = nil
         state.requestedOn = nil
     }
-}
-
-extension SyncModel: ScreenModel {}
-
-extension SyncModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let clock: ScreenClock
-        let cloud: SyncCloud
-    }
-
-    public static let loadFailedMessage = "同期の状態を読めませんでした"
 }
 
 private extension SyncModel {
@@ -235,7 +236,6 @@ private extension SyncModel {
 
         do {
             try await operation()
-
             input.isOn = try await dependencies.database.isSyncEnabled()
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
@@ -244,6 +244,8 @@ private extension SyncModel {
         state.isWorking = false
     }
 }
+
+extension SyncModel: ScreenModel {}
 
 extension SyncModel: SettingsFoldModel {
     public func foldStore() -> SettingsFoldStore {

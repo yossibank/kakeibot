@@ -50,7 +50,6 @@ public extension TemplateEditModel {
         public internal(set) var isHidden = false
         public internal(set) var options: EntryOptions?
         public internal(set) var cardBills: [Recurring] = []
-
         public internal(set) var baseline: EntryTemplateDraft?
 
         public let editingId: EntryTemplate.ID?
@@ -59,7 +58,9 @@ public extension TemplateEditModel {
             self.editingId = editingId
         }
     }
+}
 
+public extension TemplateEditModel {
     func editCategoryModel(_ category: EntryCategory) -> CategoryEditModel {
         CategoryEditModel(
             parts: dependencies,
@@ -82,7 +83,6 @@ public extension TemplateEditModel {
         do {
             input.options = try await dependencies.database.entryOptions()
             input.cardBills = try await dependencies.database.recurrings()
-
             try await loadTemplate()
 
             if state.categoryId == nil {
@@ -141,7 +141,6 @@ private extension TemplateEditModel {
         }
 
         input.isHidden = template.archivedAt != nil
-
         state.apply(EntryTemplateDraft(template))
     }
 }

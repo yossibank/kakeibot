@@ -67,7 +67,6 @@ private extension AssetsBalanceTrend {
             let ratio = high == low ? 0.5 : CGFloat(total - low) / range
             let x = step * (CGFloat(index) + 0.5)
             let y = inset + (size.height - inset * 2) * (1 - ratio)
-
             return CGPoint(x: x, y: y)
         }
     }

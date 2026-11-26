@@ -28,6 +28,7 @@ public enum Yen {
         }
 
         let number = (abs(amount) / 10000).formatted(.number.locale(locale))
+
         return "\(mark(of: amount, type: type, sign: sign))\(number)万円"
     }
 

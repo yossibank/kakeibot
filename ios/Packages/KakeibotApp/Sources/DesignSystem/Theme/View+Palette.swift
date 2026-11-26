@@ -59,6 +59,7 @@ private extension PaletteSceneView {
         case let .system(light, dark):
             let style = scene.screen.traitCollection.userInterfaceStyle
             let palette = style == .dark ? dark : light
+
             scene.traitOverrides.remove(UITraitUserInterfaceStyle.self)
             scene.traitOverrides[PaletteTrait.self] = palette
         }

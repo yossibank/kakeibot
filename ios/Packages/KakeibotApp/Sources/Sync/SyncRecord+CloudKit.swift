@@ -2,37 +2,6 @@ import CloudKit
 import Foundation
 import Store
 
-extension SyncKey {
-    init?(_ recordID: CKRecord.ID) {
-        let parts = recordID.recordName.split(separator: "/", maxSplits: 1)
-
-        guard
-            parts.count == 2,
-            let table = SyncTable(rawValue: String(parts[0]))
-        else {
-            return nil
-        }
-
-        let id = String(parts[1])
-
-        self.init(table: table, id: id)
-    }
-
-    func recordID(in zoneID: CKRecordZone.ID) -> CKRecord.ID {
-        CKRecord.ID(recordName: "\(table.rawValue)/\(id)", zoneID: zoneID)
-    }
-}
-
-extension SyncRecordID {
-    init?(_ recordID: CKRecord.ID) {
-        guard let key = SyncKey(recordID) else {
-            return nil
-        }
-
-        self.init(key: key, zoneName: recordID.zoneID.zoneName)
-    }
-}
-
 extension SyncRecord {
     static let fieldsKey = "fields"
 
@@ -66,6 +35,37 @@ extension SyncRecord {
         record.encryptedValues[Self.fieldsKey] = fields
 
         return record
+    }
+}
+
+extension SyncKey {
+    init?(_ recordID: CKRecord.ID) {
+        let parts = recordID.recordName.split(separator: "/", maxSplits: 1)
+
+        guard
+            parts.count == 2,
+            let table = SyncTable(rawValue: String(parts[0]))
+        else {
+            return nil
+        }
+
+        let id = String(parts[1])
+
+        self.init(table: table, id: id)
+    }
+
+    func recordID(in zoneID: CKRecordZone.ID) -> CKRecord.ID {
+        CKRecord.ID(recordName: "\(table.rawValue)/\(id)", zoneID: zoneID)
+    }
+}
+
+extension SyncRecordID {
+    init?(_ recordID: CKRecord.ID) {
+        guard let key = SyncKey(recordID) else {
+            return nil
+        }
+
+        self.init(key: key, zoneName: recordID.zoneID.zoneName)
     }
 }
 

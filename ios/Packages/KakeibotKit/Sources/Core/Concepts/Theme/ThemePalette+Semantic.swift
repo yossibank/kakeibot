@@ -6,46 +6,6 @@ public extension ThemePalette {
         case amber
         case holiday
         case saturday
-
-        public var light: UInt32 {
-            switch self {
-            case .rose: 0xB04A4A
-            case .amber: 0xA8581A
-            case .holiday: 0xC0392B
-            case .saturday: 0x2D63B5
-            }
-        }
-
-        public var dark: UInt32 {
-            switch self {
-            case .rose: 0xE3A3A3
-            case .amber: 0xE89B57
-            case .holiday: 0xEE8A84
-            case .saturday: 0x8DB0EA
-            }
-        }
-    }
-
-    func color(_ semantic: Semantic) -> UInt32 {
-        let base = isLight ? semantic.light : semantic.dark
-
-        if lowestContrast(of: base) >= Self.semanticMinimum {
-            return base
-        }
-
-        let hsl = HSL(base)
-        let directions = isLight ? [-1.0, 1.0] : [1.0, -1.0]
-        let shifts = directions.map { shifted(hsl, direction: $0) }
-
-        if let found = shifts.compactMap(\.found).first {
-            return found
-        }
-
-        let candidates = [base] + shifts.map(\.best)
-
-        return candidates.max { first, second in
-            lowestContrast(of: first) < lowestContrast(of: second)
-        } ?? base
     }
 }
 
@@ -70,7 +30,33 @@ private extension ThemePalette {
             self.lightness = lightness
         }
     }
+}
 
+public extension ThemePalette {
+    func color(_ semantic: Semantic) -> UInt32 {
+        let base = isLight ? semantic.light : semantic.dark
+
+        if lowestContrast(of: base) >= Self.semanticMinimum {
+            return base
+        }
+
+        let hsl = HSL(base)
+        let directions = isLight ? [-1.0, 1.0] : [1.0, -1.0]
+        let shifts = directions.map { shifted(hsl, direction: $0) }
+
+        if let found = shifts.compactMap(\.found).first {
+            return found
+        }
+
+        let candidates = [base] + shifts.map(\.best)
+
+        return candidates.max { first, second in
+            lowestContrast(of: first) < lowestContrast(of: second)
+        } ?? base
+    }
+}
+
+private extension ThemePalette {
     static let semanticMinimum = 3.0
     static let semanticSteps = 100
 
@@ -101,6 +87,26 @@ private extension ThemePalette {
     }
 }
 
+public extension ThemePalette.Semantic {
+    var light: UInt32 {
+        switch self {
+        case .rose: 0xB04A4A
+        case .amber: 0xA8581A
+        case .holiday: 0xC0392B
+        case .saturday: 0x2D63B5
+        }
+    }
+
+    var dark: UInt32 {
+        switch self {
+        case .rose: 0xE3A3A3
+        case .amber: 0xE89B57
+        case .holiday: 0xEE8A84
+        case .saturday: 0x8DB0EA
+        }
+    }
+}
+
 private extension ThemePalette.HSL {
     var rgb: UInt32 {
         let chroma = (1 - abs(2 * lightness - 1)) * saturation
@@ -108,6 +114,7 @@ private extension ThemePalette.HSL {
         let sectorRemainder = sector.truncatingRemainder(dividingBy: 2)
         let mid = chroma * (1 - abs(sectorRemainder - 1))
         let offset = lightness - chroma / 2
+
         let parts: (Double, Double, Double) = switch Int(sector) {
         case 0: (chroma, mid, 0)
         case 1: (mid, chroma, 0)

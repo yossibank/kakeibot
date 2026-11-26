@@ -4,7 +4,9 @@ import UIKit
 
 struct PaletteKey: EnvironmentKey, UITraitBridgedEnvironmentKey {
     static let defaultValue = ThemePreset.white.palette
+}
 
+extension PaletteKey {
     static func read(from traitCollection: UITraitCollection) -> ThemePalette {
         traitCollection[PaletteTrait.self]
     }

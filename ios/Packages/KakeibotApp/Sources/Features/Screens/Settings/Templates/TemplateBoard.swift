@@ -8,6 +8,30 @@ struct TemplateBoard {
     let parts: ScreenParts
 }
 
+private extension TemplateBoard {
+    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
+        .init("支出", value: .expense),
+        .init("収入", value: .income)
+    ]
+
+    func notes(in model: TemplateListModel) -> [SettingsIntroCard.Note] {
+        let purpose: [SettingsIntroCard.Note] = [
+            .init("hand.tap", "金額を決めておくと、押すだけで記録します"),
+            .init("apps.iphone", "ウィジェットからも記録できます")
+        ]
+
+        if model.output.shown.isEmpty {
+            return purpose
+        }
+
+        return purpose + [
+            .init("list.number", "この順でホームと入力シートに出ます"),
+            .arrange,
+            .swipeDelete
+        ]
+    }
+}
+
 extension TemplateBoard: SettingsBoardSpec {
     typealias Destination = TemplateListModel.Destination
     typealias Editor = TemplateEditSheet
@@ -120,29 +144,5 @@ extension TemplateBoard: SettingsBoardSpec {
             title: "このテンプレートを削除しますか",
             message: "このテンプレートで記録したものは残ります"
         )
-    }
-}
-
-private extension TemplateBoard {
-    static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
-        .init("支出", value: .expense),
-        .init("収入", value: .income)
-    ]
-
-    func notes(in model: TemplateListModel) -> [SettingsIntroCard.Note] {
-        let purpose: [SettingsIntroCard.Note] = [
-            .init("hand.tap", "金額を決めておくと、押すだけで記録します"),
-            .init("apps.iphone", "ウィジェットからも記録できます")
-        ]
-
-        if model.output.shown.isEmpty {
-            return purpose
-        }
-
-        return purpose + [
-            .init("list.number", "この順でホームと入力シートに出ます"),
-            .arrange,
-            .swipeDelete
-        ]
     }
 }

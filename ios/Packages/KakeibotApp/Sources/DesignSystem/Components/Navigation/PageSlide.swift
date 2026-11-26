@@ -11,21 +11,6 @@ struct PageSlide: Equatable {
     }
 }
 
-public struct PageSlideProxy {
-    let value: PageSlide
-    let binding: Binding<PageSlide>
-}
-
-public extension PageSlideProxy {
-    @MainActor
-    func run(
-        forward: Bool,
-        change: @escaping @MainActor () -> Void
-    ) {
-        PageSlide.run(binding, forward: forward, change: change)
-    }
-}
-
 extension PageSlide {
     static let distance: CGFloat = 40
     static let outDuration = 0.15
@@ -39,7 +24,6 @@ extension PageSlide {
     ) {
         let fade = Double(abs(x) / fadeDistance)
         let opacity = max(1 - fade, minimumOpacity)
-
         slide.wrappedValue = PageSlide(offset: x, opacity: opacity, isDragging: true)
     }
 
@@ -71,10 +55,8 @@ extension PageSlide {
 
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(outDuration))
-
             change()
             slide.wrappedValue = PageSlide(offset: entry, opacity: 0)
-
             try? await Task.sleep(for: .seconds(frameDuration))
 
             slide.wrappedValue = PageSlide(
@@ -100,6 +82,21 @@ private extension PageSlide {
         self.opacity = opacity
         self.isDragging = isDragging
         self.animation = animation
+    }
+}
+
+public struct PageSlideProxy {
+    let value: PageSlide
+    let binding: Binding<PageSlide>
+}
+
+public extension PageSlideProxy {
+    @MainActor
+    func run(
+        forward: Bool,
+        change: @escaping @MainActor () -> Void
+    ) {
+        PageSlide.run(binding, forward: forward, change: change)
     }
 }
 

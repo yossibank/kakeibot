@@ -38,7 +38,9 @@ extension WidgetGuideStage {
         let detail: String
         let amount: Int
     }
+}
 
+extension WidgetGuideStage {
     static let homeWidth: CGFloat = 364
     static let width: CGFloat = 338
     static let widgetHeight: CGFloat = 170
@@ -97,6 +99,34 @@ extension WidgetGuideStage {
 }
 
 private extension WidgetGuideStage {
+    @ViewBuilder
+    var content: some View {
+        switch place {
+        case .home:
+            switch (widget, size) {
+            case (.budget, .small):
+                budgetSmall
+
+            case (.budget, _):
+                budget
+
+            case (.quickRecord, .large):
+                quickRecordLarge
+
+            case (.quickRecord, _):
+                quickRecord
+            }
+
+        case .lockScreen:
+            lockScreen
+
+        case .control:
+            control
+        }
+    }
+}
+
+private extension WidgetGuideStage {
     var width: CGFloat {
         place == .home ? Self.homeWidth : Self.width
     }
@@ -128,34 +158,6 @@ private extension WidgetGuideStage {
                     endPoint: .bottom
                 )
             )
-        }
-    }
-}
-
-private extension WidgetGuideStage {
-    @ViewBuilder
-    var content: some View {
-        switch place {
-        case .home:
-            switch (widget, size) {
-            case (.budget, .small):
-                budgetSmall
-
-            case (.budget, _):
-                budget
-
-            case (.quickRecord, .large):
-                quickRecordLarge
-
-            case (.quickRecord, _):
-                quickRecord
-            }
-
-        case .lockScreen:
-            lockScreen
-
-        case .control:
-            control
         }
     }
 }

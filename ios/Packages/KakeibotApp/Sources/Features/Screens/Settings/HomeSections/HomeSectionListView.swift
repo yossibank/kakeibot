@@ -54,6 +54,12 @@ public struct HomeSectionListView: View {
 }
 
 private extension HomeSectionListView {
+    struct Layout {
+        var translation: CGFloat = 0
+    }
+}
+
+private extension HomeSectionListView {
     var board: some View {
         let slots = model.state.layout.slots
 
@@ -153,40 +159,6 @@ private extension HomeSectionListView {
         .contentShape(.rect)
         .gesture(dragGesture(section))
     }
-}
-
-private extension HomeSectionListView {
-    struct Layout {
-        var translation: CGFloat = 0
-    }
-
-    static let rowHeight: CGFloat = 56
-    static let zoneGap: CGFloat = 16
-    static let liftScale: CGFloat = 1.02
-
-    var hiddenCount: Int {
-        model.state.layout.order.count - model.state.layout.visible.count
-    }
-
-    var zoneShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
-    func offset(of section: HomeSection) -> CGFloat {
-        guard
-            let dragging = model.state.dragging,
-            dragging.section == section,
-            let index = model.state.layout.slots.firstIndex(of: .section(section))
-        else {
-            return 0
-        }
-
-        return layout.translation - CGFloat(index - dragging.start) * Self.rowHeight
-    }
-
-    func layer(of section: HomeSection) -> Double {
-        model.state.dragging?.section == section ? 1 : 0
-    }
 
     func dragGesture(_ section: HomeSection) -> some Gesture {
         LongPressGesture(minimumDuration: 0.2)
@@ -210,6 +182,40 @@ private extension HomeSectionListView {
             .onEnded { _ in
                 finishDragging()
             }
+    }
+}
+
+private extension HomeSectionListView {
+    static let rowHeight: CGFloat = 56
+    static let zoneGap: CGFloat = 16
+    static let liftScale: CGFloat = 1.02
+
+    var hiddenCount: Int {
+        model.state.layout.order.count - model.state.layout.visible.count
+    }
+
+    var zoneShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+
+    func offset(of section: HomeSection) -> CGFloat {
+        guard
+            let dragging = model.state.dragging,
+            dragging.section == section,
+            let index = model.state.layout.slots.firstIndex(of: .section(section))
+        else {
+            return 0
+        }
+
+        return layout.translation - CGFloat(index - dragging.start) * Self.rowHeight
+    }
+
+    func layer(of section: HomeSection) -> Double {
+        model.state.dragging?.section == section ? 1 : 0
     }
 
     func startDragging(_ section: HomeSection) {
@@ -247,12 +253,6 @@ private extension HomeSectionListView {
         model.perform {
             await $0.save()
         }
-    }
-}
-
-private extension HomeSectionListView {
-    var hint: SettingsFold {
-        SettingsFold(\.hint, in: model)
     }
 }
 

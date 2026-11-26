@@ -53,32 +53,6 @@ public extension EntryReceiptFlow {
         public private(set) var offer: String?
 
         public internal(set) var outcome = ScreenOutcome<Outcome>()
-
-        func showOffer(_ feature: String) {
-            offer = feature
-        }
-
-        func closeOffer() {
-            offer = nil
-        }
-
-        func open(showsGuide: Bool) {
-            offer = nil
-            hidesGuide = false
-            step = showsGuide ? .guide : .camera
-        }
-
-        func openCamera() {
-            step = .camera
-        }
-
-        func startReading() {
-            step = .reading
-        }
-
-        func close() {
-            step = nil
-        }
     }
 
     @MainActor
@@ -95,9 +69,10 @@ public extension EntryReceiptFlow {
         let prepare: @MainActor () -> Void
         let itemsDelay: Duration
     }
+}
 
+public extension EntryReceiptFlow {
     internal static let coverDismissDelay: Duration = .milliseconds(400)
-
     internal static let offerFeature = "4 回目からのレシートの読み取り"
     internal static let unreadMessage = "レシートを読めませんでした。明るい所で撮り直してください"
     internal static let totalMessage = "レシートの合計を読みました"
@@ -167,6 +142,34 @@ public extension EntryReceiptFlow {
         state.outcome.send(outcome)
 
         return outcome
+    }
+}
+
+extension EntryReceiptFlow.State {
+    func showOffer(_ feature: String) {
+        offer = feature
+    }
+
+    func closeOffer() {
+        offer = nil
+    }
+
+    func open(showsGuide: Bool) {
+        offer = nil
+        hidesGuide = false
+        step = showsGuide ? .guide : .camera
+    }
+
+    func openCamera() {
+        step = .camera
+    }
+
+    func startReading() {
+        step = .reading
+    }
+
+    func close() {
+        step = nil
     }
 }
 

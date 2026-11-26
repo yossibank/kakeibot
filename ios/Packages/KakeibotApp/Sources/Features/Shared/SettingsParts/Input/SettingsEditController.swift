@@ -48,7 +48,6 @@ extension SettingsEditController {
 
     func save() {
         onRest()
-
         model.perform(onSave)
     }
 

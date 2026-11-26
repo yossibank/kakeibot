@@ -9,7 +9,6 @@ struct EntryWalletDeck: View {
     @State private var layout = Layout()
 
     let model: EntryModel
-
     let role: Role
     let onChoose: (Wallet) -> Void
     let onEdit: (Wallet) -> Void
@@ -69,7 +68,20 @@ struct EntryWalletDeck: View {
 
 extension EntryWalletDeck {
     typealias Role = EntryModel.WalletRole
+}
 
+private extension EntryWalletDeck {
+    struct Layout {
+        var scrollPosition = ScrollPosition()
+    }
+
+    struct BillTrigger: Equatable {
+        let walletId: Wallet.ID?
+        let showsBills: Bool
+    }
+}
+
+extension EntryWalletDeck {
     var shown: EntryModel.WalletDeck {
         model.state.screen.wallets
     }
@@ -153,15 +165,6 @@ private extension EntryWalletDeck {
 }
 
 private extension EntryWalletDeck {
-    struct Layout {
-        var scrollPosition = ScrollPosition()
-    }
-
-    struct BillTrigger: Equatable {
-        let walletId: Wallet.ID?
-        let showsBills: Bool
-    }
-
     static let badgeSize: CGFloat = 20
 
     static let columns = [

@@ -1,10 +1,6 @@
 import Core
 import GRDB
 
-extension Recurring: StoreRecord {
-    public static let databaseTableName = "recurring"
-}
-
 extension Recurring {
     static func cardBills() -> QueryInterfaceRequest<Recurring> {
         filter(Column("closing_day") != nil)
@@ -18,12 +14,16 @@ extension Recurring {
     }
 }
 
-extension Recurring.Frequency: DatabaseValueConvertible {}
+extension Recurring: StoreRecord {
+    public static let databaseTableName = "recurring"
+}
 
-extension HolidayShift: DatabaseValueConvertible {}
+extension Recurring.Frequency: DatabaseValueConvertible {}
 
 extension Recurring: SortableRecord {
     public static var notFound: any Error {
         AppDatabase.RecurringWriteError.recurringNotFound
     }
 }
+
+extension HolidayShift: DatabaseValueConvertible {}

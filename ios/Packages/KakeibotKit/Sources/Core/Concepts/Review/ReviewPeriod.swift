@@ -40,7 +40,9 @@ public extension ReviewPeriod {
         case month
         case year
     }
+}
 
+public extension ReviewPeriod {
     var previous: ReviewPeriod {
         adding(-1)
     }

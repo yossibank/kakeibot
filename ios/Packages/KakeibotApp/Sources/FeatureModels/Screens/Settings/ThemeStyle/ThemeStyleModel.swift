@@ -23,26 +23,10 @@ public final class ThemeStyleModel: SettingSaving {
     }
 }
 
-extension ThemeStyleModel {
-    struct Dependencies {
-        let database: AppDatabase
-    }
-}
-
 public extension ThemeStyleModel {
     enum FontOffer: Hashable, Sendable {
         case display(ThemeFont)
         case text(ThemeFont)
-
-        public var feature: String {
-            "\(font.title)の字体"
-        }
-
-        var font: ThemeFont {
-            switch self {
-            case let .display(font), let .text(font): font
-            }
-        }
     }
 
     @MainActor
@@ -53,21 +37,6 @@ public extension ThemeStyleModel {
         public internal(set) var fontOffer: FontOffer?
 
         public private(set) var preview: ThemeStyle?
-
-        func show<Value>(
-            _ value: Value,
-            at keyPath: WritableKeyPath<ThemeStyle, Value>,
-            over saved: ThemeStyle
-        ) {
-            var style = preview ?? saved
-
-            style[keyPath: keyPath] = value
-            preview = style
-        }
-
-        func clearPreview() {
-            preview = nil
-        }
     }
 
     @MainActor
@@ -85,14 +54,6 @@ public extension ThemeStyleModel {
         let input: Input
         let state: State
 
-        public var style: ThemeStyle {
-            state.preview ?? input.style
-        }
-
-        public var savedStyle: ThemeStyle {
-            input.style
-        }
-
         init(
             input: Input,
             state: State
@@ -101,7 +62,15 @@ public extension ThemeStyleModel {
             self.state = state
         }
     }
+}
 
+extension ThemeStyleModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+}
+
+public extension ThemeStyleModel {
     static func isLocked(
         _ font: ThemeFont,
         isPro: Bool
@@ -158,9 +127,7 @@ public extension ThemeStyleModel {
             offer.font != savedFont(for: offer)
         else {
             state.fontOffer = nil
-
             cancelPreview()
-
             await save(offer)
 
             return
@@ -178,7 +145,6 @@ public extension ThemeStyleModel {
 
     func closeFontOffer() {
         state.fontOffer = nil
-
         cancelPreview()
     }
 
@@ -188,7 +154,6 @@ public extension ThemeStyleModel {
         }
 
         state.fontOffer = nil
-
         await save(offer)
     }
 
@@ -247,7 +212,6 @@ private extension ThemeStyleModel {
         var chosen = output.style
 
         chosen[keyPath: keyPath] = value
-
         state.clearPreview()
         input.style = chosen
 
@@ -261,6 +225,46 @@ private extension ThemeStyleModel {
         at keyPath: WritableKeyPath<ThemeStyle, Value>
     ) {
         state.show(value, at: keyPath, over: input.style)
+    }
+}
+
+public extension ThemeStyleModel.Output {
+    var style: ThemeStyle {
+        state.preview ?? input.style
+    }
+
+    var savedStyle: ThemeStyle {
+        input.style
+    }
+}
+
+extension ThemeStyleModel.State {
+    func show<Value>(
+        _ value: Value,
+        at keyPath: WritableKeyPath<ThemeStyle, Value>,
+        over saved: ThemeStyle
+    ) {
+        var style = preview ?? saved
+        style[keyPath: keyPath] = value
+        preview = style
+    }
+
+    func clearPreview() {
+        preview = nil
+    }
+}
+
+public extension ThemeStyleModel.FontOffer {
+    var feature: String {
+        "\(font.title)の字体"
+    }
+}
+
+extension ThemeStyleModel.FontOffer {
+    var font: ThemeFont {
+        switch self {
+        case let .display(font), let .text(font): font
+        }
     }
 }
 

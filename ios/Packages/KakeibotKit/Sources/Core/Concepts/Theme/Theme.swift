@@ -52,7 +52,9 @@ public struct Theme: Codable, Hashable, Identifiable, Sendable {
 
 public extension Theme {
     typealias ID = Identifier<Theme>
+}
 
+public extension Theme {
     var palette: ThemePalette {
         ThemeDraft(self).palette ?? .night
     }

@@ -52,9 +52,7 @@ public extension SettingsEditRemoving {
 
     func saveTogglingHidden(_ save: @MainActor (Self) async -> Void) async {
         state.prompt.togglesHiddenAfterSave = true
-
         await save(self)
-
         state.prompt.togglesHiddenAfterSave = false
     }
 
@@ -104,6 +102,12 @@ extension SettingsEditRemoving {
     }
 }
 
+extension SettingsEditRemoving where State.Saved == Void {
+    func finishSave() async {
+        await finishSave(())
+    }
+}
+
 private extension SettingsEditRemoving {
     func showHideFailure(_ error: any Error) {
         if let message = hideFailedMessage(for: error) {
@@ -111,11 +115,5 @@ private extension SettingsEditRemoving {
         } else {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
         }
-    }
-}
-
-extension SettingsEditRemoving where State.Saved == Void {
-    func finishSave() async {
-        await finishSave(())
     }
 }

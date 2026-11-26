@@ -98,45 +98,6 @@ extension AppDatabase {
     }
 }
 
-extension SyncRecord {
-    init(
-        key: SyncKey,
-        row: Row
-    ) {
-        let pairs = row.columnNames.map { ($0, SyncValue(row[$0])) }
-        let values = Dictionary(uniqueKeysWithValues: pairs)
-
-        self.init(key: key, values: values)
-    }
-
-    func keeping(
-        _ columns: Set<String>,
-        of row: Row
-    ) -> SyncRecord {
-        var values = values
-
-        for column in columns {
-            values[column] = SyncValue(row[column])
-        }
-
-        return SyncRecord(key: key, values: values)
-    }
-
-    func removingLocalColumns() -> SyncRecord {
-        removing(key.table.localColumns)
-    }
-
-    func removing(_ columns: Set<String>) -> SyncRecord {
-        guard !columns.isEmpty else {
-            return self
-        }
-
-        let kept = values.filter { !columns.contains($0.key) }
-
-        return SyncRecord(key: key, values: kept)
-    }
-}
-
 private extension AppDatabase {
     static let transferColumns: Set = [
         "type",
@@ -244,6 +205,7 @@ private extension AppDatabase {
         }
 
         var values = record.values
+
         values["type"] = .text(kind.rawValue)
         values["wallet_id"] = wallet
         values["to_wallet_id"] = .null
@@ -263,6 +225,45 @@ private extension AppDatabase {
             sql: "SELECT EXISTS (SELECT 1 FROM wallet WHERE id = ?)",
             arguments: [id]
         ) ?? false
+    }
+}
+
+extension SyncRecord {
+    init(
+        key: SyncKey,
+        row: Row
+    ) {
+        let pairs = row.columnNames.map { ($0, SyncValue(row[$0])) }
+        let values = Dictionary(uniqueKeysWithValues: pairs)
+
+        self.init(key: key, values: values)
+    }
+
+    func keeping(
+        _ columns: Set<String>,
+        of row: Row
+    ) -> SyncRecord {
+        var values = values
+
+        for column in columns {
+            values[column] = SyncValue(row[column])
+        }
+
+        return SyncRecord(key: key, values: values)
+    }
+
+    func removingLocalColumns() -> SyncRecord {
+        removing(key.table.localColumns)
+    }
+
+    func removing(_ columns: Set<String>) -> SyncRecord {
+        guard !columns.isEmpty else {
+            return self
+        }
+
+        let kept = values.filter { !columns.contains($0.key) }
+
+        return SyncRecord(key: key, values: kept)
     }
 }
 

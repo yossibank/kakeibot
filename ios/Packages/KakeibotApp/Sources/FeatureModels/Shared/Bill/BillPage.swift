@@ -37,7 +37,6 @@ public extension BillPage {
         return (0..<limit).compactMap { offset in
             let month = first.adding(months: offset)
             let members = charged.filter { $0.month == month }
-
             return members.isEmpty ? nil : BillPage(month: month, bills: members)
         }
     }

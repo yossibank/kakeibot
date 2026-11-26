@@ -60,7 +60,9 @@ public extension RecurringEditModel {
             self.paidWallet = paidWallet
         }
     }
+}
 
+public extension RecurringEditModel {
     static let remindChoices: [Int?] = [nil, 0, 1, 3, 7]
     static let destinationTitle = "振替先"
 
@@ -71,7 +73,6 @@ public extension RecurringEditModel {
 
         state.type = type
         state.categoryId = output.categories.first?.id
-
         presetDestination()
         suggestHolidayShift()
     }

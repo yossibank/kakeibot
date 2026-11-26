@@ -38,7 +38,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | 画面の部品を PNG に描く（下の注） | `make snapshot SNAPSHOT=widget` |
 | Android のビルド（デバッグの APK） | `make android-build` |
 | Android の Core・Store・画面のモデルのテスト | `make android-test` |
-| Swift・Kotlin・JSON の整形 | `make format` |
+| Swift の並びの直しと、Swift・Kotlin・JSON の整形 | `make format` |
 | ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
 
 `make snapshot` は claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前で、出力は `.build/snapshots/<セット>/` に出る。

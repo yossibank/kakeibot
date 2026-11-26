@@ -10,7 +10,9 @@ public extension AppDatabase {
         case shortOfBalance
         case isHidden
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func deleteRewardRule(_ id: RewardRule.ID) async throws -> Deletion {
         try await writer.write { db in

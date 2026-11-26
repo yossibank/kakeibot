@@ -32,7 +32,6 @@ public extension ReviewModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-
         public var today: LocalDate
         public var sheet: Sheet?
         public var analysisShare: Share?
@@ -87,10 +86,6 @@ public extension ReviewModel {
         let upcomingTotals = DerivedTable<ClosedRange<LocalDate>, Int>()
         let closingContents = DerivedTable<ClosingKey, ReviewClosing.Content>()
 
-        var entries: [Entry] {
-            input.list?.entries ?? []
-        }
-
         init(
             input: Input,
             state: State
@@ -99,6 +94,20 @@ public extension ReviewModel {
             self.state = state
         }
     }
+
+    struct Share: Identifiable {
+        public let id: AnyHashable
+        public let name: String
+        public let icon: Icon?
+        public let amount: Int
+        public let ratio: Double
+        public let usage: BudgetUsage?
+    }
+}
+
+public extension ReviewModel {
+    static let recurringShareId = AnyHashable("recurring")
+    static let loadFailedMessage = "記録を読めませんでした"
 
     func run() async {
         await loadSelection()
@@ -183,42 +192,8 @@ public extension ReviewModel {
     }
 }
 
-extension ReviewModel.State {
-    func restart(movingForward isMovingForward: Bool) {
-        self.isMovingForward = isMovingForward
-        offset = 0
-    }
-
-    func move(by count: Int) {
-        guard offset + count <= 0 else {
-            return
-        }
-
-        isMovingForward = count > 0
-        offset += count
-    }
-
-    func moveToCurrent() {
-        guard offset < 0 else {
-            return
-        }
-
-        isMovingForward = true
-        offset = 0
-    }
-}
-
-public extension ReviewModel {
-    struct Share: Identifiable {
-        public let id: AnyHashable
-        public let name: String
-        public let icon: Icon?
-        public let amount: Int
-        public let ratio: Double
-        public let usage: BudgetUsage?
-    }
-
-    static let recurringShareId = AnyHashable("recurring")
+private extension ReviewModel {
+    static let saveFailedMessage = "保存できませんでした"
 }
 
 public extension ReviewModel.Output {
@@ -268,6 +243,10 @@ public extension ReviewModel.Output {
 
     var stampTallies: [StampBook.Tally] {
         input.stampBook?.tallies(in: period.range) ?? []
+    }
+
+    var entryType: Entry.Kind? {
+        input.kind.entryType
     }
 
     func total(of kind: ReviewKind) -> Int {
@@ -337,18 +316,10 @@ public extension ReviewModel.Output {
     }
 }
 
-public extension ReviewModel.Output {
-    var entryType: Entry.Kind? {
-        input.kind.entryType
+extension ReviewModel.Output {
+    var entries: [Entry] {
+        input.list?.entries ?? []
     }
-}
-
-public extension ReviewModel {
-    static let loadFailedMessage = "記録を読めませんでした"
-}
-
-private extension ReviewModel {
-    static let saveFailedMessage = "保存できませんでした"
 }
 
 private extension ReviewModel.Output {
@@ -367,5 +338,30 @@ private extension ReviewModel.Output {
         case .income: summary.income.total
         case .balance: summary.balance
         }
+    }
+}
+
+extension ReviewModel.State {
+    func restart(movingForward isMovingForward: Bool) {
+        self.isMovingForward = isMovingForward
+        offset = 0
+    }
+
+    func move(by count: Int) {
+        guard offset + count <= 0 else {
+            return
+        }
+
+        isMovingForward = count > 0
+        offset += count
+    }
+
+    func moveToCurrent() {
+        guard offset < 0 else {
+            return
+        }
+
+        isMovingForward = true
+        offset = 0
     }
 }

@@ -23,7 +23,9 @@ public extension ReviewGoal {
         case likelyOver
         case over
     }
+}
 
+public extension ReviewGoal {
     func progress(
         of entries: [Entry],
         in range: ClosedRange<LocalDate>,

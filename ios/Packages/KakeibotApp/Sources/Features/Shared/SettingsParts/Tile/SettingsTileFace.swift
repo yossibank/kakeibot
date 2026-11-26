@@ -2,12 +2,6 @@ import Core
 import DesignSystem
 import SwiftUI
 
-extension View {
-    func settingsTileFace(isHidden: Bool) -> some View {
-        modifier(SettingsTileFace(isHidden: isHidden))
-    }
-}
-
 private struct SettingsTileFace: ViewModifier {
     @Environment(\.themeStyle.corner) private var corner
 
@@ -28,10 +22,6 @@ private struct SettingsTileFace: ViewModifier {
 }
 
 private extension SettingsTileFace {
-    var shape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
     @ViewBuilder
     var border: some View {
         if isHidden {
@@ -41,5 +31,17 @@ private extension SettingsTileFace {
             shape
                 .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
         }
+    }
+}
+
+private extension SettingsTileFace {
+    var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+}
+
+extension View {
+    func settingsTileFace(isHidden: Bool) -> some View {
+        modifier(SettingsTileFace(isHidden: isHidden))
     }
 }

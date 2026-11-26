@@ -12,7 +12,9 @@ extension ReviewView {
                 .animation(.snappy(duration: 0.15), value: configuration.isPressed)
         }
     }
+}
 
+extension ReviewView {
     var analysisBanner: some View {
         Button {
             if model.output.hasNewReport {

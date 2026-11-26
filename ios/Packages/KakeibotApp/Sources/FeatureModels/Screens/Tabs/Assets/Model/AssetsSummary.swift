@@ -22,7 +22,9 @@ extension AssetsSummary {
         var monthStartDay: MonthStartDay = .first
         var today: LocalDate
     }
+}
 
+extension AssetsSummary {
     init(_ input: Input) {
         let wallets = input.activeWallets
         let current = input.holdings(of: wallets, through: input.today)

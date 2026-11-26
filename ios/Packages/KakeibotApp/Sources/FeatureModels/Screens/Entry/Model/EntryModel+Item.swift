@@ -8,7 +8,9 @@ public extension EntryModel {
         public let index: Int
         public let item: EntryItem.Draft
     }
+}
 
+public extension EntryModel {
     func newItemModel(isSlipOpen: Bool = false) -> EntryItemModel {
         EntryItemModel(isSlipOpen: isSlipOpen)
     }

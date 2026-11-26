@@ -9,7 +9,9 @@ public extension AppDatabase {
         case lastShownWallet
         case hasEntries
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func deleteWallet(
         _ id: Wallet.ID,

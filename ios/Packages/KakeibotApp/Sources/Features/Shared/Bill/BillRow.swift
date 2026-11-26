@@ -37,6 +37,13 @@ struct BillRow<Moves: View>: View {
     }
 }
 
+extension BillRow {
+    enum Style {
+        case compact
+        case detailed
+    }
+}
+
 extension BillRow where Moves == EmptyView {
     init(
         _ bill: CardBill,
@@ -58,11 +65,6 @@ extension BillRow where Moves == EmptyView {
 }
 
 extension BillRow {
-    enum Style {
-        case compact
-        case detailed
-    }
-
     nonisolated static func share(of bill: CardBill) -> Double {
         guard bill.balanceBefore > 0 else {
             return 1
@@ -71,20 +73,6 @@ extension BillRow {
         let share = Double(bill.amount) / Double(bill.balanceBefore)
 
         return min(share, 1)
-    }
-}
-
-private extension BillRow {
-    var isShort: Bool {
-        bill.shortage > 0 && !bill.isOpen
-    }
-
-    var balanceColor: Color {
-        isShort ? Palette.rose : Palette.accent
-    }
-
-    var daysText: String {
-        BillText.days(until: bill.date, today: today)
     }
 }
 
@@ -277,5 +265,19 @@ private extension BillRow {
 
             moves
         }
+    }
+}
+
+private extension BillRow {
+    var isShort: Bool {
+        bill.shortage > 0 && !bill.isOpen
+    }
+
+    var balanceColor: Color {
+        isShort ? Palette.rose : Palette.accent
+    }
+
+    var daysText: String {
+        BillText.days(until: bill.date, today: today)
     }
 }

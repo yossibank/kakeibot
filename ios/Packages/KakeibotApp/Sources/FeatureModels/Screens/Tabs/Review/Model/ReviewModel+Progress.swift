@@ -99,6 +99,7 @@ extension ReviewModel.Output {
         }
 
         let month = period.range.upperBound.yearMonth
+
         return input.budgets.amount(for: nil, in: month).map { $0 + carryover(into: month) }
     }
 }

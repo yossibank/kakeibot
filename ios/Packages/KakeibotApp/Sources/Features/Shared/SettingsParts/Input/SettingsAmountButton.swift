@@ -40,10 +40,6 @@ struct SettingsAmountButton: View {
 }
 
 private extension SettingsAmountButton {
-    var stroke: StrokeStyle {
-        isEmpty ? .dashed : StrokeStyle(lineWidth: 1)
-    }
-
     @ViewBuilder
     var value: some View {
         if let text {
@@ -55,5 +51,11 @@ private extension SettingsAmountButton {
         } else {
             SettingsKeypadValue(amount, isAnimated: false)
         }
+    }
+}
+
+private extension SettingsAmountButton {
+    var stroke: StrokeStyle {
+        isEmpty ? .dashed : StrokeStyle(lineWidth: 1)
     }
 }

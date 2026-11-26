@@ -30,8 +30,6 @@ extension WhatsNewWalletScene {
 }
 
 private extension WhatsNewWalletScene {
-    static let debtKinds: [Wallet.Kind] = [.card, .loan]
-
     var kinds: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("手持ち")
@@ -143,4 +141,8 @@ private extension WhatsNewWalletScene {
         .card(cornerRadius: 12)
         .padding(.horizontal, 4)
     }
+}
+
+private extension WhatsNewWalletScene {
+    static let debtKinds: [Wallet.Kind] = [.card, .loan]
 }

@@ -52,7 +52,10 @@ private extension ReviewNoteWriter {
         @Guide(description: "締めた期間の様子を書いた 1 文の丁寧語。数字は書かない")
         var body: String
     }
+}
 
+@available(iOS 26.0, *)
+private extension ReviewNoteWriter {
     static let maximumTokens = 120
 
     static let attempts = [

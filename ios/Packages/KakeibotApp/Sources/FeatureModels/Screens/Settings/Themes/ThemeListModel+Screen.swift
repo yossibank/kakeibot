@@ -4,71 +4,21 @@ public extension ThemeListModel {
     enum Offer: Hashable {
         case create(base: ThemePalette?)
         case select(ThemeChoice)
-
-        public var feature: String {
-            switch self {
-            case .create: "テーマを作るの"
-            case .select: "作ったテーマ"
-            }
-        }
     }
 
     enum EditTarget: Hashable, Identifiable {
         case new(base: ThemePalette?)
         case edit(Theme)
-
-        public var id: String {
-            switch self {
-            case .new: "new"
-            case let .edit(theme): theme.id.description
-            }
-        }
-
-        public var theme: Theme? {
-            switch self {
-            case .new: nil
-            case let .edit(theme): theme
-            }
-        }
-
-        public var base: ThemePalette? {
-            switch self {
-            case let .new(base): base
-            case .edit: nil
-            }
-        }
     }
 
     enum Presented: Hashable {
         case menu(ThemeChoice)
         case editing(EditTarget)
         case offer(Offer)
-
-        public var menu: ThemeChoice? {
-            guard case let .menu(choice) = self else {
-                return nil
-            }
-
-            return choice
-        }
-
-        public var editing: EditTarget? {
-            guard case let .editing(target) = self else {
-                return nil
-            }
-
-            return target
-        }
-
-        public var offer: Offer? {
-            guard case let .offer(offer) = self else {
-                return nil
-            }
-
-            return offer
-        }
     }
+}
 
+public extension ThemeListModel {
     func choose(
         _ choice: ThemeChoice,
         isPro: Bool
@@ -101,8 +51,65 @@ public extension ThemeListModel {
 
         case let .select(choice):
             state.close(.offer(offer))
-
             await select(choice)
+        }
+    }
+}
+
+public extension ThemeListModel.Presented {
+    var menu: ThemeChoice? {
+        guard case let .menu(choice) = self else {
+            return nil
+        }
+
+        return choice
+    }
+
+    var editing: ThemeListModel.EditTarget? {
+        guard case let .editing(target) = self else {
+            return nil
+        }
+
+        return target
+    }
+
+    var offer: ThemeListModel.Offer? {
+        guard case let .offer(offer) = self else {
+            return nil
+        }
+
+        return offer
+    }
+}
+
+public extension ThemeListModel.EditTarget {
+    var id: String {
+        switch self {
+        case .new: "new"
+        case let .edit(theme): theme.id.description
+        }
+    }
+
+    var theme: Theme? {
+        switch self {
+        case .new: nil
+        case let .edit(theme): theme
+        }
+    }
+
+    var base: ThemePalette? {
+        switch self {
+        case let .new(base): base
+        case .edit: nil
+        }
+    }
+}
+
+public extension ThemeListModel.Offer {
+    var feature: String {
+        switch self {
+        case .create: "テーマを作るの"
+        case .select: "作ったテーマ"
         }
     }
 }

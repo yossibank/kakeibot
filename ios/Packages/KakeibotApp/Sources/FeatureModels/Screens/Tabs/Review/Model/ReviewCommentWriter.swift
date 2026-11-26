@@ -57,7 +57,10 @@ private extension ReviewCommentWriter {
         @Guide(description: "次の目標を決めた理由。1〜2 文の丁寧語")
         var body: String
     }
+}
 
+@available(iOS 26.0, *)
+private extension ReviewCommentWriter {
     static let locale = Locale(identifier: "ja_JP")
     static let maximumTokens = 160
 

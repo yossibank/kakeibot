@@ -3,12 +3,6 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
-extension View {
-    func budgetKeypad(_ model: BudgetListModel) -> some View {
-        modifier(BudgetKeypadDrawer(model: model))
-    }
-}
-
 private struct BudgetKeypadDrawer: ViewModifier {
     let model: BudgetListModel
 
@@ -111,5 +105,11 @@ private extension BudgetKeypadDrawer {
             .minimumScaleFactor(0.8)
             .padding(.vertical, 4)
         }
+    }
+}
+
+extension View {
+    func budgetKeypad(_ model: BudgetListModel) -> some View {
+        modifier(BudgetKeypadDrawer(model: model))
     }
 }

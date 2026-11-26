@@ -182,6 +182,7 @@ private extension ReviewClosingView {
 
     var streakTitle: String? {
         let isBudget = content.pace?.basis == .budget
+
         let continues = isBudget
             && content.budgetStreak >= 2
 

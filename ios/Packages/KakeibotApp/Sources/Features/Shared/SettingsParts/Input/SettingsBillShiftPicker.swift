@@ -41,6 +41,7 @@ private extension SettingsBillShiftPicker {
         }
 
         let bill = Recurring.billText(paidOn: dates[shift])
+
         return "次の記録は、\(bill)の引き落としに入れます"
     }
 }

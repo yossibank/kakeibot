@@ -61,7 +61,9 @@ private extension SettingsPagedGrid {
         var width: CGFloat = 0
         var position = ScrollPosition(idType: Int.self)
     }
+}
 
+private extension SettingsPagedGrid {
     static func pages(
         of items: [Item],
         size: Int

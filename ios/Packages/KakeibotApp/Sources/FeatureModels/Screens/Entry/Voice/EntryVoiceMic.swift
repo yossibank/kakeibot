@@ -7,13 +7,17 @@ actor EntryVoiceMic {
     private let engine = AVAudioEngine()
 
     private var feed: EntryVoiceAudioFeed?
+}
 
+@available(iOS 26.0, *)
+extension EntryVoiceMic {
     func start(
         to format: AVAudioFormat,
         continuation: AsyncStream<AnalyzerInput>.Continuation,
         onLevel: @escaping @Sendable (Double) -> Void
     ) throws {
         let session = AVAudioSession.sharedInstance()
+
         try session.setCategory(.record, mode: .measurement, options: .duckOthers)
         try session.setActive(true, options: .notifyOthersOnDeactivation)
 
@@ -48,7 +52,6 @@ actor EntryVoiceMic {
         engine.inputNode.removeTap(onBus: 0)
         feed?.finish()
         feed = nil
-
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 }

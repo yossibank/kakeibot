@@ -22,18 +22,22 @@ public enum SyncTable: String, CaseIterable, Sendable {
     case noSpendDay = "no_spend_day"
     case setting
 
-    struct UniqueKey {
-        let columns: [String]
-        let matchesNull: Bool
-    }
-
     static let localSettingKeys = Setting.Key.deviceOnly
 
     private static let parentOrders: [SyncTable: Int] = {
         let pairs = allCases.enumerated().map { ($1, $0) }
         return Dictionary(uniqueKeysWithValues: pairs)
     }()
+}
 
+extension SyncTable {
+    struct UniqueKey {
+        let columns: [String]
+        let matchesNull: Bool
+    }
+}
+
+extension SyncTable {
     var parentOrder: Int {
         Self.parentOrders[self, default: 0]
     }

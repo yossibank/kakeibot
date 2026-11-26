@@ -15,6 +15,7 @@ public extension RecurringEditModel {
         }
 
         let count = state.repayment.countCalculator.amount
+
         let end = output.recurring(endDate: nil, finalAmount: nil).endDate(
             afterCount: count,
             from: output.repaymentStart

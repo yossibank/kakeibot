@@ -8,26 +8,19 @@ public extension EntryModel {
         case category(EntryCategory)
         case add
         case edit
-
-        public var categoryId: EntryCategory.ID? {
-            if case let .category(category) = self {
-                category.id
-            } else {
-                nil
-            }
-        }
     }
 
     struct HiddenCategory: Hashable, Sendable {
         public let id: EntryCategory.ID
         public let wasSelected: Bool
     }
+}
 
+public extension EntryModel {
     static let categoriesPerPage = 15
 
     func apply(_ template: EntryTemplate) {
         select(template.type)
-
         state.setCategory(template.categoryId)
         state.category.tagId = output.recordableTagId(of: template)
         setWallet(template.walletId)
@@ -57,7 +50,6 @@ public extension EntryModel {
 
     func addCategory(_ id: EntryCategory.ID) async {
         await reloadCategories(selecting: id)
-
         state.results.outcome.send(.categoryAdded)
     }
 
@@ -138,7 +130,6 @@ public extension EntryModel {
             )
 
             await reloadCategories()
-
             state.results.hiddenCategory = hidden
 
             return hidden
@@ -158,7 +149,6 @@ public extension EntryModel {
             )
 
             await reloadCategories(selecting: hidden.wasSelected ? hidden.id : nil)
-
             state.results.outcome.send(.categoryMoved)
         } catch {
             state.errorNotice.show(Self.restoreFailedMessage, for: error)
@@ -178,4 +168,14 @@ extension EntryModel {
 
 private extension EntryModel {
     static let restoreFailedMessage = "元に戻せませんでした"
+}
+
+public extension EntryModel.CategoryCell {
+    var categoryId: EntryCategory.ID? {
+        if case let .category(category) = self {
+            category.id
+        } else {
+            nil
+        }
+    }
 }

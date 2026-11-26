@@ -8,29 +8,6 @@ public extension EntryModel {
         case fee
         case wallet(WalletRole)
         case date
-
-        public static func fields(for type: Entry.Kind) -> [Self] {
-            switch type {
-            case .transfer: [.transfer, .fee, .date, .amount]
-            case .expense, .income: [.category, .wallet(.source), .date, .amount]
-            }
-        }
-
-        public static func start(for type: Entry.Kind) -> Self {
-            type == .transfer ? .transfer : .category
-        }
-
-        public func field(for type: Entry.Kind) -> Self {
-            switch (self, type) {
-            case (.wallet, .transfer): .transfer
-            default: self
-            }
-        }
-
-        public func order(for type: Entry.Kind) -> Int {
-            let target = field(for: type)
-            return Self.fields(for: type).firstIndex(of: target) ?? 0
-        }
     }
 
     enum Sheet: Hashable, Identifiable, Sendable {
@@ -43,17 +20,6 @@ public extension EntryModel {
         case addTag(EntryCategory)
         case newTemplate
         case categories
-
-        public var id: Self {
-            self
-        }
-
-        var isWallet: Bool {
-            switch self {
-            case .newWallet, .editWallet: true
-            default: false
-            }
-        }
     }
 
     struct WalletDeck: Equatable, Sendable {
@@ -80,49 +46,13 @@ public extension EntryModel {
         var addedWallet: AddedWallet?
         var reloadsWallets = false
 
-        public var sheet: Sheet? {
-            get {
-                if case let .sheet(sheet) = shown {
-                    sheet
-                } else {
-                    nil
-                }
-            }
-            set {
-                if let newValue {
-                    shown = .sheet(newValue)
-                } else if sheet != nil {
-                    shown = nil
-                }
-            }
-        }
-
-        public var isConfirmingDiscard: Bool {
-            get {
-                shown == .discard
-            }
-            set {
-                if newValue {
-                    shown = .discard
-                } else if isConfirmingDiscard {
-                    shown = nil
-                }
-            }
-        }
-
-        public var menuCategory: EntryCategory? {
-            if case let .menu(category) = shown {
-                category
-            } else {
-                nil
-            }
-        }
-
         init(deck: Deck) {
             self.deck = deck
         }
     }
+}
 
+public extension EntryModel {
     func showSelectedCategory() {
         let page = output.categoryPages.firstIndex { page in
             page.contains { $0.categoryId == state.category.id }
@@ -139,8 +69,87 @@ public extension EntryModel {
 
         state.screen.addedWallet = nil
         state.screen.reloadsWallets = false
-
         await reloadAfterSheet(wallets: needsWallets, adding: added)
+    }
+}
+
+public extension EntryModel.Screen {
+    var sheet: EntryModel.Sheet? {
+        get {
+            if case let .sheet(sheet) = shown {
+                sheet
+            } else {
+                nil
+            }
+        }
+        set {
+            if let newValue {
+                shown = .sheet(newValue)
+            } else if sheet != nil {
+                shown = nil
+            }
+        }
+    }
+
+    var isConfirmingDiscard: Bool {
+        get {
+            shown == .discard
+        }
+        set {
+            if newValue {
+                shown = .discard
+            } else if isConfirmingDiscard {
+                shown = nil
+            }
+        }
+    }
+
+    var menuCategory: EntryCategory? {
+        if case let .menu(category) = shown {
+            category
+        } else {
+            nil
+        }
+    }
+}
+
+public extension EntryModel.Sheet {
+    var id: Self {
+        self
+    }
+}
+
+extension EntryModel.Sheet {
+    var isWallet: Bool {
+        switch self {
+        case .newWallet, .editWallet: true
+        default: false
+        }
+    }
+}
+
+public extension EntryModel.Deck {
+    static func fields(for type: Entry.Kind) -> [Self] {
+        switch type {
+        case .transfer: [.transfer, .fee, .date, .amount]
+        case .expense, .income: [.category, .wallet(.source), .date, .amount]
+        }
+    }
+
+    static func start(for type: Entry.Kind) -> Self {
+        type == .transfer ? .transfer : .category
+    }
+
+    func field(for type: Entry.Kind) -> Self {
+        switch (self, type) {
+        case (.wallet, .transfer): .transfer
+        default: self
+        }
+    }
+
+    func order(for type: Entry.Kind) -> Int {
+        let target = field(for: type)
+        return Self.fields(for: type).firstIndex(of: target) ?? 0
     }
 }
 
@@ -166,7 +175,6 @@ public extension EntryModel.State {
 
     func resetDeck() {
         screen.deck = EntryModel.Deck.start(for: type)
-
         enter(.amount)
     }
 

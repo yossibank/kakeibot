@@ -92,7 +92,6 @@ extension AppDatabase {
 
         let rowIds = rows.map(\.id)
         let fees = try Entry.filter(rowIds.contains(Column("transfer_id"))).fetchAll(db)
-
         var seen = Set<Entry.ID>()
 
         return (rows + fees).filter { seen.insert($0.id).inserted }
@@ -155,7 +154,6 @@ private extension AppDatabase {
         var recalculated = bill
 
         recalculated.amount = amount
-
         try recalculated.update(db)
 
         return CardBillChange(before: [bill], after: [recalculated])

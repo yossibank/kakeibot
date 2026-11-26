@@ -23,7 +23,9 @@ public extension EntryTagDraft {
         case nameTooLong
         case duplicateName
     }
+}
 
+public extension EntryTagDraft {
     static let maxNameLength = 8
 
     var problems: [Problem] {

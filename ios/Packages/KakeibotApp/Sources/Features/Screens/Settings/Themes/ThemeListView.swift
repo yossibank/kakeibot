@@ -134,7 +134,9 @@ extension ThemeListView {
         var menuHeight: CGFloat = 0
         var menuFrame: CGRect = .zero
     }
+}
 
+extension ThemeListView {
     static let space = "themes"
 
     var offer: ThemeListModel.Offer? {
@@ -299,6 +301,10 @@ private extension ThemeListView {
         return "アプリアイコンも\(title)にできます"
     }
 
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+
     func reload() {
         model.perform {
             await $0.load()
@@ -309,11 +315,5 @@ private extension ThemeListView {
         model.perform {
             await $0.restore(deletion)
         }
-    }
-}
-
-private extension ThemeListView {
-    var hint: SettingsFold {
-        SettingsFold(\.hint, in: model)
     }
 }

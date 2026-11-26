@@ -38,7 +38,6 @@ public extension RewardBank {
             .sorted { left, right in
                 let leftDate = left.purchasedAt ?? .distantPast
                 let rightDate = right.purchasedAt ?? .distantPast
-
                 return leftDate > rightDate
             }
     }

@@ -3,6 +3,13 @@ import FeatureModels
 import SwiftUI
 
 extension MainView {
+    static let tabItems: [FloatingTabBar<MainModel.Tab>.Item] = [
+        .init("ホーム", systemImage: "house", value: .home),
+        .init("記録", systemImage: "calendar", value: .records),
+        .init("振り返り", systemImage: "chart.pie", value: .review),
+        .init("資産", systemImage: "building.columns", value: .assets)
+    ]
+
     static func hasSidebar(_ sizeClass: UserInterfaceSizeClass?) -> Bool {
         sizeClass == .regular
     }
@@ -17,21 +24,6 @@ extension MainView {
 
     static func noticeBottom(hasSidebar: Bool) -> CGFloat {
         noticeAbove(hasSidebar: hasSidebar) + NoticeBanner.bottomMargin
-    }
-}
-
-extension MainView {
-    static let tabItems: [FloatingTabBar<MainModel.Tab>.Item] = [
-        .init("ホーム", systemImage: "house", value: .home),
-        .init("記録", systemImage: "calendar", value: .records),
-        .init("振り返り", systemImage: "chart.pie", value: .review),
-        .init("資産", systemImage: "building.columns", value: .assets)
-    ]
-}
-
-extension View {
-    func tabContent() -> some View {
-        modifier(TabContent())
     }
 }
 
@@ -55,8 +47,6 @@ private struct TabContent: ViewModifier {
 }
 
 private extension TabContent {
-    static let fadeReach: CGFloat = 24
-
     var tabBarFade: some View {
         LinearGradient(
             colors: [Palette.backgroundBottom.opacity(0.0), Palette.backgroundBottom],
@@ -66,5 +56,15 @@ private extension TabContent {
         .frame(height: FloatingTabBar<Int>.clearance + Self.fadeReach)
         .ignoresSafeArea(edges: .bottom)
         .allowsHitTesting(false)
+    }
+}
+
+private extension TabContent {
+    static let fadeReach: CGFloat = 24
+}
+
+extension View {
+    func tabContent() -> some View {
+        modifier(TabContent())
     }
 }

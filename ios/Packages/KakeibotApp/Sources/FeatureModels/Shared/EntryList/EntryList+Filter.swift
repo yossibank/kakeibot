@@ -1,6 +1,14 @@
 import Core
 import Store
 
+private extension EntryList {
+    struct SameKey: Hashable {
+        let kind: EntryCategory.Kind
+        let category: String
+        let tag: String?
+    }
+}
+
 public extension EntryList {
     var filterCategories: [EntryCategory] {
         categories.values
@@ -63,19 +71,15 @@ public extension EntryList {
 
     func widened(_ filter: EntryFilter) -> EntryFilter {
         var widened = filter
+
         widened.categoryIds = sameCategoryIds(as: filter.categoryIds)
         widened.tagIds = sameTagIds(as: filter.tagIds)
+
         return widened
     }
 }
 
 private extension EntryList {
-    struct SameKey: Hashable {
-        let kind: EntryCategory.Kind
-        let category: String
-        let tag: String?
-    }
-
     func sameCategoryIds(as ids: Set<EntryCategory.ID>) -> Set<EntryCategory.ID> {
         let keys = Set(ids.compactMap { categories[$0] }.map { key(of: $0) })
 

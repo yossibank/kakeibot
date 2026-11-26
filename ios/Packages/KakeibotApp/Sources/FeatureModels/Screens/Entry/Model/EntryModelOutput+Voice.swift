@@ -28,6 +28,7 @@ public extension EntryModel.Output {
         }
 
         var names: [String] = categories.map(\.name)
+
         names += tags
         names += wallets.map(\.name)
         names += input.allTemplates.map(\.name)

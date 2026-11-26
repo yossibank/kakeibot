@@ -22,7 +22,9 @@ public extension EntryBatch {
         case changedWallet
         case deleted
     }
+}
 
+public extension EntryBatch {
     var message: String {
         let count = "\(previous.count) 件"
 

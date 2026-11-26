@@ -17,7 +17,9 @@ public extension StampBook {
         public let count: Int
         public let lastDate: LocalDate
     }
+}
 
+public extension StampBook {
     func icon(on date: LocalDate) -> Icon? {
         stamps[date].flatMap { icons[$0.iconId] }
     }

@@ -34,12 +34,9 @@ private extension WhatsNewAnalysisScene {
         let current: CGFloat
         let isUp: Bool
     }
+}
 
-    static let metrics = [
-        Metric(title: "回数", previous: 0.6, current: 1, isUp: true),
-        Metric(title: "1 回", previous: 0.9, current: 0.85, isUp: false)
-    ]
-
+private extension WhatsNewAnalysisScene {
     var displaySwitch: some View {
         HStack(spacing: 4) {
             segment("グラフ", systemImage: "chart.pie", isSelected: false)
@@ -154,4 +151,11 @@ private extension WhatsNewAnalysisScene {
                 .foregroundStyle(Palette.subtext)
         }
     }
+}
+
+private extension WhatsNewAnalysisScene {
+    static let metrics = [
+        Metric(title: "回数", previous: 0.6, current: 1, isUp: true),
+        Metric(title: "1 回", previous: 0.9, current: 0.85, isUp: false)
+    ]
 }

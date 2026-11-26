@@ -14,7 +14,9 @@ public extension ProOfferModel {
     final class State {
         public var isShowingPro = false
     }
+}
 
+public extension ProOfferModel {
     func showPro() {
         state.isShowingPro = true
     }

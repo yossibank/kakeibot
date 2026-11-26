@@ -7,7 +7,9 @@ public extension AssetsModel {
         public let month: YearMonth
         public let logs: [RewardLog]
     }
+}
 
+public extension AssetsModel {
     func goalEditModel(editing goal: RewardGoal?) -> AssetsRewardGoalEditModel {
         AssetsRewardGoalEditModel(
             parts: dependencies,
@@ -38,9 +40,7 @@ public extension AssetsModel {
             return false
         }
     }
-}
 
-public extension AssetsModel {
     func childParts() -> ScreenParts {
         dependencies
     }

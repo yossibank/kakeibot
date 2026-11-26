@@ -93,8 +93,6 @@ extension ReviewProgressView {
 }
 
 private extension ReviewProgressView {
-    static let chartHeight: CGFloat = 96
-
     func yearChart(_ year: ReviewYearProgress) -> some View {
         let largest = max(year.largest, 1)
         let averageRatio = year.average.map { Double($0) / Double(largest) }
@@ -176,6 +174,10 @@ private extension ReviewProgressView {
         }
         .frame(maxWidth: .infinity)
     }
+}
+
+private extension ReviewProgressView {
+    static let chartHeight: CGFloat = 96
 
     static func labelColor(of month: ReviewYearProgress.Month) -> Color {
         switch month.state {

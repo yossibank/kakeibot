@@ -21,33 +21,6 @@ public extension RecurringListModel {
 
         let input: Input
 
-        public var rows: [Row] {
-            shown.compactMap { row(for: $0) }
-        }
-
-        public var hiddenRows: [Row] {
-            hidden.compactMap { row(for: $0) }
-        }
-
-        public var monthTotal: Int {
-            let startDay = input.monthStartDay
-            let period = input.today.periodMonth(startingOn: startDay).period(startingOn: startDay)
-
-            guard let list = input.list else {
-                return visible.total(of: state.type, in: period)
-            }
-
-            return visible.total(of: state.type, in: period, entries: list.entries)
-        }
-
-        public var items: [Recurring] {
-            guard input.list != nil, let snapshot = input.snapshot else {
-                return []
-            }
-
-            return snapshot.filter { $0.type == state.type }
-        }
-
         init(
             input: Input,
             state: State
@@ -55,14 +28,43 @@ public extension RecurringListModel {
             self.input = input
             self.state = state
         }
+    }
+}
 
-        public func row(for recurring: Recurring) -> Row? {
-            input.list.map { row(for: recurring, in: $0) }
+public extension RecurringListModel.Output {
+    var rows: [RecurringListModel.Row] {
+        shown.compactMap { row(for: $0) }
+    }
+
+    var hiddenRows: [RecurringListModel.Row] {
+        hidden.compactMap { row(for: $0) }
+    }
+
+    var monthTotal: Int {
+        let startDay = input.monthStartDay
+        let period = input.today.periodMonth(startingOn: startDay).period(startingOn: startDay)
+
+        guard let list = input.list else {
+            return visible.total(of: state.type, in: period)
         }
 
-        public func isHidden(_ item: Recurring) -> Bool {
-            item.archivedAt != nil
+        return visible.total(of: state.type, in: period, entries: list.entries)
+    }
+
+    var items: [Recurring] {
+        guard input.list != nil, let snapshot = input.snapshot else {
+            return []
         }
+
+        return snapshot.filter { $0.type == state.type }
+    }
+
+    func row(for recurring: Recurring) -> RecurringListModel.Row? {
+        input.list.map { row(for: recurring, in: $0) }
+    }
+
+    func isHidden(_ item: Recurring) -> Bool {
+        item.archivedAt != nil
     }
 }
 

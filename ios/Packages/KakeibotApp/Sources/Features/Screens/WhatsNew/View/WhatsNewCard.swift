@@ -161,28 +161,6 @@ private extension WhatsNewCard {
                 .scaleEffect(isShown ? 1 : 0.94)
         }
     }
-
-    static let minSceneWidth: CGFloat = 88
-    static let listSceneWidth: CGFloat = 116
-    static let chevronWidth: CGFloat = 8
-    static let gap: CGFloat = 4
-    static let stepDelay: Duration = .milliseconds(320)
-}
-
-private extension WhatsNewCard {
-    var indexedSteps: [(offset: Int, element: WhatsNewRelease.Step)] {
-        Array(feature.steps.enumerated())
-    }
-
-    var wideStepsWidth: CGFloat {
-        let count = CGFloat(feature.steps.count)
-        let joint = Self.chevronWidth + Self.gap * 2
-        return Self.minSceneWidth * count + joint * max(count - 1, 0)
-    }
-
-    func isShown(_ index: Int) -> Bool {
-        Double(index) < layout.shownSteps
-    }
 }
 
 private extension WhatsNewCard {
@@ -211,6 +189,28 @@ private extension WhatsNewCard {
                 .foregroundStyle(Palette.text)
                 .fixedSize(horizontal: false, vertical: true)
         }
+    }
+}
+
+private extension WhatsNewCard {
+    static let minSceneWidth: CGFloat = 88
+    static let listSceneWidth: CGFloat = 116
+    static let chevronWidth: CGFloat = 8
+    static let gap: CGFloat = 4
+    static let stepDelay: Duration = .milliseconds(320)
+
+    var indexedSteps: [(offset: Int, element: WhatsNewRelease.Step)] {
+        Array(feature.steps.enumerated())
+    }
+
+    var wideStepsWidth: CGFloat {
+        let count = CGFloat(feature.steps.count)
+        let joint = Self.chevronWidth + Self.gap * 2
+        return Self.minSceneWidth * count + joint * max(count - 1, 0)
+    }
+
+    func isShown(_ index: Int) -> Bool {
+        Double(index) < layout.shownSteps
     }
 
     func revealSteps() async {

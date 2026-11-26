@@ -16,7 +16,6 @@ public extension CategoryEditModel {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt<Never>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<EntryCategory>>()
-
         public var name = ""
         public var isMovingTag = false
         public var ignoresKeyboard = false
@@ -62,7 +61,6 @@ public extension CategoryEditModel.State {
         }
 
         let others = tags.filter { $0.id != id }.map(\.draft)
-
         var draft = tags[index].draft
 
         draft.name = name
@@ -145,7 +143,6 @@ extension CategoryEditModel.State {
     ) {
         name = draft.name
         icon.apply(draft.icon)
-
         self.tags = tags
     }
 }

@@ -38,20 +38,6 @@ extension AssetsView {
 }
 
 private extension AssetsView {
-    static let billTitle = "これからの引き落とし"
-    static let billInset: CGFloat = 16
-
-    static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
-        let movedIn = row.movedIn.count
-        let movedOut = row.movedOut.count
-        let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
-        let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
-        let parts = inText + outText
-        return parts.isEmpty ? nil : parts.joined(separator: "・")
-    }
-}
-
-private extension AssetsView {
     func billList(_ page: BillPage) -> some View {
         VStack(spacing: 12) {
             ForEach(model.output.upcomingBills(in: page.month)) { row in
@@ -94,5 +80,19 @@ private extension AssetsView {
                 .buttonStyle(.plain)
             }
         }
+    }
+}
+
+private extension AssetsView {
+    static let billTitle = "これからの引き落とし"
+    static let billInset: CGFloat = 16
+
+    static func movesText(of row: AssetsModel.UpcomingBill) -> String? {
+        let movedIn = row.movedIn.count
+        let movedOut = row.movedOut.count
+        let inText = movedIn > 0 ? ["前から \(movedIn) 件"] : []
+        let outText = movedOut > 0 ? ["後へ \(movedOut) 件"] : []
+        let parts = inText + outText
+        return parts.isEmpty ? nil : parts.joined(separator: "・")
     }
 }

@@ -57,7 +57,9 @@ private extension AppIconTile {
         var ring = 1.0
         var glow = 0.0
     }
+}
 
+private extension AppIconTile {
     var preview: some View {
         AppIconPreview(choice: choice, size: Self.size)
             .keyframeAnimator(initialValue: Pop(), trigger: taps) { content, pop in

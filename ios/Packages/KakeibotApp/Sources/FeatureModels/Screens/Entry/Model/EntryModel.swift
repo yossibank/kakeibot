@@ -51,28 +51,19 @@ public extension EntryModel {
             let itemLimit = Self.recentItemNameLimit
 
             input.options = try await database.entryOptions()
-
             input.recentMemos = try await database.recentMemos(limit: limit)
-
             input.recentItemNames = try await database.recentItemNames(limit: itemLimit)
-
             input.allTemplates = try await database.templates()
 
             input.cardBills = try await database.recurrings()
                 .filter { $0.type == .transfer && $0.closingDay != nil }
 
             input.weekStart = try await database.setting(.weekStart)
-
             input.monthStartDay = try await database.setting(.monthStartDay)
-
             input.carryoverFrom = try await database.setting(.budgetCarryoverFrom)
-
             input.receiptSavedCount = try await database.setting(.receiptSavedCount)
-
             input.receiptGuideHidden = try await database.setting(.receiptGuideHidden)
-
             input.budgets = try await database.budgets()
-
             try await loadEntry()
             try await loadHistory()
 
@@ -144,7 +135,6 @@ public extension EntryModel {
         }
 
         await startNext()
-
         state.results.outcome.send(.continued(change))
 
         return change
@@ -204,7 +194,6 @@ public extension EntryModel {
 
         input.baseline = output.snapshot
         state.progress.isSaving = false
-
         state.errorNotice.inform(Self.recordAgainMessage)
         state.results.outcome.send(.categoryMoved)
     }

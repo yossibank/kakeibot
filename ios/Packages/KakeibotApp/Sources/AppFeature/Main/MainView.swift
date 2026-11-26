@@ -297,9 +297,7 @@ private extension MainView {
             assets.state.errorNotice.count
         ]
     }
-}
 
-private extension MainView {
     func replaceNotices(with source: NoticeSource) {
         if source != .entry {
             notice.clear()

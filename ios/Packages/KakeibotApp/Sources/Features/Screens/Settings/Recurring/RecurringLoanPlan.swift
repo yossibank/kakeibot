@@ -38,31 +38,6 @@ struct RecurringLoanPlan: View {
 }
 
 private extension RecurringLoanPlan {
-    var totalTitle: String {
-        model.isEditing ? "これから返す額" : "返す総額"
-    }
-
-    var noteText: String? {
-        if model.output.usesAutoCount,
-           let owed = model.output.loanOwed {
-            return "残高 \(Yen.text(owed)) から回数と最後の回を出しています"
-        }
-
-        guard let plan = model.output.autoPlan else {
-            return nil
-        }
-
-        if let gap = model.output.balanceGap {
-            return "残高と \(Yen.text(abs(gap))) ずれています"
-        }
-
-        return model.output.plannedTotal == nil ? "残高から出すと、あと \(plan.count) 回で終わります" : nil
-    }
-
-    var canMatch: Bool {
-        !model.output.usesAutoCount && model.output.autoPlan != nil
-    }
-
     @ViewBuilder
     var note: some View {
         if let noteText {
@@ -117,5 +92,32 @@ private extension RecurringLoanPlan {
                     .foregroundStyle(Palette.text)
             }
         }
+    }
+}
+
+private extension RecurringLoanPlan {
+    var totalTitle: String {
+        model.isEditing ? "これから返す額" : "返す総額"
+    }
+
+    var noteText: String? {
+        if model.output.usesAutoCount,
+           let owed = model.output.loanOwed {
+            return "残高 \(Yen.text(owed)) から回数と最後の回を出しています"
+        }
+
+        guard let plan = model.output.autoPlan else {
+            return nil
+        }
+
+        if let gap = model.output.balanceGap {
+            return "残高と \(Yen.text(abs(gap))) ずれています"
+        }
+
+        return model.output.plannedTotal == nil ? "残高から出すと、あと \(plan.count) 回で終わります" : nil
+    }
+
+    var canMatch: Bool {
+        !model.output.usesAutoCount && model.output.autoPlan != nil
     }
 }

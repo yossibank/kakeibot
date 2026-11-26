@@ -19,9 +19,13 @@ public struct NotificationPermission: Sendable {
 
 public extension NotificationPermission {
     typealias Check = @Sendable () async -> NotificationAuthorization
-    typealias Request = @Sendable () async -> Bool
-    typealias Reschedule = @Sendable () async -> Void
 
+    typealias Request = @Sendable () async -> Bool
+
+    typealias Reschedule = @Sendable () async -> Void
+}
+
+public extension NotificationPermission {
     static let allowed = Self {
         .allowed
     } request: {

@@ -28,8 +28,11 @@ private extension ExportV1.Tables {
     ]
 
     static let adjustmentTitle = "調整"
+
     static let byteOrderMark: [UInt8] = [0xEF, 0xBB, 0xBF]
+
     static let formulaPrefixes: Set<Character> = ["=", "+", "-", "@"]
+
     static let quotedScalars: Set<Unicode.Scalar> = ["\"", ",", "\r", "\n"]
 
     var sortedRows: [CSVRow] {

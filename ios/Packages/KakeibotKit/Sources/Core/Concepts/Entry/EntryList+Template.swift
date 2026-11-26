@@ -32,7 +32,6 @@ private extension EntryList {
 
     func templateUses(through today: LocalDate) -> [EntryTemplate.ID: Int] {
         let start = today.adding(days: 1 - TemplateOrder.frequentDays)
-
         var uses: [EntryTemplate.ID: Int] = [:]
 
         for day in days where day.date >= start && day.date <= today {

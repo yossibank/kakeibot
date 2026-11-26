@@ -89,16 +89,22 @@ public struct RecurringEditSheet: View {
 }
 
 extension RecurringEditSheet {
+    typealias Panel = RecurringEditModel.Panel
+}
+
+private extension RecurringEditSheet {
+    enum Field: Hashable {
+        case name
+    }
+}
+
+extension RecurringEditSheet {
     var saveButton: some View {
         PrimaryButton(model.saveTitle) {
             edit.save()
         }
         .disabled(!model.canSave)
     }
-}
-
-extension RecurringEditSheet {
-    typealias Panel = RecurringEditModel.Panel
 
     func closePanel() {
         withAnimation(.snappy) {
@@ -154,10 +160,6 @@ private extension RecurringEditSheet {
 }
 
 private extension RecurringEditSheet {
-    enum Field: Hashable {
-        case name
-    }
-
     static let typeOptions: [CapsulePicker<Entry.Kind>.Option] = [
         .init("支出", value: .expense),
         .init("収入", value: .income),

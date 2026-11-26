@@ -18,6 +18,7 @@ public struct CappedWidthLayout: Layout {
 
         let ideal = subview.sizeThatFits(.unspecified)
         let width = min(ideal.width, maxWidth)
+
         return subview.sizeThatFits(ProposedViewSize(width: width, height: proposal.height))
     }
 

@@ -5,7 +5,9 @@ public extension AppDatabase {
     enum BudgetWriteError: Error, Equatable {
         case amountNotPositive
     }
+}
 
+public extension AppDatabase {
     func setBudget(
         _ amount: Int?,
         for categoryId: EntryCategory.ID?,
@@ -40,7 +42,6 @@ public extension AppDatabase {
             )
 
             budget.amount = amount
-
             try budget.save(db)
         }
     }

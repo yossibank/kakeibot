@@ -41,26 +41,11 @@ public extension RewardRuleEditModel {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-
         public var name = ""
 
         public private(set) var calculator = AmountCalculator()
 
         public let icon = SettingsIconEditorModel(glyph: .giftbox)
-
-        public func press(_ key: AmountCalculator.Key) {
-            calculator.press(key)
-        }
-
-        func apply(
-            _ rule: RewardRule,
-            icon saved: Icon
-        ) {
-            name = rule.name
-            calculator = AmountCalculator(amount: rule.amount)
-
-            icon.apply(saved)
-        }
     }
 
     @MainActor
@@ -68,7 +53,6 @@ public extension RewardRuleEditModel {
     final class Input: SettingsEditHidingInput {
         public internal(set) var isHidden = false
         public internal(set) var hasLogs = false
-
         public internal(set) var baseline: RewardRuleDraft?
 
         public let editingId: RewardRule.ID?
@@ -82,23 +66,13 @@ public extension RewardRuleEditModel {
     final class Output {
         let state: State
 
-        public var amount: Int? {
-            state.calculator.amount > 0 ? state.calculator.amount : nil
-        }
-
-        public var draft: RewardRuleDraft {
-            RewardRuleDraft(
-                name: state.name,
-                amount: state.calculator.amount,
-                icon: state.icon.draft
-            )
-        }
-
         init(state: State) {
             self.state = state
         }
     }
+}
 
+public extension RewardRuleEditModel {
     func load() async {
         guard let editingId = input.editingId else {
             return
@@ -117,7 +91,6 @@ public extension RewardRuleEditModel {
             }
 
             state.apply(rule, icon: saved)
-
             input.isHidden = !rule.isActive
             input.hasLogs = list.total(of: rule) != nil
             input.baseline = output.draft
@@ -147,6 +120,37 @@ public extension RewardRuleEditModel {
 
 private extension RewardRuleEditModel {
     static let loadFailedMessage = "決まりを読めませんでした"
+}
+
+public extension RewardRuleEditModel.Output {
+    var amount: Int? {
+        state.calculator.amount > 0 ? state.calculator.amount : nil
+    }
+
+    var draft: RewardRuleDraft {
+        RewardRuleDraft(
+            name: state.name,
+            amount: state.calculator.amount,
+            icon: state.icon.draft
+        )
+    }
+}
+
+public extension RewardRuleEditModel.State {
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
+    }
+}
+
+extension RewardRuleEditModel.State {
+    func apply(
+        _ rule: RewardRule,
+        icon saved: Icon
+    ) {
+        name = rule.name
+        calculator = AmountCalculator(amount: rule.amount)
+        icon.apply(saved)
+    }
 }
 
 extension RewardRuleEditModel: SettingsEditRemoving {

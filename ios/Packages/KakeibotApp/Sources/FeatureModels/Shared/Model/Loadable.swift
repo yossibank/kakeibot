@@ -2,7 +2,9 @@ enum Loadable<Value> {
     case loading
     case loaded(Value)
     case failed
+}
 
+extension Loadable {
     var value: Value? {
         switch self {
         case let .loaded(value): value
