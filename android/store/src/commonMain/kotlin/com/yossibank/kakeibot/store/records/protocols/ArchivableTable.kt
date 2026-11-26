@@ -28,7 +28,6 @@ interface ArchivableTable<Value : Any> : HidableTable<Value> {
         at: Instant,
     ) {
         val value = find(database, id) ?: throw notFound()
-
         update(database, archived(value, if (isHidden) at else null, at))
     }
 }

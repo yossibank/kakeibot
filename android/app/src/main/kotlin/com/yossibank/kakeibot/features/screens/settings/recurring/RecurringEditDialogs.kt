@@ -19,20 +19,23 @@ fun RecurringEditDialogs(
     prompt: RecurringEditPrompt?,
     isHidden: Boolean,
     canSave: Boolean,
-    onDismiss: () -> Unit,
+    onDismiss: (RecurringEditPrompt) -> Unit,
     onDiscard: () -> Unit,
     onDelete: () -> Unit,
     onSaveHiding: () -> Unit,
     onDiscardHiding: () -> Unit,
 ) {
-    when (prompt) {
+    val current = prompt ?: return
+    val dismiss = { onDismiss(current) }
+
+    when (current) {
         RecurringEditPrompt.Discard -> {
             DiscardDialog(
                 onDiscard = {
-                    onDismiss()
+                    dismiss()
                     onDiscard()
                 },
-                onKeep = onDismiss,
+                onKeep = dismiss,
             )
         }
 
@@ -41,10 +44,10 @@ fun RecurringEditDialogs(
                 title = "この固定費を削除しますか",
                 message = "これまでに作った記録は残ります",
                 onConfirm = {
-                    onDismiss()
+                    dismiss()
                     onDelete()
                 },
-                onDismiss = onDismiss,
+                onDismiss = dismiss,
             )
         }
 
@@ -53,18 +56,16 @@ fun RecurringEditDialogs(
                 isHidden = isHidden,
                 canSave = canSave,
                 onSave = {
-                    onDismiss()
+                    dismiss()
                     onSaveHiding()
                 },
                 onDiscard = {
-                    onDismiss()
+                    dismiss()
                     onDiscardHiding()
                 },
-                onKeep = onDismiss,
+                onKeep = dismiss,
             )
         }
-
-        null -> {}
     }
 }
 

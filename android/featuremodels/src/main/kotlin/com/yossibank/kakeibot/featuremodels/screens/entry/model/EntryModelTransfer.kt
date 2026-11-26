@@ -11,7 +11,6 @@ data class TransferRoute(
 
 fun EntryModel.payOffLoan() {
     val remaining = output.loanRemaining ?: return
-
     state.setAmount(minOf(remaining, AmountCalculator.maxValue.toLong()).toInt())
 }
 

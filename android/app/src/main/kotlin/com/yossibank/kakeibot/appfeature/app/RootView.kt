@@ -45,7 +45,6 @@ fun RootView(
 
     LifecycleResumeEffect(model) {
         model.refreshDay()
-
         onPauseOrDispose {}
     }
 

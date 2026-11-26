@@ -13,15 +13,6 @@ data class PlannedNotification(
     val body: String,
     val route: Route,
 ) {
-    val identifier: String
-        get() = listOf(
-            key,
-            date.toString(),
-            time.toString(),
-            title,
-            body,
-        ).joinToString("|")
-
     sealed interface Route {
         val link: String
 
@@ -103,4 +94,13 @@ data class PlannedNotification(
             }
         }
     }
+
+    val identifier: String
+        get() = listOf(
+            key,
+            date.toString(),
+            time.toString(),
+            title,
+            body,
+        ).joinToString("|")
 }

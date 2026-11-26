@@ -8,14 +8,14 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 
 class UndoNoticeState<Item : Any> {
+    private var shown: Shown<Item>? by mutableStateOf(null)
+
+    private var count = 0
+
     private data class Shown<Item>(
         val id: Int,
         val item: Item,
     )
-
-    private var shown: Shown<Item>? by mutableStateOf(null)
-
-    private var count = 0
 
     val current: Item?
         get() = shown?.item

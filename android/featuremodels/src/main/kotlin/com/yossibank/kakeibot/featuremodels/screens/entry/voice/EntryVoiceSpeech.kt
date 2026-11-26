@@ -41,8 +41,8 @@ internal object EntryVoiceSpeech {
         else -> Outcome.Failed
     }
 
-    fun download(recognizer: SpeechRecognizer?): Outcome {
-        if (recognizer == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+    fun download(recognizer: SpeechRecognizer): Outcome {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return Outcome.Unsupported
         }
 
@@ -57,6 +57,7 @@ internal object EntryVoiceSpeech {
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
             )
+
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, LANGUAGE)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)

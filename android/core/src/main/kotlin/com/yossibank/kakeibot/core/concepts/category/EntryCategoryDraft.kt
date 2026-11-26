@@ -3,8 +3,7 @@ package com.yossibank.kakeibot.core.concepts.category
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.icon.IconDraft
 import com.yossibank.kakeibot.core.shared.DraftProblem
-import com.yossibank.kakeibot.core.shared.DraftProblemException
-import com.yossibank.kakeibot.core.shared.IconBackedDraft
+import com.yossibank.kakeibot.core.shared.IconHoldingDraft
 import com.yossibank.kakeibot.core.shared.Identifier
 import java.time.Instant
 
@@ -13,7 +12,7 @@ data class EntryCategoryDraft(
     val name: String,
     val mark: IconDraft.Mark,
     val color: String,
-) : IconBackedDraft<EntryCategory> {
+) : IconHoldingDraft<EntryCategory> {
     constructor(
         category: EntryCategory,
         icon: Icon,
@@ -23,51 +22,6 @@ data class EntryCategoryDraft(
         mark = IconDraft.Mark.of(icon),
         color = icon.color,
     )
-
-    val icon: IconDraft
-        get() = IconDraft(
-            mark = mark,
-            color = color,
-        )
-
-    val problems: List<DraftProblem>
-        get() {
-            val nameProblems = if (trimmedName.isEmpty()) {
-                listOf(
-                    DraftProblem.emptyName,
-                )
-            } else {
-                emptyList()
-            }
-
-            return nameProblems + icon.problems
-        }
-
-    private val trimmedName: String
-        get() = name.trim()
-
-    override fun newIcon(at: Instant): Icon {
-        validate()
-
-        return icon.newIcon(at)
-    }
-
-    fun newCategory(
-        iconId: Identifier<Icon>,
-        sortOrder: Int,
-        at: Instant,
-    ): EntryCategory {
-        validate()
-
-        return EntryCategory(
-            kind = kind,
-            name = trimmedName,
-            iconId = iconId,
-            sortOrder = sortOrder,
-            createdAt = at,
-            updatedAt = at,
-        )
-    }
 
     override fun newValue(
         iconId: Identifier<Icon>,
@@ -80,22 +34,10 @@ data class EntryCategoryDraft(
     )
 
     override fun applied(
-        to: Icon,
-        at: Instant,
-    ): Icon {
-        validate()
-
-        return icon.applied(
-            to = to,
-            at = at,
-        )
-    }
-
-    override fun applied(
         to: EntryCategory,
         at: Instant,
     ): EntryCategory {
-        validate()
+        validateProblems()
 
         return to.copy(
             name = trimmedName,
@@ -103,11 +45,44 @@ data class EntryCategoryDraft(
         )
     }
 
-    private fun validate() {
-        val problem = problems.firstOrNull() ?: return
+    override val icon: IconDraft
+        get() = IconDraft(
+            mark = mark,
+            color = color,
+        )
 
-        throw DraftProblemException(problem)
+    override val problems: List<DraftProblem>
+        get() {
+            val nameProblems = if (trimmedName.isEmpty()) {
+                listOf(
+                    DraftProblem.emptyName,
+                )
+            } else {
+                emptyList()
+            }
+
+            return nameProblems + icon.problems
+        }
+
+    fun newCategory(
+        iconId: Identifier<Icon>,
+        sortOrder: Int,
+        at: Instant,
+    ): EntryCategory {
+        validateProblems()
+
+        return EntryCategory(
+            kind = kind,
+            name = trimmedName,
+            iconId = iconId,
+            sortOrder = sortOrder,
+            createdAt = at,
+            updatedAt = at,
+        )
     }
+
+    private val trimmedName: String
+        get() = name.trim()
 
     companion object {
         val maxTextLength = IconDraft.MAX_TEXT_LENGTH

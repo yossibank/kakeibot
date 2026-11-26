@@ -56,6 +56,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
+import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
@@ -84,6 +85,7 @@ fun ReviewView(
     }
 
     model.state.task.Timer()
+    TabNoticeRound(model.state.task)
 
     LoadFailedColumn(
         isFailed = model.state.isListFailed,
@@ -342,6 +344,12 @@ private fun CategoryRow(row: ReviewModel.Row) {
     }
 }
 
+private fun title(of: ReviewKind): String = when (of) {
+    ReviewKind.expense -> "支出"
+    ReviewKind.income -> "収入"
+    ReviewKind.balance -> "収支"
+}
+
 private val scales = listOf(
     ReviewPeriod.Scale.week to "週",
     ReviewPeriod.Scale.month to "月",
@@ -349,9 +357,3 @@ private val scales = listOf(
 )
 
 private val kinds = ReviewKind.entries.map { it to title(of = it) }
-
-private fun title(of: ReviewKind): String = when (of) {
-    ReviewKind.expense -> "支出"
-    ReviewKind.income -> "収入"
-    ReviewKind.balance -> "収支"
-}

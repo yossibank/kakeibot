@@ -11,7 +11,6 @@ fun RecurringEditModel.select(type: Entry.Kind) {
 
     state.update { copy(type = type) }
     state.update { copy(categoryId = output.categories.firstOrNull()?.id) }
-
     presetDestination()
     suggestHolidayShift()
 }

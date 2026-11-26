@@ -87,6 +87,7 @@ suspend fun AppDatabase.deleteCategory(
 ): Deletion = write {
     val category =
         findCategory(id) ?: throw CategoryWriteException(CategoryWriteError.categoryNotFound)
+
     val key = id.databaseValue
 
     if (entryDao().countOfCategory(key) > 0) {
@@ -95,9 +96,11 @@ suspend fun AppDatabase.deleteCategory(
 
     val tags = tagDao().ofCategory(key).map { it.decoded(EntryTagRecord::entryTag) }
     val recurrings = recurringDao().ofCategory(key).map { it.decoded(RecurringRecord::recurring) }
+
     val templates = templateDao().ofCategory(key).map {
         it.decoded(EntryTemplateRecord::entryTemplate)
     }
+
     val budgets = budgetDao().ofCategory(key).map { it.decoded(BudgetRecord::budget) }
 
     val deletion = Deletion(
@@ -132,6 +135,7 @@ private suspend fun AppDatabase.storeTags(
     val existing = tagDao().ofCategory(categoryId.databaseValue).map {
         it.decoded(EntryTagRecord::entryTag)
     }
+
     val names = drafts.map { it.name.trim() }
 
     if (names.toSet().size != names.size) {

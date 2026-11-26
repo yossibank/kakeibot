@@ -12,12 +12,14 @@ class ForegroundReturn {
     fun receive(phase: Phase): Boolean = when (phase) {
         Phase.Background -> {
             wasBackground = true
+
             false
         }
 
         Phase.Active -> {
             val isReturn = wasBackground
             wasBackground = false
+
             isReturn
         }
 

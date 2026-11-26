@@ -107,6 +107,13 @@ internal fun RecordsCalendarCard(model: RecordsModel) {
 }
 
 @Composable
+internal fun weekdayColor(weekday: Weekday): Color = when (weekday) {
+    Weekday.sunday -> Palette.holiday
+    Weekday.saturday -> Palette.saturday
+    else -> Palette.subtext
+}
+
+@Composable
 private fun CalendarCell(
     date: LocalDate,
     day: EntryDay?,
@@ -171,11 +178,4 @@ private fun CalendarCell(
             )
         }
     }
-}
-
-@Composable
-internal fun weekdayColor(weekday: Weekday): Color = when (weekday) {
-    Weekday.sunday -> Palette.holiday
-    Weekday.saturday -> Palette.saturday
-    else -> Palette.subtext
 }

@@ -53,6 +53,13 @@ val EntryModel.Output.wallet: Wallet?
 val EntryModel.Output.toWallet: Wallet?
     get() = wallets.firstOrNull { it.id == state.form.toWalletId }
 
+fun EntryModel.Output.icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
+
+fun EntryModel.Output.category(of: Identifier<EntryCategory>?): EntryCategory? =
+    allCategories.firstOrNull { it.id == of }
+
+fun EntryModel.Output.wallet(of: Identifier<Wallet>?): Wallet? = wallets.firstOrNull { it.id == of }
+
 internal val EntryModel.Output.usualWalletId: Identifier<Wallet>?
     get() {
         val type = state.form.type
@@ -141,6 +148,14 @@ internal fun EntryModel.Output.offeredCategories(
     Entry.Kind.transfer -> emptyList()
 }
 
+internal fun EntryModel.Output.message(of: EntryDraft.Problem): String = when (of) {
+    EntryDraft.Problem.amountNotPositive -> "金額を入れてください"
+    EntryDraft.Problem.missingCategory -> "カテゴリを選んでください"
+    EntryDraft.Problem.missingDestination -> "振替先を選んでください"
+    EntryDraft.Problem.sameWallet -> "振替元と振替先を別にしてください"
+    else -> ModelTask.saveFailed
+}
+
 private fun EntryModel.Output.offeredCategories(
     of: EntryCategory.Kind,
     walletId: Identifier<Wallet>?,
@@ -157,19 +172,4 @@ private fun EntryModel.Output.offeredCategories(
         EntryCategory.Kind.expense -> input.options?.expenseCategories ?: emptyList()
         EntryCategory.Kind.income -> input.options?.incomeCategories ?: emptyList()
     }
-}
-
-fun EntryModel.Output.icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
-
-fun EntryModel.Output.category(of: Identifier<EntryCategory>?): EntryCategory? =
-    allCategories.firstOrNull { it.id == of }
-
-fun EntryModel.Output.wallet(of: Identifier<Wallet>?): Wallet? = wallets.firstOrNull { it.id == of }
-
-internal fun EntryModel.Output.message(of: EntryDraft.Problem): String = when (of) {
-    EntryDraft.Problem.amountNotPositive -> "金額を入れてください"
-    EntryDraft.Problem.missingCategory -> "カテゴリを選んでください"
-    EntryDraft.Problem.missingDestination -> "振替先を選んでください"
-    EntryDraft.Problem.sameWallet -> "振替元と振替先を別にしてください"
-    else -> ModelTask.saveFailed
 }

@@ -6,14 +6,14 @@ import java.util.Locale
 import kotlin.math.abs
 
 object AmountText {
+    private const val COMPACT_FLOOR = 1_000_000
+
+    private val locale = Locale.JAPAN
+
     enum class Sign {
         Auto,
         Plus,
     }
-
-    private const val COMPACT_FLOOR = 1_000_000
-
-    private val locale = Locale.JAPAN
 
     fun number(value: Int): String = NumberFormat.getIntegerInstance(locale).format(value)
 

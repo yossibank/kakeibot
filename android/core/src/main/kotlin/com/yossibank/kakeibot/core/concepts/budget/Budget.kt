@@ -28,7 +28,6 @@ fun List<Budget>.carryover(
     expense: (YearMonth) -> Long,
 ): Long {
     val start = from ?: return 0L
-
     val months = generateSequence(start) { it.adding(months = 1) }.takeWhile { it < into }
 
     return months.fold(0L) { total, current ->

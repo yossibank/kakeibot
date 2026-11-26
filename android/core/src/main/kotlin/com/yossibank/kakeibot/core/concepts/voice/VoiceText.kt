@@ -32,6 +32,7 @@ internal class VoiceText(
         }
 
         val start = folded.indexOf(target)
+
         return if (start < 0) null else Span(start, start + target.length)
     }
 
@@ -61,7 +62,6 @@ internal class VoiceText(
 
     internal companion object {
         private val separators: Set<Char> = "、。,.!?！？「」".toSet()
-
         private val particles: Set<Char> = "でにをはがともへの".toSet()
 
         private val endings = listOf(
@@ -91,7 +91,6 @@ internal class VoiceText(
         )
 
         private val fillers = setOf("えっと", "えーと", "えー", "あの", "あと", "それと", "から", "より")
-
         private val digitComma = Regex("([0-9])[,，](?=[0-9]{3})")
 
         fun fold(text: String): String {
@@ -128,7 +127,6 @@ internal class VoiceText(
 
         private fun trimmed(fragment: String): String {
             var word = fragment
-
             val ending = endings.firstOrNull { word.endsWith(it) && word.length > it.length }
 
             if (ending != null) {

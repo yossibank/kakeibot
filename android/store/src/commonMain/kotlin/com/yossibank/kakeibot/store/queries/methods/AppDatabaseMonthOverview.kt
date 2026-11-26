@@ -63,8 +63,6 @@ suspend fun AppDatabase.widgetOverview(
     plan.with(list)
 }
 
-private const val widgetMonths = 4
-
 private suspend fun AppDatabase.fetchMonthPlan(today: LocalDate): MonthOverview = MonthOverview(
     list = null,
     budgets = fetchBudgets(),
@@ -86,3 +84,5 @@ private val MonthOverview.widgetStart: LocalDate
     }
 
 private fun MonthOverview.with(list: EntryList): MonthOverview = copy(list = list)
+
+private const val widgetMonths = 4

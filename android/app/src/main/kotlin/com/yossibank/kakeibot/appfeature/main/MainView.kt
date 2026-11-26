@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -12,18 +13,21 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.notification.PlannedNotification
 import com.yossibank.kakeibot.designsystem.components.modal.SheetLayer
+import com.yossibank.kakeibot.designsystem.components.navigation.FloatingTabBar
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.featuremodels.screens.main.MainModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPartsShared
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.featuremodels.shared.notice.EntryNoticeModel
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.menu.SettingsMenuSheet
@@ -31,6 +35,9 @@ import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
 import com.yossibank.kakeibot.features.screens.tabs.home.view.HomeView
 import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
 import com.yossibank.kakeibot.features.screens.tabs.review.view.ReviewView
+import com.yossibank.kakeibot.features.shared.notice.EntryNoticeBanner
+import com.yossibank.kakeibot.features.shared.notice.LocalTabNoticeRound
+import com.yossibank.kakeibot.features.shared.notice.LocalTabNoticeShown
 import com.yossibank.kakeibot.features.shared.observation.LocalObservationRound
 
 @Composable
@@ -47,7 +54,6 @@ fun MainView(
 
     LaunchedEffect(link) {
         val route = link?.let { PlannedNotification.Route.of(link = it) } ?: return@LaunchedEffect
-
         onOpenLink()
         model.perform { it.open(route) }
     }
@@ -95,57 +101,41 @@ private fun MainLayers(
 ) {
     val sheet = model.state.sheet
     val close = { model.state.sheet = null }
+    val notice = remember(parts) { EntryNoticeModel(parts) }
+
+    LaunchedEffect(notice.state.count) {
+        if (notice.state.notice != null) {
+            model.state.hideTabNotices()
+        }
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Palette.background),
     ) {
-        MainModel.Tab.entries.forEach { tab ->
-            MainTabLayer(
+        CompositionLocalProvider(
+            LocalTabNoticeRound provides model.state.noticeRound,
+            LocalTabNoticeShown provides notice::clear,
+        ) {
+            MainTabs(
+                parts = parts,
+                today = today,
                 model = model,
-                value = tab,
-            ) {
-                TabContent {
-                    when (tab) {
-                        MainModel.Tab.Home -> {
-                            HomeView(
-                                parts = parts,
-                                today = today,
-                                onOpenBudget = { model.state.sheet = MainModel.Sheet.Budget },
-                                onOpenEntry = model::openEntry,
-                                onAddEntry = { model.openEntry(editing = null) },
-                                onOpenSettings = {
-                                    model.state.sheet = MainModel.Sheet.Settings()
-                                },
-                            )
-                        }
-
-                        MainModel.Tab.Records -> {
-                            RecordsView(
-                                parts = parts,
-                                today = today,
-                                onOpenEntry = model::openEntry,
-                            )
-                        }
-
-                        MainModel.Tab.Review -> {
-                            ReviewView(
-                                parts = parts,
-                                today = today,
-                            )
-                        }
-
-                        MainModel.Tab.Assets -> {
-                            AssetsView(
-                                parts = parts,
-                                today = today,
-                            )
-                        }
-                    }
-                }
-            }
+            )
         }
+
+        EntryNoticeBanner(
+            model = notice,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = FloatingTabBar.clearance + 12.dp,
+                ),
+        )
 
         MainTabBar(
             model = model,
@@ -164,6 +154,7 @@ private fun MainLayers(
                 today = today,
                 editing = entry.editing,
                 date = entry.date,
+                onChange = notice::show,
                 onClose = close,
             )
         }
@@ -191,6 +182,59 @@ private fun MainLayers(
                 today = today,
                 onBack = close,
             )
+        }
+    }
+}
+
+@Composable
+private fun MainTabs(
+    parts: ScreenParts,
+    today: LocalDate,
+    model: MainModel,
+) {
+    MainModel.Tab.entries.forEach { tab ->
+        MainTabLayer(
+            model = model,
+            value = tab,
+        ) {
+            TabContent {
+                when (tab) {
+                    MainModel.Tab.Home -> {
+                        HomeView(
+                            parts = parts,
+                            today = today,
+                            onOpenBudget = { model.state.sheet = MainModel.Sheet.Budget },
+                            onOpenEntry = model::openEntry,
+                            onAddEntry = { model.openEntry(editing = null) },
+                            onOpenSettings = {
+                                model.state.sheet = MainModel.Sheet.Settings()
+                            },
+                        )
+                    }
+
+                    MainModel.Tab.Records -> {
+                        RecordsView(
+                            parts = parts,
+                            today = today,
+                            onOpenEntry = model::openEntry,
+                        )
+                    }
+
+                    MainModel.Tab.Review -> {
+                        ReviewView(
+                            parts = parts,
+                            today = today,
+                        )
+                    }
+
+                    MainModel.Tab.Assets -> {
+                        AssetsView(
+                            parts = parts,
+                            today = today,
+                        )
+                    }
+                }
+            }
         }
     }
 }

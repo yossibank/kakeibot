@@ -30,15 +30,6 @@ class NotificationPermissionState(
 
     private var answer: CompletableDeferred<Boolean>? = null
 
-    private val isEnabled: Boolean
-        get() = NotificationManagerCompat.from(context).areNotificationsEnabled()
-
-    private val canAsk: Boolean
-        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-
-    private val store
-        get() = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
-
     fun openSettings() {
         val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
             .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
@@ -56,6 +47,15 @@ class NotificationPermissionState(
 
         answer?.complete(isGranted)
     }
+
+    private val isEnabled: Boolean
+        get() = NotificationManagerCompat.from(context).areNotificationsEnabled()
+
+    private val canAsk: Boolean
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+    private val store
+        get() = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
 
     private fun authorization(): NotificationAuthorization = when {
         isEnabled -> NotificationAuthorization.allowed

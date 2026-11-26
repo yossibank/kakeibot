@@ -81,6 +81,42 @@ internal fun EntryTransferRoutes(model: EntryModel) {
 }
 
 @Composable
+internal fun PayOffButton(
+    remaining: Long,
+    onSelect: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .height(40.dp)
+            .clip(CircleShape)
+            .border(
+                width = 1.dp,
+                color = Palette.accent.opacity(Emphasis.Medium),
+                shape = CircleShape,
+            ).clickable(onClick = onSelect)
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_check),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = Palette.accent,
+        )
+
+        Text(
+            text = "残り ${AmountText.text(remaining.toInt())} をまとめて返す",
+            color = Palette.accent,
+            style = textFont(
+                size = FontSize.Small,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+    }
+}
+
+@Composable
 private fun RouteChip(
     model: EntryModel,
     route: TransferRoute,
@@ -88,6 +124,7 @@ private fun RouteChip(
     val isApplied =
         model.state.form.walletId == route.walletId &&
             model.state.form.toWalletId == route.toWalletId
+
     val fill = if (isApplied) Palette.accent.opacity(Emphasis.Soft) else Color.Transparent
     val rim = if (isApplied) Palette.accent else Palette.accent.opacity(Emphasis.Muted)
     val style = textFont(size = FontSize.Caption)
@@ -123,42 +160,6 @@ private fun RouteChip(
             text = model.output.wallet(of = route.toWalletId)?.name ?: "",
             color = Palette.text,
             style = style,
-        )
-    }
-}
-
-@Composable
-internal fun PayOffButton(
-    remaining: Long,
-    onSelect: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .height(40.dp)
-            .clip(CircleShape)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Medium),
-                shape = CircleShape,
-            ).clickable(onClick = onSelect)
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_check),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Palette.accent,
-        )
-
-        Text(
-            text = "残り ${AmountText.text(remaining.toInt())} をまとめて返す",
-            color = Palette.accent,
-            style = textFont(
-                size = FontSize.Small,
-                weight = FontWeight.SemiBold,
-            ),
         )
     }
 }

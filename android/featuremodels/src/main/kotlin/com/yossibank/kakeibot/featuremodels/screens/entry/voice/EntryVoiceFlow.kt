@@ -1,8 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.voice
 
 import android.content.Context
-import android.os.Build
-import android.speech.SpeechRecognizer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -20,16 +18,42 @@ import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
-class EntryVoiceFlow(
-    context: Context,
+class EntryVoiceFlow internal constructor(
+    isAvailable: Boolean,
     clock: ScreenClock,
+    makeSource: () -> EntryVoiceSource?,
+    sleep: suspend (Long) -> Unit,
+    silenceMillis: Long,
+    noticeMillis: Long,
 ) : ScreenPerforming {
     val state = State()
-    val input = Input(isAvailable = EntryVoiceSpeech.isAvailable(context))
     val output = Output(state)
 
-    private val dependencies = Dependencies(context, clock)
+    val input = Input(
+        isAvailable = isAvailable,
+        silenceMillis = silenceMillis,
+    )
+
     private val runtime = Runtime()
+
+    private val dependencies = Dependencies(
+        clock = clock,
+        makeSource = makeSource,
+        sleep = sleep,
+        noticeMillis = noticeMillis,
+    )
+
+    constructor(
+        context: Context,
+        clock: ScreenClock,
+    ) : this(
+        isAvailable = EntryVoiceSpeech.isAvailable(context),
+        clock = clock,
+        makeSource = { EntryVoiceRecognizer.make(context) },
+        sleep = { millis -> delay(millis) },
+        silenceMillis = SILENCE_MILLIS,
+        noticeMillis = UndoNoticeState.MILLIS,
+    )
 
     sealed interface Phase {
         data object Idle : Phase
@@ -99,9 +123,8 @@ class EntryVoiceFlow(
 
     class Input(
         val isAvailable: Boolean,
-    ) {
-        val silenceMillis: Long = SILENCE_MILLIS
-    }
+        val silenceMillis: Long,
+    )
 
     class Output(
         private val state: State,
@@ -114,12 +137,14 @@ class EntryVoiceFlow(
     }
 
     private class Dependencies(
-        val context: Context,
         val clock: ScreenClock,
+        val makeSource: () -> EntryVoiceSource?,
+        val sleep: suspend (Long) -> Unit,
+        val noticeMillis: Long,
     )
 
     private class Runtime {
-        var recognizer: SpeechRecognizer? = null
+        var source: EntryVoiceSource? = null
         var session: Session? = null
         var noticeJob: Job? = null
         var silenceJob: Job? = null
@@ -134,18 +159,15 @@ class EntryVoiceFlow(
         model: EntryModel,
         today: LocalDate,
     ) {
-        if (output.isActive || !input.isAvailable ||
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.S
-        ) {
+        if (output.isActive || !input.isAvailable) {
             return
         }
 
+        val source = dependencies.makeSource() ?: return
+
         clearNotice()
         model.state.focus(EntryModel.Field.Amount)
-
-        val recognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(dependencies.context)
-
-        runtime.recognizer = recognizer
+        runtime.source = source
 
         runtime.session = Session(
             model = model,
@@ -154,8 +176,10 @@ class EntryVoiceFlow(
 
         state.start()
 
-        recognizer.setRecognitionListener(EntryVoiceListener(::receive))
-        recognizer.startListening(EntryVoiceSpeech.intent(hints = model.output.voiceHints))
+        source.start(
+            hints = model.output.voiceHints,
+            receive = ::receive,
+        )
     }
 
     fun deny() {
@@ -167,7 +191,7 @@ class EntryVoiceFlow(
 
         runtime.silenceJob?.cancel()
         state.finish(transcript = listening.transcript)
-        runtime.recognizer?.stopListening()
+        runtime.source?.finish()
     }
 
     fun cancel() {
@@ -180,7 +204,7 @@ class EntryVoiceFlow(
             state.countEnd()
         }
 
-        runtime.recognizer?.cancel()
+        runtime.source?.cancel()
         reset()
     }
 
@@ -195,7 +219,7 @@ class EntryVoiceFlow(
     }
 
     fun close() {
-        runtime.recognizer?.cancel()
+        runtime.source?.cancel()
         reset()
         clearNotice()
     }
@@ -215,7 +239,6 @@ class EntryVoiceFlow(
 
     private fun hear(level: Float) {
         val listening = output.listening ?: return
-
         state.move(to = listening.copy(levels = listOf(level) + listening.levels.dropLast(1)))
         follow(level)
     }
@@ -268,7 +291,7 @@ class EntryVoiceFlow(
 
     private fun fail(error: Int) {
         val outcome = EntryVoiceSpeech.outcome(error = error) {
-            EntryVoiceSpeech.download(runtime.recognizer)
+            runtime.source?.download() ?: EntryVoiceResult.Outcome.Unsupported
         }
 
         reset()
@@ -292,7 +315,7 @@ class EntryVoiceFlow(
         state.show(notice)
 
         runtime.noticeJob = perform {
-            delay(UndoNoticeState.MILLIS)
+            dependencies.sleep(dependencies.noticeMillis)
 
             if (state.notice?.id == notice.id) {
                 state.clearNotice()
@@ -332,7 +355,7 @@ class EntryVoiceFlow(
         state.move(to = listening.copy(silenceStart = dependencies.clock.now.toEpochMilli()))
 
         runtime.silenceJob = perform {
-            delay(SILENCE_MILLIS)
+            dependencies.sleep(input.silenceMillis)
             runtime.silenceJob = null
             finish()
         }
@@ -341,8 +364,8 @@ class EntryVoiceFlow(
     private fun reset() {
         runtime.silenceJob?.cancel()
         runtime.silenceJob = null
-        runtime.recognizer?.destroy()
-        runtime.recognizer = null
+        runtime.source?.close()
+        runtime.source = null
         runtime.session = null
         state.move(to = Phase.Idle)
     }

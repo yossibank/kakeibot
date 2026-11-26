@@ -21,7 +21,6 @@ class SettingsFoldInput internal constructor(
 
     internal suspend fun load(from: AppDatabase) {
         val screens = read(from) ?: emptySet()
-
         isClosed = screen in screens
     }
 

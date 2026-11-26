@@ -9,5 +9,4 @@ internal data class Seed(
 )
 
 internal val feeSeed = Seed("手数料", Icon.Glyph.coin, "#A68A64")
-
 internal val transferSeed = Seed("振替", Icon.Glyph.banknote, "#7A8B99")

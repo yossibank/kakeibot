@@ -33,7 +33,6 @@ fun EntryModel.apply(reading: VoiceReading): VoiceUndo {
     reading.walletId?.let { setWallet(it) }
 
     val categoryId = reading.categoryId?.takeIf { id -> output.categories.any { it.id == id } }
-
     var next = state.form
 
     categoryId?.let { next = next.withCategory(it) }

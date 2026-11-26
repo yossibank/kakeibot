@@ -275,20 +275,26 @@ fun EntryRecord.entry(): Entry? {
     val id = Identifier.fromDatabaseValue<Entry>(id) ?: return null
     val type = Entry.Kind.of(type) ?: return null
     val date = LocalDate.fromDatabaseValue(date) ?: return null
+
     val categoryId = categoryId?.let {
         Identifier.fromDatabaseValue<EntryCategory>(it)
             ?: return null
     }
+
     val tagId = tagId?.let { Identifier.fromDatabaseValue<EntryTag>(it) ?: return null }
+
     val templateId = templateId?.let {
         Identifier.fromDatabaseValue<EntryTemplate>(it)
             ?: return null
     }
+
     val walletId = Identifier.fromDatabaseValue<Wallet>(walletId) ?: return null
     val toWalletId = toWalletId?.let { Identifier.fromDatabaseValue<Wallet>(it) ?: return null }
+
     val recurringId = recurringId?.let {
         Identifier.fromDatabaseValue<Recurring>(it) ?: return null
     }
+
     val recurringDate = recurringDate?.let { LocalDate.fromDatabaseValue(it) ?: return null }
     val billMonth = billMonth?.let { YearMonth.fromDatabaseValue(it) ?: return null }
     val transferId = transferId?.let { Identifier.fromDatabaseValue<Entry>(it) ?: return null }

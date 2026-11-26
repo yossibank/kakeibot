@@ -5,6 +5,15 @@ data class DeletionSubject(
     val count: Int,
     val names: List<String>,
 ) {
+    internal constructor(
+        kind: Kind,
+        names: List<String?>,
+    ) : this(
+        kind = kind,
+        count = names.size,
+        names = names.mapNotNull { name -> name?.ifEmpty { null } },
+    )
+
     enum class Kind {
         wallet,
         category,
@@ -16,15 +25,6 @@ data class DeletionSubject(
         valuation,
         adjustment,
     }
-
-    internal constructor(
-        kind: Kind,
-        names: List<String?>,
-    ) : this(
-        kind = kind,
-        count = names.size,
-        names = names.mapNotNull { name -> name?.ifEmpty { null } },
-    )
 }
 
 val Deletion.subject: DeletionSubject?

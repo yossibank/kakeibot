@@ -44,116 +44,13 @@ suspend fun AppDatabase.insertTemplatesIfEmpty(at: Instant) {
     }
 }
 
-private val wallets = listOf(
-    Seed(
-        name = "財布",
-        glyph = Icon.Glyph.cash,
-        color = "#C9A465",
-    ) to Wallet.Kind.cash,
-    Seed(
-        name = "銀行",
-        glyph = Icon.Glyph.bank,
-        color = "#4A6FA5",
-    ) to Wallet.Kind.bank,
-)
-
-private val expenseCategories = listOf(
-    Seed(
-        name = "食費",
-        glyph = Icon.Glyph.food,
-        color = "#E07A5F",
-    ),
-    Seed(
-        name = "日用品",
-        glyph = Icon.Glyph.daily,
-        color = "#81B29A",
-    ),
-    Seed(
-        name = "交通",
-        glyph = Icon.Glyph.transit,
-        color = "#3D5A80",
-    ),
-    Seed(
-        name = "交際",
-        glyph = Icon.Glyph.social,
-        color = "#F2CC8F",
-    ),
-    Seed(
-        name = "趣味",
-        glyph = Icon.Glyph.hobby,
-        color = "#9C6ADE",
-    ),
-    Seed(
-        name = "衣服",
-        glyph = Icon.Glyph.clothes,
-        color = "#5FA8D3",
-    ),
-    Seed(
-        name = "美容",
-        glyph = Icon.Glyph.beauty,
-        color = "#E5989B",
-    ),
-    Seed(
-        name = "医療",
-        glyph = Icon.Glyph.medical,
-        color = "#6CBF84",
-    ),
-    Seed(
-        name = "住まい",
-        glyph = Icon.Glyph.home,
-        color = "#B08968",
-    ),
-    Seed(
-        name = "通信",
-        glyph = Icon.Glyph.phone,
-        color = "#577590",
-    ),
-    Seed(
-        name = "光熱費",
-        glyph = Icon.Glyph.utility,
-        color = "#F4A261",
-    ),
-    Seed(
-        name = "その他",
-        glyph = Icon.Glyph.other,
-        color = "#8D99AE",
-    ),
-)
-
-private val incomeCategories = listOf(
-    Seed(
-        name = "給料",
-        glyph = Icon.Glyph.salary,
-        color = "#2A9D8F",
-    ),
-    Seed(
-        name = "臨時収入",
-        glyph = Icon.Glyph.bonus,
-        color = "#E9C46A",
-    ),
-    Seed(
-        name = "その他",
-        glyph = Icon.Glyph.other,
-        color = "#8D99AE",
-    ),
-)
-
-private val templates = listOf(
-    "コンビニ" to "食費",
-    "ランチ" to "食費",
-    "電車" to "交通",
-    "日用品" to "日用品",
-)
-
-private val shelf = listOf(
-    Icon.Glyph.star to "#C9A465",
-    Icon.Glyph.party to "#E07A5F",
-    Icon.Glyph.trophy to "#E9C46A",
-    Icon.Glyph.cake to "#E5989B",
-    Icon.Glyph.fitness to "#6CBF84",
-    Icon.Glyph.travel to "#5FA8D3",
-    Icon.Glyph.sun to "#F4A261",
-    Icon.Glyph.moon to "#577590",
+internal suspend fun AppDatabase.insertIcon(
+    seed: Seed,
+    now: Instant,
+): Icon = insertIcon(
+    glyph = seed.glyph,
+    color = seed.color,
+    now = now,
 )
 
 private suspend fun AppDatabase.insertDefaults(now: Instant) {
@@ -271,15 +168,6 @@ private suspend fun AppDatabase.insertShelf(now: Instant) {
     }
 }
 
-internal suspend fun AppDatabase.insertIcon(
-    seed: Seed,
-    now: Instant,
-): Icon = insertIcon(
-    glyph = seed.glyph,
-    color = seed.color,
-    now = now,
-)
-
 private suspend fun AppDatabase.insertIcon(
     glyph: Icon.Glyph,
     color: String,
@@ -298,3 +186,115 @@ private suspend fun AppDatabase.insertIcon(
 
     return icon
 }
+
+private val wallets = listOf(
+    Seed(
+        name = "財布",
+        glyph = Icon.Glyph.cash,
+        color = "#C9A465",
+    ) to Wallet.Kind.cash,
+    Seed(
+        name = "銀行",
+        glyph = Icon.Glyph.bank,
+        color = "#4A6FA5",
+    ) to Wallet.Kind.bank,
+)
+
+private val expenseCategories = listOf(
+    Seed(
+        name = "食費",
+        glyph = Icon.Glyph.food,
+        color = "#E07A5F",
+    ),
+    Seed(
+        name = "日用品",
+        glyph = Icon.Glyph.daily,
+        color = "#81B29A",
+    ),
+    Seed(
+        name = "交通",
+        glyph = Icon.Glyph.transit,
+        color = "#3D5A80",
+    ),
+    Seed(
+        name = "交際",
+        glyph = Icon.Glyph.social,
+        color = "#F2CC8F",
+    ),
+    Seed(
+        name = "趣味",
+        glyph = Icon.Glyph.hobby,
+        color = "#9C6ADE",
+    ),
+    Seed(
+        name = "衣服",
+        glyph = Icon.Glyph.clothes,
+        color = "#5FA8D3",
+    ),
+    Seed(
+        name = "美容",
+        glyph = Icon.Glyph.beauty,
+        color = "#E5989B",
+    ),
+    Seed(
+        name = "医療",
+        glyph = Icon.Glyph.medical,
+        color = "#6CBF84",
+    ),
+    Seed(
+        name = "住まい",
+        glyph = Icon.Glyph.home,
+        color = "#B08968",
+    ),
+    Seed(
+        name = "通信",
+        glyph = Icon.Glyph.phone,
+        color = "#577590",
+    ),
+    Seed(
+        name = "光熱費",
+        glyph = Icon.Glyph.utility,
+        color = "#F4A261",
+    ),
+    Seed(
+        name = "その他",
+        glyph = Icon.Glyph.other,
+        color = "#8D99AE",
+    ),
+)
+
+private val incomeCategories = listOf(
+    Seed(
+        name = "給料",
+        glyph = Icon.Glyph.salary,
+        color = "#2A9D8F",
+    ),
+    Seed(
+        name = "臨時収入",
+        glyph = Icon.Glyph.bonus,
+        color = "#E9C46A",
+    ),
+    Seed(
+        name = "その他",
+        glyph = Icon.Glyph.other,
+        color = "#8D99AE",
+    ),
+)
+
+private val templates = listOf(
+    "コンビニ" to "食費",
+    "ランチ" to "食費",
+    "電車" to "交通",
+    "日用品" to "日用品",
+)
+
+private val shelf = listOf(
+    Icon.Glyph.star to "#C9A465",
+    Icon.Glyph.party to "#E07A5F",
+    Icon.Glyph.trophy to "#E9C46A",
+    Icon.Glyph.cake to "#E5989B",
+    Icon.Glyph.fitness to "#6CBF84",
+    Icon.Glyph.travel to "#5FA8D3",
+    Icon.Glyph.sun to "#F4A261",
+    Icon.Glyph.moon to "#577590",
+)

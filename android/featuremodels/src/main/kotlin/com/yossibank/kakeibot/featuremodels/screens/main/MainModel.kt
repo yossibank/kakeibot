@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.featuremodels.screens.main
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
@@ -61,13 +62,17 @@ class MainModel(
         var visitedTabs: Set<Tab> by mutableStateOf(visitedTabs)
             private set
 
+        var noticeRound: Int by mutableIntStateOf(0)
+            private set
+
         val observation = ObservationRound()
+
+        private val foreground = ForegroundReturn()
+
+        private var round = 0
 
         val observationRound: Int
             get() = observation.count
-
-        private val foreground = ForegroundReturn()
-        private var round = 0
 
         fun select(tab: Tab) {
             this.tab = tab
@@ -82,6 +87,10 @@ class MainModel(
             if (foreground.receive(to)) {
                 restartObservation()
             }
+        }
+
+        fun hideTabNotices() {
+            noticeRound += 1
         }
 
         internal fun openSettings(recurring: Identifier<Recurring>) {

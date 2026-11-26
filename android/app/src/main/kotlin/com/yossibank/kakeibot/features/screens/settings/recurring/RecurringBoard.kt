@@ -46,8 +46,6 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.rows
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import kotlin.math.roundToInt
 
-private val rowSpacing = 12.dp
-
 data class RecurringRowActions(
     val onOpen: (Identifier<Recurring>?) -> Unit,
     val onEdit: (Identifier<Recurring>) -> Unit,
@@ -132,8 +130,8 @@ private fun BoardRow(
     actions: RecurringRowActions,
 ) {
     val slot = with(LocalDensity.current) { (recurringRowHeight + rowSpacing).toPx() }
-
     val isLifted = lift.id == row.id
+
     val target by animateDpAsState(
         targetValue = (recurringRowHeight + rowSpacing) * index,
         label = "recurring-row",
@@ -193,3 +191,5 @@ private fun BoardRow(
         RecurringRowCard(row = row)
     }
 }
+
+private val rowSpacing = 12.dp

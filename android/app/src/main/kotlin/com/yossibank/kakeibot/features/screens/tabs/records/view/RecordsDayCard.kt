@@ -76,7 +76,6 @@ private fun DayHeader(
     today: LocalDate,
 ) {
     val date = day.date
-
     val weekdayColor = weekdayColor(weekday = date.weekday)
 
     Row(

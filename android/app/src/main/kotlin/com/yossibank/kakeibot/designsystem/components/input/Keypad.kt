@@ -37,39 +37,6 @@ import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.shared.amount.symbol
 
-private val rows: List<List<AmountCalculator.Key>> = listOf(
-    listOf(
-        AmountCalculator.Key.Delete,
-        AmountCalculator.Key.Tax(AmountCalculator.TaxRate.reduced),
-        AmountCalculator.Key.Tax(AmountCalculator.TaxRate.standard),
-        AmountCalculator.Key.Operation(AmountCalculator.Operation.divide),
-    ),
-    listOf(
-        AmountCalculator.Key.Digit(1),
-        AmountCalculator.Key.Digit(2),
-        AmountCalculator.Key.Digit(3),
-        AmountCalculator.Key.Operation(AmountCalculator.Operation.multiply),
-    ),
-    listOf(
-        AmountCalculator.Key.Digit(4),
-        AmountCalculator.Key.Digit(5),
-        AmountCalculator.Key.Digit(6),
-        AmountCalculator.Key.Operation(AmountCalculator.Operation.subtract),
-    ),
-    listOf(
-        AmountCalculator.Key.Digit(7),
-        AmountCalculator.Key.Digit(8),
-        AmountCalculator.Key.Digit(9),
-        AmountCalculator.Key.Operation(AmountCalculator.Operation.add),
-    ),
-    listOf(
-        AmountCalculator.Key.DoubleZero,
-        AmountCalculator.Key.Digit(0),
-        AmountCalculator.Key.TripleZero,
-        AmountCalculator.Key.Equals,
-    ),
-)
-
 @Composable
 fun Keypad(
     calculator: AmountCalculator,
@@ -111,7 +78,6 @@ private fun KeyButton(
     val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(16.dp))
     val feedback = LocalHapticFeedback.current
     val hasHaptics = LocalThemeStyle.current.haptics
-
     val tint = Palette.accent.opacity(Emphasis.Subtle)
     val rim = Palette.accent.opacity(Emphasis.Muted)
 
@@ -231,3 +197,36 @@ private fun DigitText(text: String) {
         style = displayFont(size = FontSize.Title),
     )
 }
+
+private val rows: List<List<AmountCalculator.Key>> = listOf(
+    listOf(
+        AmountCalculator.Key.Delete,
+        AmountCalculator.Key.Tax(AmountCalculator.TaxRate.reduced),
+        AmountCalculator.Key.Tax(AmountCalculator.TaxRate.standard),
+        AmountCalculator.Key.Operation(AmountCalculator.Operation.divide),
+    ),
+    listOf(
+        AmountCalculator.Key.Digit(1),
+        AmountCalculator.Key.Digit(2),
+        AmountCalculator.Key.Digit(3),
+        AmountCalculator.Key.Operation(AmountCalculator.Operation.multiply),
+    ),
+    listOf(
+        AmountCalculator.Key.Digit(4),
+        AmountCalculator.Key.Digit(5),
+        AmountCalculator.Key.Digit(6),
+        AmountCalculator.Key.Operation(AmountCalculator.Operation.subtract),
+    ),
+    listOf(
+        AmountCalculator.Key.Digit(7),
+        AmountCalculator.Key.Digit(8),
+        AmountCalculator.Key.Digit(9),
+        AmountCalculator.Key.Operation(AmountCalculator.Operation.add),
+    ),
+    listOf(
+        AmountCalculator.Key.DoubleZero,
+        AmountCalculator.Key.Digit(0),
+        AmountCalculator.Key.TripleZero,
+        AmountCalculator.Key.Equals,
+    ),
+)

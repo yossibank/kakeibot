@@ -121,17 +121,15 @@ fun RecurringListView(
     }
 
     model.state.task.Timer()
-
     hiddenNotice.Timer()
     deletedNotice.Timer()
-
     BackHandler(onBack = onBack)
 
     val actions = RecurringRowActions(
         onOpen = { model.state.openId = it },
         onEdit = { model.state.editing = Editing.Existing(it) },
         onHide = { id -> model.perform { it.hide(id) } },
-        onDelete = { model.state.deleting = DeleteTarget.One(it) },
+        onDelete = { model.state.ask(DeleteTarget.One(it)) },
     )
 
     SettingsFrame(
@@ -262,7 +260,7 @@ fun RecurringListView(
                     rows = model.output.hiddenRows,
                     isOpen = model.input.hiddenList.isClosed != true,
                     onToggle = { model.perform { it.toggleHiddenList() } },
-                    onDeleteAll = { model.state.deleting = DeleteTarget.AllHidden },
+                    onDeleteAll = { model.state.ask(DeleteTarget.AllHidden) },
                     onEdit = actions.onEdit,
                     onShow = { id -> model.perform { it.show(id) } },
                 )
@@ -288,7 +286,7 @@ fun RecurringListView(
             title = if (isAll) "非表示の固定費をまとめて削除しますか" else "この固定費を削除しますか",
             message = "これまでに作った記録は残ります",
             onConfirm = {
-                model.state.deleting = null
+                model.state.closePrompt(target)
 
                 model.perform {
                     when (target) {
@@ -297,7 +295,7 @@ fun RecurringListView(
                     }
                 }
             },
-            onDismiss = { model.state.deleting = null },
+            onDismiss = { model.state.closePrompt(target) },
         )
     }
 }

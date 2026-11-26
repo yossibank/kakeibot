@@ -38,13 +38,6 @@ val EntryModel.Output.saveTitle: String
         return saveAction
     }
 
-private val EntryModel.Output.saveAction: String
-    get() = when {
-        isEditing -> "変更を保存"
-        state.form.type == Entry.Kind.transfer -> "振り替える"
-        else -> "記録する"
-    }
-
 val EntryModel.Output.expressionText: String?
     get() {
         val calculator = activeCalculator
@@ -83,4 +76,11 @@ val EntryModel.Output.categoryText: String
         val name = category?.name ?: return "選ぶ"
         val tag = tags.firstOrNull { it.id == state.form.tagId }?.name ?: return name
         return "$name・$tag"
+    }
+
+private val EntryModel.Output.saveAction: String
+    get() = when {
+        isEditing -> "変更を保存"
+        state.form.type == Entry.Kind.transfer -> "振り替える"
+        else -> "記録する"
     }

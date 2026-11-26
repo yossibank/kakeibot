@@ -8,9 +8,6 @@ import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 
-private const val AVERAGE_MONTHS = 3
-private const val AVERAGE_UNIT = 100
-
 val BudgetListModel.Output.suggestions: List<BudgetListModel.Suggestion>
     get() {
         val target = state.editing ?: return emptyList()
@@ -92,7 +89,11 @@ private fun BudgetListModel.Output.averageSpent(categoryId: Identifier<EntryCate
             month = month,
         )
     }
+
     val unit = months.size.toLong() * AVERAGE_UNIT
 
     return (total + unit - 1) / unit * AVERAGE_UNIT
 }
+
+private const val AVERAGE_MONTHS = 3
+private const val AVERAGE_UNIT = 100

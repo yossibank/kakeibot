@@ -10,16 +10,16 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import kotlin.math.absoluteValue
 
 object NotificationPlan {
+    const val reminderDays = 30
+    const val recurringDays = 31
+    const val maxCount = 64
+
     data class Shortage(
         val recurringId: Identifier<Recurring>,
         val date: LocalDate,
         val walletName: String,
         val amount: Long,
     )
-
-    const val reminderDays = 30
-    const val recurringDays = 31
-    const val maxCount = 64
 
     fun notifications(
         today: LocalDate,
@@ -84,7 +84,6 @@ object NotificationPlan {
         shortages: List<Shortage>,
     ): List<PlannedNotification> {
         val daysBefore = of.remindDaysBefore ?: return emptyList()
-
         val category = of.categoryId?.let { names[it] }
         val name = of.title(categoryName = category) ?: "固定費"
         val start = today.adding(days = daysBefore)

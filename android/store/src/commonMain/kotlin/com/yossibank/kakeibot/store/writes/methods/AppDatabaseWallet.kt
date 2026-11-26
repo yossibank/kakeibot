@@ -58,14 +58,17 @@ suspend fun AppDatabase.deleteWallet(
     val categories = categoryDao().ofWallet(key).map {
         it.decoded(EntryCategoryRecord::entryCategory)
     }
+
     val categoryIds = categories.map { it.id.databaseValue }
     val iconIds = categories.map { it.iconId.databaseValue } + wallet.iconId.databaseValue
     val icons = iconDao().withIds(iconIds).map { it.decoded(IconRecord::icon) }
     val tags = tagDao().ofCategories(categoryIds).map { it.decoded(EntryTagRecord::entryTag) }
     val recurrings = recurringDao().ofWallet(key).map { it.decoded(RecurringRecord::recurring) }
+
     val templates = templateDao().ofWallet(key).map {
         it.decoded(EntryTemplateRecord::entryTemplate)
     }
+
     val valuations = valuationDao().ofWallet(key).map { it.decoded(ValuationRecord::valuation) }
     val adjustments = adjustmentDao().ofWallet(key).map { it.decoded(AdjustmentRecord::adjustment) }
 
@@ -96,9 +99,6 @@ suspend fun AppDatabase.deleteWallet(
     deletion
 }
 
-private suspend fun AppDatabase.findWallet(id: Identifier<Wallet>): Wallet? =
-    walletDao().find(id.databaseValue)?.decoded(WalletRecord::wallet)
-
 internal suspend fun AppDatabase.hasValuations(id: Identifier<Wallet>): Boolean =
     valuationDao().countOfWallet(id.databaseValue) > 0
 
@@ -109,3 +109,6 @@ internal suspend fun AppDatabase.hasRecords(id: Identifier<Wallet>): Boolean {
     val hasAdjustments = adjustmentDao().countOfWallet(key) > 0
     return hasEntries || hasRecurrings || hasAdjustments || hasValuations(id)
 }
+
+private suspend fun AppDatabase.findWallet(id: Identifier<Wallet>): Wallet? =
+    walletDao().find(id.databaseValue)?.decoded(WalletRecord::wallet)

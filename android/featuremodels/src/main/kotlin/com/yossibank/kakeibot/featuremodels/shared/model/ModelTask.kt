@@ -17,17 +17,34 @@ class ModelTask {
     var message: String by mutableStateOf("")
         private set
 
+    var tone: Tone by mutableStateOf(Tone.error)
+        private set
+
     var count: Int by mutableIntStateOf(0)
         private set
 
     private var running: Int by mutableIntStateOf(0)
 
+    enum class Tone {
+        info,
+        error,
+    }
+
     val isRunning: Boolean
         get() = running > 0
 
     fun show(message: String) {
-        this.message = message
-        count += 1
+        show(
+            message = message,
+            tone = Tone.error,
+        )
+    }
+
+    fun inform(message: String) {
+        show(
+            message = message,
+            tone = Tone.info,
+        )
     }
 
     fun clear() {
@@ -108,9 +125,17 @@ class ModelTask {
         }
     }
 
+    private fun show(
+        message: String,
+        tone: Tone,
+    ) {
+        this.message = message
+        this.tone = tone
+        count += 1
+    }
+
     companion object {
         const val MILLIS = 6_000L
-
         const val saveFailed = "保存できませんでした"
         const val settingSaveFailed = "設定を保存できませんでした"
         const val restoreFailed = "元に戻せませんでした"

@@ -16,12 +16,6 @@ class NotificationScheduler(
 ) {
     private val context = context.applicationContext
 
-    private val alarms: AlarmManager
-        get() = context.getSystemService(AlarmManager::class.java)
-
-    private val store
-        get() = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
-
     fun apply(
         plan: List<PlannedNotification>,
         now: Instant,
@@ -57,6 +51,12 @@ class NotificationScheduler(
 
         store.edit { putStringSet(KEY_PENDING, wanted.keys) }
     }
+
+    private val alarms: AlarmManager
+        get() = context.getSystemService(AlarmManager::class.java)
+
+    private val store
+        get() = context.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
 
     private fun fireTime(
         notification: PlannedNotification,

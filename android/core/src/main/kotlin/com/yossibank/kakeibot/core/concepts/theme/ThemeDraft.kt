@@ -60,7 +60,6 @@ data class ThemeDraft(
     val problems: List<DraftProblem>
         get() {
             val palette = palette ?: return nameProblems + DraftProblem.invalidColor
-
             val isReadable = palette.unreadableRoles.isEmpty()
 
             return nameProblems +

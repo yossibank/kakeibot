@@ -130,18 +130,6 @@ internal suspend fun AppDatabase.fetchIcons(
         .associateBy { it.id }
 }
 
-private val entryListTables = arrayOf(
-    "entry",
-    "category",
-    "tag",
-    "wallet",
-    "valuation",
-    "adjustment",
-    "icon",
-    "recurring",
-    "entry_item",
-)
-
 private suspend fun AppDatabase.fetchEntryOptions(): EntryOptions {
     val categories = categoryDao()
         .unarchivedWithoutWallet()
@@ -177,3 +165,15 @@ private suspend fun AppDatabase.fetchEntryOptions(): EntryOptions {
 private suspend fun AppDatabase.fetchCardBills(): List<Recurring> = recurringDao()
     .cardBills()
     .map { it.decoded(RecurringRecord::recurring).copy(generatedUntil = null) }
+
+private val entryListTables = arrayOf(
+    "entry",
+    "category",
+    "tag",
+    "wallet",
+    "valuation",
+    "adjustment",
+    "icon",
+    "recurring",
+    "entry_item",
+)

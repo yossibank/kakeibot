@@ -3,62 +3,6 @@ package com.yossibank.kakeibot.core.concepts.voice
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 
-private const val MAX_AMOUNT = 999_999_999
-private const val MAX_DAYS_AGO = 60
-
-private val relativeDays = listOf(
-    "一昨日" to -2,
-    "おととい" to -2,
-    "昨日" to -1,
-    "きのう" to -1,
-    "昨夜" to -1,
-    "昨晩" to -1,
-    "ゆうべ" to -1,
-    "今日" to 0,
-    "きょう" to 0,
-    "今朝" to 0,
-    "今夜" to 0,
-    "今晩" to 0,
-)
-
-private val weekdays = mapOf(
-    "月" to Weekday.monday,
-    "火" to Weekday.tuesday,
-    "水" to Weekday.wednesday,
-    "木" to Weekday.thursday,
-    "金" to Weekday.friday,
-    "土" to Weekday.saturday,
-    "日" to Weekday.sunday,
-)
-
-private val kanjiDigits = mapOf(
-    '〇' to 0,
-    '零' to 0,
-    '一' to 1,
-    '二' to 2,
-    '三' to 3,
-    '四' to 4,
-    '五' to 5,
-    '六' to 6,
-    '七' to 7,
-    '八' to 8,
-    '九' to 9,
-)
-
-private val smallUnits = mapOf(
-    '十' to 10,
-    '百' to 100,
-    '千' to 1000,
-)
-
-private val yenPattern = Regex("([0-9〇零一二三四五六七八九十百千万]+)\\s*(?:円|えん)")
-private val signPattern = Regex("¥\\s*([0-9]+)")
-private val daysAgoPattern = Regex("([0-9〇一二三四五六七八九十]{1,3})日前")
-private val weekdayPattern = Regex("(先週の?)?([月火水木金土日])曜日?")
-private val barePattern = Regex("([0-9]+)(?![0-9])(?!\\s*[日月年時分秒個つ人回件%％番])")
-private val monthDayPattern = Regex("([0-9〇一二三四五六七八九十]{1,3})月([0-9〇一二三四五六七八九十]{1,3})日")
-private val dayPattern = Regex("([0-9〇一二三四五六七八九十]{1,3})日(?![前間分])")
-
 internal fun VoiceText.Companion.number(token: String): Int? {
     token.toIntOrNull()?.let { return it }
 
@@ -93,6 +37,7 @@ internal fun VoiceText.Companion.number(token: String): Int? {
     }
 
     val value = total + section + (current ?: 0)
+
     return if (value > 0) value else null
 }
 
@@ -166,6 +111,7 @@ internal fun VoiceText.date(today: LocalDate): VoiceText.Found<LocalDate>? {
     monthDayPattern.find(text)?.let { match ->
         val month = VoiceText.number(match.groupValues[1])
         val day = VoiceText.number(match.groupValues[2])
+
         val date = if (month != null &&
             day != null
         ) {
@@ -243,3 +189,59 @@ private fun recent(
 
     return LocalDate.of(yearMonth = today.yearMonth.adding(months = -1), day = day)
 }
+
+private const val MAX_AMOUNT = 999_999_999
+private const val MAX_DAYS_AGO = 60
+
+private val relativeDays = listOf(
+    "一昨日" to -2,
+    "おととい" to -2,
+    "昨日" to -1,
+    "きのう" to -1,
+    "昨夜" to -1,
+    "昨晩" to -1,
+    "ゆうべ" to -1,
+    "今日" to 0,
+    "きょう" to 0,
+    "今朝" to 0,
+    "今夜" to 0,
+    "今晩" to 0,
+)
+
+private val weekdays = mapOf(
+    "月" to Weekday.monday,
+    "火" to Weekday.tuesday,
+    "水" to Weekday.wednesday,
+    "木" to Weekday.thursday,
+    "金" to Weekday.friday,
+    "土" to Weekday.saturday,
+    "日" to Weekday.sunday,
+)
+
+private val kanjiDigits = mapOf(
+    '〇' to 0,
+    '零' to 0,
+    '一' to 1,
+    '二' to 2,
+    '三' to 3,
+    '四' to 4,
+    '五' to 5,
+    '六' to 6,
+    '七' to 7,
+    '八' to 8,
+    '九' to 9,
+)
+
+private val smallUnits = mapOf(
+    '十' to 10,
+    '百' to 100,
+    '千' to 1000,
+)
+
+private val yenPattern = Regex("([0-9〇零一二三四五六七八九十百千万]+)\\s*(?:円|えん)")
+private val signPattern = Regex("¥\\s*([0-9]+)")
+private val daysAgoPattern = Regex("([0-9〇一二三四五六七八九十]{1,3})日前")
+private val weekdayPattern = Regex("(先週の?)?([月火水木金土日])曜日?")
+private val barePattern = Regex("([0-9]+)(?![0-9])(?!\\s*[日月年時分秒個つ人回件%％番])")
+private val monthDayPattern = Regex("([0-9〇一二三四五六七八九十]{1,3})月([0-9〇一二三四五六七八九十]{1,3})日")
+private val dayPattern = Regex("([0-9〇一二三四五六七八九十]{1,3})日(?![前間分])")

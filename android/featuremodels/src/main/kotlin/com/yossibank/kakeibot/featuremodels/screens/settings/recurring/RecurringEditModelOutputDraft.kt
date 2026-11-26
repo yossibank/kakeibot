@@ -41,6 +41,7 @@ val RecurringEditModel.Output.saveTitle: String
     get() {
         val problem =
             draft.problems.firstOrNull() ?: return if (isEditing) "変更を保存" else "追加する"
+
         return message(problem)
     }
 

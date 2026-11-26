@@ -30,6 +30,7 @@ class NotificationBootReceiver : BroadcastReceiver() {
 
             try {
                 val opened = AppDatabase.file(app, now = Instant.now())
+
                 database = opened
 
                 val today = AppModel.deviceDay()

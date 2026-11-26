@@ -19,6 +19,7 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
+import com.yossibank.kakeibot.designsystem.components.layout.HorizontalFit
 import com.yossibank.kakeibot.designsystem.components.tag.TagCard
 import com.yossibank.kakeibot.designsystem.components.tag.TagCardSize
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
@@ -47,7 +48,7 @@ fun EntryRow(
     memo: String? = null,
     isRecurring: Boolean = false,
 ) {
-    val joinsMemo = tag == null && route == null
+    val showsMemo = tag != null || detail == null || route != null
 
     Row(
         modifier = modifier
@@ -102,21 +103,11 @@ fun EntryRow(
                 }
             }
 
-            if (tag != null) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    TagCard(
-                        title = tag,
-                        size = TagCardSize.Small,
-                    )
-
-                    Note(text = detail)
-                }
-            } else {
-                Note(text = listOfNotNull(detail, memo.takeIf { joinsMemo }).joinToString("｜"))
-            }
+            Details(
+                tag = tag,
+                detail = detail,
+                memo = memo.takeIf { route == null },
+            )
 
             if (route != null) {
                 EntryRoute(
@@ -125,8 +116,8 @@ fun EntryRow(
                 )
             }
 
-            if (!joinsMemo) {
-                Note(text = memo)
+            if (memo != null && showsMemo) {
+                EntryMemo(text = memo)
             }
         }
 
@@ -136,6 +127,65 @@ fun EntryRow(
             type = type,
         )
     }
+}
+
+@Composable
+private fun Details(
+    tag: String?,
+    detail: String?,
+    memo: String?,
+) {
+    if (tag != null) {
+        HorizontalFit(
+            wide = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SmallTag(title = tag)
+
+                    Note(text = detail)
+                }
+            },
+            narrow = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Note(text = detail)
+
+                    SmallTag(title = tag)
+                }
+            },
+        )
+    } else if (detail != null && memo != null) {
+        HorizontalFit(
+            wide = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Note(text = detail)
+
+                    EntryMemo(text = memo)
+                }
+            },
+            narrow = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Note(text = detail)
+
+                    EntryMemo(text = memo)
+                }
+            },
+        )
+    } else {
+        Note(text = detail)
+    }
+}
+
+@Composable
+private fun SmallTag(title: String) {
+    TagCard(
+        title = title,
+        size = TagCardSize.Small,
+    )
 }
 
 @Composable

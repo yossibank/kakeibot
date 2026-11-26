@@ -3,7 +3,6 @@ package com.yossibank.kakeibot.core.concepts.theme
 internal object ThemeHex {
     fun rgb(text: String): Int? {
         val digits = text.drop(1)
-
         val isHex = digits.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }
 
         if (!text.startsWith("#") || digits.length != 6 || !isHex) {

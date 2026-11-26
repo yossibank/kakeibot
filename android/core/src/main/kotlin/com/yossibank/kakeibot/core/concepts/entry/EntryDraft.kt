@@ -70,6 +70,48 @@ data class EntryDraft(
             return amountProblems + typeProblems + tagProblems + feeProblems + itemProblems
         }
 
+    fun newEntry(at: Instant): Entry {
+        validate()
+
+        return Entry(
+            type = type,
+            amount = amount,
+            date = date,
+            categoryId = categoryId,
+            tagId = tagId,
+            templateId = templateId,
+            walletId = walletId,
+            toWalletId = destination,
+            memo = trimmedMemo,
+            billMonth = billMonth,
+            taxIncluded = includesTax,
+            createdAt = at,
+            updatedAt = at,
+        )
+    }
+
+    fun applied(
+        to: Entry,
+        at: Instant,
+    ): Entry {
+        validate()
+
+        return to.copy(
+            type = type,
+            amount = amount,
+            date = date,
+            categoryId = categoryId,
+            tagId = tagId,
+            templateId = templateId,
+            walletId = walletId,
+            toWalletId = destination,
+            memo = trimmedMemo,
+            billMonth = billMonth,
+            taxIncluded = if (items != null) includesTax else to.taxIncluded,
+            updatedAt = at,
+        )
+    }
+
     private val includesTax: Boolean
         get() = taxIncluded && !items.isNullOrEmpty()
 
@@ -138,51 +180,8 @@ data class EntryDraft(
     private val trimmedMemo: String?
         get() = memo.trim().ifEmpty { null }
 
-    fun newEntry(at: Instant): Entry {
-        validate()
-
-        return Entry(
-            type = type,
-            amount = amount,
-            date = date,
-            categoryId = categoryId,
-            tagId = tagId,
-            templateId = templateId,
-            walletId = walletId,
-            toWalletId = destination,
-            memo = trimmedMemo,
-            billMonth = billMonth,
-            taxIncluded = includesTax,
-            createdAt = at,
-            updatedAt = at,
-        )
-    }
-
-    fun applied(
-        to: Entry,
-        at: Instant,
-    ): Entry {
-        validate()
-
-        return to.copy(
-            type = type,
-            amount = amount,
-            date = date,
-            categoryId = categoryId,
-            tagId = tagId,
-            templateId = templateId,
-            walletId = walletId,
-            toWalletId = destination,
-            memo = trimmedMemo,
-            billMonth = billMonth,
-            taxIncluded = if (items != null) includesTax else to.taxIncluded,
-            updatedAt = at,
-        )
-    }
-
     private fun validate() {
         val problem = problems.firstOrNull() ?: return
-
         throw ProblemException(problem)
     }
 }

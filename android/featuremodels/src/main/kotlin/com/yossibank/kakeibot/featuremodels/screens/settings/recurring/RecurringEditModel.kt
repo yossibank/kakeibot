@@ -53,7 +53,9 @@ class RecurringEditModel(
         var today: LocalDate by mutableStateOf(today)
         var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
         var panel: RecurringPanel? by mutableStateOf(null)
+
         var prompt: RecurringEditPrompt? by mutableStateOf(null)
+            private set
 
         var form: RecurringEditForm by mutableStateOf(
             RecurringEditForm.starting(
@@ -74,6 +76,16 @@ class RecurringEditModel(
 
         var isHolidayShiftChosen = false
             private set
+
+        fun ask(prompt: RecurringEditPrompt) {
+            this.prompt = prompt
+        }
+
+        fun closePrompt(prompt: RecurringEditPrompt) {
+            if (this.prompt == prompt) {
+                this.prompt = null
+            }
+        }
 
         fun update(change: RecurringEditForm.() -> RecurringEditForm) {
             form = form.change()
@@ -171,7 +183,6 @@ class RecurringEditModel(
         state.task.attempt(failure = LOAD_FAILED) {
             input.options = dependencies.database.entryOptions()
             input.cardBills = dependencies.database.recurrings()
-
             loadLoanBalances()
             loadRecurring()
 

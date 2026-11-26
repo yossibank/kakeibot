@@ -3,8 +3,7 @@ package com.yossibank.kakeibot.core.concepts.wallet
 import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.icon.IconDraft
 import com.yossibank.kakeibot.core.shared.DraftProblem
-import com.yossibank.kakeibot.core.shared.DraftProblemException
-import com.yossibank.kakeibot.core.shared.IconBackedDraft
+import com.yossibank.kakeibot.core.shared.IconHoldingDraft
 import com.yossibank.kakeibot.core.shared.Identifier
 import java.time.Instant
 
@@ -17,7 +16,7 @@ data class WalletDraft(
     val loanAmount: Int? = null,
     val recordedKind: Wallet.Kind? = null,
     val hasValuations: Boolean = false,
-) : IconBackedDraft<Wallet> {
+) : IconHoldingDraft<Wallet> {
     constructor(
         wallet: Wallet,
         icon: Icon,
@@ -30,13 +29,38 @@ data class WalletDraft(
         loanAmount = wallet.loanAmount,
     )
 
-    val icon: IconDraft
+    override fun newValue(
+        iconId: Identifier<Icon>,
+        sortOrder: Int,
+        at: Instant,
+    ): Wallet = newWallet(
+        iconId = iconId,
+        sortOrder = sortOrder,
+        at = at,
+    )
+
+    override fun applied(
+        to: Wallet,
+        at: Instant,
+    ): Wallet {
+        validateProblems()
+
+        return to.copy(
+            name = trimmedName,
+            kind = kind,
+            initialBalance = initialBalance,
+            loanAmount = savedLoanAmount,
+            updatedAt = at,
+        )
+    }
+
+    override val icon: IconDraft
         get() = IconDraft(
             mark = mark,
             color = color,
         )
 
-    val problems: List<DraftProblem>
+    override val problems: List<DraftProblem>
         get() {
             val nameProblems = if (trimmedName.isEmpty()) {
                 listOf(
@@ -48,6 +72,34 @@ data class WalletDraft(
 
             return nameProblems + icon.problems + kindProblems
         }
+
+    fun locked(
+        by: Wallet,
+        hasRecords: Boolean,
+        hasValuations: Boolean,
+    ): WalletDraft = copy(
+        recordedKind = if (hasRecords) by.kind else null,
+        hasValuations = hasValuations,
+    )
+
+    fun newWallet(
+        iconId: Identifier<Icon>,
+        sortOrder: Int,
+        at: Instant,
+    ): Wallet {
+        validateProblems()
+
+        return Wallet(
+            name = trimmedName,
+            kind = kind,
+            iconId = iconId,
+            initialBalance = initialBalance,
+            loanAmount = savedLoanAmount,
+            sortOrder = sortOrder,
+            createdAt = at,
+            updatedAt = at,
+        )
+    }
 
     private val kindProblems: List<DraftProblem>
         get() {
@@ -80,81 +132,4 @@ data class WalletDraft(
 
             return loanAmount
         }
-
-    fun locked(
-        by: Wallet,
-        hasRecords: Boolean,
-        hasValuations: Boolean,
-    ): WalletDraft = copy(
-        recordedKind = if (hasRecords) by.kind else null,
-        hasValuations = hasValuations,
-    )
-
-    override fun newIcon(at: Instant): Icon {
-        validate()
-
-        return icon.newIcon(at)
-    }
-
-    fun newWallet(
-        iconId: Identifier<Icon>,
-        sortOrder: Int,
-        at: Instant,
-    ): Wallet {
-        validate()
-
-        return Wallet(
-            name = trimmedName,
-            kind = kind,
-            iconId = iconId,
-            initialBalance = initialBalance,
-            loanAmount = savedLoanAmount,
-            sortOrder = sortOrder,
-            createdAt = at,
-            updatedAt = at,
-        )
-    }
-
-    override fun newValue(
-        iconId: Identifier<Icon>,
-        sortOrder: Int,
-        at: Instant,
-    ): Wallet = newWallet(
-        iconId = iconId,
-        sortOrder = sortOrder,
-        at = at,
-    )
-
-    override fun applied(
-        to: Icon,
-        at: Instant,
-    ): Icon {
-        validate()
-
-        return icon.applied(
-            to = to,
-            at = at,
-        )
-    }
-
-    override fun applied(
-        to: Wallet,
-        at: Instant,
-    ): Wallet {
-        validate()
-
-        return to.copy(
-            name = trimmedName,
-            kind = kind,
-            initialBalance = initialBalance,
-            loanAmount = savedLoanAmount,
-            updatedAt = at,
-        )
-    }
-
-    private fun validate() {
-        val problem = problems.firstOrNull() ?: return
-
-        throw DraftProblemException(problem)
-    }
 }

@@ -40,9 +40,6 @@ data class EntryTagDraft(
             }
         }
 
-    private val trimmedName: String
-        get() = name.trim()
-
     fun problems(among: List<EntryTagDraft>): List<Problem> {
         val own = problems
 
@@ -86,9 +83,11 @@ data class EntryTagDraft(
         )
     }
 
+    private val trimmedName: String
+        get() = name.trim()
+
     private fun validate() {
         val problem = problems.firstOrNull() ?: return
-
         throw ProblemException(problem)
     }
 

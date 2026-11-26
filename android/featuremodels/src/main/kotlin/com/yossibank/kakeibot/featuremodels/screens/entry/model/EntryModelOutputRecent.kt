@@ -80,6 +80,13 @@ fun EntryModel.Output.fee(of: Entry): Int = (input.history?.entries ?: emptyList
     .firstOrNull { it.transferId == of.id }
     ?.amount ?: 0
 
+val EntryModel.Output.hasRecent: Boolean
+    get() = if (state.form.type == Entry.Kind.transfer) {
+        recentTransfers.isNotEmpty()
+    } else {
+        templates.isNotEmpty() || recentEntries.isNotEmpty()
+    }
+
 private val EntryModel.Output.feesByTransfer: Map<Identifier<Entry>, Int>
     get() = (input.history?.entries ?: emptyList())
         .mapNotNull { entry -> entry.transferId?.let { it to entry.amount } }
@@ -91,10 +98,3 @@ private fun recentKey(
     amount: Int?,
     memo: String?,
 ): String = "${categoryId ?: ""}>${amount ?: ""}>${memo ?: ""}"
-
-val EntryModel.Output.hasRecent: Boolean
-    get() = if (state.form.type == Entry.Kind.transfer) {
-        recentTransfers.isNotEmpty()
-    } else {
-        templates.isNotEmpty() || recentEntries.isNotEmpty()
-    }

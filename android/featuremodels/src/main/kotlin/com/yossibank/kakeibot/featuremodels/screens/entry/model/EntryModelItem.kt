@@ -48,6 +48,7 @@ fun EntryModel.restoreItem(removed: RemovedItem) {
         state.update {
             val restored = items.toMutableList()
             restored.add(minOf(removed.index, restored.size), removed.item)
+
             copy(items = restored)
         }
     }

@@ -2,7 +2,10 @@ package com.yossibank.kakeibot.featuremodels.screens.settings.recurring
 
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel.DeleteTarget
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel.Editing
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
@@ -240,6 +243,40 @@ class RecurringListModelTest {
 
         assertEquals(listOf(ids[2], ids[0], ids[1]), toStart)
         assertEquals(ids, model.state.movingOrder)
+    }
+
+    @Test
+    fun asksOneConfirmationAtATime() = modelTest(today = "2026-10-17") { setup ->
+        val model = RecurringListModel(parts = setup.parts, today = setup.today)
+        val one = DeleteTarget.One(Identifier())
+
+        model.state.ask(one)
+        model.state.ask(DeleteTarget.AllHidden)
+        val asked = model.state.deleting
+
+        model.state.closePrompt(one)
+        val kept = model.state.deleting
+
+        model.state.closePrompt(DeleteTarget.AllHidden)
+
+        assertEquals(DeleteTarget.AllHidden, asked)
+        assertEquals(DeleteTarget.AllHidden, kept)
+        assertNull(model.state.deleting)
+    }
+
+    @Test
+    fun opensEditorWhileKeepingOpenRow() = modelTest(today = "2026-10-17") { setup ->
+        val model = RecurringListModel(parts = setup.parts, today = setup.today)
+        val editing = Identifier<Recurring>()
+        val open = Identifier<Recurring>()
+        model.state.openId = open
+
+        model.state.editing = Editing.Existing(editing)
+
+        assertEquals(Editing.Existing(editing), model.state.editing)
+        assertEquals(editing, (model.state.editing as? Editing.Existing)?.id)
+        assertEquals(open, model.state.openId)
+        assertNull(model.state.deleting)
     }
 
     @Test

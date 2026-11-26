@@ -21,8 +21,6 @@ class IconBackedTable<Value : Any, Draft : IconBackedDraft<Value>>(
 ) : HidableTable<Value> {
     override fun notFound(): Throwable = notFoundError()
 
-    fun iconNotFound(): Throwable = iconNotFoundError()
-
     override suspend fun hide(
         database: AppDatabase,
         id: Identifier<Value>,
@@ -30,8 +28,9 @@ class IconBackedTable<Value : Any, Draft : IconBackedDraft<Value>>(
         at: Instant,
     ) {
         val value = database.find(id) ?: throw notFound()
-
         database.hideGuard(isHidden)
         database.update(archived(value, if (isHidden) at else null, at))
     }
+
+    fun iconNotFound(): Throwable = iconNotFoundError()
 }

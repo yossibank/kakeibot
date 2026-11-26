@@ -121,72 +121,6 @@ internal fun ItemRow(
 }
 
 @Composable
-private fun ItemLine(
-    item: EntryItem.Draft,
-    isEditing: Boolean,
-    showsRate: Boolean,
-    onSelect: () -> Unit,
-) {
-    val isNegative = item.amount < 0
-    val fill = if (isEditing) Palette.accent.opacity(Emphasis.Subtle) else Color.Transparent
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Palette.paper)
-            .background(fill)
-            .clickable(onClick = onSelect)
-            .padding(
-                horizontal = 4.dp,
-                vertical = 8.dp,
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = if (isNegative) 12.dp else 0.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FittedText(
-                    text = item.trimmedName,
-                    color = if (isNegative) Palette.rose else Palette.text,
-                    style = textFont(size = FontSize.Small),
-                )
-
-                val rate = item.taxRate
-
-                if (showsRate && rate != null) {
-                    Text(
-                        text = "${rate.rawValue}%",
-                        color = Palette.subtext,
-                        style = textFont(size = FontSize.Micro),
-                    )
-                }
-            }
-
-            item.quantityText()?.let { text ->
-                Text(
-                    text = text,
-                    color = Palette.subtext,
-                    style = textFont(size = FontSize.Caption),
-                )
-            }
-        }
-
-        Text(
-            text = AmountText.text(item.amount),
-            color = if (isNegative) Palette.rose else Palette.text,
-            style = textFont(size = FontSize.Small),
-        )
-    }
-}
-
-@Composable
 internal fun SummaryLine(
     title: String,
     amount: Long?,
@@ -249,6 +183,72 @@ internal fun AdjustmentLine(model: EntryModel) {
         Text(
             text = AmountText.text(model.output.itemAdjustment.toInt()),
             color = Palette.amber,
+            style = textFont(size = FontSize.Small),
+        )
+    }
+}
+
+@Composable
+private fun ItemLine(
+    item: EntryItem.Draft,
+    isEditing: Boolean,
+    showsRate: Boolean,
+    onSelect: () -> Unit,
+) {
+    val isNegative = item.amount < 0
+    val fill = if (isEditing) Palette.accent.opacity(Emphasis.Subtle) else Color.Transparent
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Palette.paper)
+            .background(fill)
+            .clickable(onClick = onSelect)
+            .padding(
+                horizontal = 4.dp,
+                vertical = 8.dp,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = if (isNegative) 12.dp else 0.dp),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                FittedText(
+                    text = item.trimmedName,
+                    color = if (isNegative) Palette.rose else Palette.text,
+                    style = textFont(size = FontSize.Small),
+                )
+
+                val rate = item.taxRate
+
+                if (showsRate && rate != null) {
+                    Text(
+                        text = "${rate.rawValue}%",
+                        color = Palette.subtext,
+                        style = textFont(size = FontSize.Micro),
+                    )
+                }
+            }
+
+            item.quantityText()?.let { text ->
+                Text(
+                    text = text,
+                    color = Palette.subtext,
+                    style = textFont(size = FontSize.Caption),
+                )
+            }
+        }
+
+        Text(
+            text = AmountText.text(item.amount),
+            color = if (isNegative) Palette.rose else Palette.text,
             style = textFont(size = FontSize.Small),
         )
     }

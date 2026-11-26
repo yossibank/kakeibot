@@ -40,8 +40,6 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-private val actionWidth = 76.dp
-
 @Composable
 fun <ID> SwipeRow(
     id: ID,
@@ -159,3 +157,5 @@ private fun Action(
         )
     }
 }
+
+private val actionWidth = 76.dp

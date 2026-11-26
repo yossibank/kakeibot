@@ -14,8 +14,6 @@ internal suspend fun AppDatabase.tag(
     belongsTo: Identifier<EntryCategory>?,
 ): Boolean {
     id ?: return true
-
     val tag = tagDao().find(id.databaseValue)?.decoded(EntryTagRecord::entryTag)
-
     return tag?.categoryId == belongsTo
 }

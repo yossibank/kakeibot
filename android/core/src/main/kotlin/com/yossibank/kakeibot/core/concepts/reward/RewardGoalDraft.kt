@@ -22,6 +22,7 @@ data class RewardGoalDraft(
             } else {
                 emptyList()
             }
+
             val amountProblems = if (targetAmount >
                 0
             ) {
@@ -32,9 +33,6 @@ data class RewardGoalDraft(
 
             return nameProblems + amountProblems
         }
-
-    private val trimmedName: String
-        get() = name.trim()
 
     fun newGoal(at: Instant): RewardGoal {
         validate()
@@ -60,9 +58,11 @@ data class RewardGoalDraft(
         )
     }
 
+    private val trimmedName: String
+        get() = name.trim()
+
     private fun validate() {
         val problem = problems.firstOrNull() ?: return
-
         throw DraftProblemException(problem)
     }
 }

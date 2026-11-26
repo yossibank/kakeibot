@@ -33,9 +33,7 @@ suspend fun AppDatabase.saveTheme(
 ): Theme = write {
     if (editing == null) {
         val theme = draft.newTheme(at)
-
         themeDao().insert(theme.record())
-
         return@write theme
     }
 

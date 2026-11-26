@@ -48,7 +48,6 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
-import com.yossibank.kakeibot.designsystem.components.modal.DeleteDialog
 import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
@@ -69,8 +68,11 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsRecent
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
+import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.featuremodels.shared.notice.EntryChange
+import com.yossibank.kakeibot.featuremodels.shared.notice.EntryNoticeModel
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryDeck
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryRecentRow
 import com.yossibank.kakeibot.features.screens.entry.parts.EntrySlip
@@ -81,6 +83,7 @@ import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceNotice
 import com.yossibank.kakeibot.features.screens.entry.voice.rememberVoiceStarter
 import com.yossibank.kakeibot.features.screens.settings.templates.TemplateEditSheet
 import com.yossibank.kakeibot.features.shared.model.OnOutcome
+import com.yossibank.kakeibot.features.shared.notice.EntryNoticeBanner
 
 @Composable
 fun EntrySheet(
@@ -88,6 +91,7 @@ fun EntrySheet(
     today: LocalDate,
     editing: Identifier<Entry>?,
     date: LocalDate?,
+    onChange: (EntryChange) -> Unit,
     onClose: () -> Unit,
 ) {
     val model = remember(parts, editing, date) {
@@ -99,6 +103,7 @@ fun EntrySheet(
         )
     }
 
+    val notice = remember(parts) { EntryNoticeModel(parts) }
     val context = LocalContext.current
 
     val voice = remember(model) {
@@ -125,8 +130,15 @@ fun EntrySheet(
     model.state.task.Timer()
 
     OnOutcome(model.state.outcome) { outcome ->
-        if (outcome == EntryModel.Outcome.Closed) {
-            onClose()
+        when (outcome) {
+            is EntryModel.Outcome.Closed -> {
+                onChange(outcome.change)
+                onClose()
+            }
+
+            is EntryModel.Outcome.Continued -> {
+                notice.show(outcome.change)
+            }
         }
     }
 
@@ -141,7 +153,6 @@ fun EntrySheet(
     }
 
     BackHandler(onBack = ::close)
-
     BackHandler(enabled = voice.output.isActive, onBack = voice::cancel)
 
     HapticEffect(
@@ -180,7 +191,7 @@ fun EntrySheet(
                 if (model.output.isEditing) {
                     CircleIconButton(
                         icon = R.drawable.ic_trash,
-                        onClick = { model.state.present(EntryModel.Presented.Delete) },
+                        onClick = { model.perform { it.delete() } },
                         size = 36.dp,
                         iconSize = 20.dp,
                         tint = Palette.rose,
@@ -215,6 +226,7 @@ fun EntrySheet(
                         today = today,
                         onOpenSettings = {
                             voice.cancel()
+
                             context.startActivity(
                                 Intent(
                                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -237,10 +249,12 @@ fun EntrySheet(
                     )
                 }
 
+                val isInfo = model.state.task.tone == ModelTask.Tone.info
+
                 FittedText(
                     text = model.state.task.message,
                     modifier = Modifier.clickable(onClick = model.state.task::clear),
-                    color = Palette.rose,
+                    color = if (isInfo) Palette.accent else Palette.rose,
                     style = textFont(size = FontSize.Caption),
                 )
 
@@ -252,19 +266,28 @@ fun EntrySheet(
             }
         }
 
-        voice.state.notice?.let { notice ->
+        val noticeModifier = Modifier
+            .align(Alignment.BottomCenter)
+            .navigationBarsPadding()
+            .padding(
+                start = 20.dp,
+                end = 20.dp,
+                bottom = 96.dp,
+            )
+
+        val voiceNotice = voice.state.notice
+
+        if (voiceNotice == null) {
+            EntryNoticeBanner(
+                model = notice,
+                modifier = noticeModifier,
+            )
+        } else {
             EntryVoiceNotice(
-                notice = notice,
+                notice = voiceNotice,
                 onUndo = { voice.undoLast(model) },
                 onClose = voice::clearNotice,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(
-                        start = 20.dp,
-                        end = 20.dp,
-                        bottom = 96.dp,
-                    ),
+                modifier = noticeModifier,
             )
         }
 
@@ -290,17 +313,6 @@ fun EntrySheet(
                 onClose = model.state::dismiss,
             )
         }
-    }
-
-    if (model.state.presented == EntryModel.Presented.Delete) {
-        DeleteDialog(
-            title = "この記録を削除しますか",
-            onConfirm = {
-                model.state.dismiss()
-                model.perform { it.delete() }
-            },
-            onDismiss = model.state::dismiss,
-        )
     }
 
     if (model.state.presented == EntryModel.Presented.Discard) {

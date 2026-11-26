@@ -45,6 +45,7 @@ class BudgetListModel(
 
     sealed interface Target {
         val categoryId: Identifier<EntryCategory>?
+
         val title: String
 
         data object Total : Target {
@@ -150,10 +151,6 @@ class BudgetListModel(
                 ).map { it.value }
         }
 
-        private val monthSpent: Map<Identifier<EntryCategory>?, Long> by derivedStateOf {
-            month?.let { spentByCategory(it) }.orEmpty()
-        }
-
         val totalAmount: Int?
             get() = amount(null)
 
@@ -177,6 +174,7 @@ class BudgetListModel(
 
         fun amount(categoryId: Identifier<EntryCategory>?): Int? {
             val month = month ?: return null
+
             return input.overview?.budgets?.amount(
                 categoryId = categoryId,
                 month = month,
@@ -186,12 +184,30 @@ class BudgetListModel(
         fun spent(categoryId: Identifier<EntryCategory>?): Long = monthSpent[categoryId] ?: 0L
 
         fun icon(category: EntryCategory) = input.categoryList?.icons?.get(category.iconId)
+
+        private val monthSpent: Map<Identifier<EntryCategory>?, Long> by derivedStateOf {
+            month?.let { spentByCategory(it) }.orEmpty()
+        }
     }
 
     private class Dependencies(
         val database: AppDatabase,
         val entryList: Flow<EntryList>,
     )
+
+    override suspend fun loadFold(fold: SettingsFoldInput) {
+        fold.load(from = dependencies.database)
+    }
+
+    override suspend fun setFold(
+        fold: SettingsFoldInput,
+        isClosed: Boolean,
+    ) {
+        fold.save(
+            isClosed = isClosed,
+            to = dependencies.database,
+        )
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun observe() {
@@ -211,20 +227,6 @@ class BudgetListModel(
 
             observe(overviews) { input.overview = it }
         }
-    }
-
-    override suspend fun loadFold(fold: SettingsFoldInput) {
-        fold.load(from = dependencies.database)
-    }
-
-    override suspend fun setFold(
-        fold: SettingsFoldInput,
-        isClosed: Boolean,
-    ) {
-        fold.save(
-            isClosed = isClosed,
-            to = dependencies.database,
-        )
     }
 
     fun startEditing(target: Target) {

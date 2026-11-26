@@ -44,8 +44,8 @@ fun ReviewComparison(
 
         Text(
             text = model.output.comparisonText,
-            color = Palette.subtext,
-            style = textFont(style = FontTextStyle.Caption),
+            color = Palette.text,
+            style = textFont(style = FontTextStyle.Footnote),
         )
     }
 }

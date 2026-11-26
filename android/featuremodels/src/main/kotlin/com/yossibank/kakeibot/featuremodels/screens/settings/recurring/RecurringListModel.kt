@@ -70,7 +70,9 @@ class RecurringListModel(
         var today: LocalDate by mutableStateOf(today)
         var editing: Editing? by mutableStateOf(editing)
         var openId: Identifier<Recurring>? by mutableStateOf(null)
+
         var deleting: DeleteTarget? by mutableStateOf(null)
+            private set
 
         var type: Entry.Kind by mutableStateOf(Entry.Kind.expense)
             private set
@@ -103,6 +105,16 @@ class RecurringListModel(
 
         fun cancelMoving() {
             movingOrder = null
+        }
+
+        fun ask(target: DeleteTarget) {
+            deleting = target
+        }
+
+        fun closePrompt(target: DeleteTarget) {
+            if (deleting == target) {
+                deleting = null
+            }
         }
 
         fun select(type: Entry.Kind) {
@@ -172,6 +184,20 @@ class RecurringListModel(
         val entryList: Flow<EntryList>,
     )
 
+    override suspend fun loadFold(fold: SettingsFoldInput) {
+        fold.load(from = dependencies.database)
+    }
+
+    override suspend fun setFold(
+        fold: SettingsFoldInput,
+        isClosed: Boolean,
+    ) {
+        fold.save(
+            isClosed = isClosed,
+            to = dependencies.database,
+        )
+    }
+
     suspend fun observe() {
         val database = dependencies.database
 
@@ -196,20 +222,6 @@ class RecurringListModel(
             id = id,
             to = to,
             among = output.visible.map { it.id },
-        )
-    }
-
-    override suspend fun loadFold(fold: SettingsFoldInput) {
-        fold.load(from = dependencies.database)
-    }
-
-    override suspend fun setFold(
-        fold: SettingsFoldInput,
-        isClosed: Boolean,
-    ) {
-        fold.save(
-            isClosed = isClosed,
-            to = dependencies.database,
         )
     }
 

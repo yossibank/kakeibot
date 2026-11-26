@@ -61,22 +61,6 @@ suspend fun AppDatabase.restore(deletion: Deletion) {
     }
 }
 
-private val deletionColumns: List<TableColumn<Deletion, *>> = listOf(
-    TableColumn(iconTable) { it.icons },
-    TableColumn(walletTable) { it.wallets },
-    TableColumn(entryCategoryTable) { it.categories },
-    TableColumn(entryTagTable) { it.tags },
-    TableColumn(recurringTable) { it.recurrings },
-    TableColumn(entryTemplateTable) { it.templates },
-    TableColumn(budgetTable) { it.budgets },
-    TableColumn(valuationTable) { it.valuations },
-    TableColumn(adjustmentTable) { it.adjustments },
-    TableColumn(shelfIconTable) { it.shelfIcons },
-    TableColumn(rewardRuleTable) { it.rewardRules },
-    TableColumn(rewardLogTable) { it.rewardLogs },
-    TableColumn(themeTable) { it.themes },
-)
-
 internal suspend fun AppDatabase.deleteRecurrings(
     recurrings: List<Recurring>,
     at: Instant,
@@ -106,3 +90,19 @@ internal suspend fun AppDatabase.detachRewardGoals(
         updatedAt = at.storedValue,
     )
 }
+
+private val deletionColumns: List<TableColumn<Deletion, *>> = listOf(
+    TableColumn(iconTable) { it.icons },
+    TableColumn(walletTable) { it.wallets },
+    TableColumn(entryCategoryTable) { it.categories },
+    TableColumn(entryTagTable) { it.tags },
+    TableColumn(recurringTable) { it.recurrings },
+    TableColumn(entryTemplateTable) { it.templates },
+    TableColumn(budgetTable) { it.budgets },
+    TableColumn(valuationTable) { it.valuations },
+    TableColumn(adjustmentTable) { it.adjustments },
+    TableColumn(shelfIconTable) { it.shelfIcons },
+    TableColumn(rewardRuleTable) { it.rewardRules },
+    TableColumn(rewardLogTable) { it.rewardLogs },
+    TableColumn(themeTable) { it.themes },
+)

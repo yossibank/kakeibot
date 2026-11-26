@@ -107,7 +107,6 @@ internal suspend fun AppDatabase.saveItems(
 
     if (of.type == Entry.Kind.transfer) {
         entryItemDao().deleteIds(existing.map { it.id.databaseValue })
-
         return
     }
 

@@ -101,7 +101,6 @@ data class CardBill(
 
             while (dates.size < count) {
                 val next = of.nextDate(onOrAfter = cursor) ?: break
-
                 dates.add(next)
                 cursor = next.adding(days = 1)
             }

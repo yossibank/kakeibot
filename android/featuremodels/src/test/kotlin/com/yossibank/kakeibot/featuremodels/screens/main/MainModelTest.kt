@@ -171,6 +171,16 @@ class MainModelTest {
     }
 
     @Test
+    fun advancesNoticeRoundToHideTabNotices() = runTest {
+        val model = MainModel()
+
+        model.state.hideTabNotices()
+
+        assertEquals(1, model.state.noticeRound)
+        assertEquals(0, model.state.observationRound)
+    }
+
+    @Test
     fun keepsTabsAndSheetWhenRestored() {
         val id = Identifier<Entry>()
 
