@@ -24,7 +24,7 @@ extension EntryModelTests {
         let today = LocalDate(Self.fixedNow, in: .current)
         let later = today.adding(days: 40)
 
-        model.state.today = later
+        model.setToday(later)
 
         #expect(model.output.monthOverview.period.contains(later))
         #expect(!model.output.monthOverview.period.contains(today))

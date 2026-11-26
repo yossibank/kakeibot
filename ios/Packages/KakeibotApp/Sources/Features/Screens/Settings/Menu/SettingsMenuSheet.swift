@@ -61,7 +61,7 @@ public struct SettingsMenuSheet: View {
         .errorBanner(Bindable(weekStart.state).errorNotice)
         .errorBanner(Bindable(recordReset.state).errorNotice)
         .confirmation(
-            isPresented: Bindable(recordReset.state).isConfirming,
+            isPresented: Bindable(recordReset.state).prompt[.deleteAll],
             systemImage: "trash",
             title: "記録をすべて削除しますか",
             message: recordReset.output.message(isSyncing: model.input.syncStatus.isEnabled),

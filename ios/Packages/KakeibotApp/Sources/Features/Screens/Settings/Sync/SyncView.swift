@@ -15,37 +15,37 @@ public struct SyncView: View {
     }
 
     public var body: some View {
-        let asking = model.state.asking
+        let presented = model.state.presented.current
 
         content
             .confirmation(
-                isPresented: isAsking(asking?.leaving.map { .leave($0) }),
+                isPresented: isPresenting(presented?.leaving.map { .leave($0) }),
                 systemImage: "person.crop.circle.badge.minus",
                 title: "共有から抜けますか",
                 message: "この \(DeviceName.current) から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
                 keepTitle: "やめる",
                 confirmTitle: "抜ける"
             ) {
-                leave(asking?.leaving)
+                leave(presented?.leaving)
             }
             .confirmation(
-                isPresented: isAsking(asking?.stopping.map { .stop($0) }),
+                isPresented: isPresenting(presented?.stopping.map { .stop($0) }),
                 systemImage: "person.2.slash",
                 title: "共有を終えますか",
                 message: "相手の端末から、この口座と記録が消えます。この \(DeviceName.current) には残ります",
                 keepTitle: "やめる",
                 confirmTitle: "共有を終える"
             ) {
-                stopSharing(asking?.stopping)
+                stopSharing(presented?.stopping)
             }
             .overlay {
                 cardOverlay
             }
-            .animation(.snappy(duration: 0.25), value: model.state.choice)
-            .animation(.snappy(duration: 0.25), value: model.state.invitation)
-            .animation(.snappy(duration: 0.25), value: model.state.opened)
-            .proOffer(asking?.offer?.feature) {
-                model.state.close(asking)
+            .animation(.snappy(duration: 0.25), value: model.output.choice)
+            .animation(.snappy(duration: 0.25), value: model.output.invitation)
+            .animation(.snappy(duration: 0.25), value: model.output.opened)
+            .proOffer(presented?.offer?.feature) {
+                close(presented)
             } onUnlock: {
                 unlock()
             }
@@ -104,7 +104,7 @@ private extension SyncView {
                             CapsulePicker(selection: onBinding, options: Self.onOptions)
                         }
                         .frame(minHeight: 58)
-                        .disabled(model.state.isWorking || model.output
+                        .disabled(model.state.task.isRunning || model.output
                             .isSwitching || !canChange)
 
                         if let progress = model.output.progress {
@@ -135,20 +135,20 @@ private extension SyncView {
 
     @ViewBuilder
     var cardOverlay: some View {
-        if let choice = model.state.choice {
+        if let choice = model.output.choice {
             SyncChoiceCard(
                 choice: choice,
                 onUseLocal: useLocalData,
                 onUseCloud: useCloudData,
                 onKeep: model.cancelChoice
             )
-        } else if let invitation = model.state.invitation {
+        } else if let invitation = model.output.invitation {
             SyncInviteCard(
                 item: invitation,
                 onInvite: confirmInvitation,
                 onCancel: model.cancelInvitation
             )
-        } else if let opened = model.state.opened {
+        } else if let opened = model.output.opened {
             SyncSharedCard(
                 item: opened,
                 participants: model.output.participants,
@@ -213,7 +213,7 @@ private extension SyncView {
             model.output.shownOn
         } set: { isOn in
             guard !isOn || isPro else {
-                model.state.ask(.offer(.sync))
+                model.state.presented.show(.offer(.sync))
                 return
             }
 
@@ -239,13 +239,19 @@ private extension SyncView {
         return true
     }
 
-    func isAsking(_ asking: SyncModel.Asking?) -> Binding<Bool> {
+    func isPresenting(_ presented: SyncModel.Presented?) -> Binding<Bool> {
         Binding {
-            asking != nil
+            presented != nil
         } set: { isPresented in
             if !isPresented {
-                model.state.close(asking)
+                close(presented)
             }
+        }
+    }
+
+    func close(_ presented: SyncModel.Presented?) {
+        if let presented {
+            model.state.presented.close(presented)
         }
     }
 
@@ -260,11 +266,11 @@ private extension SyncView {
     }
 
     func unlock() {
-        guard let offer = model.state.asking?.offer else {
+        guard let offer = model.state.presented.current?.offer else {
             return
         }
 
-        model.state.close(.offer(offer))
+        model.state.presented.close(.offer(offer))
 
         switch offer {
         case .sync:

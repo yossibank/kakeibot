@@ -6,25 +6,25 @@ import Store
 public extension SyncModel {
     func open(_ item: WalletShare) async {
         guard item.isShared else {
-            state.invitation = item
+            state.presented.show(.invitation(item))
             return
         }
 
         let id = item.wallet.id
 
-        state.opened = item
+        state.presented.show(.opened(item))
         input.members = .loading
 
         do {
             let participants = try await dependencies.cloud.participants(id, item.wallet.name)
 
-            guard state.opened?.wallet.id == id else {
+            guard output.opened?.wallet.id == id else {
                 return
             }
 
             input.members = .loaded(participants)
         } catch {
-            guard state.opened?.wallet.id == id else {
+            guard output.opened?.wallet.id == id else {
                 return
             }
 
@@ -33,25 +33,36 @@ public extension SyncModel {
     }
 
     func cancelInvitation() {
-        state.invitation = nil
+        if let item = output.invitation {
+            state.presented.close(.invitation(item))
+        }
     }
 
     func closeOpened() {
-        state.opened = nil
+        if let item = output.opened {
+            state.presented.close(.opened(item))
+        }
+
         input.members = .loading
     }
 
     func confirmInvitation() async {
-        guard let item = state.invitation else {
+        guard
+            let item = output.invitation,
+            !state.shareTask.isRunning
+        else {
             return
         }
 
-        state.invitation = nil
+        state.presented.close(.invitation(item))
         await show(item, creates: true)
     }
 
     func inviteMore() async {
-        guard let item = state.opened else {
+        guard
+            let item = output.opened,
+            !state.shareTask.isRunning
+        else {
             return
         }
 
@@ -60,10 +71,18 @@ public extension SyncModel {
     }
 
     func stopSharing(_ item: WalletShare) async {
+        guard !state.shareTask.isRunning else {
+            return
+        }
+
         await endShare(item.wallet.id)
     }
 
     func leave(_ item: JoinedShare) async {
+        guard !state.shareTask.isRunning else {
+            return
+        }
+
         let id = item.wallet.id
 
         await workOnWallet(id, failure: Self.leaveFailedMessage) {
@@ -121,7 +140,9 @@ private extension SyncModel {
         state.errorNotice.clear()
 
         do {
-            try await operation()
+            try await state.shareTask.attempt {
+                try await operation()
+            }
         } catch {
             let code = error as NSError
             let detail = String(describing: error)

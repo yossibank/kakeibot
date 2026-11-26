@@ -49,7 +49,7 @@ struct EntryModelTests {
         await model.load()
         model.state.press(.digit(5))
         model.state.press(.doubleZero)
-        model.state.memo = "ランチ"
+        model.state.fields.memo = "ランチ"
 
         let saved = await model.save()
         let entries = try setup.database.snapshot().entries
@@ -116,7 +116,7 @@ struct EntryModelTests {
             date: setup.date
         )
         await model.load()
-        model.state.memo = "ランチ"
+        model.state.fields.memo = "ランチ"
 
         await model.recordAgain()
         let saved = await model.save()
@@ -217,7 +217,7 @@ struct EntryModelTests {
         model.state.press(.clear)
         let cleared = model.output.isChanged
 
-        model.state.memo = "ランチ"
+        model.state.fields.memo = "ランチ"
 
         #expect(!loaded)
         #expect(typed)
@@ -341,7 +341,7 @@ struct EntryModelTests {
     func startsNextEntryKeepingChoices() async throws {
         let model = try await Self.newModel()
         model.state.press(.digit(5))
-        model.state.memo = "ランチ"
+        model.state.fields.memo = "ランチ"
         let category = model.state.category.id
         let wallet = model.state.payment.walletId
 
@@ -349,7 +349,7 @@ struct EntryModelTests {
         await model.startNext()
 
         #expect(model.output.amount == 0)
-        #expect(model.state.memo.isEmpty)
+        #expect(model.state.fields.memo.isEmpty)
         #expect(model.state.category.id == category)
         #expect(model.state.payment.walletId == wallet)
         #expect(!model.output.isChanged)

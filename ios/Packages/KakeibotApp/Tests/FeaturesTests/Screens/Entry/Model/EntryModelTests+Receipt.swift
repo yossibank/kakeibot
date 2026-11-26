@@ -28,7 +28,7 @@ extension EntryModelTests {
 
         #expect(model.output.amount == 911)
         #expect(model.state.payment.date == date)
-        #expect(model.state.store == "スーパー青葉")
+        #expect(model.state.fields.store == "スーパー青葉")
         #expect(model.state.items.list.map(\.name) == ["牛乳", "食パン"])
         #expect(model.state.category.id == categoryId)
         #expect(model.output.hasItemAdjustment)
@@ -66,14 +66,14 @@ extension EntryModelTests {
         let setup = try await Setup()
         let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
-        model.state.memo = "店名\n2 行目"
+        model.state.fields.memo = "店名\n2 行目"
         model.state.press(.digit(5))
 
         await model.apply(ReceiptReading(total: 0))
 
         #expect(model.output.amount == 5)
         #expect(model.state.payment.date == setup.date)
-        #expect(model.state.memo == "店名\n2 行目")
+        #expect(model.state.fields.memo == "店名\n2 行目")
         #expect(model.state.items.list.isEmpty)
     }
 
@@ -148,7 +148,7 @@ extension EntryModelTests {
                 items: [EntryItem.Draft(name: "ギユウニユウ", amount: 396)]
             )
         )
-        model.state.store = "セブン"
+        model.state.fields.store = "セブン"
         model.state.updateItem(at: 0, name: "牛乳", amount: 396)
         _ = await model.save()
         let read = try await setup.database.itemNames(at: "セブン新宿店")

@@ -117,7 +117,7 @@ private extension EntrySheet {
                 .scrollTargetLayout()
             }
             .scrollTargetBehavior(.paging)
-            .scrollPosition(id: Bindable(model.state).screen.categoryPage)
+            .scrollPosition(id: categoryPageBinding)
             .scrollIndicators(.hidden)
             .frame(height: Self.pagerHeight + Self.liftInset * 2)
             .padding(-Self.liftInset)
@@ -216,6 +216,14 @@ private extension EntrySheet {
     static var pagerHeight: CGFloat {
         let rows = CGFloat(categoryRows)
         return categoryHeight * rows + categorySpacing * (rows - 1)
+    }
+
+    var categoryPageBinding: Binding<Int?> {
+        Binding {
+            model.state.screen.categoryPage
+        } set: { page in
+            model.state.showCategoryPage(page)
+        }
     }
 
     var tagEditAction: (() -> Void)? {

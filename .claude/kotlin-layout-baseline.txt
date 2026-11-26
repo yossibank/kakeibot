@@ -23,16 +23,11 @@ android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemReceipt.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemSheet.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/sheet/EntryItemSlip.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「効果」は「組み立て」より前に置く
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「効果」は「組み立て」より前に置く
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/view/EntrySheet.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「効果」は「組み立て」より前に置く
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/voice/EntryVoiceCard.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/voice/EntryVoiceCard.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「派生の val」は「組み立て」より前に置く
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetKeypadDrawer.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetListView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/budgets/BudgetTotalCard.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/menu/SettingsMenuSheet.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringBoard.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringHiddenSection.kt: K8: 1 つの関数は 60 行までにする

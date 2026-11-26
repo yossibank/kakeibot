@@ -36,7 +36,7 @@ model.perform {
 | 閉じた後 | 閉じた画面には、結果が届かない |
 | 編集シート | 結果は `EditFlow` の `Outcome` で持つ。`editSheet` が受ける |
 | 知らせと確認 | 取り消しの知らせの値と、結果で出す確認は、モデルが `state` の値を書いて出す。取り消しの知らせは、`UndoNotice` が時間も数える |
-| 子の画面の結果 | 親の画面は親の `state` に直に書かず、親のモデルの `receive`・`receiveHidden` に渡す。設定の一覧・メインのタブ・テーマの一覧が当たる |
+| 子の画面の結果 | 親の画面は親の `state` に直に書かず、親のモデルの `receive`・`receiveHidden` に渡す。設定の一覧・メインのタブ・テーマの一覧、入力シートの `EntryModel` の `receive`、Android の `receiveTemplate` が当たる |
 | 結果が何種類もある画面 | 結果を 1 つの `enum` にして、`ScreenOutcome` に入れる。入力シートの `EntryModel.Outcome` が当たる |
 | 読み込みの後 | `.task` は、モデルの `start` だけを呼ぶ。読み込みの後に画面の値を組む時は、モデルが結果を置く |
 | 待ってから出す | 画面の動きを待つ時間は、モデルが待ってから結果を置く。レシートの品目のシートが当たる |

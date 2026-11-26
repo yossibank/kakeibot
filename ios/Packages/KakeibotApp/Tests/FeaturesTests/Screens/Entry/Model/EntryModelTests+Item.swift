@@ -143,15 +143,15 @@ extension EntryModelTests {
         let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.load()
 
-        model.state.store = "青葉"
-        let added = model.state.memo
+        model.state.fields.store = "青葉"
+        let added = model.state.fields.memo
 
-        model.state.memo = "若葉\n特売"
-        model.state.store = "青葉\n本店"
+        model.state.fields.memo = "若葉\n特売"
+        model.state.fields.store = "青葉\n本店"
 
         #expect(added == "青葉")
-        #expect(model.state.memo == "青葉 本店\n特売")
-        #expect(model.state.store == "青葉 本店")
+        #expect(model.state.fields.memo == "青葉 本店\n特売")
+        #expect(model.state.fields.store == "青葉 本店")
     }
 
     @Test

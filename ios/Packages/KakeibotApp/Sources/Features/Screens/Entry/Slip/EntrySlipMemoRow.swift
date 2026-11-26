@@ -102,7 +102,7 @@ private extension EntrySlipMemoRow {
     static let badgeSize: CGFloat = 16
 
     var memoText: String {
-        model.state.memo.isEmpty ? "\(model.output.memoPrompt)をメモ" : model.state.memo
+        model.state.fields.memo.isEmpty ? "\(model.output.memoPrompt)をメモ" : model.state.fields.memo
     }
 
     var memoColor: Color {
@@ -110,7 +110,7 @@ private extension EntrySlipMemoRow {
             return Palette.accent
         }
 
-        return model.state.memo.isEmpty ? Palette.hint : Palette.subtext
+        return model.state.fields.memo.isEmpty ? Palette.hint : Palette.subtext
     }
 
     var showsItems: Bool {

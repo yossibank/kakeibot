@@ -15,7 +15,7 @@ extension SyncModelTests {
         await model.open(item)
         let after = try await firstShare(in: setup.database)
 
-        #expect(model.state.invitation == item)
+        #expect(model.output.invitation == item)
         #expect(await cloud.shareCalls.isEmpty)
         #expect(after.isShared == false)
     }
@@ -33,7 +33,7 @@ extension SyncModelTests {
 
         #expect(await cloud.shareCalls == ["create", "show"])
         #expect(shared.isShared)
-        #expect(model.state.invitation == nil)
+        #expect(model.output.invitation == nil)
         #expect(model.state.workingWallet == nil)
         #expect(model.state.errorNotice.message == nil)
     }
@@ -49,7 +49,7 @@ extension SyncModelTests {
         model.cancelInvitation()
         await model.confirmInvitation()
 
-        #expect(model.state.invitation == nil)
+        #expect(model.output.invitation == nil)
         #expect(await cloud.shareCalls.isEmpty)
     }
 
@@ -66,7 +66,7 @@ extension SyncModelTests {
 
         await model.open(item)
 
-        #expect(model.state.opened == item)
+        #expect(model.output.opened == item)
         #expect(model.output.participants == members)
         #expect(model.output.isParticipantsFailed == false)
         #expect(await cloud.shareCalls == ["list"])
@@ -96,7 +96,7 @@ extension SyncModelTests {
         await model.inviteMore()
 
         #expect(await cloud.shareCalls == ["list", "show"])
-        #expect(model.state.opened == nil)
+        #expect(model.output.opened == nil)
     }
 
     @Test
@@ -191,19 +191,19 @@ extension SyncModelTests {
         let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
-        model.state.ask(.offer(.sync))
-        let feature = model.state.asking?.offer?.feature
+        model.state.presented.show(.offer(.sync))
+        let feature = model.state.presented.current?.offer?.feature
 
-        model.state.ask(.offer(.share(item)))
-        model.state.close(.offer(.sync))
-        let kept = model.state.asking
+        model.state.presented.show(.offer(.share(item)))
+        model.state.presented.close(.offer(.sync))
+        let kept = model.state.presented.current
 
-        model.state.close(kept)
+        model.state.presented.closeAll()
 
         #expect(feature == "端末間の同期")
         #expect(kept == .offer(.share(item)))
         #expect(kept?.offer?.feature == "家族との共有")
-        #expect(model.state.asking == nil)
+        #expect(model.state.presented.current == nil)
     }
 
     @Test
@@ -216,13 +216,46 @@ extension SyncModelTests {
         await model.confirmInvitation()
         let shared = try await firstShare(in: setup.database)
         await model.open(shared)
-        let opened = model.state.opened
+        let opened = model.output.opened
 
         model.askToStop(shared)
 
         #expect(opened == shared)
-        #expect(model.state.opened == nil)
-        #expect(model.state.asking?.stopping == shared)
-        #expect(model.state.asking?.leaving == nil)
+        #expect(model.output.opened == nil)
+        #expect(model.state.presented.current?.stopping == shared)
+        #expect(model.state.presented.current?.leaving == nil)
+    }
+
+    @Test
+    func ignoresShareWorkWhileAnotherRuns() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+        await model.open(item)
+
+        await model.state.shareTask.attempt {
+            await model.confirmInvitation()
+        }
+
+        let after = try await firstShare(in: setup.database)
+
+        #expect(await cloud.shareCalls.isEmpty)
+        #expect(after.isShared == false)
+        #expect(model.state.workingWallet == nil)
+    }
+
+    @Test
+    func showsOneCardAtATime() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let cloud = FakeCloud(hasData: false)
+        let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
+        let item = try await firstShare(in: setup.database)
+        model.state.presented.show(.offer(.sync))
+
+        await model.open(item)
+
+        #expect(model.output.invitation == item)
+        #expect(model.state.presented.current?.offer == nil)
     }
 }

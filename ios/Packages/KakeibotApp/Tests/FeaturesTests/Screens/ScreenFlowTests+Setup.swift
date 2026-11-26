@@ -118,7 +118,7 @@ extension ScreenFlowTests.Setup {
         }
 
         model.state.setDate(date ?? today)
-        model.state.memo = memo
+        model.state.fields.memo = memo
 
         return try #require(await model.save())
     }

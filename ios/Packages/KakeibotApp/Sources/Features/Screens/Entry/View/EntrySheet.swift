@@ -198,7 +198,7 @@ private extension EntrySheet {
                     }
                 }
 
-            if let category = model.state.screen.menuCategory {
+            if let category = model.state.presented.current?.menuCategory {
                 categoryMenuLayer(category, at: layout.menuFrame)
             }
 
@@ -223,7 +223,7 @@ private extension EntrySheet {
         content
             .haptic(
                 .impact(weight: .medium),
-                trigger: model.state.screen.menuCategory
+                trigger: model.state.presented.current?.menuCategory
             ) { _, category in
                 category != nil
             }
@@ -290,13 +290,13 @@ private extension EntrySheet {
             .backdrop()
             .modifier(
                 EntryDiscardGuard(
-                    isPresented: Bindable(model.state).screen.isConfirmingDiscard,
+                    isPresented: Bindable(model.state).presented[.discard],
                     model: model
                 ) {
                     dismiss()
                 }
             )
-            .sheet(item: Bindable(model.state).screen.sheet, onDismiss: reloadAfterSheet) { sheet in
+            .sheet(item: sheetBinding, onDismiss: reloadAfterSheet) { sheet in
                 sheetContent(for: sheet)
             }
             .task {

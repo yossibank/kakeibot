@@ -4,18 +4,30 @@ import FeatureModels
 import SwiftUI
 
 extension EntrySheet {
+    var sheetBinding: Binding<EntryModel.Sheet?> {
+        Binding {
+            model.state.presented.current?.sheet
+        } set: { sheet in
+            if let sheet {
+                model.state.open(sheet)
+            } else {
+                model.state.closeSheet()
+            }
+        }
+    }
+
     @ViewBuilder
     func sheetContent(for sheet: EntryModel.Sheet) -> some View {
         switch sheet {
         case let .newWallet(role):
             WalletEditSheet(model: model.newWalletModel()) { wallet in
-                model.state.noteAdded(wallet, as: role)
+                model.receive(wallet, as: role)
             }
 
         case let .editWallet(id):
             WalletEditSheet(model: model.editWalletModel(id)) { _ in
             } onDelete: { deletion in
-                model.state.results.deletion.show(deletion)
+                model.receive(deletion)
             }
 
         case .items:
@@ -34,7 +46,7 @@ extension EntrySheet {
         case let .editCategory(category):
             CategoryEditSheet(model: model.editCategoryModel(category)) { _ in
             } onDelete: { deletion in
-                model.state.results.deletion.show(deletion)
+                model.receive(deletion)
             }
 
         case let .addTag(category):
@@ -43,7 +55,7 @@ extension EntrySheet {
                 startsAddingTag: true
             ) { _ in
             } onDelete: { deletion in
-                model.state.results.deletion.show(deletion)
+                model.receive(deletion)
             }
 
         case .newTemplate:

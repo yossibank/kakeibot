@@ -33,9 +33,11 @@ public extension ProPurchaseModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var outcome = ScreenOutcome<Work>()
 
+        public internal(set) var outcome = ScreenOutcome<Work>()
         public internal(set) var working: Work?
+
+        public let task = ModelTask()
     }
 
     @MainActor
@@ -131,7 +133,7 @@ private extension ProPurchaseModel {
         failedMessage: String,
         _ operation: () async throws -> ProStatus
     ) async -> ProStatus? {
-        guard !output.isWorking else {
+        guard !state.task.isRunning else {
             return nil
         }
 
@@ -143,7 +145,9 @@ private extension ProPurchaseModel {
         }
 
         do {
-            return try await operation()
+            return try await state.task.attempt {
+                try await operation()
+            }
         } catch ProStoreError.cancelled {
             return nil
         } catch {
@@ -163,7 +167,7 @@ private extension ProPurchaseModel {
 
 public extension ProPurchaseModel.Output {
     var isWorking: Bool {
-        state.working != nil
+        state.task.isRunning
     }
 
     var purchaseTitle: String {

@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.notice.EntryChange
 import com.yossibank.kakeibot.featuremodels.support.failWrites
 import com.yossibank.kakeibot.featuremodels.support.modelTest
+import com.yossibank.kakeibot.store.queries.methods.entry
 import com.yossibank.kakeibot.store.queries.methods.entryList
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -38,6 +39,30 @@ class EntryModelOutcomeTest {
 
         assertFalse(isSaved)
         assertNull(model.state.outcome.value)
+    }
+
+    @Test
+    fun ignoresSavingWhileRunning() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        model.press(5)
+
+        val isSaved = model.state.task.attempt(failure = "") { model.save() }
+
+        assertEquals(false, isSaved)
+        assertNull(model.state.outcome.value)
+        assertTrue(setup.database.entryList().entries.isEmpty())
+    }
+
+    @Test
+    fun ignoresDeletingWhileRunning() = modelTest(today = "2026-10-12") { setup ->
+        val entry = setup.save(Entry.Kind.expense, amount = 980, on = setup.today)
+        val model = setup.loadedModel(editing = entry.id)
+
+        val isDeleted = model.state.task.attempt(failure = "") { model.delete() }
+
+        assertEquals(false, isDeleted)
+        assertNull(model.state.outcome.value)
+        assertEquals(entry, setup.database.entry(entry.id))
     }
 
     @Test

@@ -29,7 +29,7 @@ struct EntryVoiceFlowTests {
         #expect(model.output.amount == 980)
         #expect(model.state.payment.date == setup.date.adding(days: -1))
         #expect(model.state.payment.walletId == wallet.id)
-        #expect(model.state.store == "コンビニ")
+        #expect(model.state.fields.store == "コンビニ")
         #expect(model.output.isDateFromVoice)
         #expect(model.output.isWalletFromVoice)
         #expect(model.output.isMemoFromVoice)
@@ -44,7 +44,7 @@ struct EntryVoiceFlowTests {
 
         #expect(model.output.amount == 0)
         #expect(model.state.payment.date == setup.date)
-        #expect(model.state.memo.isEmpty)
+        #expect(model.state.fields.memo.isEmpty)
         #expect(!model.output.isDateFromVoice)
         #expect(flow.state.notice == nil)
     }

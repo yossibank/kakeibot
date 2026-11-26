@@ -16,7 +16,7 @@ struct SettingsMenuResetModelTests {
         let isReady = await model.prepare()
 
         #expect(isReady)
-        #expect(model.state.isConfirming)
+        #expect(model.state.prompt[.deleteAll])
         #expect(model.input.count == 1)
         #expect(model.state.errorNotice.message == nil)
     }
@@ -29,7 +29,7 @@ struct SettingsMenuResetModelTests {
         let isReady = await model.prepare()
 
         #expect(!isReady)
-        #expect(!model.state.isConfirming)
+        #expect(!model.state.prompt[.deleteAll])
         #expect(model.state.errorNotice.message == "削除する記録はありません")
     }
 
@@ -44,7 +44,22 @@ struct SettingsMenuResetModelTests {
         let isReady = await model.prepare()
 
         #expect(!isReady)
-        #expect(!model.state.isConfirming)
+        #expect(!model.state.prompt[.deleteAll])
         #expect(model.state.errorNotice.message == "記録の件数を読めませんでした")
+    }
+
+    @Test
+    func ignoresPreparingWhileRunning() async throws {
+        let setup = try await EntryModelTests.Setup()
+        _ = try await setup.saveEntry(amount: 980)
+        let model = SettingsMenuResetModel(parts: .system(setup.database))
+
+        let isReady = await model.state.task.attempt {
+            await model.prepare()
+        }
+
+        #expect(!isReady)
+        #expect(!model.state.prompt[.deleteAll])
+        #expect(model.input.count == 0)
     }
 }

@@ -157,7 +157,7 @@ extension BackupModelTests {
 
         #expect(pressed == .export(.csv))
         #expect(model.state.pressed == nil)
-        #expect(!model.state.isWorking)
+        #expect(!model.state.task.isRunning)
     }
 
     @Test
@@ -165,13 +165,27 @@ extension BackupModelTests {
         let setup = try Setup()
         let model = setup.exporter()
 
-        model.state.pick(.importer)
-        model.state.close(.exporter)
-        let kept = model.state.picker
+        model.state.presented.show(.importer)
+        model.state.presented.close(.exporter)
+        let kept = model.state.presented.current
 
-        model.state.close(.importer)
+        model.state.presented.close(.importer)
 
         #expect(kept == .importer)
-        #expect(model.state.picker == nil)
+        #expect(model.state.presented.current == nil)
+    }
+
+    @Test
+    func ignoresMakingFileWhileRunning() async throws {
+        let setup = try Setup()
+        let model = setup.exporter()
+
+        let isMade = await model.state.task.attempt {
+            await model.makeFile(.csv)
+        }
+
+        #expect(!isMade)
+        #expect(model.state.file == nil)
+        #expect(!model.state.presented[.exporter])
     }
 }

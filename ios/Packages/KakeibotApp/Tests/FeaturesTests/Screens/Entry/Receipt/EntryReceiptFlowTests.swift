@@ -157,7 +157,7 @@ struct EntryReceiptFlowTests {
         #expect(outcome == .read(itemCount: 0, hasAmount: true))
         #expect(flow.state.step == nil)
         #expect(model.output.amount == 911)
-        #expect(model.state.store == "スーパー青葉")
+        #expect(model.state.fields.store == "スーパー青葉")
         #expect(model.state.errorNotice.message == EntryReceiptFlow.totalMessage)
     }
 

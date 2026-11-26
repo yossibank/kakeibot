@@ -26,7 +26,7 @@ extension EntryModelTests {
         let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.start()
         let category = try #require(model.output.categories.first)
-        model.state.results.deletion.show(Deletion(merging: []))
+        model.receive(Deletion(merging: []))
         model.state.results.hiddenCategory.show(.init(id: category.id, wasSelected: false))
 
         await model.start()
@@ -43,7 +43,7 @@ extension EntryModelTests {
         let change = try #require(await model.save())
 
         #expect(model.state.results.outcome.value == .closed(change))
-        #expect(model.state.progress.isClosing)
+        #expect(model.state.results.isClosing)
     }
 
     @Test
@@ -58,7 +58,7 @@ extension EntryModelTests {
 
         #expect(change == nil)
         #expect(model.state.results.outcome.value == nil)
-        #expect(!model.state.progress.isClosing)
+        #expect(!model.state.results.isClosing)
     }
 
     @Test
@@ -72,7 +72,7 @@ extension EntryModelTests {
         let next = await model.saveAndContinue()
 
         #expect(amount == 0)
-        #expect(!model.state.progress.isClosing)
+        #expect(!model.state.results.isClosing)
         #expect(next != nil)
         #expect(next?.entry.id != change.entry.id)
         #expect(model.state.results.outcome.value == next.map(EntryModel.Outcome.continued))
@@ -93,7 +93,53 @@ extension EntryModelTests {
 
         #expect(change.kind == .deleted)
         #expect(model.state.results.outcome.value == .closed(change))
-        #expect(model.state.progress.isClosing)
+        #expect(model.state.results.isClosing)
+    }
+
+    @Test
+    func ignoresSavingWhileRunning() async throws {
+        let model = try await Self.newModel()
+        model.state.press(.digit(5))
+
+        let change = await model.state.task.attempt {
+            await model.save()
+        }
+
+        let history = try await model.dependencies.database.entryList().entries
+
+        #expect(change == nil)
+        #expect(history.isEmpty)
+        #expect(model.state.results.outcome.value == nil)
+    }
+
+    @Test
+    func ignoresDeletingWhileRunning() async throws {
+        let setup = try await Setup()
+        let entry = try await setup.saveEntry(amount: 980)
+        let model = EntryModel(
+            parts: .system(setup.database),
+            editing: entry.id,
+            date: setup.date
+        )
+        await model.load()
+
+        let change = await model.state.task.attempt {
+            await model.delete()
+        }
+
+        #expect(change == nil)
+        #expect(try await setup.database.entry(entry.id) != nil)
+        #expect(!model.state.results.isClosing)
+    }
+
+    @Test
+    func receivesDeletionFromChildSheet() async throws {
+        let model = try await Self.newModel()
+        let deletion = Deletion(merging: [])
+
+        model.receive(deletion)
+
+        #expect(model.state.results.deletion == deletion)
     }
 
     @Test

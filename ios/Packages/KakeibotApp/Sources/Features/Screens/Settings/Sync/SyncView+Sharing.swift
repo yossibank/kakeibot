@@ -98,7 +98,7 @@ private extension SyncView {
 
             Button {
                 guard item.isShared || isPro else {
-                    model.state.ask(.offer(.share(item)))
+                    model.state.presented.show(.offer(.share(item)))
                     return
                 }
 
@@ -169,7 +169,7 @@ private extension SyncView {
             Spacer(minLength: 0)
 
             Button {
-                model.state.ask(.leave(item))
+                model.state.presented.show(.leave(item))
             } label: {
                 pill(
                     "抜ける",
@@ -225,6 +225,6 @@ private extension SyncView {
 
 private extension SyncView {
     var isSharingLocked: Bool {
-        model.state.isWorking || model.state.workingWallet != nil || !model.output.isAvailable
+        model.state.task.isRunning || model.state.shareTask.isRunning || !model.output.isAvailable
     }
 }

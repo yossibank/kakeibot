@@ -29,7 +29,7 @@ public extension EntryModel {
             tagId: state.category.tagId,
             walletId: state.payment.walletId,
             billMonth: state.payment.billMonth,
-            memo: state.memo
+            memo: state.fields.memo
         )
 
         if let amount = reading.amount,
@@ -52,7 +52,7 @@ public extension EntryModel {
         }
 
         if let memo = reading.memo {
-            state.store = memo
+            state.fields.store = memo
         }
 
         state.filled.voice = VoiceFilled(
@@ -71,7 +71,7 @@ public extension EntryModel {
         state.keypad.calculator = undo.calculator
         state.setDate(undo.date)
         state.payment.billMonth = undo.billMonth
-        state.memo = undo.memo
+        state.fields.memo = undo.memo
         state.filled.voice = nil
     }
 }

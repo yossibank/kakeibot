@@ -29,6 +29,9 @@ entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAn
 entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails	EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	対応	
 entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving	EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	対応	
 entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterDeleting	対応	Android は閉じ始めの旗が無く、変更を持つ閉じる結果を確かめる
+entry.ignores-saving-while-running	EntryModelTests/ignoresSavingWhileRunning	EntryModelOutcomeTest/ignoresSavingWhileRunning	対応	
+entry.ignores-deleting-while-running	EntryModelTests/ignoresDeletingWhileRunning	EntryModelOutcomeTest/ignoresDeletingWhileRunning	対応	
+entry.receives-deletion-from-child-sheet	EntryModelTests/receivesDeletionFromChildSheet		未移植	入力から口座・カテゴリを直すシートが無い
 entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未移植	記録し直した後に、カテゴリの棚を動かす結果（categoryMoved）が無い
 entry.places-hidden-category-and-moves-back-on-undo	EntryModelTests/placesHiddenCategoryAndMovesBackOnUndo		未移植	入力からカテゴリを非表示にする所が無い
 entry.clears-hidden-category-when-hiding-fails	EntryModelTests/clearsHiddenCategoryWhenHidingFails		未移植	入力からカテゴリを非表示にする所が無い
@@ -116,6 +119,7 @@ entry.refuses-missing-category		EntryModelTest/refusesMissingCategory	Androidの
 entry.reports-missing-entry-on-save		EntryModelTest/reportsMissingEntryOnSave	Androidのみ	保存の時に記録が消えていた時の文のテストが iOS に無い
 entry.does-not-delete-new-entry		EntryModelTest/doesNotDeleteNewEntry	Androidのみ	新しい記録では削除が何もしない、というテストが iOS に無い
 entry-change.counts-type-switch-on-edited-entry		EntryModelChangeTest/countsTypeSwitchOnEditedEntry	Androidのみ	編集中は種類の切り替えを変更に数える、というテストが iOS に無い
+entry-template.closes-template-sheet-and-reloads-after-saving		EntryModelTemplateTest/closesTemplateSheetAndReloadsAfterSaving	Androidのみ	iOS はシートを閉じた後の reloadAfterSheet で、ひな形を読み直す
 entry-change.stays-unchanged-before-loading		EntryModelChangeTest/staysUnchangedBeforeLoading	Androidのみ	読み込む前は変更なしのまま、というテストが iOS に無い
 entry-change.ignores-applied-template-id-and-remembered-categories		EntryModelChangeTest/ignoresAppliedTemplateIdAndRememberedCategories	Androidのみ	種類ごとに覚えたカテゴリを変更に数えない、というテストが iOS に無い
 entry-change.closes-unchanged-entry-without-asking		EntryModelChangeTest/closesUnchangedEntryWithoutAsking	Androidのみ	変更が無ければ確かめずに閉じる。iOS は画面の EntrySheet が決める
@@ -453,6 +457,7 @@ settings-menu-link.*	SettingsMenuLinkTests/*		未移植	問い合わせのフォ
 settings-menu-reset.asks-to-confirm-when-records-exist	SettingsMenuResetModelTests/asksToConfirmWhenRecordsExist		未移植	記録をすべて消す機能が、設定のメニューに無い
 settings-menu-reset.tells-instead-of-confirming-when-nothing-to-delete	SettingsMenuResetModelTests/tellsInsteadOfConfirmingWhenNothingToDelete		未移植	記録をすべて消す機能が、設定のメニューに無い
 settings-menu-reset.closes-confirmation-when-counting-fails	SettingsMenuResetModelTests/closesConfirmationWhenCountingFails		未移植	記録をすべて消す機能が、設定のメニューに無い
+settings-menu-reset.ignores-preparing-while-running	SettingsMenuResetModelTests/ignoresPreparingWhileRunning		未移植	記録をすべて消す機能が、設定のメニューに無い
 settings-menu-sample-data.*	SettingsMenuSampleDataTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sample.*	SettingsMenuSampleModelTests/*		未移植	サンプルのデータを入れる機能（DEBUG だけ）が Android に無い
 settings-menu-sheet.*	SettingsMenuSheetTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない

@@ -15,8 +15,11 @@ public final class SettingsMenuSampleModel: ScreenPerforming {
 }
 
 public extension SettingsMenuSampleModel {
+    enum Prompt: Hashable, Sendable {
+        case insert
+    }
+
     enum Progress: Hashable, Sendable {
-        case inserting
         case inserted
         case failed
     }
@@ -24,20 +27,28 @@ public extension SettingsMenuSampleModel {
     @MainActor
     @Observable
     final class State {
-        public var isConfirming = false
+        public var prompt = Shown<Prompt>()
 
         public internal(set) var progress: Progress?
+
+        public let task = ModelTask()
     }
 
     func insert(today: LocalDate) async {
-        state.progress = .inserting
+        guard !state.task.isRunning else {
+            return
+        }
+
+        state.progress = nil
 
         do {
-            try await SettingsMenuSampleData.insert(
-                into: dependencies.database,
-                today: today,
-                now: dependencies.clock.now
-            )
+            try await state.task.attempt {
+                try await SettingsMenuSampleData.insert(
+                    into: dependencies.database,
+                    today: today,
+                    now: dependencies.clock.now
+                )
+            }
 
             state.progress = .inserted
         } catch {
@@ -50,7 +61,6 @@ public extension SettingsMenuSampleModel {
 public extension SettingsMenuSampleModel.Progress {
     var message: String? {
         switch self {
-        case .inserting: nil
         case .inserted: "テストデータを入れました"
         case .failed: "テストデータを入れられませんでした"
         }

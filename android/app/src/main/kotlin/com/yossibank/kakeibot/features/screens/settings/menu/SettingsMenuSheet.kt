@@ -72,10 +72,42 @@ fun SettingsMenuSheet(
 
     BackHandler(onBack = ::back)
 
+    SettingsMenuFrame(
+        model = model,
+        screen = screen,
+        today = today,
+        onBack = ::back,
+    )
+
+    if (screen == Screen.Budgets) {
+        BudgetListView(
+            parts = parts,
+            today = today,
+            onBack = ::back,
+        )
+    }
+
+    if (screen == Screen.Recurrings) {
+        RecurringListView(
+            parts = parts,
+            today = today,
+            onBack = ::back,
+            opening = openRecurring,
+        )
+    }
+}
+
+@Composable
+private fun SettingsMenuFrame(
+    model: SettingsMenuModel,
+    screen: Screen,
+    today: LocalDate,
+    onBack: () -> Unit,
+) {
     SettingsFrame(
         title = screen.title,
         isRoot = screen == Screen.Menu,
-        onBack = ::back,
+        onBack = onBack,
         followsKeyboard = true,
         trailing = {
             if (screen == Screen.MonthStart) {
@@ -93,92 +125,93 @@ fun SettingsMenuSheet(
             )
         }
 
-        when (screen) {
-            Screen.Menu -> {
-                SettingsCaption(text = "予算と期間")
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .card(),
-                ) {
-                    SettingsRow(
-                        title = "予算",
-                        value = "",
-                        onSelect = { model.state.open(Screen.Budgets) },
-                    )
-
-                    SettingsDivider()
-
-                    SettingsRow(
-                        title = "固定費",
-                        value = "${model.input.recurringCount} 件",
-                        onSelect = { model.state.open(Screen.Recurrings) },
-                    )
-
-                    SettingsDivider()
-
-                    SettingsRow(
-                        title = "月の始まり",
-                        value = model.input.monthStartDay.title,
-                        onSelect = { model.state.open(Screen.MonthStart) },
-                    )
-
-                    SettingsDivider()
-
-                    SettingsRow(
-                        title = "週の始まり",
-                        value = model.input.weekStart.title,
-                        onSelect = { model.state.open(Screen.WeekStart) },
-                    )
-                }
-            }
-
-            Screen.MonthStart -> {
-                SettingsIntroCard(
-                    icon = R.drawable.ic_calendar,
-                    headline = "給料日に合わせて" to "1 か月を数えられます",
-                    fold = model.input.monthStartHint,
-                    model = model,
-                    notes = listOf(
-                        SettingsIntroNote(R.drawable.ic_chevron_right, "給料日から、次の給料日の前日までです"),
-                        SettingsIntroNote(R.drawable.ic_calendar, "29〜31 日が無い月は、月末からです"),
-                        SettingsIntroNote(R.drawable.ic_swap, "土日・祝日は、平日にずらせます"),
-                    ),
-                )
-
-                MonthStartDayView(
-                    selection = model.input.monthStartDay,
-                    today = today,
-                    onSelect = { day -> model.perform { it.choose(monthStartDay = day) } },
-                )
-            }
-
-            Screen.WeekStart -> {
-                SettingsMenuWeekStart(
-                    selection = model.input.weekStart,
-                    onSelect = { weekday -> model.perform { it.choose(weekStart = weekday) } },
-                )
-            }
-
-            Screen.Budgets, Screen.Recurrings -> {}
-        }
-    }
-
-    if (screen == Screen.Budgets) {
-        BudgetListView(
-            parts = parts,
+        SettingsMenuPage(
+            model = model,
+            screen = screen,
             today = today,
-            onBack = ::back,
         )
     }
+}
 
-    if (screen == Screen.Recurrings) {
-        RecurringListView(
-            parts = parts,
-            today = today,
-            onBack = ::back,
-            opening = openRecurring,
+@Composable
+private fun SettingsMenuPage(
+    model: SettingsMenuModel,
+    screen: Screen,
+    today: LocalDate,
+) {
+    when (screen) {
+        Screen.Menu -> {
+            SettingsMenuList(model = model)
+        }
+
+        Screen.MonthStart -> {
+            SettingsIntroCard(
+                icon = R.drawable.ic_calendar,
+                headline = "給料日に合わせて" to "1 か月を数えられます",
+                fold = model.input.monthStartHint,
+                model = model,
+                notes = listOf(
+                    SettingsIntroNote(R.drawable.ic_chevron_right, "給料日から、次の給料日の前日までです"),
+                    SettingsIntroNote(R.drawable.ic_calendar, "29〜31 日が無い月は、月末からです"),
+                    SettingsIntroNote(R.drawable.ic_swap, "土日・祝日は、平日にずらせます"),
+                ),
+            )
+
+            MonthStartDayView(
+                selection = model.input.monthStartDay,
+                today = today,
+                onSelect = { day -> model.perform { it.choose(monthStartDay = day) } },
+            )
+        }
+
+        Screen.WeekStart -> {
+            SettingsMenuWeekStart(
+                selection = model.input.weekStart,
+                onSelect = { weekday -> model.perform { it.choose(weekStart = weekday) } },
+            )
+        }
+
+        Screen.Budgets, Screen.Recurrings -> {}
+    }
+}
+
+@Composable
+private fun SettingsMenuList(model: SettingsMenuModel) {
+    SettingsCaption(text = "予算と期間")
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .card(),
+    ) {
+        SettingsRow(
+            title = "予算",
+            value = "",
+            onSelect = { model.state.open(Screen.Budgets) },
+        )
+
+        SettingsDivider()
+
+        SettingsRow(
+            title = "固定費",
+            value = "${model.input.recurringCount} 件",
+            onSelect = { model.state.open(Screen.Recurrings) },
+        )
+
+        SettingsDivider()
+
+        SettingsRow(
+            title = "月の始まり",
+            value = model.input.monthStartDay.title,
+            onSelect = { model.state.open(Screen.MonthStart) },
+        )
+
+        SettingsDivider()
+
+        SettingsRow(
+            title = "週の始まり",
+            value = model.input.weekStart.title,
+            onSelect = { model.state.open(Screen.WeekStart) },
         )
     }
 }

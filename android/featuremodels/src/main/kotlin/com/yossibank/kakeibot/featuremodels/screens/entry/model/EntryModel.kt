@@ -333,6 +333,11 @@ class EntryModel(
         }
     }
 
+    suspend fun receiveTemplate() {
+        (state.presented.current as? Presented.Template)?.let(state.presented::close)
+        reloadTemplates()
+    }
+
     internal suspend fun loadHistory() {
         val database = dependencies.database
 

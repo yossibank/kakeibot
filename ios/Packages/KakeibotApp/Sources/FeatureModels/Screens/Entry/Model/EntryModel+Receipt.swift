@@ -36,7 +36,7 @@ public extension EntryModel {
         }
 
         if !store.isEmpty {
-            state.store = store
+            state.fields.store = store
         }
 
         state.items.receiptStore = store.isEmpty ? nil : store

@@ -118,8 +118,10 @@ public extension EntryModel {
     }
 
     func updateToday() {
-        let today = dependencies.clock.today
+        setToday(dependencies.clock.today)
+    }
 
+    func setToday(_ today: LocalDate) {
         if state.today != today {
             state.today = today
         }
@@ -129,7 +131,7 @@ public extension EntryModel {
         do {
             for try await list in dependencies.database.entryListUpdates() {
                 guard
-                    !state.progress.isClosing,
+                    !state.results.isClosing,
                     list != input.history
                 else {
                     continue

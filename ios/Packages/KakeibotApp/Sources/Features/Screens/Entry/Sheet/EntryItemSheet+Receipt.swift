@@ -188,7 +188,7 @@ private extension EntryItemSheet {
 
             TextField(
                 "店名",
-                text: Bindable(model.state).store,
+                text: Bindable(model.state).fields.store,
                 prompt: Text("店名を入れる").foregroundStyle(Palette.hint)
             )
             .textFont(.subheadline, weight: .semibold)

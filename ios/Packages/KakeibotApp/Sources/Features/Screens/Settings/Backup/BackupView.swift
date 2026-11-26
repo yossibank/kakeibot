@@ -33,7 +33,7 @@ public struct BackupView: View {
         }
         .animation(.snappy, value: model.state.doneMessage)
         .fileExporter(
-            isPresented: isPicking(.exporter),
+            isPresented: Bindable(model.state).presented[.exporter],
             document: document,
             contentType: exportType,
             defaultFilename: model.state.file?.name
@@ -43,7 +43,7 @@ public struct BackupView: View {
             }
         }
         .fileImporter(
-            isPresented: isPicking(.importer),
+            isPresented: Bindable(model.state).presented[.importer],
             allowedContentTypes: [.json]
         ) { result in
             model.perform {
@@ -51,7 +51,7 @@ public struct BackupView: View {
             }
         }
         .confirmation(
-            isPresented: Bindable(model.state).isConfirmingRestore,
+            isPresented: Bindable(model.state).presented[.restore],
             systemImage: "arrow.triangle.2.circlepath",
             title: "データを置き換えますか",
             message: model.output.pendingSummary ?? "",
@@ -83,7 +83,7 @@ private extension BackupView {
                         .transition(.opacity)
                 }
             }
-            .disabled(model.state.isWorking)
+            .disabled(model.state.task.isRunning)
             .buttonStyle(.plain)
             .padding(.vertical, 8)
         }
@@ -168,7 +168,7 @@ private extension BackupView {
         detail: String,
         action: @escaping () -> Void
     ) -> some View {
-        let isWorking = model.state.isWorking && model.state.pressed == row
+        let isWorking = model.state.task.isRunning && model.state.pressed == row
 
         return Button {
             model.state.press(row)
@@ -235,17 +235,7 @@ private extension BackupView {
     }
 
     func importFile() {
-        model.state.pick(.importer)
-    }
-
-    func isPicking(_ picker: BackupModel.Picker) -> Binding<Bool> {
-        Binding {
-            model.state.picker == picker
-        } set: { isPresented in
-            if !isPresented {
-                model.state.close(picker)
-            }
-        }
+        model.state.presented.show(.importer)
     }
 
     func restorePrevious(_ item: BackupModel.Previous) {

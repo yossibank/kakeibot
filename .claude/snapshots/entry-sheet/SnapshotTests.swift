@@ -398,6 +398,9 @@ private extension EntryVoiceFlow.Dependencies {
             prepare: {},
             choose: { _ in nil },
             clock: .fixed(snapshotNow),
+            sleep: { duration in
+                try await Task.sleep(for: duration)
+            },
             silence: .seconds(60),
             noticeDuration: .seconds(60)
         )
@@ -729,7 +732,7 @@ private extension SnapshotTests {
 
             await draft.load()
 
-            draft.state.memo = memo
+            draft.state.fields.memo = memo
 
             for character in String(amount) {
                 draft.state.press(.digit(Int(String(character)) ?? 0))
@@ -800,7 +803,7 @@ private extension SnapshotTests {
     }
 
     static func addItems(to model: EntryModel) {
-        model.state.memo = "スーパー山田"
+        model.state.fields.memo = "スーパー山田"
         model.state.addItem(name: "牛乳", quantity: 2, amount: 396, taxRate: .reduced)
         model.state.addItem(name: "食パン", amount: 250, taxRate: .reduced)
         model.state.addItem(name: "洗剤", amount: 398, taxRate: .standard)

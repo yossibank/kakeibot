@@ -33,7 +33,7 @@ public struct ReminderView: View {
         .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
         .animation(.snappy, value: model.input.time)
         .animation(.snappy, value: model.output.isDenied)
-        .animation(.snappy, value: model.state.isPickingTime)
+        .animation(.snappy, value: isPickingTime)
         .animation(.snappy, value: model.state.previewDay)
         .transaction(value: model.input.isLoaded) { transaction in
             transaction.disablesAnimations = true
@@ -133,10 +133,10 @@ private extension ReminderView {
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     ForEach(ReminderModel.presets, id: \.self) { time in
-                        let isSelected = !model.state.isPickingTime && model.input.time == time
+                        let isSelected = !isPickingTime && model.input.time == time
 
                         timeButton("\(time.hour)", isSelected: isSelected) {
-                            model.state.pickTime(false)
+                            model.state.presented.close(.timePicker)
 
                             model.perform {
                                 await $0.choose(time)
@@ -144,8 +144,8 @@ private extension ReminderView {
                         }
                     }
 
-                    timeButton("…", isSelected: model.state.isPickingTime) {
-                        model.state.pickTime(true)
+                    timeButton("…", isSelected: isPickingTime) {
+                        model.state.presented.show(.timePicker)
                     }
                 }
                 .padding(.vertical, 4)
@@ -153,7 +153,7 @@ private extension ReminderView {
             }
             .scrollIndicators(.hidden)
 
-            if model.state.isPickingTime {
+            if isPickingTime {
                 DatePicker(
                     "時刻",
                     selection: dateBinding,
@@ -200,6 +200,10 @@ private extension ReminderView {
         .init("オフ", value: false),
         .init("オン", value: true)
     ]
+
+    var isPickingTime: Bool {
+        model.state.presented[.timePicker]
+    }
 
     var bellImage: String {
         model.output.isOn ? "bell.badge" : "bell.slash"

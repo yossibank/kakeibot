@@ -9,17 +9,17 @@ extension SettingsMenuSheet {
             sectionTitle("開発")
 
             Button {
-                sample.state.isConfirming = true
+                sample.state.prompt.show(.insert)
             } label: {
                 row("テストデータを入れる", systemImage: "wand.and.stars")
             }
             .buttonStyle(.plain)
-            .disabled(sample.state.progress == .inserting)
+            .disabled(sample.state.task.isRunning)
             .padding(.horizontal, 16)
             .card()
             .confirmationDialog(
                 "4 か月分の記録・予算・テンプレート・固定費を足します",
-                isPresented: Bindable(sample.state).isConfirming,
+                isPresented: Bindable(sample.state).prompt[.insert],
                 titleVisibility: .visible
             ) {
                 Button("足す") {
@@ -29,7 +29,7 @@ extension SettingsMenuSheet {
                 }
             }
 
-            if sample.state.progress == .inserting {
+            if sample.state.task.isRunning {
                 ProgressView()
                     .frame(maxWidth: .infinity)
             }
