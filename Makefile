@@ -77,6 +77,8 @@ verify: verify-docs
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py || { echo "NG claude-config に code-design-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt')
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py || { echo "NG claude-config に swift-layout-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh swift-layout python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py $$(git ls-files --cached --others --exclude-standard '*.swift')
 	scripts/verify.sh features-no-store sh -c '! grep -rnE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/Features'
 	scripts/verify.sh app-feature-no-store sh -c '! grep -rlE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/AppFeature | grep -vxE "ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel(\+(Pro|State|Sync))?\.swift"'
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit

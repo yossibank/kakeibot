@@ -6,7 +6,6 @@ import SwiftUI
 struct EntrySlip: View {
     @Environment(\.themeStyle.displayFont) private var themeFont
     @Environment(\.themeStyle.corner) private var corner
-    @Environment(\.isPro) private var isPro
 
     let model: EntryModel
     let deck: EntryModel.Deck
@@ -29,7 +28,15 @@ struct EntrySlip: View {
 
             amountRow
 
-            memoBand
+            EntrySlipMemoRow(
+                model: model,
+                isMemoActive: isMemoActive,
+                height: memoHeight,
+                onMemo: onMemo,
+                onOpenItems: onOpenItems,
+                onReceipt: onReceipt,
+                onVoice: onVoice
+            )
         }
         .background(Self.cardFill, in: shape)
         .clipShape(shape)
@@ -210,56 +217,6 @@ private extension EntrySlip {
         }
     }
 
-    var memoBand: some View {
-        HStack(spacing: 8) {
-            Button(action: onMemo) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Image(systemName: "pencil")
-                        .textFont(.caption, weight: .semibold)
-
-                    Text(memoText)
-                        .textFont(.footnote)
-                        .underline(
-                            model.output.isMemoFromVoice,
-                            color: Palette.accent.opacity(.medium)
-                        )
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .foregroundStyle(memoColor)
-                .frame(maxHeight: .infinity)
-                .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-
-            if showsItems {
-                EntryItemButton(
-                    count: model.state.items.list.count,
-                    total: model.output.itemTotal,
-                    adjustment: model.output.itemAdjustment,
-                    onOpen: onOpenItems
-                )
-                .fixedSize()
-            }
-
-            if let onReceipt {
-                quickButton("doc.text.viewfinder", action: onReceipt)
-                    .overlay(alignment: .topTrailing) {
-                        if let receiptsLeft {
-                            receiptBadge(receiptsLeft)
-                        }
-                    }
-            }
-
-            if let onVoice {
-                quickButton("mic", action: onVoice)
-            }
-        }
-        .padding(.leading, 16)
-        .padding(.trailing, 12)
-        .frame(height: memoHeight)
-    }
-
     func row(
         _ title: String,
         value: String,
@@ -346,37 +303,6 @@ private extension EntrySlip {
             }
     }
 
-    func quickButton(
-        _ systemImage: String,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .textFont(.footnote, weight: .semibold)
-                .foregroundStyle(Palette.accent)
-                .frame(width: Self.quickSize, height: Self.quickSize)
-                .overlay {
-                    Circle()
-                        .stroke(Palette.accent.opacity(.medium), lineWidth: 1)
-                }
-                .contentShape(.circle)
-        }
-        .buttonStyle(.plain)
-    }
-
-    func receiptBadge(_ left: Int) -> some View {
-        let fill = left > 0 ? Palette.accent : Palette.amber
-
-        return Text("\(left)")
-            .sansFont(.micro, weight: .bold)
-            .monospacedDigit()
-            .foregroundStyle(Palette.backgroundBottom)
-            .frame(minWidth: Self.badgeSize, minHeight: Self.badgeSize)
-            .background(fill, in: .capsule)
-            .offset(x: 4, y: -4)
-            .allowsHitTesting(false)
-    }
-
     func amountText(color: Color) -> some View {
         AmountText(
             shownAmount,
@@ -391,9 +317,5 @@ private extension EntrySlip {
 private extension EntrySlip {
     var amountFont: Font {
         .display(size: amountSize, weight: .semibold, in: themeFont)
-    }
-
-    var receiptsLeft: Int? {
-        isPro ? nil : model.output.freeReceiptsLeft
     }
 }

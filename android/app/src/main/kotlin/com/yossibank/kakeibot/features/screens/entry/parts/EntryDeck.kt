@@ -77,10 +77,14 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.fee
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.feeChoices
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.selectDestination
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsItems
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.tags
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.toggleTag
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 

@@ -53,6 +53,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.BalanceLine
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.afterLine
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.currentLine
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.icon
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.idleAfterLine
@@ -60,6 +61,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.isOverSourceBala
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.loanRemaining
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.payOffLoan
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.recentTransfers
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.swapWallets
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.toWallet
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallet
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.walletTitle

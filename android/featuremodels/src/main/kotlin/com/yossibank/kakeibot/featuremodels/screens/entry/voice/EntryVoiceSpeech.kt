@@ -41,6 +41,16 @@ internal object EntryVoiceSpeech {
         else -> Outcome.Failed
     }
 
+    fun download(recognizer: SpeechRecognizer?): Outcome {
+        if (recognizer == null || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return Outcome.Unsupported
+        }
+
+        recognizer.triggerModelDownload(intent(hints = emptyList()))
+
+        return Outcome.Downloading
+    }
+
     fun intent(hints: List<String>): Intent =
         Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(

@@ -3,8 +3,6 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.yossibank.kakeibot.core.concepts.category.EntryCategory
-import com.yossibank.kakeibot.core.concepts.category.EntryTag
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
@@ -12,7 +10,6 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
-import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
@@ -127,28 +124,6 @@ class EntryModel(
             this.field = next
         }
 
-        fun select(category: EntryCategory) {
-            form = form.withCategory(category.id)
-            focus(Field.Amount)
-        }
-
-        fun toggleTag(id: Identifier<EntryTag>) {
-            form = form.copy(tagId = if (form.tagId == id) null else id)
-        }
-
-        fun selectDestination(wallet: Wallet) {
-            form = form.copy(toWalletId = wallet.id)
-            focus(Field.Transfer)
-        }
-
-        fun swapWallets() {
-            form = form.copy(
-                walletId = form.toWalletId,
-                toWalletId = form.walletId,
-                billMonth = null,
-            )
-        }
-
         fun select(date: LocalDate) {
             form = form.withDate(date)
             focus(Field.Amount)
@@ -231,22 +206,7 @@ class EntryModel(
     class Output(
         internal val input: Input,
         internal val state: State,
-    ) {
-        val isEditing: Boolean
-            get() = input.editingId != null
-
-        val isBlank: Boolean
-            get() = !isEditing && amount <= 0
-
-        val amount: Int
-            get() = state.calculator.amount
-
-        val fee: Int
-            get() = if (state.form.type == Entry.Kind.transfer) state.feeCalculator.amount else 0
-
-        val activeCalculator: AmountCalculator
-            get() = if (state.field == Field.Fee) state.feeCalculator else state.calculator
-    }
+    )
 
     internal data class Snapshot(
         val form: EntryForm,

@@ -19,6 +19,21 @@ fun EntryModel.State.applyRoute(route: TransferRoute) {
     update { withWallet(route.walletId).copy(toWalletId = route.toWalletId) }
 }
 
+fun EntryModel.State.selectDestination(wallet: Wallet) {
+    update { copy(toWalletId = wallet.id) }
+    focus(EntryModel.Field.Transfer)
+}
+
+fun EntryModel.State.swapWallets() {
+    update {
+        copy(
+            walletId = toWalletId,
+            toWalletId = walletId,
+            billMonth = null,
+        )
+    }
+}
+
 internal fun EntryModel.chooseDestination() {
     val form = state.form
 

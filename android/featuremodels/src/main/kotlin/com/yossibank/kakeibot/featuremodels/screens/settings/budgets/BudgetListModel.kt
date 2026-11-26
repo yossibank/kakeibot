@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.core.concepts.budget.amount
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
@@ -13,11 +12,8 @@ import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
-import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
-import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -131,26 +127,8 @@ class BudgetListModel(
         val month: YearMonth?
             get() = input.overview?.month
 
-        val periodText: String
-            get() = input.overview?.period?.let(PeriodText::range) ?: ""
-
-        val startText: String
-            get() = "${month?.month ?: ""}月（$periodText）から使う額"
-
-        val categoriesNote: String
-            get() = "合計 ${AmountText.text(amount = categoriesTotal)}"
-
-        val unbudgetedNote: String
-            get() = "${unbudgeted.size} カテゴリ"
-
         val recurringExpense: Long
             get() = input.overview?.recurringExpense ?: 0L
-
-        val recurringText: String
-            get() {
-                val amount = AmountText.text(amount = recurringExpense.clamped)
-                return "この月の固定費は $amount。予算の目安にできます"
-            }
 
         val categories: List<EntryCategory> by derivedStateOf {
             input.categoryList?.categories.orEmpty().filter { category ->
@@ -197,9 +175,6 @@ class BudgetListModel(
         val isChanged: Boolean
             get() = state.editing != null && state.calculator.amount != (editingAmount ?: 0)
 
-        val saveTitle: String
-            get() = if (canSave) "${month?.month ?: ""}月からこの額にする" else "金額を入れてください"
-
         fun amount(categoryId: Identifier<EntryCategory>?): Int? {
             val month = month ?: return null
             return input.overview?.budgets?.amount(
@@ -209,19 +184,6 @@ class BudgetListModel(
         }
 
         fun spent(categoryId: Identifier<EntryCategory>?): Long = monthSpent[categoryId] ?: 0L
-
-        fun usage(categoryId: Identifier<EntryCategory>?): BudgetUsage? {
-            val overview = input.overview ?: return null
-            val budget = amount(categoryId) ?: return null
-
-            return BudgetUsage(
-                budget = budget,
-                carryover = if (categoryId == null) carryover else 0L,
-                spent = spent(categoryId),
-                today = overview.today,
-                periodEnd = overview.period.endInclusive,
-            )
-        }
 
         fun icon(category: EntryCategory) = input.categoryList?.icons?.get(category.iconId)
     }

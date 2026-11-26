@@ -175,7 +175,7 @@ AppModel は、今日からの記録と支出なしの印、通知の時刻、�
 | 記録 | `Tabs/Records/` |
 | 振り返り | `Tabs/Review/` |
 | 資産 | `Tabs/Assets/` |
-| 入力シート | `Entry/` |
+| 入力シート | `Entry/`。紙のカードは `Slip/` |
 | 設定（入口） | `Settings/Menu/` |
 | 口座 | `Settings/Wallets/` |
 | カテゴリ | `Settings/Categories/` |

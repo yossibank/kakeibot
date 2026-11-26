@@ -14,8 +14,6 @@ extension EntrySlip {
     static let memoGrowth: CGFloat = 8
     static let fieldCount: CGFloat = 3
     static let markSize: CGFloat = 24
-    static let quickSize: CGFloat = 32
-    static let badgeSize: CGFloat = 16
 
     static var growthLimit: CGFloat {
         fieldCount * rowGrowth + amountGrowth + memoGrowth
@@ -110,22 +108,6 @@ extension EntrySlip {
     var dateValue: String {
         let day = EntryModel.shortDateText(for: model.state.payment.date, today: today)
         return "\(day)（\(model.state.payment.date.weekday.shortName)）"
-    }
-
-    var memoText: String {
-        model.state.memo.isEmpty ? "\(model.output.memoPrompt)をメモ" : model.state.memo
-    }
-
-    var memoColor: Color {
-        if isMemoActive {
-            return Palette.accent
-        }
-
-        return model.state.memo.isEmpty ? Palette.hint : Palette.subtext
-    }
-
-    var showsItems: Bool {
-        model.output.showsItems && !model.state.items.list.isEmpty
     }
 
     var shownCategory: EntryCategory? {

@@ -52,6 +52,7 @@
 | `+Name` | 文や見出しに入れる呼び名（`name`・`shortName`・`displayName`） |
 | `+Message` | 知らせとエラーの文（`message`・`troubleMessage`） |
 | `+Text` | 値を文字にしたもの（金額・割合・日付の入った文） |
+| `+Values` | 画面の部品の寸法・色と、表示用の値の計算。例は `EntrySlip+Values`・`TagLine+Values` |
 | `+Actions` | 画面の操作の関数。複数形で書く |
 | `+Sheets` | 画面から開くシートの種類と、その振り分け。複数形で書く |
 | `+Stored` | データベースに保存した形の値から作る `init` |

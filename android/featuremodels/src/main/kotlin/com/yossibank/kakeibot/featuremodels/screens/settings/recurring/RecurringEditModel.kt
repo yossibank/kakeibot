@@ -3,7 +3,6 @@ package com.yossibank.kakeibot.featuremodels.screens.settings.recurring
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.HolidayShift
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
@@ -12,8 +11,6 @@ import com.yossibank.kakeibot.core.concepts.icon.Icon
 import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorization
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.RecurringDraft
-import com.yossibank.kakeibot.core.concepts.recurring.endDate
-import com.yossibank.kakeibot.core.concepts.recurring.maxCount
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
@@ -169,66 +166,6 @@ class RecurringEditModel(
         val database: AppDatabase,
         val clock: ScreenClock,
     )
-
-    fun select(type: Entry.Kind) {
-        if (type == state.form.type) {
-            return
-        }
-
-        state.update { copy(type = type) }
-        state.update { copy(categoryId = output.categories.firstOrNull()?.id) }
-
-        presetDestination()
-        suggestHolidayShift()
-    }
-
-    fun select(category: Identifier<EntryCategory>) {
-        state.update { copy(categoryId = category) }
-        suggestHolidayShift()
-    }
-
-    fun open(panel: RecurringPanel) {
-        if (panel == RecurringPanel.Count) {
-            prepareCount()
-        }
-
-        state.panel = panel
-    }
-
-    fun prepareCount() {
-        state.updateLoan { copy(count = AmountCalculator(amount = output.repaymentCount ?: 0)) }
-    }
-
-    fun pressCount(key: AmountCalculator.Key) {
-        val pressed = state.loan.count.press(key)
-        val isOver = pressed.amount > Recurring.maxCount
-        val count = if (isOver) AmountCalculator(amount = Recurring.maxCount) else pressed
-
-        state.updateLoan { copy(count = count) }
-
-        val end = output.recurring(
-            endDate = null,
-            finalAmount = null,
-        ).endDate(
-            afterCount = count.amount,
-            from = output.repaymentStart,
-        )
-
-        setEnd(end)
-    }
-
-    fun setEnd(date: LocalDate?) {
-        state.update { copy(endDate = date) }
-
-        val manualFinal = output.manualFinalAmount(through = date)
-
-        state.updateLoan {
-            copy(
-                isCountAuto = false,
-                manualFinal = manualFinal,
-            )
-        }
-    }
 
     suspend fun load() {
         state.task.attempt(failure = LOAD_FAILED) {

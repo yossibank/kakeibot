@@ -7,11 +7,9 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
-import com.yossibank.kakeibot.core.concepts.recurring.nextDate
 import com.yossibank.kakeibot.core.concepts.recurring.total
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
@@ -21,10 +19,6 @@ import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
 import com.yossibank.kakeibot.store.queries.types.EntryList
-import com.yossibank.kakeibot.store.queries.types.amount
-import com.yossibank.kakeibot.store.queries.types.icon
-import com.yossibank.kakeibot.store.queries.types.place
-import com.yossibank.kakeibot.store.queries.types.title
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import com.yossibank.kakeibot.store.writes.methods.deleteRecurring
@@ -133,26 +127,14 @@ class RecurringListModel(
     }
 
     class Output(
-        private val input: Input,
-        private val state: State,
+        internal val input: Input,
+        internal val state: State,
     ) {
         val visible: List<Recurring>
             get() = recurrings(isHidden = false)
 
         val hidden: List<Recurring>
             get() = recurrings(isHidden = true)
-
-        val rows: List<RecurringRow>
-            get() {
-                val list = input.list ?: return emptyList()
-                return shown.map { row(of = it, list = list) }
-            }
-
-        val hiddenRows: List<RecurringRow>
-            get() {
-                val list = input.list ?: return emptyList()
-                return hidden.map { row(of = it, list = list) }
-            }
 
         val monthTotal: Long
             get() {
@@ -179,49 +161,10 @@ class RecurringListModel(
                 Entry.Kind.transfer -> "カードの引き落としや積立などを足すと、ここに並びます"
             }
 
-        private val shown: List<Recurring>
-            get() {
-                val order = state.movingOrder ?: return visible
-                val byId = visible.associateBy { it.id }
-                return order.mapNotNull { byId[it] }
-            }
-
         private fun recurrings(isHidden: Boolean): List<Recurring> =
             input.recurrings.filter { recurring ->
                 recurring.type == state.type && (recurring.archivedAt != null) == isHidden
             }
-
-        private fun row(
-            of: Recurring,
-            list: EntryList,
-        ): RecurringRow {
-            val schedule = RecurringText.schedule(
-                frequency = of.frequency,
-                month = of.month ?: of.startDate.month,
-                day = of.day,
-            )
-
-            val next = of.nextDate(onOrAfter = state.today)
-
-            return RecurringRow(
-                id = of.id,
-                title = list.title(of = of) ?: title(of.type),
-                schedule = RecurringText.detail(
-                    schedule = schedule,
-                    holiday = RecurringText.holidayNote(of.holidayShift),
-                ),
-                place = list.place(of = of),
-                amount = list
-                    .amount(
-                        of = of,
-                        on = next ?: state.today,
-                    ).clamped,
-                type = of.type,
-                icon = list.icon(of = of),
-                next = next,
-                closing = of.closingDay?.let(RecurringText::closingNote),
-            )
-        }
     }
 
     private class Dependencies(

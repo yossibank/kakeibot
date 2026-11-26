@@ -51,6 +51,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.close
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.saveTitle
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.suggestions
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton

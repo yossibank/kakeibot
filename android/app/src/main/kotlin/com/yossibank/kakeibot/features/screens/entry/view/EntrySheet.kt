@@ -63,6 +63,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.close
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasRecent
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.isEditing
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.newTemplateDraft
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsRecent

@@ -42,6 +42,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringRow
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.rows
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import kotlin.math.roundToInt
 
