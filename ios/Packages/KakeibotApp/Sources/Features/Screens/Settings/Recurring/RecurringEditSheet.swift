@@ -77,8 +77,8 @@ public struct RecurringEditSheet: View {
                 }
             }
             .task {
-                await model.load()
                 await model.refreshAuthorization(permission)
+                await model.load()
             }
             .presentationSizing(.tallForm)
     }
