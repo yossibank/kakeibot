@@ -256,8 +256,7 @@ class RecordsModelTest {
     @Test
     fun showsNoticeWhenListFails() = modelTest(today = "2026-10-17") { setup ->
         val model = RecordsModel(
-            database = setup.database,
-            entryList = failingEntryList,
+            parts = setup.parts(entryList = failingEntryList),
             today = setup.today,
             round = ObservationRound(),
         )
@@ -275,8 +274,9 @@ class RecordsModelTest {
     @Test
     fun marksListFailureUntilRetried() = modelTest(today = "2026-10-17") { setup ->
         val model = RecordsModel(
-            database = setup.database,
-            entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            parts = setup.parts(
+                entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            ),
             today = setup.today,
             round = ObservationRound(),
         )
@@ -318,8 +318,7 @@ class RecordsModelTest {
     }
 
     private fun ModelTestSetup.recordsModel() = RecordsModel(
-        database = database,
-        entryList = database.entryListUpdates(),
+        parts = parts,
         today = today,
         round = ObservationRound(),
     )

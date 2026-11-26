@@ -69,7 +69,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsRecent
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryDeck
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryRecentRow
@@ -81,20 +81,18 @@ import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceNotice
 import com.yossibank.kakeibot.features.screens.entry.voice.rememberVoiceStarter
 import com.yossibank.kakeibot.features.screens.settings.templates.TemplateEditSheet
 import com.yossibank.kakeibot.features.shared.model.OnOutcome
-import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
 fun EntrySheet(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     editing: Identifier<Entry>?,
     date: LocalDate?,
     onClose: () -> Unit,
 ) {
-    val model = remember(database, editing, date) {
+    val model = remember(parts, editing, date) {
         EntryModel(
-            database = database,
-            clock = ScreenClock.system,
+            parts = parts,
             today = today,
             editing = editing,
             date = date ?: today,
@@ -106,7 +104,7 @@ fun EntrySheet(
     val voice = remember(model) {
         EntryVoiceFlow(
             context = context,
-            clock = ScreenClock.system,
+            clock = parts.clock,
         )
     }
 
@@ -272,7 +270,7 @@ fun EntrySheet(
 
         (model.state.presented as? EntryModel.Presented.Template)?.let { template ->
             TemplateEditSheet(
-                database = database,
+                parts = parts,
                 draft = template.draft,
                 onSave = {
                     model.state.dismiss()

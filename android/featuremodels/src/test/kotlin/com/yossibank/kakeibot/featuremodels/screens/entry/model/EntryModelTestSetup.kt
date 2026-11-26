@@ -10,7 +10,6 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.store.queries.methods.entryList
 import com.yossibank.kakeibot.store.records.rows.record
@@ -111,8 +110,7 @@ suspend fun ModelTestSetup.addSharedTag(
 
 suspend fun ModelTestSetup.loadedModel(editing: Identifier<Entry>? = null): EntryModel {
     val model = EntryModel(
-        database = database,
-        clock = ScreenClock.fixed(now),
+        parts = parts,
         today = today,
         editing = editing,
     )

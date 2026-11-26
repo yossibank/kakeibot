@@ -16,6 +16,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.notification.NotificationPermission
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
@@ -30,8 +31,7 @@ import com.yossibank.kakeibot.store.writes.methods.setRecurringHidden
 import com.yossibank.kakeibot.store.writes.types.Deletion
 
 class RecurringEditModel(
-    database: AppDatabase,
-    clock: ScreenClock,
+    parts: ScreenParts,
     today: LocalDate,
     type: Entry.Kind = Entry.Kind.expense,
     editingId: Identifier<Recurring>? = null,
@@ -40,7 +40,7 @@ class RecurringEditModel(
     val input = Input(editingId)
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, clock)
+    private val dependencies = Dependencies(parts.database, parts.clock)
 
     class State(
         today: LocalDate,

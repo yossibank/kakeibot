@@ -7,7 +7,6 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.templates.TemplateEditModel
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.failUpdates
 import com.yossibank.kakeibot.featuremodels.support.failWrites
@@ -148,8 +147,7 @@ class SettingsEditOutcomeTest {
 }
 
 private fun ModelTestSetup.templateModel() = TemplateEditModel(
-    database = database,
-    clock = ScreenClock.fixed(now),
+    parts = parts,
     draft = EntryTemplateDraft(
         name = "",
         type = Entry.Kind.expense,
@@ -161,8 +159,7 @@ private fun ModelTestSetup.templateModel() = TemplateEditModel(
 
 private fun ModelTestSetup.recurringModel(editingId: Identifier<Recurring>? = null) =
     RecurringEditModel(
-        database = database,
-        clock = ScreenClock.fixed(now),
+        parts = parts,
         today = today,
         editingId = editingId,
     )

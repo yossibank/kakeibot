@@ -130,6 +130,20 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 `:featuremodels` と `:app` の中身は、[architecture-android-app](architecture-android-app.md) にある。
 
+### 画面と保存の境目
+
+`:app` の `features/` は、`:store` を import しない。**DB を開けるのは、`:featuremodels` のモデルだけである。**
+
+| 仕組み | 中身 |
+| --- | --- |
+| `featuremodels/shared/model/` の `ScreenParts` | DB・時計・記録の一覧の見張りを包んで、画面からモデルへ渡す。DB と見張りは `internal` で、`:app` から読めない |
+| `ScreenParts` を作る所 | `AppModel` が DB を開いた時に作り、`RootView` が `MainView` に渡す。画面は、子の画面とモデルへそのまま渡す |
+| `ScreenPartsShared` | 記録の一覧の見張りを 1 本にまとめた `ScreenParts` を作る。`MainView` が持ち、消える時に止める |
+| `:store` の型 | 画面は名前を書かず、モデルの値と関数に通す。固定費の編集の結果は、`RecurringListModel` の `finishEditing` が受ける |
+| `make verify` の `android-features-no-store` | `features/` の下の `:store` の import を、grep で止める |
+
+`appfeature/` と `notifications/` は、`:store` を import してよい。`:app` の依存に `:store` を残すのは、このためである。
+
 ## 🔧 設定
 
 版は、Gradle の wrapper と `gradle/libs.versions.toml` でそろえる。

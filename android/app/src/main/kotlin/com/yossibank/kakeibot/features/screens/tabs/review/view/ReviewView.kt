@@ -53,26 +53,23 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.review.model.ReviewMode
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
-import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
-import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
 fun ReviewView(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
 ) {
-    val entryList = rememberEntryList(database)
     val round = rememberObservationRound()
 
-    val model = remember(database, entryList, round) {
+    val model = remember(parts, round) {
         ReviewModel(
-            database = database,
-            entryList = entryList,
+            parts = parts,
             today = today,
             round = round,
         )

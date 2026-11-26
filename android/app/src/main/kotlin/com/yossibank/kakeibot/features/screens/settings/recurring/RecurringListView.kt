@@ -78,33 +78,27 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.Recurring
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.hiddenRows
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.rows
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.shared.notice.DeletionNotice
-import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNote
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
-import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.roundToInt
 
 @Composable
 fun RecurringListView(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     onBack: () -> Unit,
     opening: Identifier<Recurring>? = null,
 ) {
-    val entryList = rememberEntryList(database)
-
-    val model = remember(database, entryList) {
+    val model = remember(parts) {
         RecurringListModel(
-            database = database,
-            clock = ScreenClock.system,
-            entryList = entryList,
+            parts = parts,
             today = today,
             opening = opening,
         )
@@ -203,13 +197,17 @@ fun RecurringListView(
 
                 if (current != null) {
                     RecurringEditSheet(
-                        database = database,
+                        parts = parts,
                         today = today,
                         type = model.state.type,
                         editingId = (current as? Editing.Existing)?.id,
                         onClose = { model.state.editing = null },
-                        onDelete = deletedNotice::show,
-                        onHide = { (current as? Editing.Existing)?.id?.let(hiddenNotice::show) },
+                        onOutcome = { outcome ->
+                            model.state.finishEditing(
+                                edited = current,
+                                outcome = outcome,
+                            )
+                        },
                     )
                 }
             }

@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
@@ -19,6 +21,8 @@ import com.yossibank.kakeibot.designsystem.components.modal.SheetLayer
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.featuremodels.screens.main.MainModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPartsShared
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.entry.view.EntrySheet
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
@@ -27,20 +31,17 @@ import com.yossibank.kakeibot.features.screens.tabs.assets.view.AssetsView
 import com.yossibank.kakeibot.features.screens.tabs.home.view.HomeView
 import com.yossibank.kakeibot.features.screens.tabs.records.view.RecordsView
 import com.yossibank.kakeibot.features.screens.tabs.review.view.ReviewView
-import com.yossibank.kakeibot.features.shared.entrylist.LocalEntryList
-import com.yossibank.kakeibot.features.shared.entrylist.rememberSharedEntryList
 import com.yossibank.kakeibot.features.shared.observation.LocalObservationRound
-import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
 fun MainView(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     link: String?,
     onOpenLink: () -> Unit,
 ) {
     val model = rememberMainModel()
-    val entryList = rememberSharedEntryList(database)
+    val shared = rememberSharedParts(parts)
 
     SceneEffect(model)
 
@@ -51,12 +52,9 @@ fun MainView(
         model.perform { it.open(route) }
     }
 
-    CompositionLocalProvider(
-        LocalEntryList provides entryList,
-        LocalObservationRound provides model.state.observation,
-    ) {
+    CompositionLocalProvider(LocalObservationRound provides model.state.observation) {
         MainLayers(
-            database = database,
+            parts = shared,
             today = today,
             model = model,
         )
@@ -79,8 +77,19 @@ private fun SceneEffect(model: MainModel) {
 }
 
 @Composable
+private fun rememberSharedParts(parts: ScreenParts): ScreenParts {
+    val shared = remember(parts) { ScreenPartsShared(parts) }
+
+    DisposableEffect(shared) {
+        onDispose { shared.stop() }
+    }
+
+    return shared.parts
+}
+
+@Composable
 private fun MainLayers(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     model: MainModel,
 ) {
@@ -101,7 +110,7 @@ private fun MainLayers(
                     when (tab) {
                         MainModel.Tab.Home -> {
                             HomeView(
-                                database = database,
+                                parts = parts,
                                 today = today,
                                 onOpenBudget = { model.state.sheet = MainModel.Sheet.Budget },
                                 onOpenEntry = model::openEntry,
@@ -114,7 +123,7 @@ private fun MainLayers(
 
                         MainModel.Tab.Records -> {
                             RecordsView(
-                                database = database,
+                                parts = parts,
                                 today = today,
                                 onOpenEntry = model::openEntry,
                             )
@@ -122,14 +131,14 @@ private fun MainLayers(
 
                         MainModel.Tab.Review -> {
                             ReviewView(
-                                database = database,
+                                parts = parts,
                                 today = today,
                             )
                         }
 
                         MainModel.Tab.Assets -> {
                             AssetsView(
-                                database = database,
+                                parts = parts,
                                 today = today,
                             )
                         }
@@ -151,7 +160,7 @@ private fun MainLayers(
             modifier = Modifier.zIndex(SHEET_LAYER),
         ) { entry ->
             EntrySheet(
-                database = database,
+                parts = parts,
                 today = today,
                 editing = entry.editing,
                 date = entry.date,
@@ -165,7 +174,7 @@ private fun MainLayers(
         ) { settings ->
             key(settings.round) {
                 SettingsMenuSheet(
-                    database = database,
+                    parts = parts,
                     today = today,
                     onClose = close,
                     openRecurring = settings.recurring,
@@ -178,7 +187,7 @@ private fun MainLayers(
             modifier = Modifier.zIndex(SHEET_LAYER),
         ) {
             BudgetListView(
-                database = database,
+                parts = parts,
                 today = today,
                 onBack = close,
             )

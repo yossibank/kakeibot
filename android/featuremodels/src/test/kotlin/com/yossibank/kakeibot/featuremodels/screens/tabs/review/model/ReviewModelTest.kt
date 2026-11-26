@@ -12,7 +12,6 @@ import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.dat
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryList
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.setting
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.reviewKind
@@ -88,8 +87,7 @@ class ReviewModelTest {
         val day = EntryDay(date = known.date, entries = listOf(known, unknown))
 
         val model = ReviewModel(
-            database = setup.database,
-            entryList = flowOf(list.copy(days = listOf(day))),
+            parts = setup.parts(entryList = flowOf(list.copy(days = listOf(day)))),
             today = setup.today,
             round = ObservationRound(),
         )
@@ -329,8 +327,7 @@ class ReviewModelTest {
     }
 
     private fun ModelTestSetup.reviewModel() = ReviewModel(
-        database = database,
-        entryList = database.entryListUpdates(),
+        parts = parts,
         today = today,
         round = ObservationRound(),
     )

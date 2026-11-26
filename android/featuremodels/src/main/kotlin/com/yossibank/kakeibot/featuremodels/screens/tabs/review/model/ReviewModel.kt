@@ -19,6 +19,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -37,8 +38,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class ReviewModel(
-    database: AppDatabase,
-    entryList: Flow<EntryList>,
+    parts: ScreenParts,
     today: LocalDate,
     round: ObservationRound,
 ) : ScreenPerforming {
@@ -46,7 +46,7 @@ class ReviewModel(
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, entryList, round)
+    private val dependencies = Dependencies(parts.database, parts.entryList, round)
 
     data class Row(
         val key: String,

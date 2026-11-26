@@ -58,8 +58,8 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.categoriesNote
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.unbudgetedNote
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
-import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
@@ -69,20 +69,16 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCapti
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
-import com.yossibank.kakeibot.store.database.AppDatabase
 
 @Composable
 fun BudgetListView(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     onBack: () -> Unit,
 ) {
-    val entryList = rememberEntryList(database)
-
-    val model = remember(database, entryList) {
+    val model = remember(parts) {
         BudgetListModel(
-            database = database,
-            entryList = entryList,
+            parts = parts,
             today = today,
         )
     }

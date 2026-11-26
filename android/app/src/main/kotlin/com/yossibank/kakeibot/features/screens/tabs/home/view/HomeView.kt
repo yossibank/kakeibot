@@ -46,31 +46,28 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
-import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderEmpty
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderLoadFailed
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
-import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlin.math.abs
 
 @Composable
 fun HomeView(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     onOpenBudget: () -> Unit,
     onOpenEntry: (Identifier<Entry>) -> Unit,
     onAddEntry: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    val entryList = rememberEntryList(database)
     val round = rememberObservationRound()
 
-    val model = remember(database, entryList, round) {
+    val model = remember(parts, round) {
         HomeModel(
-            database = database,
-            entryList = entryList,
+            parts = parts,
             today = today,
             round = round,
         )

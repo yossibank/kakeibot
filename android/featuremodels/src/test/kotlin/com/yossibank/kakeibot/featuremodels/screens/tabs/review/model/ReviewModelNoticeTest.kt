@@ -122,8 +122,7 @@ class ReviewModelNoticeTest {
     private fun ModelTestSetup.reviewModel(
         entryList: Flow<EntryList> = database.entryListUpdates(),
     ) = ReviewModel(
-        database = database,
-        entryList = entryList,
+        parts = parts(entryList = entryList),
         today = today,
         round = ObservationRound(),
     )

@@ -14,6 +14,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
@@ -34,8 +35,7 @@ import com.yossibank.kakeibot.store.writes.methods.recentItemNames
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
 
 class EntryModel(
-    database: AppDatabase,
-    clock: ScreenClock,
+    parts: ScreenParts,
     today: LocalDate,
     editing: Identifier<Entry>? = null,
     date: LocalDate = today,
@@ -44,7 +44,7 @@ class EntryModel(
     val input = Input(editing)
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, clock)
+    private val dependencies = Dependencies(parts.database, parts.clock)
 
     enum class Field {
         Category,

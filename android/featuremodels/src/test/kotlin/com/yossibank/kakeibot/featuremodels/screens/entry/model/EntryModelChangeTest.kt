@@ -2,7 +2,6 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -99,8 +98,7 @@ class EntryModelChangeTest {
     @Test
     fun staysUnchangedBeforeLoading() = modelTest(today = "2026-10-12") { setup ->
         val model = EntryModel(
-            database = setup.database,
-            clock = ScreenClock.fixed(setup.now),
+            parts = setup.parts,
             today = setup.today,
         )
 

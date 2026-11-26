@@ -63,7 +63,7 @@ fun RootView(
                 AppModel.Launch.Opening -> CircularProgressIndicator(color = Palette.accent)
 
                 is AppModel.Launch.Ready -> MainView(
-                    database = launch.database,
+                    parts = launch.parts,
                     today = model.today,
                     link = link,
                     onOpenLink = onOpenLink,

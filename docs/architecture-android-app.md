@@ -88,7 +88,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 今の時刻 | `featuremodels/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
 | 説明カードを閉じたか | `settingsparts/hint/` の `SettingsFoldInput` を、モデルの `Input` に置く。読み書きは、`SettingsFoldModel` の `loadFold`・`setFold` に通す |
 | 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` で入れる。`AssetsModel` だけは iOS と同じく `input.today` に持ち、画面が `setToday` で入れる |
-| 記録の一覧の見張り | `MainView` が 1 本を共有し、`LocalEntryList` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
+| 記録の一覧の見張り | `MainView` が 1 本を共有し、`ScreenParts` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 共有した見張りの持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
 | 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
 | タブの記録の一覧の失敗 | 4 つのタブのモデルは、記録の一覧を読めなかった時に `state.isListFailed` を立てる。見張りを始め直す時に下ろす |

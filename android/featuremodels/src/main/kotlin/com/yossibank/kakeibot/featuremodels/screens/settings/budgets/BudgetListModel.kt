@@ -13,6 +13,7 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
@@ -33,15 +34,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class BudgetListModel(
-    database: AppDatabase,
-    entryList: Flow<EntryList>,
+    parts: ScreenParts,
     today: LocalDate,
 ) : SettingsFoldModel {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, entryList)
+    private val dependencies = Dependencies(parts.database, parts.entryList)
 
     sealed interface Target {
         val categoryId: Identifier<EntryCategory>?
