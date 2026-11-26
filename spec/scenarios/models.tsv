@@ -438,6 +438,7 @@ template-edit.opens-one-panel-at-a-time	TemplateEditModelTests/opensOnePanelAtAT
 template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton	TemplateEditModelTest/namesWhatIsMissingOnSaveButton	対応	
 template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	名前が無い時は save の結果で確かめる
 template-edit.loads-existing-template-and-tracks-changes	TemplateEditModelTests/loadsExistingTemplateAndTracksChanges		未移植	既にあるテンプレートを編集する入口（editing・isChanged）が無い
+template-edit.asks-before-discarding-changes	TemplateEditModelTests/asksBeforeDiscardingChanges	TemplateEditModelTest/asksBeforeDiscardingChanges	対応	
 template-edit.keeps-notice-when-input-changes	TemplateEditModelTests/keepsNoticeWhenInputChanges	TemplateEditModelTest/keepsNoticeWhenInputChanges	対応	
 template-edit.chooses-first-category-and-wallet-on-load		TemplateEditModelTest/choosesFirstCategoryAndWalletOnLoad	Androidのみ	読み込みで最初のカテゴリと口座を選ぶ。iOS にこれだけのテストが無い
 template-edit.names-missing-wallet-by-type		TemplateEditModelTest/namesMissingWalletByType	Androidのみ	カテゴリと口座が無い時の知らせの文を確かめる。iOS にテストが無い

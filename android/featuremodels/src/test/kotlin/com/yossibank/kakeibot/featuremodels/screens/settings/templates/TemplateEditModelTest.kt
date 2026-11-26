@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.templates
@@ -27,6 +28,24 @@ class TemplateEditModelTest {
         assertEquals(100, typed)
         assertNull(model.output.amount)
         assertEquals("入金先", model.output.walletTitle)
+    }
+
+    @Test
+    fun asksBeforeDiscardingChanges() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.templateModel(type = Entry.Kind.expense)
+        model.load()
+
+        val changedAfterLoad = model.flow.output.isChanged
+        model.state.update { copy(name = "ランチ") }
+        model.flow.close()
+        val asked = model.flow.state.prompt.isShowing(EditFlow.Prompt.discard)
+        val pending = model.flow.state.outcome.value
+        model.flow.discard()
+
+        assertFalse(changedAfterLoad)
+        assertTrue(asked)
+        assertNull(pending)
+        assertEquals(true, model.flow.state.outcome.value?.closes)
     }
 
     @Test

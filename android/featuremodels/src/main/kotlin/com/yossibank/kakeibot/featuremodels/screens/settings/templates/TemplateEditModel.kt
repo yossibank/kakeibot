@@ -80,6 +80,9 @@ class TemplateEditModel(
 
         var cardBills: List<Recurring> by mutableStateOf(emptyList())
             internal set
+
+        var baseline: EntryTemplateDraft? by mutableStateOf(null)
+            internal set
     }
 
     class Output(
@@ -148,7 +151,9 @@ class TemplateEditModel(
 
     private inner class Source : EditFlowSource<EntryTemplate> {
         override val isEditing: Boolean = false
-        override val isChanged: Boolean = false
+
+        override val isChanged: Boolean
+            get() = input.baseline?.let { it != output.draft } ?: false
 
         override val problem: String?
             get() = output.problemMessage
@@ -182,6 +187,8 @@ class TemplateEditModel(
                     )
                 }
             }
+
+            input.baseline = output.draft
         }
     }
 }

@@ -105,6 +105,27 @@ struct TemplateEditModelTests {
     }
 
     @Test
+    func asksBeforeDiscardingChanges() async throws {
+        let database = try Self.database()
+        let model = TemplateEditModel(parts: .system(database), type: .expense)
+        await model.load()
+
+        let changedAfterLoad = model.flow.output.isChanged
+        model.state.fields.name = "ランチ"
+
+        model.flow.close()
+        let asked = model.flow.state.prompt.isShowing(.discard)
+        let pending = model.flow.state.outcome.value
+
+        model.flow.discard()
+
+        #expect(!changedAfterLoad)
+        #expect(asked)
+        #expect(pending == nil)
+        #expect(model.flow.state.outcome.value?.closes == true)
+    }
+
+    @Test
     func keepsNoticeWhenInputChanges() async throws {
         let database = try Self.database()
         let model = TemplateEditModel(parts: .system(database), type: .expense)
