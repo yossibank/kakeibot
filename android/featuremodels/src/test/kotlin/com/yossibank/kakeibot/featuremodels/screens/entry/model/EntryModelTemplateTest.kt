@@ -7,6 +7,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class EntryModelTemplateTest {
     @Test
@@ -59,5 +60,17 @@ class EntryModelTemplateTest {
         assertEquals(stock.id, entry.templateId)
         assertNull(saved.tagId)
         assertNull(saved.templateId)
+    }
+
+    @Test
+    fun closesTemplateSheetAndReloadsAfterSaving() = modelTest(today = "2026-10-15") { setup ->
+        val model = setup.loadedModel()
+        model.state.presented.show(EntryModel.Presented.Template(model.output.newTemplateDraft()))
+        val saved = setup.saveTemplate(name = "社食", amount = 500)
+
+        model.receiveTemplate()
+
+        assertNull(model.state.presented.current)
+        assertTrue(model.input.allTemplates.any { it.id == saved.id })
     }
 }

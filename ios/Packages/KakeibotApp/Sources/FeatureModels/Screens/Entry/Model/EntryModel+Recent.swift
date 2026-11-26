@@ -20,7 +20,7 @@ public extension EntryModel {
 
         if let memo = entry.memo,
            !memo.isEmpty {
-            state.memo = memo
+            state.fields.memo = memo
         }
 
         state.keypad.setAmount(entry.amount)

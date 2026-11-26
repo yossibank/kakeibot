@@ -32,7 +32,7 @@ public extension EntryModel {
         )
 
         if let memo = Self.filledMemo(of: template) {
-            state.memo = memo
+            state.fields.memo = memo
         }
 
         if let amount = template.amount {
@@ -79,7 +79,7 @@ public extension EntryModel {
             categoryId: state.category.id,
             tagId: state.category.tagId,
             walletId: state.payment.walletId,
-            memo: state.memo
+            memo: state.fields.memo
         )
 
         return TemplateEditModel(

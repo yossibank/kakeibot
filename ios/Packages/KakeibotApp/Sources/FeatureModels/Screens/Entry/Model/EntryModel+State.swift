@@ -48,10 +48,8 @@ public extension EntryModel {
         var templateId: EntryTemplate.ID?
     }
 
-    struct Progress: Equatable {
-        public internal(set) var isClosing = false
-
-        var isSaving = false
+    struct Fields: ScreenEditable {
+        public var memo = ""
     }
 
     enum Outcome: Hashable, Sendable {
@@ -68,6 +66,7 @@ public extension EntryModel {
         public let hiddenCategory: UndoNotice<HiddenCategory>
 
         public internal(set) var outcome = ScreenOutcome<Outcome>()
+        public internal(set) var isClosing = false
 
         @MainActor
         init(wait: ScreenWait) {
@@ -81,17 +80,19 @@ public extension EntryModel {
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
         public var results: Results
-        public var memo = ""
-        public var today: LocalDate
-        public var screen: Screen
+        public var fields = Fields()
+        public var presented = Shown<Presented>()
 
+        public internal(set) var today: LocalDate
+        public internal(set) var screen: Screen
         public internal(set) var type: Entry.Kind
         public internal(set) var payment: Payment
         public internal(set) var category = CategoryChoice()
         public internal(set) var keypad = Keypad()
         public internal(set) var items = Items()
         public internal(set) var filled = Filled()
-        public internal(set) var progress = Progress()
+
+        public let task = ModelTask()
 
         init(
             type: Entry.Kind,
@@ -199,7 +200,7 @@ private extension EntryModel.Payment {
     }
 }
 
-public extension EntryModel.State {
+public extension EntryModel.Fields {
     var store: String {
         get {
             memoLines[0]
@@ -210,7 +211,15 @@ public extension EntryModel.State {
             memo = lines.joined(separator: "\n")
         }
     }
+}
 
+private extension EntryModel.Fields {
+    var memoLines: [String] {
+        memo.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+    }
+}
+
+public extension EntryModel.State {
     func setDate(_ date: LocalDate) {
         payment.setDate(date)
     }
@@ -337,7 +346,7 @@ extension EntryModel.State {
 
     func clearForNext() {
         keypad = EntryModel.Keypad()
-        memo = ""
+        fields.memo = ""
         items = EntryModel.Items()
         category.tagId = nil
         payment.billMonth = nil
@@ -346,10 +355,6 @@ extension EntryModel.State {
 }
 
 private extension EntryModel.State {
-    var memoLines: [String] {
-        memo.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
-    }
-
     func changeItems(_ change: () -> Void) {
         let amount = keypad.calculator.amount
         let follows = amount == 0 || amount - items.totals.total == 0

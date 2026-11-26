@@ -89,7 +89,7 @@ extension EntryModel.Output {
             payment: state.payment,
             categoryId: state.category.id,
             tagId: state.category.tagId,
-            memo: state.memo,
+            memo: state.fields.memo,
             items: state.items.list,
             taxIncluded: state.items.taxIncluded
         )
@@ -115,7 +115,7 @@ extension EntryModel.Output {
             templateId: templateId,
             walletId: walletId,
             toWalletId: state.payment.toWalletId,
-            memo: state.memo,
+            memo: state.fields.memo,
             billMonth: billMonth,
             fee: fee,
             items: showsItems ? state.items.list : [],

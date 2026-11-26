@@ -35,7 +35,7 @@ extension EntryModelTests {
         let saved = await model.save()
 
         #expect(model.output.amount == 980)
-        #expect(model.state.memo == "社食")
+        #expect(model.state.fields.memo == "社食")
         #expect(model.state.category.id == lunch.categoryId)
         #expect(model.output.isApplied(lunch))
         #expect(saved?.entry.templateId == lunch.id)
@@ -50,12 +50,12 @@ extension EntryModelTests {
         model.state.press(.digit(4))
         model.state.press(.digit(5))
         model.state.press(.digit(0))
-        model.state.memo = "カフェ"
+        model.state.fields.memo = "カフェ"
 
         model.apply(pass)
 
         #expect(model.output.amount == 450)
-        #expect(model.state.memo == "カフェ")
+        #expect(model.state.fields.memo == "カフェ")
         #expect(model.state.category.id == pass.categoryId)
         #expect(model.output.isApplied(pass))
     }
@@ -154,7 +154,7 @@ extension EntryModelTests {
         await model.load()
 
         #expect(model.output.amount == 0)
-        #expect(model.state.memo == "社食")
+        #expect(model.state.fields.memo == "社食")
         #expect(!model.output.isChanged)
         #expect(model.output.templates.map(\.name) == ["定期"])
     }
@@ -167,7 +167,7 @@ extension EntryModelTests {
         model.state.press(.digit(4))
         model.state.press(.digit(5))
         model.state.press(.digit(0))
-        model.state.memo = "カフェ"
+        model.state.fields.memo = "カフェ"
 
         let editor = model.newTemplateModel()
 

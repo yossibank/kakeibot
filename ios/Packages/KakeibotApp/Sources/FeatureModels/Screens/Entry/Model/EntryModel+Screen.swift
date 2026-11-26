@@ -28,16 +28,14 @@ public extension EntryModel {
         public internal(set) var isBillShown = false
     }
 
-    enum Shown: Hashable, Sendable {
+    enum Presented: Hashable, Sendable {
         case sheet(Sheet)
         case discard
         case menu(EntryCategory)
     }
 
     struct Screen {
-        public var categoryPage: Int? = 0
-
-        public internal(set) var shown: Shown?
+        public internal(set) var categoryPage: Int? = 0
         public internal(set) var wallets = WalletDeck()
         public internal(set) var deck: Deck
         public internal(set) var isForward = true
@@ -63,6 +61,17 @@ public extension EntryModel {
         }
     }
 
+    func receive(
+        _ wallet: Wallet,
+        as role: WalletRole
+    ) {
+        state.screen.addedWallet = AddedWallet(wallet: wallet, role: role)
+    }
+
+    func receive(_ deletion: Deletion) {
+        state.results.deletion.show(deletion)
+    }
+
     func reloadAfterSheet() async {
         let added = state.screen.addedWallet
         let needsWallets = state.screen.reloadsWallets
@@ -73,39 +82,17 @@ public extension EntryModel {
     }
 }
 
-public extension EntryModel.Screen {
+public extension EntryModel.Presented {
     var sheet: EntryModel.Sheet? {
-        get {
-            if case let .sheet(sheet) = shown {
-                sheet
-            } else {
-                nil
-            }
-        }
-        set {
-            if let newValue {
-                shown = .sheet(newValue)
-            } else if sheet != nil {
-                shown = nil
-            }
-        }
-    }
-
-    var isConfirmingDiscard: Bool {
-        get {
-            shown == .discard
-        }
-        set {
-            if newValue {
-                shown = .discard
-            } else if isConfirmingDiscard {
-                shown = nil
-            }
+        if case let .sheet(sheet) = self {
+            sheet
+        } else {
+            nil
         }
     }
 
     var menuCategory: EntryCategory? {
-        if case let .menu(category) = shown {
+        if case let .menu(category) = self {
             category
         } else {
             nil
@@ -178,6 +165,18 @@ public extension EntryModel.State {
         enter(.amount)
     }
 
+    func showCategoryPage(_ page: Int?) {
+        if screen.categoryPage != page {
+            screen.categoryPage = page
+        }
+    }
+
+    func closeSheet() {
+        if let sheet = presented.current?.sheet {
+            presented.close(.sheet(sheet))
+        }
+    }
+
     func editMemo(_ isEditing: Bool) {
         if screen.isEditingMemo != isEditing {
             screen.isEditingMemo = isEditing
@@ -185,12 +184,12 @@ public extension EntryModel.State {
     }
 
     func openMenu(for category: EntryCategory) {
-        screen.shown = .menu(category)
+        presented.show(.menu(category))
     }
 
     func closeMenu() {
-        if screen.menuCategory != nil {
-            screen.shown = nil
+        if let category = presented.current?.menuCategory {
+            presented.close(.menu(category))
         }
     }
 
@@ -211,18 +210,11 @@ public extension EntryModel.State {
     }
 
     func open(_ sheet: EntryModel.Sheet) {
-        screen.shown = .sheet(sheet)
+        presented.show(.sheet(sheet))
         screen.reloadsWallets = sheet.isWallet
     }
 
-    func noteAdded(
-        _ wallet: Wallet,
-        as role: EntryModel.WalletRole
-    ) {
-        screen.addedWallet = EntryModel.AddedWallet(wallet: wallet, role: role)
-    }
-
     func confirmDiscard() {
-        screen.shown = .discard
+        presented.show(.discard)
     }
 }

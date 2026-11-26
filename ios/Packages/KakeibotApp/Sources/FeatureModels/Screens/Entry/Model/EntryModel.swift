@@ -156,7 +156,7 @@ public extension EntryModel {
         }
 
         input.baseline = output.snapshot
-        state.progress.isSaving = false
+        state.results.isClosing = false
     }
 
     func recordAgain() async {
@@ -199,25 +199,34 @@ public extension EntryModel {
         }
 
         input.baseline = output.snapshot
-        state.progress.isSaving = false
+        state.results.isClosing = false
         state.errorNotice.inform(Self.recordAgainMessage)
         state.results.outcome.send(.categoryMoved)
     }
 
     @discardableResult
     func delete() async -> EntryChange? {
-        guard let original = input.original else {
+        guard
+            let original = input.original,
+            !state.task.isRunning,
+            !state.results.isClosing
+        else {
             return nil
         }
 
         do {
             let database = dependencies.database
-            let items = try await database.entryItems(of: original.id)
 
-            let deleted = try await database.deleteEntry(
-                original.id,
-                at: dependencies.clock.now
-            )
+            let (items, deleted) = try await state.task.attempt {
+                let items = try await database.entryItems(of: original.id)
+
+                let deleted = try await database.deleteEntry(
+                    original.id,
+                    at: dependencies.clock.now
+                )
+
+                return (items, deleted)
+            }
 
             let title = output.label(for: original)
 
@@ -240,7 +249,7 @@ public extension EntryModel {
     }
 
     func beginClosing() {
-        state.progress.isClosing = true
+        state.results.isClosing = true
     }
 
     func newNoticeModel() -> EntryNoticeModel {
@@ -271,48 +280,52 @@ private extension EntryModel {
 
     func store() async -> EntryChange? {
         guard
-            !state.progress.isSaving,
+            !state.task.isRunning,
+            !state.results.isClosing,
             let draft = output.draft
         else {
             return nil
         }
 
-        state.progress.isSaving = true
-
         do {
-            let database = dependencies.database
-
-            let saved = try await database.saveEntryResult(
-                draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
-
-            let entry = saved.entry
-
-            await finishReceipt()
-
-            let fee = try await database.fee(of: entry.id)
-            let title = output.label(for: entry)
-
-            let kind: EntryChange.Kind = if let original = input.original {
-                .edited(previous: original, previousFee: input.originalFee)
-            } else {
-                .recorded
+            return try await state.task.attempt {
+                try await store(draft)
             }
-
-            return EntryChange(
-                kind: kind,
-                entry: entry,
-                label: title,
-                fee: fee,
-                clearedNoSpendDays: saved.clearedNoSpendDays
-            )
         } catch {
-            state.progress.isSaving = false
             report(error)
             return nil
         }
+    }
+
+    func store(_ draft: EntryDraft) async throws -> EntryChange {
+        let database = dependencies.database
+
+        let saved = try await database.saveEntryResult(
+            draft,
+            editing: input.editingId,
+            at: dependencies.clock.now
+        )
+
+        let entry = saved.entry
+
+        await finishReceipt()
+
+        let fee = try await database.fee(of: entry.id)
+        let title = output.label(for: entry)
+
+        let kind: EntryChange.Kind = if let original = input.original {
+            .edited(previous: original, previousFee: input.originalFee)
+        } else {
+            .recorded
+        }
+
+        return EntryChange(
+            kind: kind,
+            entry: entry,
+            label: title,
+            fee: fee,
+            clearedNoSpendDays: saved.clearedNoSpendDays
+        )
     }
 
     func startNew() {
@@ -351,7 +364,7 @@ private extension EntryModel {
         state.category.tagId = entry.tagId
         setWallet(entry.walletId)
         state.setDestination(entry.toWalletId)
-        state.memo = entry.memo ?? ""
+        state.fields.memo = entry.memo ?? ""
         state.filled.templateId = entry.templateId
         state.payment.billMonth = entry.billMonth
         state.keypad.setFee(input.originalFee?.amount ?? 0)

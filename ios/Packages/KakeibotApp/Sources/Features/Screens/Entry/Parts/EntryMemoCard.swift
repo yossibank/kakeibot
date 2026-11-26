@@ -26,7 +26,7 @@ struct EntryMemoCard: View {
 
             TextField(
                 "メモ",
-                text: Bindable(model.state).memo,
+                text: Bindable(model.state).fields.memo,
                 prompt: Text(model.output.memoPrompt).foregroundStyle(Palette.hint),
                 axis: .vertical
             )
@@ -59,7 +59,7 @@ struct EntryMemoCard: View {
 private extension EntryMemoCard {
     func suggestionButton(_ memo: String) -> some View {
         ChipButton {
-            model.state.memo = memo
+            model.state.fields.memo = memo
         } content: {
             Text(memo)
                 .sharedTextScale()

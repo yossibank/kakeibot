@@ -41,6 +41,18 @@ class EntryModelOutcomeTest {
     }
 
     @Test
+    fun ignoresSavingWhileRunning() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        model.press(5)
+
+        val isSaved = model.state.task.attempt(failure = "") { model.save() }
+
+        assertEquals(false, isSaved)
+        assertNull(model.state.outcome.value)
+        assertTrue(setup.database.entryList().entries.isEmpty())
+    }
+
+    @Test
     fun continuesWithNextEntryAfterSaving() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
         model.press(5)

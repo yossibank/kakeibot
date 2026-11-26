@@ -94,8 +94,9 @@ public extension EntryModel.Output {
     }
 
     func isApplied(_ template: EntryTemplate) -> Bool {
+        let memo = state.fields.memo
         let amountMatches = template.amount.map { $0 == amount } ?? true
-        let memoMatches = EntryModel.filledMemo(of: template).map { $0 == state.memo } ?? true
+        let memoMatches = EntryModel.filledMemo(of: template).map { $0 == memo } ?? true
 
         return template.id == state.filled.templateId
             && template.type == state.type

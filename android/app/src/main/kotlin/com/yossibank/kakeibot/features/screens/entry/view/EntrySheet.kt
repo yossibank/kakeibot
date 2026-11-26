@@ -1,36 +1,14 @@
 package com.yossibank.kakeibot.features.screens.entry.view
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -38,49 +16,23 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.designsystem.components.button.CircleIconButton
 import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
-import com.yossibank.kakeibot.designsystem.components.text.FittedText
-import com.yossibank.kakeibot.designsystem.theme.Emphasis
-import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Haptic
 import com.yossibank.kakeibot.designsystem.theme.HapticEffect
-import com.yossibank.kakeibot.designsystem.theme.LocalThemeStyle
-import com.yossibank.kakeibot.designsystem.theme.Palette
-import com.yossibank.kakeibot.designsystem.theme.opacity
-import com.yossibank.kakeibot.designsystem.theme.radius
-import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.close
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasRecent
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.isEditing
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.newTemplateDraft
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsRecent
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
-import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.shared.notice.EntryChange
 import com.yossibank.kakeibot.featuremodels.shared.notice.EntryNoticeModel
-import com.yossibank.kakeibot.features.screens.entry.parts.EntryDeck
-import com.yossibank.kakeibot.features.screens.entry.parts.EntryRecentRow
-import com.yossibank.kakeibot.features.screens.entry.parts.EntrySlip
-import com.yossibank.kakeibot.features.screens.entry.parts.EntryTypeSwitch
 import com.yossibank.kakeibot.features.screens.entry.sheet.EntryItemSheet
-import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceCard
 import com.yossibank.kakeibot.features.screens.entry.voice.EntryVoiceNotice
-import com.yossibank.kakeibot.features.screens.entry.voice.rememberVoiceStarter
 import com.yossibank.kakeibot.features.screens.settings.templates.TemplateEditSheet
 import com.yossibank.kakeibot.features.shared.model.OnOutcome
 import com.yossibank.kakeibot.features.shared.notice.EntryNoticeBanner
@@ -104,21 +56,67 @@ fun EntrySheet(
     }
 
     val notice = remember(parts) { EntryNoticeModel(parts) }
+    val voice = rememberEntryVoice(model = model, parts = parts)
+
+    fun close() {
+        if (model.close()) {
+            onClose()
+        }
+    }
+
+    EntrySheetEffects(
+        model = model,
+        voice = voice,
+        notice = notice,
+        today = today,
+        onChange = onChange,
+        onClose = onClose,
+        onBack = ::close,
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        EntryBody(
+            model = model,
+            voice = voice,
+            today = today,
+            onClose = ::close,
+        )
+
+        EntryOverlay(
+            model = model,
+            notice = notice,
+            voice = voice,
+            parts = parts,
+            onClose = onClose,
+        )
+    }
+}
+
+@Composable
+private fun rememberEntryVoice(
+    model: EntryModel,
+    parts: ScreenParts,
+): EntryVoiceFlow {
     val context = LocalContext.current
 
-    val voice = remember(model) {
+    return remember(model) {
         EntryVoiceFlow(
             context = context,
             clock = parts.clock,
         )
     }
+}
 
-    val startVoice = rememberVoiceStarter(
-        voice = voice,
-        model = model,
-        today = today,
-    )
-
+@Composable
+private fun EntrySheetEffects(
+    model: EntryModel,
+    voice: EntryVoiceFlow,
+    notice: EntryNoticeModel,
+    today: LocalDate,
+    onChange: (EntryChange) -> Unit,
+    onClose: () -> Unit,
+    onBack: () -> Unit,
+) {
     SideEffect {
         model.setToday(today)
     }
@@ -127,7 +125,22 @@ fun EntrySheet(
         model.load()
     }
 
-    model.state.task.Timer()
+    DisposableEffect(voice) {
+        onDispose(voice::close)
+    }
+
+    HapticEffect(
+        haptic = Haptic.LightImpact,
+        trigger = voice.state.startCount,
+    )
+
+    HapticEffect(
+        haptic = Haptic.LightImpact,
+        trigger = voice.state.endCount,
+    )
+
+    BackHandler(onBack = onBack)
+    BackHandler(enabled = voice.output.isActive, onBack = voice::cancel)
 
     OnOutcome(model.state.outcome) { outcome ->
         when (outcome) {
@@ -142,177 +155,86 @@ fun EntrySheet(
         }
     }
 
-    DisposableEffect(voice) {
-        onDispose(voice::close)
-    }
+    model.state.task.Timer()
+}
 
-    fun close() {
-        if (model.close()) {
-            onClose()
-        }
-    }
-
-    BackHandler(onBack = ::close)
-    BackHandler(enabled = voice.output.isActive, onBack = voice::cancel)
-
-    HapticEffect(
-        haptic = Haptic.LightImpact,
-        trigger = voice.state.startCount,
+@Composable
+private fun BoxScope.EntryOverlay(
+    model: EntryModel,
+    notice: EntryNoticeModel,
+    voice: EntryVoiceFlow,
+    parts: ScreenParts,
+    onClose: () -> Unit,
+) {
+    EntryNoticeLayer(
+        notice = notice,
+        voice = voice,
+        model = model,
     )
 
-    HapticEffect(
-        haptic = Haptic.LightImpact,
-        trigger = voice.state.endCount,
+    EntryPresentedLayer(
+        model = model,
+        parts = parts,
+        onClose = onClose,
     )
+}
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Palette.background)
-                .pointerInput(Unit) {}
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .imePadding()
-                .padding(
-                    horizontal = 16.dp,
-                    vertical = 12.dp,
-                ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                EntryTypeSwitch(
-                    selection = model.state.form.type,
-                    onSelect = { model.select(type = it) },
-                )
+@Composable
+private fun BoxScope.EntryNoticeLayer(
+    notice: EntryNoticeModel,
+    voice: EntryVoiceFlow,
+    model: EntryModel,
+) {
+    val voiceNotice = voice.state.notice
 
-                Spacer(modifier = Modifier.weight(1f))
+    val modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .navigationBarsPadding()
+        .padding(
+            start = 20.dp,
+            end = 20.dp,
+            bottom = 96.dp,
+        )
 
-                if (model.output.isEditing) {
-                    CircleIconButton(
-                        icon = R.drawable.ic_trash,
-                        onClick = { model.perform { it.delete() } },
-                        size = 36.dp,
-                        iconSize = 20.dp,
-                        tint = Palette.rose,
-                    )
+    if (voiceNotice == null) {
+        EntryNoticeBanner(
+            model = notice,
+            modifier = modifier,
+        )
+    } else {
+        EntryVoiceNotice(
+            notice = voiceNotice,
+            onUndo = { voice.undoLast(model) },
+            onClose = voice::clearNotice,
+            modifier = modifier,
+        )
+    }
+}
 
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
+@Composable
+private fun EntryPresentedLayer(
+    model: EntryModel,
+    parts: ScreenParts,
+    onClose: () -> Unit,
+) {
+    (model.state.presented.current as? EntryModel.Presented.Template)?.let { template ->
+        TemplateEditSheet(
+            parts = parts,
+            draft = template.draft,
+            onSave = { model.perform { it.receiveTemplate() } },
+            onClose = model.state.presented::closeAll,
+        )
+    }
 
-                CircleIconButton(
-                    icon = R.drawable.ic_close,
-                    onClick = ::close,
-                    size = 36.dp,
-                    iconSize = 20.dp,
-                    tint = Palette.subtext,
-                )
-            }
-
-            EntrySlip(
-                model = model,
-                onOpenItems = { model.state.presented.show(EntryModel.Presented.Items) },
-                onVoice = startVoice.takeIf {
-                    voice.input.isAvailable && model.output.showsVoice && !voice.output.isActive
-                },
-                listening = voice.output.listening,
-            )
-
-            DeckPanel(modifier = Modifier.weight(1f)) {
-                if (voice.output.isActive) {
-                    EntryVoiceCard(
-                        flow = voice,
-                        model = model,
-                        today = today,
-                        onOpenSettings = {
-                            voice.cancel()
-
-                            context.startActivity(
-                                Intent(
-                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                    Uri.fromParts("package", context.packageName, null),
-                                ),
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                } else {
-                    EntryDeck(
-                        model = model,
-                        onOpenItems = { model.state.presented.show(EntryModel.Presented.Items) },
-                        onSaveTemplate = {
-                            model.state.presented.show(
-                                EntryModel.Presented.Template(model.output.newTemplateDraft()),
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-
-                val isInfo = model.state.task.tone == ModelTask.Tone.info
-
-                FittedText(
-                    text = model.state.task.message,
-                    modifier = Modifier.clickable(onClick = model.state.task::clear),
-                    color = if (isInfo) Palette.accent else Palette.rose,
-                    style = textFont(size = FontSize.Caption),
-                )
-
-                if (!voice.output.isActive && model.output.showsRecent && model.output.hasRecent) {
-                    EntryRecentRow(model = model)
-                } else {
-                    ActionBar(model = model)
-                }
-            }
-        }
-
-        val noticeModifier = Modifier
-            .align(Alignment.BottomCenter)
-            .navigationBarsPadding()
-            .padding(
-                start = 20.dp,
-                end = 20.dp,
-                bottom = 96.dp,
-            )
-
-        val voiceNotice = voice.state.notice
-
-        if (voiceNotice == null) {
-            EntryNoticeBanner(
-                model = notice,
-                modifier = noticeModifier,
-            )
-        } else {
-            EntryVoiceNotice(
-                notice = voiceNotice,
-                onUndo = { voice.undoLast(model) },
-                onClose = voice::clearNotice,
-                modifier = noticeModifier,
-            )
-        }
-
-        (model.state.presented.current as? EntryModel.Presented.Template)?.let { template ->
-            TemplateEditSheet(
-                parts = parts,
-                draft = template.draft,
-                onSave = {
-                    model.state.presented.closeAll()
-                    model.perform { it.reloadTemplates() }
-                },
-                onClose = model.state.presented::closeAll,
-            )
-        }
-
-        AnimatedVisibility(
-            visible = model.state.presented.current == EntryModel.Presented.Items,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
-            EntryItemSheet(
-                model = model,
-                onClose = model.state.presented::closeAll,
-            )
-        }
+    AnimatedVisibility(
+        visible = model.state.presented.current == EntryModel.Presented.Items,
+        enter = slideInVertically { it },
+        exit = slideOutVertically { it },
+    ) {
+        EntryItemSheet(
+            model = model,
+            onClose = model.state.presented::closeAll,
+        )
     }
 
     if (model.state.presented.current == EntryModel.Presented.Discard) {
@@ -324,26 +246,4 @@ fun EntrySheet(
             onKeep = model.state.presented::closeAll,
         )
     }
-}
-
-@Composable
-private fun DeckPanel(
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(24.dp))
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(Palette.panel)
-            .border(
-                width = 1.dp,
-                color = Palette.accent.opacity(Emphasis.Soft),
-                shape = shape,
-            ).padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        content = content,
-    )
 }

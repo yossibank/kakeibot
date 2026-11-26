@@ -15,7 +15,7 @@ public extension EntryModel.Output {
     }
 
     var isMemoFromVoice: Bool {
-        state.filled.voice?.memo.map { !$0.isEmpty && $0 == state.store } ?? false
+        state.filled.voice?.memo.map { !$0.isEmpty && $0 == state.fields.store } ?? false
     }
 
     var voiceHints: [String] {
