@@ -236,13 +236,17 @@ public extension EntryModel {
     func newNoticeModel() -> EntryNoticeModel {
         EntryNoticeModel(parts: dependencies)
     }
-}
 
-extension EntryModel {
-    public func newVoiceFlow() -> EntryVoiceFlow {
+    func newVoiceFlow() -> EntryVoiceFlow {
         EntryVoiceFlow(dependencies: .live(clock: dependencies.clock))
     }
 
+    func newReceiptFlow() -> EntryReceiptFlow {
+        EntryReceiptFlow()
+    }
+}
+
+extension EntryModel {
     func report(_ error: any Error) {
         guard !(error is CancellationError) else {
             return

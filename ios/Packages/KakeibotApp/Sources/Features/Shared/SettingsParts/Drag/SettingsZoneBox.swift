@@ -3,8 +3,7 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsZoneBox: View {
-    @State private var isOpen = false
-    @State private var showsOnLabel = false
+    @State private var layout = Layout()
 
     @Environment(\.themeStyle.corner) private var corner
 
@@ -17,9 +16,10 @@ struct SettingsZoneBox: View {
     var body: some View {
         let color = isOn ? tint : Palette.subtext
         let fill = isOn ? tint.opacity(.subtle) : Color.clear
-        let height = isOpen ? SettingsDropZones.openHeight : closedHeight
-        let labelHeight = isOpen ? SettingsDropZones.labelHeight : closedHeight
-        let label = showsOnLabel ? onLabel : offLabel
+        let isClosed = layout.phase == .closed
+        let height = isClosed ? closedHeight : SettingsDropZones.openHeight
+        let labelHeight = isClosed ? closedHeight : SettingsDropZones.labelHeight
+        let label = layout.phase == .open ? onLabel : offLabel
 
         VStack(spacing: 0) {
             ZStack {
@@ -57,25 +57,39 @@ extension SettingsZoneBox {
 }
 
 private extension SettingsZoneBox {
+    struct Layout {
+        var phase: OpenPhase = .closed
+    }
+
+    enum OpenPhase {
+        case closed
+        case opening
+        case open
+    }
+}
+
+private extension SettingsZoneBox {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
     }
 
     func update() {
         guard isOn else {
-            showsOnLabel = false
+            layout.phase = layout.phase == .closed ? .closed : .opening
 
             withAnimation(.smooth(duration: 0.3)) {
-                isOpen = false
+                layout.phase = .closed
             }
 
             return
         }
 
         withAnimation(.spring(duration: 0.4, bounce: 0.35)) {
-            isOpen = true
+            layout.phase = .opening
         } completion: {
-            showsOnLabel = isOn
+            if isOn {
+                layout.phase = .open
+            }
         }
     }
 }
