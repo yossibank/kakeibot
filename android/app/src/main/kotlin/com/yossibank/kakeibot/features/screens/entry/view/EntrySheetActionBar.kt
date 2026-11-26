@@ -24,6 +24,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.canSave
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.isEditing
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.opensKeypadOnSave
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.saveTitle
 import com.yossibank.kakeibot.featuremodels.shared.model.perform

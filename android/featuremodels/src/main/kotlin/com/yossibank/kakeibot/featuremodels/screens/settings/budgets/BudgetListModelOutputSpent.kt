@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.screens.settings.budgets
 
+import com.yossibank.kakeibot.core.concepts.budget.BudgetUsage
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
@@ -33,6 +34,19 @@ val BudgetListModel.Output.suggestions: List<BudgetListModel.Suggestion>
             ),
         ).filter { it.amount > 0 && seen.add(it.amount) }
     }
+
+fun BudgetListModel.Output.usage(categoryId: Identifier<EntryCategory>?): BudgetUsage? {
+    val overview = input.overview ?: return null
+    val budget = amount(categoryId) ?: return null
+
+    return BudgetUsage(
+        budget = budget,
+        carryover = if (categoryId == null) carryover else 0L,
+        spent = spent(categoryId),
+        today = overview.today,
+        periodEnd = overview.period.endInclusive,
+    )
+}
 
 internal fun BudgetListModel.Output.spentByCategory(
     month: YearMonth,

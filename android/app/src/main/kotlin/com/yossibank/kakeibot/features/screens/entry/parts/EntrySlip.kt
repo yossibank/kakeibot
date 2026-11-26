@@ -47,11 +47,13 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.categories
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.category
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.categoryText
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.dateValue
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.expressionText
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.fee
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.field
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.icon
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.isDateFromVoice

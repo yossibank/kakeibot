@@ -65,6 +65,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.categories
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.icon
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallets
 import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 

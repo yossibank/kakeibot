@@ -1,0 +1,1146 @@
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppDelegate.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。application は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppDelegate.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。scene は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppDelegate.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。windowScene は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppDelegate.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。animatableData は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppLaunchView.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+Pro.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。database は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。finishCurtain は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。finishSweep は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isRevealed は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isShown は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。leaveCurtain は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。markHomeLoaded は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。markObservationStopped は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。receiveScene は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。restartStoppedObservation は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setLaunch は extension に出す
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+Sync.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+Sync.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+Sync.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel+Sync.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/App/RootView.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/Bridge/SyncParticipant+CloudKit.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView+Actions.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView+Layout.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView+Layout.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView+Layout.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView+Sheets.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/AppFeature/Main/MainView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/AppWidget/Intents/EntryControlIntent.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isDiscoverable は extension に出す
+ios/Packages/KakeibotApp/Sources/AppWidget/Intents/EntryControlIntent.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。perform は extension に出す
+ios/Packages/KakeibotApp/Sources/AppWidget/Intents/EntryControlIntent.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotApp/Sources/AppWidget/Shared/WidgetTimelineProvider.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/Budget/BudgetWidgetSummary.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/Budget/BudgetWidgetView.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/Budget/BudgetWidgetView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/Budget/BudgetWidgetView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetProvider.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetSummary.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetSummary.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetView+Entry.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetView+Entry.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetView+Tile.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetView+Tile.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetView.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetView.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/AppWidget/Widgets/QuickRecord/QuickRecordWidgetView.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Button/ChipButton.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Chart/DonutChart.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Chart/DonutChart.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Entry/EntryRow.swift: L1: extension の順が違う。「入れ子の型の宣言」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Entry/EntryRow.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Entry/EntryRow.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Icon/DisclosureMark.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。Style は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Icon/IconGlyph+Symbol.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/CapsulePicker.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/CapsulePicker.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。font は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/CapsulePicker.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。segment は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/GoldSwitch.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/KeyCatcher.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/KeyCatcher.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/Keypad.swift: L1: extension の順が違う。「入れ子の型の宣言」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/Keypad.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Input/Keypad.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Layout/CappedWidthLayout.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Layout/TwoColumnLayout.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Layout/TwoColumnLayout.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Layout/TwoColumnLayout.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Modal/DismissAttemptController.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Modal/TallFormSizing.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Modal/TallFormSizing.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。proposedSize は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Navigation/FloatingTabBar.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Navigation/FloatingTabBar.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Navigation/FloatingTabBar.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。usesGlass は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Navigation/PageSlide.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Navigation/PageSlide.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Navigation/PageSlide.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Notice/View+ErrorBanner.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Notice/View+ErrorBanner.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Surface/Backdrop.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Surface/Backdrop.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Surface/Scrim.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。Level は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Template/TemplateCardStyle.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/DesignSystem/Theme/Color+Hex.swift: L7: 1 行の let の並びと最後の return だけのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Theme/Color+Hex.swift: L7: 1 行の let の並びと最後の return だけのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/DesignSystem/Theme/PaletteKey.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。read は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Theme/PaletteKey.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。write は extension に出す
+ios/Packages/KakeibotApp/Sources/DesignSystem/Theme/View+Palette.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/DesignSystem/Theme/View+TextScale.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。explicitAlignment は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Category.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Category.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。categoryId は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Category.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Category.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Category.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Category.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Draft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Item.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Output.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。field は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。fields は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isConfirmingDiscard は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isWallet は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。menuCategory は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。order は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。sheet は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。start は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Screen.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。active は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。canAdjust は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。forgetReadNames は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。press は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。remember は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。select は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setAmount は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setDate は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setFee は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setWallet は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。tags は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。toggleTag は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。totals は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+State.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Text.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Transfer.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Voice.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Wallet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel+Wallet.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModelOutput+Text.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModelOutput+Text.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModelOutput+Transfer.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModelOutput+Transfer.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModelOutput+Transfer.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Model/EntryModelOutput+Voice.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。close は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。closeOffer は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。open は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。openCamera は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。showOffer は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。startReading は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptFlow.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptInterpreter.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptInterpreter.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptInterpreter.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Receipt/EntryReceiptInterpreter.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Sheet/EntryItemModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Sheet/EntryItemModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceAudioFeed.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceAudioFeed.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。finish は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceAudioFeed.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。level は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceAudioFeed.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。receive は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceAudioFeed.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceAudioFeed.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。canUndo は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。clearNotice は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。clearSilence は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。closeDenied は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。countEnd は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。finish は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。hint は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。message は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。reset は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setDenied は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。show は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。startListening は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。startSilence は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow+State.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。live は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceFlow.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceInterpreter.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceInterpreter.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。cancel は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。finish は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。start は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceListener.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceMic.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。start は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceMic.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。stop は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceMic.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceMic.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceSource.swift: L6: 複数行の宣言の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceTranscript.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isEmpty は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceTranscript.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。text は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/AppReviewModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/AppReviewModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel+Actions.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。changeScene は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。finishWarmingEntry は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。hideTabNotices は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。replaceDraft は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。restartObservation は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。select は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setToday は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Main/MainModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。startReceipt は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isFirstPage は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isLastPage は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。nextTitle は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。open は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。pages は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。pages は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。stepPages は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Onboarding/OnboardingModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isWorking は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。purchaseTitle は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Pro/ProPurchaseModel.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/AppIcons/AppIconChoice.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/AppIcons/AppIconChoice.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/AppIcons/AppIconChoice.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/AppIcons/AppIconListModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/AppIcons/AppIconListModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。pendingSummary は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。previousTitle は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Backup/BackupStash.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。categoryId は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。choose は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。press は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Budgets/BudgetListModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel+State.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel+State.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel+State.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。draft は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。snapshot は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryEditModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。icon は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。items は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Categories/CategoryListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/HomeSections/HomeSectionListModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/HomeSections/HomeSectionListModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/HomeSections/HomeSectionListModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/LaunchScreen/LaunchScreenModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/LaunchScreen/LaunchScreenModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuResetModel.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuResetModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuResetModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleData+Insert.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleData.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleData.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleData.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleData.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。message は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuValueModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuValueModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuValueModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。value は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuValueModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/MonthStartDay/MonthStartDayModel.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/MonthStartDay/MonthStartDayModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/MonthStartDay/MonthStartDayModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+Load.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+Load.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+Repayment.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。choose は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。load は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。load は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。setCountAuto は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。suggest は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。useAutoCount は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。useManualCount は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel+State.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModelOutput+PreviewRow.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringEditModelOutput+PreviewRow.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel+Output.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。hiddenRows は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel+Output.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isHidden は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel+Output.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。items は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel+Output.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。monthTotal は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel+Output.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。row は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel+Output.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。rows は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Recurring/RecurringListModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Reminder/ReminderModel.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Reminder/ReminderModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Reminder/ReminderModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Reminder/ReminderModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。pickTime は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Reminder/ReminderModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Reminder/ReminderModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Reminder/ReminderModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。amount は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。apply は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。draft は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。press は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleEditModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。icon は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isHidden は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。items は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。total は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/RewardRules/RewardRuleListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Stamps/StampEditModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Stamps/StampEditModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Stamps/StampEditModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Stamps/StampListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。icon は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Stamps/StampListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。items は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Stamps/StampListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncChoice.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncCloud.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncCloud.swift: L6: 複数行の宣言の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncCloud.swift: L6: 複数行の宣言の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Screen.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。feature は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。leaving は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。offer は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。stopping は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Screen.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Sharing.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Sharing.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel+Sharing.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel.swift: L1: extension の順が違う。「外に見せる値と関数」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncModel.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Sync/SyncProgress.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateEditModel+State.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateEditModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateEditModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateEditModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateEditModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateListModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。detail は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。icon は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。items は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Templates/TemplateListModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。clearPreview は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。feature は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。font は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。savedStyle は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。show は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。style は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/ThemeStyle/ThemeStyleModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L1: extension の順が違う。「外に見せる値と関数」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isAvailable は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。palette は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。base は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。editing は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。feature は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。menu は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。offer は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。theme は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel+Screen.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。currentPalette は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。palette は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Themes/ThemeListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。theme は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Actions.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+Input.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+State.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModel+State.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletEditModelOutput+Text.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。balance は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。hasEntries は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。icon は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isShared は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。items は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletListModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。needsHideConfirmation は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Wallets/WalletListModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/WidgetGuide/WidgetGuideModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。show は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/WidgetGuide/WidgetGuideModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。showChosenSample は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/WidgetGuide/WidgetGuidePlace.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。canSave は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。difference は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。differenceNote は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。differenceText は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isChanged は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。press は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。saveTitle は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsAdjustmentModel.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Outlook.swift: L1: extension の順が違う。「入れ子の型の宣言」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Outlook.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Outlook.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Outlook.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Reward.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Reward.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Wallets.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。canSave は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。draft は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isChanged は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isEditing は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。press は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。progress は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。remaining は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。saveTitle は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsRewardGoalEditModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsSummary+Outlook.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsSummary+Outlook.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsSummary+Outlook.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsSummary.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Home/HomeModel+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Home/HomeModel+Actions.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Home/HomeModel+Output.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Home/HomeModel+State.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Adjustment.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Adjustment.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Output.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Output.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Recurring.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isSheet は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Search.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Search.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+State.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModelOutput+Batch.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewClosing.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewCommentWriter.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Closing.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Goal.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Goal.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Goal.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Moves.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Moves.swift: L1: extension の順が違う。「入れ子の型の宣言」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Moves.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Moves.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Moves.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Note.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Note.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Note.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Progress.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Reason.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Reason.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Reason.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Reason.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Screen.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Screen.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Shares.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Shares.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Year.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Year.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Year.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L1: extension の順が違う。「外に見せる値と関数」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L1: extension の順が違う。「外に見せる値と関数」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。entries は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewNoteWriter.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Parts/ReviewGoalItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Parts/ReviewGoalItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Parts/ReviewGoalItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。titleParts は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Parts/ReviewGoalItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。value は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Parts/ReviewYearProgress.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Bill/BillPage.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/EntryList/EntryList+Filter.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/EntryList/EntryList+Filter.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/EntryList/EntryList+Filter.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Model/DeviceName.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Model/ForegroundReturn.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Model/Loadable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isFailed は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Model/Loadable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isLoaded は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Model/Loadable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。value は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/DeletionUndo.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/DeletionUndo.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/DeletionUndo.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryBatch.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryChange.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。change は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。clear は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。show は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notice/EntryNoticeModel.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Notification/NotificationPermission.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Pro/ProOfferModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Pro/ProStatus.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isUnlocked は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Pro/ProStore.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Board/Model/SettingsBoardModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Board/Model/SettingsBoardModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Board/Model/SettingsBoardModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Board/Model/SettingsBoardModel.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Board/Model/SettingsBoardModel.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Board/Model/SettingsBoardMovingState.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Hint/SettingsFoldModel.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Icon/SettingsIconEditorModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Input/SettingsEditPrompt.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Input/SettingsEditRemoving.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Input/SettingsEditRemoving.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/SettingsParts/Input/SettingsEditRemoving.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isDone は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。systemImage は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupItem.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupModel.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupModel.swift: L1: extension の順が違う。「外に見せる値と関数」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupModel.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/FeatureModels/Shared/Setup/SetupModel.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryCategoryCell.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryCategoryCell.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryGuideCard.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryGuideCard.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryGuideCard.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryGuideCard.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryMemoCard.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryRecentCard.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryRecentLines.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryRecentLines.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryTransferPanel.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryTransferPanel.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryTypeSwitch.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryTypeSwitch.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptArt.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptArt.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptArt.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptArt.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptArt.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptCamera.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。documentCameraViewController は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptCamera.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。documentCameraViewController は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptCamera.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。documentCameraViewControllerDidCancel は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptCamera.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。makeCoordinator は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptCamera.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。makeUIViewController は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptCamera.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。updateUIViewController は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptShape.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptShape.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptShape.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Receipt/EntryReceiptTaxBreakdown.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet+Receipt.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet+Receipt.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet+Slip.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet+Slip.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet+Slip.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet+Slip.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet+Category.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet+Deck.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet+Deck.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet+Deck.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet+Deck.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet+Recent.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet+Sheets.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/View/EntrySheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceCard.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceCard.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。frames は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceCard.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceCard.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceCard.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceCard.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Voice/EntryVoiceFinishButton.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Onboarding/OnboardingView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Pro/ProComparison.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Pro/ProComparison.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Pro/ProComparison.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Pro/ProFeature.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Pro/ProHero.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Pro/ProHero.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Pro/ProHero.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/AppIcons/AppIconListView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/AppIcons/AppIconTile.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/AppIcons/AppIconTile.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Backup/BackupView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Backup/BackupView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Budgets/BudgetKeypadDrawer.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Budgets/BudgetListView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Budgets/BudgetListView.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Budgets/BudgetListView.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Budgets/BudgetListView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Budgets/BudgetListView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Categories/CategoryBoard.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Categories/CategoryEditSheet+Actions.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Categories/CategoryEditSheet.swift: L1: #Preview は、ファイルの最後に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Categories/CategoryEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/HomeSections/HomeSectionListView.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/HomeSections/HomeSectionListView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/HomeSections/HomeSectionListView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Menu/SettingsMenuSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringBoard.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringBoard.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringEditSheet+Drawer.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringEditSheet.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Recurring/RecurringLoanPlan.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Reminder/ReminderView+Notices.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Reminder/ReminderView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Reminder/ReminderView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/RewardRules/RewardRuleEditSheet.swift: L1: #Preview は、ファイルの最後に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/RewardRules/RewardRuleEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/RewardRules/RewardRuleEditSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/RewardRules/RewardRuleEditSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Stamps/StampEditSheet.swift: L1: #Preview は、ファイルの最後に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Stamps/StampEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Sync/SyncChoiceCard.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Sync/SyncInviteCard.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Sync/SyncView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Sync/SyncView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateBoard.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditSheet+Card.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditSheet.swift: L1: #Preview は、ファイルの最後に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditSheet.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateEditSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Templates/TemplateQuickCard.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleBackdrop.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleLookView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleLookView.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleLookView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleMarks.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleTextView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleTextView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleTextView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleTextView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleTextView.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyleTextView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeEditSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView+Menu.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView+Menu.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView+Menu.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Actions.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Actions.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Actions.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Actions.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Actions.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Kind.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Kind.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。kinds は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Kind.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。note は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet+Kind.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: L1: #Preview は、ファイルの最後に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage+Tile.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage+Tile.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Parts/AssetsBalanceTrend.swift: L7: 1 行の let の並びと最後の return だけのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Parts/AssetsBillSchedule.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsAdjustmentSheet.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsAdjustmentSheet.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsAdjustmentSheet.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsAdjustmentSheet.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsEntrySheet.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsOutlookSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsRewardGoalEditSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsRewardSheet.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/View/AssetsView+Bills.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/View/AssetsView+Outlook.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/View/AssetsView+Outlook.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/View/AssetsView.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeCustomizeCard.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeTemplateOrderButton.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView+Bills.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView+Budget.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView+Templates.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsCalendarCell.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsCalendarCell.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsCalendarCell.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsCalendarCell.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsCalendarCell.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsItemReceipt.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsItemReceipt.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsItemReceipt.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsMarkMenu.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsMarkMenu.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsSearchHistory.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Parts/RecordsSearchHistory.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Sheet/RecordsFilterSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Sheet/RecordsFilterSheet.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/Sheet/RecordsFilterSheet.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView+Buttons.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView+Calendar.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView+DayHeader.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView+Items.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView+Items.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Records/View/RecordsView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewEmphasisText.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewEmphasisText.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewEmphasisText.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewReportGauge.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewReportGauge.swift: L1: extension の順が違う。「private extension」は「適合」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewReportGauge.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewReportStat.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewShareSheet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/Parts/ReviewSharesCard.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Compare.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Compare.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Compare.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Compare.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Goal.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Goal.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Goal.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Streak.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Streak.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView+Streak.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewClosingView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewProgressView+Year.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewProgressView+Year.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewProgressView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewProgressView.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView+Analysis.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView+Analysis.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView+Content.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView+Detail.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView+Detail.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView+Upcoming.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Review/View/ReviewView.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Model/WhatsNewModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。choose は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Model/WhatsNewModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。isNew は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Model/WhatsNewModel.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。release は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Model/WhatsNewRelease.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Model/WhatsNewRelease.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Model/WhatsNewRelease.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Model/WhatsNewRelease.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewAnalysisScene.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewAnalysisScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewBillScene.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewBillScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewEntryScene.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewEntryScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewIconScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewIconScene.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewLoanScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewPadScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewRecurringScene.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewRecurringScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewReviewScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewScene.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewUpcomingScene.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewUpcomingScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewVoiceScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewWalletScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/Parts/WhatsNewWidgetScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewCard.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewCard.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewCard.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewCard.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewCard.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/WhatsNew/View/WhatsNewPagerScene.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillRow.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillRow.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/Bill/BillTabs.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArt.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArt.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArt.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArtMiniHome.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArtReceipt.swift: L1: extension の順が違う。「入れ子の型の宣言」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArtReceipt.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArtSample.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArtViewfinder.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArtViewfinder.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/FeatureArt/FeatureArtViewfinder.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/Notice/Deletion+Notice.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/Notice/EntryDeletionBanner.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/Notice/EntryDeletionBanner.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/Notice/EntryNoticeBanner.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardPage.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardScreen.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardSpec.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsBoardSpec.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsHiddenTiles.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsHiddenTiles.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Board/SettingsTileBoard.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsAutoScroll.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsAutoScroll.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsAutoScroll.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsDrag.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsDrag.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsDrag.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsDropZones.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsLiftLayer.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsLiftLayer.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsLiftLayer.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Drag/SettingsZoneBox.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Hint/SettingsIntroCard.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Hint/SettingsIntroCard.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Icon/SettingsIconEditor.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Icon/SettingsIconEditorDrawer.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Icon/SettingsIconEditorDrawer.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Input/SettingsAmountButton.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Input/SettingsBillShiftPicker.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Input/SettingsEditController.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Input/SettingsRowList.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Layout/SettingsBackHeader.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Layout/SettingsCaption.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。Kind は extension に出す
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Layout/SettingsEditHeader.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Tile/SettingsPagedGrid.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Tile/SettingsTileFace.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/SettingsParts/Tile/SettingsTileFace.swift: L2: 画面の部品と処理を、別の private extension に分ける。部品を先に置く
+ios/Packages/KakeibotApp/Sources/Features/Shared/Setup/SetupDestination.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Sync/SyncEngine+Send.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Sync/SyncEngine+Send.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Sync/SyncEngine+Send.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Sync/SyncEngine+Send.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Sync/SyncEngine+Share.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Sync/SyncEngine.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotApp/Sources/Sync/SyncRecord+CloudKit.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Sync/SyncRecord+CloudKit.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotApp/Sources/Sync/SyncRoute+Queue.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotApp/Sources/Sync/SyncRoute+Queue.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Sync/SyncRoute+Queue.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Sync/SyncRoute+Send.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Sync/SyncRoute.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Sync/SyncShareSheet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotApp/Sources/Sync/SyncShareSheet.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotApp/Sources/Sync/SyncShareSheet.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Budget/Budget.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Category/EntryCategoryDraft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Category/EntryTagDraft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Date/HolidayShift.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。apply は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Date/LocalDate.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Date/Weekday.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。daysSinceMonday は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Date/Weekday.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。week は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Date/YearMonth.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Date/YearMonth.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/AmountCalculator.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDay.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDay.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDay.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDraft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDraft.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDraft.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDraft.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDraft.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDraft.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryDraft.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryList+Template.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryList.swift: L1: extension の順が違う。「外に見せる値と関数」は「適合」より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryList.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryTemplate.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryTemplateDraft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Entry/EntryTemplateDraft.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Export/V1/ExportV1+CSV.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Export/V1/ExportV1+CSV.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Export/V1/ExportV1.swift: L1: extension の順が違う。「入れ子の型の中身」は「適合」より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Export/V1/ExportV1.swift: L1: extension の順が違う。「入れ子の型の宣言」は「外に見せる値と関数」より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Export/V1/ExportV1.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Icon/Icon+Mark.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Icon/IconDraft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Icon/StampBook.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Notification/NotificationPlan.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Notification/NotificationPlan.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Notification/PlannedNotification.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Notification/PlannedNotification.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。link は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLabels.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Kind.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Words.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Words.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Words.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Words.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Words.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Words.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine+Words.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptLine.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptReading+Builder.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptReading+Builder.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptReading+ReceiptLabels.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptReading+ReceiptLabels.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptReading.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptSuspect.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Receipt/ReceiptSuspect.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/CardBill.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/LoanPayoff.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/PeriodRecurring.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/Recurring+CardBill.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/Recurring+CardBill.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/Recurring+Schedule.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/Recurring+Schedule.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/Recurring+Schedule.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/Recurring+Schedule.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/RecurringDraft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/RecurringDraft.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/RepaymentPlan.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Recurring/RepaymentPlan.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewClosingFacts.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewComment.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewComment.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewComment.swift: L6: 複数行の宣言の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewCompare+Why.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewCompare+Why.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewCompare+Why.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewCompare.swift: L1: extension の順が違う。「private extension」は「入れ子の型の中身」より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewCompare.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewCompare.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。countEffect は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。pastUnitPrice は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。priceEffect は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。unitPrice は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L7: 1 行の let の並びと最後の return だけのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Make.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal+Progress.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewGoal.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewPace.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewPeriod.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Review/ReviewSummary.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Reward/RewardBank.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Reward/RewardRuleList.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Setting/HomeLayout.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Setting/HomeLayout.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。section は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Setting/HomeSection.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Setting/TemplateOrder.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。id は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/Theme.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemeChoice.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。text は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemeCorner.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。scale は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemeDraft.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemeLook.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。palette は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Contrast.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Mix.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Mix.swift: L7: 1 行の let の並びと最後の return だけのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Semantic.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Semantic.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Semantic.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。dark は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Semantic.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。light は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette+Semantic.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePalette.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePreset.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。palette は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePreset.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。title は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemePreset.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemeRowSpacing.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。minHeight は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemeRowSpacing.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。padding は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Theme/ThemeTextSize.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。scale は extension に出す
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceReading.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText+Number.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText+Number.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText+Number.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText+Number.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Voice/VoiceText.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Wallet/Holdings.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Concepts/Wallet/Valuation.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Shared/Deletion+Subject.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Core/Shared/Deletion+Subject.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Core/Shared/Percent.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Shared/Percent.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Core/Shared/Yen.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Store/Database/AppDatabase+Defaults.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Database/AppDatabase+Defaults.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Database/AppDatabase.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Database/AppDatabase.swift: L6: 同じまとまりの 1 行の宣言の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Database/AppDatabase.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Database/AppDatabase.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Migrations/MigrationSyncTriggers.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Migrations/MigrationV040.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Queries/Methods/AppDatabase+MonthOverview.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Queries/Methods/AppDatabase+NotificationInput.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Records/Protocols/ArchivableRecord.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Records/Protocols/SortableRecord.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/Entry+Record.swift: L1: extension の順が違う。「外に見せる値と関数」は「適合」より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/EntryCategory+Record.swift: L5: 実装のある適合は、1 つの適合につき 1 つの extension に分ける
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/Icon+Record.swift: L1: extension の順が違う。「外に見せる値と関数」は「適合」より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/Recurring+Record.swift: L1: extension の順が違う。「外に見せる値と関数」は「適合」より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/Recurring+Record.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/RewardRule+Record.swift: L5: 実装のある適合は、1 つの適合につき 1 つの extension に分ける
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/RewardRule+Record.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/ShelfIcon+Record.swift: L5: 実装のある適合は、1 つの適合につき 1 つの extension に分ける
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/Wallet+Record.swift: L5: 実装のある適合は、1 つの適合につき 1 つの extension に分ける
+ios/Packages/KakeibotKit/Sources/Store/Records/Rows/Wallet+Record.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Records/SettingKeys/SettingKey+Calendar.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/SettingKeys/SettingKey+Calendar.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/SettingKeys/SettingKey+Calendar.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/SettingKeys/SettingKey+Calendar.swift: L1: extension の順が違う。「外に見せる値と関数」は「private extension」より前に置く
+ios/Packages/KakeibotKit/Sources/Store/Records/SettingKeys/SettingKey.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
+ios/Packages/KakeibotKit/Sources/Store/Records/SettingKeys/SettingKey.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Snapshot/AppDatabase+Snapshot.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncApply.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncApply.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncApply.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncApply.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncApply.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncLeave.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShare.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShare.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShareCopy.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShareCopy.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShareCopy.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShareCopy.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShareRecord.swift: L1: ほかの型の extension は、このファイルの型の後に置く
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncShareRecord.swift: L7: 段落（準備・実行・出口）が変わる所には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Store/Sync/Methods/AppDatabase+SyncSharedCategory.swift: L7: 複数行の文の前後には、空行を入れる
+ios/Packages/KakeibotKit/Sources/Store/Sync/Types/SyncTable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。UniqueKey は extension に出す
+ios/Packages/KakeibotKit/Sources/Store/Sync/Types/SyncTable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。hasUpdatedAt は extension に出す
+ios/Packages/KakeibotKit/Sources/Store/Sync/Types/SyncTable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。keyColumn は extension に出す
+ios/Packages/KakeibotKit/Sources/Store/Sync/Types/SyncTable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。parentOrder は extension に出す
+ios/Packages/KakeibotKit/Sources/Store/Sync/Types/SyncTable.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。uniqueKeys は extension に出す
+ios/Packages/KakeibotKit/Sources/Store/Sync/Types/SyncValue.swift: L3: 型の本体には、保存プロパティ・case・init だけを置く。databaseValue は extension に出す
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Budget.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Budget.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+CardBill.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+CardBill.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Entry.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Entry.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Entry.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Entry.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Entry.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryCategory.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryCategory.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryCategory.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryCategory.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryItem.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryItem.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryRestore.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryRestore.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryRestore.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+EntryTemplate.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+NoSpendDay.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Recurring.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Recurring.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Recurring.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Recurring.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+RewardGoal.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+RewardGoal.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+RewardRule.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+ShelfIcon.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Theme.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Wallet.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+Wallet.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotKit/Sources/Store/Writes/Methods/AppDatabase+WidgetEntry.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
+ios/Packages/KakeibotKit/Sources/Store/Writes/Types/IconDraft+IconBacked.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない
+ios/Packages/KakeibotKit/Sources/Store/Writes/Types/IconDraft+IconBacked.swift: L7: 1 行の文が 3 つまでのブロックには、空行を入れない

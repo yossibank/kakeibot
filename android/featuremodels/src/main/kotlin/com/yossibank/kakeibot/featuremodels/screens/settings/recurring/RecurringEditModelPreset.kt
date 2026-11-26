@@ -1,6 +1,25 @@
 package com.yossibank.kakeibot.featuremodels.screens.settings.recurring
 
+import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.shared.Identifier
+
+fun RecurringEditModel.select(type: Entry.Kind) {
+    if (type == state.form.type) {
+        return
+    }
+
+    state.update { copy(type = type) }
+    state.update { copy(categoryId = output.categories.firstOrNull()?.id) }
+
+    presetDestination()
+    suggestHolidayShift()
+}
+
+fun RecurringEditModel.select(category: Identifier<EntryCategory>) {
+    state.update { copy(categoryId = category) }
+    suggestHolidayShift()
+}
 
 internal fun RecurringEditModel.chooseCountMode() {
     if (!output.isEditing) {

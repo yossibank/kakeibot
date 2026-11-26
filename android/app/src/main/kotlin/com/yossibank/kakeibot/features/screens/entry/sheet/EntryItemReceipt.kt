@@ -68,6 +68,7 @@ import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasItemAdjustment
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.itemCount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.itemTotals

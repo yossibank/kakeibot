@@ -45,6 +45,7 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.billDates
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.billRecurring
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.categories
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.isCardBill
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.select
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.walletTitle
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.wallets
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryText

@@ -75,6 +75,8 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel.DeleteTarget
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringListModel.Editing
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.hiddenRows
+import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.rows
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.perform

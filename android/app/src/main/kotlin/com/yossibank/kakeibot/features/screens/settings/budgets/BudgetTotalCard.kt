@@ -59,6 +59,9 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.recurringText
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.startText
+import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.usage
 import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton

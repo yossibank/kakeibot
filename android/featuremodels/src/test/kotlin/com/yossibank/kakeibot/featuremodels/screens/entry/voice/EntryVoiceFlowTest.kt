@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.voice
 
 import android.content.ContextWrapper
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.loadedModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
