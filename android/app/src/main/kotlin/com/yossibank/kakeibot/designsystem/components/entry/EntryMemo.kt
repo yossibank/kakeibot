@@ -54,7 +54,6 @@ fun EntryMemo(
     var isExpanded by remember { mutableStateOf(false) }
     var isTruncated by remember { mutableStateOf(false) }
     var lineHeight by remember { mutableFloatStateOf(0f) }
-
     val canExpand = isExpanded || isTruncated
     val angle by animateFloatAsState(if (isExpanded) 270f else 90f)
     val toggleWidth = with(LocalDensity.current) { TOGGLE_WIDTH.toSp() }
@@ -127,7 +126,6 @@ fun EntryMemo(
             inlineContent = room,
             onTextLayout = { layout ->
                 val last = layout.lineCount - 1
-
                 isTruncated = layout.hasVisualOverflow
                 lineHeight = layout.getLineBottom(last) - layout.getLineTop(last)
             },

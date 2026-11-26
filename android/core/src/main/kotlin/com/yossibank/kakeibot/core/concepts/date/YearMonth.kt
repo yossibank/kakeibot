@@ -15,12 +15,46 @@ data class YearMonth private constructor(
     val year: Int,
     val month: Int,
 ) : Comparable<YearMonth> {
+    override fun compareTo(other: YearMonth): Int = monthIndex.compareTo(other.monthIndex)
+
+    override fun toString(): String {
+        val yearText = DateText.padded(
+            value = year,
+            digits = 4,
+        )
+
+        val monthText = DateText.padded(
+            value = month,
+            digits = 2,
+        )
+
+        return "$yearText-$monthText"
+    }
+
     val numberOfDays: Int
         get() = when (month) {
             2 -> if (isLeapYear) 29 else 28
             4, 6, 9, 11 -> 30
             else -> 31
         }
+
+    fun adding(months: Int): YearMonth = ofMonthIndex(monthIndex + months)
+
+    fun weeks(startingOn: Weekday): List<List<LocalDate?>> {
+        val first = LocalDate.ofClamped(
+            yearMonth = this,
+            clampedDay = 1,
+        )
+
+        val last = first.adding(days = numberOfDays - 1)
+
+        return (first..last).weeks(startingOn)
+    }
+
+    fun period(startingOn: MonthStartDay): ClosedRange<LocalDate> {
+        val startMonth = startingOn.startMonth(ofPeriodIn = this)
+        return startingOn.period(startingIn = startMonth)
+    }
 
     internal val monthIndex: Int
         get() = year * 12 + month - 1
@@ -42,40 +76,6 @@ data class YearMonth private constructor(
             val isCentury = year % 100 == 0
             return isFourth && (!isCentury || year % 400 == 0)
         }
-
-    fun adding(months: Int): YearMonth = ofMonthIndex(monthIndex + months)
-
-    fun weeks(startingOn: Weekday): List<List<LocalDate?>> {
-        val first = LocalDate.ofClamped(
-            yearMonth = this,
-            clampedDay = 1,
-        )
-
-        val last = first.adding(days = numberOfDays - 1)
-
-        return (first..last).weeks(startingOn)
-    }
-
-    fun period(startingOn: MonthStartDay): ClosedRange<LocalDate> {
-        val startMonth = startingOn.startMonth(ofPeriodIn = this)
-        return startingOn.period(startingIn = startMonth)
-    }
-
-    override fun compareTo(other: YearMonth): Int = monthIndex.compareTo(other.monthIndex)
-
-    override fun toString(): String {
-        val yearText = DateText.padded(
-            value = year,
-            digits = 4,
-        )
-
-        val monthText = DateText.padded(
-            value = month,
-            digits = 2,
-        )
-
-        return "$yearText-$monthText"
-    }
 
     companion object {
         private val daysBeforeMonthInCommonYear = listOf(

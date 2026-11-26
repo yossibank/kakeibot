@@ -2,8 +2,6 @@ package com.yossibank.kakeibot.core.concepts.notification
 
 import java.net.URI
 
-private const val scheme = "kakeibot"
-
 val PlannedNotification.Route.url: URI?
     get() = runCatching { URI("$scheme://$link") }.getOrNull()
 
@@ -17,3 +15,5 @@ fun PlannedNotification.Route.Companion.of(url: URI): PlannedNotification.Route?
 
     return PlannedNotification.Route.of(link = link)
 }
+
+private const val scheme = "kakeibot"

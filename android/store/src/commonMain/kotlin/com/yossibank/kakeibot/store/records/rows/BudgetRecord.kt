@@ -70,10 +70,12 @@ fun Budget.record(): BudgetRecord = BudgetRecord(
 
 fun BudgetRecord.budget(): Budget? {
     val id = Identifier.fromDatabaseValue<Budget>(id) ?: return null
+
     val categoryId = categoryId?.let {
         Identifier.fromDatabaseValue<EntryCategory>(it)
             ?: return null
     }
+
     val fromMonth = YearMonth.fromDatabaseValue(fromMonth) ?: return null
 
     return Budget(

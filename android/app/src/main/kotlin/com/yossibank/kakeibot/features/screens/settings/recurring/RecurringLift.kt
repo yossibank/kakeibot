@@ -47,15 +47,12 @@ class RecurringLift {
     ): Int {
         dragY += amount.y
         pointer = pointer?.plus(amount)
-
         return (y / slot).roundToInt()
     }
 
     fun end(): Identifier<Recurring>? {
         val hiding = id.takeIf { isOverHide }
-
         cancel()
-
         return hiding
     }
 

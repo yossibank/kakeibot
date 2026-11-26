@@ -9,11 +9,6 @@ import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import kotlin.math.abs
 
 class EntryItemEditor {
-    enum class Target {
-        Unit,
-        Quantity,
-    }
-
     var isOpen by mutableStateOf(false)
     var name by mutableStateOf("")
     var unit by mutableStateOf(AmountCalculator())
@@ -26,6 +21,11 @@ class EntryItemEditor {
 
     val removed = UndoNoticeState<RemovedItem>()
 
+    enum class Target {
+        Unit,
+        Quantity,
+    }
+
     val trimmedName: String
         get() = name.trim()
 
@@ -34,18 +34,6 @@ class EntryItemEditor {
 
     val activeCalculator: AmountCalculator
         get() = if (target == Target.Unit) unit else quantity
-
-    private val keptItem: EntryItem.Draft?
-        get() {
-            val item = editingItem ?: return null
-            val price = item.unitPrice()
-
-            val isSame = unit.amount == abs(price.first) &&
-                quantity.amount == price.second &&
-                isDiscount == (item.amount < 0)
-
-            return if (isSame) item else null
-        }
 
     val lineQuantity: Int
         get() = keptItem?.quantity ?: quantityValue
@@ -171,4 +159,16 @@ class EntryItemEditor {
         model.restoreItem(item)
         removed.dismiss()
     }
+
+    private val keptItem: EntryItem.Draft?
+        get() {
+            val item = editingItem ?: return null
+            val price = item.unitPrice()
+
+            val isSame = unit.amount == abs(price.first) &&
+                quantity.amount == price.second &&
+                isDiscount == (item.amount < 0)
+
+            return if (isSame) item else null
+        }
 }

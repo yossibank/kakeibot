@@ -127,6 +127,27 @@ fun RecurringQuickCard(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun DayGrid(
+    selection: Int?,
+    onSelect: (Int) -> Unit,
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        MonthStartDay.allDays.forEach { day ->
+            ChoiceChip(
+                title = if (day.isLastDay) "末日" else "${day.day}",
+                isSelected = day.day == selection,
+                onSelect = { onSelect(day.day) },
+                modifier = Modifier.widthIn(min = 40.dp),
+            )
+        }
+    }
+}
+
 @Composable
 private fun Section(
     title: String,
@@ -313,27 +334,6 @@ private fun Schedule(model: RecurringEditModel) {
             DayGrid(
                 selection = model.state.form.day,
                 onSelect = { day -> model.state.update { copy(day = day) } },
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-fun DayGrid(
-    selection: Int?,
-    onSelect: (Int) -> Unit,
-) {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        MonthStartDay.allDays.forEach { day ->
-            ChoiceChip(
-                title = if (day.isLastDay) "末日" else "${day.day}",
-                isSelected = day.day == selection,
-                onSelect = { onSelect(day.day) },
-                modifier = Modifier.widthIn(min = 40.dp),
             )
         }
     }

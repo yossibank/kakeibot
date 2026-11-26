@@ -153,7 +153,6 @@ fun EntrySheet(
     }
 
     BackHandler(onBack = ::close)
-
     BackHandler(enabled = voice.output.isActive, onBack = voice::cancel)
 
     HapticEffect(
@@ -227,6 +226,7 @@ fun EntrySheet(
                         today = today,
                         onOpenSettings = {
                             voice.cancel()
+
                             context.startActivity(
                                 Intent(
                                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,

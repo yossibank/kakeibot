@@ -233,11 +233,6 @@ private fun SummaryValue(
     }
 }
 
-private val layouts = listOf(
-    RecordsLayout.calendar to "カレンダー",
-    RecordsLayout.list to "一覧",
-)
-
 @Composable
 private fun EmptyCard() {
     Text(
@@ -254,3 +249,8 @@ private fun EmptyCard() {
         style = textFont(style = FontTextStyle.Subheadline),
     )
 }
+
+private val layouts = listOf(
+    RecordsLayout.calendar to "カレンダー",
+    RecordsLayout.list to "一覧",
+)

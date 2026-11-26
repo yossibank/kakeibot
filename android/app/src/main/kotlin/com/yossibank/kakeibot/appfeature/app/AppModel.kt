@@ -57,6 +57,10 @@ class AppModel(
         data object Failed : Launch
     }
 
+    override fun onCleared() {
+        (launch as? Launch.Ready)?.database?.close()
+    }
+
     fun open(openDatabase: suspend () -> AppDatabase) {
         if (opening != null || launch != Launch.Opening) {
             return
@@ -67,10 +71,9 @@ class AppModel(
 
             try {
                 val opened = openDatabase()
+
                 database = opened
-
                 generateRecurring(opened)
-
                 look = opened.themeLook()
                 style = opened.style()
 
@@ -104,7 +107,6 @@ class AppModel(
         }
 
         launch = Launch.Opening
-
         open(openDatabase)
     }
 
@@ -118,10 +120,6 @@ class AppModel(
         }
 
         observeNotifications(database)
-    }
-
-    override fun onCleared() {
-        (launch as? Launch.Ready)?.database?.close()
     }
 
     private fun observeTheme(database: AppDatabase) {

@@ -129,10 +129,6 @@ class RecordsModel(
             input.list?.days?.within(period) ?: emptyList()
         }
 
-        private val daysByDate: Map<LocalDate, EntryDay> by derivedStateOf {
-            days.associateBy { it.date }
-        }
-
         val expenseTotal: Long
             get() = days.expenseTotal
 
@@ -157,6 +153,10 @@ class RecordsModel(
                 )
             }
         }
+
+        private val daysByDate: Map<LocalDate, EntryDay> by derivedStateOf {
+            days.associateBy { it.date }
+        }
     }
 
     private class Dependencies(
@@ -171,6 +171,21 @@ class RecordsModel(
 
     fun retry() {
         dependencies.round.restart()
+    }
+
+    fun move(months: Int) {
+        state.move(to = output.shownMonth.adding(months = months))
+    }
+
+    suspend fun select(layout: RecordsLayout) {
+        input.layout = layout
+
+        state.task.attempt(failure = ModelTask.saveFailed) {
+            dependencies.database.setSetting(
+                key = SettingKey.recordsLayout,
+                to = layout,
+            )
+        }
     }
 
     private suspend fun observeAll() {
@@ -204,21 +219,6 @@ class RecordsModel(
                     input.isLoaded = true
                 }
             }
-        }
-    }
-
-    fun move(months: Int) {
-        state.move(to = output.shownMonth.adding(months = months))
-    }
-
-    suspend fun select(layout: RecordsLayout) {
-        input.layout = layout
-
-        state.task.attempt(failure = ModelTask.saveFailed) {
-            dependencies.database.setSetting(
-                key = SettingKey.recordsLayout,
-                to = layout,
-            )
         }
     }
 

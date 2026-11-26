@@ -8,9 +8,6 @@ data class Setting(
     val key: Key,
     val value: String,
 ) {
-    val id: Key
-        get() = key
-
     @Serializable
     enum class Key(
         val rawValue: String,
@@ -143,4 +140,7 @@ data class Setting(
             fun of(rawValue: String): Key? = entries.firstOrNull { it.rawValue == rawValue }
         }
     }
+
+    val id: Key
+        get() = key
 }

@@ -12,7 +12,6 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import kotlinx.coroutines.flow.drop
 
 val LocalTabNoticeRound = compositionLocalOf { 0 }
-
 val LocalTabNoticeShown = staticCompositionLocalOf<() -> Unit> { {} }
 
 @Composable

@@ -32,6 +32,22 @@ fun ThemePalette.Companion.contrast(
 internal val ThemePalette.Companion.surfaces: List<ThemePalette.Role>
     get() = surfaceRoles
 
+private fun luminance(rgb: Int): Double {
+    val channels = listOf(rgb shr 16, rgb shr 8, rgb).map { value ->
+        val ratio = (value and 0xFF).toDouble() / 255
+        val linear = (ratio + 0.055) / 1.055
+
+        if (ratio <= 0.04045) ratio / 12.92 else linear.pow(2.4)
+    }
+
+    return channels.zip(luminanceWeights) { channel, weight ->
+        channel * weight
+    }.fold(0.0) { sum, part ->
+        sum +
+            part
+    }
+}
+
 private val surfaceRoles = listOf(
     ThemePalette.Role.backgroundTop,
     ThemePalette.Role.backgroundBottom,
@@ -49,19 +65,3 @@ private val readableRoles = listOf(
 )
 
 private val luminanceWeights = listOf(0.2126, 0.7152, 0.0722)
-
-private fun luminance(rgb: Int): Double {
-    val channels = listOf(rgb shr 16, rgb shr 8, rgb).map { value ->
-        val ratio = (value and 0xFF).toDouble() / 255
-        val linear = (ratio + 0.055) / 1.055
-
-        if (ratio <= 0.04045) ratio / 12.92 else linear.pow(2.4)
-    }
-
-    return channels.zip(luminanceWeights) { channel, weight ->
-        channel * weight
-    }.fold(0.0) { sum, part ->
-        sum +
-            part
-    }
-}

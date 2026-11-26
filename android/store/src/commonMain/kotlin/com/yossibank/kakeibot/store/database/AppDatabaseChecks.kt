@@ -89,6 +89,12 @@ internal object AppDatabaseChecks : RoomDatabase.Callback() {
         )
     """.trimIndent()
 
+    override fun onCreate(connection: SQLiteConnection) {
+        for (statement in statements) {
+            connection.execSQL(statement)
+        }
+    }
+
     val statements: List<String>
         get() {
             val checks = conditions.flatMap { (table, conditions) ->
@@ -120,12 +126,6 @@ internal object AppDatabaseChecks : RoomDatabase.Callback() {
 
             return checks + budget
         }
-
-    override fun onCreate(connection: SQLiteConnection) {
-        for (statement in statements) {
-            connection.execSQL(statement)
-        }
-    }
 
     private fun trigger(
         name: String,

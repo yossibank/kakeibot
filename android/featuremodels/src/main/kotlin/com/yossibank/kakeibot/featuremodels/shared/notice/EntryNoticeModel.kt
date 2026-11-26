@@ -42,15 +42,6 @@ class EntryNoticeModel(
         var count: Int by mutableIntStateOf(0)
             private set
 
-        internal fun show(notice: Notice) {
-            this.notice = notice
-            count += 1
-        }
-
-        internal fun clear() {
-            notice = null
-        }
-
         @Composable
         fun Timer() {
             val notice = notice ?: return
@@ -63,6 +54,15 @@ class EntryNoticeModel(
                     clear()
                 }
             }
+        }
+
+        internal fun show(notice: Notice) {
+            this.notice = notice
+            count += 1
+        }
+
+        internal fun clear() {
+            notice = null
         }
     }
 

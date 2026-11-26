@@ -17,6 +17,11 @@ class HomeLayout private constructor(
         }
     }
 
+    override fun equals(other: Any?): Boolean =
+        other is HomeLayout && order == other.order && hidden == other.hidden
+
+    override fun hashCode(): Int = 31 * order.hashCode() + hidden.hashCode()
+
     val visible: List<HomeSection>
         get() = order.filter { it !in hidden }
 
@@ -84,11 +89,6 @@ class HomeLayout private constructor(
             hidden = hidden + section,
         )
     }
-
-    override fun equals(other: Any?): Boolean =
-        other is HomeLayout && order == other.order && hidden == other.hidden
-
-    override fun hashCode(): Int = 31 * order.hashCode() + hidden.hashCode()
 
     companion object {
         val standard = HomeLayout()

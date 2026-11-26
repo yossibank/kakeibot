@@ -119,59 +119,6 @@ data class RecurringDraft(
             return problems
         }
 
-    private val categoryProblems: List<Problem>
-        get() = when (type) {
-            Entry.Kind.expense,
-            Entry.Kind.income,
-            -> if (categoryId == null) listOf(Problem.missingCategory) else emptyList()
-
-            Entry.Kind.transfer -> if (categoryId ==
-                null
-            ) {
-                emptyList()
-            } else {
-                listOf(Problem.categoryOnTransfer)
-            }
-        }
-
-    private val destinationProblems: List<Problem>
-        get() {
-            if (type != Entry.Kind.transfer) {
-                return emptyList()
-            }
-
-            val toWalletId = toWalletId ?: return listOf(Problem.missingDestination)
-
-            return if (toWalletId == walletId) listOf(Problem.sameWallet) else emptyList()
-        }
-
-    private val destination: Identifier<Wallet>?
-        get() = if (type == Entry.Kind.transfer) toWalletId else null
-
-    private val cardClosingDay: Int?
-        get() = if (type == Entry.Kind.transfer) closingDay else null
-
-    private val savedFee: Int?
-        get() = if (type == Entry.Kind.transfer && fee > 0) fee else null
-
-    private val savedFinalAmount: Int?
-        get() {
-            val isSaved = endDate != null && cardClosingDay == null && finalAmount > 0
-            return if (isSaved) finalAmount else null
-        }
-
-    private val savedBillShift: Int
-        get() = if (type == Entry.Kind.transfer) 0 else Recurring.clampedBillShift(billShift)
-
-    private val savedAmount: Int
-        get() = if (cardClosingDay == null) amount else 0
-
-    private val yearlyMonth: Int?
-        get() = if (frequency == Recurring.Frequency.yearly) month else null
-
-    private val trimmedMemo: String?
-        get() = memo.trim().ifEmpty { null }
-
     fun newRecurring(at: Instant): Recurring {
         val fields = validated()
 
@@ -225,6 +172,59 @@ data class RecurringDraft(
             updatedAt = at,
         )
     }
+
+    private val categoryProblems: List<Problem>
+        get() = when (type) {
+            Entry.Kind.expense,
+            Entry.Kind.income,
+            -> if (categoryId == null) listOf(Problem.missingCategory) else emptyList()
+
+            Entry.Kind.transfer -> if (categoryId ==
+                null
+            ) {
+                emptyList()
+            } else {
+                listOf(Problem.categoryOnTransfer)
+            }
+        }
+
+    private val destinationProblems: List<Problem>
+        get() {
+            if (type != Entry.Kind.transfer) {
+                return emptyList()
+            }
+
+            val toWalletId = toWalletId ?: return listOf(Problem.missingDestination)
+
+            return if (toWalletId == walletId) listOf(Problem.sameWallet) else emptyList()
+        }
+
+    private val destination: Identifier<Wallet>?
+        get() = if (type == Entry.Kind.transfer) toWalletId else null
+
+    private val cardClosingDay: Int?
+        get() = if (type == Entry.Kind.transfer) closingDay else null
+
+    private val savedFee: Int?
+        get() = if (type == Entry.Kind.transfer && fee > 0) fee else null
+
+    private val savedFinalAmount: Int?
+        get() {
+            val isSaved = endDate != null && cardClosingDay == null && finalAmount > 0
+            return if (isSaved) finalAmount else null
+        }
+
+    private val savedBillShift: Int
+        get() = if (type == Entry.Kind.transfer) 0 else Recurring.clampedBillShift(billShift)
+
+    private val savedAmount: Int
+        get() = if (cardClosingDay == null) amount else 0
+
+    private val yearlyMonth: Int?
+        get() = if (frequency == Recurring.Frequency.yearly) month else null
+
+    private val trimmedMemo: String?
+        get() = memo.trim().ifEmpty { null }
 
     private fun validated(): Fields {
         problems.firstOrNull()?.let {

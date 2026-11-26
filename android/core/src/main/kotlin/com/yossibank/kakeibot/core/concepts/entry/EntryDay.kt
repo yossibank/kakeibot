@@ -9,7 +9,6 @@ data class EntryDay(
     val entries: List<Entry>,
 ) {
     val expenseTotal: Long = total(Entry.Kind.expense, entries)
-
     val incomeTotal: Long = total(Entry.Kind.income, entries)
 
     companion object {

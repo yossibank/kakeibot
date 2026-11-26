@@ -8,16 +8,6 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceResult
 internal class EntryVoiceRecognizer private constructor(
     private val recognizer: SpeechRecognizer,
 ) : EntryVoiceSource {
-    companion object {
-        fun make(context: Context): EntryVoiceSource? {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                return null
-            }
-
-            return EntryVoiceRecognizer(SpeechRecognizer.createOnDeviceSpeechRecognizer(context))
-        }
-    }
-
     override fun start(
         hints: List<String>,
         receive: (EntryVoiceEvent) -> Unit,
@@ -39,4 +29,14 @@ internal class EntryVoiceRecognizer private constructor(
     }
 
     override fun download(): Outcome = EntryVoiceSpeech.download(recognizer)
+
+    companion object {
+        fun make(context: Context): EntryVoiceSource? {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                return null
+            }
+
+            return EntryVoiceRecognizer(SpeechRecognizer.createOnDeviceSpeechRecognizer(context))
+        }
+    }
 }

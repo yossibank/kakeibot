@@ -33,7 +33,6 @@ data class EntryList(
     val items: Map<Identifier<Entry>, List<EntryItem>> = emptyMap(),
 ) {
     val entries: List<Entry> = days.flatMap { it.entries }
-
     val entriesByWallet: Map<Identifier<Wallet>, List<Entry>> = Wallet.entriesByWallet(entries)
 
     fun balance(

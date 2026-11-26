@@ -30,12 +30,6 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
-private val types = listOf(
-    Triple(Entry.Kind.expense, Entry.Kind.expense.title, R.drawable.ic_arrow_upward),
-    Triple(Entry.Kind.income, Entry.Kind.income.title, R.drawable.ic_arrow_downward),
-    Triple(Entry.Kind.transfer, Entry.Kind.transfer.title, R.drawable.ic_swap),
-)
-
 @Composable
 fun EntryTypeSwitch(
     selection: Entry.Kind,
@@ -93,3 +87,9 @@ fun EntryTypeSwitch(
         }
     }
 }
+
+private val types = listOf(
+    Triple(Entry.Kind.expense, Entry.Kind.expense.title, R.drawable.ic_arrow_upward),
+    Triple(Entry.Kind.income, Entry.Kind.income.title, R.drawable.ic_arrow_downward),
+    Triple(Entry.Kind.transfer, Entry.Kind.transfer.title, R.drawable.ic_swap),
+)

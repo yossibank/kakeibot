@@ -43,6 +43,50 @@ data class IconDraft(
         }
     }
 
+    override fun newIcon(at: Instant): Icon {
+        validate()
+
+        return Icon(
+            emoji = emoji,
+            text = text,
+            glyph = glyph,
+            color = color,
+            createdAt = at,
+            updatedAt = at,
+        )
+    }
+
+    override fun newValue(
+        iconId: Identifier<Icon>,
+        sortOrder: Int,
+        at: Instant,
+    ): ShelfIcon = ShelfIcon(
+        iconId = iconId,
+        sortOrder = sortOrder,
+        createdAt = at,
+        updatedAt = at,
+    )
+
+    override fun applied(
+        to: Icon,
+        at: Instant,
+    ): Icon {
+        validate()
+
+        return to.copy(
+            emoji = emoji,
+            text = text,
+            glyph = glyph,
+            color = color,
+            updatedAt = at,
+        )
+    }
+
+    override fun applied(
+        to: ShelfIcon,
+        at: Instant,
+    ): ShelfIcon = to.copy(updatedAt = at)
+
     val problems: List<DraftProblem>
         get() {
             val colorProblems = if (isValidColor) emptyList() else listOf(DraftProblem.invalidColor)
@@ -88,53 +132,8 @@ data class IconDraft(
     private val text: String?
         get() = (mark as? Mark.Text)?.let { trimmed(it.value) }
 
-    override fun newIcon(at: Instant): Icon {
-        validate()
-
-        return Icon(
-            emoji = emoji,
-            text = text,
-            glyph = glyph,
-            color = color,
-            createdAt = at,
-            updatedAt = at,
-        )
-    }
-
-    override fun newValue(
-        iconId: Identifier<Icon>,
-        sortOrder: Int,
-        at: Instant,
-    ): ShelfIcon = ShelfIcon(
-        iconId = iconId,
-        sortOrder = sortOrder,
-        createdAt = at,
-        updatedAt = at,
-    )
-
-    override fun applied(
-        to: Icon,
-        at: Instant,
-    ): Icon {
-        validate()
-
-        return to.copy(
-            emoji = emoji,
-            text = text,
-            glyph = glyph,
-            color = color,
-            updatedAt = at,
-        )
-    }
-
-    override fun applied(
-        to: ShelfIcon,
-        at: Instant,
-    ): ShelfIcon = to.copy(updatedAt = at)
-
     private fun validate() {
         val problem = problems.firstOrNull() ?: return
-
         throw DraftProblemException(problem)
     }
 

@@ -63,6 +63,12 @@ fun Wallet.balance(
     }
 }
 
+internal fun Wallet.change(entry: Entry): Long = when (entry.type) {
+    Entry.Kind.expense -> if (entry.walletId == id) -entry.amount.toLong() else 0
+    Entry.Kind.income -> if (entry.walletId == id) entry.amount.toLong() else 0
+    Entry.Kind.transfer -> transferChange(entry)
+}
+
 private fun Wallet.latestValuation(
     valuations: List<Valuation>,
     through: LocalDate?,
@@ -71,12 +77,6 @@ private fun Wallet.latestValuation(
         valuation.walletId == id && (through == null || valuation.date <= through)
     }
     .maxByOrNull { it.date }
-
-internal fun Wallet.change(entry: Entry): Long = when (entry.type) {
-    Entry.Kind.expense -> if (entry.walletId == id) -entry.amount.toLong() else 0
-    Entry.Kind.income -> if (entry.walletId == id) entry.amount.toLong() else 0
-    Entry.Kind.transfer -> transferChange(entry)
-}
 
 private fun Wallet.transferChange(entry: Entry): Long {
     val outgoing = if (entry.walletId == id) -entry.amount.toLong() else 0L

@@ -344,6 +344,12 @@ private fun CategoryRow(row: ReviewModel.Row) {
     }
 }
 
+private fun title(of: ReviewKind): String = when (of) {
+    ReviewKind.expense -> "支出"
+    ReviewKind.income -> "収入"
+    ReviewKind.balance -> "収支"
+}
+
 private val scales = listOf(
     ReviewPeriod.Scale.week to "週",
     ReviewPeriod.Scale.month to "月",
@@ -351,9 +357,3 @@ private val scales = listOf(
 )
 
 private val kinds = ReviewKind.entries.map { it to title(of = it) }
-
-private fun title(of: ReviewKind): String = when (of) {
-    ReviewKind.expense -> "支出"
-    ReviewKind.income -> "収入"
-    ReviewKind.balance -> "収支"
-}

@@ -17,6 +17,20 @@ data class LocalDate private constructor(
     val yearMonth: YearMonth,
     val day: Int,
 ) : Comparable<LocalDate> {
+    override fun compareTo(other: LocalDate): Int {
+        val monthOrder = yearMonth.compareTo(other.yearMonth)
+        return if (monthOrder != 0) monthOrder else day.compareTo(other.day)
+    }
+
+    override fun toString(): String {
+        val dayText = DateText.padded(
+            value = day,
+            digits = 2,
+        )
+
+        return "$yearMonth-$dayText"
+    }
+
     val year: Int
         get() = yearMonth.year
 
@@ -28,9 +42,6 @@ data class LocalDate private constructor(
 
     val weekday: Weekday
         get() = Weekday.of(daysSinceMonday = dayNumber)
-
-    internal val dayNumber: Int
-        get() = yearMonth.firstDayNumber + day - 1
 
     fun adding(days: Int): LocalDate = ofDayNumber(dayNumber + days)
 
@@ -56,23 +67,12 @@ data class LocalDate private constructor(
         return start..start.adding(days = 6)
     }
 
+    internal val dayNumber: Int
+        get() = yearMonth.firstDayNumber + day - 1
+
     internal fun period(startingOn: MonthStartDay): ClosedRange<LocalDate> {
         val startMonth = startingOn.startMonth(ofPeriodContaining = this)
         return startingOn.period(startingIn = startMonth)
-    }
-
-    override fun compareTo(other: LocalDate): Int {
-        val monthOrder = yearMonth.compareTo(other.yearMonth)
-        return if (monthOrder != 0) monthOrder else day.compareTo(other.day)
-    }
-
-    override fun toString(): String {
-        val dayText = DateText.padded(
-            value = day,
-            digits = 2,
-        )
-
-        return "$yearMonth-$dayText"
     }
 
     companion object {

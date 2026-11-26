@@ -13,7 +13,6 @@ fun ThemePalette.color(semantic: ThemePalette.Semantic): Int {
     val hsl = HSL.of(base)
     val directions = if (isLight) listOf(-1.0, 1.0) else listOf(1.0, -1.0)
     val shifts = directions.map { shifted(hsl, direction = it) }
-
     val found = shifts.firstNotNullOfOrNull { it.found }
 
     if (found != null) {
@@ -26,9 +25,6 @@ fun ThemePalette.color(semantic: ThemePalette.Semantic): Int {
         lowestContrast(first).compareTo(lowestContrast(second))
     } ?: base
 }
-
-private const val semanticMinimum = 3.0
-private const val semanticSteps = 100
 
 private class Shift(
     val found: Int?,
@@ -47,6 +43,7 @@ private class HSL(
             val sectorRemainder = sector % 2
             val mid = chroma * (1 - abs(sectorRemainder - 1))
             val offset = lightness - chroma / 2
+
             val parts = when (sector.toInt()) {
                 0 -> Triple(chroma, mid, 0.0)
                 1 -> Triple(mid, chroma, 0.0)
@@ -140,3 +137,6 @@ private fun ThemePalette.shifted(
         best = best,
     )
 }
+
+private const val semanticMinimum = 3.0
+private const val semanticSteps = 100

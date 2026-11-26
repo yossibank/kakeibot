@@ -121,10 +121,8 @@ fun RecurringListView(
     }
 
     model.state.task.Timer()
-
     hiddenNotice.Timer()
     deletedNotice.Timer()
-
     BackHandler(onBack = onBack)
 
     val actions = RecurringRowActions(

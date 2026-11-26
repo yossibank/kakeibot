@@ -183,7 +183,6 @@ class RecurringEditModel(
         state.task.attempt(failure = LOAD_FAILED) {
             input.options = dependencies.database.entryOptions()
             input.cardBills = dependencies.database.recurrings()
-
             loadLoanBalances()
             loadRecurring()
 

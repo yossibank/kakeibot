@@ -316,5 +316,4 @@ fun RecurringEditSheet(
 }
 
 private val previewSpacing = 6.dp
-
 private val typeOptions = Entry.Kind.entries.map { it to it.title }

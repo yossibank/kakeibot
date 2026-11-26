@@ -195,19 +195,6 @@ internal fun UsageLine(
 }
 
 @Composable
-private fun SpentText(
-    spent: Long,
-    modifier: Modifier = Modifier,
-) {
-    FittedText(
-        text = "使った額 ${AmountText.text(amount = spent.toInt())}",
-        modifier = modifier,
-        color = Palette.subtext,
-        style = textFont(style = FontTextStyle.Caption2),
-    )
-}
-
-@Composable
 internal fun AmountValue(
     amount: Int?,
     size: FontSize,
@@ -254,4 +241,17 @@ internal fun EditMark() {
             tint = Palette.accent,
         )
     }
+}
+
+@Composable
+private fun SpentText(
+    spent: Long,
+    modifier: Modifier = Modifier,
+) {
+    FittedText(
+        text = "使った額 ${AmountText.text(amount = spent.toInt())}",
+        modifier = modifier,
+        color = Palette.subtext,
+        style = textFont(style = FontTextStyle.Caption2),
+    )
 }

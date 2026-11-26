@@ -26,7 +26,6 @@ data class MonthOverview(
     val today: LocalDate,
 ) {
     val month: YearMonth = today.periodMonth(startingOn = monthStartDay)
-
     val period: ClosedRange<LocalDate> = month.period(startingOn = monthStartDay)
 
     val periodRecurrings: List<PeriodRecurring> = periodRecurrings(
@@ -37,9 +36,7 @@ data class MonthOverview(
     )
 
     val monthDays: List<EntryDay> = list?.days?.within(period).orEmpty()
-
     val monthExpense: Long = monthDays.expenseTotal
-
     val monthIncome: Long = monthDays.incomeTotal
 
     val budgetCarryover: Long = list?.budgetCarryover(

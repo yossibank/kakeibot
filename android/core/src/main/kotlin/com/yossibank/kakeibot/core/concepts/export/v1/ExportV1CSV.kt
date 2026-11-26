@@ -8,34 +8,6 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import java.text.BreakIterator
 import java.time.Instant
 
-private val csvHeader = listOf(
-    "日付",
-    "種類",
-    "金額",
-    "カテゴリ",
-    "タグ",
-    "財布",
-    "振替先",
-    "メモ",
-)
-
-private val byteOrderMark = byteArrayOf(
-    0xEF.toByte(),
-    0xBB.toByte(),
-    0xBF.toByte(),
-)
-
-private val formulaPrefixes = setOf("=", "+", "-", "@")
-
-private const val adjustmentTitle = "調整"
-
-private data class CSVRow(
-    val date: LocalDate,
-    val createdAt: Instant,
-    val id: String,
-    val fields: List<String>,
-)
-
 fun ExportV1.Tables.csv(): ByteArray {
     val rows = listOf(csvHeader) + sortedRows.map { it.fields }
 
@@ -45,6 +17,13 @@ fun ExportV1.Tables.csv(): ByteArray {
 
     return byteOrderMark + text.toByteArray(Charsets.UTF_8)
 }
+
+private data class CSVRow(
+    val date: LocalDate,
+    val createdAt: Instant,
+    val id: String,
+    val fields: List<String>,
+)
 
 private val ExportV1.Tables.sortedRows: List<CSVRow>
     get() = (entries.map { row(it) } + adjustments.map { row(it) }).sortedWith(
@@ -140,3 +119,24 @@ private fun kindTitle(kind: Entry.Kind): String = when (kind) {
     Entry.Kind.income -> "収入"
     Entry.Kind.transfer -> "振替"
 }
+
+private val csvHeader = listOf(
+    "日付",
+    "種類",
+    "金額",
+    "カテゴリ",
+    "タグ",
+    "財布",
+    "振替先",
+    "メモ",
+)
+
+private val byteOrderMark = byteArrayOf(
+    0xEF.toByte(),
+    0xBB.toByte(),
+    0xBF.toByte(),
+)
+
+private val formulaPrefixes = setOf("=", "+", "-", "@")
+
+private const val adjustmentTitle = "調整"

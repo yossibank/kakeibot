@@ -184,6 +184,20 @@ class RecurringListModel(
         val entryList: Flow<EntryList>,
     )
 
+    override suspend fun loadFold(fold: SettingsFoldInput) {
+        fold.load(from = dependencies.database)
+    }
+
+    override suspend fun setFold(
+        fold: SettingsFoldInput,
+        isClosed: Boolean,
+    ) {
+        fold.save(
+            isClosed = isClosed,
+            to = dependencies.database,
+        )
+    }
+
     suspend fun observe() {
         val database = dependencies.database
 
@@ -208,20 +222,6 @@ class RecurringListModel(
             id = id,
             to = to,
             among = output.visible.map { it.id },
-        )
-    }
-
-    override suspend fun loadFold(fold: SettingsFoldInput) {
-        fold.load(from = dependencies.database)
-    }
-
-    override suspend fun setFold(
-        fold: SettingsFoldInput,
-        isClosed: Boolean,
-    ) {
-        fold.save(
-            isClosed = isClosed,
-            to = dependencies.database,
         )
     }
 

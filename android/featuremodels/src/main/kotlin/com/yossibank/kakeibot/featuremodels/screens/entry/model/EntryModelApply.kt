@@ -27,7 +27,6 @@ fun EntryModel.apply(template: EntryTemplate) {
     }
 
     template.amount?.let(state::setAmount)
-
     state.focus(EntryModel.Field.Amount)
 }
 

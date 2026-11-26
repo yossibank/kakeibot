@@ -20,7 +20,6 @@ data class ReviewSummary private constructor(
         companion object {
             internal operator fun invoke(entries: List<Entry>): Breakdown {
                 val total = entries.sumOf { it.amount.toLong() }
-
                 val byCategory = mutableMapOf<Identifier<EntryCategory>, Long>()
                 val byWallet = mutableMapOf<Identifier<Wallet>, Long>()
 

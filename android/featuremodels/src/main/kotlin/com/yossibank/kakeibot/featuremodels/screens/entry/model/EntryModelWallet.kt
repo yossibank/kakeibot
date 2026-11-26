@@ -6,7 +6,6 @@ import com.yossibank.kakeibot.core.shared.Identifier
 
 fun EntryModel.select(wallet: Wallet) {
     setWallet(wallet.id)
-
     val isTransfer = state.form.type == Entry.Kind.transfer
     state.focus(if (isTransfer) EntryModel.Field.Transfer else EntryModel.Field.Amount)
 }

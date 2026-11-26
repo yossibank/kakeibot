@@ -44,8 +44,6 @@ fun EntryList.ordered(
     }
 }
 
-private val japanese: Locale = Locale.JAPANESE
-
 private fun EntryList.templateUses(through: LocalDate): Map<Identifier<EntryTemplate>, Int> {
     val start = through.adding(days = 1 - TemplateOrder.frequentDays)
     val uses = mutableMapOf<Identifier<EntryTemplate>, Int>()
@@ -157,3 +155,5 @@ private fun compareDigits(
 
     return left.compareTo(right)
 }
+
+private val japanese: Locale = Locale.JAPANESE

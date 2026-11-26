@@ -54,7 +54,6 @@ fun MainView(
 
     LaunchedEffect(link) {
         val route = link?.let { PlannedNotification.Route.of(link = it) } ?: return@LaunchedEffect
-
         onOpenLink()
         model.perform { it.open(route) }
     }

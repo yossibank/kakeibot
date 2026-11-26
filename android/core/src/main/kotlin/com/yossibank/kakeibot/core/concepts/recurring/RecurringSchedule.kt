@@ -4,9 +4,6 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 
-private const val searchDays = 400
-private const val finalSearchMonths = 13
-
 val Recurring.Companion.maxCount: Int
     get() = 1200
 
@@ -190,3 +187,6 @@ private fun Recurring.months(
         }
     }
 }
+
+private const val searchDays = 400
+private const val finalSearchMonths = 13

@@ -167,7 +167,6 @@ class EntryVoiceFlow internal constructor(
 
         clearNotice()
         model.state.focus(EntryModel.Field.Amount)
-
         runtime.source = source
 
         runtime.session = Session(
@@ -240,7 +239,6 @@ class EntryVoiceFlow internal constructor(
 
     private fun hear(level: Float) {
         val listening = output.listening ?: return
-
         state.move(to = listening.copy(levels = listOf(level) + listening.levels.dropLast(1)))
         follow(level)
     }

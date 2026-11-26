@@ -245,9 +245,9 @@ class EntryModel(
 
         state.task.attempt(describe = ::describe) {
             database.insertDefaultsIfEmpty(at = dependencies.clock.now)
-
             input.options = database.entryOptions()
             input.allTemplates = database.templates()
+
             input.cardBills = database.recurrings().filter { recurring ->
                 recurring.type == Entry.Kind.transfer && recurring.closingDay != null
             }
@@ -275,9 +275,7 @@ class EntryModel(
 
     suspend fun save(): Boolean {
         val change = store() ?: return false
-
         state.outcome.send(Outcome.Closed(change))
-
         return true
     }
 
@@ -288,36 +286,6 @@ class EntryModel(
         state.outcome.send(Outcome.Continued(change))
 
         return true
-    }
-
-    private suspend fun store(): EntryChange? {
-        val draft = output.draft
-
-        if (draft == null || state.task.isRunning) {
-            return null
-        }
-
-        val problem = draft.problems.firstOrNull()
-
-        if (problem != null) {
-            state.task.show(output.message(of = problem))
-            return null
-        }
-
-        return state.task.attempt(describe = ::describe) {
-            val database = dependencies.database
-
-            val saved = database.saveEntryResult(
-                draft = draft,
-                editing = input.editingId,
-                at = dependencies.clock.now,
-            )
-
-            change(
-                saved = saved,
-                fee = database.fee(of = saved.entry.id),
-            )
-        }
     }
 
     suspend fun delete(): Boolean {
@@ -375,6 +343,36 @@ class EntryModel(
         input.recentItemNames = database.recentItemNames(limit = RECENT_ITEM_NAME_LIMIT)
         input.recentMemos = database.recentMemos(limit = RECENT_MEMO_LIMIT)
         input.history = database.entryList()
+    }
+
+    private suspend fun store(): EntryChange? {
+        val draft = output.draft
+
+        if (draft == null || state.task.isRunning) {
+            return null
+        }
+
+        val problem = draft.problems.firstOrNull()
+
+        if (problem != null) {
+            state.task.show(output.message(of = problem))
+            return null
+        }
+
+        return state.task.attempt(describe = ::describe) {
+            val database = dependencies.database
+
+            val saved = database.saveEntryResult(
+                draft = draft,
+                editing = input.editingId,
+                at = dependencies.clock.now,
+            )
+
+            change(
+                saved = saved,
+                fee = database.fee(of = saved.entry.id),
+            )
+        }
     }
 
     private suspend fun loadEntry(): Entry? {

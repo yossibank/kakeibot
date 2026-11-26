@@ -14,11 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
 
 class ModelTask {
-    enum class Tone {
-        info,
-        error,
-    }
-
     var message: String by mutableStateOf("")
         private set
 
@@ -29,6 +24,11 @@ class ModelTask {
         private set
 
     private var running: Int by mutableIntStateOf(0)
+
+    enum class Tone {
+        info,
+        error,
+    }
 
     val isRunning: Boolean
         get() = running > 0
@@ -136,7 +136,6 @@ class ModelTask {
 
     companion object {
         const val MILLIS = 6_000L
-
         const val saveFailed = "保存できませんでした"
         const val settingSaveFailed = "設定を保存できませんでした"
         const val restoreFailed = "元に戻せませんでした"

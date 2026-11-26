@@ -227,7 +227,6 @@ internal suspend fun AppDatabase.generateEntry(
 
     if (entry != null) {
         change.after += entry
-
         fetchFee(entry.id)?.let { change.after += it }
     }
 

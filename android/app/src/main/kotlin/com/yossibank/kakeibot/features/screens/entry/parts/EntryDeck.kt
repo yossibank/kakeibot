@@ -368,11 +368,8 @@ private fun <T> snappy(visibilityThreshold: T? = null): SpringSpec<T> = spring(
 )
 
 private const val KEY_ROWS = 5
-
 private const val SNAPPY_DAMPING = 0.85f
-
 private const val SNAPPY_STIFFNESS = 158f
 
 private val minKeyHeight: Dp = 36.dp
-
 private val maxKeyHeight: Dp = 72.dp

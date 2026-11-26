@@ -37,8 +37,6 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.shared.datechoice.shortName
 
-private val dayCellSize: Dp = 36.dp
-
 @Composable
 fun MonthCalendar(
     selection: LocalDate,
@@ -163,3 +161,5 @@ private fun DayCell(
         )
     }
 }
+
+private val dayCellSize: Dp = 36.dp

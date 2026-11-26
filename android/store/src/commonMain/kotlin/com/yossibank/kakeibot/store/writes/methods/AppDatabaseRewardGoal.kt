@@ -28,9 +28,7 @@ suspend fun AppDatabase.saveRewardGoal(
 ): RewardGoal = write {
     if (editing == null) {
         val goal = draft.newGoal(at)
-
         rewardGoalDao().insert(goal.record())
-
         return@write goal
     }
 

@@ -278,7 +278,6 @@ internal suspend fun AppDatabase.saveFee(
 
     if (transfer.type != Entry.Kind.transfer || amount <= 0) {
         existing?.let { entryDao().delete(it.id.databaseValue) }
-
         return emptyList()
     }
 
@@ -308,6 +307,7 @@ internal suspend fun AppDatabase.findEntry(id: Identifier<Entry>): Entry? =
 
 internal suspend fun AppDatabase.fitCategory(entry: Entry): Entry {
     val categoryId = entry.categoryId ?: return entry
+
     val category =
         categoryDao().find(categoryId.databaseValue)?.decoded(EntryCategoryRecord::entryCategory)
             ?: return entry

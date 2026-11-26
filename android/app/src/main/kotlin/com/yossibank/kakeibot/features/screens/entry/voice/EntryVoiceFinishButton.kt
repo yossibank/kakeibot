@@ -44,6 +44,7 @@ fun EntryVoiceFinishButton(
         val start = passed(silenceStart)
 
         fill.snapTo(start.toFloat() / duration)
+
         fill.animateTo(
             targetValue = 1f,
             animationSpec = tween(

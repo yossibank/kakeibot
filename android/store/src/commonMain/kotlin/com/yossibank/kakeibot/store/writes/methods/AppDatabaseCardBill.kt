@@ -128,11 +128,6 @@ internal suspend fun AppDatabase.sameRecurrence(entry: Entry): List<Entry>? {
         .map { it.decoded(EntryRecord::entry) }
 }
 
-private const val MAX_PERIOD_DAYS = 31
-private const val MAX_PAYMENT_LAG_DAYS = 31
-private const val MAX_HOLIDAY_SHIFT_DAYS = 10
-private const val BILL_SEARCH_DAYS = MAX_PERIOD_DAYS + MAX_PAYMENT_LAG_DAYS + MAX_HOLIDAY_SHIFT_DAYS
-
 private suspend fun AppDatabase.recalculateBill(
     of: Recurring,
     on: Recurring.Occurrence,
@@ -273,3 +268,8 @@ private fun Recurring.candidates(
 
     return paid + carried
 }
+
+private const val MAX_PERIOD_DAYS = 31
+private const val MAX_PAYMENT_LAG_DAYS = 31
+private const val MAX_HOLIDAY_SHIFT_DAYS = 10
+private const val BILL_SEARCH_DAYS = MAX_PERIOD_DAYS + MAX_PAYMENT_LAG_DAYS + MAX_HOLIDAY_SHIFT_DAYS

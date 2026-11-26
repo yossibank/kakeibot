@@ -33,6 +33,11 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import kotlin.math.PI
 import kotlin.math.sin
 
+data class TagLineItem<Id>(
+    val id: Id,
+    val name: String,
+)
+
 @Composable
 fun <Id> TagLine(
     tags: List<TagLineItem<Id>>,
@@ -90,11 +95,6 @@ fun <Id> TagLine(
         }
     }
 }
-
-data class TagLineItem<Id>(
-    val id: Id,
-    val name: String,
-)
 
 @Composable
 private fun Hanging(

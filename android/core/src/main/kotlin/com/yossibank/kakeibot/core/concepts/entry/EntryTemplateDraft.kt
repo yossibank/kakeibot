@@ -76,12 +76,6 @@ data class EntryTemplateDraft(
             return problems
         }
 
-    private val trimmedName: String
-        get() = name.trim()
-
-    private val trimmedMemo: String?
-        get() = memo.trim().ifEmpty { null }
-
     fun newTemplate(
         sortOrder: Int,
         at: Instant,
@@ -121,6 +115,12 @@ data class EntryTemplateDraft(
             updatedAt = at,
         )
     }
+
+    private val trimmedName: String
+        get() = name.trim()
+
+    private val trimmedMemo: String?
+        get() = memo.trim().ifEmpty { null }
 
     private fun validated(): Fields {
         problems.firstOrNull()?.let {

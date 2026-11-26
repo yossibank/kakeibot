@@ -63,14 +63,14 @@ object FloatingTabBar {
     val height: Dp = 64.dp
     val clearance: Dp = height + bottomGap
 
-    internal val bottomGap: Dp
-        get() = 4.dp
-
     data class Item<Value>(
         val title: String,
         @param:DrawableRes val icon: Int,
         val value: Value,
     )
+
+    internal val bottomGap: Dp
+        get() = 4.dp
 }
 
 @Composable
@@ -109,10 +109,8 @@ private fun <Value> Tabs(
 ) {
     var barWidth by remember { mutableIntStateOf(0) }
     var dragX by remember { mutableStateOf<Float?>(null) }
-
     val currentItems by rememberUpdatedState(items)
     val currentOnSelect by rememberUpdatedState(onSelect)
-
     val itemWidth = if (items.isEmpty()) 0f else barWidth.toFloat() / items.size
     val selectedIndex = items.indexOfFirst { it.value == selection }.takeIf { it >= 0 }
 
@@ -300,7 +298,6 @@ private fun <Value> TabItem(
 @Composable
 private fun AddButton(onAdd: () -> Unit) {
     var addCount by remember { mutableIntStateOf(0) }
-
     val interaction = remember { MutableInteractionSource() }
     val isPressed by interaction.collectIsPressedAsState()
 

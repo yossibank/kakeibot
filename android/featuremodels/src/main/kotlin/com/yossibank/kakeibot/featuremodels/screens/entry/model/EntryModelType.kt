@@ -7,11 +7,6 @@ fun EntryModel.Field.field(of: Entry.Kind): EntryModel.Field {
     return if (isWallet && of == Entry.Kind.transfer) EntryModel.Field.Transfer else this
 }
 
-internal fun EntryModel.Field.order(of: Entry.Kind): Int {
-    val fields = if (of == Entry.Kind.transfer) transferFields else paymentFields
-    return fields.indexOf(field(of)).coerceAtLeast(0)
-}
-
 val EntryModel.Output.startField: EntryModel.Field
     get() {
         val isTransfer = state.form.type == Entry.Kind.transfer
@@ -55,6 +50,11 @@ fun EntryModel.select(type: Entry.Kind) {
     if (isUntouched) {
         input.baseline = output.snapshot
     }
+}
+
+internal fun EntryModel.Field.order(of: Entry.Kind): Int {
+    val fields = if (of == Entry.Kind.transfer) transferFields else paymentFields
+    return fields.indexOf(field(of)).coerceAtLeast(0)
 }
 
 private val transferFields = listOf(

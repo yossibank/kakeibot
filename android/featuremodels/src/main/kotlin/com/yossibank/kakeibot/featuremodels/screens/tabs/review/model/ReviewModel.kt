@@ -277,32 +277,6 @@ class ReviewModel(
         dependencies.round.restart()
     }
 
-    private suspend fun observeAll() {
-        loadSelection()
-
-        val database = dependencies.database
-
-        coroutineScope {
-            launch {
-                observe(database.settingUpdates(SettingKey.monthStartDay)) {
-                    input.monthStartDay = it
-                }
-            }
-
-            launch {
-                observe(database.settingUpdates(SettingKey.weekStart)) { input.weekStart = it }
-            }
-
-            launch {
-                state.task.observe(
-                    values = dependencies.entryList,
-                    failure = loadFailedMessage,
-                    failing = { state.isListFailed = it },
-                ) { input.list = it }
-            }
-        }
-    }
-
     suspend fun loadSelection() {
         val database = dependencies.database
 
@@ -329,10 +303,37 @@ class ReviewModel(
                 key = SettingKey.reviewScale,
                 to = input.scale,
             )
+
             database.setSetting(
                 key = SettingKey.reviewKind,
                 to = input.kind,
             )
+        }
+    }
+
+    private suspend fun observeAll() {
+        loadSelection()
+
+        val database = dependencies.database
+
+        coroutineScope {
+            launch {
+                observe(database.settingUpdates(SettingKey.monthStartDay)) {
+                    input.monthStartDay = it
+                }
+            }
+
+            launch {
+                observe(database.settingUpdates(SettingKey.weekStart)) { input.weekStart = it }
+            }
+
+            launch {
+                state.task.observe(
+                    values = dependencies.entryList,
+                    failure = loadFailedMessage,
+                    failing = { state.isListFailed = it },
+                ) { input.list = it }
+            }
         }
     }
 

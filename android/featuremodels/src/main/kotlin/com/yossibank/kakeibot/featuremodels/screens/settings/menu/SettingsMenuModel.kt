@@ -66,6 +66,20 @@ class SettingsMenuModel(
         val database: AppDatabase,
     )
 
+    override suspend fun loadFold(fold: SettingsFoldInput) {
+        fold.load(from = dependencies.database)
+    }
+
+    override suspend fun setFold(
+        fold: SettingsFoldInput,
+        isClosed: Boolean,
+    ) {
+        fold.save(
+            isClosed = isClosed,
+            to = dependencies.database,
+        )
+    }
+
     suspend fun observe() {
         val database = dependencies.database
 
@@ -89,20 +103,6 @@ class SettingsMenuModel(
                 fallback = emptyList(),
             ) { input.recurringCount = it.size }
         }
-    }
-
-    override suspend fun loadFold(fold: SettingsFoldInput) {
-        fold.load(from = dependencies.database)
-    }
-
-    override suspend fun setFold(
-        fold: SettingsFoldInput,
-        isClosed: Boolean,
-    ) {
-        fold.save(
-            isClosed = isClosed,
-            to = dependencies.database,
-        )
     }
 
     suspend fun choose(monthStartDay: MonthStartDay) {

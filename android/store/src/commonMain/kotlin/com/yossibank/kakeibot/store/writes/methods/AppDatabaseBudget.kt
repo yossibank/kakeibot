@@ -44,7 +44,6 @@ suspend fun AppDatabase.setBudget(
 
         if (inherited == amount) {
             existing?.let { budgetDao().delete(it.id.databaseValue) }
-
             return@write
         }
 

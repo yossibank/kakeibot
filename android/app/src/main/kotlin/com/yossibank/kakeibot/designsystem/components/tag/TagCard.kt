@@ -28,6 +28,38 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
+enum class TagCardStyle {
+    Plain,
+    Selected,
+    Add,
+}
+
+enum class TagCardSize(
+    internal val font: FontSize,
+    internal val height: Dp,
+    internal val minWidth: Dp,
+    internal val padding: Dp,
+    internal val hole: Dp,
+    internal val holeTop: Dp,
+) {
+    Regular(
+        font = FontSize.Caption,
+        height = 30.dp,
+        minWidth = 56.dp,
+        padding = 8.dp,
+        hole = 4.dp,
+        holeTop = 4.dp,
+    ),
+    Small(
+        font = FontSize.Micro,
+        height = 18.dp,
+        minWidth = 0.dp,
+        padding = 4.dp,
+        hole = 3.dp,
+        holeTop = 2.dp,
+    ),
+}
+
 @Composable
 fun TagCard(
     title: String,
@@ -92,38 +124,6 @@ fun TagCard(
             style = textFont(size = size.font),
         )
     }
-}
-
-enum class TagCardStyle {
-    Plain,
-    Selected,
-    Add,
-}
-
-enum class TagCardSize(
-    internal val font: FontSize,
-    internal val height: Dp,
-    internal val minWidth: Dp,
-    internal val padding: Dp,
-    internal val hole: Dp,
-    internal val holeTop: Dp,
-) {
-    Regular(
-        font = FontSize.Caption,
-        height = 30.dp,
-        minWidth = 56.dp,
-        padding = 8.dp,
-        hole = 4.dp,
-        holeTop = 4.dp,
-    ),
-    Small(
-        font = FontSize.Micro,
-        height = 18.dp,
-        minWidth = 0.dp,
-        padding = 4.dp,
-        hole = 3.dp,
-        holeTop = 2.dp,
-    ),
 }
 
 private val TagCardStyle.foreground: Color

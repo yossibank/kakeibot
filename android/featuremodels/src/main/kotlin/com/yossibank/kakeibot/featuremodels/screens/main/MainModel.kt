@@ -67,11 +67,12 @@ class MainModel(
 
         val observation = ObservationRound()
 
+        private val foreground = ForegroundReturn()
+
+        private var round = 0
+
         val observationRound: Int
             get() = observation.count
-
-        private val foreground = ForegroundReturn()
-        private var round = 0
 
         fun select(tab: Tab) {
             this.tab = tab

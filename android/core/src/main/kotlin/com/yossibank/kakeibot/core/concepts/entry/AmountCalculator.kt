@@ -207,6 +207,7 @@ data class AmountCalculator private constructor(
         } else {
             this
         }
+
         val amount = trimmed.amount
 
         return trimmed.copy(

@@ -3,11 +3,6 @@ package com.yossibank.kakeibot.featuremodels.screens.main
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.shared.Identifier
 
-private const val ENTRY = "entry"
-private const val BUDGET = "budget"
-private const val SETTINGS = "settings"
-private const val SEPARATOR = ","
-
 fun MainModel.saved(): List<String> {
     val tabs = listOf(
         state.tab.name,
@@ -49,3 +44,8 @@ private fun sheet(names: List<String>): MainModel.Sheet? = when (names.firstOrNu
 
     else -> null
 }
+
+private const val ENTRY = "entry"
+private const val BUDGET = "budget"
+private const val SETTINGS = "settings"
+private const val SEPARATOR = ","
