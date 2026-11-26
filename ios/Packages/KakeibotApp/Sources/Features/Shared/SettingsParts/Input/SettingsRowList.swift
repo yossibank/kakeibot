@@ -22,7 +22,7 @@ struct SettingsRowList<Panel: Hashable>: View {
                     }
             }
         }
-        .background(SettingsTile.cardFill.opacity(0.7), in: shape)
+        .background(SettingsTileStyle.cardFill.opacity(0.7), in: shape)
         .overlay {
             shape
                 .stroke(Palette.accent.opacity(.soft), lineWidth: 1)

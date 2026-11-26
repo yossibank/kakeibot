@@ -100,7 +100,7 @@ private extension ReminderView {
                 .textFont(.caption, weight: weight)
                 .foregroundStyle(color)
                 .frame(maxWidth: .infinity, minHeight: 32)
-                .background(SettingsTile.fill(isSelected: isSelected), in: Capsule())
+                .background(SettingsTileStyle.fill(isSelected: isSelected), in: Capsule())
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)

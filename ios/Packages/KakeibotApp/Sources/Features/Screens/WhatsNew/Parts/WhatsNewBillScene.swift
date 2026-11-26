@@ -200,10 +200,10 @@ private extension WhatsNewBillScene {
             .foregroundStyle(isSelected ? Palette.accentStrong : Palette.subtext)
             .frame(maxWidth: .infinity)
             .frame(height: height)
-            .background(SettingsTile.fill(isSelected: isSelected), in: .capsule)
+            .background(SettingsTileStyle.fill(isSelected: isSelected), in: .capsule)
             .overlay {
                 Capsule()
-                    .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
+                    .stroke(SettingsTileStyle.stroke(isSelected: isSelected), lineWidth: 1)
             }
     }
 }

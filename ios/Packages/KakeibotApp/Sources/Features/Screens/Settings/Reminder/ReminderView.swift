@@ -180,10 +180,10 @@ private extension ReminderView {
                 .monospacedDigit()
                 .foregroundStyle(color)
                 .frame(width: 48, height: 48)
-                .background(SettingsTile.fill(isSelected: isSelected), in: Circle())
+                .background(SettingsTileStyle.fill(isSelected: isSelected), in: Circle())
                 .overlay {
                     Circle()
-                        .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
+                        .stroke(SettingsTileStyle.stroke(isSelected: isSelected), lineWidth: 1)
                 }
                 .contentShape(Circle())
         }

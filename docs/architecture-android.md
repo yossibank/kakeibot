@@ -100,7 +100,7 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | --- | --- |
 | `AppDatabase+EntryItemQuery`（品目の読み出し） | `writes/methods/AppDatabaseEntryItem.kt` に書き込みと一緒にある |
 | `AppDatabase+ReviewRequest`（レビューのお願いの記録） | `queries/methods/AppDatabaseEntryHistory.kt` にある |
-| `MonthPlan`・`SettingKey+Scope` | 無い |
+| `MonthPlan`・`SettingKey+Export` | 無い |
 | `Core/Shared/` の `Draft`・`String+Trimmed`、`Icon+Mark` | 無い。各下書きが検証と空白の除去を持つ |
 | `Core/Shared/NamedIconDraft` | 無い。各下書きが名前とアイコンの検証を持つ |
 

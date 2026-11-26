@@ -25,12 +25,12 @@ struct SettingsCategoryTile: View {
             .foregroundStyle(color)
             .frame(maxWidth: .infinity, minHeight: 54)
             .background(
-                SettingsTile.fill(isSelected: isSelected),
+                SettingsTileStyle.fill(isSelected: isSelected),
                 in: .rect(cornerRadius: corner.radius(12))
             )
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(12))
-                    .stroke(SettingsTile.stroke(isSelected: isSelected), lineWidth: 1)
+                    .stroke(SettingsTileStyle.stroke(isSelected: isSelected), lineWidth: 1)
             }
             .contentShape(.rect)
         }

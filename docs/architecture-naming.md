@@ -54,6 +54,7 @@
 | `+Text` | 値を文字にしたもの（金額・割合・日付の入った文） |
 | `+Actions` | 画面の操作の関数。複数形で書く |
 | `+Sheets` | 画面から開くシートの種類と、その振り分け。複数形で書く |
+| `+Stored` | データベースに保存した形の値から作る `init` |
 
 型をまたぐ文言は、拡張にせず、名前空間の `enum` の `<頭>Text` に置く。例は `BillText`・`PeriodText`・`RecurringText`・`ReviewText` である。
 
@@ -89,7 +90,7 @@
 | `Card` | 面を持つ 1 かたまり | `StampTallyCard` |
 | `RowCard` | 面を持つ横長の 1 件 | `WalletRowCard` |
 | `IntroCard` | 画面の上の説明カード。中身の値は `IntroContent` | `SyncIntroCard` |
-| `Tile` | 格子に並べる 1 枚 | `SettingsTile` |
+| `Tile` | 格子に並べる 1 枚 | `SettingsCategoryTile` |
 | `Row` | 一覧の 1 行 | `SettingsMenuRow` |
 | `Drawer` | 画面の下から出す引き出しと、それを重ねるモディファイア | `SettingsDrawer`・`BudgetKeypadDrawer` |
 | `Layer` | 画面に層を重ねるモディファイア | `SettingsLiftLayer` |

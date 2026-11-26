@@ -24,7 +24,7 @@ struct SettingsFormCard<Content: View>: View {
             content()
         }
         .padding(16)
-        .background(SettingsTile.cardFill.opacity(0.7), in: shape)
+        .background(SettingsTileStyle.cardFill.opacity(0.7), in: shape)
         .overlay {
             shape
                 .stroke(Palette.accent.opacity(.soft), lineWidth: 1)
