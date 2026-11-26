@@ -69,6 +69,7 @@ public extension EntryModel {
 
         public internal(set) var outcome = ScreenOutcome<Outcome>()
 
+        @MainActor
         init(wait: ScreenWait) {
             self.deletion = UndoNotice(wait: wait)
             self.hiddenCategory = UndoNotice(wait: wait)
