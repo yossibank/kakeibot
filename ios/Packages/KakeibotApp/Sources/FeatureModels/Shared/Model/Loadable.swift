@@ -1,10 +1,10 @@
-enum Loadable<Value> {
+public enum Loadable<Value> {
     case loading
     case loaded(Value)
     case failed
 }
 
-extension Loadable {
+public extension Loadable {
     var value: Value? {
         switch self {
         case let .loaded(value): value
@@ -21,6 +21,17 @@ extension Loadable {
         case .failed: true
         case .loading, .loaded: false
         }
+    }
+
+    var isSettled: Bool {
+        switch self {
+        case .loaded, .failed: true
+        case .loading: false
+        }
+    }
+
+    var retrying: Self {
+        isFailed ? .loading : self
     }
 }
 

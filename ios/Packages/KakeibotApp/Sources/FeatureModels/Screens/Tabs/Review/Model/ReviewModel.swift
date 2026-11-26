@@ -59,13 +59,12 @@ public extension ReviewModel {
     final class Input {
         public internal(set) var scale: ReviewPeriod.Scale = .month
         public internal(set) var kind: ReviewKind = .expense
-        public internal(set) var isListFailed = false
         public internal(set) var monthStartDay: MonthStartDay = .first
         public internal(set) var weekStart: Weekday = .sunday
         public internal(set) var budgets: [Budget] = []
         public internal(set) var carryoverFrom: YearMonth?
         public internal(set) var stampBook: StampBook?
-        public internal(set) var list: EntryList?
+        public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var goals: [ReviewGoal] = []
 
         var reasons: [String: String] = [:]
@@ -118,8 +117,7 @@ public extension ReviewModel {
             {
                 await self.observe(
                     database.entryListUpdates(),
-                    into: \.input.list,
-                    failing: \.input.isListFailed
+                    into: \.input.list
                 )
             },
             {
@@ -275,7 +273,7 @@ public extension ReviewModel.Output {
         }
 
         guard
-            let list = input.list,
+            let list = input.list.value,
             let type = entryType
         else {
             return []
@@ -308,7 +306,7 @@ public extension ReviewModel.Output {
     }
 
     func day(on date: LocalDate) -> EntryDay? {
-        input.list?.days.first { $0.date == date }
+        input.list.value?.days.first { $0.date == date }
     }
 
     func canMove(by count: Int) -> Bool {
@@ -318,7 +316,7 @@ public extension ReviewModel.Output {
 
 extension ReviewModel.Output {
     var entries: [Entry] {
-        input.list?.entries ?? []
+        input.list.value?.entries ?? []
     }
 }
 

@@ -11,6 +11,6 @@ public extension HomeModel.Output {
     }
 
     func day(on date: LocalDate) -> EntryDay? {
-        input.list?.days.first { $0.date == date }
+        input.list.value?.days.first { $0.date == date }
     }
 }

@@ -76,7 +76,7 @@ fun RecordsView(
     TabNoticeRound(model.state.task)
 
     LoadFailedColumn(
-        isFailed = model.state.isListFailed,
+        isFailed = model.input.list.isFailed,
         onRetry = model::retry,
     ) {
         item(key = "title") {
@@ -128,7 +128,7 @@ fun RecordsView(
                 )
             }
         } else {
-            if (model.input.isLoaded && model.output.days.isEmpty()) {
+            if (model.input.list.isLoaded && model.output.days.isEmpty()) {
                 item(key = "empty") {
                     EmptyCard()
                 }

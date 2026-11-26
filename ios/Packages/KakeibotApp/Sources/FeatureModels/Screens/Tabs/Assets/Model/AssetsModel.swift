@@ -43,7 +43,7 @@ public extension AssetsModel {
     @MainActor
     @Observable
     final class Input {
-        public internal(set) var isListFailed = false
+        public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var rewardBank: RewardBank?
 
         var summary: AssetsSummary
@@ -112,7 +112,10 @@ public extension AssetsModel {
 
     func load() async {
         do {
-            input.latest.list = try await dependencies.database.entryList()
+            let list = try await dependencies.database.entryList()
+
+            input.list = .loaded(list)
+            input.latest.list = list
             input.latest.recurrings = try await dependencies.database.recurrings()
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
@@ -153,12 +156,7 @@ private extension AssetsModel {
     }
 
     func observe() async {
-        input.isListFailed = false
-
-        input.isListFailed = await observe(
-            dependencies.database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
+        await observe(dependencies.database.entryListUpdates(), into: \.input.list) { list in
             input.latest.list = list
             refreshLater()
         }

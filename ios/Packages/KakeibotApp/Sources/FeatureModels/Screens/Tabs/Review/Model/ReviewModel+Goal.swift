@@ -11,7 +11,7 @@ public extension ReviewModel {
 
 public extension ReviewModel {
     func refreshGoals() async {
-        guard input.list != nil else {
+        guard input.list.isLoaded else {
             return
         }
 
@@ -119,7 +119,7 @@ public extension ReviewModel.Output {
     }
 
     var goalTrigger: ReviewModel.GoalTrigger {
-        ReviewModel.GoalTrigger(period: currentPeriod, isLoaded: input.list != nil)
+        ReviewModel.GoalTrigger(period: currentPeriod, isLoaded: input.list.isLoaded)
     }
 
     var hasNewReport: Bool {

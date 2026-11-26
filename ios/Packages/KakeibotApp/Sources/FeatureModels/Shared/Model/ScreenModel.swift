@@ -50,13 +50,18 @@ extension ScreenModel {
 
     func observe<Values: AsyncSequence>(
         _ values: @autoclosure () -> Values,
-        into keyPath: ReferenceWritableKeyPath<Self, Values.Element?>,
-        failing failed: ReferenceWritableKeyPath<Self, Bool>
+        into keyPath: ReferenceWritableKeyPath<Self, Loadable<Values.Element>>,
+        receive: (Values.Element) -> Void = { _ in }
     ) async {
-        self[keyPath: failed] = false
+        self[keyPath: keyPath] = self[keyPath: keyPath].retrying
 
-        self[keyPath: failed] = await observe(values(), failure: Self.loadFailedMessage) { value in
-            self[keyPath: keyPath] = value
+        let isFailed = await observe(values(), failure: Self.loadFailedMessage) { value in
+            self[keyPath: keyPath] = .loaded(value)
+            receive(value)
+        }
+
+        if isFailed {
+            self[keyPath: keyPath] = .failed
         }
     }
 

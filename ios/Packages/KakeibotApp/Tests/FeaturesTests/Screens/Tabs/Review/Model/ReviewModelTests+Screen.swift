@@ -13,7 +13,7 @@ extension ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         let share = try #require(model.output.categoryShares.first)
@@ -42,7 +42,7 @@ extension ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         let share = try #require(model.output.categoryShares.first)

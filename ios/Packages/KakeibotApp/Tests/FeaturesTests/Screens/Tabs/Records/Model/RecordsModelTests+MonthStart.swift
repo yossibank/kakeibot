@@ -17,7 +17,7 @@ extension RecordsModelTests {
         }
 
         await ObservationWait.until {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         model.state.move(months: -3)

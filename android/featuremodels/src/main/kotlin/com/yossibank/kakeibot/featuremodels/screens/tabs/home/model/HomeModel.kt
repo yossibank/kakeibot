@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
@@ -40,13 +41,10 @@ class HomeModel(
 
         var today: LocalDate by mutableStateOf(today)
             internal set
-
-        var isListFailed: Boolean by mutableStateOf(false)
-            internal set
     }
 
     class Input {
-        var overview: MonthOverview? by mutableStateOf(null)
+        var overview: Loadable<MonthOverview> by mutableStateOf(Loadable.Loading)
             internal set
     }
 
@@ -55,31 +53,31 @@ class HomeModel(
         private val state: State,
     ) {
         val month: YearMonth?
-            get() = input.overview?.month
+            get() = input.overview.value?.month
 
         val periodText: String
             get() {
-                val period = input.overview?.period ?: return ""
+                val period = input.overview.value?.period ?: return ""
                 return PeriodText.range(period)
             }
 
         val usage: BudgetUsage?
-            get() = input.overview?.budgetUsage
+            get() = input.overview.value?.budgetUsage
 
         val middleTitle: String
             get() = if (usage == null) "昨日の支出" else "今月の支出"
 
         val middleAmount: Long
             get() {
-                val overview = input.overview ?: return 0L
+                val overview = input.overview.value ?: return 0L
                 return if (usage == null) overview.yesterdayExpense else overview.monthExpense
             }
 
         val showsNoRecords: Boolean
-            get() = input.overview?.list != null && recentRows.isEmpty()
+            get() = input.overview.value?.list != null && recentRows.isEmpty()
 
         val recentRows: List<EntryRowItem> by derivedStateOf {
-            val list = input.overview?.list
+            val list = input.overview.value?.list
 
             list?.entries.orEmpty()
                 .sortedWith(recentOrder)
@@ -139,8 +137,8 @@ class HomeModel(
         state.task.observe(
             values = overviews,
             failure = loadFailedMessage,
-            failing = { state.isListFailed = it },
-        ) { input.overview = it }
+            into = input::overview,
+        )
     }
 
     companion object {

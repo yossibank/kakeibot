@@ -32,7 +32,7 @@ public extension ReviewModel.Output {
     var categoryShares: [ReviewModel.Share] {
         guard
             let breakdown,
-            let list = input.list
+            let list = input.list.value
         else {
             return []
         }
@@ -58,7 +58,7 @@ public extension ReviewModel.Output {
     var walletShares: [ReviewModel.Share] {
         guard
             let breakdown,
-            let list = input.list
+            let list = input.list.value
         else {
             return []
         }
@@ -145,7 +145,7 @@ public extension ReviewModel.Output {
 
 extension ReviewModel.Output {
     func carryover(into month: YearMonth) -> Int {
-        input.list?.budgetCarryover(
+        input.list.value?.budgetCarryover(
             budgets: input.budgets,
             from: input.carryoverFrom,
             into: month,

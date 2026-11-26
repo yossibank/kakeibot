@@ -89,6 +89,6 @@ private extension ReviewModel.Output {
     }
 
     func categoryName(of id: EntryCategory.ID?) -> String {
-        id.flatMap { input.list?.categories[$0]?.name } ?? "未分類"
+        id.flatMap { input.list.value?.categories[$0]?.name } ?? "未分類"
     }
 }

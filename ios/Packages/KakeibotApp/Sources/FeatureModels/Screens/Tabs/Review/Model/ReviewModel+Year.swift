@@ -62,7 +62,7 @@ public extension ReviewModel.Output {
     }
 
     internal func monthRows(of key: ReviewModel.MonthKey) -> [EntryRowItem] {
-        guard let list = input.list else {
+        guard let list = input.list.value else {
             return []
         }
 

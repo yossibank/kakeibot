@@ -57,7 +57,7 @@ private extension HomeView {
     var budgetLink: some View {
         if let usage = model.output.budgetUsage {
             VStack(spacing: 4) {
-                if !model.input.isListFailed,
+                if !model.input.list.isFailed,
                    let warning = usage.warningText {
                     Text(warning)
                         .textFont(.caption, weight: .semibold)
@@ -180,7 +180,7 @@ private extension HomeView {
                 .foregroundStyle(Palette.subtext)
 
             Group {
-                if model.input.isListFailed {
+                if model.input.list.isFailed {
                     Text(Self.unknownAmount)
                         .foregroundStyle(Palette.subtext)
                 } else {
@@ -233,7 +233,7 @@ private extension HomeView {
     }
 
     var dialAmount: String {
-        guard !model.input.isListFailed else {
+        guard !model.input.list.isFailed else {
             return Self.unknownAmount
         }
 
@@ -245,11 +245,11 @@ private extension HomeView {
     }
 
     var dialProgress: Double? {
-        model.input.isListFailed ? nil : model.output.budgetUsage?.progress
+        model.input.list.isFailed ? nil : model.output.budgetUsage?.progress
     }
 
     var dialAmountColor: Color {
-        guard !model.input.isListFailed else {
+        guard !model.input.list.isFailed else {
             return Palette.subtext
         }
 

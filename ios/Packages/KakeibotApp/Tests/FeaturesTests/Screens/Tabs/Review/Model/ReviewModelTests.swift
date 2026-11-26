@@ -21,7 +21,7 @@ struct ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         let expense = model.output.total
@@ -56,7 +56,7 @@ struct ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         model.move(by: -1)
@@ -73,7 +73,7 @@ struct ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         let hasPreviousNow = model.output.hasPreviousEntries
@@ -114,7 +114,7 @@ struct ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         model.move(by: -1)
@@ -169,7 +169,7 @@ struct ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil && !model.output.moves.isEmpty
+            model.input.list.isLoaded && !model.output.moves.isEmpty
         }
 
         let move = try #require(model.output.moves.first)

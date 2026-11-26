@@ -13,6 +13,7 @@ import com.yossibank.kakeibot.core.concepts.wallet.role
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
@@ -40,9 +41,6 @@ class AssetsModel(
 
     class State {
         val task = ModelTask()
-
-        var isListFailed: Boolean by mutableStateOf(false)
-            internal set
     }
 
     class Input(
@@ -51,7 +49,7 @@ class AssetsModel(
         var today: LocalDate by mutableStateOf(today)
             internal set
 
-        var list: EntryList? by mutableStateOf(null)
+        var list: Loadable<EntryList> by mutableStateOf(Loadable.Loading)
             internal set
     }
 
@@ -59,7 +57,7 @@ class AssetsModel(
         private val input: Input,
     ) {
         val rows: List<Row> by derivedStateOf {
-            val list = input.list
+            val list = input.list.value
 
             list?.wallets?.values.orEmpty()
                 .filter { it.archivedAt == null }
@@ -132,8 +130,8 @@ class AssetsModel(
             state.task.observe(
                 values = dependencies.entryList,
                 failure = loadFailedMessage,
-                failing = { state.isListFailed = it },
-            ) { input.list = it }
+                into = input::list,
+            )
         }
     }
 

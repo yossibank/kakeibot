@@ -6,7 +6,7 @@ import SwiftUI
 
 extension MainView {
     var isLoaded: Bool {
-        let isHomeLoaded = home.input.list != nil || home.state.errorNotice.message != nil
+        let isHomeLoaded = Self.isSettled(home.input.list, home.state.errorNotice)
         let isSetupLoaded = setup.output.isLoaded || setup.state.errorNotice.message != nil
         let isLaunchChosen = model.input.launchScreen != nil
         return isHomeLoaded && isSetupLoaded && isLaunchChosen && areTabsLoaded
@@ -53,7 +53,19 @@ extension MainView {
     }
 
     func retry() {
-        model.state.restartObservation()
+        model.state.round.restart()
+    }
+
+    func observe() async {
+        let models = (home, records, review, assets, setup)
+
+        await model.state.round.each([
+            { await models.0.run() },
+            { await models.1.run() },
+            { await models.2.run() },
+            { await models.3.run() },
+            { await models.4.run() }
+        ])
     }
 
     func markOpened(_ sheet: MainModel.Sheet?) {
@@ -137,10 +149,18 @@ private extension MainView {
     }
 
     var areTabsLoaded: Bool {
-        let isRecordsLoaded = records.input.list != nil || records.state.errorNotice.message != nil
-        let isReviewLoaded = review.input.list != nil || review.state.errorNotice.message != nil
-        let isAssetsLoaded = assets.output.list != nil || assets.state.errorNotice.message != nil
+        let isRecordsLoaded = Self.isSettled(records.input.list, records.state.errorNotice)
+        let isReviewLoaded = Self.isSettled(review.input.list, review.state.errorNotice)
+        let isAssetsShown = assets.output.list != nil || assets.input.list.isFailed
+        let isAssetsLoaded = isAssetsShown || assets.state.errorNotice.message != nil
         return isRecordsLoaded && isReviewLoaded && isAssetsLoaded
+    }
+
+    static func isSettled(
+        _ list: Loadable<some Any>,
+        _ notice: ErrorNotice
+    ) -> Bool {
+        list.isSettled || notice.message != nil
     }
 
     static func destination(

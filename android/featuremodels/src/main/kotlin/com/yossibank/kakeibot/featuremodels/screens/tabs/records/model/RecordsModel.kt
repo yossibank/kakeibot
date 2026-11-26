@@ -16,6 +16,7 @@ import com.yossibank.kakeibot.core.concepts.entry.within
 import com.yossibank.kakeibot.core.concepts.setting.RecordsLayout
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
@@ -58,9 +59,6 @@ class RecordsModel(
         var selected: LocalDate? by mutableStateOf(null)
             private set
 
-        var isListFailed: Boolean by mutableStateOf(false)
-            internal set
-
         fun move(to: YearMonth) {
             month = to
             selected = null
@@ -76,10 +74,7 @@ class RecordsModel(
     }
 
     class Input {
-        var list: EntryList? by mutableStateOf(null)
-            internal set
-
-        var isLoaded: Boolean by mutableStateOf(false)
+        var list: Loadable<EntryList> by mutableStateOf(Loadable.Loading)
             internal set
 
         var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
@@ -127,7 +122,7 @@ class RecordsModel(
             get() = PeriodText.range(period)
 
         val days: List<EntryDay> by derivedStateOf {
-            input.list?.days?.within(period) ?: emptyList()
+            input.list.value?.days?.within(period) ?: emptyList()
         }
 
         val expenseTotal: Long
@@ -145,7 +140,7 @@ class RecordsModel(
         fun day(on: LocalDate): EntryDay? = daysByDate[on]
 
         fun rows(of: EntryDay): List<EntryRowItem> {
-            val list = input.list ?: return emptyList()
+            val list = input.list.value ?: return emptyList()
 
             return of.entries.map { entry ->
                 EntryRowItem.of(
@@ -218,11 +213,8 @@ class RecordsModel(
                 state.task.observe(
                     values = dependencies.entryList,
                     failure = loadFailedMessage,
-                    failing = { state.isListFailed = it },
-                ) {
-                    input.list = it
-                    input.isLoaded = true
-                }
+                    into = input::list,
+                )
             }
         }
     }

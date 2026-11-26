@@ -154,7 +154,7 @@ private extension HomeView {
                     .frame(minHeight: 44)
             }
 
-            if model.input.isListFailed {
+            if model.input.list.isFailed {
                 PlaceholderLoadFailed(onRetry: onRetry)
             } else if model.output.showsNoRecords {
                 PlaceholderEmpty(

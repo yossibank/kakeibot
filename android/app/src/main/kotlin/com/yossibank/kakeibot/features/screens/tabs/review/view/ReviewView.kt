@@ -88,7 +88,7 @@ fun ReviewView(
     TabNoticeRound(model.state.task)
 
     LoadFailedColumn(
-        isFailed = model.state.isListFailed,
+        isFailed = model.input.list.isFailed,
         onRetry = model::retry,
     ) {
         item(key = "title") {

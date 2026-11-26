@@ -73,7 +73,8 @@ public extension ReviewModel.Output {
         _ goal: ReviewGoal,
         in period: ReviewPeriod
     ) -> ReviewGoalItem? {
-        guard let category = goal.categoryId.flatMap({ input.list?.categories[$0]?.name }) else {
+        guard let category = goal.categoryId.flatMap({ input.list.value?.categories[$0]?.name })
+        else {
             return nil
         }
 

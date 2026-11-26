@@ -147,7 +147,7 @@ private fun BudgetCard(
     model: HomeModel,
     onOpenBudget: () -> Unit,
 ) {
-    val overview = model.input.overview
+    val overview = model.input.overview.value
     val usage = model.output.usage
 
     Column(
@@ -161,7 +161,7 @@ private fun BudgetCard(
         Dial(
             usage = usage,
             monthExpense = overview?.monthExpense ?: 0,
-            isFailed = model.state.isListFailed,
+            isFailed = model.input.overview.isFailed,
         )
 
         Row(
@@ -195,7 +195,7 @@ private fun BudgetCard(
                 title = "今日の支出",
                 amount = overview?.todayExpense ?: 0,
                 type = Entry.Kind.expense,
-                isFailed = model.state.isListFailed,
+                isFailed = model.input.overview.isFailed,
                 modifier = Modifier.weight(1f),
             )
 
@@ -205,7 +205,7 @@ private fun BudgetCard(
                 title = model.output.middleTitle,
                 amount = model.output.middleAmount,
                 type = Entry.Kind.expense,
-                isFailed = model.state.isListFailed,
+                isFailed = model.input.overview.isFailed,
                 modifier = Modifier.weight(1f),
             )
 
@@ -215,7 +215,7 @@ private fun BudgetCard(
                 title = "今月の収入",
                 amount = overview?.monthIncome ?: 0,
                 type = Entry.Kind.income,
-                isFailed = model.state.isListFailed,
+                isFailed = model.input.overview.isFailed,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -345,7 +345,7 @@ private fun RecentCard(
             ),
         )
 
-        if (model.state.isListFailed) {
+        if (model.input.overview.isFailed) {
             return@Column PlaceholderLoadFailed(onRetry = model::retry)
         }
 

@@ -36,7 +36,8 @@ public extension HomeModel.Output {
     var templates: [EntryTemplate] {
         templatesCache.value {
             let shown = input.allTemplates.filter { $0.type == state.templateType }
-            return input.list?.ordered(shown, by: input.templateOrder, today: state.today) ?? shown
+            return input.list.value?
+                .ordered(shown, by: input.templateOrder, today: state.today) ?? shown
         }
     }
 
@@ -45,11 +46,11 @@ public extension HomeModel.Output {
     }
 
     var showsNoRecords: Bool {
-        input.list != nil && recentRows.isEmpty
+        input.list.isLoaded && recentRows.isEmpty
     }
 
     var recentRows: [EntryRowItem] {
-        guard let list = input.list else {
+        guard let list = input.list.value else {
             return []
         }
 
@@ -80,14 +81,14 @@ public extension HomeModel.Output {
 private extension HomeModel.Output {
     var figures: HomeFigures {
         figuresCache.value {
-            let bills = input.list?.upcomingCardBills(
+            let bills = input.list.value?.upcomingCardBills(
                 recurrings: input.recurrings,
                 after: state.today,
                 count: BillPage.limit
             )
 
             let overview = MonthOverview(
-                list: input.list,
+                list: input.list.value,
                 budgets: input.budgets,
                 recurrings: input.recurrings,
                 monthStartDay: input.monthStartDay,

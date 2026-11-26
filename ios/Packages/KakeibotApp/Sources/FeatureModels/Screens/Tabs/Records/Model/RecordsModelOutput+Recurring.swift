@@ -75,11 +75,11 @@ public extension RecordsModel.Output {
         of recurring: Recurring,
         on date: LocalDate
     ) -> Int {
-        input.list?.amount(of: recurring, on: date) ?? recurring.scheduledAmount(paidOn: date)
+        input.list.value?.amount(of: recurring, on: date) ?? recurring.scheduledAmount(paidOn: date)
     }
 
     func title(of recurring: Recurring) -> String {
-        input.list?.title(of: recurring) ?? Self.recurringTitle
+        input.list.value?.title(of: recurring) ?? Self.recurringTitle
     }
 }
 

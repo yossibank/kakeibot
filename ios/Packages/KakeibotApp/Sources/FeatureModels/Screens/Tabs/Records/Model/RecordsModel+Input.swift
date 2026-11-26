@@ -6,8 +6,7 @@ public extension RecordsModel {
     @MainActor
     @Observable
     final class Input {
-        public internal(set) var list: EntryList?
-        public internal(set) var isListFailed = false
+        public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var monthStartDay: MonthStartDay = .first
         public internal(set) var weekStart: Weekday = .sunday
         public internal(set) var noSpendDays: Set<LocalDate> = []

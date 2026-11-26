@@ -72,26 +72,24 @@ class ScreenObservationTest {
     fun marksFailureUntilObservedAgain() = runTest {
         val task = ModelTask()
         val counter = Counter()
-        var value: Int? = null
-        var isFailed = false
+        val holder = Holder()
 
         task.observe(
             values = values(counter, failures = 4),
             failure = "読めませんでした",
-            failing = { isFailed = it },
-        ) { value = it }
+            into = holder::value,
+        )
 
-        val failed = isFailed
+        val failed = holder.value.isFailed
 
         task.observe(
             values = values(counter, failures = 4),
             failure = "読めませんでした",
-            failing = { isFailed = it },
-        ) { value = it }
+            into = holder::value,
+        )
 
         assertTrue(failed)
-        assertFalse(isFailed)
-        assertEquals(1, value)
+        assertEquals(Loadable.Loaded(1), holder.value)
         assertEquals("読めませんでした", task.message)
     }
 
@@ -204,6 +202,10 @@ class ScreenObservationTest {
 
     private class Counter {
         var attempts = 0
+    }
+
+    private class Holder {
+        var value: Loadable<Int> = Loadable.Loading
     }
 
     private fun values(

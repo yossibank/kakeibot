@@ -11,6 +11,7 @@ import com.yossibank.kakeibot.store.database.isStorageFull
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 
 class ModelTask {
@@ -99,18 +100,22 @@ class ModelTask {
     suspend fun <Value> observe(
         values: Flow<Value>,
         failure: String,
-        failing: (Boolean) -> Unit,
-        receive: suspend (Value) -> Unit,
+        into: KMutableProperty0<Loadable<Value>>,
+        receive: suspend (Value) -> Unit = {},
     ) {
-        failing(false)
+        into.set(into.get().retrying)
 
         val isFailed = observe(
             values = values,
             failure = failure,
-            receive = receive,
-        )
+        ) {
+            into.set(Loadable.Loaded(it))
+            receive(it)
+        }
 
-        failing(isFailed)
+        if (isFailed) {
+            into.set(Loadable.Failed)
+        }
     }
 
     @Composable

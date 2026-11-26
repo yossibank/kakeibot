@@ -204,20 +204,8 @@ private extension MainView {
                 sheetContent(for: sheet)
                     .presentationSizing(.tallForm)
             }
-            .task(id: model.state.observationRound) {
-                await home.run()
-            }
-            .task(id: model.state.observationRound) {
-                await records.run()
-            }
-            .task(id: model.state.observationRound) {
-                await review.run()
-            }
-            .task(id: model.state.observationRound) {
-                await assets.run()
-            }
-            .task(id: model.state.observationRound) {
-                await setup.run()
+            .task {
+                await observe()
             }
             .task {
                 await model.state.draft.load()

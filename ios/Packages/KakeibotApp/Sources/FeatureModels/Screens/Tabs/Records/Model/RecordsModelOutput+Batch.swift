@@ -4,11 +4,11 @@ import Store
 
 public extension RecordsModel.Output {
     var batchWallets: [Wallet] {
-        input.list?.filterWallets ?? []
+        input.list.value?.filterWallets ?? []
     }
 
     func batchCategories(for type: Entry.Kind) -> [EntryCategory] {
-        let categories = input.list?.filterCategories ?? []
+        let categories = input.list.value?.filterCategories ?? []
         return categories.filter { $0.kind.rawValue == type.rawValue }
     }
 
@@ -67,7 +67,7 @@ private extension RecordsModel.Output {
     static let emptySelectionBlock = "記録を選んでください"
 
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
-        let entries = input.list?.entries ?? []
+        let entries = input.list.value?.entries ?? []
         return entries.filter { ids.contains($0.id) }
     }
 }

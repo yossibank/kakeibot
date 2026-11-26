@@ -166,7 +166,7 @@ private extension ReviewView {
         .task(id: model.output.goalTrigger) {
             await model.refreshGoals()
         }
-        .task(id: model.input.list?.entries.count) {
+        .task(id: model.input.list.value?.entries.count) {
             await model.refreshStoreReviewCard()
         }
         .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in

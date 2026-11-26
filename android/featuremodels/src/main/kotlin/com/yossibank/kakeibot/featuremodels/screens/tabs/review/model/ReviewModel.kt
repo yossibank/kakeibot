@@ -17,6 +17,7 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.entryType
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
@@ -76,9 +77,6 @@ class ReviewModel(
         var offset: Int by mutableStateOf(0)
             private set
 
-        var isListFailed: Boolean by mutableStateOf(false)
-            internal set
-
         fun move(count: Int) {
             if (offset + count > 0) {
                 return
@@ -99,7 +97,7 @@ class ReviewModel(
         var kind: ReviewKind by mutableStateOf(ReviewKind.expense)
             internal set
 
-        var list: EntryList? by mutableStateOf(null)
+        var list: Loadable<EntryList> by mutableStateOf(Loadable.Loading)
             internal set
 
         var monthStartDay: MonthStartDay by mutableStateOf(MonthStartDay.first)
@@ -153,7 +151,7 @@ class ReviewModel(
 
         val summary: ReviewSummary by derivedStateOf {
             ReviewSummary(
-                entries = input.list?.entries ?: emptyList(),
+                entries = input.list.value?.entries ?: emptyList(),
                 range = period.range,
             )
         }
@@ -161,7 +159,7 @@ class ReviewModel(
         val previousTotal: Long
             get() {
                 val previous = ReviewSummary(
-                    entries = input.list?.entries ?: emptyList(),
+                    entries = input.list.value?.entries ?: emptyList(),
                     range = period.comparisonRange(today = state.today),
                 )
 
@@ -171,7 +169,7 @@ class ReviewModel(
         val hasPreviousEntries: Boolean
             get() {
                 val range = period.comparisonRange(today = state.today)
-                return input.list?.entries.orEmpty().any { it.date in range }
+                return input.list.value?.entries.orEmpty().any { it.date in range }
             }
 
         val comparisonText: String
@@ -202,7 +200,7 @@ class ReviewModel(
 
         val rows: List<Row>
             get() {
-                val list = input.list ?: return emptyList()
+                val list = input.list.value ?: return emptyList()
                 val type = input.kind.entryType ?: return emptyList()
                 val breakdown = summary.breakdown(of = type) ?: return emptyList()
 
@@ -336,8 +334,8 @@ class ReviewModel(
                 state.task.observe(
                     values = dependencies.entryList,
                     failure = loadFailedMessage,
-                    failing = { state.isListFailed = it },
-                ) { input.list = it }
+                    into = input::list,
+                )
             }
         }
     }

@@ -40,7 +40,7 @@ public extension ReviewModel.Output {
     }
 
     internal func factorRows(of key: ReviewModel.FactorKey) -> [EntryRowItem] {
-        guard let list = input.list else {
+        guard let list = input.list.value else {
             return []
         }
 
@@ -59,7 +59,7 @@ private extension ReviewModel.Output {
         name: String
     ) -> ReviewModel.Share? {
         guard
-            let list = input.list,
+            let list = input.list.value,
             let category = list.categories[categoryId]
         else {
             return nil

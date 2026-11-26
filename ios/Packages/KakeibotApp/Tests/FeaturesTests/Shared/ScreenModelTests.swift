@@ -48,21 +48,18 @@ struct ScreenModelTests {
 
         await model.observe(
             Self.values(counter, failures: 4),
-            into: \.value,
-            failing: \.isFailed
+            into: \.value
         )
 
-        let failed = model.isFailed
+        let failed = model.value.isFailed
 
         await model.observe(
             Self.values(counter, failures: 4),
-            into: \.value,
-            failing: \.isFailed
+            into: \.value
         )
 
         #expect(failed)
-        #expect(!model.isFailed)
-        #expect(model.value == 1)
+        #expect(model.value == .loaded(1))
         #expect(model.state.errorNotice.message == "読めませんでした")
     }
 
@@ -114,8 +111,7 @@ extension ScreenModelTests {
 
         let state = NoticeState()
 
-        var value: Int?
-        var isFailed = false
+        var value: Loadable<Int> = .loading
     }
 }
 

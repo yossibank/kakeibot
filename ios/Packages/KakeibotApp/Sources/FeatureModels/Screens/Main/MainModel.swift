@@ -76,9 +76,9 @@ public extension MainModel {
         public private(set) var draft: EntryModel
         public private(set) var isWarmingEntry = true
         public private(set) var noticeRound = 0
-        public private(set) var observationRound = 0
 
         public let undo: DeletionUndo
+        public let round = ObservationRound()
 
         @ObservationIgnored private var foreground = ForegroundReturn()
 
@@ -119,13 +119,9 @@ public extension MainModel.State {
         visitedTabs.insert(tab)
     }
 
-    func restartObservation() {
-        observationRound += 1
-    }
-
     func changeScene(to phase: ForegroundReturn.Phase) {
         if foreground.receive(phase) {
-            restartObservation()
+            round.restart()
         }
     }
 

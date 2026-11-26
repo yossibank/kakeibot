@@ -34,7 +34,7 @@ class HomeModelTest {
         ModelWait.until { model.state.task.message.isNotEmpty() }
 
         assertEquals("記録を読めませんでした", model.state.task.message)
-        assertNull(model.input.overview)
+        assertNull(model.input.overview.value)
     }
 
     @Test
@@ -48,15 +48,15 @@ class HomeModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.isListFailed }
+        ModelWait.until { model.input.overview.isFailed }
         val message = model.state.task.message
-        val overview = model.input.overview
+        val overview = model.input.overview.value
         model.retry()
-        ModelWait.until { model.input.overview != null }
+        ModelWait.until { model.input.overview.isLoaded }
 
         assertEquals("記録を読めませんでした", message)
         assertNull(overview)
-        assertFalse(model.state.isListFailed)
+        assertFalse(model.input.overview.isFailed)
     }
 
     @Test
@@ -77,7 +77,7 @@ class HomeModelTest {
         assertTrue(model.output.recentRows.isEmpty())
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.input.overview != null }
+        ModelWait.until { model.input.overview.isLoaded }
 
         assertFalse(before)
         assertTrue(model.output.showsNoRecords)
@@ -108,7 +108,7 @@ class HomeModelTest {
         setup.save(Entry.Kind.income, amount = 250_000, daysAgo = 2)
         setup.save(Entry.Kind.expense, amount = 3000, daysAgo = 30)
         val model = setup.observedModel()
-        val overview = checkNotNull(model.input.overview)
+        val overview = checkNotNull(model.input.overview.value)
 
         assertEquals(5700L, overview.monthExpense)
         assertEquals(250_000L, overview.monthIncome)
@@ -141,7 +141,7 @@ class HomeModelTest {
         ModelWait.until { model.output.month.toString() == "2026-11" }
 
         assertEquals("11/1〜11/30", model.output.periodText)
-        assertEquals(300L, model.input.overview?.monthExpense)
+        assertEquals(300L, model.input.overview.value?.monthExpense)
     }
 
     @Test
@@ -219,7 +219,7 @@ class HomeModelTest {
         val model = setup.observedModel()
         ModelWait.until { model.output.periodText == "9/25〜10/24" }
 
-        assertEquals(1480L, model.input.overview?.monthExpense)
+        assertEquals(1480L, model.input.overview.value?.monthExpense)
     }
 
     private fun ModelTestSetup.homeModel() = HomeModel(
@@ -232,7 +232,7 @@ class HomeModelTest {
         val model = homeModel()
 
         scope.launch { model.observe() }
-        ModelWait.until { model.input.overview != null }
+        ModelWait.until { model.input.overview.isLoaded }
 
         return model
     }

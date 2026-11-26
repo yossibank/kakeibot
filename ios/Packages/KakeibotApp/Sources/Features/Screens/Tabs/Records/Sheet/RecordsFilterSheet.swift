@@ -190,7 +190,7 @@ private extension RecordsFilterSheet {
     }
 
     var list: EntryList? {
-        model.input.list
+        model.input.list.value
     }
 
     var showTitle: String {

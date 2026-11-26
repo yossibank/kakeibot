@@ -53,7 +53,7 @@ struct RecordsModelTests {
         }
 
         await ObservationWait.until {
-            model.input.list != nil
+            model.input.list.isLoaded
         }
 
         first.cancel()
