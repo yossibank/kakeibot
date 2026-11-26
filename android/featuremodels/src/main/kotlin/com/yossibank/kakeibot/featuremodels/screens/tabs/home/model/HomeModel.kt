@@ -12,6 +12,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.monthOverviewUpdates
@@ -22,8 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 
 class HomeModel(
-    database: AppDatabase,
-    entryList: Flow<EntryList>,
+    parts: ScreenParts,
     today: LocalDate,
     round: ObservationRound,
 ) {
@@ -31,7 +31,7 @@ class HomeModel(
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, entryList, round)
+    private val dependencies = Dependencies(parts.database, parts.entryList, round)
 
     class State(
         today: LocalDate,

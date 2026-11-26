@@ -9,7 +9,6 @@ import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.budgets
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.setting
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.budgetCarryoverFrom
@@ -276,8 +275,7 @@ class BudgetListModelTest {
     @Test
     fun tellsWhenBudgetsCannotBeRead() = modelTest(today = "2026-10-12") { setup ->
         val model = BudgetListModel(
-            database = setup.database,
-            entryList = failingEntryList,
+            parts = setup.parts(entryList = failingEntryList),
             today = setup.today,
         )
 
@@ -291,8 +289,7 @@ class BudgetListModelTest {
     @Test
     fun keepsNoticeWhenEditingStarts() = modelTest(today = "2026-10-12") { setup ->
         val model = BudgetListModel(
-            database = setup.database,
-            entryList = failingEntryList,
+            parts = setup.parts(entryList = failingEntryList),
             today = setup.today,
         )
 
@@ -323,8 +320,7 @@ class BudgetListModelTest {
 
     private suspend fun ModelTestSetup.observedModel(): BudgetListModel {
         val model = BudgetListModel(
-            database = database,
-            entryList = database.entryListUpdates(),
+            parts = parts,
             today = today,
         )
 

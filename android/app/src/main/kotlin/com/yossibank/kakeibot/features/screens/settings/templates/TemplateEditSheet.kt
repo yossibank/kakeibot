@@ -65,7 +65,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.templates.TemplateEditModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.shared.model.OnOutcome
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
@@ -73,20 +73,18 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCapti
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
-import com.yossibank.kakeibot.store.database.AppDatabase
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TemplateEditSheet(
-    database: AppDatabase,
+    parts: ScreenParts,
     draft: EntryTemplateDraft,
     onSave: (EntryTemplate) -> Unit,
     onClose: () -> Unit,
 ) {
-    val model = remember(database, draft) {
+    val model = remember(parts, draft) {
         TemplateEditModel(
-            database = database,
-            clock = ScreenClock.system,
+            parts = parts,
             draft = draft,
         )
     }

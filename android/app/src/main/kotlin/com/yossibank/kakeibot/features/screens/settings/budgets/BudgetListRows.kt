@@ -62,7 +62,6 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.usage
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
-import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.settingsparts.board.SettingsUndoNotice
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintButton
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
@@ -72,7 +71,6 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCapti
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
-import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
 @Composable

@@ -18,6 +18,7 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.review.parts.ReviewText
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -33,8 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class RecordsModel(
-    database: AppDatabase,
-    entryList: Flow<EntryList>,
+    parts: ScreenParts,
     today: LocalDate,
     round: ObservationRound,
 ) : ScreenPerforming {
@@ -42,7 +42,7 @@ class RecordsModel(
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, entryList, round)
+    private val dependencies = Dependencies(parts.database, parts.entryList, round)
 
     class State(
         today: LocalDate,

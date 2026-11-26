@@ -4,7 +4,6 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.templates
@@ -163,8 +162,7 @@ class TemplateEditModelTest {
     }
 
     private fun ModelTestSetup.templateModel(type: Entry.Kind) = TemplateEditModel(
-        database = database,
-        clock = ScreenClock.fixed(now),
+        parts = parts,
         draft = EntryTemplateDraft(
             name = "",
             type = type,

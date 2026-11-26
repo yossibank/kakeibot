@@ -3,7 +3,6 @@ package com.yossibank.kakeibot.featuremodels.screens.settings.recurring
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
@@ -11,7 +10,6 @@ import com.yossibank.kakeibot.featuremodels.support.failDeletes
 import com.yossibank.kakeibot.featuremodels.support.failWrites
 import com.yossibank.kakeibot.featuremodels.support.failingEntryList
 import com.yossibank.kakeibot.featuremodels.support.modelTest
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.methods.recurrings
 import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
@@ -179,9 +177,7 @@ class RecurringListModelTest {
     @Test
     fun tellsWhenRecurringsCannotBeRead() = modelTest(today = "2026-10-17") { setup ->
         val model = RecurringListModel(
-            database = setup.database,
-            clock = ScreenClock.fixed(setup.now),
-            entryList = failingEntryList,
+            parts = setup.parts(entryList = failingEntryList),
             today = setup.today,
         )
 
@@ -285,9 +281,7 @@ class RecurringListModelTest {
 
     private suspend fun ModelTestSetup.observedModel(count: Int = 1): RecurringListModel {
         val model = RecurringListModel(
-            database = database,
-            clock = ScreenClock.fixed(now),
-            entryList = database.entryListUpdates(),
+            parts = parts,
             today = today,
         )
 

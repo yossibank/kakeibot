@@ -25,6 +25,7 @@ import com.yossibank.kakeibot.designsystem.components.notice.NoticeBanner
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel.Screen
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.settings.budgets.BudgetListView
 import com.yossibank.kakeibot.features.screens.settings.monthstartday.MonthStartDayView
@@ -38,25 +39,18 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCapti
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
-import com.yossibank.kakeibot.store.database.AppDatabase
-import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
-import com.yossibank.kakeibot.store.queries.methods.settingUpdates
-import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
-import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
-import com.yossibank.kakeibot.store.records.settingkeys.weekStart
-import com.yossibank.kakeibot.store.writes.methods.setSetting
 import kotlinx.coroutines.CancellationException
 
 @Composable
 fun SettingsMenuSheet(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     onClose: () -> Unit,
     openRecurring: Identifier<Recurring>? = null,
 ) {
-    val model = remember(database) {
+    val model = remember(parts) {
         SettingsMenuModel(
-            database = database,
+            parts = parts,
             screen = if (openRecurring != null) Screen.Recurrings else Screen.Menu,
         )
     }
@@ -156,28 +150,14 @@ fun SettingsMenuSheet(
                 MonthStartDayView(
                     selection = model.input.monthStartDay,
                     today = today,
-                    onSelect = { day ->
-                        model.perform {
-                            it.store(
-                                key = SettingKey.monthStartDay,
-                                value = day,
-                            )
-                        }
-                    },
+                    onSelect = { day -> model.perform { it.choose(monthStartDay = day) } },
                 )
             }
 
             Screen.WeekStart -> {
                 SettingsMenuWeekStart(
                     selection = model.input.weekStart,
-                    onSelect = { weekday ->
-                        model.perform {
-                            it.store(
-                                key = SettingKey.weekStart,
-                                value = weekday,
-                            )
-                        }
-                    },
+                    onSelect = { weekday -> model.perform { it.choose(weekStart = weekday) } },
                 )
             }
 
@@ -187,7 +167,7 @@ fun SettingsMenuSheet(
 
     if (screen == Screen.Budgets) {
         BudgetListView(
-            database = database,
+            parts = parts,
             today = today,
             onBack = ::back,
         )
@@ -195,7 +175,7 @@ fun SettingsMenuSheet(
 
     if (screen == Screen.Recurrings) {
         RecurringListView(
-            database = database,
+            parts = parts,
             today = today,
             onBack = ::back,
             opening = openRecurring,

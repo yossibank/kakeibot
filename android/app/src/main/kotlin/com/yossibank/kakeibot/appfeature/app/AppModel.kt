@@ -9,6 +9,8 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.theme.ThemeLook
 import com.yossibank.kakeibot.core.concepts.theme.ThemeStyle
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.notifications.NotificationScheduler
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.notificationInputUpdates
@@ -49,6 +51,7 @@ class AppModel(
 
         data class Ready(
             val database: AppDatabase,
+            val parts: ScreenParts,
         ) : Launch
 
         data object Failed : Launch
@@ -70,7 +73,14 @@ class AppModel(
 
                 look = opened.themeLook()
                 style = opened.style()
-                launch = Launch.Ready(opened)
+
+                launch = Launch.Ready(
+                    database = opened,
+                    parts = ScreenParts(
+                        database = opened,
+                        clock = ScreenClock.system,
+                    ),
+                )
 
                 observeTheme(opened)
                 observeNotifications(opened)

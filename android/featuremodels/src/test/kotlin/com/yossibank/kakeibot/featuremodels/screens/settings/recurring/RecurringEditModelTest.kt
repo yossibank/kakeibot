@@ -7,7 +7,6 @@ import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorizati
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.FakePermission
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
@@ -324,8 +323,7 @@ class RecurringEditModelTest {
         type: Entry.Kind = Entry.Kind.expense,
         editingId: Identifier<Recurring>? = null,
     ) = RecurringEditModel(
-        database = database,
-        clock = ScreenClock.fixed(now),
+        parts = parts,
         today = today,
         type = type,
         editingId = editingId,

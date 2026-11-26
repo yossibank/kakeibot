@@ -13,10 +13,8 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.featuremodels.screens.tabs.records.model.RecordsModel
 import com.yossibank.kakeibot.featuremodels.screens.tabs.review.model.ReviewModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.queries.types.MonthOverview
 import com.yossibank.kakeibot.store.writes.methods.generateRecurringEntries
@@ -25,32 +23,28 @@ import kotlinx.coroutines.launch
 class ScreenFlowTabs(
     setup: ModelTestSetup,
 ) {
-    private val entryList = setup.database.entryListUpdates()
     private val round = ObservationRound()
 
     val home = HomeModel(
-        database = setup.database,
-        entryList = entryList,
+        parts = setup.parts,
         today = setup.today,
         round = round,
     )
 
     val records = RecordsModel(
-        database = setup.database,
-        entryList = entryList,
+        parts = setup.parts,
         today = setup.today,
         round = round,
     )
 
     val review = ReviewModel(
-        database = setup.database,
-        entryList = entryList,
+        parts = setup.parts,
         today = setup.today,
         round = round,
     )
 
     val assets = AssetsModel(
-        entryList = entryList,
+        parts = setup.parts,
         today = setup.today,
         round = round,
     )
@@ -102,8 +96,7 @@ suspend fun ModelTestSetup.entryModel(
     today: LocalDate = this.today,
 ): EntryModel {
     val model = EntryModel(
-        database = database,
-        clock = ScreenClock.fixed(now),
+        parts = parts,
         today = today,
         editing = editing,
     )

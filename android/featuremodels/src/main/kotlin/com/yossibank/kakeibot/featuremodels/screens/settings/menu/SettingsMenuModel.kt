@@ -8,6 +8,7 @@ import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -22,13 +23,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class SettingsMenuModel(
-    database: AppDatabase,
+    parts: ScreenParts,
     screen: Screen = Screen.Menu,
 ) : SettingsFoldModel {
     val state = State(screen)
     val input = Input()
 
-    private val dependencies = Dependencies(database)
+    private val dependencies = Dependencies(parts.database)
 
     enum class Screen(
         val title: String,
@@ -104,7 +105,21 @@ class SettingsMenuModel(
         )
     }
 
-    suspend fun <Value> store(
+    suspend fun choose(monthStartDay: MonthStartDay) {
+        store(
+            key = SettingKey.monthStartDay,
+            value = monthStartDay,
+        )
+    }
+
+    suspend fun choose(weekStart: Weekday) {
+        store(
+            key = SettingKey.weekStart,
+            value = weekStart,
+        )
+    }
+
+    private suspend fun <Value> store(
         key: SettingKey<Value>,
         value: Value,
     ) {

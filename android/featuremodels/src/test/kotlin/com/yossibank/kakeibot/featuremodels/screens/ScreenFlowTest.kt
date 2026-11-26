@@ -8,13 +8,10 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.menu.SettingsMenuModel
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditModel
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryList
-import com.yossibank.kakeibot.store.queries.methods.entryListUpdates
-import com.yossibank.kakeibot.store.records.settingkeys.SettingKey
 import com.yossibank.kakeibot.store.records.settingkeys.monthStartDay
 import kotlinx.coroutines.launch
 import org.junit.Test
@@ -139,8 +136,7 @@ class ScreenFlowTest {
         val nextDay = date("2026-11-10")
         val tabs = setup.openTabs()
         val editor = RecurringEditModel(
-            database = setup.database,
-            clock = ScreenClock.fixed(setup.now),
+            parts = setup.parts,
             today = setup.today,
         )
         editor.load()
@@ -176,13 +172,13 @@ class ScreenFlowTest {
         setup.record(500, on = early)
         setup.record(1200, on = late)
         ModelWait.until { tabs.amounts.all { it.size == 2 } }
-        val settings = SettingsMenuModel(database = setup.database)
+        val settings = SettingsMenuModel(parts = setup.parts)
 
         assertEquals(1700L, tabs.overview.monthExpense)
         assertEquals(1700L, tabs.records.output.expenseTotal)
         assertEquals(1700L, tabs.review.output.total)
 
-        settings.store(key = SettingKey.monthStartDay, value = startDay)
+        settings.choose(monthStartDay = startDay)
         ModelWait.until {
             tabs.overview.monthStartDay == startDay &&
                 tabs.records.input.monthStartDay == startDay &&
@@ -211,8 +207,7 @@ class ScreenFlowTest {
         setup.record(1200)
         ModelWait.until { tabs.amounts.all { it == listOf(1200) } }
         val settings = BudgetListModel(
-            database = setup.database,
-            entryList = setup.database.entryListUpdates(),
+            parts = setup.parts,
             today = setup.today,
         )
         setup.scope.launch { settings.observe() }

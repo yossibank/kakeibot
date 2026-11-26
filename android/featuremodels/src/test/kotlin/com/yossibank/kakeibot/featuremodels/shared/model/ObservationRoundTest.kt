@@ -46,14 +46,13 @@ class ObservationRoundTest {
         val entryList = setup.database.entryListUpdates()
 
         val records = RecordsModel(
-            database = setup.database,
-            entryList = entryList.failingFirst(times = 4),
+            parts = setup.parts(entryList = entryList.failingFirst(times = 4)),
             today = setup.today,
             round = round,
         )
 
         val assets = AssetsModel(
-            entryList = entryList.failingFirst(times = 4),
+            parts = setup.parts(entryList = entryList.failingFirst(times = 4)),
             today = setup.today,
             round = round,
         )

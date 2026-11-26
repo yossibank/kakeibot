@@ -28,7 +28,7 @@ class ScreenPerformingTest {
 
     @Test
     fun runsModelWorkUntilItEnds() = modelTest(today = "2026-10-17") { setup ->
-        val model = SettingsMenuModel(database = setup.database)
+        val model = SettingsMenuModel(parts = setup.parts)
 
         model.perform { it.loadFold(it.input.monthStartHint) }.join()
 

@@ -25,8 +25,7 @@ class HomeModelTest {
     @Test
     fun showsNoticeWhenListFails() = modelTest(today = "2026-10-12") { setup ->
         val model = HomeModel(
-            database = setup.database,
-            entryList = failingEntryList,
+            parts = setup.parts(entryList = failingEntryList),
             today = setup.today,
             round = ObservationRound(),
         )
@@ -41,8 +40,9 @@ class HomeModelTest {
     @Test
     fun marksListFailureUntilRetried() = modelTest(today = "2026-10-12") { setup ->
         val model = HomeModel(
-            database = setup.database,
-            entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            parts = setup.parts(
+                entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            ),
             today = setup.today,
             round = ObservationRound(),
         )
@@ -223,8 +223,7 @@ class HomeModelTest {
     }
 
     private fun ModelTestSetup.homeModel() = HomeModel(
-        database = database,
-        entryList = database.entryListUpdates(),
+        parts = parts,
         today = today,
         round = ObservationRound(),
     )

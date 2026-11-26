@@ -12,9 +12,11 @@ import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -32,9 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class RecurringListModel(
-    database: AppDatabase,
-    clock: ScreenClock,
-    entryList: Flow<EntryList>,
+    parts: ScreenParts,
     today: LocalDate,
     opening: Identifier<Recurring>? = null,
 ) : SettingsFoldModel {
@@ -42,7 +42,7 @@ class RecurringListModel(
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, clock, entryList)
+    private val dependencies = Dependencies(parts.database, parts.clock, parts.entryList)
 
     sealed interface Editing {
         data object New : Editing
@@ -109,6 +109,23 @@ class RecurringListModel(
         fun select(type: Entry.Kind) {
             openId = null
             this.type = type
+        }
+
+        fun finishEditing(
+            edited: Editing,
+            outcome: SettingsEditOutcome<Unit>,
+        ) {
+            val id = (edited as? Editing.Existing)?.id
+
+            if (outcome.isHidden == true && id != null) {
+                hidden.show(id)
+            }
+
+            outcome.deletion?.let(deleted::show)
+
+            if (outcome.closes) {
+                editing = null
+            }
         }
     }
 

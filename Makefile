@@ -82,6 +82,7 @@ verify: verify-docs
 	scripts/verify.sh swift-layout python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py $$(git ls-files --cached --others --exclude-standard '*.swift')
 	scripts/verify.sh features-no-store sh -c '! grep -rnE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/Features'
 	scripts/verify.sh app-feature-no-store sh -c '! grep -rlE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/AppFeature | grep -vxE "ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel(\+(Pro|State|Sync))?\.swift"'
+	scripts/verify.sh android-features-no-store sh -c '! grep -rnE "^import com\.yossibank\.kakeibot\.store" android/app/src/main/kotlin/com/yossibank/kakeibot/features'
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
 	scripts/verify.sh app-build scripts/no-warnings.sh $(XCODEBUILD) $(ANY_SIMULATOR) build
 	scripts/verify.sh android-test $(GRADLE) :core:test :store:jvmTest :featuremodels:testDebugUnitTest

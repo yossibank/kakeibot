@@ -17,6 +17,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -26,15 +27,14 @@ import com.yossibank.kakeibot.store.queries.types.EntryOptions
 import com.yossibank.kakeibot.store.writes.methods.saveTemplate
 
 class TemplateEditModel(
-    database: AppDatabase,
-    clock: ScreenClock,
+    parts: ScreenParts,
     draft: EntryTemplateDraft,
 ) : ScreenPerforming {
     val state = State(draft)
     val input = Input()
     val output = Output(input, state)
 
-    private val dependencies = Dependencies(database, clock)
+    private val dependencies = Dependencies(parts.database, parts.clock)
 
     class State(
         draft: EntryTemplateDraft,

@@ -91,8 +91,9 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.plannedTo
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.previewRow
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.saveTitle
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.select
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.features.shared.model.OnOutcome
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
@@ -100,23 +101,19 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCapti
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
-import com.yossibank.kakeibot.store.database.AppDatabase
-import com.yossibank.kakeibot.store.writes.types.Deletion
 
 @Composable
 fun RecurringEditSheet(
-    database: AppDatabase,
+    parts: ScreenParts,
     today: LocalDate,
     type: Entry.Kind,
     editingId: Identifier<Recurring>?,
     onClose: () -> Unit,
-    onDelete: (Deletion) -> Unit,
-    onHide: () -> Unit,
+    onOutcome: (SettingsEditOutcome<Unit>) -> Unit,
 ) {
-    val model = remember(database, editingId) {
+    val model = remember(parts, editingId) {
         RecurringEditModel(
-            database = database,
-            clock = ScreenClock.system,
+            parts = parts,
             today = today,
             type = type,
             editingId = editingId,
@@ -172,17 +169,10 @@ fun RecurringEditSheet(
         }
     }
 
-    OnOutcome(model.state.outcome) { outcome ->
-        if (outcome.isHidden == true) {
-            onHide()
-        }
-
-        outcome.deletion?.let(onDelete)
-
-        if (outcome.closes) {
-            onClose()
-        }
-    }
+    OnOutcome(
+        outcome = model.state.outcome,
+        action = onOutcome,
+    )
 
     BackHandler {
         if (model.state.panel != null) {

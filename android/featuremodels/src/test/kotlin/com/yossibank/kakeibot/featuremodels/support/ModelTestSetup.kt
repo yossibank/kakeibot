@@ -14,9 +14,12 @@ import com.yossibank.kakeibot.core.concepts.recurring.RecurringDraft
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.concepts.wallet.WalletDraft
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryList
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
+import com.yossibank.kakeibot.store.queries.types.EntryList
 import com.yossibank.kakeibot.store.queries.types.EntryOptions
 import com.yossibank.kakeibot.store.writes.methods.save
 import com.yossibank.kakeibot.store.writes.methods.saveEntry
@@ -26,6 +29,7 @@ import com.yossibank.kakeibot.store.writes.types.WalletTable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.TestResult
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -37,6 +41,17 @@ class ModelTestSetup(
     val scope: CoroutineScope,
 ) {
     val now: Instant = ModelTestDatabase.now
+
+    val parts = ScreenParts(
+        database = database,
+        clock = ScreenClock.fixed(now),
+    )
+
+    fun parts(entryList: Flow<EntryList>): ScreenParts = ScreenParts(
+        database = database,
+        clock = parts.clock,
+        entryList = entryList,
+    )
 
     suspend fun options(): EntryOptions = database.entryOptions()
 

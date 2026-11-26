@@ -22,10 +22,7 @@ class SettingsMenuModelTest {
     fun savesChosenDay() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.observedModel()
 
-        model.store(
-            key = SettingKey.weekStart,
-            value = Weekday.wednesday,
-        )
+        model.choose(weekStart = Weekday.wednesday)
         ModelWait.until { model.input.weekStart == Weekday.wednesday }
 
         assertEquals(Weekday.wednesday, setup.database.setting(SettingKey.weekStart))
@@ -38,10 +35,7 @@ class SettingsMenuModelTest {
         val before = model.input.weekStart
         setup.database.failWrites(to = "setting")
 
-        model.store(
-            key = SettingKey.weekStart,
-            value = Weekday.wednesday,
-        )
+        model.choose(weekStart = Weekday.wednesday)
 
         assertEquals(before, model.input.weekStart)
         assertEquals(before, setup.database.setting(SettingKey.weekStart))
@@ -54,10 +48,7 @@ class SettingsMenuModelTest {
         val model = setup.observedModel()
         setup.database.failWrites(to = "setting")
 
-        model.store(
-            key = SettingKey.monthStartDay,
-            value = payday,
-        )
+        model.choose(monthStartDay = payday)
 
         assertEquals(MonthStartDay.first, model.input.monthStartDay)
         assertEquals(MonthStartDay.first, setup.database.setting(SettingKey.monthStartDay))
@@ -69,8 +60,8 @@ class SettingsMenuModelTest {
         val model = setup.observedModel()
         setup.database.failWrites(to = "setting", containing = "monday")
 
-        val first = launch { model.store(key = SettingKey.weekStart, value = Weekday.monday) }
-        val second = launch { model.store(key = SettingKey.weekStart, value = Weekday.tuesday) }
+        val first = launch { model.choose(weekStart = Weekday.monday) }
+        val second = launch { model.choose(weekStart = Weekday.tuesday) }
         first.join()
         second.join()
         ModelWait.until { model.input.weekStart == Weekday.tuesday }
@@ -84,8 +75,8 @@ class SettingsMenuModelTest {
         val model = setup.observedModel()
         setup.database.failWrites(to = "setting")
 
-        val first = launch { model.store(key = SettingKey.weekStart, value = Weekday.monday) }
-        val second = launch { model.store(key = SettingKey.weekStart, value = Weekday.tuesday) }
+        val first = launch { model.choose(weekStart = Weekday.monday) }
+        val second = launch { model.choose(weekStart = Weekday.tuesday) }
         first.join()
         second.join()
 
@@ -101,7 +92,7 @@ class SettingsMenuModelTest {
         val start = model.input.monthStartDay
         val initial = PeriodText.current(startingOn = start, today = setup.today)
 
-        model.store(key = SettingKey.monthStartDay, value = payday)
+        model.choose(monthStartDay = payday)
         ModelWait.until { model.input.monthStartDay == payday }
         val chosen = model.input.monthStartDay
 
@@ -122,7 +113,7 @@ class SettingsMenuModelTest {
         val shiftedText = PeriodText.current(startingOn = shifted, today = setup.today)
         val weekdayNote = PeriodText.shiftNote(startingOn = shifted, today = setup.today)
         val kept = earlier.keepingShift(of = shifted)
-        model.store(key = SettingKey.monthStartDay, value = kept)
+        model.choose(monthStartDay = kept)
         ModelWait.until { model.input.monthStartDay == kept }
 
         assertEquals("土日・祝日でも、そのまま数えます", plainNote)
@@ -140,7 +131,7 @@ class SettingsMenuModelTest {
     }
 
     private suspend fun ModelTestSetup.observedModel(): SettingsMenuModel {
-        val model = SettingsMenuModel(database = database)
+        val model = SettingsMenuModel(parts = parts)
         val saved = database.setting(SettingKey.weekStart)
 
         scope.launch { model.observe() }

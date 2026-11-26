@@ -8,7 +8,6 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.tabs.assets.model.AssetsModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import kotlinx.coroutines.Dispatchers
@@ -68,8 +67,7 @@ class MainModelTest {
         val sheet = model.state.sheet as? MainModel.Sheet.Entry
 
         val entry = EntryModel(
-            database = setup.database,
-            clock = ScreenClock.fixed(setup.now),
+            parts = setup.parts,
             today = setup.today,
             editing = sheet?.editing,
             date = sheet?.date ?: setup.today,
@@ -155,11 +153,11 @@ class MainModelTest {
     }
 
     @Test
-    fun restartsObservationOnRetry() {
+    fun restartsObservationOnRetry() = modelTest(today = "2026-10-15") { setup ->
         val model = MainModel()
 
         val assets = AssetsModel(
-            entryList = emptyFlow(),
+            parts = setup.parts(entryList = emptyFlow()),
             today = date,
             round = model.state.observation,
         )

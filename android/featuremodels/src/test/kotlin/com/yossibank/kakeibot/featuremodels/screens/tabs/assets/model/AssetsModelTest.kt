@@ -23,7 +23,7 @@ class AssetsModelTest {
     @Test
     fun showsNoticeWhenListFails() = modelTest(today = "2026-10-17") { setup ->
         val model = AssetsModel(
-            entryList = failingEntryList,
+            parts = setup.parts(entryList = failingEntryList),
             today = setup.today,
             round = ObservationRound(),
         )
@@ -38,7 +38,9 @@ class AssetsModelTest {
     @Test
     fun marksListFailureUntilRetried() = modelTest(today = "2026-10-17") { setup ->
         val model = AssetsModel(
-            entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            parts = setup.parts(
+                entryList = setup.database.entryListUpdates().failingFirst(times = 4),
+            ),
             today = setup.today,
             round = ObservationRound(),
         )
@@ -58,7 +60,7 @@ class AssetsModelTest {
     @Test
     fun showsNoRowsBeforeListArrives() = modelTest(today = "2026-10-17") { setup ->
         val model = AssetsModel(
-            entryList = setup.database.entryListUpdates(),
+            parts = setup.parts,
             today = setup.today,
             round = ObservationRound(),
         )
@@ -235,7 +237,7 @@ class AssetsModelTest {
 
     private suspend fun ModelTestSetup.observedModel(): AssetsModel {
         val model = AssetsModel(
-            entryList = database.entryListUpdates(),
+            parts = parts,
             today = today,
             round = ObservationRound(),
         )

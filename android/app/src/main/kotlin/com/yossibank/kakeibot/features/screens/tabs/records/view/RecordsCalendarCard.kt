@@ -57,9 +57,7 @@ import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.tabs.records.model.RecordsModel
 import com.yossibank.kakeibot.featuremodels.shared.datechoice.shortName
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
-import com.yossibank.kakeibot.features.shared.entrylist.rememberEntryList
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
-import com.yossibank.kakeibot.store.database.AppDatabase
 import kotlinx.coroutines.launch
 
 @Composable

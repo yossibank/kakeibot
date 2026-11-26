@@ -15,11 +15,12 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import kotlinx.coroutines.flow.Flow
 
 class AssetsModel(
-    entryList: Flow<EntryList>,
+    parts: ScreenParts,
     today: LocalDate,
     round: ObservationRound,
 ) {
@@ -27,7 +28,7 @@ class AssetsModel(
     val input = Input(today)
     val output = Output(input)
 
-    private val dependencies = Dependencies(entryList, round)
+    private val dependencies = Dependencies(parts.entryList, round)
 
     data class Row(
         val id: Identifier<Wallet>,

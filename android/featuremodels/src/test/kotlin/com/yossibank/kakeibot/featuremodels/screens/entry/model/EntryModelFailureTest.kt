@@ -3,7 +3,6 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.failReads
 import com.yossibank.kakeibot.featuremodels.support.failWrites
 import com.yossibank.kakeibot.featuremodels.support.fillStorage
@@ -30,8 +29,7 @@ class EntryModelFailureTest {
     @Test
     fun ignoresCancelledLoad() = modelTest(today = "2026-10-12") { setup ->
         val model = EntryModel(
-            database = setup.database,
-            clock = ScreenClock.fixed(setup.now),
+            parts = setup.parts,
             today = setup.today,
         )
 
