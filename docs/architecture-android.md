@@ -124,8 +124,8 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 | iOS | Android |
 | --- | --- |
-| CHECK 制約 | 表を作るときに足すトリガー |
-| WHERE 付きの一意インデックス | 表を作るときに足すトリガー |
+| CHECK 制約 | 表を作る時に足すトリガー |
+| WHERE 付きの一意インデックス | 表を作る時に足すトリガー |
 | BOOLEAN の列 | INTEGER の列。入る値は 0 と 1 で同じ |
 
 `:featuremodels` と `:app` の中身は、[architecture-android-app](architecture-android-app.md) にある。

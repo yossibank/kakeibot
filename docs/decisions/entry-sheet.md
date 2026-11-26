@@ -1,7 +1,7 @@
 # 入力シートの見た目
 
 > [!NOTE]
-> 記録を入れるシートの形・種類の切り替え・最近の記録をどう決めたかと、その理由が分かる。
+> 記録を入れるシートの形・種類の切り替え・最近の記録をどう決めたかと、その理由が分かる。寸法の数は pt で書く。
 > 紙のカードは [entry-sheet-card](entry-sheet-card.md)、入力盤は [entry-sheet-keypad](entry-sheet-keypad.md) にある。
 > 言葉の対応は [glossary](../glossary.md) にある。
 

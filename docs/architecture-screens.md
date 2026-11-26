@@ -15,7 +15,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | AppModel の持ち物 | DB を開く関数・時計・通知・Pro の窓口は、`dependencies` にまとめる。今の時刻は、その時計から受け取る |
 | DB と時計の受け渡し | AppModel が DB を開いた時に `ScreenParts` を作り、RootView が渡す。画面は、子の画面とモデルの init へそのまま渡す |
 | 子の画面に渡す `ScreenParts` | モデルから開く画面には、モデルの `childParts()` が返す |
-| MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが監視を始め、全部を読み終えるまで起動画面を出す |
+| MainView | タブは Home・Records・Review・Assets。起動した時に全部のタブが監視を始め、全部を読み終えるまで起動画面を出す |
 | MainView のタブの切り替え | 開いたことのあるタブを重ねて持ち、見えるかどうかだけを切り替える。`TabView` は切り替えのたびに中身の大きさを測り直して重いため使わない |
 | MainView のタブの選択 | `MainModel` の `state` が持ち、`MainTabLayer` とタブの帯（`MainTabBar`）だけが読む。MainView の `body` が読むと、切り替えのたびに 4 つのタブを組み直して重いため読まない |
 | MainView のシート | 新規・編集・設定・振替・お知らせなど。テンプレート（`EntryTemplate`）・口座（`Wallet`）・固定費（`Recurring`）も開く |
@@ -53,10 +53,10 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | iOS のウィジェットの読み出し | AppWidget が `AppDatabase.appGroupForReading()` で DB を読むだけで開く。表の形が最新でなければ読まない |
 | iOS のウィジェットの読み出しの範囲 | 記録は、今月の 4 か月前の月初か 90 日前の早いほうからと、そこからの固定費・請求月に当たるものだけを読む |
 | iOS のウィジェットの描き方 | ホームと同じ `MonthOverview` を使う。背景は、テーマ（`ThemePalette`）の色の値から作った色で描く |
-| iOS のウィジェットの更新 | AppModel が、記録・予算・固定費・テンプレートとその並べ順・テーマの変化を監視して更新する。日付が変わるときはタイムラインで切り替える |
+| iOS のウィジェットの更新 | AppModel が、記録・予算・固定費・テンプレートとその並べ順・テーマの変化を監視して更新する。日付が変わる時はタイムラインで切り替える |
 | iOS のウィジェットの更新の間隔 | 最後の変化から 1 秒待ち、続けて変わった分を 1 回にまとめる。シートを閉じる動きと重ねないため |
 | iOS のウィジェットが読めない時 | 最初のロックの解除の前や移行の前で DB を読めない時は「アプリを開くと出ます」と出し、5 分後に読み直す |
-| すぐ記録の書き込み | 押したときだけ、AppIntent が `appGroupForWriting()` で開いて書く。通知を予約し直し、すべてのウィジェットを更新する |
+| すぐ記録の書き込み | 押した時だけ、AppIntent が `appGroupForWriting()` で開いて書く。通知を予約し直し、すべてのウィジェットを更新する |
 | すぐ記録の反映 | アプリを前面に戻すと、書いた記録が画面に出る |
 | DB のファイル保護 | `NSFileProtectionCompleteUntilFirstUserAuthentication` にそろえる。ロック中も、ロック画面のウィジェットが金額を出す |
 | DB のバックアップ | App Group の DB は、端末の iCloud バックアップに含まれる |

@@ -20,6 +20,9 @@ TEST_TARGET = re.compile(r"\.testTarget\(\s*name:\s*\"([^\"]+)\"")
 SAMPLES = {"export/export-v1.json"}
 ENTRANCES = [os.path.join(ROOT, "README.md"), os.path.join(ROOT, "docs", "decisions", "README.md")]
 REACHED_FOLDERS = ["docs", "spec"]
+TERMS_HEADING = "### そろえる語"
+INLINE_CODE = re.compile(r"`[^`]*`")
+LINK_TARGET = re.compile(r"\]\([^)]*\)")
 TREE_DOCS = [
     os.path.join(ROOT, "docs", name)
     for name in ("architecture-packages.md", "architecture-packages-app.md")
@@ -98,6 +101,39 @@ def check_reach():
                 path = os.path.normpath(os.path.join(top, file))
                 if file.endswith(".md") and path not in reached:
                     error(path, 1, "README の文書の表か、決定の索引（docs/decisions/README.md）から届かない")
+
+
+def read_terms(path):
+    lines = open(path, encoding="utf-8").read().split("\n")
+    if TERMS_HEADING not in lines:
+        return []
+    terms = []
+    for line in lines[lines.index(TERMS_HEADING) + 1:]:
+        if line.startswith("#"):
+            break
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if not line.startswith("|") or len(cells) != 2 or cells[0] == "使う語" or set(cells[0]) <= set("-: "):
+            continue
+        terms.append((cells[0], cells[1]))
+    return terms
+
+
+def term_pattern(word):
+    edge = r"[A-Za-z0-9_./-]"
+    return re.compile(rf"(?<!{edge}){re.escape(word)}(?!{edge})" if word.isascii() else re.escape(word))
+
+
+def check_terms(path, lines, terms):
+    fenced = False
+    for number, line in enumerate(lines, 1):
+        if FENCE.match(line):
+            fenced = not fenced
+        if fenced:
+            continue
+        plain = INLINE_CODE.sub("", LINK_TARGET.sub("]", line))
+        for use, avoid, pattern in terms:
+            if pattern.search(plain):
+                error(path, number, f"「{avoid}」ではなく「{use}」と書く（claude-config のそろえる語の表）")
 
 
 def check_trees(path, lines):
@@ -203,11 +239,19 @@ def check_test_plan():
 def main():
     makefile = open(os.path.join(ROOT, "Makefile"), encoding="utf-8").read()
     targets = set(TARGET.findall(makefile))
+    terms = []
+    if "--terms" in sys.argv:
+        terms_path = sys.argv[sys.argv.index("--terms") + 1]
+        found = read_terms(terms_path) if os.path.exists(terms_path) else []
+        if not found:
+            error(terms_path, 1, f"そろえる語の表が読めない（{TERMS_HEADING}）")
+        terms = [(use, avoid, term_pattern(avoid)) for use, avoid in found]
     for path in markdown_files():
         text = open(path, encoding="utf-8").read()
         lines = text.split("\n")
         check_links(path, lines)
         check_make(path, text, targets)
+        check_terms(path, lines, terms)
     check_reach()
     for path in TREE_DOCS:
         check_trees(path, open(path, encoding="utf-8").read().split("\n"))

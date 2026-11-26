@@ -51,7 +51,7 @@ erDiagram
 - 月は `YYYY-MM` にする。期間との対応は下の表にある。
 - 日時は UTC の ISO 8601 にする。
 - 財布（`Wallet`）・カテゴリ・タグ・スタンプの一覧のアイコンは、ふだんは `archived_at` でしまう。
-- 財布とカテゴリは、記録が無いときだけ消せる。使っている固定費（`Recurring`）・テンプレート（`EntryTemplate`）・評価額・予算・タグも一緒に消す。
+- 財布とカテゴリは、記録が無い時だけ消せる。使っている固定費（`Recurring`）・テンプレート（`EntryTemplate`）・評価額・予算・タグも一緒に消す。
 - 残高・貯金箱の残高は保存せず、記録と評価額から計算する。
 
 月の始まりごとに、期間と月の呼び方を次の表に並べる。理由は [decisions/periods.md の「期間の呼び方」](decisions/periods.md#期間の呼び方)にある。
@@ -64,7 +64,7 @@ erDiagram
 
 ## 🚀 最初に入るデータ
 
-App Group の DB を開いたときに財布もカテゴリも無ければ、次を入れる。理由は [decisions/setup.md の「最初の財布とカテゴリ」](decisions/setup.md#最初の財布とカテゴリ)にある。
+App Group の DB を開いた時に財布もカテゴリも無ければ、次を入れる。理由は [decisions/setup.md の「最初の財布とカテゴリ」](decisions/setup.md#最初の財布とカテゴリ)にある。
 
 | 表 | 中身 |
 | --- | --- |
@@ -74,7 +74,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 どれにも、絵柄（`glyph`）と色の icon を 1 つずつ付ける。
 
-最初の設定を開いたときにテンプレートが 1 つも無ければ、支出のテンプレートを入れる。金額は空にし、口座は最初の現金の口座にする。
+最初の設定を開いた時にテンプレートが 1 つも無ければ、支出のテンプレートを入れる。金額は空にし、口座は最初の現金の口座にする。
 
 | 名前 | カテゴリ |
 | --- | --- |
@@ -83,7 +83,16 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 | 電車 | 交通 |
 | 日用品 | 日用品 |
 
-スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は `star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の順にする。
+スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は、次の順にする。
+
+1. `star`
+2. `party`
+3. `trophy`
+4. `cake`
+5. `fitness`
+6. `travel`
+7. `sun`
+8. `moon`
 
 同期を入れて最初の取得を終えるまでは、財布・カテゴリ・shelf_icon を入れない。`sync_state.engine_state` が空の間がそれに当たる。
 
@@ -260,12 +269,12 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | id | TEXT | |
 | name | TEXT | |
 | type | TEXT | `expense` `income` |
-| amount | INTEGER | 空なら使うときに入れる。入れるなら 1 以上 |
+| amount | INTEGER | 空なら使う時に入れる。入れるなら 1 以上 |
 | category_id | TEXT | |
 | tag_id | TEXT | 空でもよい。入れるなら category_id のタグ |
 | wallet_id | TEXT | |
 | memo | TEXT | |
-| bill_shift | INTEGER | 0〜2。wallet_id がカードのとき、使った日の何回あとの引き落としに入れるか。カードでなければ 0 |
+| bill_shift | INTEGER | 0〜2。wallet_id がカードの時、使った日の何回あとの引き落としに入れるか。カードでなければ 0 |
 | sort_order | INTEGER | |
 | archived_at | TEXT | |
 | created_at / updated_at | TEXT | |

@@ -27,7 +27,7 @@
 | `2026-04` | 120000 |
 | `2026-07` | 空 |
 
-このとき、月ごとに使う行と予算は、次の表になる。
+この時、月ごとに使う行と予算は、次の表になる。
 
 | 月 | 使う行 | 予算 |
 | --- | --- | --- |
@@ -46,9 +46,9 @@
 | day | INTEGER | 1〜31。月末を超えたらその月の最終日 |
 | holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
 | closing_day | INTEGER | 振替だけで、1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にし、amount は 0 にする |
-| fee | INTEGER | 振替だけで、1 以上。あれば、記録するときに手数料も記録する |
+| fee | INTEGER | 振替だけで、1 以上。あれば、記録する時に手数料も記録する |
 | bill_shift | INTEGER | 0〜2。テンプレートと同じ。振替では 0 |
-| final_amount | INTEGER | 最後の回の額で、end_date があり決まった額のときだけ入る。空なら最後の回も amount |
+| final_amount | INTEGER | 最後の回の額で、end_date があり決まった額の時だけ入る。空なら最後の回も amount |
 | start_date / end_date | TEXT | end_date は空でもよい |
 | remind_days_before | INTEGER | 空なら知らせない |
 | generated_until | TEXT | どの日まで記録を作ったか |
@@ -88,7 +88,7 @@
 | name | TEXT | |
 | target_amount | INTEGER | |
 | purchased_at | TEXT | |
-| entry_id | TEXT | 買ったときの記録。その記録を消すと空にする |
+| entry_id | TEXT | 買った時の記録。その記録を消すと空にする |
 | created_at / updated_at | TEXT | |
 
 貯金箱の残高 ＝ reward_log の合計 − 買った目標の target_amount の合計。

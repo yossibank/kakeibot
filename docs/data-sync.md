@@ -35,29 +35,29 @@ flowchart LR
 | applying | INTEGER | 受け取った変更を書いている間だけ 1。その間は sync_change に記録しない |
 | engine_state | BLOB | 自分のデータベースの CKSyncEngine の状態 |
 | shared_engine_state | BLOB | 共有のデータベースの CKSyncEngine の状態。誘われた共有の財布を送り受けする |
-| stop_reason | TEXT | 同期が自分から切れた理由（`signed_out`・`account_changed`・`cloud_replaced`）。同期を入れているときだけ書き、入れ直すか手で切ると NULL |
+| stop_reason | TEXT | 同期が自分から切れた理由（`signed_out`・`account_changed`・`cloud_replaced`）。同期を入れている時だけ書き、入れ直すか手で切ると NULL |
 | send_problem | TEXT | 自分のデータベースへ送れていない理由で、送れたら NULL。値は `quota_exceeded`・`network_unavailable`・`not_allowed` |
 | fetching | INTEGER | 自分のデータベースから受け取っている間だけ 1。同期を入れると 1 にし、取得を終えると 0 に戻す |
-| synced_at | DATETIME | 自分のデータベースと最後に受け取りか送りを終えた時刻。同期を入れているときだけ書き、切ると NULL |
+| synced_at | DATETIME | 自分のデータベースと最後に受け取りか送りを終えた時刻。同期を入れている時だけ書き、切ると NULL |
 
 ### sync_change
 
 まだ送っていない行。data・data-budget・data-settings の表は、すべてトリガーを持つ。行を足す・変える・消すと、トリガーがここに記録する。
-トリガーは、同期を入れているか、sync_share に行があるときだけ記録する。
+トリガーは、同期を入れているか、sync_share に行がある時だけ記録する。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |
 | table_name | TEXT | 表の名前 |
 | record_id | TEXT | 行の id。no_spend_day は date、setting は key |
-| version | INTEGER | 記録するたびに 1 足す。送った後は、読んだときと同じ値のときだけ消す |
+| version | INTEGER | 記録するたびに 1 足す。送った後は、読んだ時と同じ値の時だけ消す |
 
 `(table_name, record_id)` が主キー。行が残っていれば保存、無ければ削除として送る。
 
-保存を送る前に行を消したときは、CKSyncEngine の送る列にある保存を、同じゾーンへの削除に替える。削除を送り終えてから、この表の行を消す。iCloud にレコードが無ければ、消えたものとして終える。
+保存を送る前に行を消した時は、CKSyncEngine の送る列にある保存を、同じゾーンへの削除に替える。削除を送り終えてから、この表の行を消す。iCloud にレコードが無ければ、消えたものとして終える。
 
-送る束を作るときに、行が無いか、行の入るゾーンが変わっていた保存は、送る列から外す。外したら、この表から送る列を作り直す。
+送る束を作る時に、行が無いか、行の入るゾーンが変わっていた保存は、送る列から外す。外したら、この表から送る列を作り直す。
 
-`WITHOUT ROWID` の表なので、GRDB の監視は、この表の変更に気づかない。トリガーを通さずに書くときは、`notifyChanges` で監視に知らせる。
+`WITHOUT ROWID` の表なので、GRDB の監視は、この表の変更に気づかない。トリガーを通さずに書く時は、`notifyChanges` で監視に知らせる。
 
 setting は、次の key を記録しない。
 
@@ -81,11 +81,11 @@ setting は、次の key を記録しない。
 
 `WITHOUT ROWID` の表である。ゾーンの名前は列に持たず、`"Wallet-" + wallet_id` で決める。行を書いたら、同じ書き込みの中で `notifyShareChanges` を呼び、同期の画面の一覧に知らせる。
 
-自分のほかの端末は、`Wallet-` のゾーンのレコードを受け取ったときに、財布があれば行を足す。`endSharing` を呼ぶと、行と、そのゾーンの sync_record が消える。
+自分のほかの端末は、`Wallet-` のゾーンのレコードを受け取った時に、財布があれば行を足す。`endSharing` を呼ぶと、行と、そのゾーンの sync_record が消える。
 
 `endSharing` の後も財布の行は残り、自分のゾーンに送り直す。誘った側なら、共有用のカテゴリを自分のカテゴリに戻す。
 
-同期の画面の一覧は、owner_name が NULL の財布と、sync_share に行の無い財布を並べる。隠した財布は、共有しているときだけ並べる。
+同期の画面の一覧は、owner_name が NULL の財布と、sync_share に行の無い財布を並べる。隠した財布は、共有している時だけ並べる。
 
 共有している財布の id は、`EntryList` と `EntryOptions` が持つ。財布を並べる画面は、その名前の後ろに `SharedMark` を出す。
 
@@ -105,7 +105,7 @@ setting は、次の key を記録しない。
 
 ### sync_waiting
 
-受け取ったが、入れられない行。参照先がまだ無い・一意の列で負けた・ほかの決まりに合わないときに置き、次に受け取ったときに入れ直す。
+受け取ったが、入れられない行。参照先がまだ無い・一意の列で負けた・ほかの決まりに合わない時に置き、次に受け取った時に入れ直す。
 
 | 列 | 型 | 補足 |
 | --- | --- | --- |
@@ -120,21 +120,21 @@ iCloud にあるレコードの控え。送った行と受け取った行ごと�
 | --- | --- | --- |
 | table_name / record_id | TEXT | sync_change と同じ |
 | zone_name | TEXT | レコードがあるゾーンの名前。主キーは 3 列の組 |
-| system_fields | BLOB | 次に送るときの元にする |
+| system_fields | BLOB | 次に送る時の元にする |
 
-受け取った行と同じ書き込みで控える。全部を取り直すときは、全部消す。
+受け取った行と同じ書き込みで控える。全部を取り直す時は、全部消す。
 
-保存を送る前に、送り先のゾーンを空の system_fields で控える。空の控えは、次に送るときの元にしない。
+保存を送る前に、送り先のゾーンを空の system_fields で控える。空の控えは、次に送る時の元にしない。
 
-同期を入れたとき・切ったときは、自分のゾーン（`Kakeibot`）の行だけを消す。共有のゾーンに関わる sync_change と、`Wallet-` のゾーンの行は残す。
+同期を入れた時・切った時は、自分のゾーン（`Kakeibot`）の行だけを消す。共有のゾーンに関わる sync_change と、`Wallet-` のゾーンの行は残す。
 
 sync_waiting は、共有の財布かそのカテゴリの id を値に持つ行を残す。`Wallet-` のゾーンから届いた行も残し、ほかを消す。
 
-iCloud の行に入れ替えて同期を入れるときは、手元の行を消す間、sync_change に記録しない。sync_record・sync_change・sync_waiting は全部消す。
+iCloud の行に入れ替えて同期を入れる時は、手元の行を消す間、sync_change に記録しない。sync_record・sync_change・sync_waiting は全部消す。
 
 ## 📏 一意の列
 
-受け取った行と手元の行で比べる、一意の列。ぶつかったときに残す方は [decisions/sync.md](decisions/sync.md#一意の列がぶつかったとき) で決める。
+受け取った行と手元の行で比べる、一意の列。ぶつかった時に残す方は [decisions/sync.md](decisions/sync.md#一意の列がぶつかった時) で決める。
 
 | 表 | 一意の列 | 古さを比べる列 |
 | --- | --- | --- |

@@ -80,7 +80,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 分けたファイル | `Output` の計算は、`EntryModelOutputText.kt` のように拡張プロパティのファイルへ出す |
 | 画面からの読み方 | `model.state.x`・`model.input.x`・`model.output.x` の形で読む。モデルに転送のプロパティを足さない |
 | 入力の下書き | 1 つの `data class` にまとめ、`State` の `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
-| 下書きの決まり | 口座・カテゴリ・日付を変えたときの消し込みは、下書きの型の関数に置く |
+| 下書きの決まり | 口座・カテゴリ・日付を変えた時の消し込みは、下書きの型の関数に置く |
 | 保存と読み込みの失敗 | `featuremodels/shared/model/` の `ModelTask` に通す。失敗の文と実行中かどうかを、`State` の `task` に持つ |
 | 失敗の知らせの消え方 | 押すか、出してから 6 秒たつと消える。入力を変えても、後で成功しても消さない |
 | 知らせを消すまでの秒 | 失敗の知らせは画面の `task.Timer()` が、取り消しの知らせは `UndoNotice` が数える |

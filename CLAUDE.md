@@ -8,9 +8,9 @@
 
 | 場面 | 決まり |
 | --- | --- |
-| 変更した | `make verify` を通す。出力は成否と失敗の箇所だけで、失敗したときは全ログのパスが最後の行にある |
+| 変更した | `make verify` を通す。出力は成否と失敗の箇所だけで、失敗した時は全ログのパスが最後の行にある |
 | PR を作る前 | テストは CI で走らせず、手元で `make test` を 1 回通す。結果は PR の本文の「確認」に書く |
-| push し直す | Swift か fixtures を変えたときだけ、`make test` を通し直す |
+| push し直す | Swift か fixtures を変えた時だけ、`make test` を通し直す |
 | 文書だけの PR | `make test` を走らせない |
 | 見た目を変えた | 当たるセットを `make snapshot SNAPSHOT=<セット>` で描いて確かめる。セットは `.claude/snapshots/` の下にあり、PNG は `.build/snapshots/<セット>/` に出る |
 | 動きの不具合を確かめる | claude-config の `ui-record` のスキルで録画して確かめる |

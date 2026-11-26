@@ -27,7 +27,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | スクリプト | 見るもの | 走る make |
 | --- | --- | --- |
 | `scripts/docs-check.py` | 文書と実物の一致。見るものは下の箇条書きにある | `make verify-docs` |
-| `scripts/docs-check-test.py` | `docs-check.py` の届く文書の検査を、仮の文書に通して確かめる | `make verify-docs` |
+| `scripts/docs-check-test.py` | `docs-check.py` の届く文書とそろえる語の検査を、仮の文書に通して確かめる | `make verify-docs` |
 | `scripts/scenarios-check.py` | 画面のモデルのテストと [scenarios](../spec/scenarios.md) の一覧の一致。`make scenarios` で区分ごとの件数を出す | `make verify-docs` |
 | `scripts/scenarios-check-test.py` | `scenarios-check.py` を、仮のテストと一覧に通して確かめる | `make verify-docs` |
 | `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON の整形。`make format` と pre-commit で直す | `make verify-docs` |
@@ -43,6 +43,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 - fixtures の `description` と `summary`
 - `Package.swift` のテストのターゲットと、テストプランの中身が一致するか
 - `docs/`・`spec/` の `.md` が、README の文書の表か[決定の索引](decisions/README.md)からリンクされているか
+- claude-config のそろえる語の表の、使わない語（コードとリンク先は除く）
 
 ### 基準線
 
@@ -96,7 +97,7 @@ claude-config の並びの検査が見送る、今ある並びの外れを持つ
 | 登録済みの端末 | 自分の iPhone 1 台 |
 | 開発用の証明書 | 2027-01-25 まで |
 | プロファイル | 2027-10-10 まで |
-| 配布用の証明書 | Archive のときに Xcode がクラウドで管理するものを使う |
+| 配布用の証明書 | Archive の時に Xcode がクラウドで管理するものを使う |
 
 ## 📦 パッケージ
 

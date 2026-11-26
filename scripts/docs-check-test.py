@@ -19,6 +19,8 @@ FILES = {
     "docs/decisions/sync.md": "# 同期\n",
     "README.md": README,
 }
+TERMS = "development.md"
+TERMS_TABLE = "# 開発\n\n### そろえる語\n\n| 使う語 | 使わない語 |\n| --- | --- |\n| 時 | とき |\n| スキル | skill |\n\n## 次\n\n| 時 | ころ |\n"
 UNREACHED = "README の文書の表か、決定の索引（docs/decisions/README.md）から届かない"
 CASES = [
     ("すべて届く", {}, None),
@@ -26,18 +28,28 @@ CASES = [
     ("どこからも届かない spec", {"spec/lost.md": "# 迷子\n"}, f"spec/lost.md:1: error: {UNREACHED}"),
     ("索引から届かない決定", {"docs/decisions/README.md": "# 索引\n"}, f"docs/decisions/sync.md:1: error: {UNREACHED}"),
     ("決定の文書からだけ届く", {"docs/decisions/sync.md": "# 同期\n\n[迷子](../lost.md)\n", "docs/lost.md": "# 迷子\n"}, f"docs/lost.md:1: error: {UNREACHED}"),
+    ("使わない語", {"spec/fixtures.md": "# fixtures\n\n開いたときに読む。\n"}, "spec/fixtures.md:3: error: 「とき」ではなく「時」と書く"),
+    ("英字の使わない語", {"spec/fixtures.md": "# fixtures\n\nskill を使う。\n"}, "spec/fixtures.md:3: error: 「skill」ではなく「スキル」と書く"),
+    ("コードの中の使わない語", {"spec/fixtures.md": "# fixtures\n\n`とき` と `skill` と skills/ と [見本](https://example.com/とき) と ころ。\n\n```\nとき\n```\n"}, None),
+    ("読めないそろえる語の表", {TERMS: "# 開発\n"}, "そろえる語の表が読めない"),
     ("README から届かない索引", {"README.md": README.replace("[docs/decisions/README.md](docs/decisions/README.md)", "")}, f"docs/decisions/README.md:1: error: {UNREACHED}"),
 ]
 
 
+def write(root, relative, text):
+    path = os.path.join(root, relative)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(text)
+
+
 def run(changes):
-    with tempfile.TemporaryDirectory() as root:
-        for relative, text in {**FILES, **changes}.items():
-            path = os.path.join(root, relative)
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, "w", encoding="utf-8") as file:
-                file.write(text)
-        command = [sys.executable, "-I", CHECK, "--root", root]
+    with tempfile.TemporaryDirectory() as root, tempfile.TemporaryDirectory() as config:
+        files = {**FILES, **changes}
+        write(config, TERMS, files.pop(TERMS, TERMS_TABLE))
+        for relative, text in files.items():
+            write(root, relative, text)
+        command = [sys.executable, "-I", CHECK, "--root", root, "--terms", os.path.join(config, TERMS)]
         return subprocess.run(command, capture_output=True, text=True, check=False)
 
 
