@@ -20,9 +20,11 @@ public final class ReminderModel {
         authorization: NotificationAuthorization = .allowed,
         permission: NotificationPermission
     ) {
+        let isCustom = time.map { !Self.presets.contains($0) } ?? false
+
         let state = State(
             previewDay: today.weekday,
-            isPickingTime: time.map { !Self.presets.contains($0) } ?? false
+            presented: Shown(isCustom ? .timePicker : nil)
         )
 
         let input = Input(today: today, time: time, authorization: authorization)
@@ -35,21 +37,24 @@ public final class ReminderModel {
 }
 
 public extension ReminderModel {
+    enum Presented: Hashable, Sendable {
+        case timePicker
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
+        public var presented: Shown<Presented>
 
         public internal(set) var previewDay: Weekday
 
-        public private(set) var isPickingTime: Bool
-
         init(
             previewDay: Weekday,
-            isPickingTime: Bool
+            presented: Shown<Presented>
         ) {
             self.previewDay = previewDay
-            self.isPickingTime = isPickingTime
+            self.presented = presented
         }
     }
 
@@ -177,14 +182,6 @@ private extension ReminderModel {
     static let noticeCount = 3
     static let loadFailedMessage = "通知の設定を読めませんでした"
     static let saveFailedMessage = "通知の設定を保存できませんでした"
-}
-
-public extension ReminderModel.State {
-    func pickTime(_ isPicking: Bool) {
-        if isPickingTime != isPicking {
-            isPickingTime = isPicking
-        }
-    }
 }
 
 public extension ReminderModel.Output {
