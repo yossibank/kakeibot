@@ -39,14 +39,14 @@ public extension BackupModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var isConfirmingRestore = false
+        public var presented = Shown<Presented>()
 
         public internal(set) var file: BackupFile?
         public internal(set) var pending: ExportV1?
         public internal(set) var doneMessage: String?
-        public internal(set) var isWorking = false
-        public internal(set) var picker: Picker?
         public internal(set) var pressed: Row?
+
+        public let task = ModelTask()
     }
 
     @MainActor
@@ -138,9 +138,12 @@ public extension BackupModel {
 
     @discardableResult
     func makeFile(_ kind: FileKind) async -> Bool {
+        guard !state.task.isRunning else {
+            return false
+        }
+
         let date = dependencies.clock.now
 
-        state.isWorking = true
         state.doneMessage = nil
 
         defer {
@@ -148,16 +151,19 @@ public extension BackupModel {
         }
 
         do {
-            let data = try await data(of: kind, at: date)
+            let data = try await state.task.attempt {
+                try await self.data(of: kind, at: date)
+            }
+
             let name = Self.fileName(of: kind, at: date)
 
             state.file = BackupFile(kind: kind, data: data, name: name)
-            state.pick(.exporter)
+            state.presented.show(.exporter)
 
             return true
         } catch {
             state.errorNotice.show(Self.exportFailedMessage)
-            state.close(.exporter)
+            state.presented.close(.exporter)
             return false
         }
     }
@@ -189,7 +195,7 @@ public extension BackupModel {
 
         guard case let .success(url) = result else {
             state.errorNotice.show(Self.readFailedMessage)
-            state.isConfirmingRestore = false
+            state.presented.close(.restore)
             return false
         }
 
@@ -233,7 +239,10 @@ public extension BackupModel {
     }
 
     func restore() async {
-        guard let pending = state.pending else {
+        guard
+            let pending = state.pending,
+            !state.task.isRunning
+        else {
             return
         }
 
@@ -243,8 +252,6 @@ public extension BackupModel {
             return
         }
 
-        state.isWorking = true
-
         defer {
             state.finishWorking()
         }
@@ -253,12 +260,14 @@ public extension BackupModel {
             let app = ExportV1.App(platform: .ios, version: dependencies.appVersion)
             let stash = dependencies.stash
 
-            try await dependencies.database.restoreBackup(
-                pending,
-                stashingAt: dependencies.clock.now,
-                app: app
-            ) {
-                try stash.save($0)
+            try await state.task.attempt {
+                try await dependencies.database.restoreBackup(
+                    pending,
+                    stashingAt: dependencies.clock.now,
+                    app: app
+                ) {
+                    try stash.save($0)
+                }
             }
 
             try? await dependencies.database.setSetting(.backupExportedAt, to: pending.exportedAt)
@@ -307,11 +316,11 @@ private extension BackupModel {
     func accept(_ export: Result<ExportV1, any Error>) -> Bool {
         do {
             state.pending = try export.get()
-            state.isConfirmingRestore = true
+            state.presented.show(.restore)
             return true
         } catch {
             state.errorNotice.show(Self.readMessage(for: error))
-            state.isConfirmingRestore = false
+            state.presented.close(.restore)
             return false
         }
     }

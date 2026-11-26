@@ -1,7 +1,8 @@
 public extension BackupModel {
-    enum Picker: Hashable, Sendable {
+    enum Presented: Hashable, Sendable {
         case exporter
         case importer
+        case restore
     }
 
     enum Row: Equatable, Sendable {
@@ -17,24 +18,10 @@ public extension BackupModel.State {
             pressed = row
         }
     }
-
-    func pick(_ picker: BackupModel.Picker) {
-        if self.picker != picker {
-            self.picker = picker
-        }
-    }
-
-    func close(_ picker: BackupModel.Picker) {
-        if self.picker == picker {
-            self.picker = nil
-        }
-    }
 }
 
 extension BackupModel.State {
     func finishWorking() {
-        isWorking = false
-
         if pressed != nil {
             pressed = nil
         }
