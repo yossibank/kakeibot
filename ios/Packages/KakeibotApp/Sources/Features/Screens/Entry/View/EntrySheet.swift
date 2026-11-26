@@ -6,7 +6,7 @@ import SwiftUI
 public struct EntrySheet: View {
     @State var model: EntryModel
     @State var layout = Layout()
-    @State var receipt = EntryReceiptFlow()
+    @State var receipt: EntryReceiptFlow
     @State var voice: EntryVoiceFlow
 
     @Environment(\.themeStyle.corner) var corner
@@ -30,6 +30,7 @@ public struct EntrySheet: View {
     ) {
         _model = State(initialValue: model)
         _notice = State(initialValue: model.newNoticeModel())
+        _receipt = State(initialValue: model.newReceiptFlow())
         _voice = State(initialValue: model.newVoiceFlow())
 
         self.onChange = onChange
