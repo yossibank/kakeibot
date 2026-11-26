@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
+import com.yossibank.kakeibot.core.concepts.voice.VoiceReading
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -110,6 +111,35 @@ private fun ColumnScope.Listening(
         modifier = Modifier.fillMaxWidth(),
     )
 
+    Transcript(transcript = listening.transcript)
+
+    Slots(
+        reading = listening.preview,
+        model = model,
+        today = today,
+    )
+
+    Spacer(modifier = Modifier.weight(1f))
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        CardButton(
+            title = "やめる",
+            isFilled = false,
+            onSelect = flow::cancel,
+        )
+
+        EntryVoiceFinishButton(
+            silenceStart = listening.silenceStart,
+            duration = flow.input.silenceMillis,
+            passed = flow::silencePassed,
+            onSelect = flow::finish,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun Transcript(transcript: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,20 +147,25 @@ private fun ColumnScope.Listening(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = listening.transcript.ifEmpty { "話してください\n$EXAMPLE" },
-            color = if (listening.transcript.isEmpty()) Palette.hint else Palette.text,
+            text = transcript.ifEmpty { "話してください\n$EXAMPLE" },
+            color = if (transcript.isEmpty()) Palette.hint else Palette.text,
             textAlign = TextAlign.Center,
             maxLines = 3,
             overflow = TextOverflow.Ellipsis,
             style = textFont(
-                size = if (listening.transcript.isEmpty()) FontSize.Small else FontSize.Body,
+                size = if (transcript.isEmpty()) FontSize.Small else FontSize.Body,
                 weight = FontWeight.Medium,
             ),
         )
     }
+}
 
-    val reading = listening.preview
-
+@Composable
+private fun Slots(
+    reading: VoiceReading?,
+    model: EntryModel,
+    today: LocalDate,
+) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Chip(
             label = "金額",
@@ -164,24 +199,6 @@ private fun ColumnScope.Listening(
         Chip(
             label = "メモ",
             value = reading?.memo,
-        )
-    }
-
-    Spacer(modifier = Modifier.weight(1f))
-
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        CardButton(
-            title = "やめる",
-            isFilled = false,
-            onSelect = flow::cancel,
-        )
-
-        EntryVoiceFinishButton(
-            silenceStart = listening.silenceStart,
-            duration = flow.input.silenceMillis,
-            passed = flow::silencePassed,
-            onSelect = flow::finish,
-            modifier = Modifier.weight(1f),
         )
     }
 }

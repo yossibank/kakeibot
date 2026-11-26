@@ -192,28 +192,10 @@ private fun RecentCard(
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                if (isPinned) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_pin),
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp),
-                        tint = Palette.accent,
-                    )
-                }
-
-                FittedText(
-                    text = title,
-                    color = Palette.text,
-                    style = textFont(
-                        size = FontSize.Caption,
-                        weight = FontWeight.Bold,
-                    ),
-                )
-            }
+            RecentCardTitle(
+                title = title,
+                isPinned = isPinned,
+            )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 FittedText(
@@ -225,27 +207,61 @@ private fun RecentCard(
 
                 Spacer(modifier = Modifier.size(8.dp))
 
-                if (amount != null) {
-                    FittedText(
-                        text = AmountText.text(amount),
-                        color = Palette.accentStrong,
-                        style = displayFont(
-                            size = FontSize.Small,
-                            weight = FontWeight.SemiBold,
-                        ),
-                    )
-                } else {
-                    FittedText(
-                        text = "毎回入れる",
-                        color = Palette.hint,
-                        style = textFont(
-                            size = FontSize.Micro,
-                            weight = FontWeight.SemiBold,
-                        ),
-                    )
-                }
+                AmountLabel(amount = amount)
             }
         }
+    }
+}
+
+@Composable
+private fun RecentCardTitle(
+    title: String,
+    isPinned: Boolean,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (isPinned) {
+            Icon(
+                painter = painterResource(R.drawable.ic_pin),
+                contentDescription = null,
+                modifier = Modifier.size(12.dp),
+                tint = Palette.accent,
+            )
+        }
+
+        FittedText(
+            text = title,
+            color = Palette.text,
+            style = textFont(
+                size = FontSize.Caption,
+                weight = FontWeight.Bold,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun AmountLabel(amount: Int?) {
+    if (amount != null) {
+        FittedText(
+            text = AmountText.text(amount),
+            color = Palette.accentStrong,
+            style = displayFont(
+                size = FontSize.Small,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+    } else {
+        FittedText(
+            text = "毎回入れる",
+            color = Palette.hint,
+            style = textFont(
+                size = FontSize.Micro,
+                weight = FontWeight.SemiBold,
+            ),
+        )
     }
 }
 

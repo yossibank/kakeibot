@@ -112,6 +112,7 @@ Android は、次の技術を使う。
 | `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
 | `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `undoNotice` と `deletionNotice` に分かれる |
 | `shared/tab/TabScreen.kt` | タブの外枠。iOS の `tabScreen` は失敗の画面だけを持ち、今日と監視は `MainView` が持つ |
+| `entry/parts/EntryTransferArea.kt` | 振替の欄を縦に並べる枠。iOS は `EntrySheet+Transfer` に置く |
 | `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
 | `shared/observation/LocalObservationRound.kt` | 監視の回を配る。iOS は `MainModel` の `ObservationRound` が全部のタブを監視し、タブに配らない |
 | `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |

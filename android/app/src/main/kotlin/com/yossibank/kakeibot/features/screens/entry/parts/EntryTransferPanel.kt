@@ -4,11 +4,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,10 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
@@ -58,51 +56,16 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.currentLine
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.icon
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.idleAfterLine
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.isOverSourceBalance
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.loanRemaining
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.payOffLoan
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.recentTransfers
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.swapWallets
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.toWallet
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallet
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.walletTitle
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryText
+import com.yossibank.kakeibot.core.concepts.icon.Icon as EntryIcon
 
 @Composable
-fun EntryTransferArea(
-    model: EntryModel,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        EntryTransferPanel(model = model)
-
-        EntryTransferRoutes(model = model)
-
-        if (model.output.recentTransfers.isEmpty()) {
-            Text(
-                text = "チャージ・カードの支払い・口座のあいだの移動",
-                color = Palette.subtext,
-                style = textFont(size = FontSize.Caption),
-            )
-        }
-
-        val remaining = model.output.loanRemaining
-
-        if (remaining != null && remaining != model.output.amount.toLong()) {
-            PayOffButton(
-                remaining = remaining,
-                onSelect = model::payOffLoan,
-            )
-        }
-    }
-}
-
-@Composable
-private fun EntryTransferPanel(model: EntryModel) {
+internal fun EntryTransferPanel(model: EntryModel) {
     Column {
         WalletCard(
             model = model,
@@ -115,23 +78,7 @@ private fun EntryTransferPanel(model: EntryModel) {
                 .height(44.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val link = Palette.accent.opacity(Emphasis.Medium)
-
-            Canvas(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .width(ICON_SIZE)
-                    .fillMaxHeight(),
-            ) {
-                drawLine(
-                    color = link,
-                    start = Offset(size.width / 2, 0f),
-                    end = Offset(size.width / 2, size.height),
-                    strokeWidth = 2.dp.toPx(),
-                    cap = StrokeCap.Round,
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(1.dp.toPx(), 4.dp.toPx())),
-                )
-            }
+            LinkLine()
 
             Flow(
                 amount = model.output.amount,
@@ -140,33 +87,59 @@ private fun EntryTransferPanel(model: EntryModel) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Box(
-                modifier = Modifier
-                    .padding(end = 20.dp)
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Palette.card)
-                    .border(
-                        width = 1.dp,
-                        color = Palette.accent.opacity(Emphasis.Medium),
-                        shape = CircleShape,
-                    ).clickable(onClick = model.state::swapWallets),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_swap),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .rotate(90f),
-                    tint = Palette.accent,
-                )
-            }
+            SwapButton(onSwap = model.state::swapWallets)
         }
 
         WalletCard(
             model = model,
             isSource = false,
+        )
+    }
+}
+
+@Composable
+private fun LinkLine() {
+    val link = Palette.accent.opacity(Emphasis.Medium)
+
+    Canvas(
+        modifier = Modifier
+            .padding(start = 16.dp)
+            .width(ICON_SIZE)
+            .fillMaxHeight(),
+    ) {
+        drawLine(
+            color = link,
+            start = Offset(size.width / 2, 0f),
+            end = Offset(size.width / 2, size.height),
+            strokeWidth = 2.dp.toPx(),
+            cap = StrokeCap.Round,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(1.dp.toPx(), 4.dp.toPx())),
+        )
+    }
+}
+
+@Composable
+private fun SwapButton(onSwap: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(end = 20.dp)
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(Palette.card)
+            .border(
+                width = 1.dp,
+                color = Palette.accent.opacity(Emphasis.Medium),
+                shape = CircleShape,
+            ).clickable(onClick = onSwap),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_swap),
+            contentDescription = null,
+            modifier = Modifier
+                .size(16.dp)
+                .rotate(90f),
+            tint = Palette.accent,
         )
     }
 }
@@ -211,8 +184,6 @@ private fun WalletCard(
     val icon = wallet?.let { model.output.icon(of = it.iconId) }
     val corner = LocalThemeStyle.current.corner
     val shape = RoundedCornerShape(corner.radius(20.dp))
-    val iconShape = RoundedCornerShape(corner.radius(12.dp))
-    val tint = icon?.let { colorOf(hex = it.color) } ?: Palette.accent
     val isOver = isSource && model.output.isOverSourceBalance
     val current = wallet?.let(model.output::currentLine)
     val after = wallet?.let { model.output.afterLine(of = it, isSource = isSource) }
@@ -240,60 +211,20 @@ private fun WalletCard(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(ICON_SIZE)
-                .clip(iconShape)
-                .background(tint.opacity(Emphasis.Subtle))
-                .border(
-                    width = 1.5.dp,
-                    color = tint.opacity(Emphasis.Medium),
-                    shape = iconShape,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            CompositionLocalProvider(LocalContentColor provides Palette.accent) {
-                IconImage(
-                    icon = icon,
-                    size = 22.dp,
-                )
-            }
-        }
+        CardIcon(icon = icon)
 
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            RoleTag(
-                title = if (isSource) model.output.walletTitle else EntryText.destinationTitle,
-                isSource = isSource,
-            )
+        CardInfo(
+            title = if (isSource) model.output.walletTitle else EntryText.destinationTitle,
+            name = wallet?.name,
+            isSource = isSource,
+        )
 
-            Text(
-                text = wallet?.name ?: "選ぶ",
-                color = if (wallet == null) Palette.hint else Palette.text,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                style = textFont(
-                    size = FontSize.Small,
-                    weight = FontWeight.Bold,
-                ),
-            )
-        }
-
-        Column(
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            val color = if (isOver) Palette.rose else Palette.subtext
-
-            current?.let { BalanceText(line = it, color = color) }
-
-            when {
-                after != null -> BalanceText(line = after, color = color)
-                idleAfter != null -> BalanceText(line = idleAfter, color = Palette.hint)
-            }
-        }
+        CardBalances(
+            current = current,
+            after = after,
+            idleAfter = idleAfter,
+            isOver = isOver,
+        )
 
         Icon(
             painter = painterResource(R.drawable.ic_chevron_right),
@@ -301,6 +232,82 @@ private fun WalletCard(
             modifier = Modifier.size(14.dp),
             tint = Palette.hint,
         )
+    }
+}
+
+@Composable
+private fun CardIcon(icon: EntryIcon?) {
+    val iconShape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(12.dp))
+    val tint = icon?.let { colorOf(hex = it.color) } ?: Palette.accent
+
+    Box(
+        modifier = Modifier
+            .size(ICON_SIZE)
+            .clip(iconShape)
+            .background(tint.opacity(Emphasis.Subtle))
+            .border(
+                width = 1.5.dp,
+                color = tint.opacity(Emphasis.Medium),
+                shape = iconShape,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        CompositionLocalProvider(LocalContentColor provides Palette.accent) {
+            IconImage(
+                icon = icon,
+                size = 22.dp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowScope.CardInfo(
+    title: String,
+    name: String?,
+    isSource: Boolean,
+) {
+    Column(
+        modifier = Modifier.weight(1f),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        RoleTag(
+            title = title,
+            isSource = isSource,
+        )
+
+        Text(
+            text = name ?: "選ぶ",
+            color = if (name == null) Palette.hint else Palette.text,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            style = textFont(
+                size = FontSize.Small,
+                weight = FontWeight.Bold,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun CardBalances(
+    current: BalanceLine?,
+    after: BalanceLine?,
+    idleAfter: BalanceLine?,
+    isOver: Boolean,
+) {
+    Column(
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        val color = if (isOver) Palette.rose else Palette.subtext
+
+        current?.let { BalanceText(line = it, color = color) }
+
+        when {
+            after != null -> BalanceText(line = after, color = color)
+            idleAfter != null -> BalanceText(line = idleAfter, color = Palette.hint)
+        }
     }
 }
 

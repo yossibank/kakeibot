@@ -99,78 +99,18 @@ fun EntryItemSlip(
             ),
         verticalArrangement = Arrangement.spacedBy(slipSpacing),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = editor.editingIndex?.let { "品目 ${it + 1} を変更" } ?: "品目を追加",
-                modifier = Modifier.weight(1f),
-                color = Palette.text,
-                style = textFont(
-                    size = FontSize.Small,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-
-            CircleIconButton(
-                icon = R.drawable.ic_close,
-                onClick = editor::close,
-                size = 36.dp,
-                iconSize = 20.dp,
-                fill = SolidColor(Color.Transparent),
-                tint = Palette.subtext,
-            )
-        }
+        SlipHeader(editor = editor)
 
         NameField(editor = editor)
 
-        val suggestions = model.output.itemNameSuggestions(editor.name)
-
-        if (suggestions.isNotEmpty()) {
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                suggestions.forEach { suggestion ->
-                    EntryItemChip(
-                        title = suggestion,
-                        isSelected = false,
-                        onSelect = {
-                            focus.clearFocus()
-                            editor.name = suggestion
-                        },
-                    )
-                }
-            }
-        }
+        Suggestions(
+            model = model,
+            editor = editor,
+        )
 
         Equation(editor = editor)
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(
-                null to "税込",
-                AmountCalculator.TaxRate.reduced to "8%",
-                AmountCalculator.TaxRate.standard to "10%",
-            ).forEach { (rate, title) ->
-                EntryItemChip(
-                    title = title,
-                    isSelected = editor.taxRate == rate,
-                    onSelect = { editor.taxRate = rate },
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            EntryItemChip(
-                title = "値引",
-                isSelected = editor.isDiscount,
-                onSelect = { editor.isDiscount = !editor.isDiscount },
-            )
-
-            EntryItemChip(
-                title = "半額",
-                isSelected = false,
-                onSelect = editor::halveUnit,
-            )
-        }
+        TaxRow(editor = editor)
 
         Keypad(
             calculator = editor.activeCalculator,
@@ -181,35 +121,131 @@ fun EntryItemSlip(
             keyHeight = 44.dp,
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .clip(CircleShape)
-                .background(
-                    if (editor.canSubmit) {
-                        Palette.accent
-                    } else {
-                        Palette.accent.opacity(
-                            Emphasis.Muted,
-                        )
+        SubmitButton(
+            editor = editor,
+            onSubmit = {
+                focus.clearFocus()
+                editor.submit(model)
+            },
+        )
+    }
+}
+
+@Composable
+private fun SlipHeader(editor: EntryItemEditor) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = editor.editingIndex?.let { "品目 ${it + 1} を変更" } ?: "品目を追加",
+            modifier = Modifier.weight(1f),
+            color = Palette.text,
+            style = textFont(
+                size = FontSize.Small,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+
+        CircleIconButton(
+            icon = R.drawable.ic_close,
+            onClick = editor::close,
+            size = 36.dp,
+            iconSize = 20.dp,
+            fill = SolidColor(Color.Transparent),
+            tint = Palette.subtext,
+        )
+    }
+}
+
+@Composable
+private fun Suggestions(
+    model: EntryModel,
+    editor: EntryItemEditor,
+) {
+    val focus = LocalFocusManager.current
+    val suggestions = model.output.itemNameSuggestions(editor.name)
+
+    if (suggestions.isNotEmpty()) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            suggestions.forEach { suggestion ->
+                EntryItemChip(
+                    title = suggestion,
+                    isSelected = false,
+                    onSelect = {
+                        focus.clearFocus()
+                        editor.name = suggestion
                     },
                 )
-                .clickable(enabled = editor.canSubmit) {
-                    focus.clearFocus()
-                    editor.submit(model)
-                },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = if (editor.editingIndex == null) "追加" else "変更",
-                color = Palette.backgroundTop,
-                style = textFont(
-                    size = FontSize.Body,
-                    weight = FontWeight.SemiBold,
-                ),
+            }
+        }
+    }
+}
+
+@Composable
+private fun TaxRow(editor: EntryItemEditor) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf(
+            null to "税込",
+            AmountCalculator.TaxRate.reduced to "8%",
+            AmountCalculator.TaxRate.standard to "10%",
+        ).forEach { (rate, title) ->
+            EntryItemChip(
+                title = title,
+                isSelected = editor.taxRate == rate,
+                onSelect = { editor.taxRate = rate },
             )
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        EntryItemChip(
+            title = "値引",
+            isSelected = editor.isDiscount,
+            onSelect = { editor.isDiscount = !editor.isDiscount },
+        )
+
+        EntryItemChip(
+            title = "半額",
+            isSelected = false,
+            onSelect = editor::halveUnit,
+        )
+    }
+}
+
+@Composable
+private fun SubmitButton(
+    editor: EntryItemEditor,
+    onSubmit: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clip(CircleShape)
+            .background(
+                if (editor.canSubmit) {
+                    Palette.accent
+                } else {
+                    Palette.accent.opacity(
+                        Emphasis.Muted,
+                    )
+                },
+            )
+            .clickable(
+                enabled = editor.canSubmit,
+                onClick = onSubmit,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = if (editor.editingIndex == null) "追加" else "変更",
+            color = Palette.backgroundTop,
+            style = textFont(
+                size = FontSize.Body,
+                weight = FontWeight.SemiBold,
+            ),
+        )
     }
 }
 
