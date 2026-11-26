@@ -363,3 +363,15 @@ extension ReviewModel.State {
         offset = 0
     }
 }
+
+extension ReviewModel: TabScreenModel {
+    public var isLoadFailed: Bool {
+        input.list.isFailed
+    }
+
+    public func setToday(_ today: LocalDate) {
+        if state.today != today {
+            state.today = today
+        }
+    }
+}

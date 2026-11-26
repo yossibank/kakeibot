@@ -104,13 +104,13 @@ fun RecurringListView(
         )
     }
 
+    val lift = remember { RecurringLift() }
+    val hiddenNotice = model.state.hidden
+    val deletedNotice = model.state.deleted
+
     SideEffect {
         model.setToday(today)
     }
-
-    val hiddenNotice = model.state.hidden
-    val deletedNotice = model.state.deleted
-    val lift = remember { RecurringLift() }
 
     LaunchedEffect(model) {
         model.loadFold(model.input.hiddenList)

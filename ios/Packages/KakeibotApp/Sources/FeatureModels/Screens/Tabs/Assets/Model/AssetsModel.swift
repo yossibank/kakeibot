@@ -187,3 +187,9 @@ private extension AssetsModel {
         }
     }
 }
+
+extension AssetsModel: TabScreenModel {
+    public var isLoadFailed: Bool {
+        input.list.isFailed
+    }
+}

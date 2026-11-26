@@ -591,6 +591,8 @@ loadable.retries-only-from-failure	LoadableTests/retriesOnlyFromFailure	Loadable
 undo-notice.clears-after-duration	UndoNoticeTests/clearsAfterDuration	UndoNoticeTest/clearsAfterDuration	対応	
 undo-notice.keeps-later-notice-when-earlier-time-ends	UndoNoticeTests/keepsLaterNoticeWhenEarlierTimeEnds	UndoNoticeTest/keepsLaterNoticeWhenEarlierTimeEnds	対応	
 undo-notice.takes-item-and-clears	UndoNoticeTests/takesItemAndClears	UndoNoticeTest/takesItemAndClears	対応	
+tab-screen.sets-today-on-tab-models	TabScreenModelTests/setsTodayOnTabModels	TabScreenModelTest/setsTodayOnTabModels	対応	
+tab-screen.fails-load-only-for-list-tabs	TabScreenModelTests/failsLoadOnlyForListTabs	TabScreenModelTest/failsLoadOnlyForListTabs	対応	
 app-icon-list.*	AppIconListModelTests/*		未移植	アプリのアイコンを選ぶ画面が無い
 backup.*	BackupModelTests/*		未移植	書き出しと読み込みの画面が無い
 category-edit.*	CategoryEditModelTests/*		未移植	カテゴリを編集する画面が無い

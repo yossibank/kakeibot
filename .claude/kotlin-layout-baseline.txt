@@ -1,4 +1,3 @@
-android/app/src/main/kotlin/com/yossibank/kakeibot/appfeature/main/MainView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/date/MonthCalendar.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/dial/HalfDial.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/entry/EntryMemo.kt: K8: 1 つの関数は 60 行までにする
@@ -38,7 +37,6 @@ android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/rec
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringEditSheet.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringHiddenSection.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringListView.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「効果」より前に置く
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringLoanPlan.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringPanelBody.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringQuickCard.kt: K8: 1 つの関数は 60 行までにする
@@ -46,14 +44,10 @@ android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/rec
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/recurring/RecurringRowCard.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/settings/templates/TemplateEditSheet.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/assets/view/AssetsView.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/assets/view/AssetsView.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/home/view/HomeView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/home/view/HomeView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsCalendarCard.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsDayCard.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/records/view/RecordsView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/review/view/ReviewView.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
-android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/review/view/ReviewView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/tabs/review/view/ReviewView.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/shared/settingsparts/hint/SettingsIntroCard.kt: K8: 1 つの関数は 60 行までにする
 android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportJson.kt: K8: 1 つの関数は 60 行までにする

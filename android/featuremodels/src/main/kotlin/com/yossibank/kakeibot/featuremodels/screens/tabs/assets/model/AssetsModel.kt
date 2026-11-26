@@ -17,6 +17,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.TabScreenModel
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import kotlinx.coroutines.flow.Flow
 
@@ -24,7 +25,7 @@ class AssetsModel(
     parts: ScreenParts,
     today: LocalDate,
     round: ObservationRound,
-) {
+) : TabScreenModel {
     val state = State()
     val input = Input(today)
     val output = Output(input)
@@ -121,11 +122,17 @@ class AssetsModel(
         val round: ObservationRound,
     )
 
-    fun setToday(today: LocalDate) {
+    override val task: ModelTask
+        get() = state.task
+
+    override val isLoadFailed: Boolean
+        get() = input.list.isFailed
+
+    override fun setToday(today: LocalDate) {
         input.today = today
     }
 
-    suspend fun observe() {
+    override suspend fun observe() {
         dependencies.round.each {
             state.task.observe(
                 values = dependencies.entryList,
@@ -135,7 +142,7 @@ class AssetsModel(
         }
     }
 
-    fun retry() {
+    override fun retry() {
         dependencies.round.restart()
     }
 

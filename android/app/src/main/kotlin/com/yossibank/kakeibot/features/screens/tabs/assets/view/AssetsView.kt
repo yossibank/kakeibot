@@ -35,18 +35,15 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.wallets.title
 import com.yossibank.kakeibot.featuremodels.screens.tabs.assets.model.AssetsModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
-import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
-import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
-import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
+import com.yossibank.kakeibot.features.shared.tab.TabScreen
+import com.yossibank.kakeibot.features.shared.tab.rememberTabModel
 
 @Composable
 fun AssetsView(
     parts: ScreenParts,
     today: LocalDate,
 ) {
-    val round = rememberObservationRound()
-
-    val model = remember(parts, round) {
+    val model = rememberTabModel(parts, today) { round ->
         AssetsModel(
             parts = parts,
             today = today,
@@ -54,21 +51,7 @@ fun AssetsView(
         )
     }
 
-    SideEffect {
-        model.setToday(today)
-    }
-
-    LaunchedEffect(model) {
-        model.observe()
-    }
-
-    model.state.task.Timer()
-    TabNoticeRound(model.state.task)
-
-    LoadFailedColumn(
-        isFailed = model.input.list.isFailed,
-        onRetry = model::retry,
-    ) {
+    TabScreen(model = model) {
         item(key = "title") {
             Text(
                 text = "資産",

@@ -21,6 +21,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.TabScreenModel
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -38,7 +39,8 @@ class RecordsModel(
     parts: ScreenParts,
     today: LocalDate,
     round: ObservationRound,
-) : ScreenPerforming {
+) : ScreenPerforming,
+    TabScreenModel {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
@@ -161,15 +163,21 @@ class RecordsModel(
         val round: ObservationRound,
     )
 
-    fun setToday(today: LocalDate) {
+    override val task: ModelTask
+        get() = state.task
+
+    override val isLoadFailed: Boolean
+        get() = input.list.isFailed
+
+    override fun setToday(today: LocalDate) {
         state.today = today
     }
 
-    suspend fun observe() {
+    override suspend fun observe() {
         dependencies.round.each { observeAll() }
     }
 
-    fun retry() {
+    override fun retry() {
         dependencies.round.restart()
     }
 

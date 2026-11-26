@@ -14,6 +14,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.TabScreenModel
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.monthOverviewUpdates
@@ -27,7 +28,7 @@ class HomeModel(
     parts: ScreenParts,
     today: LocalDate,
     round: ObservationRound,
-) {
+) : TabScreenModel {
     val state = State(today)
     val input = Input()
     val output = Output(input, state)
@@ -113,15 +114,21 @@ class HomeModel(
         val round: ObservationRound,
     )
 
-    fun setToday(today: LocalDate) {
+    override val task: ModelTask
+        get() = state.task
+
+    override val isLoadFailed: Boolean
+        get() = false
+
+    override fun setToday(today: LocalDate) {
         state.today = today
     }
 
-    suspend fun observe() {
+    override suspend fun observe() {
         dependencies.round.each { observeOverview() }
     }
 
-    fun retry() {
+    override fun retry() {
         dependencies.round.restart()
     }
 

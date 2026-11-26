@@ -48,11 +48,11 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
-import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
-import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderEmpty
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderLoadFailed
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
+import com.yossibank.kakeibot.features.shared.tab.TabScreen
+import com.yossibank.kakeibot.features.shared.tab.rememberTabModel
 import kotlin.math.abs
 
 @Composable
@@ -64,9 +64,7 @@ fun HomeView(
     onAddEntry: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    val round = rememberObservationRound()
-
-    val model = remember(parts, round) {
+    val model = rememberTabModel(parts, today) { round ->
         HomeModel(
             parts = parts,
             today = today,
@@ -74,53 +72,12 @@ fun HomeView(
         )
     }
 
-    SideEffect {
-        model.setToday(today)
-    }
-
-    LaunchedEffect(model) {
-        model.observe()
-    }
-
-    model.state.task.Timer()
-    TabNoticeRound(model.state.task)
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            top = 12.dp,
-            end = 16.dp,
-            bottom = 24.dp,
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
+    TabScreen(model = model) {
         item(key = "title") {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Text(
-                    text = model.output.month?.let { "${it.month}月" } ?: "",
-                    modifier = Modifier.alignByBaseline(),
-                    color = Palette.accentStrong,
-                    style = displayFont(size = FontSize.Headline),
-                )
-
-                Text(
-                    text = model.output.periodText,
-                    modifier = Modifier
-                        .alignByBaseline()
-                        .weight(1f),
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption),
-                )
-
-                RoundIconButton(
-                    icon = R.drawable.ic_settings,
-                    onSelect = onOpenSettings,
-                )
-            }
+            TitleRow(
+                model = model,
+                onOpenSettings = onOpenSettings,
+            )
         }
 
         noticeBanner(task = model.state.task)
@@ -139,6 +96,38 @@ fun HomeView(
                 onAddEntry = onAddEntry,
             )
         }
+    }
+}
+
+@Composable
+private fun TitleRow(
+    model: HomeModel,
+    onOpenSettings: () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        Text(
+            text = model.output.month?.let { "${it.month}月" } ?: "",
+            modifier = Modifier.alignByBaseline(),
+            color = Palette.accentStrong,
+            style = displayFont(size = FontSize.Headline),
+        )
+
+        Text(
+            text = model.output.periodText,
+            modifier = Modifier
+                .alignByBaseline()
+                .weight(1f),
+            color = Palette.subtext,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+
+        RoundIconButton(
+            icon = R.drawable.ic_settings,
+            onSelect = onOpenSettings,
+        )
     }
 }
 

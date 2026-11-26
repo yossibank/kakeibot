@@ -104,10 +104,6 @@ struct MainView: View {
                 markOpened(sheet)
             }
             .onChange(of: today) { _, today in
-                home.state.today = today
-                records.state.today = today
-                review.state.today = today
-                assets.setToday(today)
                 model.setToday(today)
             }
     }

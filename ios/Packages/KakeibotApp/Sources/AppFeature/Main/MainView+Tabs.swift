@@ -48,6 +48,7 @@ extension MainView {
                 },
                 onOpenDay: showDay
             )
+            .tabScreen(home, today: today, round: model.state.round)
             .tabContent()
         }
     }
@@ -71,7 +72,7 @@ extension MainView {
                 },
                 onDeleteAdjustment: model.receive
             )
-            .loadFailed(records.input.list.isFailed, onRetry: retry)
+            .tabScreen(records, today: today, round: model.state.round)
             .tabContent()
         }
     }
@@ -86,7 +87,7 @@ extension MainView {
                 onAddEntry: model.addEntry(on:),
                 onOpenRecurrings: openRecurrings
             )
-            .loadFailed(review.input.list.isFailed, onRetry: retry)
+            .tabScreen(review, today: today, round: model.state.round)
             .tabContent()
         }
     }
@@ -105,7 +106,7 @@ extension MainView {
                     model.state.sheet = .reward
                 }
             )
-            .loadFailed(assets.input.list.isFailed, onRetry: retry)
+            .tabScreen(assets, today: today, round: model.state.round)
             .tabContent()
         }
     }
