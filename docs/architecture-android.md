@@ -1,7 +1,7 @@
 # Android の構成
 
 > [!NOTE]
-> Android のモジュールと、ビルドの設定が分かる。
+> Android のモジュールと、共通の部品の置き場所と、ビルドの設定が分かる。
 > 画面とそのモデルのモジュールは [architecture-android-app](architecture-android-app.md) にある。
 > 両 OS の分け方は [architecture](architecture.md) にある。
 
@@ -144,6 +144,42 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | `make verify` の `android-features-no-store` | `features/` の下の `:store` の import を、grep で止める |
 
 `appfeature/` と `notifications/` は、`:store` を import してよい。`:app` の依存に `:store` を残すのは、このためである。
+
+## 📂 部品とフォルダ
+
+複数の画面で使う部品は、次の場所に置く。
+
+| 部品 | 置き場所 |
+| --- | --- |
+| 主ボタン・丸いアイコンのボタン | `designsystem/components/button/` |
+| 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
+| 下からせり上がる全画面の層 | `designsystem/components/modal/` の `SheetLayer`。閉じる動きの間は、最後の中身を出す |
+| 失敗の知らせ | `designsystem/components/notice/` の `NoticeBanner`。タブの画面は、題のすぐ下に出す |
+| 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`LoadFailedColumn` で画面の全体に出す |
+| 記録が無い時の表示 | `features/shared/placeholder/` の `PlaceholderEmpty`。記録するボタンを付けられる |
+| 振替の経路 | `designsystem/components/entry/` の `EntryRoute`。記録の行が、タグの札と一緒に出す |
+| 記録の行のメモ | `designsystem/components/entry/` の `EntryMemo`。左に線を引き、2 行を超えると押して開く |
+| 横に収まらない時に並べ替える | `designsystem/components/layout/` の `HorizontalFit`。iOS の `ViewThatFits` に当たる |
+| 記録の知らせ | `features/shared/notice/` の `EntryNoticeBanner`。入口と入力シートが出す |
+| 1 行に収めて縮める文字 | `designsystem/components/text/` の `FittedText` |
+| 横線・縦の区切り | `designsystem/components/surface/` |
+| 置き文字付きの入力欄 | `designsystem/components/input/` の `PlaceholderTextField` |
+| ボタンの高さなどの寸法 | `designsystem/theme/` の `Metrics` |
+| 設定の画面の枠 | `features/shared/settingsparts/layout/` の `SettingsFrame` |
+| 期間を前後に送る見出し | `features/shared/period/` の `PeriodStepper` |
+| 通知の許可 | `features/shared/notification/`。窓口は `:featuremodels` |
+
+画面のフォルダとファイルで、iOS と違う所は次のとおりである。
+
+| Android | iOS との違い |
+| --- | --- |
+| `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
+| `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
+| `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
+| `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
+| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainModel` が番号を持ち、タブに配らない |
+| `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
+| `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |
 
 ## 🔧 設定
 

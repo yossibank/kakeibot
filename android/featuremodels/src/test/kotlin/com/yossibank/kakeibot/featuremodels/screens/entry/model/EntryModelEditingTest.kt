@@ -3,6 +3,7 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.month
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entry
@@ -205,5 +206,31 @@ class EntryModelEditingTest {
         assertTrue(saved)
         assertEquals(month("2026-11"), setup.database.entry(entry.id)?.billMonth)
         assertNotEquals(month("2026-11"), model.output.draft?.billMonth)
+    }
+
+    @Test
+    fun recordsEditedEntryAgainAsNewEntry() = modelTest(today = "2026-10-12") { setup ->
+        val entry = setup.save(Entry.Kind.expense, amount = 980, daysAgo = 3)
+        val model = setup.loadedModel(editing = entry.id)
+        model.state.update { copy(memo = "ランチ") }
+
+        model.recordAgain()
+        val isEditing = model.output.isEditing
+        val message = model.state.task.message
+        val tone = model.state.task.tone
+        model.save()
+        val entries = setup.database.entryList().entries
+        val saved = entries.first { it.id != entry.id }
+        val stored = setup.database.entry(entry.id)
+
+        assertFalse(isEditing)
+        assertEquals("同じ内容で新しい記録にしました", message)
+        assertEquals(ModelTask.Tone.info, tone)
+        assertEquals(980, saved.amount)
+        assertEquals("ランチ", saved.memo)
+        assertEquals(entry.categoryId, saved.categoryId)
+        assertEquals(setup.today, saved.date)
+        assertEquals(2, entries.size)
+        assertEquals(entry.memo, stored?.memo)
     }
 }

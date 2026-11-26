@@ -148,7 +148,7 @@ fun RecurringEditSheet(
         model.state.panel = null
 
         if (model.output.isChanged) {
-            model.state.prompt = RecurringEditPrompt.Discard
+            model.state.ask(RecurringEditPrompt.Discard)
         } else {
             onClose()
         }
@@ -202,7 +202,7 @@ fun RecurringEditSheet(
                         isHidden = model.input.isHidden,
                         onSelect = {
                             if (model.output.isChanged) {
-                                model.state.prompt = RecurringEditPrompt.Hide
+                                model.state.ask(RecurringEditPrompt.Hide)
                             } else {
                                 setHidden(!model.input.isHidden)
                             }
@@ -211,7 +211,7 @@ fun RecurringEditSheet(
 
                     RoundIconButton(
                         icon = R.drawable.ic_trash,
-                        onSelect = { model.state.prompt = RecurringEditPrompt.Delete },
+                        onSelect = { model.state.ask(RecurringEditPrompt.Delete) },
                     )
                 }
             }
@@ -307,7 +307,7 @@ fun RecurringEditSheet(
         prompt = model.state.prompt,
         isHidden = model.input.isHidden,
         canSave = model.output.canSave,
-        onDismiss = { model.state.prompt = null },
+        onDismiss = model.state::closePrompt,
         onDiscard = onClose,
         onDelete = { model.perform { it.delete() } },
         onSaveHiding = { save(hiding = true) },

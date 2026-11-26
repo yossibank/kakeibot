@@ -43,6 +43,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
+import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
 import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
@@ -72,6 +73,7 @@ fun RecordsView(
     }
 
     model.state.task.Timer()
+    TabNoticeRound(model.state.task)
 
     LoadFailedColumn(
         isFailed = model.state.isListFailed,

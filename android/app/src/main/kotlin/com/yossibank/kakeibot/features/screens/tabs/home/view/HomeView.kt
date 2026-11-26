@@ -48,6 +48,7 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
+import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
 import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderEmpty
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderLoadFailed
@@ -82,6 +83,7 @@ fun HomeView(
     }
 
     model.state.task.Timer()
+    TabNoticeRound(model.state.task)
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -269,14 +271,6 @@ private fun Dial(
                         weight = FontWeight.Bold,
                     ),
                     color = color,
-                )
-            }
-
-            if (!isFailed && usage != null) {
-                Text(
-                    text = "あと ${usage.daysLeft} 日",
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption),
                 )
             }
         }

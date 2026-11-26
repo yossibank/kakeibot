@@ -7,6 +7,7 @@ import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.dat
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.month
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryList
+import com.yossibank.kakeibot.store.writes.methods.fee
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -342,5 +343,23 @@ class EntryModelTransferTest {
 
         assertEquals(wallet.id, model.state.form.toWalletId)
         assertEquals(source, model.state.form.walletId)
+    }
+
+    @Test
+    fun dropsFeeWhenRecordingAgain() = modelTest(today = "2026-10-12") { setup ->
+        val wallets = setup.options().wallets
+        setup.saveTransfer(10000, from = wallets[1].id, to = wallets[0].id, fee = 220)
+        val transfer = setup.database.entryList().entries.first { it.type == Entry.Kind.transfer }
+        val model = setup.loadedModel(editing = transfer.id)
+
+        model.recordAgain()
+        model.save()
+
+        val saved = setup.database.entryList().entries.first { entry ->
+            entry.type == Entry.Kind.transfer && entry.id != transfer.id
+        }
+
+        assertEquals(10000, saved.amount)
+        assertNull(setup.database.fee(of = saved.id))
     }
 }

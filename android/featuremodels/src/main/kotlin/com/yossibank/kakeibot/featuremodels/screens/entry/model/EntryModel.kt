@@ -16,6 +16,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.notice.EntryChange
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
 import com.yossibank.kakeibot.store.queries.methods.entry
@@ -32,7 +33,7 @@ import com.yossibank.kakeibot.store.writes.methods.deleteEntry
 import com.yossibank.kakeibot.store.writes.methods.entryItems
 import com.yossibank.kakeibot.store.writes.methods.fee
 import com.yossibank.kakeibot.store.writes.methods.recentItemNames
-import com.yossibank.kakeibot.store.writes.methods.saveEntry
+import com.yossibank.kakeibot.store.writes.methods.saveEntryResult
 
 class EntryModel(
     parts: ScreenParts,
@@ -56,15 +57,18 @@ class EntryModel(
         Transfer,
     }
 
-    enum class Outcome {
-        Closed,
-        Continued,
+    sealed interface Outcome {
+        data class Closed(
+            val change: EntryChange,
+        ) : Outcome
+
+        data class Continued(
+            val change: EntryChange,
+        ) : Outcome
     }
 
     sealed interface Presented {
         data object Discard : Presented
-
-        data object Delete : Presented
 
         data object Items : Presented
 
@@ -171,6 +175,20 @@ class EntryModel(
             calculator = AmountCalculator(amount = amount)
             feeCalculator = AmountCalculator(amount = fee)
         }
+
+        internal fun startAgain() {
+            form = form.copy(
+                date = today,
+                billMonth = null,
+                items = emptyList(),
+                taxIncluded = false,
+                templateId = null,
+            )
+
+            feeCalculator = AmountCalculator()
+            voiceFilled = null
+            focus(Field.Amount)
+        }
     }
 
     class Input(
@@ -180,6 +198,9 @@ class EntryModel(
             internal set
 
         var original: Entry? = null
+            internal set
+
+        var originalFee: Entry? = null
             internal set
 
         var history: EntryList? by mutableStateOf(null)
@@ -237,7 +258,7 @@ class EntryModel(
                 fill(
                     entry = entry,
                     items = database.entryItems(of = entry.id).map { EntryItem.Draft(it) },
-                    fee = database.fee(of = entry.id)?.amount ?: 0,
+                    fee = input.originalFee?.amount ?: 0,
                 )
             }
 
@@ -253,49 +274,50 @@ class EntryModel(
     }
 
     suspend fun save(): Boolean {
-        if (!store()) {
-            return false
-        }
+        val change = store() ?: return false
 
-        state.outcome.send(Outcome.Closed)
+        state.outcome.send(Outcome.Closed(change))
 
         return true
     }
 
     suspend fun saveAndContinue(): Boolean {
-        if (!store()) {
-            return false
-        }
+        val change = store() ?: return false
 
         startNext()
-        state.outcome.send(Outcome.Continued)
+        state.outcome.send(Outcome.Continued(change))
 
         return true
     }
 
-    private suspend fun store(): Boolean {
+    private suspend fun store(): EntryChange? {
         val draft = output.draft
 
         if (draft == null || state.task.isRunning) {
-            return false
+            return null
         }
 
         val problem = draft.problems.firstOrNull()
 
         if (problem != null) {
             state.task.show(output.message(of = problem))
-            return false
+            return null
         }
 
-        val saved = state.task.attempt(describe = ::describe) {
-            dependencies.database.saveEntry(
+        return state.task.attempt(describe = ::describe) {
+            val database = dependencies.database
+
+            val saved = database.saveEntryResult(
                 draft = draft,
                 editing = input.editingId,
                 at = dependencies.clock.now,
             )
-        }
 
-        return saved != null
+            change(
+                saved = saved,
+                fee = database.fee(of = saved.entry.id),
+            )
+        }
     }
 
     suspend fun delete(): Boolean {
@@ -305,18 +327,29 @@ class EntryModel(
             return false
         }
 
-        val deleted = state.task.attempt(describe = ::describe) {
-            dependencies.database.deleteEntry(
+        val change = state.task.attempt(describe = ::describe) {
+            val database = dependencies.database
+            val items = database.entryItems(of = original.id)
+
+            val deleted = database.deleteEntry(
                 id = original.id,
                 at = dependencies.clock.now,
             )
+
+            EntryChange(
+                kind = EntryChange.Kind.Deleted,
+                entry = original,
+                label = output.label(of = original),
+                fee = deleted.firstOrNull { it.transferId == original.id },
+                items = items,
+            )
         }
 
-        if (deleted != null) {
-            state.outcome.send(Outcome.Closed)
+        if (change != null) {
+            state.outcome.send(Outcome.Closed(change))
         }
 
-        return deleted != null
+        return change != null
     }
 
     suspend fun startNext() {
@@ -336,7 +369,7 @@ class EntryModel(
         }
     }
 
-    private suspend fun loadHistory() {
+    internal suspend fun loadHistory() {
         val database = dependencies.database
 
         input.recentItemNames = database.recentItemNames(limit = RECENT_ITEM_NAME_LIMIT)
@@ -353,6 +386,7 @@ class EntryModel(
 
         input.editingId = entry.id
         input.original = entry
+        input.originalFee = database.fee(of = entry.id)
 
         return entry
     }

@@ -14,7 +14,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.time.Duration
 
 class ModelTask {
+    enum class Tone {
+        info,
+        error,
+    }
+
     var message: String by mutableStateOf("")
+        private set
+
+    var tone: Tone by mutableStateOf(Tone.error)
         private set
 
     var count: Int by mutableIntStateOf(0)
@@ -26,8 +34,17 @@ class ModelTask {
         get() = running > 0
 
     fun show(message: String) {
-        this.message = message
-        count += 1
+        show(
+            message = message,
+            tone = Tone.error,
+        )
+    }
+
+    fun inform(message: String) {
+        show(
+            message = message,
+            tone = Tone.info,
+        )
     }
 
     fun clear() {
@@ -106,6 +123,15 @@ class ModelTask {
                 clear()
             }
         }
+    }
+
+    private fun show(
+        message: String,
+        tone: Tone,
+    ) {
+        this.message = message
+        this.tone = tone
+        count += 1
     }
 
     companion object {

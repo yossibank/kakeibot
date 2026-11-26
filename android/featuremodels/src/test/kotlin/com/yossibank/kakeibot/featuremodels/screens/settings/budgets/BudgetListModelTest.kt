@@ -141,6 +141,31 @@ class BudgetListModelTest {
     }
 
     @Test
+    fun asksBeforeDiscardingChangedAmount() = modelTest(today = "2026-10-12") { setup ->
+        setup.database.setBudget(amount = 50000, categoryId = null, from = setup.today.yearMonth)
+        val model = setup.observedModel()
+        ModelWait.until { model.output.totalAmount != null }
+
+        model.startEditing(Target.Total)
+        model.close()
+        val unchanged = model.state.editing
+
+        model.startEditing(Target.Total)
+        model.press(1)
+        model.close()
+        val isAsking = model.state.isConfirmingDiscard
+        val kept = model.state.editing
+
+        model.state.cancelEditing()
+
+        assertNull(unchanged)
+        assertTrue(isAsking)
+        assertEquals(Target.Total, kept)
+        assertFalse(model.state.isConfirmingDiscard)
+        assertNull(model.state.editing)
+    }
+
+    @Test
     fun turnsCarryoverOnFromPeriodMonthAndOff() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.observedModel()
         val initial = model.output.isCarryoverOn

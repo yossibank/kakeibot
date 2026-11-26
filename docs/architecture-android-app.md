@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > Android の `:featuremodels` と `:app` の中身と、画面のモデルの書き方が分かる。
-> モジュールの分け方とビルドの設定は [architecture-android](architecture-android.md) にある。
+> モジュールの分け方・ビルドの設定・共通の部品の置き場所は [architecture-android](architecture-android.md) にある。
 
 ## 📦 モデルのモジュール
 
@@ -28,6 +28,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `Weekday+Name` | `datechoice/WeekdayName.kt` |
 | 無い | `notice/UndoNoticeState.kt`。取り消しの知らせの状態で、Android だけにある。モデルの `State` に置く |
 | Features の `Deletion+Notice` の文 | `notice/DeletionNotice.kt`。削除の知らせの文を出す |
+| FeatureModels の `EntryNoticeModel`・`EntryChange` | `notice/` の同じ名前のファイル。知らせを消す時を数える `Timer` も、`State` に置く |
 
 ## 📱 アプリのモジュール
 
@@ -93,6 +94,9 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
 | タブの記録の一覧の失敗 | 4 つのタブのモデルは、記録の一覧を読めなかった時に `state.isListFailed` を立てる。見張りを始め直す時に下ろす |
 | 見張りの回 | `MainModel` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
+| 記録の知らせ | `MainView` が `EntryNoticeModel` を持ち、タブの上に出す。`EntrySheet` が閉じる時に、結果の変更を渡す |
+| 知らせの入れ替え | 記録の知らせが出ると、`MainModel` の `noticeRound` を進める。タブは `TabNoticeRound` で、失敗の知らせを消す |
+| タブの失敗の知らせ | `TabNoticeRound` が `LocalTabNoticeShown` を呼び、出ている記録の知らせを消す |
 | 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
 | 開いているシート | `MainModel.Sheet` のように、1 つの sealed interface で持つ |
 | 入口のタブとシート | `featuremodels/screens/main/` の `MainModel` が持つ。通知やリンクの行き先は、`open` が開く |
@@ -118,6 +122,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 受ける所 | 画面は、`features/shared/model/` の `OnOutcome` を 1 か所に書く。閉じる・親に知らせるだけを書く |
 | 編集シートの結果 | `SettingsEditOutcome`。保存した値・非表示にしたか・消した物・閉じるかを持つ |
 | 取り消しの知らせ | モデルが、`state` の `UndoNoticeState` に出す。予算と固定費の一覧が当たる |
+| 入力の結果 | `EntryModel.Outcome` の `Closed` と `Continued` が、`EntryChange` を持つ |
 | 残す `rememberCoroutineScope` | `designsystem` の動きだけが持つ。画面のファイルには書かない |
 
 モデルのテストは `featuremodels/src/test/` に置く。`modelTest` が DB をメモリに開き、`ModelWait` が値を待つ。iOS と違う動きは `@Ignore` の理由に書く。
@@ -127,36 +132,3 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 入力の値だけで決まる画面の文は、`spec/fixtures` を読んで確かめる。読む部品は `support/ModelFixture.kt` で、iOS も同じファイルを読む。形式は [fixtures](../spec/fixtures.md) にある。
 
 読み書きの失敗は、`support/AppDatabaseFailure.kt` で起こす。記録の一覧の失敗は、失敗する `Flow` をモデルに渡して起こす。やり直すと読める一覧は、`failingFirst` で作る。
-
-## 📂 部品とフォルダ
-
-複数の画面で使う部品は、次の場所に置く。
-
-| 部品 | 置き場所 |
-| --- | --- |
-| 主ボタン・丸いアイコンのボタン | `designsystem/components/button/` |
-| 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
-| 下からせり上がる全画面の層 | `designsystem/components/modal/` の `SheetLayer`。閉じる動きの間は、最後の中身を出す |
-| 失敗の知らせ | `designsystem/components/notice/` の `NoticeBanner`。タブの画面は、題のすぐ下に出す |
-| 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`LoadFailedColumn` で画面の全体に出す |
-| 記録が無い時の表示 | `features/shared/placeholder/` の `PlaceholderEmpty`。記録するボタンを付けられる |
-| 振替の経路 | `designsystem/components/entry/` の `EntryRoute`。記録の行が、タグの札と一緒に出す |
-| 1 行に収めて縮める文字 | `designsystem/components/text/` の `FittedText` |
-| 横線・縦の区切り | `designsystem/components/surface/` |
-| 置き文字付きの入力欄 | `designsystem/components/input/` の `PlaceholderTextField` |
-| ボタンの高さなどの寸法 | `designsystem/theme/` の `Metrics` |
-| 設定の画面の枠 | `features/shared/settingsparts/layout/` の `SettingsFrame` |
-| 期間を前後に送る見出し | `features/shared/period/` の `PeriodStepper` |
-| 通知の許可 | `features/shared/notification/`。窓口は `:featuremodels` |
-
-画面のフォルダとファイルで、iOS と違う所は次のとおりである。
-
-| Android | iOS との違い |
-| --- | --- |
-| `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
-| `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
-| `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
-| `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
-| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainModel` が番号を持ち、タブに配らない |
-| `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
-| `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |

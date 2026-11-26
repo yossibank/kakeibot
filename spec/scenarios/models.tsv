@@ -25,11 +25,11 @@ entry.replaces-edited-amount-in-month-total	EntryModelTests/replacesEditedAmount
 entry.removes-entry-moved-out-of-month-from-total	EntryModelTests/removesEntryMovedOutOfMonthFromTotal		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い
 entry.reports-ready-after-first-load-only	EntryModelTests/reportsReadyAfterFirstLoadOnly		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、開き直しの合図（start）が無い
 entry.drops-undo-notices-when-starting-again	EntryModelTests/dropsUndoNoticesWhenStartingAgain		未移植	入口が入力の下書きを持ち続ける仕組みがまだ無く、始め直しで知らせを消す所が無い
-entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterSaving	対応	Android の結果は変更を持たず、閉じ始めの旗も無い。閉じる結果だけを確かめる
+entry.places-saved-change-and-begins-closing	EntryModelTests/placesSavedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterSaving	対応	Android は閉じ始めの旗が無く、変更を持つ閉じる結果を確かめる
 entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSavingFails	EntryModelOutcomeTest/placesNoOutcomeWhenSavingFails	対応	
-entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving	EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	対応	Android の結果は変更を持たず、送った回数と保存した 2 件で確かめる
-entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterDeleting	対応	Android の結果は変更を持たず、閉じ始めの旗も無い。閉じる結果だけを確かめる
-entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未移植	同じ内容で記録し直す recordAgain が無い
+entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving	EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	対応	
+entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterDeleting	対応	Android は閉じ始めの旗が無く、変更を持つ閉じる結果を確かめる
+entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未移植	記録し直した後に、カテゴリの棚を動かす結果（categoryMoved）が無い
 entry.places-hidden-category-and-moves-back-on-undo	EntryModelTests/placesHiddenCategoryAndMovesBackOnUndo		未移植	入力からカテゴリを非表示にする所が無い
 entry.clears-hidden-category-when-hiding-fails	EntryModelTests/clearsHiddenCategoryWhenHidingFails		未移植	入力からカテゴリを非表示にする所が無い
 entry.reports-added-category	EntryModelTests/reportsAddedCategory		未移植	入力からカテゴリを足す所が無い
@@ -75,7 +75,7 @@ entry.shows-template-icon-while-shared-wallet-is-chosen	EntryModelTests/showsTem
 entry.applies-template-to-entry	EntryModelTests/appliesTemplateToEntry	EntryModelTest/appliesTemplateToEntry	対応	選んだひな形の目印（isApplied）は Android に無く確かめていない
 entry.keeps-typed-amount-and-memo-when-template-lacks-them	EntryModelTests/keepsTypedAmountAndMemoWhenTemplateLacksThem	EntryModelTest/keepsTypedAmountAndMemoWhenTemplateLacksThem	対応	ひな形のカテゴリに変わる所を確かめていない
 entry.drops-archived-tag-when-applying-template	EntryModelTests/dropsArchivedTagWhenApplyingTemplate	EntryModelTemplateTest/dropsArchivedTagWhenApplyingTemplate	対応	
-entry.drops-archived-tag-and-template-when-recording-again	EntryModelTests/dropsArchivedTagAndTemplateWhenRecordingAgain		未移植	同じ内容で新しく記録する所（recordAgain）が無い
+entry.drops-archived-tag-and-template-when-recording-again	EntryModelTests/dropsArchivedTagAndTemplateWhenRecordingAgain	EntryModelTemplateTest/dropsArchivedTagAndTemplateWhenRecordingAgain	対応	
 entry.applies-tag-and-drops-it-with-other-category	EntryModelTests/appliesTagAndDropsItWithOtherCategory	EntryModelTest/clearsTagWhenCategoryChanges	対応	ひな形でタグが付いて保存される所を確かめていない（isApplied は無い）
 entry.highlights-only-the-applied-template	EntryModelTests/highlightsOnlyTheAppliedTemplate		未移植	選んだひな形の目印（isApplied）がモデルにも画面にも無い
 entry.starts-from-template-without-changes	EntryModelTests/startsFromTemplateWithoutChanges		未移植	ひな形を渡して入力を開く所が EntryModel と EntrySheet に無い
@@ -97,7 +97,7 @@ entry.saves-new-entry	EntryModelTests/savesNewEntry	EntryModelTest/savesNewEntry
 entry.saves-once-when-save-is-tapped-twice	EntryModelTests/savesOnceWhenSaveIsTappedTwice	EntryModelTest/savesOnceWhenSaveIsTappedTwice	対応	
 entry.refuses-zero-amount	EntryModelTests/refusesZeroAmount	EntryModelTest/refusesZeroAmount	対応	保存できるかの印（canSave）は確かめていない
 entry.edits-existing-entry	EntryModelTests/editsExistingEntry	EntryModelTest/editsExistingEntry	対応	
-entry.records-edited-entry-again-as-new-entry	EntryModelTests/recordsEditedEntryAgainAsNewEntry		未移植	同じ内容で新しく記録する所（recordAgain）がモデルにも画面にも無い
+entry.records-edited-entry-again-as-new-entry	EntryModelTests/recordsEditedEntryAgainAsNewEntry	EntryModelEditingTest/recordsEditedEntryAgainAsNewEntry	対応	
 entry.describes-expression-and-tax	EntryModelTests/describesExpressionAndTax	EntryModelTest/describesExpressionAndTax	対応	
 entry.groups-wallets-by-kind	EntryModelTests/groupsWalletsByKind		未移植	口座を種類ごとに分ける所（walletSections）が無く、一列に並べる
 entry.splits-categories-add-and-edit-into-pages	EntryModelTests/splitsCategoriesAddAndEditIntoPages		未移植	カテゴリの一覧に追加と編集のマスが無く、ページにも分けない
@@ -152,7 +152,7 @@ entry-transfer.saves-fee-typed-on-keypad	EntryModelTransferTests/savesFeeTypedOn
 entry-transfer.puts-used-fees-first	EntryModelTransferTests/putsUsedFeesFirst	EntryModelTransferTest/putsUsedFeesFirst	対応	先頭だけを確かめ、残りの並びは確かめていない
 entry-transfer.counts-fee-in-source-balance	EntryModelTransferTests/countsFeeInSourceBalance	EntryModelTransferTest/countsFeeInSourceBalance	対応	
 entry-transfer.opens-transfer-from-fee	EntryModelTransferTests/opensTransferFromFee	EntryModelTransferTest/opensTransferFromFee	対応	手数料を変えて保存する所と振替後の残高は確かめていない
-entry-transfer.drops-fee-when-recording-again	EntryModelTransferTests/dropsFeeWhenRecordingAgain		未移植	同じ内容で新しい記録にする recordAgain がモデルと画面に無い
+entry-transfer.drops-fee-when-recording-again	EntryModelTransferTests/dropsFeeWhenRecordingAgain	EntryModelTransferTest/dropsFeeWhenRecordingAgain	対応	
 entry-transfer.caps-loan-payoff-at-largest-amount	EntryModelTransferTests/capsLoanPayoffAtLargestAmount	EntryModelTransferTest/capsLoanPayoffAtLargestAmount	対応	
 entry-transfer.starts-with-two-different-wallets	EntryModelTransferTests/startsWithTwoDifferentWallets	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	口座の見出し（振替元）は確かめていない
 entry-transfer.loaded-draft-switched-to-transfer-matches-fresh-transfer	EntryModelTransferTests/loadedDraftSwitchedToTransferMatchesFreshTransfer	EntryModelTransferTest/startsWithTwoDifferentWallets	対応	種類を指定して開く形が無く、切り替えた後の値と未変更だけを確かめる
@@ -179,18 +179,18 @@ entry-voice-flow.asks-the-model-with-recent-examples	EntryVoiceFlowTests/asksThe
 entry-voice-flow.puts-similar-entries-first-in-examples	EntryVoiceFlowTests/putsSimilarEntriesFirstInExamples		iOSのみ	端末の中のモデルへ渡す例文の話で、Android に voiceExamples は無い
 entry-voice-flow.drops-underline-when-the-field-changes	EntryVoiceFlowTests/dropsUnderlineWhenTheFieldChanges	EntryModelVoiceTest/dropsUnderlineWhenTheFieldChanges	対応	
 entry-voice-flow.cancel-while-starting-stops-the-source	EntryVoiceFlowTests/cancelWhileStartingStopsTheSource		iOSのみ	始めるのを待つ間の取り消しの話で、Android の start は待たずに始まる
-entry-voice-flow.reads-the-last-result-given-while-finishing	EntryVoiceFlowTests/readsTheLastResultGivenWhileFinishing		未確認	Listener.onResults からだけ動き、SpeechRecognizer が無いと単体テストで呼べない
+entry-voice-flow.reads-the-last-result-given-while-finishing	EntryVoiceFlowTests/readsTheLastResultGivenWhileFinishing	EntryVoiceFlowTest/readsTheLastResultGivenWhileFinishing	対応	
 entry-voice-flow.hides-voice-for-transfers	EntryVoiceFlowTests/hidesVoiceForTransfers	EntryModelVoiceTest/hidesVoiceForTransfers	対応	
 entry-voice-flow.applies-spoken-fields-and-undoes-them	EntryVoiceFlowTests/appliesSpokenFieldsAndUndoesThem	EntryModelVoiceTest/appliesSpokenFieldsAndUndoesThem EntryVoiceSpeechTest/describesResult	対応	EntryVoiceFlow を通さず、モデルへの反映と知らせの文だけを確かめる
 entry-voice-flow.keeps-keypad-open-when-amount-is-missing	EntryVoiceFlowTests/keepsKeypadOpenWhenAmountIsMissing	EntryModelVoiceTest/keepsAmountWhenSpokenAmountIsMissing EntryVoiceSpeechTest/describesResult	対応	EntryVoiceFlow を通さず、モデルへの反映と知らせの文だけを確かめる
 entry-voice-flow.tells-when-nothing-was-heard	EntryVoiceFlowTests/tellsWhenNothingWasHeard	EntryVoiceSpeechTest/describesResult	対応	知らせの文だけで、何も聞こえずに終える流れは確かめていない
-entry-voice-flow.finishes-after-silence	EntryVoiceFlowTests/finishesAfterSilence		未確認	waitForSilence は Listener からだけ動き、単体テストで呼べない
-entry-voice-flow.keeps-recent-levels-while-listening	EntryVoiceFlowTests/keepsRecentLevelsWhileListening		未確認	Listener.onRmsChanged からだけ動き、単体テストで呼べない
-entry-voice-flow.counts-silence-from-the-last-voice	EntryVoiceFlowTests/countsSilenceFromTheLastVoice		未確認	follow は Listener.onRmsChanged からだけ動き、単体テストで呼べない
-entry-voice-flow.finishes-when-silence-runs-out-before-the-words	EntryVoiceFlowTests/finishesWhenSilenceRunsOutBeforeTheWords		未確認	follow は Listener.onRmsChanged からだけ動き、単体テストで呼べない
-entry-voice-flow.keeps-listening-while-the-voice-is-loud	EntryVoiceFlowTests/keepsListeningWhileTheVoiceIsLoud		未確認	follow は Listener.onRmsChanged からだけ動き、単体テストで呼べない
-entry-voice-flow.clears-notice-after-a-while	EntryVoiceFlowTests/clearsNoticeAfterAWhile		未確認	知らせを出す show は Listener からだけ動き、単体テストで呼べない
-entry-voice-flow.cancel-leaves-the-entry-as-it-was	EntryVoiceFlowTests/cancelLeavesTheEntryAsItWas	EntryVoiceFlowTest/cancelLeavesTheEntryAsItWas	対応	聞いている状態からの cancel だけで、認識の部品を止める所は確かめていない
+entry-voice-flow.finishes-after-silence	EntryVoiceFlowTests/finishesAfterSilence	EntryVoiceFlowTest/finishesAfterSilence	対応	
+entry-voice-flow.keeps-recent-levels-while-listening	EntryVoiceFlowTests/keepsRecentLevelsWhileListening	EntryVoiceFlowTest/keepsRecentLevelsWhileListening	対応	
+entry-voice-flow.counts-silence-from-the-last-voice	EntryVoiceFlowTests/countsSilenceFromTheLastVoice	EntryVoiceFlowTest/countsSilenceFromTheLastVoice	対応	
+entry-voice-flow.finishes-when-silence-runs-out-before-the-words	EntryVoiceFlowTests/finishesWhenSilenceRunsOutBeforeTheWords	EntryVoiceFlowTest/finishesWhenSilenceRunsOutBeforeTheWords	対応	
+entry-voice-flow.keeps-listening-while-the-voice-is-loud	EntryVoiceFlowTests/keepsListeningWhileTheVoiceIsLoud	EntryVoiceFlowTest/keepsListeningWhileTheVoiceIsLoud	対応	
+entry-voice-flow.clears-notice-after-a-while	EntryVoiceFlowTests/clearsNoticeAfterAWhile	EntryVoiceFlowTest/clearsNoticeAfterAWhile	対応	
+entry-voice-flow.cancel-leaves-the-entry-as-it-was	EntryVoiceFlowTests/cancelLeavesTheEntryAsItWas	EntryVoiceFlowTest/cancelLeavesTheEntryAsItWas	対応	
 entry-voice-flow.shows-denied-card-when-permission-was-refused	EntryVoiceFlowTests/showsDeniedCardWhenPermissionWasRefused	EntryVoiceFlowTest/showsDeniedCardWhenPermissionWasRefused	対応	許可を求める所は画面にあり、断られた後の deny と閉じる所だけを確かめる
 entry-voice-interpreter.*	EntryVoiceInterpreterTests/*		iOSのみ	端末の中のモデルに渡す型を作る話で、Android は android.speech だけを使う
 entry-voice-interpreter-accuracy.*	EntryVoiceInterpreterAccuracyTests/*		iOSのみ	端末の中のモデルの当たり具合を測る話で、Android にそのモデルは無い
@@ -230,7 +230,7 @@ main.opens-receipt-route-and-starts-reading	MainModelTests/opensReceiptRouteAndS
 main.finishes-warming-entry-after-waiting	MainModelTests/finishesWarmingEntryAfterWaiting		iOSのみ	見えない入力シートの下ごしらえは、iOS の初回の描画への対応である
 main.restarts-observation-when-returning-from-background	MainModelTests/restartsObservationWhenReturningFromBackground	MainModelTest/restartsObservationWhenReturningFromBackground	対応	
 main.restarts-observation-on-retry	MainModelTests/restartsObservationOnRetry	MainModelTest/restartsObservationOnRetry	対応	
-main.advances-notice-round-to-hide-tab-notices	MainModelTests/advancesNoticeRoundToHideTabNotices		未移植	入口に記録や削除の知らせが無く、タブの知らせと入れ替えて消す場面が無い
+main.advances-notice-round-to-hide-tab-notices	MainModelTests/advancesNoticeRoundToHideTabNotices	MainModelTest/advancesNoticeRoundToHideTabNotices	対応	
 main.keeps-deletion-for-undo	MainModelTests/keepsDeletionForUndo		未移植	入口が削除の取り消し（DeletionUndo）を持たず、入口で受ける削除も無い
 main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	保存した値から作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
 app-review.*	AppReviewModelTests/*		未移植	レビューのお願いを待って出すモデルが Android に無い
@@ -391,7 +391,7 @@ budget-list.clears-budget	BudgetListModelTests/clearsBudget	BudgetListModelTest/
 budget-list.restores-budget-carried-from-earlier-month	BudgetListModelTests/restoresBudgetCarriedFromEarlierMonth	BudgetListModelTest/restoresBudgetCarriedFromEarlierMonth	対応	
 budget-list.saves-with-done-and-shows-spending	BudgetListModelTests/savesWithDoneAndShowsSpending	BudgetListModelTest/savesWithDoneAndShowsSpending	対応	
 budget-list.detects-changed-amount-while-editing	BudgetListModelTests/detectsChangedAmountWhileEditing	BudgetListModelTest/detectsChangedAmountWhileEditing	対応	
-budget-list.asks-before-discarding-changed-amount	BudgetListModelTests/asksBeforeDiscardingChangedAmount		未確認	Android は別のブランチで合わせる
+budget-list.asks-before-discarding-changed-amount	BudgetListModelTests/asksBeforeDiscardingChangedAmount	BudgetListModelTest/asksBeforeDiscardingChangedAmount	対応	
 budget-list.turns-carryover-on-from-period-month-and-off	BudgetListModelTests/turnsCarryoverOnFromPeriodMonthAndOff	BudgetListModelTest/turnsCarryoverOnFromPeriodMonthAndOff	対応	
 budget-list.carries-only-total-budget-remaining-into-total-usage	BudgetListModelTests/carriesOnlyTotalBudgetRemainingIntoTotalUsage	BudgetListModelTest/carriesOnlyTotalBudgetRemainingIntoTotalUsage	対応	
 budget-list.resets-carryover-and-restores-start	BudgetListModelTests/resetsCarryoverAndRestoresStart	BudgetListModelTest/resetsCarryoverAndRestoresStart	対応	
@@ -403,7 +403,7 @@ budget-list.suggests-only-recurring-without-records	BudgetListModelTests/suggest
 budget-list.tells-when-budgets-cannot-be-read	BudgetListModelTests/tellsWhenBudgetsCannotBeRead	BudgetListModelTest/tellsWhenBudgetsCannotBeRead	対応	設定の表ではなく、共有の記録の一覧を失敗させて確かめる
 budget-list.keeps-notice-when-editing-starts	BudgetListModelTests/keepsNoticeWhenEditingStarts	BudgetListModelTest/keepsNoticeWhenEditingStarts	対応	共有の記録の一覧を失敗させて、知らせを出してから確かめる
 recurring-edit.warns-that-reminders-cannot-arrive-when-denied	RecurringEditModelTests/warnsThatRemindersCannotArriveWhenDenied	RecurringEditModelTest/warnsThatRemindersCannotArriveWhenDenied	対応	未回答は、Android 13 以上でアプリがまだ尋ねていない時。12 以下には無い
-recurring-edit.opens-one-panel-at-a-time	RecurringEditModelTests/opensOnePanelAtATime		未確認	Android は別のブランチで合わせる
+recurring-edit.opens-one-panel-at-a-time	RecurringEditModelTests/opensOnePanelAtATime	RecurringEditModelPromptTest/opensOnePanelAtATime	対応	
 recurring-edit.does-not-warn-when-reminders-are-allowed	RecurringEditModelTests/doesNotWarnWhenRemindersAreAllowed	RecurringEditModelTest/doesNotWarnWhenRemindersAreAllowed	対応	
 recurring-edit.starts-new-recurring-with-given-transfer-type	RecurringEditModelTests/startsNewRecurringWithGivenTransferType	RecurringEditModelTest/startsNewRecurringWithGivenTransferType	対応	
 recurring-edit.opens-schedule-when-adding-recurring	RecurringEditModelTests/opensScheduleWhenAddingRecurring	RecurringEditModelTest/opensScheduleOnlyWhenAdding	対応	
@@ -433,7 +433,7 @@ recurring-list.names-failed-action	RecurringListModelTests/namesFailedAction	Rec
 recurring-list.saves-moved-order		RecurringListModelTest/savesMovedOrder	Androidのみ	固定費の並べ替えを保存する。iOS は別の一覧（カテゴリ・スタンプ）でだけ確かめている
 recurring-list.starts-from-first-period-on-later-day		RecurringListModelTest/startsFromFirstPeriodOnLaterDay	Androidのみ	始まりの日より後の最初の予定日を次回に出す。iOS の画面のテストに無い
 template-edit.enters-amount-with-keypad	TemplateEditModelTests/entersAmountWithKeypad	TemplateEditModelTest/entersAmountWithKeypad	対応	Android に typeName（収入・支出の名前）が無く、確かめていない
-template-edit.opens-one-panel-at-a-time	TemplateEditModelTests/opensOnePanelAtATime		未確認	Android は別のブランチで合わせる
+template-edit.opens-one-panel-at-a-time	TemplateEditModelTests/opensOnePanelAtATime		未移植	テンプレートの編集は全部を 1 画面に並べ、開く枠（panel）が無い
 template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton	TemplateEditModelTest/namesWhatIsMissingOnSaveButton	対応	
 template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	名前が無い時は save の結果で確かめる
 template-edit.loads-existing-template-and-tracks-changes	TemplateEditModelTests/loadsExistingTemplateAndTracksChanges		未移植	既にあるテンプレートを編集する入口（editing・isChanged）が無い
@@ -468,8 +468,8 @@ month-start-day.ends-asset-months-at-period-end	MonthStartDayModelTests/endsAsse
 settings-list-screen.*	SettingsListScreenTests/*		iOSのみ	SwiftUI の View の型の深さを見るテストで、Compose には当たらない
 settings-board.keeps-move-inside-the-board	SettingsBoardModelTests/keepsMoveInsideTheBoard	RecurringListModelTest/keepsMoveInsideTheBoard	対応	
 settings-board.ignores-move-to-same-place-or-unknown-item	SettingsBoardModelTests/ignoresMoveToSamePlaceOrUnknownItem	RecurringListModelTest/ignoresMoveToSamePlaceOrUnknownRecurring	対応	
-settings-board.asks-one-confirmation-at-a-time	SettingsBoardModelTests/asksOneConfirmationAtATime		未確認	Android は別のブランチで合わせる
-settings-board.opens-editor-while-keeping-open-row	SettingsBoardModelTests/opensEditorWhileKeepingOpenRow		未確認	Android は別のブランチで合わせる
+settings-board.asks-one-confirmation-at-a-time	SettingsBoardModelTests/asksOneConfirmationAtATime	RecurringListModelTest/asksOneConfirmationAtATime	対応	非表示の確認が無く、1 件の削除とまとめての削除で確かめる
+settings-board.opens-editor-while-keeping-open-row	SettingsBoardModelTests/opensEditorWhileKeepingOpenRow	RecurringListModelTest/opensEditorWhileKeepingOpenRow	対応	
 settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/keepsHiddenItemInStateAfterHiding	RecurringListModelTest/hidesAndShowsRecurring	対応	
 settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting	RecurringListModelTest/deletesAndRestoresRecurring	対応	Android は、削除を元に戻す所まで 1 つのテストで確かめる
 settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails	RecurringListModelTest/clearsDeletionInStateWhenDeletingFails	対応	
@@ -488,9 +488,9 @@ settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/places
 settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome	SettingsEditOutcomeTest/placesSaveAndHideInOneOutcome	対応	
 settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails	SettingsEditOutcomeTest/keepsSheetOpenWhenHidingAfterSaveFails	対応	
 settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide	SettingsEditOutcomeTest/savesWithoutHidingAfterFailedSaveAndHide	対応	
-settings-edit-prompt.shows-one-prompt-at-a-time	SettingsEditPromptTests/showsOnePromptAtATime		未確認	Android は別のブランチで合わせる
-settings-edit-prompt.closes-only-the-prompt-in-front	SettingsEditPromptTests/closesOnlyThePromptInFront		未確認	Android は別のブランチで合わせる
-settings-edit-prompt.keeps-panel-open-behind-prompt	SettingsEditPromptTests/keepsPanelOpenBehindPrompt		未確認	Android は別のブランチで合わせる
+settings-edit-prompt.shows-one-prompt-at-a-time	SettingsEditPromptTests/showsOnePromptAtATime	RecurringEditModelPromptTest/showsOnePromptAtATime	対応	操作のメニューが無く、非表示と削除の確認で確かめる
+settings-edit-prompt.closes-only-the-prompt-in-front	SettingsEditPromptTests/closesOnlyThePromptInFront	RecurringEditModelPromptTest/closesOnlyThePromptInFront	対応	
+settings-edit-prompt.keeps-panel-open-behind-prompt	SettingsEditPromptTests/keepsPanelOpenBehindPrompt	RecurringEditModelPromptTest/keepsPanelOpenBehindPrompt	対応	報酬の規則の画面が無く、固定費の編集で確かめる
 settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い
@@ -507,7 +507,7 @@ screen-flow.budget-set-in-settings-follows-new-entries-on-home	ScreenFlowTests/b
 screen-flow.hidden-wallet-leaves-assets-and-entry-choices-but-keeps-its-records	ScreenFlowTests/hiddenWalletLeavesAssetsAndEntryChoicesButKeepsItsRecords		未移植	口座を非表示にする設定の画面とモデル（WalletEditModel）が無い
 screen-flow.hidden-category-keeps-naming-records-but-leaves-entry-choices	ScreenFlowTests/hiddenCategoryKeepsNamingRecordsButLeavesEntryChoices		未移植	カテゴリを非表示にする設定の画面とモデル（CategoryEditModel）が無い
 screen-flow.recorded-entry-appears-in-every-tab	ScreenFlowTests/recordedEntryAppearsInEveryTab	AssetsModelTest/followsNewEntries	対応	資産の残高だけを確かめ、ほかのタブへの反映はまたいで確かめていない
-screen-flow.edited-entry-moves-to-another-month-in-every-tab	ScreenFlowTests/editedEntryMovesToAnotherMonthInEveryTab	ScreenFlowTest/editedEntryMovesToAnotherMonthInEveryTab	対応	編集の取り消し（EntryNoticeModel）は無く、月を移る所までを確かめる
+screen-flow.edited-entry-moves-to-another-month-in-every-tab	ScreenFlowTests/editedEntryMovesToAnotherMonthInEveryTab	ScreenFlowTest/editedEntryMovesToAnotherMonthInEveryTab	対応	編集の取り消しは EntryNoticeModelTest が確かめ、ここは月を移る所まで
 screen-flow.deleted-entry-leaves-every-tab-until-undone	ScreenFlowTests/deletedEntryLeavesEveryTabUntilUndone	ScreenFlowTest/deletedEntryLeavesEveryTabUntilUndone	対応	削除の取り消しは無く、どのタブからも消える所までを確かめる
 screen-flow.undone-recording-leaves-every-tab-and-restores-no-spend-day	ScreenFlowTests/undoneRecordingLeavesEveryTabAndRestoresNoSpendDay		未移植	記録の取り消しも、使わなかった日の印（toggleNoSpendDay）も無い
 screen-flow.swiped-deletion-keeps-items-when-undone	ScreenFlowTests/swipedDeletionKeepsItemsWhenUndone		未移植	一覧の行からの削除とその取り消しが無く、行に品目も出さない
@@ -521,21 +521,21 @@ deletion-notice.falls-back-to-kind-and-count	DeletionNoticeTests/fallsBackToKind
 derived.*	DerivedTests/*		iOSのみ	Swift の Observation 用の計算の覚え置きで、Android は derivedStateOf を使う
 device-name.*	DeviceNameTests/*		iOSのみ	iPhone と iPad の呼び分けで、Android は呼び分けず「端末」と書く
 entry-list-filter.*	EntryListFilterTests/*		未移植	記録の絞り込み（filterCategories・widened）のモデルと画面が無い
-entry-notice.undoes-new-entry	EntryNoticeModelTests/undoesNewEntry		未移植	記録の後の知らせと取り消しが無く、save は Boolean を返すだけ
-entry-notice.restores-fee-deleted-from-stale-list	EntryNoticeModelTests/restoresFeeDeletedFromStaleList		未移植	一覧からの削除と、手数料を含む取り消しが無い
-entry-notice.undoes-edit	EntryNoticeModelTests/undoesEdit		未移植	編集の後の知らせと取り消しが無い
-entry-notice.undoes-delete	EntryNoticeModelTests/undoesDelete		未移植	削除の後の知らせと取り消しが無く、delete は Boolean を返すだけ
+entry-notice.undoes-new-entry	EntryNoticeModelTests/undoesNewEntry	EntryNoticeModelTest/undoesNewEntry	対応	
+entry-notice.restores-fee-deleted-from-stale-list	EntryNoticeModelTests/restoresFeeDeletedFromStaleList		未移植	一覧の行から記録を消す操作が無い
+entry-notice.undoes-edit	EntryNoticeModelTests/undoesEdit	EntryNoticeModelTest/undoesEdit	対応	
+entry-notice.undoes-delete	EntryNoticeModelTests/undoesDelete	EntryNoticeModelTest/undoesDelete	対応	
 entry-notice.deletes-from-list-and-undoes	EntryNoticeModelTests/deletesFromListAndUndoes		未移植	一覧の行からの削除とその取り消しが無い
-entry-notice.names-deleted-entry-by-memo	EntryNoticeModelTests/namesDeletedEntryByMemo		未移植	記録の変更を知らせる文（EntryChange）が無い
-entry-notice.names-deleted-entry-without-category-as-record	EntryNoticeModelTests/namesDeletedEntryWithoutCategoryAsRecord		未移植	記録の変更を知らせる文（EntryChange）が無い
-entry-notice.keeps-deletion-notice-on-screen-tap	EntryNoticeModelTests/keepsDeletionNoticeOnScreenTap		未移植	記録の削除の知らせと、画面のタップで消す決まりが無い
-entry-notice.names-transfer-by-wallets	EntryNoticeModelTests/namesTransferByWallets		未移植	振替を知らせる文（「財布 → 銀行 を振り替えました」）が無い
-entry-notice.clears-notice	EntryNoticeModelTests/clearsNotice		未移植	記録の変更の知らせ（EntryNoticeModel）が無い
+entry-notice.names-deleted-entry-by-memo	EntryNoticeModelTests/namesDeletedEntryByMemo	EntryNoticeModelTest/namesDeletedEntryByMemo	対応	一覧からの削除が無く、入力の画面の削除で確かめる
+entry-notice.names-deleted-entry-without-category-as-record	EntryNoticeModelTests/namesDeletedEntryWithoutCategoryAsRecord	EntryNoticeModelTest/namesDeletedEntryWithoutCategoryAsRecord	対応	
+entry-notice.keeps-deletion-notice-on-screen-tap	EntryNoticeModelTests/keepsDeletionNoticeOnScreenTap	EntryNoticeModelTest/keepsDeletionNoticeOnScreenTap	対応	一覧からの削除が無く、入力の画面の削除で確かめる
+entry-notice.names-transfer-by-wallets	EntryNoticeModelTests/namesTransferByWallets	EntryNoticeModelTest/namesTransferByWallets	対応	
+entry-notice.clears-notice	EntryNoticeModelTests/clearsNotice	EntryNoticeModelTest/clearsNotice	対応	
 entry-notice.changes-category-of-selected-entries-and-undoes	EntryNoticeModelTests/changesCategoryOfSelectedEntriesAndUndoes		未移植	複数の記録を選んでカテゴリを変える操作が無い
 entry-notice.deletes-selected-entries-and-undoes	EntryNoticeModelTests/deletesSelectedEntriesAndUndoes		未移植	複数の記録を選んで消す操作が無い
 entry-notice.keeps-batch-notice-longer-and-ignores-screen-taps	EntryNoticeModelTests/keepsBatchNoticeLongerAndIgnoresScreenTaps		未移植	まとめての変更の知らせ（EntryBatch）が無い
-entry-notice.restores-no-spend-mark-when-undoing-new-entry	EntryNoticeModelTests/restoresNoSpendMarkWhenUndoingNewEntry		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
-entry-notice.does-not-make-no-spend-mark-when-undoing-entry-on-unmarked-day	EntryNoticeModelTests/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay		未移植	記録の取り消しが無く、使わなかった日の印を戻す所が無い
+entry-notice.restores-no-spend-mark-when-undoing-new-entry	EntryNoticeModelTests/restoresNoSpendMarkWhenUndoingNewEntry	EntryNoticeModelTest/restoresNoSpendMarkWhenUndoingNewEntry	対応	
+entry-notice.does-not-make-no-spend-mark-when-undoing-entry-on-unmarked-day	EntryNoticeModelTests/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay	EntryNoticeModelTest/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay	対応	
 entry-row-item.shows-tag-name-of-entry	EntryRowItemTests/showsTagNameOfEntry	EntryRowItemTest/showsTagNameOfEntry	対応	
 entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage	EntryRowItemTest/showsBillDateOfMovedUsage	対応	
 entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown	EntryRowItemTest/keepsMonthWhenBillIsUnknown	対応	
