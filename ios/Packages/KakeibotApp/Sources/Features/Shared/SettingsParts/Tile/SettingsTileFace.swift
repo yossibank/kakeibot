@@ -18,7 +18,7 @@ private struct SettingsTileFace: ViewModifier {
             .background {
                 if !isHidden {
                     shape
-                        .fill(SettingsTile.cardFill)
+                        .fill(SettingsTileStyle.cardFill)
                 }
             }
             .overlay {

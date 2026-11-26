@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-enum SettingsTile {
+enum SettingsTileStyle {
     static var cardFill: LinearGradient {
         LinearGradient(
             colors: [Palette.cardTop, Palette.cardBottom],
