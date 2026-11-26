@@ -160,22 +160,27 @@ private fun CalendarCell(
             )
         }
 
-        if (day != null && day.expenseTotal > 0) {
-            AmountText(
-                amount = day.expenseTotal.toInt(),
-                style = displayFont(size = FontSize.Micro),
-                type = Entry.Kind.expense,
-                isCompact = true,
-            )
-        }
+        CellTotals(day = day)
+    }
+}
 
-        if (day != null && day.incomeTotal > 0) {
-            AmountText(
-                amount = day.incomeTotal.toInt(),
-                style = displayFont(size = FontSize.Micro),
-                type = Entry.Kind.income,
-                isCompact = true,
-            )
-        }
+@Composable
+private fun CellTotals(day: EntryDay?) {
+    if (day != null && day.expenseTotal > 0) {
+        AmountText(
+            amount = day.expenseTotal.toInt(),
+            style = displayFont(size = FontSize.Micro),
+            type = Entry.Kind.expense,
+            isCompact = true,
+        )
+    }
+
+    if (day != null && day.incomeTotal > 0) {
+        AmountText(
+            amount = day.incomeTotal.toInt(),
+            style = displayFont(size = FontSize.Micro),
+            type = Entry.Kind.income,
+            isCompact = true,
+        )
     }
 }
