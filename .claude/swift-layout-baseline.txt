@@ -9,8 +9,6 @@ ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Entry/Voice/EntryVoiceLis
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/AppIcons/AppIconChoice.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleData+Insert.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Settings/Menu/SettingsMenuSampleData.swift: L8: 1 つの関数は 60 行までにする
-ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Outlook.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
-ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsModel+Screen.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsSummary+Outlook.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsSummary+Outlook.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Assets/Model/AssetsSummary+Outlook.swift: L7: 同じ段落の 1 行の文の間に、空行を入れない
@@ -18,8 +16,6 @@ ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Home/HomeModel+Actio
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Home/HomeModel+Output.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Output.swift: L2: 入れ子の型の宣言と、値・関数を同じ extension に置かない。extension を分ける
 ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Output.swift: L7: 複数行の文の前後には、空行を入れる
-ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Records/Model/RecordsModel+Screen.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
-ios/Packages/KakeibotApp/Sources/FeatureModels/Screens/Tabs/Review/Model/ReviewModel+Screen.swift: L2: 同じ役割の extension が 2 つある。1 つにまとめる
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryTransferPanel.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Parts/EntryWalletDeck.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/Features/Screens/Entry/Sheet/EntryItemSheet+Receipt.swift: L8: 1 つの関数は 60 行までにする
