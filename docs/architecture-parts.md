@@ -2,6 +2,7 @@
 
 > [!NOTE]
 > 複数の画面で使う仕組みの名前、使いどころ、置き場所が分かる。
+> 設定の一覧の画面の足し方は [architecture-parts-settings](architecture-parts-settings.md) にある。
 > 全体の構成は [architecture](architecture.md)、名前の付け方は [architecture-naming](architecture-naming.md) にある。
 
 ## 🪝 プロトコル
@@ -67,6 +68,27 @@
 | `PageSlideProxy` | 頁めくりの口。`pageSlide` と `onPageSwipe` に渡し、ボタンからは `run(forward:)` で頁を送る | `DesignSystem/Components/Navigation/` |
 | `ResizingPager` | 横に送る頁の入れ物。送っている途中も、隣の頁との間で高さをなめらかに変える | `DesignSystem/Components/Navigation/` |
 
+`Loadable` の値は、監視の中で次のように移る。
+
+```mermaid
+stateDiagram-v2
+    state "読み込み中" as loading
+    state "読めた" as loaded
+    state "失敗" as failed
+    [*] --> loading
+    loading --> loaded : 値を受けた
+    loading --> failed : 監視が失敗した
+    loaded --> failed : 監視が失敗した
+    failed --> loading : 監視し直す
+    loaded --> loaded : 監視し直しても変えない
+    classDef bad fill:#fde2e2,stroke:#c0392b,color:#7b1f1f
+    classDef good fill:#dff3e2,stroke:#2e7d32,color:#1b4d1f
+    classDef wip fill:#fff4cc,stroke:#b58900,color:#5c4500
+    class failed bad
+    class loaded good
+    class loading wip
+```
+
 ## 🗄️ 書き込みの共通の関数
 
 保存・並べ替え・非表示は、表ごとの名前の関数を持たず、次の関数に表の型を渡して呼ぶ。
@@ -86,31 +108,3 @@
 | `IconBackedDraft`（Kotlin） | アイコン付きの 1 件の下書き。行を作る・直す操作を持つ | `core/shared/` |
 | `IconHoldingDraft`（Kotlin） | `icon` と `problems` を持つ下書きの、`IconBackedDraft` の既定の処理 | `core/shared/` |
 | `InsertableDao`・`UpdatableDao` | Room の DAO の insert と update。`@Query` は表ごとの DAO に残す | `store/records/protocols/` |
-
-## 🪜 設定の一覧の画面を足す
-
-並べ替えのできる設定の一覧は、次の順で足す。
-
-| 順 | すること | 書く所 |
-| --- | --- | --- |
-| 1 | モデルを `SettingsBoardListModel` と `SettingsBoardModel` に適合させる | `<単数>ListModel` |
-| 2 | 設定の型を 1 つ書き、`SettingsBoardSpec` に適合させる | `<単数>Board` |
-| 3 | 画面は、`body` で `SettingsBoardPage` を返すだけにする | `<単数>ListView` |
-
-設定の型の例は、`StampBoard` と `CategoryBoard` にある。行の画面は `WalletBoard`、合計のカードを持つ画面は `RecurringBoard` を見る。`CategoryBoard` は、支出と収入の切り替えを `header` に持つ。
-
-## 📏 画面ごとの違いの書き方
-
-`SettingsBoardSpec` の要素のうち、既定の実装がある所は、違う画面だけが書く。
-
-| 違い | 書く所 | 例 |
-| --- | --- | --- |
-| 行の画面 | `layout` を `swipeRows` か `swipeCards` にし、`grid` を 1 列にする。`tile` は行の部品を返す | `WalletBoard`・`RecurringBoard`・`TemplateBoard` |
-| 持ち上げの倍率・余白 | `liftScale`・`scrollMargin` | `WalletBoard`（1.03）・`TemplateBoard`（余白 20） |
-| 一覧の上の合計のカード | `lead(in:)`。タイルの並びの前に出る | `RecurringBoard` |
-| 非表示にした時の文言 | `hideMessage` | `RecurringBoard` |
-| 非表示・削除の前の確認 | `hideConfirmation`・`deleteConfirmation`。無ければ確認せずに行う | `WalletBoard`（非表示は残高がある時だけ）・`RecurringBoard` |
-| 文字の大きさをそろえる | `scaleID(in:)`。変わると、そろえ直す | `WalletBoard`・`RecurringBoard` |
-| 編集画面 | `typealias Editor` を書き、`editModel(for:)` を 1 つ書く | 全部の `Board` |
-| 種類の切り替え | `header(in:)` に `CapsulePicker` を置く。行き先の型はモデルに書き、種類を持たせる | `CategoryBoard`・`RecurringBoard`・`TemplateBoard` |
-| モデルを外から渡す | `makeModel()` が、持っているモデルを返す | `RecurringBoard` |

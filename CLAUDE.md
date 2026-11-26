@@ -31,15 +31,15 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 
 | 作業 | 先に読む | 終えたら直す |
 | --- | --- | --- |
-| 機能・画面を足す | overview、roadmap、architecture-parts | overview、roadmap、architecture-screens の「画面とフォルダ」 |
+| 機能・画面を足す | overview、roadmap、architecture-parts、architecture-parts-settings | overview、roadmap、architecture-screens の「画面とフォルダ」 |
 | iOS のターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | architecture、architecture-packages、architecture-packages-app、architecture-naming | 先に読む文書のすべて |
-| Android のモジュール・依存・フォルダを変える、ファイルを足す・名前を変える | iOS の行の文書も読む。architecture-android、architecture-android-app、architecture-android-flow | 先に読む文書のすべて |
+| Android のモジュール・依存・フォルダを変える、ファイルを足す・名前を変える | iOS の行の文書も読む。architecture-android、architecture-android-store、architecture-android-app、architecture-android-flow | 先に読む文書のすべて |
 | 画面の組み立て・監視・通知とウィジェットの流れを変える | architecture-screens、architecture-screens-flow | architecture-screens、architecture-screens-flow |
 | 表の形を変える | data、data-budget、data-settings、data-sync | 変えた表の文書。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | export-format | export-format |
 | fixtures を足す・変える | fixtures | fixtures |
 | 画面のモデルのテストを足す・消す・名前を変える | scenarios | `spec/scenarios/models.tsv`。違いを見つけたら scenarios も |
-| 画面の言葉・型の名前を足す・変える | glossary | glossary |
+| 画面の言葉・型の名前を足す・変える | glossary、glossary-features | 言葉を足した方の文書 |
 | 方針を決める・変える | decisions の索引から選び、`docs-section.sh` で探した節だけ | decisions。文書を足したら、索引も |
 | 作る順番の 1 段を終える | roadmap | roadmap の状態 |
 | 対応 OS を変える | overview | overview、README の技術のアイコンと実行環境 |

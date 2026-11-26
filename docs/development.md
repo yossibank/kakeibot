@@ -52,6 +52,22 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 
 `make snapshot` は claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前で、出力は `.build/snapshots/<セット>/` に出る。
 
+## 🪜 スクリーンショットを撮って置く
+
+文書に画面の画像を載せる時は、`make snapshot` の PNG を使い、次の順で置く。
+
+1. 当たるセットを `make snapshot SNAPSHOT=<セット>` で描く。
+2. `.build/snapshots/<セット>/index.jsonl` の名前を見て、載せる画面のライトとダークの PNG を選ぶ。
+3. 選んだ PNG を `docs/images/screens/<セット>/` に写す。
+4. 文書には `<picture>` で置き、ライトとダークを出し分ける。幅は `width="280"` にする。
+
+```html
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="images/screens/<セット>/<名前>-dark.png">
+  <img src="images/screens/<セット>/<名前>-light.png" width="280" alt="<画面の説明>">
+</picture>
+```
+
 ## 📱 画面を直接開く
 
 DEBUG のビルドは、起動の引数 `-open` で設定の画面を直接開く。`settings` なら設定のシートを、`SetupItem` の名前（`homeSections` など）ならその画面を開く。

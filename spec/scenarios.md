@@ -60,6 +60,25 @@ ID は `<モデル>.<筋書き>` の形で、小文字の英数字とハイフ�
 | `iOSのみ` | OS の仕組みの違いで、Android に要らない | 空 |
 | `Androidのみ` | Android だけにあるテスト。`ios` は空にする | 書く |
 
+`未確認` の行は、確かめた結果で次のように変える。
+
+```mermaid
+stateDiagram-v2
+    state "未確認" as unchecked
+    state "対応" as same
+    state "違い" as differs
+    state "未移植" as missing
+    unchecked --> same : テストを移植し、同じ動きと確かめた
+    unchecked --> differs : テストを移植し、違う動きと確かめた
+    unchecked --> missing : モデルと画面を読み、機能が無いと確かめた
+    classDef bad fill:#fde2e2,stroke:#c0392b,color:#7b1f1f
+    classDef good fill:#dff3e2,stroke:#2e7d32,color:#1b4d1f
+    classDef wip fill:#fff4cc,stroke:#b58900,color:#5c4500
+    class differs bad
+    class same good
+    class unchecked wip
+```
+
 `未確認` は、推測で `未移植` にしない。Android のモデルと画面を読み、機能が無いと確かめてから `未移植` にする。
 
 直す候補は、`違い` の行である。`未確認` は、テストを移植して動きを確かめる候補である。確かめた結果で、`対応` か `違い` に変える。

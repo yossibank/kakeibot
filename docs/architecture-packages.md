@@ -124,9 +124,9 @@ KakeibotKit/
 | `Concepts/Voice/` | 話した文から金額・日付・カテゴリ・口座・メモを読む決まり |
 | `Concepts/Wallet/` | 財布と残高 |
 | `Core/Concepts/` の読み出しの型 | DB から読んだ値をまとめた型（`EntryList`・`MonthOverview` など）。DB を知らないので、画面も使う |
-| `Core/Shared/` | 概念をまたいで使う型。型付きの ID、割合、金額の表記、下書きの決まりと問題、文字の前後の空白を除く拡張 |
-| `Core/Shared/` の `Deletion` | 取り消しに使う削除の値。中の行は、Kit の中だけが読む |
-| `Core/Shared/` の `NamedIconDraft` | 名前とアイコンを持つ下書き。カテゴリと口座の下書きが適合する |
+| `Core/Shared/` | 概念をまたいで使う型。型付きの ID・割合・金額の表記、下書きの決まりと問題、文字の前後の空白を除く拡張 |
+| 同じフォルダの `Deletion` | 取り消しに使う削除の値。中の行は、Kit の中だけが読む |
+| 同じフォルダの `NamedIconDraft` | 名前とアイコンを持つ下書き。カテゴリと口座の下書きが適合する |
 | `Store/Queries/`・`Store/Sync/`・`Store/Writes/` | `Methods/` に `AppDatabase+*.swift` の拡張、`Types/` にそれ以外の型を置く |
 | `Store/Queries/Methods/` | 返す型の名前で付ける。書き込みと同じ型なら `+<型>Query` |
 | `Store/Records/` | 表の行・設定のキー・列の値の適合。`Protocols/` に並べ替え・非表示・アイコン付きの行の決まりを置く |

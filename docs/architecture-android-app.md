@@ -70,7 +70,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | モデルの形 | `state`・`input`・`output` の `val` と、`private val dependencies` を持つ。使わないまとまりは書かない |
 | `State` | 人の操作で変わる値と、進み具合・知らせを持つ。`mutableStateOf` は 12 個まで、Boolean は 3 個までである |
 | `Input` | DB から読んだ値と、最初に渡された値を持つ。setter を `internal set` にし、モデルの関数だけが書く |
-| `Input` への書き込み | `:app` の画面から書くと、コンパイルで止まる |
+| 画面から `Input` に書く | `:app` の画面から書くと、コンパイルで止まる |
 | `Output` | `input` と `state` から出す値を持つ。`derivedStateOf` はここに置き、DB と `dependencies` を使わない |
 | `Dependencies` | DB・時計・`Flow`・`Context`・`CoroutineScope` のような外の口を持つ。`private class` にし、モデルの関数だけが使う |
 | 画面だけが使う値 | `state` と `output` の両方から出す値は、`:app` にモデルの拡張で書く。`RecurringEditModel.detailRows` が当たる |
