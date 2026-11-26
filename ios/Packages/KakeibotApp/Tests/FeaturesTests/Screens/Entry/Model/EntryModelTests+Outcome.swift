@@ -139,7 +139,7 @@ extension EntryModelTests {
 
         model.receive(deletion)
 
-        #expect(model.state.results.deletion == deletion)
+        #expect(model.state.results.deletion.current == deletion)
     }
 
     @Test
