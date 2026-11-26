@@ -26,6 +26,7 @@ open:
 
 format:
 	python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py --fix $$(git ls-files --cached --others --exclude-standard '*.swift')
+	python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-layout-check.py --fix $$(git ls-files --cached --others --exclude-standard '*.kt')
 	mint run swiftformat .
 	$(KTLINT) --format
 	scripts/json-format.sh write
@@ -80,6 +81,8 @@ verify: verify-docs
 	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt')
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py || { echo "NG claude-config に swift-layout-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh swift-layout python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py $$(git ls-files --cached --others --exclude-standard '*.swift')
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-layout-check.py || { echo "NG claude-config に kotlin-layout-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh kotlin-layout python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-layout-check.py $$(git ls-files --cached --others --exclude-standard '*.kt')
 	scripts/verify.sh features-no-store sh -c '! grep -rnE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/Features'
 	scripts/verify.sh app-feature-no-store sh -c '! grep -rlE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/AppFeature | grep -vxE "ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel(\+(Pro|State|Sync))?\.swift"'
 	scripts/verify.sh android-features-no-store sh -c '! grep -rnE "^import com\.yossibank\.kakeibot\.store" android/app/src/main/kotlin/com/yossibank/kakeibot/features'

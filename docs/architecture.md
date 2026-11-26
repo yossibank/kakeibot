@@ -24,6 +24,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
 | `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数かを確かめ、`make verify` で走る。2 以下と、式の中の値は見ない |
 | `.claude/swift-layout-baseline.txt` | claude-config の swift-layout-check が見送る、今ある Swift の並びの外れ。`make verify` で確かめ、直したら行を消す |
+| `.claude/kotlin-layout-baseline.txt` | claude-config の kotlin-layout-check が見送る、今ある Kotlin の並びの外れ。`make verify` で確かめ、直したら行を消す |
 | `scripts/no-warnings.sh` | `make verify` のアプリのビルドを包み、外のパッケージを除いた `warning:` で失敗にする。差分ビルドなので、組み直したファイルの警告だけを見る |
 | `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON を整形する。`make format` と pre-commit で直し、`make verify-docs` で確かめる |
 | claude-config の書き方を確かめるフック | `docs-check.py`・`swift-style-check.py`・`kotlin-style-check.py`。`.md` は `make verify-docs`、`.swift` と `.kt` は `make verify` で全部にかける |
