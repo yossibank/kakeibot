@@ -23,6 +23,8 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/docs-check.py` のフォルダの木 | [architecture-packages](architecture-packages.md) と [architecture-packages-app](architecture-packages-app.md) の木を見る |
 | `scripts/docs-check.py` の fixtures | fixtures の `description` と `summary` も見る |
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
+| `scripts/docs-check.py` の届く文書 | `docs/`・`spec/` の `.md` が、README の文書の表か[決定の索引](decisions/README.md)からリンクされているかも見る |
+| `scripts/docs-check-test.py` | `docs-check.py` の届く文書の検査を、仮の文書に通して確かめる。`make verify-docs` で走る |
 | `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数かを確かめ、`make verify` で走る。2 以下と、式の中の値は見ない |
 | `.claude/swift-layout-baseline.txt` | claude-config の swift-layout-check が見送る、今ある Swift の並びの外れ。`make verify` で確かめ、直したら行を消す |
 | `.claude/kotlin-layout-baseline.txt` | claude-config の kotlin-layout-check が見送る、今ある Kotlin の並びの外れ。`make verify` で確かめ、直したら行を消す |

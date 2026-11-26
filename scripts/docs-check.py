@@ -7,6 +7,8 @@ import unicodedata
 from urllib.parse import unquote
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if "--root" in sys.argv:
+    ROOT = os.path.abspath(sys.argv[sys.argv.index("--root") + 1])
 SKIP = {".git", ".build", ".swiftpm", "DerivedData", "worktrees", "node_modules"}
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 FENCE = re.compile(r"^\s*```")
@@ -16,6 +18,8 @@ MAKE = re.compile(r"`make ([a-z][a-z-]*)")
 TARGET = re.compile(r"^([a-z][a-z-]*):", re.M)
 TEST_TARGET = re.compile(r"\.testTarget\(\s*name:\s*\"([^\"]+)\"")
 SAMPLES = {"export/export-v1.json"}
+ENTRANCES = [os.path.join(ROOT, "README.md"), os.path.join(ROOT, "docs", "decisions", "README.md")]
+REACHED_FOLDERS = ["docs", "spec"]
 TREE_DOCS = [
     os.path.join(ROOT, "docs", name)
     for name in ("architecture-packages.md", "architecture-packages-app.md")
@@ -23,6 +27,7 @@ TREE_DOCS = [
 
 errors = []
 anchors = {}
+links = {}
 
 
 def error(path, line, message):
@@ -65,6 +70,7 @@ def anchors_of(path):
 
 def check_links(path, lines):
     fenced = False
+    found = links.setdefault(path, set())
     for number, line in enumerate(lines, 1):
         if FENCE.match(line):
             fenced = not fenced
@@ -75,10 +81,23 @@ def check_links(path, lines):
                 continue
             file, _, anchor = target.partition("#")
             full = os.path.join(os.path.dirname(path), unquote(file)) if file else path
+            found.add(os.path.normpath(full))
             if not os.path.exists(full):
                 error(path, number, f"リンク先が無い: {target}")
             elif anchor and full.endswith(".md") and unquote(anchor) not in anchors_of(full):
                 error(path, number, f"リンク先の見出しが無い: {target}")
+
+
+def check_reach():
+    reached = set()
+    for entrance in ENTRANCES:
+        reached |= links.get(entrance, set())
+    for folder in REACHED_FOLDERS:
+        for top, _, files in os.walk(os.path.join(ROOT, folder)):
+            for file in sorted(files):
+                path = os.path.normpath(os.path.join(top, file))
+                if file.endswith(".md") and path not in reached:
+                    error(path, 1, "README の文書の表か、決定の索引（docs/decisions/README.md）から届かない")
 
 
 def check_trees(path, lines):
@@ -189,6 +208,7 @@ def main():
         lines = text.split("\n")
         check_links(path, lines)
         check_make(path, text, targets)
+    check_reach()
     for path in TREE_DOCS:
         check_trees(path, open(path, encoding="utf-8").read().split("\n"))
     check_fixtures()

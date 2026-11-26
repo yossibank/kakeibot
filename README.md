@@ -67,7 +67,7 @@ flowchart LR
 | 予算・固定費・ごほうび・スタンプの表 | [docs/data-budget.md](docs/data-budget.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |
 | 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
-| なぜそう決めたか | [docs/decisions/](docs/decisions/) |
+| なぜそう決めたか（決定の索引） | [docs/decisions/README.md](docs/decisions/README.md) |
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
