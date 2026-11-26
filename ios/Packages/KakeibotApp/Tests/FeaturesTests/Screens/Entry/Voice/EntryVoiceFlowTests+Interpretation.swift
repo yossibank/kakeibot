@@ -68,7 +68,7 @@ extension EntryVoiceFlowTests {
         defer {
             observing.cancel()
         }
-        try await waitForHistory(model)
+        await waitForHistory(model)
 
         var dependencies = EntryVoiceFlow.Dependencies.fake(FakeVoiceSource())
         let source = FakeVoiceSource()
@@ -104,7 +104,7 @@ extension EntryVoiceFlowTests {
         defer {
             observing.cancel()
         }
-        try await waitForHistory(model)
+        await waitForHistory(model)
 
         let similar = model.output.voiceExamples(for: "iPhoneの支払い 4800円")
         let recent = model.output.voiceExamples(for: "コーヒー 450円")
