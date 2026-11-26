@@ -21,11 +21,25 @@
 
 設定の画面をまとめる時は、次の領域に分ける。入口の `Menu/` は、まとめずに残す。
 
-| 領域 | 画面のフォルダ |
+| 画面のフォルダ | 領域 |
 | --- | --- |
-| `Book/` | `Budgets/`・`Categories/`・`MonthStartDay/`・`Recurring/`・`RewardRules/`・`Stamps/`・`Templates/`・`Wallets/` |
-| `Look/` | `AppIcons/`・`HomeSections/`・`LaunchScreen/`・`Themes/`・`ThemeStyle/`・`WidgetGuide/` |
-| `Data/` | `Backup/`・`Reminder/`・`Sync/` |
+| `Budgets/` | `Book/` |
+| `Categories/` | `Book/` |
+| `MonthStartDay/` | `Book/` |
+| `Recurring/` | `Book/` |
+| `RewardRules/` | `Book/` |
+| `Stamps/` | `Book/` |
+| `Templates/` | `Book/` |
+| `Wallets/` | `Book/` |
+| `AppIcons/` | `Look/` |
+| `HomeSections/` | `Look/` |
+| `LaunchScreen/` | `Look/` |
+| `Themes/` | `Look/` |
+| `ThemeStyle/` | `Look/` |
+| `WidgetGuide/` | `Look/` |
+| `Backup/` | `Data/` |
+| `Reminder/` | `Data/` |
+| `Sync/` | `Data/` |
 
 画面の組み立てと通知とウィジェットの方式は、[architecture-screens](architecture-screens.md) にある。
 

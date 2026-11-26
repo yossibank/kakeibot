@@ -8,10 +8,13 @@
 
 ボタンなどの同期の場所からモデルの async の関数を呼ぶ時は、モデルの `perform` を使う。画面に `Task` を書かない。
 
-```swift
-model.perform {
-    await $0.save()
-}
+```diff
+-Task {
+-    await model.save()
+-}
++model.perform {
++    await $0.save()
++}
 ```
 
 | 項目 | 決まり |

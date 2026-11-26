@@ -8,13 +8,17 @@
 
 ## ✨ 機能
 
-| ホーム | 締めのレポート | レシートの読み取り |
-| :---: | :---: | :---: |
-| <img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"> | <img src="store/screenshots/6.9/02-review.png" width="200" alt="締めた期間の結果と次の一手をレポートで見る"> | <img src="store/screenshots/6.9/03-receipt.png" width="200" alt="レシートを撮って記録する"> |
+| ホーム | 締めのレポート |
+| :---: | :---: |
+| <img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"> | <img src="store/screenshots/6.9/02-review.png" width="200" alt="締めた期間の結果と次の一手をレポートで見る"> |
 
-| 1 タップの記録 | 着せ替えのテーマ | 月末の見込み |
-| :---: | :---: | :---: |
-| <img src="store/screenshots/6.9/04-entry.png" width="200" alt="金額と分類を入れて記録する"> | <img src="store/screenshots/6.9/05-theme.png" width="200" alt="テーマで見た目を着せ替える"> | <img src="store/screenshots/6.9/09-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
+| レシートの読み取り | 1 タップの記録 |
+| :---: | :---: |
+| <img src="store/screenshots/6.9/03-receipt.png" width="200" alt="レシートを撮って記録する"> | <img src="store/screenshots/6.9/04-entry.png" width="200" alt="金額と分類を入れて記録する"> |
+
+| 着せ替えのテーマ | 月末の見込み |
+| :---: | :---: |
+| <img src="store/screenshots/6.9/05-theme.png" width="200" alt="テーマで見た目を着せ替える"> | <img src="store/screenshots/6.9/09-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
 
 ## 🗺️ 全体像
 
@@ -58,18 +62,21 @@ flowchart LR
 | KakeibotApp のフォルダの木と中身 | [docs/architecture-packages-app.md](docs/architecture-packages-app.md) |
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
+| Android の保存のモジュールと iOS との対応 | [docs/architecture-android-store.md](docs/architecture-android-store.md) |
 | Android の画面とモデル | [docs/architecture-android-app.md](docs/architecture-android-app.md) |
 | Android の画面とモデルのやり取り | [docs/architecture-android-flow.md](docs/architecture-android-flow.md) |
 | 画面の組み立て・通知とウィジェット・画面のフォルダ | [docs/architecture-screens.md](docs/architecture-screens.md) |
 | 画面とモデルのやり取り・監視・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
 | 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
+| 設定の一覧の画面の足し方 | [docs/architecture-parts-settings.md](docs/architecture-parts-settings.md) |
 | データの形 | [docs/data.md](docs/data.md) |
 | 予算・固定費・ごほうび・スタンプの表 | [docs/data-budget.md](docs/data-budget.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |
 | 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
 | なぜそう決めたか（決定の索引） | [docs/decisions/README.md](docs/decisions/README.md) |
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
-| 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
+| 記録と入力シートの言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
+| 固定費から振り返りまでの言葉とコードの名前 | [docs/glossary-features.md](docs/glossary-features.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
 | fixtures の形式 | [spec/fixtures.md](spec/fixtures.md) |
 | 画面のモデルのテストの突き合わせ | [spec/scenarios.md](spec/scenarios.md) |
