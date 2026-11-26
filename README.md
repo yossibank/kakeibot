@@ -8,17 +8,26 @@
 
 ## ✨ 機能
 
-| ホーム | 締めのレポート |
-| :---: | :---: |
-| <img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"> | <img src="store/screenshots/6.9/02-review.png" width="200" alt="締めた期間の結果と次の一手をレポートで見る"> |
-
-| レシートの読み取り | 1 タップの記録 |
-| :---: | :---: |
-| <img src="store/screenshots/6.9/03-receipt.png" width="200" alt="レシートを撮って記録する"> | <img src="store/screenshots/6.9/04-entry.png" width="200" alt="金額と分類を入れて記録する"> |
-
-| 着せ替えのテーマ | 月末の見込み |
-| :---: | :---: |
-| <img src="store/screenshots/6.9/05-theme.png" width="200" alt="テーマで見た目を着せ替える"> | <img src="store/screenshots/6.9/09-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"> |
+<table>
+<tr><th>ホーム</th><th>締めのレポート</th><th>レシートの読み取り</th></tr>
+<tr>
+<td><img src="store/screenshots/6.9/01-home.png" width="200" alt="ホームで今月あといくら使えるかが分かる"></td>
+<td><img src="store/screenshots/6.9/02-review.png" width="200" alt="締めた期間の結果と次の一手をレポートで見る"></td>
+<td><img src="store/screenshots/6.9/03-receipt.png" width="200" alt="レシートを撮って記録する"></td>
+</tr>
+<tr><th>1 タップの記録</th><th>着せ替えのテーマ</th><th>声で記録</th></tr>
+<tr>
+<td><img src="store/screenshots/6.9/04-entry.png" width="200" alt="金額と分類を入れて記録する"></td>
+<td><img src="store/screenshots/6.9/05-theme.png" width="200" alt="テーマで見た目を着せ替える"></td>
+<td><img src="store/screenshots/6.9/06-voice.png" width="200" alt="話すだけで金額と日付と口座を記録する"></td>
+</tr>
+<tr><th>ふたりで共有</th><th>月末の見込み</th><th>残高と引き落とし</th></tr>
+<tr>
+<td><img src="store/screenshots/6.9/08-share.png" width="200" alt="共有の財布をふたりでいっしょに使う"></td>
+<td><img src="store/screenshots/6.9/09-outlook.png" width="200" alt="固定費と予定から月末の残りを見込む"></td>
+<td><img src="store/screenshots/6.9/10-assets.png" width="200" alt="口座とカードの残高と引き落としをまとめて見る"></td>
+</tr>
+</table>
 
 ## 🗺️ 全体像
 
