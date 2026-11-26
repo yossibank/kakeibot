@@ -241,7 +241,7 @@ private extension EntrySheet {
                 model.state.errorNotice.clear()
             }
             .deletionNotice(
-                Bindable(model.state).results.deletion,
+                model.state.results.deletion,
                 bottom: bannerBottom
             ) { deletion in
                 model.perform {
@@ -249,8 +249,8 @@ private extension EntrySheet {
                     await $0.reloadWallets()
                 }
             }
-            .settingsHideNotice(
-                Bindable(model.state).results.hiddenCategory,
+            .undoNotice(
+                model.state.results.hiddenCategory,
                 bottom: bannerBottom
             ) { hidden in
                 model.perform {

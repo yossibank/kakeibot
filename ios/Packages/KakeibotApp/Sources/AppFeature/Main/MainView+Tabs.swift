@@ -38,7 +38,7 @@ extension MainView {
                 },
                 onDeleteEntry: { id in
                     notice.perform {
-                        await $0.delete(id, in: home.input.list)
+                        await $0.delete(id, in: home.input.list.value)
                     }
                 },
                 onOpenRecurrings: openRecurrings,
@@ -48,6 +48,7 @@ extension MainView {
                 },
                 onOpenDay: showDay
             )
+            .tabScreen(home, round: model.state.round)
             .tabContent()
         }
     }
@@ -69,11 +70,9 @@ extension MainView {
                         await $0.deleteEntries(ids)
                     }
                 },
-                onDeleteAdjustment: { deletion in
-                    model.state.undo.state.deletion = deletion
-                }
+                onDeleteAdjustment: model.receive
             )
-            .loadFailed(records.input.isListFailed, onRetry: retry)
+            .tabScreen(records, round: model.state.round)
             .tabContent()
         }
     }
@@ -88,7 +87,7 @@ extension MainView {
                 onAddEntry: model.addEntry(on:),
                 onOpenRecurrings: openRecurrings
             )
-            .loadFailed(review.input.isListFailed, onRetry: retry)
+            .tabScreen(review, round: model.state.round)
             .tabContent()
         }
     }
@@ -107,7 +106,7 @@ extension MainView {
                     model.state.sheet = .reward
                 }
             )
-            .loadFailed(assets.input.isListFailed, onRetry: retry)
+            .tabScreen(assets, round: model.state.round)
             .tabContent()
         }
     }

@@ -48,11 +48,11 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
-import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
-import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderEmpty
 import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderLoadFailed
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
+import com.yossibank.kakeibot.features.shared.tab.TabScreen
+import com.yossibank.kakeibot.features.shared.tab.rememberTabModel
 import kotlin.math.abs
 
 @Composable
@@ -64,9 +64,7 @@ fun HomeView(
     onAddEntry: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    val round = rememberObservationRound()
-
-    val model = remember(parts, round) {
+    val model = rememberTabModel(parts, today) { round ->
         HomeModel(
             parts = parts,
             today = today,
@@ -74,53 +72,12 @@ fun HomeView(
         )
     }
 
-    SideEffect {
-        model.setToday(today)
-    }
-
-    LaunchedEffect(model) {
-        model.observe()
-    }
-
-    model.state.task.Timer()
-    TabNoticeRound(model.state.task)
-
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            top = 12.dp,
-            end = 16.dp,
-            bottom = 24.dp,
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
+    TabScreen(model = model) {
         item(key = "title") {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.Bottom,
-            ) {
-                Text(
-                    text = model.output.month?.let { "${it.month}月" } ?: "",
-                    modifier = Modifier.alignByBaseline(),
-                    color = Palette.accentStrong,
-                    style = displayFont(size = FontSize.Headline),
-                )
-
-                Text(
-                    text = model.output.periodText,
-                    modifier = Modifier
-                        .alignByBaseline()
-                        .weight(1f),
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption),
-                )
-
-                RoundIconButton(
-                    icon = R.drawable.ic_settings,
-                    onSelect = onOpenSettings,
-                )
-            }
+            TitleRow(
+                model = model,
+                onOpenSettings = onOpenSettings,
+            )
         }
 
         noticeBanner(task = model.state.task)
@@ -143,11 +100,43 @@ fun HomeView(
 }
 
 @Composable
+private fun TitleRow(
+    model: HomeModel,
+    onOpenSettings: () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Bottom,
+    ) {
+        Text(
+            text = model.output.month?.let { "${it.month}月" } ?: "",
+            modifier = Modifier.alignByBaseline(),
+            color = Palette.accentStrong,
+            style = displayFont(size = FontSize.Headline),
+        )
+
+        Text(
+            text = model.output.periodText,
+            modifier = Modifier
+                .alignByBaseline()
+                .weight(1f),
+            color = Palette.subtext,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+
+        RoundIconButton(
+            icon = R.drawable.ic_settings,
+            onSelect = onOpenSettings,
+        )
+    }
+}
+
+@Composable
 private fun BudgetCard(
     model: HomeModel,
     onOpenBudget: () -> Unit,
 ) {
-    val overview = model.input.overview
+    val overview = model.input.overview.value
     val usage = model.output.usage
 
     Column(
@@ -161,7 +150,7 @@ private fun BudgetCard(
         Dial(
             usage = usage,
             monthExpense = overview?.monthExpense ?: 0,
-            isFailed = model.state.isListFailed,
+            isFailed = model.input.overview.isFailed,
         )
 
         Row(
@@ -195,7 +184,7 @@ private fun BudgetCard(
                 title = "今日の支出",
                 amount = overview?.todayExpense ?: 0,
                 type = Entry.Kind.expense,
-                isFailed = model.state.isListFailed,
+                isFailed = model.input.overview.isFailed,
                 modifier = Modifier.weight(1f),
             )
 
@@ -205,7 +194,7 @@ private fun BudgetCard(
                 title = model.output.middleTitle,
                 amount = model.output.middleAmount,
                 type = Entry.Kind.expense,
-                isFailed = model.state.isListFailed,
+                isFailed = model.input.overview.isFailed,
                 modifier = Modifier.weight(1f),
             )
 
@@ -215,7 +204,7 @@ private fun BudgetCard(
                 title = "今月の収入",
                 amount = overview?.monthIncome ?: 0,
                 type = Entry.Kind.income,
-                isFailed = model.state.isListFailed,
+                isFailed = model.input.overview.isFailed,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -345,7 +334,7 @@ private fun RecentCard(
             ),
         )
 
-        if (model.state.isListFailed) {
+        if (model.input.overview.isFailed) {
             return@Column PlaceholderLoadFailed(onRetry = model::retry)
         }
 

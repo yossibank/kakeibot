@@ -6,8 +6,7 @@ public extension HomeModel {
     @MainActor
     @Observable
     final class Input {
-        public internal(set) var list: EntryList?
-        public internal(set) var isListFailed = false
+        public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var templateOrder: TemplateOrder = .manual
         public internal(set) var syncStatus = SyncStatus.off
 

@@ -72,7 +72,7 @@ struct SettingsBoardModelTests {
         let isHidden = await board.hide("b")
 
         #expect(isHidden)
-        #expect(board.state.removed.hiddenId == "b")
+        #expect(board.state.removed.hidden.current == "b")
     }
 
     @Test
@@ -82,7 +82,7 @@ struct SettingsBoardModelTests {
         let deletion = await board.delete("b")
 
         #expect(deletion != nil)
-        #expect(board.state.removed.deletion?.id == deletion?.id)
+        #expect(board.state.removed.deletion.current?.id == deletion?.id)
     }
 
     @Test
@@ -93,7 +93,7 @@ struct SettingsBoardModelTests {
         let deletion = await board.delete("b")
 
         #expect(deletion == nil)
-        #expect(board.state.removed.deletion == nil)
+        #expect(board.state.removed.deletion.current == nil)
         #expect(board.state.errorNotice.message == "削除できませんでした")
     }
 
@@ -103,8 +103,27 @@ struct SettingsBoardModelTests {
 
         let result = await board.deleteHidden()
 
-        #expect(board.state.removed.deletion?.id == result.deletion?.id)
+        #expect(board.state.removed.deletion.current?.id == result.deletion?.id)
         #expect(board.state.removed.bulkDelete?.keptCount == 1)
+    }
+
+    @Test
+    func receivesDeletionFromEditor() {
+        let board = FakeBoard(visible: ["a"])
+        let deletion = Deletion(merging: [])
+
+        board.receive(deletion)
+
+        #expect(board.state.removed.deletion.current?.id == deletion.id)
+    }
+
+    @Test
+    func receivesHiddenFromEditor() {
+        let board = FakeBoard(visible: ["a"])
+
+        board.receiveHidden("a")
+
+        #expect(board.state.removed.hidden.current == "a")
     }
 
     @Test
@@ -206,7 +225,7 @@ extension SettingsBoardModelTests {
             inUse: Set<String> = [],
             failing: Set<String> = []
         ) {
-            let state = SettingsBoardMovingState<String>()
+            let state = SettingsBoardMovingState<String>(wait: .system)
 
             self.state = state
             self.output = Output(

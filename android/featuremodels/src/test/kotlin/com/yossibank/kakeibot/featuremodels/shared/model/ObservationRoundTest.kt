@@ -59,14 +59,14 @@ class ObservationRoundTest {
 
         setup.scope.launch { records.observe() }
         setup.scope.launch { assets.observe() }
-        ModelWait.until { records.state.isListFailed && assets.state.isListFailed }
-        val wereLoaded = records.input.list != null || assets.input.list != null
+        ModelWait.until { records.input.list.isFailed && assets.input.list.isFailed }
+        val wereLoaded = records.input.list.isLoaded || assets.input.list.isLoaded
         assets.retry()
-        ModelWait.until { records.input.list != null && assets.input.list != null }
+        ModelWait.until { records.input.list.isLoaded && assets.input.list.isLoaded }
 
         assertFalse(wereLoaded)
-        assertFalse(records.state.isListFailed)
-        assertFalse(assets.state.isListFailed)
+        assertFalse(records.input.list.isFailed)
+        assertFalse(assets.input.list.isFailed)
         assertTrue(assets.output.rows.isNotEmpty())
     }
 }

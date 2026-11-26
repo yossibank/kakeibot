@@ -6,7 +6,7 @@ public extension RecordsModel.Output {
         guard
             !state.filter.isEmpty,
             days.isEmpty,
-            let list = input.list
+            let list = input.list.value
         else {
             return false
         }

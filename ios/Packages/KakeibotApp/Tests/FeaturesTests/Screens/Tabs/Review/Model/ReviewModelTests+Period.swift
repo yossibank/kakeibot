@@ -31,7 +31,7 @@ extension ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil && model.output.upcomingRecurringTotal != nil
+            model.input.list.isLoaded && model.output.upcomingRecurringTotal != nil
         }
 
         #expect(model.output.upcomingRecurringTotal == 3000)
@@ -60,7 +60,7 @@ extension ReviewModelTests {
         let model = ReviewModel(parts: .system(setup.database), today: setup.today)
 
         try await observe(model) {
-            model.input.list != nil && !model.input.budgets.isEmpty
+            model.input.list.isLoaded && !model.input.budgets.isEmpty
         }
 
         let shares = model.output.categoryShares

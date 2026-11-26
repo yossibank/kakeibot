@@ -48,7 +48,7 @@ extension RecordsView {
             adjustmentList(on: date)
 
             let upcoming = model.output.upcomingRecurrings(on: date)
-            let isEmptyDay = day == nil && model.input.list != nil
+            let isEmptyDay = day == nil && model.input.list.isLoaded
 
             if !upcoming.isEmpty {
                 upcomingList(upcoming, on: date)

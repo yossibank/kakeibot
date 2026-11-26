@@ -146,7 +146,7 @@ private extension ThemeListView {
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(shownMenu != nil)
-            .deletionNotice(Bindable(model.state).deletion) { deletion in
+            .deletionNotice(model.state.deletion) { deletion in
                 restore(deletion)
             }
 
@@ -250,7 +250,7 @@ private extension ThemeListView {
                 base: target.base ?? model.output.currentPalette
             )
         ) { deletion in
-            model.state.deletion = deletion
+            model.receive(deletion)
         }
         .toolbar(.hidden, for: .navigationBar)
         .environment(\.isSettingsEditPushed, true)

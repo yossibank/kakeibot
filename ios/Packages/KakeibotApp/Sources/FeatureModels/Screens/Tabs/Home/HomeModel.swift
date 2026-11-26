@@ -35,3 +35,15 @@ extension HomeModel {
 
     static let recurringTitle = "固定費"
 }
+
+extension HomeModel: TabScreenModel {
+    public var isLoadFailed: Bool {
+        false
+    }
+
+    public func setToday(_ today: LocalDate) {
+        if state.today != today {
+            state.today = today
+        }
+    }
+}

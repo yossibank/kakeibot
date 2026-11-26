@@ -90,7 +90,7 @@ private extension ReviewView {
         let walletShares = model.output.walletShares
         let isEmpty = categoryShares.isEmpty && walletShares.isEmpty
 
-        if model.input.list == nil {
+        if !model.input.list.isLoaded {
             EmptyView()
         } else if isEmpty {
             PlaceholderEmpty(

@@ -6,7 +6,7 @@ public protocol SettingsBoardState: NoticeHolding, Observable {
     associatedtype Destination: Hashable & Sendable
 
     var movingOrder: [ID]? { get set }
-    var removed: SettingsBoardRemoved<ID> { get set }
+    var removed: SettingsBoardRemoved<ID> { get }
     var shown: SettingsBoardShown<ID, Destination> { get set }
 }
 

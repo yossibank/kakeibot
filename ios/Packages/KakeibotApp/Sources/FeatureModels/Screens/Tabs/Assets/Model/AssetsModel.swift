@@ -17,7 +17,7 @@ public final class AssetsModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(today: today)
 
         self.state = state
@@ -33,17 +33,22 @@ public extension AssetsModel {
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
         public var billPage = 0
-        public var boughtId: RewardGoal.ID?
         public var sheet: Sheet?
 
         public internal(set) var reward = RewardSheet()
         public internal(set) var pending: Opening?
+
+        public let bought: UndoNotice<RewardGoal.ID>
+
+        init(wait: ScreenWait) {
+            self.bought = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor
     @Observable
     final class Input {
-        public internal(set) var isListFailed = false
+        public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var rewardBank: RewardBank?
 
         var summary: AssetsSummary
@@ -112,7 +117,10 @@ public extension AssetsModel {
 
     func load() async {
         do {
-            input.latest.list = try await dependencies.database.entryList()
+            let list = try await dependencies.database.entryList()
+
+            input.list = .loaded(list)
+            input.latest.list = list
             input.latest.recurrings = try await dependencies.database.recurrings()
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
@@ -153,12 +161,7 @@ private extension AssetsModel {
     }
 
     func observe() async {
-        input.isListFailed = false
-
-        input.isListFailed = await observe(
-            dependencies.database.entryListUpdates(),
-            failure: Self.loadFailedMessage
-        ) { list in
+        await observe(dependencies.database.entryListUpdates(), into: \.input.list) { list in
             input.latest.list = list
             refreshLater()
         }
@@ -182,5 +185,11 @@ private extension AssetsModel {
             input.latest.monthStartDay = startDay
             refreshLater()
         }
+    }
+}
+
+extension AssetsModel: TabScreenModel {
+    public var isLoadFailed: Bool {
+        input.list.isFailed
     }
 }

@@ -136,7 +136,7 @@ struct ScreenFlowTests {
         let recorded = try #require(await entry.save())
         await tabs.wait { $0.amounts.allSatisfy { $0 == [430] } }
 
-        await tabs.notice.delete(recorded.entry.id, in: tabs.records.input.list)
+        await tabs.notice.delete(recorded.entry.id, in: tabs.records.input.list.value)
         await tabs.wait { $0.amounts.allSatisfy(\.isEmpty) }
 
         #expect(tabs.notice.output.change?.isDeletion == true)

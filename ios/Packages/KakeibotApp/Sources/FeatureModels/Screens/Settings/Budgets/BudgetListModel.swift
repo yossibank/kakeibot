@@ -17,7 +17,7 @@ public final class BudgetListModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(today: today)
 
         self.state = state
@@ -48,12 +48,18 @@ public extension BudgetListModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var cleared: Cleared?
-        public var resetFrom: YearMonth?
         public var isConfirmingDiscard = false
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
+
+        public let cleared: UndoNotice<Cleared>
+        public let resetFrom: UndoNotice<YearMonth>
+
+        init(wait: ScreenWait) {
+            self.cleared = UndoNotice(wait: wait)
+            self.resetFrom = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor
@@ -112,11 +118,11 @@ public extension BudgetListModel {
             let previous = input.carryoverFrom,
             output.carryover != 0,
             await saveCarryoverFrom(input.month) else {
-            state.resetFrom = nil
+            state.resetFrom.dismiss()
             return nil
         }
 
-        state.resetFrom = previous
+        state.resetFrom.show(previous)
 
         return previous
     }
@@ -182,7 +188,7 @@ public extension BudgetListModel {
             month: input.month
         )
 
-        state.cleared = cleared
+        state.cleared.show(cleared)
 
         return cleared
     }

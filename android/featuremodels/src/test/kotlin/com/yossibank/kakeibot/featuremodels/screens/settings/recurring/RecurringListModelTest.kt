@@ -297,6 +297,28 @@ class RecurringListModelTest {
     }
 
     @Test
+    fun receivesDeletionFromEditor() = modelTest(today = "2026-10-17") { setup ->
+        val saved = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
+        val model = setup.observedModel()
+        val deletion = checkNotNull(model.delete(saved.id))
+        model.state.deleted.dismiss()
+
+        model.receive(deletion)
+
+        assertEquals(deletion, model.state.deleted.current)
+    }
+
+    @Test
+    fun receivesHiddenFromEditor() = modelTest(today = "2026-10-17") { setup ->
+        val saved = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
+        val model = setup.observedModel()
+
+        model.receiveHidden(saved.id)
+
+        assertEquals(saved.id, model.state.hidden.current)
+    }
+
+    @Test
     fun tellsWhenSomeHiddenRecurringsCannotBeDeleted() = modelTest(today = "2026-10-17") { setup ->
         val rent = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
         val other = setup.saveRecurring(amount = 1000, day = 5, memo = "サブスク")

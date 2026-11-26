@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,10 +44,9 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
-import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
-import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
-import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
+import com.yossibank.kakeibot.features.shared.tab.TabScreen
+import com.yossibank.kakeibot.features.shared.tab.rememberTabModel
 
 @Composable
 fun RecordsView(
@@ -54,9 +54,7 @@ fun RecordsView(
     today: LocalDate,
     onOpenEntry: (Identifier<Entry>) -> Unit,
 ) {
-    val round = rememberObservationRound()
-
-    val model = remember(parts, round) {
+    val model = rememberTabModel(parts, today) { round ->
         RecordsModel(
             parts = parts,
             today = today,
@@ -64,21 +62,7 @@ fun RecordsView(
         )
     }
 
-    LaunchedEffect(model) {
-        model.observe()
-    }
-
-    SideEffect {
-        model.setToday(today)
-    }
-
-    model.state.task.Timer()
-    TabNoticeRound(model.state.task)
-
-    LoadFailedColumn(
-        isFailed = model.state.isListFailed,
-        onRetry = model::retry,
-    ) {
+    TabScreen(model = model) {
         item(key = "title") {
             Text(
                 text = "記録",
@@ -110,40 +94,50 @@ fun RecordsView(
             )
         }
 
-        if (model.input.layout == RecordsLayout.calendar) {
-            item(key = "calendar") {
-                RecordsCalendarCard(model = model)
-            }
+        days(
+            model = model,
+            onOpenEntry = onOpenEntry,
+        )
+    }
+}
 
-            item(key = "selected") {
-                val date = model.output.selectedDate
+private fun LazyListScope.days(
+    model: RecordsModel,
+    onOpenEntry: (Identifier<Entry>) -> Unit,
+) {
+    if (model.input.layout == RecordsLayout.calendar) {
+        item(key = "calendar") {
+            RecordsCalendarCard(model = model)
+        }
 
-                RecordsDayCard(
-                    day = model.output.day(on = date) ?: EntryDay(
-                        date = date,
-                        entries = emptyList(),
-                    ),
-                    model = model,
-                    onOpenEntry = onOpenEntry,
-                )
-            }
-        } else {
-            if (model.input.isLoaded && model.output.days.isEmpty()) {
-                item(key = "empty") {
-                    EmptyCard()
-                }
-            }
+        item(key = "selected") {
+            val date = model.output.selectedDate
 
-            items(
-                items = model.output.days,
-                key = { it.date.toString() },
-            ) { day ->
-                RecordsDayCard(
-                    day = day,
-                    model = model,
-                    onOpenEntry = onOpenEntry,
-                )
+            RecordsDayCard(
+                day = model.output.day(on = date) ?: EntryDay(
+                    date = date,
+                    entries = emptyList(),
+                ),
+                model = model,
+                onOpenEntry = onOpenEntry,
+            )
+        }
+    } else {
+        if (model.input.list.isLoaded && model.output.days.isEmpty()) {
+            item(key = "empty") {
+                EmptyCard()
             }
+        }
+
+        items(
+            items = model.output.days,
+            key = { it.date.toString() },
+        ) { day ->
+            RecordsDayCard(
+                day = day,
+                model = model,
+                onOpenEntry = onOpenEntry,
+            )
         }
     }
 }

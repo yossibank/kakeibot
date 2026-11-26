@@ -59,8 +59,8 @@ private extension BudgetListView {
                 .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
-            .settingsHideNotice(
-                Bindable(model.state).cleared,
+            .undoNotice(
+                model.state.cleared,
                 message: clearedMessage,
                 systemImage: "chart.bar"
             ) { cleared in
@@ -68,8 +68,8 @@ private extension BudgetListView {
                     await $0.restore(cleared)
                 }
             }
-            .settingsHideNotice(
-                Bindable(model.state).resetFrom,
+            .undoNotice(
+                model.state.resetFrom,
                 message: "繰越を 0 に戻しました",
                 systemImage: "arrow.counterclockwise"
             ) { start in
@@ -365,7 +365,7 @@ private extension BudgetListView {
     }
 
     var clearedMessage: String {
-        model.state.cleared.map { "\($0.target.title)をなくしました" } ?? ""
+        model.state.cleared.current.map { "\($0.target.title)をなくしました" } ?? ""
     }
 
     var hint: SettingsFold {

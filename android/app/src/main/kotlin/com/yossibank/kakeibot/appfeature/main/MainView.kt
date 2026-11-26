@@ -99,8 +99,6 @@ private fun MainLayers(
     today: LocalDate,
     model: MainModel,
 ) {
-    val sheet = model.state.sheet.current
-    val close = model.state.sheet::closeAll
     val notice = remember(parts) { EntryNoticeModel(parts) }
 
     LaunchedEffect(notice.state.count) {
@@ -145,44 +143,62 @@ private fun MainLayers(
                 .navigationBarsPadding(),
         )
 
-        SheetLayer(
-            item = sheet as? MainModel.Sheet.Entry,
-            modifier = Modifier.zIndex(SHEET_LAYER),
-        ) { entry ->
-            EntrySheet(
+        MainSheets(
+            parts = parts,
+            today = today,
+            model = model,
+            notice = notice,
+        )
+    }
+}
+
+@Composable
+private fun MainSheets(
+    parts: ScreenParts,
+    today: LocalDate,
+    model: MainModel,
+    notice: EntryNoticeModel,
+) {
+    val sheet = model.state.sheet.current
+    val close = model.state.sheet::closeAll
+
+    SheetLayer(
+        item = sheet as? MainModel.Sheet.Entry,
+        modifier = Modifier.zIndex(SHEET_LAYER),
+    ) { entry ->
+        EntrySheet(
+            parts = parts,
+            today = today,
+            editing = entry.editing,
+            date = entry.date,
+            onChange = notice::show,
+            onClose = close,
+        )
+    }
+
+    SheetLayer(
+        item = sheet as? MainModel.Sheet.Settings,
+        modifier = Modifier.zIndex(SHEET_LAYER),
+    ) { settings ->
+        key(settings.round) {
+            SettingsMenuSheet(
                 parts = parts,
                 today = today,
-                editing = entry.editing,
-                date = entry.date,
-                onChange = notice::show,
                 onClose = close,
+                openRecurring = settings.recurring,
             )
         }
+    }
 
-        SheetLayer(
-            item = sheet as? MainModel.Sheet.Settings,
-            modifier = Modifier.zIndex(SHEET_LAYER),
-        ) { settings ->
-            key(settings.round) {
-                SettingsMenuSheet(
-                    parts = parts,
-                    today = today,
-                    onClose = close,
-                    openRecurring = settings.recurring,
-                )
-            }
-        }
-
-        SheetLayer(
-            item = sheet as? MainModel.Sheet.Budget,
-            modifier = Modifier.zIndex(SHEET_LAYER),
-        ) {
-            BudgetListView(
-                parts = parts,
-                today = today,
-                onBack = close,
-            )
-        }
+    SheetLayer(
+        item = sheet as? MainModel.Sheet.Budget,
+        modifier = Modifier.zIndex(SHEET_LAYER),
+    ) {
+        BudgetListView(
+            parts = parts,
+            today = today,
+            onBack = close,
+        )
     }
 }
 

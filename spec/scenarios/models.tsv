@@ -254,7 +254,7 @@ home.swaps-middle-figure-by-budget	HomeModelTests/swapsMiddleFigureByBudget	Home
 home.lists-recent-entries-newest-first	HomeModelTests/listsRecentEntriesNewestFirst	HomeModelTest/listsRecentEntriesNewestFirst	対応	
 home.shows-notice-when-list-fails		HomeModelTest/showsNoticeWhenListFails	Androidのみ	iOS は共通の observe の失敗だけを確かめ、ホームの文は確かめていない
 home.shows-no-notice-while-list-arrives		HomeModelTest/showsNoNoticeWhileListArrives	Androidのみ	一覧が届く間は知らせが空であることは、iOS にテストが無い
-home.marks-list-failure-until-retried		HomeModelTest/marksListFailureUntilRetried	Androidのみ	iOS は旗を共通の observe で確かめ、やり直しは MainView が持つ
+home.marks-list-failure-until-retried		HomeModelTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 home.orders-same-day-by-newest-save		HomeModelTest/ordersSameDayByNewestSave	Androidのみ	同じ日の中を保存の新しい順に並べることは、iOS のホームにテストが無い
 home.labels-today-and-yesterday-rows		HomeModelTest/labelsTodayAndYesterdayRows	Androidのみ	先の日付の行が日付で出ることは iOS に無く、今日と昨日の札だけ重なる
 assets.pages-card-bills-by-month	AssetsModelTests/pagesCardBillsByMonth		未移植	資産のモデルと画面に、カードの請求の月ごとのページが無い
@@ -279,7 +279,7 @@ assets.lists-upcoming-card-bills	AssetsModelTests/listsUpcomingCardBills		未移
 assets.estimates-loan-payoff	AssetsModelTests/estimatesLoanPayoff		未移植	資産の行に、借入の完済の見込みが無い
 assets.counts-cards-in-total	AssetsModelTests/countsCardsInTotal	AssetsModelTest/countsCardsInTotal	対応	
 assets.shows-notice-when-list-fails		AssetsModelTest/showsNoticeWhenListFails	Androidのみ	iOS は共通の observe の失敗だけを確かめ、資産の文は確かめていない
-assets.marks-list-failure-until-retried		AssetsModelTest/marksListFailureUntilRetried	Androidのみ	iOS は旗を共通の observe で確かめ、やり直しは MainView が持つ
+assets.marks-list-failure-until-retried		AssetsModelTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 assets.shows-no-rows-before-list-arrives		AssetsModelTest/showsNoRowsBeforeListArrives	Androidのみ	一覧が届く前は行が空で合計が 0 であることは、iOS にテストが無い
 assets.separates-debts-from-assets		AssetsModelTest/separatesDebtsFromAssets	Androidのみ	資産と負債の分け方のテスト。iOS は sections で分け、同じ形のテストが無い
 assets.counts-entries-of-today		AssetsModelTest/countsEntriesOfToday	Androidのみ	今日の記録は数え、明日の記録は数えない境目は、iOS にテストが無い
@@ -341,7 +341,7 @@ records.starts-week-on-sunday-before-setting-arrives	RecordsModelTests/startsWee
 records.describes-month-and-period		RecordsModelTest/describesMonthAndPeriod	Androidのみ	月の見出し（monthTitle）と期間の文。iOS のモデルに monthTitle は無い
 records.shows-notice-when-list-fails		RecordsModelTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 records.shows-notice-when-settings-fail		RecordsModelTest/showsNoticeWhenSettingsFail	Androidのみ	設定の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
-records.marks-list-failure-until-retried		RecordsModelTest/marksListFailureUntilRetried	Androidのみ	iOS は旗を共通の observe で確かめ、やり直しは MainView が持つ
+records.marks-list-failure-until-retried		RecordsModelTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 records.marks-no-list-failure-when-settings-fail		RecordsModelTest/marksNoListFailureWhenSettingsFail	Androidのみ	設定の見張りの失敗では旗を立てない。iOS にこの筋書きのテストは無い
 review-comment-writer-accuracy.*	ReviewCommentWriterAccuracyTests/*		iOSのみ	Apple の FoundationModels で文を書く精度の確かめで、Android に相手が無い
 review.totals-upcoming-recurrings-of-current-period	ReviewModelTests/totalsUpcomingRecurringsOfCurrentPeriod		未移植	これからの定期の合計（upcomingRecurringTotal）が無い
@@ -377,7 +377,7 @@ review.keeps-selection-only-after-saving		ReviewModelTest/keepsSelectionOnlyAfte
 review.reads-saved-selection-when-observing		ReviewModelTest/readsSavedSelectionWhenObserving	Androidのみ	observe の初めに保存済みの選択を読む。iOS にテストは無い
 review.leaves-out-categories-missing-from-list		ReviewModelTest/leavesOutCategoriesMissingFromList	Androidのみ	一覧に無いカテゴリを内訳から落とす。iOS にテストは無い
 review-notice.shows-notice-when-list-fails		ReviewModelNoticeTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
-review-notice.marks-list-failure-until-retried		ReviewModelNoticeTest/marksListFailureUntilRetried	Androidのみ	iOS は旗を共通の observe で確かめ、やり直しは MainView が持つ
+review-notice.marks-list-failure-until-retried		ReviewModelNoticeTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 review-notice.shows-notice-when-selection-cannot-be-read		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeRead	Androidのみ	選択を読めない時の知らせ。iOS も出すがテストは無い
 review-notice.shows-notice-when-selection-cannot-be-saved		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeSaved	Androidのみ	選択を保存できない時の知らせ。iOS も出すがテストは無い
 review-notice.keeps-list-notice-after-saving		ReviewModelNoticeTest/keepsListNoticeAfterSaving	Androidのみ	保存が通っても、見張りの失敗の知らせを残す
@@ -476,6 +476,8 @@ settings-board.keeps-hidden-item-in-state-after-hiding	SettingsBoardModelTests/k
 settings-board.keeps-deletion-in-state-after-deleting	SettingsBoardModelTests/keepsDeletionInStateAfterDeleting	RecurringListModelTest/deletesAndRestoresRecurring	対応	Android は、削除を元に戻す所まで 1 つのテストで確かめる
 settings-board.clears-deletion-in-state-when-deleting-fails	SettingsBoardModelTests/clearsDeletionInStateWhenDeletingFails	RecurringListModelTest/clearsDeletionInStateWhenDeletingFails	対応	
 settings-board.keeps-bulk-deletion-in-state-after-deleting-hidden	SettingsBoardModelTests/keepsBulkDeletionInStateAfterDeletingHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	残した件数（keptCount）は Android に無く、確かめていない
+settings-board.receives-deletion-from-editor	SettingsBoardModelTests/receivesDeletionFromEditor	RecurringListModelTest/receivesDeletionFromEditor	対応	
+settings-board.receives-hidden-from-editor	SettingsBoardModelTests/receivesHiddenFromEditor	RecurringListModelTest/receivesHiddenFromEditor	対応	
 settings-board.deletes-nothing-when-none-are-hidden	SettingsBoardModelTests/deletesNothingWhenNoneAreHidden	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	
 settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHiddenItem	RecurringListModelTest/deletesOnlyHiddenRecurrings	対応	並べ替え中の順を消すことは確かめていない
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
@@ -581,8 +583,16 @@ screen-observation.shares-values-after-source-recovers		ScreenObservationTest/sh
 screen-observation.shares-failure-with-each-subscriber		ScreenObservationTest/sharesFailureWithEachSubscriber	Androidのみ	監視を分け合う ScreenObservation.share は Android だけにある
 shared-observation.shares-one-source-between-subscribers		SharedObservationTest/sharesOneSourceBetweenSubscribers	Androidのみ	見張りを分け合う持ち主の SharedObservation は Android だけにある
 shared-observation.stops-source-when-stopped		SharedObservationTest/stopsSourceWhenStopped	Androidのみ	止めると元の見張りも止まる。SharedObservation は Android だけにある
-observation-round.observes-again-when-restarted		ObservationRoundTest/observesAgainWhenRestarted	Androidのみ	見張りの回を数える ObservationRound は Android だけにある
-observation-round.restarts-every-model-sharing-round		ObservationRoundTest/restartsEveryModelSharingRound	Androidのみ	iOS は MainView の 1 つの番号で全タブを読み直し、テストは無い
+observation-round.observes-again-when-restarted	ObservationRoundTests/observesAgainWhenRestarted	ObservationRoundTest/observesAgainWhenRestarted	対応	
+observation-round.restarts-every-model-sharing-round	ObservationRoundTests/restartsEveryModelSharingRound	ObservationRoundTest/restartsEveryModelSharingRound	対応	
+loadable.holds-value-only-when-loaded	LoadableTests/holdsValueOnlyWhenLoaded	LoadableTest/holdsValueOnlyWhenLoaded	対応	
+loadable.settles-when-loaded-or-failed	LoadableTests/settlesWhenLoadedOrFailed	LoadableTest/settlesWhenLoadedOrFailed	対応	
+loadable.retries-only-from-failure	LoadableTests/retriesOnlyFromFailure	LoadableTest/retriesOnlyFromFailure	対応	
+undo-notice.clears-after-duration	UndoNoticeTests/clearsAfterDuration	UndoNoticeTest/clearsAfterDuration	対応	
+undo-notice.keeps-later-notice-when-earlier-time-ends	UndoNoticeTests/keepsLaterNoticeWhenEarlierTimeEnds	UndoNoticeTest/keepsLaterNoticeWhenEarlierTimeEnds	対応	
+undo-notice.takes-item-and-clears	UndoNoticeTests/takesItemAndClears	UndoNoticeTest/takesItemAndClears	対応	
+tab-screen.sets-today-on-tab-models	TabScreenModelTests/setsTodayOnTabModels	TabScreenModelTest/setsTodayOnTabModels	対応	
+tab-screen.fails-load-only-for-list-tabs	TabScreenModelTests/failsLoadOnlyForListTabs	TabScreenModelTest/failsLoadOnlyForListTabs	対応	
 app-icon-list.*	AppIconListModelTests/*		未移植	アプリのアイコンを選ぶ画面が無い
 backup.*	BackupModelTests/*		未移植	書き出しと読み込みの画面が無い
 category-edit.*	CategoryEditModelTests/*		未移植	カテゴリを編集する画面が無い

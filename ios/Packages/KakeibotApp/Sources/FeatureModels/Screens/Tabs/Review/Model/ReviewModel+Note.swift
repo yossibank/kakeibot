@@ -18,7 +18,7 @@ public extension ReviewModel {
         let request = "\(key)\n\(basis)"
 
         guard
-            input.list != nil,
+            input.list.isLoaded,
             !output.isCurrentPeriod,
             !input.noteRequests.contains(request),
             output.entryCount(in: output.period.range) >= ReviewComment.minimumEntries
@@ -122,7 +122,7 @@ public extension ReviewModel.Output {
     }
 
     var noteTrigger: ReviewModel.NoteTrigger {
-        let basis = input.list == nil ? nil : closingFacts.basis
+        let basis = !input.list.isLoaded ? nil : closingFacts.basis
         return ReviewModel.NoteTrigger(period: period.commentKey, basis: basis)
     }
 }

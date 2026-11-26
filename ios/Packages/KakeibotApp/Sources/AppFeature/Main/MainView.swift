@@ -104,9 +104,9 @@ struct MainView: View {
                 markOpened(sheet)
             }
             .onChange(of: today) { _, today in
-                home.state.today = today
-                records.state.today = today
-                review.state.today = today
+                home.setToday(today)
+                records.setToday(today)
+                review.setToday(today)
                 assets.setToday(today)
                 model.setToday(today)
             }
@@ -204,20 +204,8 @@ private extension MainView {
                 sheetContent(for: sheet)
                     .presentationSizing(.tallForm)
             }
-            .task(id: model.state.observationRound) {
-                await home.run()
-            }
-            .task(id: model.state.observationRound) {
-                await records.run()
-            }
-            .task(id: model.state.observationRound) {
-                await review.run()
-            }
-            .task(id: model.state.observationRound) {
-                await assets.run()
-            }
-            .task(id: model.state.observationRound) {
-                await setup.run()
+            .task {
+                await observe()
             }
             .task {
                 await model.state.draft.load()
@@ -257,7 +245,7 @@ private extension MainView {
         return Color.clear
             .padding(.leading, Self.noticeLeading(hasSidebar: hasSidebar))
             .entryNotice(notice, above: noticeAbove)
-            .deletionNotice(Bindable(undo.state).deletion, bottom: noticeBottom) { deletion in
+            .deletionNotice(undo.state.deletion, bottom: noticeBottom) { deletion in
                 undo.perform {
                     await $0.restore(deletion)
                 }
@@ -270,7 +258,7 @@ private extension MainView {
                     replaceNotices(with: .entry)
                 }
             }
-            .onChange(of: undo.state.deletion) { _, new in
+            .onChange(of: undo.state.deletion.id) { _, new in
                 if new != nil {
                     replaceNotices(with: .deletion)
                 }
@@ -317,7 +305,7 @@ private extension MainView {
         }
 
         if source != .deletion {
-            model.state.undo.state.deletion = nil
+            model.state.undo.state.deletion.dismiss()
         }
 
         if source != .undoError {

@@ -6,7 +6,7 @@ public extension RecordsModel.Output {
     func adjustmentRows(on date: LocalDate) -> [RecordsModel.AdjustmentRow] {
         guard
             showsAdjustments,
-            let list = input.list
+            let list = input.list.value
         else {
             return []
         }
@@ -27,7 +27,7 @@ extension RecordsModel.Output {
     func adjustedDays(besides days: [EntryDay]) -> [EntryDay] {
         guard
             showsAdjustments,
-            let list = input.list
+            let list = input.list.value
         else {
             return []
         }

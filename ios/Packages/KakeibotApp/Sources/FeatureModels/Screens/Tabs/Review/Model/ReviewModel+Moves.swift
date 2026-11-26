@@ -39,7 +39,7 @@ public extension ReviewModel.Output {
     var moves: [ReviewModel.Move] {
         moveLists.value(for: period.range) {
             _ = input.recurrings
-            return input.list.map { moves(in: $0) } ?? []
+            return input.list.value.map { moves(in: $0) } ?? []
         }
     }
 
@@ -68,7 +68,7 @@ public extension ReviewModel.Output {
 extension ReviewModel.Output {
     func moveRows(to walletId: Wallet.ID) -> [EntryRowItem] {
         guard
-            let list = input.list,
+            let list = input.list.value,
             let wallet = list.wallets[walletId]
         else {
             return []

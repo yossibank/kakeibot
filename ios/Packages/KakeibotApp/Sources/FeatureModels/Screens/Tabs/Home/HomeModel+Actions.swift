@@ -22,7 +22,7 @@ public extension HomeModel {
 
     func load() async {
         do {
-            input.list = try await dependencies.database.entryList()
+            input.list = try await .loaded(dependencies.database.entryList())
             input.recurrings = try await dependencies.database.recurrings()
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
@@ -118,8 +118,7 @@ private extension HomeModel {
             {
                 await self.observe(
                     self.dependencies.database.entryListUpdates(),
-                    into: \.input.list,
-                    failing: \.input.isListFailed
+                    into: \.input.list
                 )
             },
             {

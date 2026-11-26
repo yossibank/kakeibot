@@ -35,7 +35,7 @@ class ReviewModelNoticeTest {
 
         assertEquals("記録を読めませんでした", model.state.task.message)
         assertEquals(ReviewKind.income, model.input.kind)
-        assertNull(model.input.list)
+        assertNull(model.input.list.value)
         assertEquals(0L, model.output.total)
     }
 
@@ -45,15 +45,15 @@ class ReviewModelNoticeTest {
         val model = setup.reviewModel(entryList = entryList)
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.isListFailed }
+        ModelWait.until { model.input.list.isFailed }
         val message = model.state.task.message
-        val list = model.input.list
+        val list = model.input.list.value
         model.retry()
-        ModelWait.until { model.input.list != null }
+        ModelWait.until { model.input.list.isLoaded }
 
         assertEquals("記録を読めませんでした", message)
         assertNull(list)
-        assertFalse(model.state.isListFailed)
+        assertFalse(model.input.list.isFailed)
     }
 
     @Test

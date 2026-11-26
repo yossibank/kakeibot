@@ -13,7 +13,7 @@ public final class TemplateListModel {
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input()
 
         self.state = state
@@ -35,8 +35,13 @@ public extension TemplateListModel {
         public var errorNotice = ErrorNotice()
         public var type: Entry.Kind = .expense
         public var movingOrder: [EntryTemplate.ID]?
-        public var removed = SettingsBoardRemoved<EntryTemplate.ID>()
         public var shown = SettingsBoardShown<EntryTemplate.ID, Destination>()
+
+        public let removed: SettingsBoardRemoved<EntryTemplate.ID>
+
+        init(wait: ScreenWait) {
+            self.removed = SettingsBoardRemoved(wait: wait)
+        }
     }
 
     @MainActor

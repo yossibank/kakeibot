@@ -187,10 +187,10 @@ private extension SettingsBoardPage {
 
     func editor(for destination: Spec.Destination) -> some View {
         spec.editor(for: destination) { deletion in
-            model.state.removed.deletion = deletion
+            model.receive(deletion)
         } onHide: {
             if let id = spec.itemID(of: destination) {
-                model.state.removed.hiddenId = id
+                model.receiveHidden(id)
             }
         }
         .toolbar(.hidden, for: .navigationBar)

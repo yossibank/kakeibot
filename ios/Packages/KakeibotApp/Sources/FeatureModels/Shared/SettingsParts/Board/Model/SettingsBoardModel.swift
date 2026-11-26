@@ -90,7 +90,7 @@ public extension SettingsBoardModel {
         do {
             try await saveHidden(id, isHidden: true)
             await reload()
-            state.removed.hiddenId = id
+            state.removed.hidden.show(id)
 
             return true
         } catch {
@@ -117,14 +117,14 @@ public extension SettingsBoardModel {
             let deletion = try await remove(id)
 
             await reload()
-            state.removed.deletion = deletion
+            state.removed.deletion.show(deletion)
 
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error) ?? Self.deleteFailedText
 
             state.errorNotice.show(message, for: error)
-            state.removed.deletion = nil
+            state.removed.deletion.dismiss()
 
             return nil
         }
@@ -151,9 +151,22 @@ public extension SettingsBoardModel {
         }
 
         state.removed.bulkDelete = result
-        state.removed.deletion = result.deletion
+
+        if let deletion = result.deletion {
+            state.removed.deletion.show(deletion)
+        } else {
+            state.removed.deletion.dismiss()
+        }
 
         return result
+    }
+
+    func receive(_ deletion: Deletion) {
+        state.removed.deletion.show(deletion)
+    }
+
+    func receiveHidden(_ id: Item.ID) {
+        state.removed.hidden.show(id)
     }
 
     func restore(_ deletion: Deletion) async {

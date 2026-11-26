@@ -26,13 +26,13 @@ extension EntryModelTests {
         let model = EntryModel(parts: .system(setup.database), date: setup.date)
         await model.start()
         let category = try #require(model.output.categories.first)
-        model.state.results.deletion = Deletion(merging: [])
-        model.state.results.hiddenCategory = .init(id: category.id, wasSelected: false)
+        model.state.results.deletion.show(Deletion(merging: []))
+        model.state.results.hiddenCategory.show(.init(id: category.id, wasSelected: false))
 
         await model.start()
 
-        #expect(model.state.results.deletion == nil)
-        #expect(model.state.results.hiddenCategory == nil)
+        #expect(model.state.results.deletion.current == nil)
+        #expect(model.state.results.hiddenCategory.current == nil)
     }
 
     @Test
@@ -119,7 +119,7 @@ extension EntryModelTests {
         let food = try #require(model.output.selectedCategory)
 
         let hidden = try #require(await model.hideCategory(food))
-        let placed = model.state.results.hiddenCategory
+        let placed = model.state.results.hiddenCategory.current
         let hiding = model.state.results.outcome.value
         await model.showCategory(hidden)
 
@@ -141,7 +141,7 @@ extension EntryModelTests {
         let hidden = await model.hideCategory(food)
 
         #expect(hidden == nil)
-        #expect(model.state.results.hiddenCategory == nil)
+        #expect(model.state.results.hiddenCategory.current == nil)
     }
 
     @Test

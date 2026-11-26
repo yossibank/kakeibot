@@ -165,7 +165,12 @@ extension ScreenFlowTests.Setup {
 
 extension ScreenFlowTests.Tabs {
     var lists: [EntryList?] {
-        [home.input.list, records.input.list, review.input.list, assets.output.list]
+        [
+            home.input.list.value,
+            records.input.list.value,
+            review.input.list.value,
+            assets.output.list
+        ]
     }
 
     var entryIDs: [[Entry.ID]] {
@@ -185,9 +190,9 @@ extension ScreenFlowTests.Tabs {
         ]
 
         await ObservationWait.until {
-            self.home.input.list != nil
-                && self.records.input.list != nil
-                && self.review.input.list != nil
+            self.home.input.list.isLoaded
+                && self.records.input.list.isLoaded
+                && self.review.input.list.isLoaded
                 && self.assets.output.list != nil
         }
     }

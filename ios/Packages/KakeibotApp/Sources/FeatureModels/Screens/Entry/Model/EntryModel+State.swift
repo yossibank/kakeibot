@@ -64,17 +64,23 @@ public extension EntryModel {
     }
 
     struct Results {
-        public var deletion: Deletion?
-        public var hiddenCategory: HiddenCategory?
+        public let deletion: UndoNotice<Deletion>
+        public let hiddenCategory: UndoNotice<HiddenCategory>
 
         public internal(set) var outcome = ScreenOutcome<Outcome>()
+
+        @MainActor
+        init(wait: ScreenWait) {
+            self.deletion = UndoNotice(wait: wait)
+            self.hiddenCategory = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var results = Results()
+        public var results: Results
         public var memo = ""
         public var today: LocalDate
         public var screen: Screen
@@ -90,8 +96,10 @@ public extension EntryModel {
         init(
             type: Entry.Kind,
             date: LocalDate,
-            today: LocalDate
+            today: LocalDate,
+            wait: ScreenWait
         ) {
+            self.results = Results(wait: wait)
             self.type = type
             self.payment = Payment(date: date)
             self.today = today

@@ -50,14 +50,14 @@ class ScreenFlowTabs(
     )
 
     val overview: MonthOverview
-        get() = checkNotNull(home.input.overview)
+        get() = checkNotNull(home.input.overview.value)
 
     val lists: List<EntryList?>
         get() = listOf(
-            home.input.overview?.list,
-            records.input.list,
-            review.input.list,
-            assets.input.list,
+            home.input.overview.value?.list,
+            records.input.list.value,
+            review.input.list.value,
+            assets.input.list.value,
         )
 
     val amounts: List<List<Int>>
@@ -71,7 +71,7 @@ class ScreenFlowTabs(
     }
 
     fun isOn(today: LocalDate): Boolean =
-        home.input.overview?.today == today && assets.input.today == today
+        home.input.overview.value?.today == today && assets.input.today == today
 
     fun balance(of: Identifier<Wallet>): Long? {
         val row = assets.output.rows.firstOrNull { it.id == of }

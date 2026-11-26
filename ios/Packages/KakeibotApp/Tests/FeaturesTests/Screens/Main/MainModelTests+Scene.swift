@@ -23,16 +23,16 @@ extension MainModelTests {
 
         model.state.changeScene(to: .inactive)
         model.state.changeScene(to: .active)
-        let afterInactive = model.state.observationRound
+        let afterInactive = model.state.round.count
         model.state.changeScene(to: .background)
         model.state.changeScene(to: .inactive)
         model.state.changeScene(to: .active)
-        let afterBackground = model.state.observationRound
+        let afterBackground = model.state.round.count
         model.state.changeScene(to: .active)
 
         #expect(afterInactive == 0)
         #expect(afterBackground == 1)
-        #expect(model.state.observationRound == 1)
+        #expect(model.state.round.count == 1)
     }
 
     @Test
@@ -40,9 +40,9 @@ extension MainModelTests {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
 
-        model.state.restartObservation()
+        model.state.round.restart()
 
-        #expect(model.state.observationRound == 1)
+        #expect(model.state.round.count == 1)
     }
 
     @Test
@@ -53,7 +53,7 @@ extension MainModelTests {
         model.state.hideTabNotices()
 
         #expect(model.state.noticeRound == 1)
-        #expect(model.state.observationRound == 0)
+        #expect(model.state.round.count == 0)
     }
 
     @Test
@@ -61,7 +61,7 @@ extension MainModelTests {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
 
-        #expect(model.state.undo.state.deletion == nil)
+        #expect(model.state.undo.state.deletion.current == nil)
         #expect(model.state.undo.state.errorNotice.message == nil)
     }
 }

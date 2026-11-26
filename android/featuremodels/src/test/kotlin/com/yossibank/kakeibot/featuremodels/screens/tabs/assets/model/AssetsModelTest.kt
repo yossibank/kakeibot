@@ -46,15 +46,15 @@ class AssetsModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.isListFailed }
+        ModelWait.until { model.input.list.isFailed }
         val message = model.state.task.message
-        val list = model.input.list
+        val list = model.input.list.value
         model.retry()
-        ModelWait.until { model.input.list != null }
+        ModelWait.until { model.input.list.isLoaded }
 
         assertEquals("残高を読めませんでした", message)
         assertNull(list)
-        assertFalse(model.state.isListFailed)
+        assertFalse(model.input.list.isFailed)
     }
 
     @Test

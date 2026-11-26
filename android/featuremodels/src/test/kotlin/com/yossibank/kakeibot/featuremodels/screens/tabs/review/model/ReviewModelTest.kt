@@ -93,7 +93,7 @@ class ReviewModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.input.list != null }
+        ModelWait.until { model.input.list.isLoaded }
 
         assertEquals(800L, model.output.total)
         assertEquals(listOf(500L), model.output.rows.map { it.amount })
@@ -336,7 +336,7 @@ class ReviewModelTest {
         val model = reviewModel()
 
         scope.launch { model.observe() }
-        ModelWait.until { model.input.list != null }
+        ModelWait.until { model.input.list.isLoaded }
 
         return model
     }

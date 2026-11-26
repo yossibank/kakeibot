@@ -25,7 +25,7 @@ extension ScreenFlowTests {
         #expect(tabs.records.output.expenseTotal == 220)
         #expect(tabs.review.output.total == 220)
 
-        await tabs.notice.delete(recorded.entry.id, in: tabs.records.input.list)
+        await tabs.notice.delete(recorded.entry.id, in: tabs.records.input.list.value)
         await tabs.wait { $0.amounts.allSatisfy(\.isEmpty) }
 
         #expect(tabs.balance(of: setup.cash) == 0)
@@ -114,7 +114,7 @@ extension ScreenFlowTests {
         #expect(tabs.balance(of: setup.cash) == -156_000)
 
         let paid = try #require(tabs.home.output.periodRecurrings.first?.entry)
-        await tabs.notice.delete(paid.id, in: tabs.records.input.list)
+        await tabs.notice.delete(paid.id, in: tabs.records.input.list.value)
         await tabs.wait { $0.home.output.periodRecurrings.map(\.status) == [.missing] }
         await tabs.wait { $0.balance(of: setup.cash) == -78000 }
 

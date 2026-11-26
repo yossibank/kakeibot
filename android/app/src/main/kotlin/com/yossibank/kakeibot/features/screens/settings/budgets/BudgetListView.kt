@@ -92,8 +92,6 @@ fun BudgetListView(
     }
 
     model.state.task.Timer()
-    model.state.cleared.Timer()
-    model.state.resetFrom.Timer()
     BackHandler(onBack = onBack)
 
     SettingsFrame(

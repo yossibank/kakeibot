@@ -35,7 +35,8 @@ model.perform {
 | 受ける所 | 画面は、`onOutcome` を 1 か所に書く。閉じる・親に知らせるだけを書く |
 | 閉じた後 | 閉じた画面には、結果が届かない |
 | 編集シート | 結果は `EditFlow` の `Outcome` で持つ。`editSheet` が受ける |
-| 知らせと確認 | 取り消しの知らせの値と、結果で出す確認は、モデルが `state` の値を書いて出す |
+| 知らせと確認 | 取り消しの知らせの値と、結果で出す確認は、モデルが `state` の値を書いて出す。取り消しの知らせは、`UndoNotice` が時間も数える |
+| 子の画面の結果 | 親の画面は親の `state` に直に書かず、親のモデルの `receive`・`receiveHidden` に渡す。設定の一覧・メインのタブ・テーマの一覧が当たる |
 | 結果が何種類もある画面 | 結果を 1 つの `enum` にして、`ScreenOutcome` に入れる。入力シートの `EntryModel.Outcome` が当たる |
 | 読み込みの後 | `.task` は、モデルの `start` だけを呼ぶ。読み込みの後に画面の値を組む時は、モデルが結果を置く |
 | 待ってから出す | 画面の動きを待つ時間は、モデルが待ってから結果を置く。レシートの品目のシートが当たる |
@@ -53,7 +54,8 @@ model.perform {
 | Pro の見張り | AppModel が StoreKit の購入の状態を見張り、Pro が無くなったら同期を止める。見張り直しはしない |
 | 回数 | 1 回の見張りの中で数え、値を受けても戻さない |
 | RootView | DB が使えるかどうかと今日が変わるたびに、AppModel の見張りを張り直す |
-| 前面に戻った時 | MainModel が `changeScene` で各画面の見張りを始め直す。AppModel は `changeScene` で、止まった見張りだけを始め直す |
+| 前面に戻った時 | MainModel が `changeScene` で `ObservationRound` を進め、各画面の見張りを始め直す。AppModel は `changeScene` で、止まった見張りだけを始め直す |
+| タブの見張り | MainView が `ObservationRound` の `each` で、タブ 4 つとはじめの案内をまとめて見張る。失敗の画面の「もう一度読み込む」も回を進める |
 | 裏に回った印 | モデルの `ForegroundReturn` が覚え、inactive を挟んで戻っても検出する。Android は `ON_STOP` を裏とする |
 | 止まった画面 | ホーム・記録・振り返り・資産は、「読めませんでした」と「もう一度読み込む」を出す |
 

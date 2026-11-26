@@ -12,7 +12,7 @@ public extension HomeModel.Output {
                 || detail(for: template).localizedStandardContains(trimmed)
         }
 
-        let categories = (input.list.map { Array($0.categories.values) } ?? [])
+        let categories = (input.list.value.map { Array($0.categories.values) } ?? [])
             .sorted { $0.sortOrder < $1.sortOrder }
 
         return categories.compactMap { category in
@@ -31,6 +31,6 @@ public extension HomeModel.Output {
     }
 
     func detail(for template: EntryTemplate) -> String {
-        input.list?.detail(for: template) ?? ""
+        input.list.value?.detail(for: template) ?? ""
     }
 }

@@ -10,8 +10,8 @@ struct SettingsBoardController<Model: SettingsBoardModel> {
 }
 
 extension SettingsBoardController {
-    var removed: Binding<SettingsBoardRemoved<Model.Item.ID>> {
-        Bindable(model.state).removed
+    var removed: SettingsBoardRemoved<Model.Item.ID> {
+        model.state.removed
     }
 
     func follow(

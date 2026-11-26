@@ -56,19 +56,16 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.tabs.review.parts.balanceColor
-import com.yossibank.kakeibot.features.shared.notice.TabNoticeRound
-import com.yossibank.kakeibot.features.shared.observation.rememberObservationRound
 import com.yossibank.kakeibot.features.shared.period.PeriodStepper
-import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedColumn
+import com.yossibank.kakeibot.features.shared.tab.TabScreen
+import com.yossibank.kakeibot.features.shared.tab.rememberTabModel
 
 @Composable
 fun ReviewView(
     parts: ScreenParts,
     today: LocalDate,
 ) {
-    val round = rememberObservationRound()
-
-    val model = remember(parts, round) {
+    val model = rememberTabModel(parts, today) { round ->
         ReviewModel(
             parts = parts,
             today = today,
@@ -76,21 +73,7 @@ fun ReviewView(
         )
     }
 
-    SideEffect {
-        model.setToday(today)
-    }
-
-    LaunchedEffect(model) {
-        model.observe()
-    }
-
-    model.state.task.Timer()
-    TabNoticeRound(model.state.task)
-
-    LoadFailedColumn(
-        isFailed = model.state.isListFailed,
-        onRetry = model::retry,
-    ) {
+    TabScreen(model = model) {
         item(key = "title") {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(

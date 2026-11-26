@@ -42,15 +42,19 @@ class ModelTestSetup(
 ) {
     val now: Instant = ModelTestDatabase.now
 
+    val wait = ManualWait()
+
     val parts = ScreenParts(
         database = database,
         clock = ScreenClock.fixed(now),
+        wait = wait.wait,
     )
 
     fun parts(entryList: Flow<EntryList>): ScreenParts = ScreenParts(
         database = database,
         clock = parts.clock,
         entryList = entryList,
+        wait = wait.wait,
     )
 
     suspend fun options(): EntryOptions = database.entryOptions()

@@ -36,10 +36,10 @@ class RecordsModelTest {
     @Test
     fun loadsOnlyAfterListArrives() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.recordsModel()
-        val before = model.input.isLoaded
+        val before = model.input.list.isLoaded
 
         backgroundScope.launch { model.observe() }
-        ModelWait.until { model.input.isLoaded }
+        ModelWait.until { model.input.list.isLoaded }
 
         assertFalse(before)
         assertTrue(model.output.days.isEmpty())
@@ -77,7 +77,7 @@ class RecordsModelTest {
     fun keepsMonthWhenObservingAgain() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.recordsModel()
         val first = backgroundScope.launch { model.observe() }
-        ModelWait.until { model.input.isLoaded }
+        ModelWait.until { model.input.list.isLoaded }
 
         first.cancelAndJoin()
         model.move(months = -1)
@@ -114,7 +114,7 @@ class RecordsModelTest {
         val model = setup.recordsModel()
 
         backgroundScope.launch { model.observe() }
-        ModelWait.until { model.input.isLoaded && model.input.monthStartDay.day == 25 }
+        ModelWait.until { model.input.list.isLoaded && model.input.monthStartDay.day == 25 }
 
         assertEquals("2026-10", model.output.shownMonth.toString())
         assertEquals("9/25〜10/24", model.output.periodText)
@@ -267,8 +267,8 @@ class RecordsModelTest {
         ModelWait.until { model.input.weekStart == Weekday.sunday }
 
         assertEquals("記録を読めませんでした", model.state.task.message)
-        assertFalse(model.input.isLoaded)
-        assertNull(model.input.list)
+        assertFalse(model.input.list.isLoaded)
+        assertNull(model.input.list.value)
     }
 
     @Test
@@ -282,15 +282,15 @@ class RecordsModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.isListFailed }
+        ModelWait.until { model.input.list.isFailed }
         val message = model.state.task.message
-        val list = model.input.list
+        val list = model.input.list.value
         model.retry()
-        ModelWait.until { model.input.isLoaded }
+        ModelWait.until { model.input.list.isLoaded }
 
         assertEquals("記録を読めませんでした", message)
         assertNull(list)
-        assertFalse(model.state.isListFailed)
+        assertFalse(model.input.list.isFailed)
     }
 
     @Test
@@ -301,7 +301,7 @@ class RecordsModelTest {
         setup.scope.launch { model.observe() }
         ModelWait.until { model.state.task.message.isNotEmpty() }
 
-        assertFalse(model.state.isListFailed)
+        assertFalse(model.input.list.isFailed)
     }
 
     @Test
@@ -311,7 +311,7 @@ class RecordsModelTest {
 
         setup.scope.launch { model.observe() }
         ModelWait.until { model.state.task.message.isNotEmpty() }
-        ModelWait.until { model.input.isLoaded }
+        ModelWait.until { model.input.list.isLoaded }
 
         assertEquals("記録を読めませんでした", model.state.task.message)
         assertEquals(MonthStartDay.first, model.input.monthStartDay)
@@ -327,7 +327,7 @@ class RecordsModelTest {
         val model = recordsModel()
 
         scope.launch { model.observe() }
-        ModelWait.until { model.input.isLoaded }
+        ModelWait.until { model.input.list.isLoaded }
 
         return model
     }

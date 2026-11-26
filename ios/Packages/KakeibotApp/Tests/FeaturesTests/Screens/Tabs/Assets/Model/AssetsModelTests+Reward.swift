@@ -51,14 +51,13 @@ extension AssetsModelTests {
         let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
-        let bought = model.state.boughtId
-        model.state.boughtId = nil
+        let bought = model.state.bought.take()
         let isUndone = await model.setPurchased(goal.id, isPurchased: false)
 
         #expect(isSaved)
         #expect(bought == goal.id)
         #expect(isUndone)
-        #expect(model.state.boughtId == nil)
+        #expect(model.state.bought.current == nil)
     }
 
     @Test
@@ -73,7 +72,7 @@ extension AssetsModelTests {
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
 
         #expect(isSaved == false)
-        #expect(model.state.boughtId == nil)
+        #expect(model.state.bought.current == nil)
         #expect(model.state.errorNotice.message == "目標を保存できませんでした")
     }
 

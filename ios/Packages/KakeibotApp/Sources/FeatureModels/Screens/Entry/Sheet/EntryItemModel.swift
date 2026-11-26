@@ -6,8 +6,11 @@ import Observation
 public final class EntryItemModel {
     public let state: State
 
-    init(isSlipOpen: Bool) {
-        self.state = State(isSlipOpen: isSlipOpen)
+    init(
+        isSlipOpen: Bool,
+        wait: ScreenWait
+    ) {
+        self.state = State(isSlipOpen: isSlipOpen, wait: wait)
     }
 }
 
@@ -57,14 +60,19 @@ public extension EntryItemModel {
     final class State {
         public var draft = Draft()
         public var openIndex: Int?
-        public var removed: EntryModel.RemovedItem?
         public var isSlipOpen: Bool
         public var isShowingHelp = false
 
         public internal(set) var scroll = ScreenOutcome<Int>()
 
-        init(isSlipOpen: Bool) {
+        public let removed: UndoNotice<EntryModel.RemovedItem>
+
+        init(
+            isSlipOpen: Bool,
+            wait: ScreenWait
+        ) {
             self.isSlipOpen = isSlipOpen
+            self.removed = UndoNotice(wait: wait)
         }
     }
 }
@@ -116,7 +124,9 @@ public extension EntryItemModel {
         _ index: Int,
         from entry: EntryModel
     ) {
-        state.removed = entry.state.removeItem(at: index)
+        if let removed = entry.state.removeItem(at: index) {
+            state.removed.show(removed)
+        }
     }
 
     func restore(

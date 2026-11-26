@@ -44,7 +44,7 @@ public extension RecordsModel.Output {
     }
 
     var showsNoRecords: Bool {
-        input.list != nil && days.isEmpty
+        input.list.isLoaded && days.isEmpty
     }
 
     var expenseTotal: Int {
@@ -56,7 +56,7 @@ public extension RecordsModel.Output {
     }
 
     var filterTitle: String? {
-        input.list?.title(of: state.filter)
+        input.list.value?.title(of: state.filter)
     }
 
     var weeks: [[LocalDate?]] {
@@ -85,11 +85,11 @@ public extension RecordsModel.Output {
     }
 
     func icon(for category: EntryCategory) -> Icon? {
-        input.list?.icons[category.iconId]
+        input.list.value?.icons[category.iconId]
     }
 
     func icon(for wallet: Wallet) -> Icon? {
-        input.list?.icons[wallet.iconId]
+        input.list.value?.icons[wallet.iconId]
     }
 
     func day(on date: LocalDate) -> EntryDay? {
@@ -97,7 +97,7 @@ public extension RecordsModel.Output {
     }
 
     func rows(for day: EntryDay) -> [EntryRowItem] {
-        guard let list = input.list else {
+        guard let list = input.list.value else {
             return []
         }
 
@@ -107,7 +107,7 @@ public extension RecordsModel.Output {
 
 extension RecordsModel.Output {
     var shownFilter: EntryFilter {
-        input.list?.widened(state.filter) ?? state.filter
+        input.list.value?.widened(state.filter) ?? state.filter
     }
 
     static func entryCount(in days: [EntryDay]) -> Int {
@@ -144,7 +144,7 @@ private extension RecordsModel.Output {
 
     var searchIndex: EntrySearchIndex? {
         searchIndexCache.value {
-            input.list.map { EntrySearchIndex($0) }
+            input.list.value.map { EntrySearchIndex($0) }
         }
     }
 
@@ -167,7 +167,7 @@ private extension RecordsModel.Output {
     }
 
     func makeDays() -> [EntryDay] {
-        let days = input.list?.days.within(period) ?? []
+        let days = input.list.value?.days.within(period) ?? []
         let filtered = shownFilter.apply(to: days)
         let adjusted = adjustedDays(besides: filtered)
 

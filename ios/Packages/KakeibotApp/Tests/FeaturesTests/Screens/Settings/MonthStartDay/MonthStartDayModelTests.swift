@@ -80,7 +80,7 @@ struct MonthStartDayModelTests {
         }
 
         try await wait {
-            model.output.monthStartDay == startDay && model.input.list != nil
+            model.output.monthStartDay == startDay && model.input.list.isLoaded
         }
 
         task.cancel()
@@ -103,7 +103,7 @@ struct MonthStartDayModelTests {
         }
 
         try await wait {
-            model.input.monthStartDay == startDay && model.input.list != nil
+            model.input.monthStartDay == startDay && model.input.list.isLoaded
         }
 
         task.cancel()

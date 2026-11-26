@@ -15,7 +15,7 @@ extension EntrySheet {
         case let .editWallet(id):
             WalletEditSheet(model: model.editWalletModel(id)) { _ in
             } onDelete: { deletion in
-                model.state.results.deletion = deletion
+                model.state.results.deletion.show(deletion)
             }
 
         case .items:
@@ -34,7 +34,7 @@ extension EntrySheet {
         case let .editCategory(category):
             CategoryEditSheet(model: model.editCategoryModel(category)) { _ in
             } onDelete: { deletion in
-                model.state.results.deletion = deletion
+                model.state.results.deletion.show(deletion)
             }
 
         case let .addTag(category):
@@ -43,7 +43,7 @@ extension EntrySheet {
                 startsAddingTag: true
             ) { _ in
             } onDelete: { deletion in
-                model.state.results.deletion = deletion
+                model.state.results.deletion.show(deletion)
             }
 
         case .newTemplate:

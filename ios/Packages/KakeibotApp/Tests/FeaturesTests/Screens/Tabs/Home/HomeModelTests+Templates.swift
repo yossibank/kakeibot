@@ -31,7 +31,7 @@ extension HomeModelTests {
         }
 
         await ObservationWait.until {
-            home.output.templates.count >= 3 && home.input.list != nil
+            home.output.templates.count >= 3 && home.input.list.isLoaded
         }
 
         let all = home.output.templateSections(matching: "")
@@ -68,7 +68,7 @@ extension HomeModelTests {
         }
 
         await ObservationWait.until {
-            home.output.templates.count >= 3 && home.input.list != nil
+            home.output.templates.count >= 3 && home.input.list.isLoaded
         }
 
         let manual = home.output.templates.map(\.name)
@@ -106,13 +106,13 @@ extension HomeModelTests {
         }
 
         await ObservationWait.until {
-            home.output.templates.count >= 2 && home.input.list != nil
+            home.output.templates.count >= 2 && home.input.list.isLoaded
         }
 
         _ = await home.record(tissue)
 
         await ObservationWait.until {
-            home.input.list?.days.count ?? 0 >= 2
+            home.input.list.value?.days.count ?? 0 >= 2
         }
 
         await home.setTemplateOrder(.frequent)
