@@ -26,6 +26,7 @@ public final class EntryModel: ScreenPerforming {
             today: parts.clock.today,
             wait: parts.wait
         )
+
         let input = Input(editingId: id, startingTemplate: template)
 
         self.state = state
