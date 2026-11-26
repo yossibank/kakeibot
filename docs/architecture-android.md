@@ -176,7 +176,7 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
 | `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
 | `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `undoNotice` と `deletionNotice` に分かれる |
-| `shared/tab/TabScreen.kt` | タブの外枠。iOS の `tabScreen` は今日と失敗の画面だけを持ち、見張りは `MainView` が持つ |
+| `shared/tab/TabScreen.kt` | タブの外枠。iOS の `tabScreen` は失敗の画面だけを持ち、今日と見張りは `MainView` が持つ |
 | `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
 | `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainModel` の `ObservationRound` が全部のタブを見張り、タブに配らない |
 | `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
