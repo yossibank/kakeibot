@@ -36,8 +36,8 @@ public extension HomeModel.Output {
     var templates: [EntryTemplate] {
         templatesCache.value {
             let shown = input.allTemplates.filter { $0.type == state.templateType }
-            return input.list.value?
-                .ordered(shown, by: input.templateOrder, today: state.today) ?? shown
+            let list = input.list.value
+            return list?.ordered(shown, by: input.templateOrder, today: state.today) ?? shown
         }
     }
 
