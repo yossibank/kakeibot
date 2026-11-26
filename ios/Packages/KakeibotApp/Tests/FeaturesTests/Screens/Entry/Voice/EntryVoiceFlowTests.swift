@@ -272,9 +272,9 @@ extension EntryVoiceFlowTests {
         )
     }
 
-    func waitForHistory(_ model: EntryModel) async throws {
-        for _ in 0..<50 where model.output.voiceExamples(for: "").isEmpty {
-            try await Task.sleep(for: .milliseconds(20))
+    func waitForHistory(_ model: EntryModel) async {
+        await ObservationWait.until {
+            !model.output.voiceExamples(for: "").isEmpty
         }
     }
 
