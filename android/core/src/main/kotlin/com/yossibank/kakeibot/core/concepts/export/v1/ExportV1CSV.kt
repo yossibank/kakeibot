@@ -120,6 +120,8 @@ private fun kindTitle(kind: Entry.Kind): String = when (kind) {
     Entry.Kind.transfer -> "振替"
 }
 
+private val formulaPrefixes = setOf("=", "+", "-", "@")
+
 private val csvHeader = listOf(
     "日付",
     "種類",
@@ -136,7 +138,5 @@ private val byteOrderMark = byteArrayOf(
     0xBB.toByte(),
     0xBF.toByte(),
 )
-
-private val formulaPrefixes = setOf("=", "+", "-", "@")
 
 private const val adjustmentTitle = "調整"

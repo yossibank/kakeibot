@@ -144,44 +144,20 @@ private suspend fun AppDatabase.recalculateBill(
         entries = used,
     )
 
-    val bill = entryDao()
-        .ofRecurring(
-            recurringId = of.id.databaseValue,
-            earliest = on.scheduled.adding(days = -40).databaseValue,
-            latest = on.scheduled.adding(days = 40).databaseValue,
-        )
-        .map { it.decoded(EntryRecord::entry) }
-        .firstOrNull {
-            of.isRecorded(
-                by = it,
-                scheduled = on.scheduled,
-            )
-        }
+    val bill = recordedBill(
+        of = of,
+        on = on,
+    )
 
     if (bill == null) {
-        val changedIds = after.after.map { it.id }.toSet()
-        val previous = used.filter { it.id !in changedIds } + after.before
-
-        val previousAmount = of.amount(
-            paidOn = on.date,
-            entries = previous,
-        )
-
-        if (previousAmount != 0L || amount <= 0 || of.archivedAt != null) {
-            return CardBillChange()
-        }
-
-        val inserted = insertEntry(
+        return insertMissingBill(
             of = of,
             on = on,
+            used = used,
+            amount = amount,
+            after = after,
             at = at,
-        ) ?: return CardBillChange()
-
-        val fees = entryDao().fees(listOf(inserted.id.databaseValue)).map {
-            it.decoded(EntryRecord::entry)
-        }
-
-        return CardBillChange(after = listOf(inserted) + fees)
+        )
     }
 
     if (bill.updatedAt != bill.createdAt || bill.amount.toLong() == amount) {
@@ -207,6 +183,39 @@ private suspend fun AppDatabase.recalculateBill(
         before = listOf(bill),
         after = listOf(recalculated),
     )
+}
+
+private suspend fun AppDatabase.insertMissingBill(
+    of: Recurring,
+    on: Recurring.Occurrence,
+    used: List<Entry>,
+    amount: Long,
+    after: CardBillChange,
+    at: Instant,
+): CardBillChange {
+    val changedIds = after.after.map { it.id }.toSet()
+    val previous = used.filter { it.id !in changedIds } + after.before
+
+    val previousAmount = of.amount(
+        paidOn = on.date,
+        entries = previous,
+    )
+
+    if (previousAmount != 0L || amount <= 0 || of.archivedAt != null) {
+        return CardBillChange()
+    }
+
+    val inserted = insertEntry(
+        of = of,
+        on = on,
+        at = at,
+    ) ?: return CardBillChange()
+
+    val fees = entryDao().fees(listOf(inserted.id.databaseValue)).map {
+        it.decoded(EntryRecord::entry)
+    }
+
+    return CardBillChange(after = listOf(inserted) + fees)
 }
 
 private fun Recurring.occurrences(

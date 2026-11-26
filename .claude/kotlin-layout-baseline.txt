@@ -1,13 +1,1 @@
-android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportJson.kt: K8: 1 つの関数は 60 行までにする
-android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/export/v1/ExportV1CSV.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
-android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePaletteContrast.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
-android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/theme/ThemePreset.kt: K8: 1 つの関数は 60 行までにする
-android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceText.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
-android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
-android/core/src/main/kotlin/com/yossibank/kakeibot/core/concepts/voice/VoiceTextNumber.kt: K8: 1 つの関数は 60 行までにする
 android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/voice/EntryVoiceFlow.kt: K3: 画面のモデルの値は、state・input・output・dependencies の順に並べる
-android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/queries/types/MonthOverview.kt: K6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
-android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseCardBill.kt: K8: 1 つの関数は 60 行までにする
-android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseEntryCategory.kt: K8: 1 つの関数は 60 行までにする
-android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/methods/AppDatabaseRecurringEntries.kt: K8: 1 つの関数は 60 行までにする
-android/store/src/commonMain/kotlin/com/yossibank/kakeibot/store/writes/types/DeletionSubject.kt: K8: 1 つの関数は 60 行までにする
