@@ -111,41 +111,8 @@ private extension ReviewSharesCard {
                 IconBadge(share.icon, size: 26)
             }
 
-            ZStack(alignment: .leading) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(verbatim: " ")
-                        .textFont(.subheadline)
-
-                    Text(verbatim: " ")
-                        .textFont(.caption)
-                }
-                .hidden()
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(share.name)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
-                        .sharedTextScale()
-
-                    if percent != nil || share.usage != nil {
-                        HStack(spacing: 8) {
-                            if let percent {
-                                Text(percent)
-                                    .textFont(.caption)
-                                    .monospacedDigit()
-                                    .foregroundStyle(Palette.subtext)
-                                    .lineLimit(1)
-                                    .fixedSize()
-                            }
-
-                            if let usage = share.usage {
-                                BudgetUsageBar(usage)
-                            }
-                        }
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            labelName(share, percent: percent)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             VStack(alignment: .trailing, spacing: 2) {
                 AmountText(share.amount, type: type, font: .size(.body))
@@ -165,6 +132,46 @@ private extension ReviewSharesCard {
             DisclosureMark()
         }
         .contentShape(.rect)
+    }
+
+    func labelName(
+        _ share: ReviewModel.Share,
+        percent: String?
+    ) -> some View {
+        ZStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(verbatim: " ")
+                    .textFont(.subheadline)
+
+                Text(verbatim: " ")
+                    .textFont(.caption)
+            }
+            .hidden()
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(share.name)
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+                    .sharedTextScale()
+
+                if percent != nil || share.usage != nil {
+                    HStack(spacing: 8) {
+                        if let percent {
+                            Text(percent)
+                                .textFont(.caption)
+                                .monospacedDigit()
+                                .foregroundStyle(Palette.subtext)
+                                .lineLimit(1)
+                                .fixedSize()
+                        }
+
+                        if let usage = share.usage {
+                            BudgetUsageBar(usage)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -38,83 +38,10 @@ public struct EntryRow: View {
 
     public var body: some View {
         HStack(spacing: 12) {
-            if icon == nil,
-               type == .transfer {
-                Image(systemName: "arrow.left.arrow.right")
-                    .sansFont(.small, weight: .light)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 28, height: 28)
-            } else if let icon {
-                IconBadge(icon, size: 28)
-            } else {
-                Color.clear
-                    .frame(width: 28, height: 28)
-            }
+            leadingIcon
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(title)
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.text)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .layoutPriority(1)
-
-                    if isRecurring {
-                        Image(systemName: "repeat")
-                            .sansFont(.caption, weight: .semibold)
-                            .foregroundStyle(Palette.accent.opacity(.strong))
-                    }
-                }
-
-                if let tag {
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 8) {
-                            tagCard(tag)
-
-                            if let detail {
-                                detailText(detail)
-                                    .fixedSize()
-                            }
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            if let detail {
-                                detailText(detail)
-                            }
-
-                            tagCard(tag)
-                        }
-                    }
-                } else if let detailMemo {
-                    ViewThatFits(in: .horizontal) {
-                        HStack(alignment: .firstTextBaseline, spacing: 8) {
-                            detailText(detailMemo.detail)
-                                .fixedSize()
-
-                            EntryMemo(detailMemo.memo)
-                                .fixedSize()
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            detailText(detailMemo.detail)
-
-                            EntryMemo(detailMemo.memo)
-                        }
-                    }
-                } else if let detail {
-                    detailText(detail)
-                }
-
-                if let route {
-                    EntryRoute(source: route.source, destination: route.destination)
-                }
-
-                if let memo, tag != nil || detail == nil || route != nil {
-                    EntryMemo(memo)
-                }
-            }
-            .padding(.vertical, rowSpacing.padding)
+            texts
+                .padding(.vertical, rowSpacing.padding)
 
             Spacer(minLength: 8)
 
@@ -151,6 +78,93 @@ private extension EntryRow {
 }
 
 private extension EntryRow {
+    @ViewBuilder
+    var leadingIcon: some View {
+        if icon == nil,
+           type == .transfer {
+            Image(systemName: "arrow.left.arrow.right")
+                .sansFont(.small, weight: .light)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 28, height: 28)
+        } else if let icon {
+            IconBadge(icon, size: 28)
+        } else {
+            Color.clear
+                .frame(width: 28, height: 28)
+        }
+    }
+
+    var texts: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(title)
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.text)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
+
+                if isRecurring {
+                    Image(systemName: "repeat")
+                        .sansFont(.caption, weight: .semibold)
+                        .foregroundStyle(Palette.accent.opacity(.strong))
+                }
+            }
+
+            details
+
+            if let route {
+                EntryRoute(source: route.source, destination: route.destination)
+            }
+
+            if let memo, tag != nil || detail == nil || route != nil {
+                EntryMemo(memo)
+            }
+        }
+    }
+
+    @ViewBuilder
+    var details: some View {
+        if let tag {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    tagCard(tag)
+
+                    if let detail {
+                        detailText(detail)
+                            .fixedSize()
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    if let detail {
+                        detailText(detail)
+                    }
+
+                    tagCard(tag)
+                }
+            }
+        } else if let detailMemo {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    detailText(detailMemo.detail)
+                        .fixedSize()
+
+                    EntryMemo(detailMemo.memo)
+                        .fixedSize()
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    detailText(detailMemo.detail)
+
+                    EntryMemo(detailMemo.memo)
+                }
+            }
+        } else if let detail {
+            detailText(detail)
+        }
+    }
+
     func tagCard(_ tag: String) -> some View {
         TagCard(tag, size: .small)
             .sharesTextScale(id: tag)

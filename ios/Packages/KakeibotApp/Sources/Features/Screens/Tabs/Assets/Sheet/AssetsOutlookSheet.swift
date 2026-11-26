@@ -200,29 +200,39 @@ private extension AssetsOutlookSheet {
 
             Spacer(minLength: 8)
 
-            VStack(alignment: .trailing, spacing: 4) {
-                AmountText(
-                    change,
-                    font: .size(.body),
-                    sign: .plus,
-                    color: change > 0 ? Palette.accent : Palette.accentStrong
-                )
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-
-                if let balance {
-                    Text("残り \(Yen.text(balance))")
-                        .textFont(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(balance < 0 ? Palette.rose : Palette.subtext)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-            }
+            rowAmount(
+                change: change,
+                balance: balance
+            )
             .layoutPriority(1)
         }
         .frame(minHeight: rowSpacing.minHeight)
         .contentShape(.rect)
+    }
+
+    func rowAmount(
+        change: Int,
+        balance: Int?
+    ) -> some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            AmountText(
+                change,
+                font: .size(.body),
+                sign: .plus,
+                color: change > 0 ? Palette.accent : Palette.accentStrong
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+
+            if let balance {
+                Text("残り \(Yen.text(balance))")
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(balance < 0 ? Palette.rose : Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
     }
 }
 

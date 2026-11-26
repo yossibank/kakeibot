@@ -6,50 +6,11 @@ import SwiftUI
 extension EntryItemSheet {
     var receipt: some View {
         VStack(spacing: 12) {
-            VStack(spacing: 2) {
-                Text(dateText)
-                    .textFont(.footnote)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-
-                TextField(
-                    "店名",
-                    text: Bindable(model.state).store,
-                    prompt: Text("店名を入れる").foregroundStyle(Palette.hint)
-                )
-                .textFont(.subheadline, weight: .semibold)
-                .foregroundStyle(Palette.text)
-                .multilineTextAlignment(.center)
-                .tint(Palette.accent)
-                .submitLabel(.done)
-                .focused($focus, equals: .store)
-            }
+            receiptHeader
 
             EntryReceiptRule(style: .dashed)
 
-            if model.state.items.list.isEmpty {
-                VStack(spacing: 4) {
-                    Text("品目はまだありません")
-                        .textFont(.subheadline)
-                        .foregroundStyle(Palette.subtext)
-
-                    Text("下の「品目を追加」から追加できます。")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.hint)
-                }
-                .frame(maxWidth: .infinity, minHeight: 72)
-            } else {
-                VStack(spacing: 0) {
-                    ForEach(
-                        Array(model.state.items.list.enumerated()),
-                        id: \.offset
-                    ) { index, item in
-                        itemRow(item, at: index)
-                            .id(index)
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                    }
-                }
-            }
+            receiptItems
 
             EntryReceiptRule(style: .dashed)
 
@@ -76,35 +37,10 @@ extension EntryItemSheet {
 
             EntryReceiptRule(style: .double)
 
-            HStack(alignment: .firstTextBaseline) {
-                Text("合計")
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.text)
-
-                Spacer()
-
-                AmountText(
-                    model.output.amount,
-                    font: .size(.title, weight: .bold),
-                    color: Palette.accentStrong
-                )
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-            }
+            receiptTotal
 
             if !model.state.items.list.isEmpty {
-                HStack {
-                    Text("お買上点数")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-
-                    Spacer()
-
-                    Text("\(model.output.itemCount)点")
-                        .textFont(.caption)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                }
+                receiptCount
             }
         }
         .padding(.horizontal, 20)
@@ -206,28 +142,7 @@ extension EntryItemSheet {
             remove(index)
         } content: {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                VStack(alignment: .leading, spacing: 1) {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(item.trimmedName)
-                            .textFont(.subheadline)
-                            .foregroundStyle(isNegative ? Palette.rose : Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-
-                        if showsRates, let rate = item.taxRate {
-                            EntryReceiptTaxRateBadge(rate: rate)
-                        }
-                    }
-
-                    if let quantity = EntryModel.quantityText(for: item) {
-                        Text(quantity)
-                            .textFont(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                    }
-                }
-                .padding(.leading, isNegative ? Self.discountIndent : 0)
-                .layoutPriority(1)
+                itemText(item, isNegative: isNegative)
 
                 EntryReceiptLeader()
 
@@ -241,23 +156,7 @@ extension EntryItemSheet {
             .padding(.vertical, 8)
             .padding(.horizontal, 4)
             .background {
-                ZStack {
-                    Rectangle()
-                        .fill(Palette.paper)
-
-                    if isEditing {
-                        Rectangle()
-                            .fill(Palette.accent.opacity(.subtle))
-                    } else if isSuspect {
-                        Rectangle()
-                            .fill(Palette.amber.opacity(.subtle))
-                            .overlay(alignment: .leading) {
-                                Rectangle()
-                                    .fill(Palette.amber)
-                                    .frame(width: 2)
-                            }
-                    }
-                }
+                itemBackground(isEditing: isEditing, isSuspect: isSuspect)
             }
         }
         .padding(.horizontal, -4)
@@ -275,6 +174,140 @@ extension EntryItemSheet {
             Spacer()
 
             AmountText(amount, font: .style(.subheadline), color: Palette.text)
+        }
+    }
+}
+
+private extension EntryItemSheet {
+    var receiptHeader: some View {
+        VStack(spacing: 2) {
+            Text(dateText)
+                .textFont(.footnote)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            TextField(
+                "店名",
+                text: Bindable(model.state).store,
+                prompt: Text("店名を入れる").foregroundStyle(Palette.hint)
+            )
+            .textFont(.subheadline, weight: .semibold)
+            .foregroundStyle(Palette.text)
+            .multilineTextAlignment(.center)
+            .tint(Palette.accent)
+            .submitLabel(.done)
+            .focused($focus, equals: .store)
+        }
+    }
+
+    @ViewBuilder
+    var receiptItems: some View {
+        if model.state.items.list.isEmpty {
+            VStack(spacing: 4) {
+                Text("品目はまだありません")
+                    .textFont(.subheadline)
+                    .foregroundStyle(Palette.subtext)
+
+                Text("下の「品目を追加」から追加できます。")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.hint)
+            }
+            .frame(maxWidth: .infinity, minHeight: 72)
+        } else {
+            VStack(spacing: 0) {
+                ForEach(
+                    Array(model.state.items.list.enumerated()),
+                    id: \.offset
+                ) { index, item in
+                    itemRow(item, at: index)
+                        .id(index)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+        }
+    }
+
+    var receiptTotal: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text("合計")
+                .textFont(.subheadline, weight: .semibold)
+                .foregroundStyle(Palette.text)
+
+            Spacer()
+
+            AmountText(
+                model.output.amount,
+                font: .size(.title, weight: .bold),
+                color: Palette.accentStrong
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+        }
+    }
+
+    var receiptCount: some View {
+        HStack {
+            Text("お買上点数")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            Text("\(model.output.itemCount)点")
+                .textFont(.caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+        }
+    }
+
+    func itemText(
+        _ item: EntryItem.Draft,
+        isNegative: Bool
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(item.trimmedName)
+                    .textFont(.subheadline)
+                    .foregroundStyle(isNegative ? Palette.rose : Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                if showsRates, let rate = item.taxRate {
+                    EntryReceiptTaxRateBadge(rate: rate)
+                }
+            }
+
+            if let quantity = EntryModel.quantityText(for: item) {
+                Text(quantity)
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+            }
+        }
+        .padding(.leading, isNegative ? Self.discountIndent : 0)
+        .layoutPriority(1)
+    }
+
+    func itemBackground(
+        isEditing: Bool,
+        isSuspect: Bool
+    ) -> some View {
+        ZStack {
+            Rectangle()
+                .fill(Palette.paper)
+
+            if isEditing {
+                Rectangle()
+                    .fill(Palette.accent.opacity(.subtle))
+            } else if isSuspect {
+                Rectangle()
+                    .fill(Palette.amber.opacity(.subtle))
+                    .overlay(alignment: .leading) {
+                        Rectangle()
+                            .fill(Palette.amber)
+                            .frame(width: 2)
+                    }
+            }
         }
     }
 }

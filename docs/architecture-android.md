@@ -139,7 +139,8 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | `featuremodels/shared/model/` の `ScreenParts` | DB・時計・記録の一覧の見張りを包んで、画面からモデルへ渡す。DB と見張りは `internal` で、`:app` から読めない |
 | `ScreenParts` を作る所 | `AppModel` が DB を開いた時に作り、`RootView` が `MainView` に渡す。画面は、子の画面とモデルへそのまま渡す |
 | `ScreenPartsShared` | 記録の一覧の見張りを 1 本にまとめた `ScreenParts` を作る。`MainView` が持ち、消える時に止める |
-| `:store` の型 | 画面は名前を書かず、モデルの値と関数に通す。固定費の編集の結果は、`RecurringListModel` の `finishEditing` が受ける |
+| `:store` の型 | 画面は名前を書かず、モデルの値と関数に通す |
+| `:store` の型の別名 | 画面が名前を書く型は、`:featuremodels` に別名を置く。例は、削除の取り消しに使う `Deletion` である |
 | `make verify` の `android-features-no-store` | `features/` の下の `:store` の import を、grep で止める |
 
 `appfeature/` と `notifications/` は、`:store` を import してよい。`:app` の依存に `:store` を残すのは、このためである。

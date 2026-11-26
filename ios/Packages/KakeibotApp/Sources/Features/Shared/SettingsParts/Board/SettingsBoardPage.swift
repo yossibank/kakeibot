@@ -22,6 +22,50 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
         let hiding = prompt?.hidingId
         let deleting = prompt?.deletingId
 
+        screen
+            .settingsSharesTextScale(spec.scaleID(in: model))
+            .navigationDestination(item: Bindable(model.state).shown.destination) { destination in
+                editor(for: destination)
+            }
+            .settingsConfirmation(
+                item(hiding).flatMap { spec.hideConfirmation(of: $0, in: model) },
+                isPresented: isAsking(hiding.map(Prompt.hide))
+            ) {
+                if let hiding {
+                    controller.hide(hiding)
+                }
+            }
+            .settingsConfirmation(
+                item(deleting).flatMap { spec.deleteConfirmation(of: $0, in: model) },
+                isPresented: isAsking(deleting.map(Prompt.delete))
+            ) {
+                if let item = item(deleting) {
+                    confirmDelete(item)
+                }
+            }
+            .settingsDeleteHiddenConfirmation(
+                isPresented: isAsking(prompt == .deleteHidden ? prompt : nil),
+                title: spec.deleteHiddenTitle,
+                message: spec.deleteHiddenMessage
+            ) {
+                controller.deleteHidden()
+            }
+            .task {
+                await model.observe()
+            }
+    }
+}
+
+private extension SettingsBoardPage {
+    struct Layout {
+        var width: CGFloat = 0
+    }
+
+    typealias Prompt = SettingsBoardPrompt<Spec.Model.Item.ID>
+}
+
+private extension SettingsBoardPage {
+    var screen: some View {
         SettingsBoardScreen(
             title: spec.title,
             hint: hint,
@@ -51,48 +95,8 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
         } floatingTile: { id in
             floatingTile(id)
         }
-        .settingsSharesTextScale(spec.scaleID(in: model))
-        .navigationDestination(item: Bindable(model.state).shown.destination) { destination in
-            editor(for: destination)
-        }
-        .settingsConfirmation(
-            item(hiding).flatMap { spec.hideConfirmation(of: $0, in: model) },
-            isPresented: isAsking(hiding.map(Prompt.hide))
-        ) {
-            if let hiding {
-                controller.hide(hiding)
-            }
-        }
-        .settingsConfirmation(
-            item(deleting).flatMap { spec.deleteConfirmation(of: $0, in: model) },
-            isPresented: isAsking(deleting.map(Prompt.delete))
-        ) {
-            if let item = item(deleting) {
-                confirmDelete(item)
-            }
-        }
-        .settingsDeleteHiddenConfirmation(
-            isPresented: isAsking(prompt == .deleteHidden ? prompt : nil),
-            title: spec.deleteHiddenTitle,
-            message: spec.deleteHiddenMessage
-        ) {
-            controller.deleteHidden()
-        }
-        .task {
-            await model.observe()
-        }
-    }
-}
-
-private extension SettingsBoardPage {
-    struct Layout {
-        var width: CGFloat = 0
     }
 
-    typealias Prompt = SettingsBoardPrompt<Spec.Model.Item.ID>
-}
-
-private extension SettingsBoardPage {
     @ViewBuilder
     var board: some View {
         switch spec.layout {

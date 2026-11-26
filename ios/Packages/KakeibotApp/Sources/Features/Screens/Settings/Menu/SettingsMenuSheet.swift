@@ -50,36 +50,7 @@ public struct SettingsMenuSheet: View {
                 SettingsBackHeader("設定")
                     .environment(\.isSettingsSheetRoot, true)
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        recordSection
-
-                        budgetSection
-
-                        if model.input.usesFun == true {
-                            funSection
-                        }
-
-                        homeSection
-
-                        lookSection
-
-                        dataSection
-
-                        aboutSection
-
-                        proSection
-
-                        #if DEBUG
-                        sampleSection
-                        #endif
-
-                        versionText
-                            .padding(.top, 8)
-                    }
-                    .padding(.bottom, 24)
-                }
-                .scrollIndicators(.hidden)
+                sections
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
@@ -117,6 +88,41 @@ public struct SettingsMenuSheet: View {
         .task {
             await model.loadAuthorization(permission)
         }
+    }
+}
+
+private extension SettingsMenuSheet {
+    var sections: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                recordSection
+
+                budgetSection
+
+                if model.input.usesFun == true {
+                    funSection
+                }
+
+                homeSection
+
+                lookSection
+
+                dataSection
+
+                aboutSection
+
+                proSection
+
+                #if DEBUG
+                sampleSection
+                #endif
+
+                versionText
+                    .padding(.top, 8)
+            }
+            .padding(.bottom, 24)
+        }
+        .scrollIndicators(.hidden)
     }
 }
 

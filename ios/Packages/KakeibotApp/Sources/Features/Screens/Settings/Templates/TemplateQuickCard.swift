@@ -42,31 +42,37 @@ struct TemplateQuickCard: View {
                 }
             }
 
-            SettingsFormSection(
-                model.output.walletTitle,
-                value: model.output.selectedWallet?.name,
-                valueIcon: model.output.selectedWallet.flatMap(model.output.icon(for:))
-            ) {
-                VStack(alignment: .leading, spacing: 12) {
-                    SettingsPagedGrid(
-                        items: model.output.wallets,
-                        selected: model.state.walletId,
-                        columns: 2,
-                        rows: 3,
-                        spacing: 8
-                    ) { wallet in
-                        SettingsWalletTile(
-                            wallet: wallet,
-                            icon: model.output.icon(for: wallet),
-                            isSelected: model.state.walletId == wallet.id
-                        ) {
-                            model.state.setWallet(wallet.id)
-                        }
-                    }
+            walletSection
+        }
+    }
+}
 
-                    if model.output.billRecurring != nil {
-                        SettingsBillShiftPicker(shift: Bindable(model.state).billShift, dates: [])
+private extension TemplateQuickCard {
+    var walletSection: some View {
+        SettingsFormSection(
+            model.output.walletTitle,
+            value: model.output.selectedWallet?.name,
+            valueIcon: model.output.selectedWallet.flatMap(model.output.icon(for:))
+        ) {
+            VStack(alignment: .leading, spacing: 12) {
+                SettingsPagedGrid(
+                    items: model.output.wallets,
+                    selected: model.state.walletId,
+                    columns: 2,
+                    rows: 3,
+                    spacing: 8
+                ) { wallet in
+                    SettingsWalletTile(
+                        wallet: wallet,
+                        icon: model.output.icon(for: wallet),
+                        isSelected: model.state.walletId == wallet.id
+                    ) {
+                        model.state.setWallet(wallet.id)
                     }
+                }
+
+                if model.output.billRecurring != nil {
+                    SettingsBillShiftPicker(shift: Bindable(model.state).billShift, dates: [])
                 }
             }
         }

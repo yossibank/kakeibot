@@ -18,20 +18,7 @@ public extension AppDatabase {
         at now: Date
     ) async throws -> Deletion {
         try await writer.write { db in
-            guard let wallet = try Wallet.fetchOne(db, key: id) else {
-                throw WalletWriteError.walletNotFound
-            }
-
-            let entries = Entry.filter(Column("wallet_id") == id || Column("to_wallet_id") == id)
-
-            if try entries.fetchCount(db) > 0 {
-                throw WalletWriteError.hasEntries
-            }
-
-            if wallet.archivedAt == nil,
-               try Self.shownWalletCount(in: db) <= 1 {
-                throw WalletWriteError.lastShownWallet
-            }
+            let wallet = try Self.deletableWallet(id, in: db)
 
             let recurrings = Recurring.filter(
                 Column("wallet_id") == id || Column("to_wallet_id") == id
@@ -106,5 +93,29 @@ extension AppDatabase {
 
     static func shownWalletCount(in db: Database) throws -> Int {
         try Wallet.filter(Column("archived_at") == nil).fetchCount(db)
+    }
+}
+
+private extension AppDatabase {
+    static func deletableWallet(
+        _ id: Wallet.ID,
+        in db: Database
+    ) throws -> Wallet {
+        guard let wallet = try Wallet.fetchOne(db, key: id) else {
+            throw WalletWriteError.walletNotFound
+        }
+
+        let entries = Entry.filter(Column("wallet_id") == id || Column("to_wallet_id") == id)
+
+        if try entries.fetchCount(db) > 0 {
+            throw WalletWriteError.hasEntries
+        }
+
+        if wallet.archivedAt == nil,
+           try shownWalletCount(in: db) <= 1 {
+            throw WalletWriteError.lastShownWallet
+        }
+
+        return wallet
     }
 }

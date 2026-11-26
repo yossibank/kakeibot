@@ -9,45 +9,11 @@ struct ProHero: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 26, weight: .light))
-                .foregroundStyle(Self.gold)
-                .frame(width: 56, height: 56)
-                .overlay {
-                    Circle()
-                        .stroke(Self.gold, lineWidth: 1)
-                }
+            emblem
 
-            VStack(spacing: 4) {
-                Text("かけいぼっと Pro")
-                    .displayFont(.title, weight: .medium)
-                    .foregroundStyle(Self.gold)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+            titles
 
-                Text("毎日の家計簿を、もっと手軽に、自分らしく")
-                    .textFont(.caption)
-                    .foregroundStyle(.white.opacity(0.75))
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                if let price {
-                    Text(price)
-                        .displayFont(.largeTitle, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(.white)
-                }
-
-                Text("買い切り")
-                    .textFont(.caption, weight: .semibold)
-                    .tracking(2)
-                    .foregroundStyle(Self.ink)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Self.gold, in: .capsule)
-            }
+            priceTag
 
             RowOrColumnLayout(rowSpacing: 12, columnSpacing: 8) {
                 promises
@@ -72,6 +38,52 @@ struct ProHero: View {
 }
 
 private extension ProHero {
+    var emblem: some View {
+        Image(systemName: "sparkles")
+            .font(.system(size: 26, weight: .light))
+            .foregroundStyle(Self.gold)
+            .frame(width: 56, height: 56)
+            .overlay {
+                Circle()
+                    .stroke(Self.gold, lineWidth: 1)
+            }
+    }
+
+    var titles: some View {
+        VStack(spacing: 4) {
+            Text("かけいぼっと Pro")
+                .displayFont(.title, weight: .medium)
+                .foregroundStyle(Self.gold)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+
+            Text("毎日の家計簿を、もっと手軽に、自分らしく")
+                .textFont(.caption)
+                .foregroundStyle(.white.opacity(0.75))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    var priceTag: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            if let price {
+                Text(price)
+                    .displayFont(.largeTitle, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            }
+
+            Text("買い切り")
+                .textFont(.caption, weight: .semibold)
+                .tracking(2)
+                .foregroundStyle(Self.ink)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Self.gold, in: .capsule)
+        }
+    }
+
     var promises: some View {
         ForEach(Self.promiseTitles, id: \.self) { title in
             Label(title, systemImage: "checkmark")

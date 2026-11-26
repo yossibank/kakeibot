@@ -13,6 +13,59 @@ extension ReceiptLine {
         let words = text.filter { !$0.isWhitespace }
         let letters = text.lowercased().filter(\.isLetter)
 
+        if let kind = leadingKind(of: text, letters: letters) {
+            return kind
+        }
+
+        guard words.contains(where: { !$0.isNumber && !numberJoints.contains($0) }) else {
+            return .skip
+        }
+
+        if let quantity = quantity(in: text) {
+            return quantity.unit > 0 ? .quantity(quantity) : .skip
+        }
+
+        let amount = amount(in: text)
+
+        if let kind = summaryKind(of: text, words: words, amount: amount) {
+            return kind
+        }
+
+        if stopWords.contains(where: words.contains) {
+            return .stop
+        }
+
+        return itemKind(of: text, words: words, amount: amount)
+    }
+
+    static func isTitle(_ letters: String) -> Bool {
+        titleWords.contains(letters) || (letters.count == 3 && letters.hasPrefix("領収"))
+    }
+
+    static func isTax(_ words: String) -> Bool {
+        words.contains("消費税") || words.contains("税額") || words.contains("外税")
+            || (words.contains("外") && words.contains("%"))
+    }
+
+    static func date(in text: String) -> LocalDate? {
+        guard
+            let match = text.firstMatch(of: datePattern),
+            let year = Int(match.year),
+            let month = Int(match.month),
+            let day = Int(match.day)
+        else {
+            return nil
+        }
+
+        return LocalDate(year: year, month: month, day: day)
+    }
+}
+
+private extension ReceiptLine {
+    static func leadingKind(
+        of text: String,
+        letters: String
+    ) -> Kind? {
         if let price = price(in: text) {
             return .item(price)
         }
@@ -37,16 +90,14 @@ extension ReceiptLine {
             return .code(isReduced: text.contains(where: reducedMarks.contains))
         }
 
-        guard words.contains(where: { !$0.isNumber && !numberJoints.contains($0) }) else {
-            return .skip
-        }
+        return nil
+    }
 
-        if let quantity = quantity(in: text) {
-            return quantity.unit > 0 ? .quantity(quantity) : .skip
-        }
-
-        let amount = amount(in: text)
-
+    static func summaryKind(
+        of text: String,
+        words: String,
+        amount: Amount?
+    ) -> Kind? {
         if totalWords.contains(where: words.contains), !words.contains("小計"),
            !words.contains("点数") {
             return amount.map { .total($0.value) } ?? .skip
@@ -69,10 +120,14 @@ extension ReceiptLine {
             )
         }
 
-        if stopWords.contains(where: words.contains) {
-            return .stop
-        }
+        return nil
+    }
 
+    static func itemKind(
+        of text: String,
+        words: String,
+        amount: Amount?
+    ) -> Kind {
         let bare = itemWords.reduce(text.replacing(taxNotePattern, with: "")) {
             $0.replacing($1, with: "")
         }
@@ -97,27 +152,5 @@ extension ReceiptLine {
         }
 
         return .item(amount)
-    }
-
-    static func isTitle(_ letters: String) -> Bool {
-        titleWords.contains(letters) || (letters.count == 3 && letters.hasPrefix("領収"))
-    }
-
-    static func isTax(_ words: String) -> Bool {
-        words.contains("消費税") || words.contains("税額") || words.contains("外税")
-            || (words.contains("外") && words.contains("%"))
-    }
-
-    static func date(in text: String) -> LocalDate? {
-        guard
-            let match = text.firstMatch(of: datePattern),
-            let year = Int(match.year),
-            let month = Int(match.month),
-            let day = Int(match.day)
-        else {
-            return nil
-        }
-
-        return LocalDate(year: year, month: month, day: day)
     }
 }

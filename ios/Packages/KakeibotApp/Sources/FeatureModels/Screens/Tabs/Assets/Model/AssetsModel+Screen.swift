@@ -6,7 +6,7 @@ public extension AssetsModel {
         case unpaid([WalletRow])
     }
 
-    enum Sheet: Equatable, Identifiable {
+    enum Sheet: Equatable {
         case reward
         case newGoal
         case newWallet(Wallet.Kind)
@@ -50,20 +50,6 @@ public extension AssetsModel.Sheet {
         case outlook
         case moved(Recurring.ID)
         case unpaid
-    }
-}
-
-public extension AssetsModel.Sheet {
-    var id: Key {
-        switch self {
-        case .reward: .reward
-        case .newGoal: .newGoal
-        case let .newWallet(kind): .newWallet(kind)
-        case let .adjustment(row): .adjustment(row.id)
-        case .outlook: .outlook
-        case let .entries(.moved(bill)): .moved(bill.id)
-        case .entries(.unpaid): .unpaid
-        }
     }
 }
 
@@ -126,5 +112,19 @@ public extension AssetsModel.State {
         self.pending = nil
 
         return pending
+    }
+}
+
+extension AssetsModel.Sheet: Identifiable {
+    public var id: Key {
+        switch self {
+        case .reward: .reward
+        case .newGoal: .newGoal
+        case let .newWallet(kind): .newWallet(kind)
+        case let .adjustment(row): .adjustment(row.id)
+        case .outlook: .outlook
+        case let .entries(.moved(bill)): .moved(bill.id)
+        case .entries(.unpaid): .unpaid
+        }
     }
 }

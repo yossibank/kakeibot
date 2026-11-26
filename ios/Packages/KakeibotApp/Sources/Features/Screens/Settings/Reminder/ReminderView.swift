@@ -28,32 +28,7 @@ public struct ReminderView: View {
                 hint: hint
             )
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    VStack(spacing: 12) {
-                        hero
-
-                        if model.output.isDenied {
-                            NotificationDeniedBanner()
-                                .transition(.opacity)
-                        }
-                    }
-
-                    if model.output.isOn {
-                        timeSection
-                            .transition(.opacity)
-
-                        previewSection
-                            .transition(.opacity)
-                    }
-
-                    if !model.output.upcomingNotices.isEmpty {
-                        recurringSection
-                    }
-                }
-                .padding(.vertical, 8)
-            }
-            .scrollIndicators(.hidden)
+            sections
         }
         .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
         .animation(.snappy, value: model.input.time)
@@ -85,6 +60,35 @@ extension ReminderView {
 }
 
 private extension ReminderView {
+    var sections: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: SettingsSpacing.section) {
+                VStack(spacing: 12) {
+                    hero
+
+                    if model.output.isDenied {
+                        NotificationDeniedBanner()
+                            .transition(.opacity)
+                    }
+                }
+
+                if model.output.isOn {
+                    timeSection
+                        .transition(.opacity)
+
+                    previewSection
+                        .transition(.opacity)
+                }
+
+                if !model.output.upcomingNotices.isEmpty {
+                    recurringSection
+                }
+            }
+            .padding(.vertical, 8)
+        }
+        .scrollIndicators(.hidden)
+    }
+
     var hero: some View {
         VStack(spacing: 12) {
             Image(systemName: bellImage)

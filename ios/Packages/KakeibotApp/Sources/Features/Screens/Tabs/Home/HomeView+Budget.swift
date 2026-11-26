@@ -6,125 +6,11 @@ import SwiftUI
 extension HomeView {
     var dialCard: some View {
         VStack(spacing: 16) {
-            ZStack(alignment: .bottom) {
-                HalfDial(progress: dialProgress, tint: dialTint)
+            dialGauge
 
-                VStack(spacing: 2) {
-                    Text(dialTitle)
-                        .textFont(size: .caption)
-                        .tracking(4)
-                        .foregroundStyle(Palette.accent)
+            dialLinks
 
-                    Text(dialAmount)
-                        .displayFont(.display, weight: .bold)
-                        .monospacedDigit()
-                        .foregroundStyle(dialAmountColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                        .contentTransition(.numericText())
-                }
-                .padding(.horizontal, 32)
-            }
-            .frame(maxWidth: 290)
-            .animation(.snappy, value: model.output.budgetUsage)
-
-            VStack(spacing: 4) {
-                if let usage = model.output.budgetUsage {
-                    VStack(spacing: 4) {
-                        if !model.input.isListFailed,
-                           let warning = usage.warningText {
-                            Text(warning)
-                                .textFont(.caption, weight: .semibold)
-                                .foregroundStyle(usage.tint)
-                        }
-
-                        Button {
-                            onOpenSetup(.budget)
-                        } label: {
-                            HStack(spacing: 4) {
-                                Text(usage.budgetText)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-
-                                DisclosureMark(.link)
-                            }
-                            .textFont(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .padding(.vertical, 4)
-                            .tapArea(budgetLinkTapOutsets)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                } else {
-                    Button {
-                        onOpenSetup(.budget)
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text("予算を決めると、あといくら使えるかが出ます")
-
-                            DisclosureMark(.link)
-                        }
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                        .frame(minHeight: 32)
-                        .tapArea(budgetHintTapOutsets)
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                if hasRecurringRow {
-                    Button(action: onOpenRecurrings) {
-                        ViewThatFits(in: .horizontal) {
-                            recurringLabel(recurringText(title: "今月の固定費"))
-
-                            recurringLabel(recurringText(title: "固定費"))
-                                .minimumScaleFactor(0.8)
-                        }
-                        .textFont(.caption2)
-                        .monospacedDigit()
-                        .foregroundStyle(Palette.subtext)
-                        .padding(.bottom, 12)
-                        .overlay(alignment: .bottom) {
-                            RatioBar(model.output.paidRecurringRatio, tint: Palette.accent)
-                        }
-                        .padding(.vertical, 4)
-                        .tapArea(Self.recurringLinkTapOutsets)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-
-            HStack(spacing: 0) {
-                stat(
-                    "今日の支出",
-                    amount: model.output.todayExpense,
-                    type: .expense
-                )
-
-                divider
-
-                stat(
-                    model.output.middleTitle,
-                    amount: model.output.middleAmount,
-                    type: .expense
-                )
-
-                divider
-
-                stat(
-                    "今月の収入",
-                    amount: model.output.monthIncome,
-                    type: .income
-                )
-            }
-            .sharesTextScale(id: statAmounts)
-            .padding(.top, 12)
-            .overlay(alignment: .top) {
-                Rectangle()
-                    .fill(Palette.accent.opacity(.soft))
-                    .frame(height: 1)
-            }
+            dialStats
         }
         .padding(16)
         .padding(.top, 4)
@@ -133,6 +19,141 @@ extension HomeView {
 }
 
 private extension HomeView {
+    var dialGauge: some View {
+        ZStack(alignment: .bottom) {
+            HalfDial(progress: dialProgress, tint: dialTint)
+
+            VStack(spacing: 2) {
+                Text(dialTitle)
+                    .textFont(size: .caption)
+                    .tracking(4)
+                    .foregroundStyle(Palette.accent)
+
+                Text(dialAmount)
+                    .displayFont(.display, weight: .bold)
+                    .monospacedDigit()
+                    .foregroundStyle(dialAmountColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .contentTransition(.numericText())
+            }
+            .padding(.horizontal, 32)
+        }
+        .frame(maxWidth: 290)
+        .animation(.snappy, value: model.output.budgetUsage)
+    }
+
+    var dialLinks: some View {
+        VStack(spacing: 4) {
+            budgetLink
+
+            if hasRecurringRow {
+                recurringLink
+            }
+        }
+    }
+
+    @ViewBuilder
+    var budgetLink: some View {
+        if let usage = model.output.budgetUsage {
+            VStack(spacing: 4) {
+                if !model.input.isListFailed,
+                   let warning = usage.warningText {
+                    Text(warning)
+                        .textFont(.caption, weight: .semibold)
+                        .foregroundStyle(usage.tint)
+                }
+
+                Button {
+                    onOpenSetup(.budget)
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(usage.budgetText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+
+                        DisclosureMark(.link)
+                    }
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .padding(.vertical, 4)
+                    .tapArea(budgetLinkTapOutsets)
+                }
+                .buttonStyle(.plain)
+            }
+        } else {
+            Button {
+                onOpenSetup(.budget)
+            } label: {
+                HStack(spacing: 4) {
+                    Text("予算を決めると、あといくら使えるかが出ます")
+
+                    DisclosureMark(.link)
+                }
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .frame(minHeight: 32)
+                .tapArea(budgetHintTapOutsets)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    var recurringLink: some View {
+        Button(action: onOpenRecurrings) {
+            ViewThatFits(in: .horizontal) {
+                recurringLabel(recurringText(title: "今月の固定費"))
+
+                recurringLabel(recurringText(title: "固定費"))
+                    .minimumScaleFactor(0.8)
+            }
+            .textFont(.caption2)
+            .monospacedDigit()
+            .foregroundStyle(Palette.subtext)
+            .padding(.bottom, 12)
+            .overlay(alignment: .bottom) {
+                RatioBar(model.output.paidRecurringRatio, tint: Palette.accent)
+            }
+            .padding(.vertical, 4)
+            .tapArea(Self.recurringLinkTapOutsets)
+        }
+        .buttonStyle(.plain)
+    }
+
+    var dialStats: some View {
+        HStack(spacing: 0) {
+            stat(
+                "今日の支出",
+                amount: model.output.todayExpense,
+                type: .expense
+            )
+
+            divider
+
+            stat(
+                model.output.middleTitle,
+                amount: model.output.middleAmount,
+                type: .expense
+            )
+
+            divider
+
+            stat(
+                "今月の収入",
+                amount: model.output.monthIncome,
+                type: .income
+            )
+        }
+        .sharesTextScale(id: statAmounts)
+        .padding(.top, 12)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Palette.accent.opacity(.soft))
+                .frame(height: 1)
+        }
+    }
+
     var divider: some View {
         Rectangle()
             .fill(Palette.accent.opacity(.soft))

@@ -200,11 +200,11 @@ private extension WidgetGuideView {
 }
 
 private extension WidgetGuideView {
+    static let carouselMargin: CGFloat = 16
+
     static let options = WidgetGuidePlace.allCases.map { place in
         CapsulePicker<WidgetGuidePlace>.Option(place.title, value: place)
     }
-
-    static let carouselMargin: CGFloat = 16
 
     var place: WidgetGuidePlace {
         model.state.place

@@ -22,110 +22,11 @@ struct WhatsNewCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 12) {
-                Image(systemName: feature.systemImage)
-                    .sansFont(.small, weight: .medium)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: 38, height: 38)
-                    .background(Palette.accent.opacity(.subtle), in: Circle())
+            header
 
-                Text(feature.title)
-                    .displayFont(.body, weight: .semibold)
-                    .foregroundStyle(Palette.text)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            steps
 
-            Group {
-                if layout.stepsWidth >= wideStepsWidth {
-                    VStack(spacing: 8) {
-                        HStack(spacing: Self.gap) {
-                            ForEach(indexedSteps, id: \.offset) { index, step in
-                                if index > 0 {
-                                    chevron(index)
-                                }
-
-                                WhatsNewScene(kind: step.scene)
-                                    .frame(
-                                        minWidth: Self.minSceneWidth,
-                                        idealWidth: Self.minSceneWidth,
-                                        maxWidth: .infinity
-                                    )
-                                    .modifier(StepReveal(isShown: isShown(index)))
-                            }
-                        }
-
-                        HStack(alignment: .top, spacing: Self.gap) {
-                            ForEach(indexedSteps, id: \.offset) { index, step in
-                                if index > 0 {
-                                    Color.clear
-                                        .frame(width: Self.chevronWidth, height: 1)
-                                }
-
-                                caption(step, number: index + 1)
-                                    .frame(
-                                        minWidth: Self.minSceneWidth,
-                                        idealWidth: Self.minSceneWidth,
-                                        maxWidth: .infinity,
-                                        alignment: .leading
-                                    )
-                                    .modifier(StepReveal(isShown: isShown(index)))
-                            }
-                        }
-                    }
-                } else {
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(indexedSteps, id: \.offset) { index, step in
-                            HStack(spacing: 12) {
-                                WhatsNewScene(kind: step.scene)
-                                    .frame(width: Self.listSceneWidth)
-
-                                caption(step, number: index + 1)
-
-                                Spacer(minLength: 0)
-                            }
-                            .modifier(StepReveal(isShown: isShown(index)))
-                        }
-                    }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.size.width
-            } action: { width in
-                layout.stepsWidth = width
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(feature.lead)
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.text)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                ForEach(feature.points, id: \.self) { point in
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(Palette.accent)
-
-                        Text(point)
-                            .foregroundStyle(Palette.text)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .textFont(.footnote)
-                }
-
-                if let note = feature.note {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Image(systemName: "sparkles")
-                            .foregroundStyle(Palette.accent)
-
-                        Text(note)
-                            .foregroundStyle(Palette.subtext)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .textFont(.caption)
-                    .padding(.top, 4)
-                }
-            }
+            details
 
             if let action = feature.action {
                 CardButton(
@@ -164,6 +65,125 @@ private extension WhatsNewCard {
 }
 
 private extension WhatsNewCard {
+    var header: some View {
+        HStack(spacing: 12) {
+            Image(systemName: feature.systemImage)
+                .sansFont(.small, weight: .medium)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 38, height: 38)
+                .background(Palette.accent.opacity(.subtle), in: Circle())
+
+            Text(feature.title)
+                .displayFont(.body, weight: .semibold)
+                .foregroundStyle(Palette.text)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    var steps: some View {
+        Group {
+            if layout.stepsWidth >= wideStepsWidth {
+                wideSteps
+            } else {
+                listSteps
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            layout.stepsWidth = width
+        }
+    }
+
+    var wideSteps: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: Self.gap) {
+                ForEach(indexedSteps, id: \.offset) { index, step in
+                    if index > 0 {
+                        chevron(index)
+                    }
+
+                    WhatsNewScene(kind: step.scene)
+                        .frame(
+                            minWidth: Self.minSceneWidth,
+                            idealWidth: Self.minSceneWidth,
+                            maxWidth: .infinity
+                        )
+                        .modifier(StepReveal(isShown: isShown(index)))
+                }
+            }
+
+            HStack(alignment: .top, spacing: Self.gap) {
+                ForEach(indexedSteps, id: \.offset) { index, step in
+                    if index > 0 {
+                        Color.clear
+                            .frame(width: Self.chevronWidth, height: 1)
+                    }
+
+                    caption(step, number: index + 1)
+                        .frame(
+                            minWidth: Self.minSceneWidth,
+                            idealWidth: Self.minSceneWidth,
+                            maxWidth: .infinity,
+                            alignment: .leading
+                        )
+                        .modifier(StepReveal(isShown: isShown(index)))
+                }
+            }
+        }
+    }
+
+    var listSteps: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(indexedSteps, id: \.offset) { index, step in
+                HStack(spacing: 12) {
+                    WhatsNewScene(kind: step.scene)
+                        .frame(width: Self.listSceneWidth)
+
+                    caption(step, number: index + 1)
+
+                    Spacer(minLength: 0)
+                }
+                .modifier(StepReveal(isShown: isShown(index)))
+            }
+        }
+    }
+
+    var details: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(feature.lead)
+                .textFont(.subheadline, weight: .semibold)
+                .foregroundStyle(Palette.text)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(feature.points, id: \.self) { point in
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Palette.accent)
+
+                    Text(point)
+                        .foregroundStyle(Palette.text)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .textFont(.footnote)
+            }
+
+            if let note = feature.note {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .foregroundStyle(Palette.accent)
+
+                    Text(note)
+                        .foregroundStyle(Palette.subtext)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .textFont(.caption)
+                .padding(.top, 4)
+            }
+        }
+    }
+
     func chevron(_ index: Int) -> some View {
         Image(systemName: "chevron.right")
             .textFont(.caption2, weight: .bold)

@@ -68,9 +68,6 @@ struct SettingsBoardScreen<
     var body: some View {
         let drag = controller.drag
         let model = controller.model
-        let removed = controller.removed
-        let bulkNote = removed.wrappedValue.bulkDelete?
-            .note(for: removed.wrappedValue.deletion)
 
         VStack(spacing: SettingsSpacing.header) {
             SettingsBackHeader(title, hint: hint)
@@ -79,50 +76,9 @@ struct SettingsBoardScreen<
 
             header
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    if model.output.shown.isEmpty {
-                        SettingsEmptyNote(
-                            systemImage: emptyNote.systemImage,
-                            text: emptyNote.text
-                        )
-                    }
+            scroll
 
-                    board
-
-                    if !model.output.hidden.isEmpty {
-                        hiddenSection
-                    }
-                }
-                .padding(.vertical, 8)
-                .coordinateSpace(.named(space))
-                .onGeometryChange(for: CGPoint.self) { proxy in
-                    proxy.frame(in: .global).origin
-                } action: { origin in
-                    drag.origin = origin
-                }
-            }
-            .scrollIndicators(.hidden)
-            .contentMargins(.horizontal, scrollMargin, for: .scrollContent)
-            .padding(.horizontal, -scrollMargin)
-            .scrollDisabled(drag.isLifting)
-            .settingsAutoScroll(drag.autoScroll)
-            .settingsDropZones(Bindable(drag).zones, showing: drag.showZone)
-            .settingsHideNotice(removed.hiddenId, message: hideMessage) { id in
-                controller.show(id)
-            }
-            .deletionNotice(removed.deletion, note: bulkNote) { deletion in
-                controller.restore(deletion)
-            }
-
-            if drag.lift != nil {
-                SettingsHideTarget(
-                    zones: Bindable(drag).zones,
-                    isArmed: drag.isOverHide
-                )
-            } else {
-                AddButton(addTitle, action: onAdd)
-            }
+            footer
         }
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
@@ -142,6 +98,66 @@ extension SettingsBoardScreen {
     struct EmptyNote {
         let systemImage: String
         let text: String
+    }
+}
+
+private extension SettingsBoardScreen {
+    var scroll: some View {
+        let drag = controller.drag
+        let model = controller.model
+        let removed = controller.removed
+        let bulkNote = removed.wrappedValue.bulkDelete?
+            .note(for: removed.wrappedValue.deletion)
+
+        return ScrollView {
+            VStack(alignment: .leading, spacing: SettingsSpacing.section) {
+                if model.output.shown.isEmpty {
+                    SettingsEmptyNote(
+                        systemImage: emptyNote.systemImage,
+                        text: emptyNote.text
+                    )
+                }
+
+                board
+
+                if !model.output.hidden.isEmpty {
+                    hiddenSection
+                }
+            }
+            .padding(.vertical, 8)
+            .coordinateSpace(.named(space))
+            .onGeometryChange(for: CGPoint.self) { proxy in
+                proxy.frame(in: .global).origin
+            } action: { origin in
+                drag.origin = origin
+            }
+        }
+        .scrollIndicators(.hidden)
+        .contentMargins(.horizontal, scrollMargin, for: .scrollContent)
+        .padding(.horizontal, -scrollMargin)
+        .scrollDisabled(drag.isLifting)
+        .settingsAutoScroll(drag.autoScroll)
+        .settingsDropZones(Bindable(drag).zones, showing: drag.showZone)
+        .settingsHideNotice(removed.hiddenId, message: hideMessage) { id in
+            controller.show(id)
+        }
+        .deletionNotice(removed.deletion, note: bulkNote) { deletion in
+            controller.restore(deletion)
+        }
+    }
+
+    @ViewBuilder
+    var footer: some View {
+        let drag = controller.drag
+
+        if drag.lift != nil {
+            SettingsHideTarget(
+                zones: Bindable(drag).zones,
+                isArmed: drag.isOverHide
+            )
+        } else {
+            AddButton(addTitle, action: onAdd)
+        }
     }
 }
 

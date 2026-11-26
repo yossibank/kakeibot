@@ -132,7 +132,25 @@ private extension RecordsView {
         }
     }
 
-    func screen(_ slide: PageSlideProxy) -> some View {
+    @ViewBuilder
+    var markMenuOverlay: some View {
+        if let date = model.state.markMenuDate {
+            RecordsMarkMenu(anchor: layout.markAnchor) {
+                withAnimation(.snappy(duration: 0.2)) {
+                    model.state.present(.stamp(date))
+                }
+            } onReward: {
+                withAnimation(.snappy(duration: 0.2)) {
+                    model.state.present(.reward(date))
+                }
+            } onClose: {
+                closeMarkMenu()
+            }
+            .transition(.opacity)
+        }
+    }
+
+    func scrollContent(_ slide: PageSlideProxy) -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 if model.state.isSearching {
@@ -142,105 +160,105 @@ private extension RecordsView {
 
                     searchContent
                 } else {
-                    header
-
-                    monthStepper(slide)
-
-                    RecordsToolLayout(spacing: 8) {
-                        CapsulePicker(
-                            selection: layoutBinding(slide),
-                            options: Self.layoutOptions
-                        )
-
-                        HStack(spacing: 8) {
-                            if model.input.layout == .list {
-                                selectButton
-                            }
-
-                            filterButton(title: "絞り込み")
-
-                            toolButton(systemImage: "magnifyingglass", title: "検索") {
-                                openSearch()
-                            }
-                        }
-                    }
-
-                    filterLine
-
-                    Group {
-                        monthContent
-                    }
-                    .frame(maxWidth: model.input.layout == .list ? Self.listWidth : nil)
-                    .pageSlide(slide, page: model.state.month)
+                    monthPage(slide)
                 }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .contentShape(.rect)
-        .onPageSwipe(following: slide, isEnabled: canSwipeMonth) { direction in
-            moveMonth(direction, with: slide)
+    }
+
+    @ViewBuilder
+    func monthPage(_ slide: PageSlideProxy) -> some View {
+        header
+
+        monthStepper(slide)
+
+        toolRow(slide)
+
+        filterLine
+
+        Group {
+            monthContent
         }
-        .scrollDismissesKeyboard(.interactively)
-        .errorBanner(Bindable(model.state).errorNotice)
-        .safeAreaInset(edge: .bottom) {
-            if let selection {
-                selectionBar(selection)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+        .frame(maxWidth: model.input.layout == .list ? Self.listWidth : nil)
+        .pageSlide(slide, page: model.state.month)
+    }
+
+    func toolRow(_ slide: PageSlideProxy) -> some View {
+        RecordsToolLayout(spacing: 8) {
+            CapsulePicker(
+                selection: layoutBinding(slide),
+                options: Self.layoutOptions
+            )
+
+            HStack(spacing: 8) {
+                if model.input.layout == .list {
+                    selectButton
+                }
+
+                filterButton(title: "絞り込み")
+
+                toolButton(systemImage: "magnifyingglass", title: "検索") {
+                    openSearch()
+                }
             }
         }
-        .confirmation(
-            isPresented: Bindable(model.state).isConfirmingDelete,
-            systemImage: "trash",
-            title: "\(model.output.pendingDeleteCount) 件の記録を削除しますか",
-            message: deleteUndoMessage,
-            keepTitle: "やめる",
-            confirmTitle: "削除する"
-        ) {
-            model.state.confirmDelete { ids in
-                onDeleteEntries(ids)
+    }
+
+    func screen(_ slide: PageSlideProxy) -> some View {
+        scrollContent(slide)
+            .contentShape(.rect)
+            .onPageSwipe(following: slide, isEnabled: canSwipeMonth) { direction in
+                moveMonth(direction, with: slide)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .errorBanner(Bindable(model.state).errorNotice)
+            .safeAreaInset(edge: .bottom) {
+                if let selection {
+                    selectionBar(selection)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .confirmation(
+                isPresented: Bindable(model.state).isConfirmingDelete,
+                systemImage: "trash",
+                title: "\(model.output.pendingDeleteCount) 件の記録を削除しますか",
+                message: deleteUndoMessage,
+                keepTitle: "やめる",
+                confirmTitle: "削除する"
+            ) {
+                model.state.confirmDelete { ids in
+                    onDeleteEntries(ids)
+                    finishSelecting()
+                }
+            }
+            .onOutcome(model.state.outcome) { deletion in
+                onDeleteAdjustment(deletion)
+            }
+            .onChange(of: model.input.layout) {
                 finishSelecting()
             }
-        }
-        .onOutcome(model.state.outcome) { deletion in
-            onDeleteAdjustment(deletion)
-        }
-        .onChange(of: model.input.layout) {
-            finishSelecting()
-        }
-        .onChange(of: model.state.month) {
-            finishSelecting()
-        }
-        .onChange(of: model.state.isSearching) {
-            finishSelecting()
-        }
-        .haptic(.selection, trigger: model.state.month)
-        .haptic(.selection, trigger: model.state.selectedDate)
-        .sheet(item: Bindable(model.state).sheet) { sheet in
-            sheetContent(sheet)
-        }
-        .overlay {
-            if let date = model.state.markMenuDate {
-                RecordsMarkMenu(anchor: layout.markAnchor) {
-                    withAnimation(.snappy(duration: 0.2)) {
-                        model.state.present(.stamp(date))
-                    }
-                } onReward: {
-                    withAnimation(.snappy(duration: 0.2)) {
-                        model.state.present(.reward(date))
-                    }
-                } onClose: {
-                    closeMarkMenu()
-                }
-                .transition(.opacity)
+            .onChange(of: model.state.month) {
+                finishSelecting()
             }
-        }
-        .onDisappear {
-            model.state.closeMarkMenu()
-        }
-        .haptic(.success, trigger: layout.stampPulse)
-        .backdrop()
+            .onChange(of: model.state.isSearching) {
+                finishSelecting()
+            }
+            .haptic(.selection, trigger: model.state.month)
+            .haptic(.selection, trigger: model.state.selectedDate)
+            .sheet(item: Bindable(model.state).sheet) { sheet in
+                sheetContent(sheet)
+            }
+            .overlay {
+                markMenuOverlay
+            }
+            .onDisappear {
+                model.state.closeMarkMenu()
+            }
+            .haptic(.success, trigger: layout.stampPulse)
+            .backdrop()
     }
 
     func monthStepper(_ slide: PageSlideProxy) -> some View {

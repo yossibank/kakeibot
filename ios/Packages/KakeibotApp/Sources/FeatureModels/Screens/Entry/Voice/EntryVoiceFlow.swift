@@ -43,6 +43,7 @@ public extension EntryVoiceFlow {
         var prepare: @MainActor () -> Void
         var choose: @MainActor (EntryVoiceQuestion) async -> VoiceReading.Choice?
         var clock: ScreenClock
+        var sleep: @Sendable (Duration) async throws -> Void
         var silence: Duration
         var noticeDuration: Duration
     }
@@ -232,11 +233,12 @@ private extension EntryVoiceFlow {
         }
 
         let silence = dependencies.silence
+        let sleep = dependencies.sleep
 
         state.startSilence(at: dependencies.clock.now)
 
         input.silenceTask = Task { [weak self] in
-            try? await Task.sleep(for: silence)
+            try? await sleep(silence)
 
             guard !Task.isCancelled else {
                 return
@@ -292,10 +294,11 @@ private extension EntryVoiceFlow {
         state.show(notice, undo: undo)
 
         let duration = dependencies.noticeDuration
+        let sleep = dependencies.sleep
         let id = notice.id
 
         input.noticeTask = Task { [weak self] in
-            try? await Task.sleep(for: duration)
+            try? await sleep(duration)
 
             guard !Task.isCancelled, self?.state.notice?.id == id else {
                 return
@@ -327,6 +330,9 @@ extension EntryVoiceFlow.Dependencies {
             prepare: EntryVoiceReader.prepare,
             choose: EntryVoiceReader.choose,
             clock: clock,
+            sleep: { duration in
+                try await Task.sleep(for: duration)
+            },
             silence: .seconds(1),
             noticeDuration: .seconds(4)
         )

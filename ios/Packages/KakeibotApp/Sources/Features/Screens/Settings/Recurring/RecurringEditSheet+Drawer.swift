@@ -8,15 +8,7 @@ extension RecurringEditSheet {
     func drawerBody(_ panel: Panel) -> some View {
         switch panel {
         case .amount:
-            VStack(spacing: 12) {
-                SettingsKeypadValue(model.output.amount)
-
-                Keypad(calculator: model.state.calculators.amount) {
-                    closePanel()
-                } onKey: { key in
-                    model.state.press(key)
-                }
-            }
+            amountKeypad
 
         case .start:
             MonthCalendar(
@@ -34,35 +26,10 @@ extension RecurringEditSheet {
             closingChooser
 
         case .fee:
-            VStack(spacing: 12) {
-                SettingsKeypadValue(model.output.fee)
-
-                FeeChoiceRow(
-                    choices: FeeChoiceRow.defaultChoices,
-                    selection: model.output.fee
-                ) { amount in
-                    model.state.setFee(amount)
-                }
-
-                Keypad(calculator: model.state.calculators.fee) {
-                    closePanel()
-                } onKey: { key in
-                    model.state.pressFee(key)
-                }
-            }
+            feeKeypad
 
         case .count:
-            VStack(spacing: 12) {
-                countChoices
-
-                countValue
-
-                Keypad(calculator: model.state.repayment.countCalculator) {
-                    closePanel()
-                } onKey: { key in
-                    model.pressCount(key)
-                }
-            }
+            countKeypad
 
         case .remind:
             remindChooser
@@ -71,6 +38,51 @@ extension RecurringEditSheet {
 }
 
 private extension RecurringEditSheet {
+    var amountKeypad: some View {
+        VStack(spacing: 12) {
+            SettingsKeypadValue(model.output.amount)
+
+            Keypad(calculator: model.state.calculators.amount) {
+                closePanel()
+            } onKey: { key in
+                model.state.press(key)
+            }
+        }
+    }
+
+    var feeKeypad: some View {
+        VStack(spacing: 12) {
+            SettingsKeypadValue(model.output.fee)
+
+            FeeChoiceRow(
+                choices: FeeChoiceRow.defaultChoices,
+                selection: model.output.fee
+            ) { amount in
+                model.state.setFee(amount)
+            }
+
+            Keypad(calculator: model.state.calculators.fee) {
+                closePanel()
+            } onKey: { key in
+                model.state.pressFee(key)
+            }
+        }
+    }
+
+    var countKeypad: some View {
+        VStack(spacing: 12) {
+            countChoices
+
+            countValue
+
+            Keypad(calculator: model.state.repayment.countCalculator) {
+                closePanel()
+            } onKey: { key in
+                model.pressCount(key)
+            }
+        }
+    }
+
     var countValue: some View {
         VStack(spacing: 4) {
             Text("\(model.state.repayment.countCalculator.amount) 回")

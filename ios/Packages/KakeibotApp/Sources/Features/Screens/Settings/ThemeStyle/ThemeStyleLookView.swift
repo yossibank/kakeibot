@@ -47,76 +47,13 @@ public struct ThemeStyleLookView: View {
                 }
             }
 
-            ThemeStyleChoices(
-                title: "スタンプの形",
-                options: ThemeStampShape.allCases,
-                selection: model.output.style.stampShape,
-                columns: 3,
-                label: \.title
-            ) { shape in
-                IconSeal(.styleSample(.star), size: Self.markSize)
-                    .environment(\.themeStyle.stampShape, shape)
-            } choose: { shape in
-                model.perform {
-                    await $0.choose(shape)
-                }
-            }
+            stampShapeChoices
 
-            ThemeStyleChoices(
-                title: "タブの名前",
-                options: [true, false],
-                selection: model.output.style.showsTabTitles,
-                columns: 2,
-                label: Self.tabTitle
-            ) { showsTitles in
-                ThemeStyleTabBar()
-                    .environment(\.themeStyle.showsTabTitles, showsTitles)
-            } choose: { showsTitles in
-                model.perform {
-                    await $0.choose(showsTabTitles: showsTitles)
-                }
-            }
+            tabTitleChoices
 
-            ThemeStyleChoices(
-                title: "背景",
-                options: ThemeBackdrop.allCases,
-                selection: model.output.style.backdrop,
-                columns: 3,
-                label: \.title
-            ) { backdrop in
-                ThemeStyleBackdrop(backdrop: backdrop)
-            } choose: { backdrop in
-                model.perform {
-                    await $0.choose(backdrop)
-                }
-            }
+            backdropChoices
 
-            VStack(alignment: .leading, spacing: 8) {
-                SettingsSectionTitle("振動と飾り")
-
-                SettingsSwitch(
-                    title: "押した時の振動",
-                    detail: "選んだ時や記録した時に、軽く振動します",
-                    systemImage: "waveform",
-                    isOn: model.output.style.haptics
-                ) { isOn in
-                    model.perform {
-                        await $0.choose(haptics: isOn)
-                    }
-                }
-
-                SettingsSwitch(
-                    title: "金の光などの飾り",
-                    detail: "ボタンの光とタブの金の輪を出します",
-                    systemImage: "sparkle",
-                    isOn: model.output.style.decorations
-                ) { isOn in
-                    model.perform {
-                        await $0.choose(decorations: isOn)
-                    }
-                }
-            }
-            .environment(\.themeStyle.decorations, model.output.style.decorations)
+            feelSwitches
         }
     }
 }
@@ -190,6 +127,85 @@ private extension ThemeStyleLookView {
         .card()
     }
 
+    var stampShapeChoices: some View {
+        ThemeStyleChoices(
+            title: "スタンプの形",
+            options: ThemeStampShape.allCases,
+            selection: model.output.style.stampShape,
+            columns: 3,
+            label: \.title
+        ) { shape in
+            IconSeal(.styleSample(.star), size: Self.markSize)
+                .environment(\.themeStyle.stampShape, shape)
+        } choose: { shape in
+            model.perform {
+                await $0.choose(shape)
+            }
+        }
+    }
+
+    var tabTitleChoices: some View {
+        ThemeStyleChoices(
+            title: "タブの名前",
+            options: [true, false],
+            selection: model.output.style.showsTabTitles,
+            columns: 2,
+            label: Self.tabTitle
+        ) { showsTitles in
+            ThemeStyleTabBar()
+                .environment(\.themeStyle.showsTabTitles, showsTitles)
+        } choose: { showsTitles in
+            model.perform {
+                await $0.choose(showsTabTitles: showsTitles)
+            }
+        }
+    }
+
+    var backdropChoices: some View {
+        ThemeStyleChoices(
+            title: "背景",
+            options: ThemeBackdrop.allCases,
+            selection: model.output.style.backdrop,
+            columns: 3,
+            label: \.title
+        ) { backdrop in
+            ThemeStyleBackdrop(backdrop: backdrop)
+        } choose: { backdrop in
+            model.perform {
+                await $0.choose(backdrop)
+            }
+        }
+    }
+
+    var feelSwitches: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("振動と飾り")
+
+            SettingsSwitch(
+                title: "押した時の振動",
+                detail: "選んだ時や記録した時に、軽く振動します",
+                systemImage: "waveform",
+                isOn: model.output.style.haptics
+            ) { isOn in
+                model.perform {
+                    await $0.choose(haptics: isOn)
+                }
+            }
+
+            SettingsSwitch(
+                title: "金の光などの飾り",
+                detail: "ボタンの光とタブの金の輪を出します",
+                systemImage: "sparkle",
+                isOn: model.output.style.decorations
+            ) { isOn in
+                model.perform {
+                    await $0.choose(decorations: isOn)
+                }
+            }
+        }
+        .environment(\.themeStyle.decorations, model.output.style.decorations)
+    }
+
     func spacingMark(_ spacing: ThemeRowSpacing) -> some View {
         VStack(spacing: spacing.padding) {
             Capsule()
@@ -214,6 +230,9 @@ private extension ThemeStyleLookView {
 }
 
 private extension ThemeStyleLookView {
+    static let markSize: CGFloat = 30
+    static let stampSize: CGFloat = 26
+
     static let intro = ThemeStyleIntroContent(
         systemImage: "square.on.circle",
         headline: ("角の丸みや背景などを", "好みに変えられます"),
@@ -222,9 +241,6 @@ private extension ThemeStyleLookView {
             .init("arrow.uturn.backward", "戻ると、アプリ全体が変わります")
         ]
     )
-
-    static let markSize: CGFloat = 30
-    static let stampSize: CGFloat = 26
 
     var hint: SettingsFold {
         SettingsFold(\.lookHint, in: model)

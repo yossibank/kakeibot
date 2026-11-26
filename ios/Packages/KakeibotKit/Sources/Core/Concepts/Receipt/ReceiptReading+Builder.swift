@@ -57,21 +57,13 @@ extension ReceiptReading.Builder {
             pendingName = nil
 
         case let .text(text):
-            if items.isEmpty, !hasDate, line.isStoreLike {
-                storeLines.append(text)
-            }
-
-            pendingName = text
+            addText(text, of: line)
 
         case let .item(amount):
             addItem(amount)
 
         case let .quantity(quantity):
-            if quantity.isUnitFirst || items.isEmpty {
-                pendingQuantity = quantity
-            } else if !isSummary {
-                items[items.count - 1].apply(quantity)
-            }
+            addQuantity(quantity)
 
         case let .discount(name, amount):
             addDiscount(name: name, amount: amount)
@@ -99,6 +91,25 @@ extension ReceiptReading.Builder {
 private extension ReceiptReading.Builder {
     var largestRate: EntryItem.TaxRate? {
         items.max { $0.amount < $1.amount }?.taxRate
+    }
+
+    mutating func addText(
+        _ text: String,
+        of line: ReceiptLine
+    ) {
+        if items.isEmpty, !hasDate, line.isStoreLike {
+            storeLines.append(text)
+        }
+
+        pendingName = text
+    }
+
+    mutating func addQuantity(_ quantity: ReceiptLine.Quantity) {
+        if quantity.isUnitFirst || items.isEmpty {
+            pendingQuantity = quantity
+        } else if !isSummary {
+            items[items.count - 1].apply(quantity)
+        }
     }
 
     mutating func addItem(_ amount: ReceiptLine.Amount) {

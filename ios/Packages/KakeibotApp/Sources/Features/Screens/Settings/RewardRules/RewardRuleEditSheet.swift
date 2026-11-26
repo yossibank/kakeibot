@@ -40,21 +40,7 @@ public struct RewardRuleEditSheet: View {
                 below: layout.iconBottom
             )
             .overlay(alignment: .top) {
-                SettingsEditHeader(
-                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-                    title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
-                    isEditing: model.isEditing,
-                    isHidden: model.input.isHidden,
-                    canDelete: !(model.input.isHidden && model.input.hasLogs)
-                ) {
-                    edit.close()
-                } onHide: {
-                    edit.toggleHidden()
-                } onDelete: {
-                    model.state.prompt.isConfirmingDelete = true
-                }
-                .padding(.horizontal, SettingsSpacing.side)
-                .padding(.top, SettingsSpacing.top)
+                editHeader
             }
             .background {
                 Backdrop()
@@ -108,38 +94,7 @@ private extension RewardRuleEditSheet {
 private extension RewardRuleEditSheet {
     var content: some View {
         SettingsEditForm(showsSave: focus == nil) {
-            SettingsPreviewSection(note: "ごほうび貯金箱では、このタイルで並びます") {
-                Button {
-                    focus = nil
-                    model.state.icon.present()
-                } label: {
-                    RewardRuleTile(
-                        icon: model.state.icon.preview,
-                        name: model.state.name.isEmpty ? "名前" : model.state.name,
-                        amount: model.output.amount ?? 0,
-                        total: nil,
-                        isHidden: false
-                    )
-                    .frame(width: 172, height: 156)
-                    .overlay {
-                        if model.state.icon.isPresented {
-                            RoundedRectangle(cornerRadius: corner.radius(16))
-                                .stroke(Palette.accent, lineWidth: 2)
-                        }
-                    }
-                    .overlay(alignment: .bottomTrailing) {
-                        EditBadge()
-                            .offset(x: 4, y: 4)
-                    }
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-            }
-            .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.frame(in: .global).maxY
-            } action: { maxY in
-                layout.iconBottom = maxY
-            }
+            tilePreview
 
             SettingsField(
                 "自炊した日など",
@@ -165,6 +120,59 @@ private extension RewardRuleEditSheet {
             }
         } save: {
             saveButton
+        }
+    }
+
+    var editHeader: some View {
+        SettingsEditHeader(
+            isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
+            title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
+            isEditing: model.isEditing,
+            isHidden: model.input.isHidden,
+            canDelete: !(model.input.isHidden && model.input.hasLogs)
+        ) {
+            edit.close()
+        } onHide: {
+            edit.toggleHidden()
+        } onDelete: {
+            model.state.prompt.isConfirmingDelete = true
+        }
+        .padding(.horizontal, SettingsSpacing.side)
+        .padding(.top, SettingsSpacing.top)
+    }
+
+    var tilePreview: some View {
+        SettingsPreviewSection(note: "ごほうび貯金箱では、このタイルで並びます") {
+            Button {
+                focus = nil
+                model.state.icon.present()
+            } label: {
+                RewardRuleTile(
+                    icon: model.state.icon.preview,
+                    name: model.state.name.isEmpty ? "名前" : model.state.name,
+                    amount: model.output.amount ?? 0,
+                    total: nil,
+                    isHidden: false
+                )
+                .frame(width: 172, height: 156)
+                .overlay {
+                    if model.state.icon.isPresented {
+                        RoundedRectangle(cornerRadius: corner.radius(16))
+                            .stroke(Palette.accent, lineWidth: 2)
+                    }
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    EditBadge()
+                        .offset(x: 4, y: 4)
+                }
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.frame(in: .global).maxY
+        } action: { maxY in
+            layout.iconBottom = maxY
         }
     }
 

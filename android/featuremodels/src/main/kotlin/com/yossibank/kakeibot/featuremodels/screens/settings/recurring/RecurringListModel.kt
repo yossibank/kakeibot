@@ -16,7 +16,6 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.recurringUpdates
 import com.yossibank.kakeibot.store.queries.methods.settingUpdates
@@ -109,23 +108,6 @@ class RecurringListModel(
         fun select(type: Entry.Kind) {
             openId = null
             this.type = type
-        }
-
-        fun finishEditing(
-            edited: Editing,
-            outcome: SettingsEditOutcome<Unit>,
-        ) {
-            val id = (edited as? Editing.Existing)?.id
-
-            if (outcome.isHidden == true && id != null) {
-                hidden.show(id)
-            }
-
-            outcome.deletion?.let(deleted::show)
-
-            if (outcome.closes) {
-                editing = null
-            }
         }
     }
 

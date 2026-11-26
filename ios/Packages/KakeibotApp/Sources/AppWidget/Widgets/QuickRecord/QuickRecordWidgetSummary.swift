@@ -53,61 +53,20 @@ extension QuickRecordWidgetSummary {
         let expenses = templates.filter { $0.type == .expense }
         let ordered = list?.ordered(expenses, by: order, today: overview.today) ?? expenses
         let today = list?.days.first { $0.date == overview.today }
-
-        let tiles = ordered.prefix(Self.limit).map { template in
-            let parts = list?.detailParts(for: template) ?? []
-            let icon = list?.icon(for: template)
-
-            return Tile(
-                id: template.id,
-                name: template.name,
-                detail: parts.rowDetail ?? "",
-                shortDetail: Array(parts.prefix(2)).rowDetail ?? "",
-                amount: template.amount,
-                icon: icon
-            )
-        }
-
+        let tiles = Self.makeTiles(of: ordered, in: list)
         let todayEntries = today?.entries ?? []
 
-        let records = todayEntries.prefix(Self.recordLimit).map { entry in
-            let template = templates.first { $0.id == entry.templateId }
-            let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
-            let wallet = list?.wallets[entry.walletId]?.name
-            let category = entry.categoryId.flatMap { list?.categories[$0] }
-            let title = list?.title(of: entry) ?? ""
-            let detail = [template?.name ?? memo, wallet].rowDetail ?? ""
-            let icon = category.flatMap { list?.icons[$0.iconId] }
+        let records = Self.makeRecords(
+            of: todayEntries,
+            templates: templates,
+            in: list
+        )
 
-            return Record(
-                id: entry.id,
-                title: title,
-                detail: detail,
-                amount: entry.amount,
-                type: entry.type,
-                icon: icon
-            )
-        }
-
-        let entry = recordedId.flatMap { id in
-            list?.days
-                .lazy
-                .flatMap(\.entries)
-                .first { $0.id == id }
-        }
-
-        let recorded = entry.map { entry in
-            let template = templates.first { $0.id == entry.templateId }
-            let name = template?.name ?? list?.title(of: entry) ?? "記録"
-            let until = entry.createdAt.addingTimeInterval(Self.undoInterval)
-
-            return Recorded(
-                id: entry.id,
-                name: name,
-                amount: entry.amount,
-                until: until
-            )
-        }
+        let recorded = Self.makeRecorded(
+            recordedId,
+            templates: templates,
+            in: list
+        )
 
         self.init(
             todayExpense: overview.todayExpense,
@@ -195,5 +154,77 @@ extension QuickRecordWidgetSummary {
             todayCount: todayCount,
             recorded: nil
         )
+    }
+}
+
+private extension QuickRecordWidgetSummary {
+    static func makeTiles(
+        of templates: [EntryTemplate],
+        in list: EntryList?
+    ) -> [Tile] {
+        templates.prefix(limit).map { template in
+            let parts = list?.detailParts(for: template) ?? []
+            let icon = list?.icon(for: template)
+
+            return Tile(
+                id: template.id,
+                name: template.name,
+                detail: parts.rowDetail ?? "",
+                shortDetail: Array(parts.prefix(2)).rowDetail ?? "",
+                amount: template.amount,
+                icon: icon
+            )
+        }
+    }
+
+    static func makeRecords(
+        of entries: [Entry],
+        templates: [EntryTemplate],
+        in list: EntryList?
+    ) -> [Record] {
+        entries.prefix(recordLimit).map { entry in
+            let template = templates.first { $0.id == entry.templateId }
+            let memo = entry.memo.flatMap { $0.isEmpty ? nil : $0 }
+            let wallet = list?.wallets[entry.walletId]?.name
+            let category = entry.categoryId.flatMap { list?.categories[$0] }
+            let title = list?.title(of: entry) ?? ""
+            let detail = [template?.name ?? memo, wallet].rowDetail ?? ""
+            let icon = category.flatMap { list?.icons[$0.iconId] }
+
+            return Record(
+                id: entry.id,
+                title: title,
+                detail: detail,
+                amount: entry.amount,
+                type: entry.type,
+                icon: icon
+            )
+        }
+    }
+
+    static func makeRecorded(
+        _ recordedId: Entry.ID?,
+        templates: [EntryTemplate],
+        in list: EntryList?
+    ) -> Recorded? {
+        let entry = recordedId.flatMap { id in
+            list?.days
+                .lazy
+                .flatMap(\.entries)
+                .first { $0.id == id }
+        }
+
+        return entry.map { entry in
+            let template = templates.first { $0.id == entry.templateId }
+            let name = template?.name ?? list?.title(of: entry) ?? "記録"
+            let until = entry.createdAt.addingTimeInterval(undoInterval)
+
+            return Recorded(
+                id: entry.id,
+                name: name,
+                amount: entry.amount,
+                until: until
+            )
+        }
     }
 }

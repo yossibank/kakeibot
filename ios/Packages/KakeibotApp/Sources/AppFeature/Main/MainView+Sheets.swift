@@ -15,14 +15,7 @@ extension MainView {
             )
 
         case let .edit(id):
-            EntrySheet(
-                model: EntryModel(
-                    parts: parts,
-                    editing: id,
-                    date: today
-                ),
-                onChange: show
-            )
+            editEntrySheet(id)
 
         case .settings:
             SettingsMenuSheet(
@@ -32,14 +25,7 @@ extension MainView {
             )
 
         case let .template(template):
-            EntrySheet(
-                model: EntryModel(
-                    parts: parts,
-                    date: today,
-                    template: template
-                ),
-                onChange: show
-            )
+            templateEntrySheet(template)
 
         case .transfer:
             EntrySheet(model: model.state.draft, onChange: show)
@@ -52,35 +38,13 @@ extension MainView {
             )
 
         case .newTemplate:
-            TemplateEditSheet(
-                model: TemplateEditModel(
-                    parts: parts,
-                    type: home.state.templateType
-                )
-            )
+            newTemplateSheet
 
         case let .recurring(id):
-            RecurringEditSheet(
-                model: RecurringEditModel(
-                    parts: parts,
-                    today: today,
-                    editing: id
-                )
-            ) { deletion in
-                model.state.undo.state.deletion = deletion
-            }
+            recurringSheet(id)
 
         case let .setup(item):
-            NavigationStack {
-                SetupDestination(
-                    item,
-                    parts: parts,
-                    today: today,
-                    appIcon: appIcon
-                )
-                .toolbar(.hidden, for: .navigationBar)
-                .environment(\.isSettingsSheetRoot, true)
-            }
+            setupSheet(item)
 
         case .reward:
             RecordsRewardSheet(model: records, date: today)
@@ -89,22 +53,88 @@ extension MainView {
             WhatsNewSheet(seenVersion: seenVersion, onTry: tryFeature)
 
         case .periodRecurrings:
-            HomeRecurringSheet(
-                model: home,
-                onOpenRecurring: { id in
-                    model.state.sheet = .recurring(id)
-                }
-            )
+            periodRecurringsSheet
 
         case let .wallet(id):
-            WalletEditSheet(
-                model: WalletEditModel(
-                    parts: parts,
-                    editing: id
-                )
-            ) { _ in } onDelete: { deletion in
-                model.state.undo.state.deletion = deletion
+            walletSheet(id)
+        }
+    }
+}
+
+private extension MainView {
+    var newTemplateSheet: some View {
+        TemplateEditSheet(
+            model: TemplateEditModel(
+                parts: parts,
+                type: home.state.templateType
+            )
+        )
+    }
+
+    var periodRecurringsSheet: some View {
+        HomeRecurringSheet(
+            model: home,
+            onOpenRecurring: { id in
+                model.state.sheet = .recurring(id)
             }
+        )
+    }
+
+    func editEntrySheet(_ id: Entry.ID) -> some View {
+        EntrySheet(
+            model: EntryModel(
+                parts: parts,
+                editing: id,
+                date: today
+            ),
+            onChange: show
+        )
+    }
+
+    func templateEntrySheet(_ template: EntryTemplate) -> some View {
+        EntrySheet(
+            model: EntryModel(
+                parts: parts,
+                date: today,
+                template: template
+            ),
+            onChange: show
+        )
+    }
+
+    func recurringSheet(_ id: Recurring.ID) -> some View {
+        RecurringEditSheet(
+            model: RecurringEditModel(
+                parts: parts,
+                today: today,
+                editing: id
+            )
+        ) { deletion in
+            model.state.undo.state.deletion = deletion
+        }
+    }
+
+    func setupSheet(_ item: SetupItem) -> some View {
+        NavigationStack {
+            SetupDestination(
+                item,
+                parts: parts,
+                today: today,
+                appIcon: appIcon
+            )
+            .toolbar(.hidden, for: .navigationBar)
+            .environment(\.isSettingsSheetRoot, true)
+        }
+    }
+
+    func walletSheet(_ id: Wallet.ID) -> some View {
+        WalletEditSheet(
+            model: WalletEditModel(
+                parts: parts,
+                editing: id
+            )
+        ) { _ in } onDelete: { deletion in
+            model.state.undo.state.deletion = deletion
         }
     }
 }

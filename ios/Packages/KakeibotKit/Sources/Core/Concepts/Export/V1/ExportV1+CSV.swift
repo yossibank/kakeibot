@@ -16,24 +16,14 @@ public extension ExportV1.Tables {
 }
 
 private extension ExportV1.Tables {
-    struct CSVRow {
-        let date: LocalDate
-        let createdAt: Date
-        let id: String
-        let fields: [String]
-    }
+    static let adjustmentTitle = "調整"
+    static let byteOrderMark: [UInt8] = [0xEF, 0xBB, 0xBF]
+    static let formulaPrefixes: Set<Character> = ["=", "+", "-", "@"]
+    static let quotedScalars: Set<Unicode.Scalar> = ["\"", ",", "\r", "\n"]
 
     static let csvHeader = [
         "日付", "種類", "金額", "カテゴリ", "タグ", "財布", "振替先", "メモ"
     ]
-
-    static let adjustmentTitle = "調整"
-
-    static let byteOrderMark: [UInt8] = [0xEF, 0xBB, 0xBF]
-
-    static let formulaPrefixes: Set<Character> = ["=", "+", "-", "@"]
-
-    static let quotedScalars: Set<Unicode.Scalar> = ["\"", ",", "\r", "\n"]
 
     var sortedRows: [CSVRow] {
         let rows = entries.map(row) + adjustments.map(row)
@@ -128,4 +118,11 @@ private extension ExportV1.Tables {
             fields: fields
         )
     }
+}
+
+private struct CSVRow {
+    let date: LocalDate
+    let createdAt: Date
+    let id: String
+    let fields: [String]
 }

@@ -140,37 +140,7 @@ private extension ReviewClosingView {
             }
 
             if let why = notes.whys[item.id] {
-                Button {
-                    onOpenWhy(item, why)
-                } label: {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Image(systemName: "sparkles")
-                            .sansFont(.micro, weight: .bold)
-                            .foregroundStyle(Palette.gold)
-
-                        ReviewEmphasisText(
-                            parts: ReviewEmphasisText.parts(of: why),
-                            face: .text(.caption),
-                            weight: nil,
-                            numberFace: .display(.body),
-                            color: Palette.text
-                        )
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        DisclosureMark(.strongLink)
-                            .foregroundStyle(Palette.accent)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(
-                        Palette.accent.opacity(.faint),
-                        in: .rect(cornerRadius: ReviewReportRadius.block)
-                    )
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 4)
+                whyButton(item, why: why)
             }
         }
         .padding(.vertical, 12)
@@ -179,6 +149,43 @@ private extension ReviewClosingView {
                 .fill(Palette.line)
                 .frame(height: 1)
         }
+    }
+
+    func whyButton(
+        _ item: ReviewClosing.CompareRow,
+        why: ReviewCompare.Why
+    ) -> some View {
+        Button {
+            onOpenWhy(item, why)
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Image(systemName: "sparkles")
+                    .sansFont(.micro, weight: .bold)
+                    .foregroundStyle(Palette.gold)
+
+                ReviewEmphasisText(
+                    parts: ReviewEmphasisText.parts(of: why),
+                    face: .text(.caption),
+                    weight: nil,
+                    numberFace: .display(.body),
+                    color: Palette.text
+                )
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                DisclosureMark(.strongLink)
+                    .foregroundStyle(Palette.accent)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                Palette.accent.opacity(.faint),
+                in: .rect(cornerRadius: ReviewReportRadius.block)
+            )
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 4)
     }
 
     func track(
@@ -217,84 +224,6 @@ private extension ReviewClosingView {
             .frame(height: 14)
         }
         .frame(height: 14)
-    }
-
-    func specialCard(_ special: ReviewClosing.Special) -> some View {
-        let date = special.date.monthDayText
-        let amount = ReviewYen.number(special.amount)
-
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 12) {
-                Image(systemName: "sparkles")
-                    .sansFont(.small, weight: .bold)
-                    .foregroundStyle(Palette.cardBottom)
-                    .frame(width: 32, height: 32)
-                    .background(Self.specialFill, in: .rect(cornerRadius: ReviewReportRadius.block))
-
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("特別な支出")
-                        .textFont(.caption2, weight: .bold)
-                        .tracking(1.5)
-                        .foregroundStyle(Palette.amber)
-
-                    Text(special.name)
-                        .displayFont(style: .subheadline, weight: .bold)
-                        .foregroundStyle(Palette.text)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-
-                Spacer(minLength: 8)
-
-                Text(date)
-                    .textFont(.caption2, weight: .bold)
-                    .foregroundStyle(Palette.amber)
-                    .monospacedDigit()
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 2)
-                    .overlay {
-                        Capsule()
-                            .strokeBorder(Palette.amber.opacity(.medium))
-                    }
-                    .fixedSize()
-            }
-
-            HStack(alignment: .lastTextBaseline, spacing: 8) {
-                Text("平均の計算から外しています")
-                    .textFont(.caption)
-                    .foregroundStyle(Palette.subtext)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                Spacer(minLength: 0)
-
-                HStack(alignment: .lastTextBaseline, spacing: 2) {
-                    Text(amount)
-                        .displayFont(.headline, weight: .bold)
-                        .monospacedDigit()
-
-                    Text("円")
-                        .displayFont(.small, weight: .bold)
-                }
-                .foregroundStyle(Palette.amber)
-                .fixedSize()
-            }
-            .padding(.top, 12)
-            .overlay(alignment: .top) {
-                Rectangle()
-                    .fill(Palette.amber.opacity(.soft))
-                    .frame(height: 1)
-            }
-        }
-        .padding(16)
-        .background {
-            RoundedRectangle(cornerRadius: ReviewReportRadius.panel)
-                .fill(Self.specialGlow)
-                .overlay {
-                    RoundedRectangle(cornerRadius: ReviewReportRadius.panel)
-                        .strokeBorder(Palette.amber.opacity(.muted))
-                }
-        }
     }
 
     func goodRow(
@@ -346,22 +275,6 @@ private extension ReviewClosingView {
 
 private extension ReviewClosingView {
     static let goodLimit = 2
-
-    static var specialFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.amber.opacity(.medium), Palette.amber],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    static var specialGlow: LinearGradient {
-        LinearGradient(
-            colors: [Palette.amber.opacity(.subtle), Palette.amber.opacity(.faint)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
 
     var compareScale: Int {
         let largest = content.rows.map { max($0.row.amount, $0.row.average) }.max() ?? 0

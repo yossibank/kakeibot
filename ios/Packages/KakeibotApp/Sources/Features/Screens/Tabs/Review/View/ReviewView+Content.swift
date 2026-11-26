@@ -24,48 +24,7 @@ extension ReviewView {
             }
 
             if model.input.kind != .balance {
-                let categoryShares = model.output.categoryShares
-                let walletShares = model.output.walletShares
-                let isEmpty = categoryShares.isEmpty && walletShares.isEmpty
-
-                if model.input.list == nil {
-                    EmptyView()
-                } else if isEmpty {
-                    PlaceholderEmpty(
-                        systemImage: "chart.pie",
-                        text: "この期間の記録はありません",
-                        onRecord: {
-                            onAddEntry(recordDate)
-                        }
-                    )
-                    .padding(.horizontal, 16)
-                    .card()
-                    .layoutColumn(.trailing)
-                } else {
-                    ReviewSharesCard(
-                        title: "カテゴリごと",
-                        type: model.output.entryType,
-                        shares: categoryShares,
-                        total: ReviewSharesCard.Total(
-                            title: totalTitle,
-                            amount: model.output.total
-                        ),
-                        onOpen: { share in
-                            model.state.sheet = .share(share)
-                        }
-                    )
-                    .layoutColumn(.trailing)
-
-                    ReviewSharesCard(
-                        title: "口座ごと",
-                        type: model.output.entryType,
-                        shares: walletShares,
-                        total: nil,
-                        onOpen: { share in
-                            model.state.sheet = .share(share)
-                        }
-                    )
-                }
+                shareCards
             }
 
             let tallies = model.output.stampTallies
@@ -125,6 +84,52 @@ extension ReviewView {
 }
 
 private extension ReviewView {
+    @ViewBuilder
+    var shareCards: some View {
+        let categoryShares = model.output.categoryShares
+        let walletShares = model.output.walletShares
+        let isEmpty = categoryShares.isEmpty && walletShares.isEmpty
+
+        if model.input.list == nil {
+            EmptyView()
+        } else if isEmpty {
+            PlaceholderEmpty(
+                systemImage: "chart.pie",
+                text: "この期間の記録はありません",
+                onRecord: {
+                    onAddEntry(recordDate)
+                }
+            )
+            .padding(.horizontal, 16)
+            .card()
+            .layoutColumn(.trailing)
+        } else {
+            ReviewSharesCard(
+                title: "カテゴリごと",
+                type: model.output.entryType,
+                shares: categoryShares,
+                total: ReviewSharesCard.Total(
+                    title: totalTitle,
+                    amount: model.output.total
+                ),
+                onOpen: { share in
+                    model.state.sheet = .share(share)
+                }
+            )
+            .layoutColumn(.trailing)
+
+            ReviewSharesCard(
+                title: "口座ごと",
+                type: model.output.entryType,
+                shares: walletShares,
+                total: nil,
+                onOpen: { share in
+                    model.state.sheet = .share(share)
+                }
+            )
+        }
+    }
+
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.input.kind
         let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear

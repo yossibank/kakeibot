@@ -52,41 +52,9 @@ private extension BudgetListView {
                         }
                     }
 
-                    if !budgeted.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                SettingsSectionTitle("カテゴリごと")
+                    budgetedSection
 
-                                Spacer()
-
-                                Text("合計 \(Yen.text(model.output.categoriesTotal))")
-                                    .textFont(.caption2)
-                                    .monospacedDigit()
-                                    .foregroundStyle(Palette.subtext)
-                                    .padding(.trailing, 8)
-                            }
-
-                            rowsCard(budgeted, row: categoryRow)
-                        }
-                    }
-
-                    if !unbudgeted.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                SettingsSectionTitle("予算なし")
-
-                                Spacer()
-
-                                Text("\(unbudgeted.count) カテゴリ")
-                                    .textFont(.caption2)
-                                    .monospacedDigit()
-                                    .foregroundStyle(Palette.subtext)
-                                    .padding(.trailing, 8)
-                            }
-
-                            rowsCard(unbudgeted, row: plainRow)
-                        }
-                    }
+                    unbudgetedSection
                 }
                 .padding(.vertical, 8)
             }
@@ -116,6 +84,48 @@ private extension BudgetListView {
         .backdrop()
     }
 
+    @ViewBuilder
+    var budgetedSection: some View {
+        if !budgeted.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    SettingsSectionTitle("カテゴリごと")
+
+                    Spacer()
+
+                    Text("合計 \(Yen.text(model.output.categoriesTotal))")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .padding(.trailing, 8)
+                }
+
+                rowsCard(budgeted, row: categoryRow)
+            }
+        }
+    }
+
+    @ViewBuilder
+    var unbudgetedSection: some View {
+        if !unbudgeted.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    SettingsSectionTitle("予算なし")
+
+                    Spacer()
+
+                    Text("\(unbudgeted.count) カテゴリ")
+                        .textFont(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.subtext)
+                        .padding(.trailing, 8)
+                }
+
+                rowsCard(unbudgeted, row: plainRow)
+            }
+        }
+    }
+
     var totalCard: some View {
         Button {
             openDrawer(.total)
@@ -137,33 +147,7 @@ private extension BudgetListView {
                 amountValue(model.output.totalAmount, size: .largeTitle, weight: .bold)
                     .editBadge()
 
-                if model.output.isCarryoverOn,
-                   let usage = model.output.usage(for: nil) {
-                    HStack(spacing: 8) {
-                        Text(usage.carryoverText)
-                            .textFont(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-
-                        if usage.carryover != 0 {
-                            Button("0 に戻す") {
-                                model.perform {
-                                    await $0.resetCarryover()
-                                }
-                            }
-                            .textFont(.caption2, weight: .semibold)
-                            .foregroundStyle(Palette.accentStrong)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Palette.panel, in: .capsule)
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                }
+                carryoverLine
 
                 if let usage = model.output.usage(for: nil) {
                     usageLine(usage)
@@ -189,6 +173,37 @@ private extension BudgetListView {
             .animation(.snappy, value: model.input.carryoverFrom)
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    var carryoverLine: some View {
+        if model.output.isCarryoverOn,
+           let usage = model.output.usage(for: nil) {
+            HStack(spacing: 8) {
+                Text(usage.carryoverText)
+                    .textFont(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                if usage.carryover != 0 {
+                    Button("0 に戻す") {
+                        model.perform {
+                            await $0.resetCarryover()
+                        }
+                    }
+                    .textFont(.caption2, weight: .semibold)
+                    .foregroundStyle(Palette.accentStrong)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Palette.panel, in: .capsule)
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 16)
+            .transition(.move(edge: .top).combined(with: .opacity))
+        }
     }
 
     func categoryRow(_ category: EntryCategory) -> some View {

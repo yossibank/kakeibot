@@ -31,46 +31,7 @@ public struct WalletEditSheet: View {
 
     public var body: some View {
         GeometryReader { _ in
-            ZStack(alignment: .bottom) {
-                content
-
-                if model.state.prompt.panel == .amount {
-                    amountDrawer(
-                        "最初の残高",
-                        calculator: model.state.calculator,
-                        amount: model.output.initialBalance,
-                        onPress: model.state.press,
-                        onDismiss: closeAmount,
-                        onDone: closeAmount
-                    )
-                }
-
-                if model.state.prompt.panel == .valuation {
-                    amountDrawer(
-                        "今の評価額",
-                        calculator: model.state.valuation,
-                        onPress: model.state.pressValuation,
-                        onDismiss: closeValuation
-                    ) {
-                        saveValuation()
-                    } button: {
-                        PrimaryButton("評価額を保存") {
-                            saveValuation()
-                        }
-                    }
-                }
-
-                if model.state.prompt.panel == .loanAmount {
-                    amountDrawer(
-                        "最初に借りた額",
-                        calculator: model.state.loanAmount,
-                        onPress: model.state.pressLoanAmount,
-                        onDismiss: closeLoanAmount,
-                        onDone: closeLoanAmount
-                    )
-                }
-            }
-            .animation(.snappy, value: model.state.prompt.panel)
+            editorStack
         }
         .iconEditorDrawer(
             model: model.state.icon,
@@ -123,6 +84,51 @@ public struct WalletEditSheet: View {
             await model.load()
         }
         .presentationSizing(.tallForm)
+    }
+}
+
+private extension WalletEditSheet {
+    var editorStack: some View {
+        ZStack(alignment: .bottom) {
+            content
+
+            if model.state.prompt.panel == .amount {
+                amountDrawer(
+                    "最初の残高",
+                    calculator: model.state.calculator,
+                    amount: model.output.initialBalance,
+                    onPress: model.state.press,
+                    onDismiss: closeAmount,
+                    onDone: closeAmount
+                )
+            }
+
+            if model.state.prompt.panel == .valuation {
+                amountDrawer(
+                    "今の評価額",
+                    calculator: model.state.valuation,
+                    onPress: model.state.pressValuation,
+                    onDismiss: closeValuation
+                ) {
+                    saveValuation()
+                } button: {
+                    PrimaryButton("評価額を保存") {
+                        saveValuation()
+                    }
+                }
+            }
+
+            if model.state.prompt.panel == .loanAmount {
+                amountDrawer(
+                    "最初に借りた額",
+                    calculator: model.state.loanAmount,
+                    onPress: model.state.pressLoanAmount,
+                    onDismiss: closeLoanAmount,
+                    onDone: closeLoanAmount
+                )
+            }
+        }
+        .animation(.snappy, value: model.state.prompt.panel)
     }
 }
 

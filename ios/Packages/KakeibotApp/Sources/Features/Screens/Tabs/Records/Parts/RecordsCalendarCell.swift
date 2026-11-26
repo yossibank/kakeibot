@@ -22,61 +22,9 @@ struct RecordsCalendarCell: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text(String(day))
-                .displayFont(.body)
-                .foregroundStyle(dayColor)
-                .frame(width: 30, height: 30)
-                .background {
-                    if isShown {
-                        Circle()
-                            .fill(Palette.accent)
-                    } else if isToday {
-                        Circle()
-                            .stroke(Palette.accent, lineWidth: 1)
-                    }
-                }
-                .overlay(alignment: .topTrailing) {
-                    if let stamp {
-                        IconSeal(stamp, size: 22)
-                            .offset(x: 11, y: -9)
-                            .id(stamp.id)
-                            .transition(Self.stampTransition)
-                    }
-                }
-                .animation(Self.stampAnimation, value: stamp?.id)
+            dayNumber
 
-            if expense > 0, income > 0 {
-                Text(bothAmounts)
-                    .displayFont(.caption)
-                    .monospacedDigit()
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.6)
-                    .padding(.horizontal, 2)
-                    .frame(height: Self.markLineHeight * 2)
-            } else {
-                VStack(spacing: 0) {
-                    markLine {
-                        if expense > 0 {
-                            markAmount(expense, type: .expense)
-                        } else if isNoSpend {
-                            Image(systemName: "leaf.fill")
-                                .sansFont(.micro)
-                                .foregroundStyle(Palette.accent)
-                        } else if hasUpcoming {
-                            Image(systemName: "repeat")
-                                .sansFont(.micro)
-                                .foregroundStyle(Palette.hint)
-                        }
-                    }
-
-                    markLine {
-                        if income > 0 {
-                            markAmount(income, type: .income)
-                        }
-                    }
-                }
-            }
+            marks
         }
         .opacity(isDimmed ? 0.45 : 1)
         .frame(maxWidth: .infinity, minHeight: 66)
@@ -93,6 +41,67 @@ struct RecordsCalendarCell: View {
 }
 
 private extension RecordsCalendarCell {
+    var dayNumber: some View {
+        Text(String(day))
+            .displayFont(.body)
+            .foregroundStyle(dayColor)
+            .frame(width: 30, height: 30)
+            .background {
+                if isShown {
+                    Circle()
+                        .fill(Palette.accent)
+                } else if isToday {
+                    Circle()
+                        .stroke(Palette.accent, lineWidth: 1)
+                }
+            }
+            .overlay(alignment: .topTrailing) {
+                if let stamp {
+                    IconSeal(stamp, size: 22)
+                        .offset(x: 11, y: -9)
+                        .id(stamp.id)
+                        .transition(Self.stampTransition)
+                }
+            }
+            .animation(Self.stampAnimation, value: stamp?.id)
+    }
+
+    @ViewBuilder
+    var marks: some View {
+        if expense > 0, income > 0 {
+            Text(bothAmounts)
+                .displayFont(.caption)
+                .monospacedDigit()
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.6)
+                .padding(.horizontal, 2)
+                .frame(height: Self.markLineHeight * 2)
+        } else {
+            VStack(spacing: 0) {
+                markLine {
+                    if expense > 0 {
+                        markAmount(expense, type: .expense)
+                    } else if isNoSpend {
+                        Image(systemName: "leaf.fill")
+                            .sansFont(.micro)
+                            .foregroundStyle(Palette.accent)
+                    } else if hasUpcoming {
+                        Image(systemName: "repeat")
+                            .sansFont(.micro)
+                            .foregroundStyle(Palette.hint)
+                    }
+                }
+
+                markLine {
+                    if income > 0 {
+                        markAmount(income, type: .income)
+                    }
+                }
+            }
+        }
+    }
+
     func markLine(@ViewBuilder _ content: () -> some View) -> some View {
         Color.clear
             .frame(height: Self.markLineHeight)

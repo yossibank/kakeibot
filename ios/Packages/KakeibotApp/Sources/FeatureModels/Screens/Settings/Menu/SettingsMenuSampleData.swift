@@ -13,6 +13,14 @@ enum SettingsMenuSampleData {
         let isNoSpend: Bool
     }
 
+    private typealias Purchase = (
+        isMade: Bool,
+        name: String,
+        amount: Int,
+        wallet: Wallet.ID,
+        memo: String
+    )
+
     static let dayCount = 120
 
     private static var cardDraft: WalletDraft {
@@ -102,66 +110,32 @@ enum SettingsMenuSampleData {
         book: Book
     ) throws -> [EntryDraft] {
         let isWeekday = date.weekday != .saturday && date.weekday != .sunday
-        var drafts: [EntryDraft] = []
 
-        func add(
-            _ name: String,
-            _ amount: Int,
-            _ wallet: Wallet.ID,
-            _ memo: String
-        ) throws {
-            let category = try book.category(name, in: book.expense)
+        let purchases: [Purchase] = [
+            (isWeekday, "食費", 700 + seed % 6 * 100, book.cash, "ランチ"),
+            (isWeekday, "交通", 440, book.cash, "電車"),
+            (seed % 4 == 2, "食費", 380, book.cash, "コーヒー"),
+            (seed % 3 == 0, "食費", 1800 + seed % 17 * 100, book.card, "スーパー"),
+            (seed % 6 == 1, "日用品", 900 + seed % 13 * 100, book.card, "ドラッグストア"),
+            (seed % 10 == 4, "交際", 3500 + seed % 5 * 500, book.cash, "飲み会"),
+            (seed % 13 == 7, "趣味", 2500 + seed % 7 * 600, book.card, "本"),
+            (seed % 29 == 11, "衣服", 6800, book.card, "シャツ"),
+            (seed % 31 == 5, "美容", 4500, book.cash, "美容院"),
+            (seed % 47 == 20, "医療", 1800, book.cash, "通院")
+        ]
 
-            let draft = EntryDraft(
+        return try purchases.filter(\.isMade).map { purchase in
+            let category = try book.category(purchase.name, in: book.expense)
+
+            return EntryDraft(
                 type: .expense,
-                amount: amount,
+                amount: purchase.amount,
                 date: date,
                 categoryId: category,
-                walletId: wallet,
-                memo: memo
+                walletId: purchase.wallet,
+                memo: purchase.memo
             )
-
-            drafts.append(draft)
         }
-
-        if isWeekday {
-            try add("食費", 700 + seed % 6 * 100, book.cash, "ランチ")
-            try add("交通", 440, book.cash, "電車")
-        }
-
-        if seed % 4 == 2 {
-            try add("食費", 380, book.cash, "コーヒー")
-        }
-
-        if seed % 3 == 0 {
-            try add("食費", 1800 + seed % 17 * 100, book.card, "スーパー")
-        }
-
-        if seed % 6 == 1 {
-            try add("日用品", 900 + seed % 13 * 100, book.card, "ドラッグストア")
-        }
-
-        if seed % 10 == 4 {
-            try add("交際", 3500 + seed % 5 * 500, book.cash, "飲み会")
-        }
-
-        if seed % 13 == 7 {
-            try add("趣味", 2500 + seed % 7 * 600, book.card, "本")
-        }
-
-        if seed % 29 == 11 {
-            try add("衣服", 6800, book.card, "シャツ")
-        }
-
-        if seed % 31 == 5 {
-            try add("美容", 4500, book.cash, "美容院")
-        }
-
-        if seed % 47 == 20 {
-            try add("医療", 1800, book.cash, "通院")
-        }
-
-        return drafts
     }
 
     private static func fixedDrafts(

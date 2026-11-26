@@ -35,84 +35,7 @@ extension SettingsMenuSampleData {
         now: Date
     ) async throws {
         let start = today.adding(days: -(dayCount - 1))
-        let salary = try book.category("給料", in: book.income)
-        let home = try book.category("住まい", in: book.expense)
-        let phone = try book.category("通信", in: book.expense)
-
-        func draft(
-            _ type: Entry.Kind,
-            _ category: EntryCategory.ID?,
-            _ amount: Int,
-            from wallet: Wallet.ID,
-            to destination: Wallet.ID? = nil,
-            day: Int,
-            closing: Int? = nil,
-            remind: Int? = nil,
-            _ memo: String
-        ) -> RecurringDraft {
-            RecurringDraft(
-                type: type,
-                amount: amount,
-                categoryId: category,
-                walletId: wallet,
-                toWalletId: destination,
-                memo: memo,
-                frequency: .monthly,
-                month: start.month,
-                day: day,
-                closingDay: closing,
-                startDate: start,
-                remindDaysBefore: remind
-            )
-        }
-
-        let drafts = [
-            draft(
-                .expense,
-                phone,
-                4800,
-                from: book.card,
-                day: 10,
-                "スマホ"
-            ),
-            draft(
-                .income,
-                salary,
-                280_000,
-                from: book.bank,
-                day: 25,
-                "給料"
-            ),
-            draft(
-                .transfer,
-                nil,
-                0,
-                from: book.bank,
-                to: book.card,
-                day: 26,
-                closing: 15,
-                remind: 1,
-                "カード"
-            ),
-            draft(
-                .expense,
-                home,
-                78000,
-                from: book.bank,
-                day: 27,
-                remind: 3,
-                "家賃"
-            ),
-            draft(
-                .transfer,
-                nil,
-                15000,
-                from: book.bank,
-                to: book.loan,
-                day: 27,
-                "奨学金の返済"
-            )
-        ]
+        let drafts = try SampleRecurrings(book: book, start: start).drafts()
 
         for draft in drafts {
             try await database.saveRecurring(draft, today: today, at: now)
@@ -161,6 +84,94 @@ extension SettingsMenuSampleData {
         for draft in drafts {
             try await database.saveTemplate(draft, at: now)
         }
+    }
+}
+
+private struct SampleRecurrings {
+    let book: SettingsMenuSampleData.Book
+    let start: LocalDate
+}
+
+extension SampleRecurrings {
+    func drafts() throws -> [RecurringDraft] {
+        let salary = try book.category("給料", in: book.income)
+        let home = try book.category("住まい", in: book.expense)
+        let phone = try book.category("通信", in: book.expense)
+
+        return [
+            draft(
+                .expense,
+                phone,
+                4800,
+                from: book.card,
+                day: 10,
+                "スマホ"
+            ),
+            draft(
+                .income,
+                salary,
+                280_000,
+                from: book.bank,
+                day: 25,
+                "給料"
+            ),
+            draft(
+                .transfer,
+                nil,
+                0,
+                from: book.bank,
+                to: book.card,
+                day: 26,
+                closing: 15,
+                remind: 1,
+                "カード"
+            ),
+            draft(
+                .expense,
+                home,
+                78000,
+                from: book.bank,
+                day: 27,
+                remind: 3,
+                "家賃"
+            ),
+            draft(
+                .transfer,
+                nil,
+                15000,
+                from: book.bank,
+                to: book.loan,
+                day: 27,
+                "奨学金の返済"
+            )
+        ]
+    }
+
+    func draft(
+        _ type: Entry.Kind,
+        _ category: EntryCategory.ID?,
+        _ amount: Int,
+        from wallet: Wallet.ID,
+        to destination: Wallet.ID? = nil,
+        day: Int,
+        closing: Int? = nil,
+        remind: Int? = nil,
+        _ memo: String
+    ) -> RecurringDraft {
+        RecurringDraft(
+            type: type,
+            amount: amount,
+            categoryId: category,
+            walletId: wallet,
+            toWalletId: destination,
+            memo: memo,
+            frequency: .monthly,
+            month: start.month,
+            day: day,
+            closingDay: closing,
+            startDate: start,
+            remindDaysBefore: remind
+        )
     }
 }
 #endif

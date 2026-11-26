@@ -48,22 +48,6 @@ public extension ReviewCompare {
     }
 }
 
-public extension ReviewCompare.Why {
-    enum Part: Hashable, Sendable {
-        case text(String)
-        case number(String)
-    }
-
-    var text: String {
-        parts.map { part in
-            switch part {
-            case let .text(text), let .number(text): text
-            }
-        }
-        .joined()
-    }
-}
-
 private extension ReviewCompare {
     static func topMemo(_ entries: [Entry]) -> (name: String, count: Int)? {
         let memos = entries.compactMap { ReviewGoal.normalizedMemo($0.memo) }
@@ -133,5 +117,16 @@ private extension ReviewCompare {
         }
 
         return [.text("1 回あたりの額が、いつもより高めでした。")]
+    }
+}
+
+public extension ReviewCompare.Why {
+    var text: String {
+        parts.map { part in
+            switch part {
+            case let .text(text), let .number(text): text
+            }
+        }
+        .joined()
     }
 }

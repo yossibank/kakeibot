@@ -6,13 +6,9 @@ extension RewardRule: StoreRecord {
     public static let databaseTableName = "reward_rule"
 }
 
-extension RewardRule: HidableRecord, IconBackedRecord {
+extension RewardRule: HidableRecord {
     public static var notFound: any Error {
         AppDatabase.RewardRuleWriteError.ruleNotFound
-    }
-
-    public static var iconNotFound: any Error {
-        AppDatabase.RewardRuleWriteError.iconNotFound
     }
 
     public static func setHidden(
@@ -28,5 +24,11 @@ extension RewardRule: HidableRecord, IconBackedRecord {
         rule.isActive = !isHidden
         rule.updatedAt = now
         try rule.update(db)
+    }
+}
+
+extension RewardRule: IconBackedRecord {
+    public static var iconNotFound: any Error {
+        AppDatabase.RewardRuleWriteError.iconNotFound
     }
 }

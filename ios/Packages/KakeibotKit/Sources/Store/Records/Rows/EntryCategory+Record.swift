@@ -7,11 +7,13 @@ extension EntryCategory: StoreRecord {
 
 extension EntryCategory.Kind: DatabaseValueConvertible {}
 
-extension EntryCategory: ArchivableRecord, IconBackedRecord {
+extension EntryCategory: ArchivableRecord {
     public static var notFound: any Error {
         AppDatabase.CategoryWriteError.categoryNotFound
     }
+}
 
+extension EntryCategory: IconBackedRecord {
     public static var iconNotFound: any Error {
         AppDatabase.CategoryWriteError.iconNotFound
     }

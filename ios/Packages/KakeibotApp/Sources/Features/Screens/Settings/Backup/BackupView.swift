@@ -16,88 +16,7 @@ public struct BackupView: View {
 
             BackupIntroCard(hint: hint)
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsSectionTitle("残す")
-
-                        VStack(spacing: 0) {
-                            actionButton(
-                                .export(.json),
-                                "書き出す",
-                                systemImage: "square.and.arrow.up",
-                                detail: "すべての記録と設定を保存します"
-                            ) {
-                                exportFile(.json)
-                            }
-
-                            Hairline()
-
-                            actionButton(
-                                .export(.csv),
-                                "表計算用に書き出す",
-                                systemImage: "tablecells",
-                                detail: "CSV で保存します。読み込めません"
-                            ) {
-                                exportFile(.csv)
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .card()
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        SettingsSectionTitle("戻す")
-
-                        VStack(spacing: 0) {
-                            actionButton(
-                                .importFile,
-                                "読み込む",
-                                systemImage: "square.and.arrow.down",
-                                detail: "ファイルから戻します"
-                            ) {
-                                importFile()
-                            }
-
-                            ForEach(model.input.previous) { item in
-                                Hairline()
-
-                                actionButton(
-                                    .previous(item),
-                                    model.output.previousTitle(of: item),
-                                    systemImage: "arrow.uturn.backward",
-                                    detail: "読み込む前に退避したデータです"
-                                ) {
-                                    restorePrevious(item)
-                                }
-                            }
-                        }
-                        .disabled(model.input.isSyncActive)
-                        .opacity(restoreOpacity)
-                        .padding(.horizontal, 16)
-                        .card()
-
-                        SettingsCaption(
-                            restoreNote,
-                            kind: model.input.isSyncActive
-                                ? .info
-                                : .caution
-                        )
-                    }
-
-                    if let message = model.state.doneMessage {
-                        Label(message, systemImage: "checkmark.circle")
-                            .textFont(.footnote)
-                            .foregroundStyle(Palette.accent)
-                            .padding(.leading, 8)
-                            .transition(.opacity)
-                    }
-                }
-                .disabled(model.state.isWorking)
-                .buttonStyle(.plain)
-                .padding(.vertical, 8)
-            }
-            .scrollIndicators(.hidden)
+            content
         }
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
@@ -149,6 +68,99 @@ public struct BackupView: View {
 }
 
 private extension BackupView {
+    var content: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: SettingsSpacing.section) {
+                saveSection
+
+                restoreSection
+
+                if let message = model.state.doneMessage {
+                    Label(message, systemImage: "checkmark.circle")
+                        .textFont(.footnote)
+                        .foregroundStyle(Palette.accent)
+                        .padding(.leading, 8)
+                        .transition(.opacity)
+                }
+            }
+            .disabled(model.state.isWorking)
+            .buttonStyle(.plain)
+            .padding(.vertical, 8)
+        }
+        .scrollIndicators(.hidden)
+    }
+
+    var saveSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("残す")
+
+            VStack(spacing: 0) {
+                actionButton(
+                    .export(.json),
+                    "書き出す",
+                    systemImage: "square.and.arrow.up",
+                    detail: "すべての記録と設定を保存します"
+                ) {
+                    exportFile(.json)
+                }
+
+                Hairline()
+
+                actionButton(
+                    .export(.csv),
+                    "表計算用に書き出す",
+                    systemImage: "tablecells",
+                    detail: "CSV で保存します。読み込めません"
+                ) {
+                    exportFile(.csv)
+                }
+            }
+            .padding(.horizontal, 16)
+            .card()
+        }
+    }
+
+    var restoreSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsSectionTitle("戻す")
+
+            VStack(spacing: 0) {
+                actionButton(
+                    .importFile,
+                    "読み込む",
+                    systemImage: "square.and.arrow.down",
+                    detail: "ファイルから戻します"
+                ) {
+                    importFile()
+                }
+
+                ForEach(model.input.previous) { item in
+                    Hairline()
+
+                    actionButton(
+                        .previous(item),
+                        model.output.previousTitle(of: item),
+                        systemImage: "arrow.uturn.backward",
+                        detail: "読み込む前に退避したデータです"
+                    ) {
+                        restorePrevious(item)
+                    }
+                }
+            }
+            .disabled(model.input.isSyncActive)
+            .opacity(restoreOpacity)
+            .padding(.horizontal, 16)
+            .card()
+
+            SettingsCaption(
+                restoreNote,
+                kind: model.input.isSyncActive
+                    ? .info
+                    : .caution
+            )
+        }
+    }
+
     func actionButton(
         _ row: BackupModel.Row,
         _ title: String,

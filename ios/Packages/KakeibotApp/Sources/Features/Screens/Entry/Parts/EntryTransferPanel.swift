@@ -76,80 +76,29 @@ private extension EntryTransferPanel {
     }
 
     func card(_ role: EntryWalletDeck.Role) -> some View {
-        let id = role == .source ? model.state.payment.walletId : model.state.payment.toWalletId
-        let wallet = model.output.wallet(id)
-        let icon = wallet.flatMap { model.output.icon(for: $0) }
-        let isOver = role == .source && model.output.isOverSourceBalance
-        let balanceColor = isOver ? Palette.rose : Palette.subtext
-        let current = wallet.flatMap(model.output.currentLine)
-        let nameColor = wallet == nil ? Palette.hint : Palette.text
-        let iconShape = RoundedRectangle(cornerRadius: corner.radius(12))
+        let wallet = roleWallet(role)
         let shape = RoundedRectangle(cornerRadius: corner.radius(20))
-        let tint = icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
-
-        let after = wallet.flatMap { wallet in
-            model.output.afterLine(of: wallet, isSource: role == .source)
-        }
-
-        let idleAfter = wallet.flatMap { wallet in
-            model.output.idleAfterLine(of: wallet, isSource: role == .source)
-        }
-
-        let info = VStack(alignment: .leading, spacing: 4) {
-            roleTag(role)
-
-            Text(wallet?.name ?? "選ぶ")
-                .textFont(.subheadline, weight: .bold)
-                .foregroundStyle(nameColor)
-                .lineLimit(2)
-                .sharedTextScale()
-        }
-
-        let balances = Grid(alignment: .trailing, horizontalSpacing: 8, verticalSpacing: 2) {
-            if let current {
-                balanceLine(current)
-            }
-
-            if let after {
-                balanceLine(after)
-            } else if let idleAfter {
-                balanceLine(idleAfter)
-                    .foregroundStyle(Palette.hint)
-            }
-        }
-        .textFont(.caption)
-        .lineLimit(1)
-        .foregroundStyle(balanceColor)
-        .fixedSize()
-        .animation(.snappy, value: after)
 
         return Button {
             onPick(role)
         } label: {
             HStack(spacing: 12) {
-                IconImage(icon, size: 22)
-                    .foregroundStyle(Palette.accent)
-                    .frame(width: Self.iconSize, height: Self.iconSize)
-                    .background(tint.opacity(.subtle), in: iconShape)
-                    .overlay {
-                        iconShape
-                            .strokeBorder(tint.opacity(.medium), lineWidth: 1.5)
-                    }
+                cardIcon(wallet)
 
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8) {
-                        info
+                        cardInfo(role, wallet: wallet)
                             .fixedSize()
 
                         Spacer(minLength: 8)
 
-                        balances
+                        cardBalances(role, wallet: wallet)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        info
+                        cardInfo(role, wallet: wallet)
 
-                        balances
+                        cardBalances(role, wallet: wallet)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -175,6 +124,73 @@ private extension EntryTransferPanel {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
+    }
+
+    func cardIcon(_ wallet: Wallet?) -> some View {
+        let icon = wallet.flatMap { model.output.icon(for: $0) }
+        let iconShape = RoundedRectangle(cornerRadius: corner.radius(12))
+        let tint = icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
+
+        return IconImage(icon, size: 22)
+            .foregroundStyle(Palette.accent)
+            .frame(width: Self.iconSize, height: Self.iconSize)
+            .background(tint.opacity(.subtle), in: iconShape)
+            .overlay {
+                iconShape
+                    .strokeBorder(tint.opacity(.medium), lineWidth: 1.5)
+            }
+    }
+
+    func cardInfo(
+        _ role: EntryWalletDeck.Role,
+        wallet: Wallet?
+    ) -> some View {
+        let nameColor = wallet == nil ? Palette.hint : Palette.text
+
+        return VStack(alignment: .leading, spacing: 4) {
+            roleTag(role)
+
+            Text(wallet?.name ?? "選ぶ")
+                .textFont(.subheadline, weight: .bold)
+                .foregroundStyle(nameColor)
+                .lineLimit(2)
+                .sharedTextScale()
+        }
+    }
+
+    func cardBalances(
+        _ role: EntryWalletDeck.Role,
+        wallet: Wallet?
+    ) -> some View {
+        let isOver = role == .source && model.output.isOverSourceBalance
+        let balanceColor = isOver ? Palette.rose : Palette.subtext
+        let current = wallet.flatMap(model.output.currentLine)
+
+        let after = wallet.flatMap { wallet in
+            model.output.afterLine(of: wallet, isSource: role == .source)
+        }
+
+        let idleAfter = wallet.flatMap { wallet in
+            model.output.idleAfterLine(of: wallet, isSource: role == .source)
+        }
+
+        return Grid(alignment: .trailing, horizontalSpacing: 8, verticalSpacing: 2) {
+            if let current {
+                balanceLine(current)
+            }
+
+            if let after {
+                balanceLine(after)
+            } else if let idleAfter {
+                balanceLine(idleAfter)
+                    .foregroundStyle(Palette.hint)
+            }
+        }
+        .textFont(.caption)
+        .lineLimit(1)
+        .foregroundStyle(balanceColor)
+        .fixedSize()
+        .animation(.snappy, value: after)
     }
 
     @ViewBuilder
@@ -215,6 +231,11 @@ private extension EntryTransferPanel {
 
 private extension EntryTransferPanel {
     static let iconSize: CGFloat = 44
+
+    func roleWallet(_ role: EntryWalletDeck.Role) -> Wallet? {
+        let id = role == .source ? model.state.payment.walletId : model.state.payment.toWalletId
+        return model.output.wallet(id)
+    }
 
     func title(_ role: EntryWalletDeck.Role) -> String {
         switch role {

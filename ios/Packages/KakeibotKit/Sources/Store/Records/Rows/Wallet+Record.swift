@@ -8,13 +8,9 @@ extension Wallet: StoreRecord {
 
 extension Wallet.Kind: DatabaseValueConvertible {}
 
-extension Wallet: ArchivableRecord, IconBackedRecord {
+extension Wallet: ArchivableRecord {
     public static var notFound: any Error {
         AppDatabase.WalletWriteError.walletNotFound
-    }
-
-    public static var iconNotFound: any Error {
-        AppDatabase.WalletWriteError.iconNotFound
     }
 
     public static func setHidden(
@@ -35,5 +31,11 @@ extension Wallet: ArchivableRecord, IconBackedRecord {
         wallet.archivedAt = isHidden ? now : nil
         wallet.updatedAt = now
         try wallet.update(db)
+    }
+}
+
+extension Wallet: IconBackedRecord {
+    public static var iconNotFound: any Error {
+        AppDatabase.WalletWriteError.iconNotFound
     }
 }

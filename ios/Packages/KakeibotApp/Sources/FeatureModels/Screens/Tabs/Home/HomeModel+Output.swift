@@ -7,7 +7,7 @@ public extension HomeModel {
         let input: Input
         let state: State
 
-        private let figuresCache = Derived<Figures>()
+        private let figuresCache = Derived<HomeFigures>()
         private let templatesCache = Derived<[EntryTemplate]>()
 
         init(
@@ -78,12 +78,7 @@ public extension HomeModel.Output {
 }
 
 private extension HomeModel.Output {
-    struct Figures {
-        let overview: MonthOverview
-        let billPages: [BillPage]
-    }
-
-    var figures: Figures {
+    var figures: HomeFigures {
         figuresCache.value {
             let bills = input.list?.upcomingCardBills(
                 recurrings: input.recurrings,
@@ -100,7 +95,7 @@ private extension HomeModel.Output {
                 today: state.today
             )
 
-            return Figures(overview: overview, billPages: BillPage.pages(of: bills ?? []))
+            return HomeFigures(overview: overview, billPages: BillPage.pages(of: bills ?? []))
         }
     }
 
@@ -111,4 +106,9 @@ private extension HomeModel.Output {
         default: date.monthDayText
         }
     }
+}
+
+private struct HomeFigures {
+    let overview: MonthOverview
+    let billPages: [BillPage]
 }

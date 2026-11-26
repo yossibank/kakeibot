@@ -65,75 +65,83 @@ private extension BudgetWidgetView {
 
     func medium(_ summary: BudgetWidgetSummary) -> some View {
         HStack(spacing: 20) {
-            VStack(alignment: .leading, spacing: 0) {
-                title(of: summary)
+            budgetColumn(of: summary)
+                .frame(maxWidth: .infinity)
 
-                Spacer(minLength: 4)
+            spendingColumn(of: summary)
+                .frame(maxWidth: .infinity)
+        }
+    }
 
-                dial(summary)
+    func budgetColumn(of summary: BudgetWidgetSummary) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            title(of: summary)
 
-                Spacer(minLength: 4)
+            Spacer(minLength: 4)
 
-                Text(budgetNote(of: summary))
-                    .textFont(size: .caption)
-                    .monospacedDigit()
-                    .foregroundStyle(noteColor(of: summary))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .frame(maxWidth: .infinity)
-                    .privacySensitive()
-            }
-            .frame(maxWidth: .infinity)
+            dial(summary)
 
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text("今日の支出")
-                        .textFont(size: .caption)
-                        .foregroundStyle(Palette.subtext)
+            Spacer(minLength: 4)
 
-                    Spacer(minLength: 4)
-
-                    days(of: summary)
-                }
-
-                AmountText(
-                    summary.todayExpense,
-                    font: .size(.title, weight: .bold),
-                    color: Palette.accentStrong
-                )
+            Text(budgetNote(of: summary))
+                .textFont(size: .caption)
+                .monospacedDigit()
+                .foregroundStyle(noteColor(of: summary))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
+                .frame(maxWidth: .infinity)
                 .privacySensitive()
+        }
+    }
 
-                Rectangle()
-                    .fill(Palette.line)
-                    .frame(height: 1)
-                    .padding(.vertical, 8)
+    func spendingColumn(of summary: BudgetWidgetSummary) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("今日の支出")
+                    .textFont(size: .caption)
+                    .foregroundStyle(Palette.subtext)
 
-                VStack(spacing: 8) {
-                    ForEach(rows(of: summary)) { row in
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(row.title)
-                                .textFont(size: .caption)
-                                .foregroundStyle(Palette.subtext)
+                Spacer(minLength: 4)
 
-                            Spacer(minLength: 8)
+                days(of: summary)
+            }
 
-                            AmountText(
-                                row.amount,
-                                font: .size(.body, weight: .medium),
-                                color: Palette.text
-                            )
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                            .privacySensitive()
-                        }
+            AmountText(
+                summary.todayExpense,
+                font: .size(.title, weight: .bold),
+                color: Palette.accentStrong
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .privacySensitive()
+
+            Rectangle()
+                .fill(Palette.line)
+                .frame(height: 1)
+                .padding(.vertical, 8)
+
+            VStack(spacing: 8) {
+                ForEach(rows(of: summary)) { row in
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(row.title)
+                            .textFont(size: .caption)
+                            .foregroundStyle(Palette.subtext)
+
+                        Spacer(minLength: 8)
+
+                        AmountText(
+                            row.amount,
+                            font: .size(.body, weight: .medium),
+                            color: Palette.text
+                        )
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .privacySensitive()
                     }
                 }
-
-                Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity)
+
+            Spacer(minLength: 0)
         }
     }
 

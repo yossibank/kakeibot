@@ -124,6 +124,9 @@ extension AppDatabase {
 }
 
 private extension AppDatabase {
+    static let feeSeed = Seed(name: "手数料", glyph: .coin, color: "#A68A64")
+    static let transferSeed = Seed(name: "振替", glyph: .banknote, color: "#7A8B99")
+
     static let wallets: [(Seed, Wallet.Kind)] = [
         (Seed(name: "財布", glyph: .cash, color: "#C9A465"), .cash),
         (Seed(name: "銀行", glyph: .bank, color: "#4A6FA5"), .bank)
@@ -149,9 +152,6 @@ private extension AppDatabase {
         Seed(name: "臨時収入", glyph: .bonus, color: "#E9C46A"),
         Seed(name: "その他", glyph: .other, color: "#8D99AE")
     ]
-
-    static let feeSeed = Seed(name: "手数料", glyph: .coin, color: "#A68A64")
-    static let transferSeed = Seed(name: "振替", glyph: .banknote, color: "#7A8B99")
 
     static let templates: [(name: String, category: String)] = [
         ("コンビニ", "食費"),

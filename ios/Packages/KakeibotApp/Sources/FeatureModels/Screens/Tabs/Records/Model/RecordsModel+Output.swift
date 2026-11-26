@@ -127,7 +127,9 @@ private extension RecordsModel.Output {
         let days: [EntryDay]
         let hiddenCount: Int
     }
+}
 
+private extension RecordsModel.Output {
     var monthDays: MonthDays {
         monthDaysCache.value {
             makeMonthDays()
@@ -148,6 +150,7 @@ private extension RecordsModel.Output {
 
     func makeMonthDays() -> MonthDays {
         let days = makeDays()
+
         let byDate = Dictionary(
             days.map { ($0.date, $0) },
             uniquingKeysWith: { first, _ in

@@ -105,6 +105,7 @@ extension VoiceText {
 private extension VoiceText {
     static let maxAmount = 999_999_999
     static let maxDaysAgo = 60
+    static let smallUnits: [Character: Int] = ["十": 10, "百": 100, "千": 1000]
 
     static let relativeDays: [(String, Int)] = [
         ("一昨日", -2),
@@ -130,8 +131,6 @@ private extension VoiceText {
         "〇": 0, "零": 0, "一": 1, "二": 2, "三": 3, "四": 4,
         "五": 5, "六": 6, "七": 7, "八": 8, "九": 9
     ]
-
-    static let smallUnits: [Character: Int] = ["十": 10, "百": 100, "千": 1000]
 
     static var yenPattern: Regex<(Substring, Substring)> {
         #/([0-9〇零一二三四五六七八九十百千万]+)\s*(?:円|えん)/#
