@@ -346,7 +346,7 @@ records.describes-month-and-period		RecordsModelTest/describesMonthAndPeriod	And
 records.shows-notice-when-list-fails		RecordsModelTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 records.shows-notice-when-settings-fail		RecordsModelTest/showsNoticeWhenSettingsFail	Androidのみ	設定の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 records.marks-list-failure-until-retried		RecordsModelTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
-records.marks-no-list-failure-when-settings-fail		RecordsModelTest/marksNoListFailureWhenSettingsFail	Androidのみ	設定の見張りの失敗では旗を立てない。iOS にこの筋書きのテストは無い
+records.marks-no-list-failure-when-settings-fail		RecordsModelTest/marksNoListFailureWhenSettingsFail	Androidのみ	設定の監視の失敗では旗を立てない。iOS にこの筋書きのテストは無い
 review-comment-writer-accuracy.*	ReviewCommentWriterAccuracyTests/*		iOSのみ	Apple の FoundationModels で文を書く精度の確かめで、Android に相手が無い
 review.totals-upcoming-recurrings-of-current-period	ReviewModelTests/totalsUpcomingRecurringsOfCurrentPeriod		未移植	これからの定期の合計（upcomingRecurringTotal）が無い
 review.ranks-categories-by-amount	ReviewModelTests/ranksCategoriesByAmount	ReviewModelTest/ranksCategoriesByAmount	対応	予算の使い方・口座ごとの割合・割合ごとの記録の行は、Android に無く確かめない
@@ -384,7 +384,7 @@ review-notice.shows-notice-when-list-fails		ReviewModelNoticeTest/showsNoticeWhe
 review-notice.marks-list-failure-until-retried		ReviewModelNoticeTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 review-notice.shows-notice-when-selection-cannot-be-read		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeRead	Androidのみ	選択を読めない時の知らせ。iOS も出すがテストは無い
 review-notice.shows-notice-when-selection-cannot-be-saved		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeSaved	Androidのみ	選択を保存できない時の知らせ。iOS も出すがテストは無い
-review-notice.keeps-list-notice-after-saving		ReviewModelNoticeTest/keepsListNoticeAfterSaving	Androidのみ	保存が通っても、見張りの失敗の知らせを残す
+review-notice.keeps-list-notice-after-saving		ReviewModelNoticeTest/keepsListNoticeAfterSaving	Androidのみ	保存が通っても、監視の失敗の知らせを残す
 review-notice.closes-notice-by-hand		ReviewModelNoticeTest/closesNoticeByHand	Androidのみ	知らせを手で閉じる。iOS の ReviewModel にこの筋書きのテストは無い
 review-note-writer-accuracy.*	ReviewNoteWriterAccuracyTests/*		iOSのみ	Apple の FoundationModels でまとめを書く精度の確かめで、Android に相手が無い
 review-text.names-shares	ReviewTextTests/namesShares	ReviewTextTest/namesShares	対応	
@@ -586,8 +586,8 @@ screen-observation.keeps-earlier-message-while-observing		ScreenObservationTest/
 screen-observation.counts-each-notice-and-keeps-it-after-success		ScreenObservationTest/countsEachNoticeAndKeepsItAfterSuccess	Androidのみ	知らせを数え、後の成功で消さない。iOS は ReviewModel で確かめる
 screen-observation.shares-values-after-source-recovers		ScreenObservationTest/sharesValuesAfterSourceRecovers	Androidのみ	監視を分け合う ScreenObservation.share は Android だけにある
 screen-observation.shares-failure-with-each-subscriber		ScreenObservationTest/sharesFailureWithEachSubscriber	Androidのみ	監視を分け合う ScreenObservation.share は Android だけにある
-shared-observation.shares-one-source-between-subscribers		SharedObservationTest/sharesOneSourceBetweenSubscribers	Androidのみ	見張りを分け合う持ち主の SharedObservation は Android だけにある
-shared-observation.stops-source-when-stopped		SharedObservationTest/stopsSourceWhenStopped	Androidのみ	止めると元の見張りも止まる。SharedObservation は Android だけにある
+shared-observation.shares-one-source-between-subscribers		SharedObservationTest/sharesOneSourceBetweenSubscribers	Androidのみ	監視を分け合う持ち主の SharedObservation は Android だけにある
+shared-observation.stops-source-when-stopped		SharedObservationTest/stopsSourceWhenStopped	Androidのみ	止めると元の監視も止まる。SharedObservation は Android だけにある
 observation-round.observes-again-when-restarted	ObservationRoundTests/observesAgainWhenRestarted	ObservationRoundTest/observesAgainWhenRestarted	対応	
 observation-round.restarts-every-model-sharing-round	ObservationRoundTests/restartsEveryModelSharingRound	ObservationRoundTest/restartsEveryModelSharingRound	対応	
 loadable.holds-value-only-when-loaded	LoadableTests/holdsValueOnlyWhenLoaded	LoadableTest/holdsValueOnlyWhenLoaded	対応	

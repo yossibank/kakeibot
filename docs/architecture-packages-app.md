@@ -92,7 +92,7 @@ KakeibotApp/
 | `FeatureModels/Shared/Bill/` | これからの引き落としを月のページに分ける |
 | `FeatureModels/Shared/DateChoice/` | 休日のずらしと曜日の表示の名前 |
 | `FeatureModels/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
-| `FeatureModels/Shared/Model/` | 画面のモデルの見張り（失敗で見張り直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、時計と待ち、値を覚える `Derived`・`DerivedTable` も置く |
+| `FeatureModels/Shared/Model/` | 画面のモデルの監視（失敗で監視し直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、時計と待ち、値を覚える `Derived`・`DerivedTable` も置く |
 | `FeatureModels/Shared/Model/` の `ScreenOutcome` | 保存できた・消した、の結果をモデルの `state` に置く型 |
 | `FeatureModels/Shared/Model/` の `ScreenParts` | DB と時計と待ち（`ScreenWait`）を包んで、画面からモデルへ渡す型。中の DB は `FeatureModels` だけが読む |
 | `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、削除の取り消し（`DeletionUndo`）。保存の失敗が空き容量不足かの見分けも置く |
@@ -116,9 +116,9 @@ KakeibotApp/
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
 | `Features/Shared/Model/` | モデルが `state` に置いた結果の変化を、画面が受ける modifier と、タブの外枠（`tabScreen`） |
 | `Features/Shared/Notice/` | 記録・削除の知らせの帯と、取り消しの知らせ（`undoNotice`）。ファイルの頭は、元の型ごとに分かれる |
-| `Features/Shared/Notification/` | 通知の許可が無いときの帯と、許可の窓口を画面に渡す値 |
+| `Features/Shared/Notification/` | 通知の許可が無い時の帯と、許可の窓口を画面に渡す値 |
 | `Features/Shared/Period/` | 期間のカード、期間を送る行と今に戻るボタン |
-| `Features/Shared/Placeholder/` | タブで記録が無いときと読み込めないときの表示。設定の一覧が空なら `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |
+| `Features/Shared/Placeholder/` | タブで記録が無い時と読み込めない時の表示。設定の一覧が空なら `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |
 | `Features/Shared/Pro/` | 止めた所の下に出すカードと、Pro の窓口を画面に渡す値 |
 | `Features/Shared/SettingsParts/` | 設定の画面で使う部品（Board・Drag・Hint・Icon・Input・Layout・Tile）。画面の上のヘッダーは `Layout/` に、持ち上げと置き場所の部品は `Drag/` に置く |
 | `Features/Shared/Setup/` | 残りの設定の一覧と、項目から開く画面 |

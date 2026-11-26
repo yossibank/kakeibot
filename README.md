@@ -59,13 +59,15 @@ flowchart LR
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
 | Android の画面とモデル | [docs/architecture-android-app.md](docs/architecture-android-app.md) |
+| Android の画面とモデルのやり取り | [docs/architecture-android-flow.md](docs/architecture-android-flow.md) |
 | 画面の組み立て・通知とウィジェット・画面のフォルダ | [docs/architecture-screens.md](docs/architecture-screens.md) |
-| 画面とモデルのやり取り・見張り・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
+| 画面とモデルのやり取り・監視・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
 | 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | データの形 | [docs/data.md](docs/data.md) |
+| 予算・固定費・ごほうび・スタンプの表 | [docs/data-budget.md](docs/data-budget.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |
 | 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
-| なぜそう決めたか | [docs/decisions/](docs/decisions/) |
+| なぜそう決めたか（決定の索引） | [docs/decisions/README.md](docs/decisions/README.md) |
 | 何をどの順で作るか | [docs/roadmap.md](docs/roadmap.md) |
 | 画面の言葉とコードの名前 | [docs/glossary.md](docs/glossary.md) |
 | 書き出しの形式 | [spec/export-format.md](spec/export-format.md) |
@@ -77,8 +79,14 @@ flowchart LR
 
 ## 🔤 フォント
 
-| 字体 | フォント | 見本 | 著作権者 | ライセンス |
-| --- | --- | --- | --- | --- |
-| 手書き | [Klee One](https://github.com/fontworks-fonts/Klee) | <img src="docs/images/font-KleeOne.png" height="38" alt="Klee One の見本"> | The Klee Project Authors | [OFL 1.1](https://openfontlicense.org/) |
-| ドット | [DotGothic16](https://github.com/fontworks-fonts/DotGothic16) | <img src="docs/images/font-DotGothic16.png" height="38" alt="DotGothic16 の見本"> | The DotGothic16 Project Authors | [OFL 1.1](https://openfontlicense.org/) |
-| ポップ | [Hachi Maru Pop](https://github.com/noriokanisawa/HachiMaruPop) | <img src="docs/images/font-HachiMaruPop.png" height="38" alt="Hachi Maru Pop の見本"> | The Hachi Maru Pop Project Authors | [OFL 1.1](https://openfontlicense.org/) |
+| 字体 | フォント | 見本 |
+| --- | --- | --- |
+| 手書き | [Klee One](https://github.com/fontworks-fonts/Klee) | <img src="docs/images/font-KleeOne.png" height="38" alt="Klee One の見本"> |
+| ドット | [DotGothic16](https://github.com/fontworks-fonts/DotGothic16) | <img src="docs/images/font-DotGothic16.png" height="38" alt="DotGothic16 の見本"> |
+| ポップ | [Hachi Maru Pop](https://github.com/noriokanisawa/HachiMaruPop) | <img src="docs/images/font-HachiMaruPop.png" height="38" alt="Hachi Maru Pop の見本"> |
+
+| フォント | 著作権者 | ライセンス |
+| --- | --- | --- |
+| Klee One | The Klee Project Authors | [OFL 1.1](https://openfontlicense.org/) |
+| DotGothic16 | The DotGothic16 Project Authors | [OFL 1.1](https://openfontlicense.org/) |
+| Hachi Maru Pop | The Hachi Maru Pop Project Authors | [OFL 1.1](https://openfontlicense.org/) |

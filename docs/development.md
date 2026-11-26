@@ -28,8 +28,8 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | 道具を入れ、hook を入れる | `make setup` |
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
-| 変更の確認（文書・JSON・筋書きの一覧・書き方と設計と並び・余白・依存・iOS の警告・両 OS のテストとビルド。出力は成否と失敗の箇所だけ） | `make verify` |
-| 文書の一致と書き方、JSON の整形、テストと筋書きの一覧の一致を確かめる（文書だけの変更） | `make verify-docs` |
+| 変更の確認（見るものは表の下にある。出力は成否と失敗の箇所だけ） | `make verify` |
+| 文書の一致と書き方とそろえる語、JSON の整形、テストと筋書きの一覧の一致を確かめる（文書だけの変更） | `make verify-docs` |
 | 筋書きの一覧の、区分ごとの件数と違いの一覧 | `make scenarios` |
 | iOS のビルド（シミュレーター） | `make build` |
 | テストのコンパイルだけ（走らせない） | `make test-build` |
@@ -39,7 +39,16 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | Android のビルド（デバッグの APK） | `make android-build` |
 | Android の Core・Store・画面のモデルのテスト | `make android-test` |
 | Swift の並びの直しと、Swift・Kotlin・JSON の整形 | `make format` |
-| ライセンスの一覧を作り直す（部品やフォントを足したとき） | `make licenses` |
+| ライセンスの一覧を作り直す（部品やフォントを足した時） | `make licenses` |
+
+`make verify` は、次のものを確かめる。
+
+- 文書・JSON・筋書きの一覧（`make verify-docs` と同じ）
+- 書き方と設計と並び
+- 余白
+- 依存
+- iOS の警告
+- 両 OS のテストとビルド
 
 `make snapshot` は claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前で、出力は `.build/snapshots/<セット>/` に出る。
 

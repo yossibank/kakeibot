@@ -57,18 +57,18 @@ expense・income の列は、描画に使わない。
 | records_layout | `calendar` `list` | 空ならカレンダー |
 | review_scale | `week` `month` `year` | 空なら月 |
 | review_kind | `expense` `income` `balance` | 空なら支出 |
-| store_review_card_closed | `true` なら、振り返りのレビューの札を出さない | Android は持たない |
-| store_review_opened | `true` なら、レビューのお願いを出さない | 札の「レビューを書く」を押すと `true` にする。Android は持たない |
+| store_review_card_closed | `true` なら、振り返りのレビューのカードを出さない | Android は持たない |
+| store_review_opened | `true` なら、レビューのお願いを出さない | カードの「レビューを書く」を押すと `true` にする。Android は持たない |
 | closed_hints | 説明を閉じた設定の画面を `,` でつないだもの | 空ならすべて出す。画面の名前は、表の下の一覧にある |
 | closed_hidden_lists | 非表示の項目をたたんだ設定の画面。書き方は closed_hints と同じ | 空ならすべて開く |
 | recent_searches | 記録の検索で探した言葉を、新しい順に改行でつないだもの。5 つまで | |
-| widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す | その記録で支出なしの印を消したときは、`,` に続けてその日付（`2026-10-03`）を付ける |
+| widget_entry | すぐ記録のウィジェットで最後に記録した entry の id。取り消すと消す | その記録で支出なしの印を消した時は、`,` に続けてその日付（`2026-10-03`）を付ける |
 | receipt_saved_count | レシートから読んで保存した記録の数 | 空なら 0。Pro でなければ 3 で止める |
 | receipt_guide_hidden | `true` なら、レシートの撮り方を出さずにカメラを開く | 撮り方の「次から表示しない」に印を付けて閉じると `true` にする |
 | fee_category_id | 振替の手数料に付ける category の id | |
-| transfer_out_category_id | 抜けた共有の財布への振替を、支出に変えるときに付ける category の id | |
-| transfer_in_category_id | 抜けた共有の財布からの振替を、収入に変えるときに付ける category の id | |
-| backup_exported_at | バックアップを JSON で最後に書き出した日時。ISO 8601 | 書き出しのファイルには含めない。読み込んだときは、そのファイルを書き出した日時にする |
+| transfer_out_category_id | 抜けた共有の財布への振替を、支出に変える時に付ける category の id | |
+| transfer_in_category_id | 抜けた共有の財布からの振替を、収入に変える時に付ける category の id | |
+| backup_exported_at | バックアップを JSON で最後に書き出した日時。ISO 8601 | 書き出しのファイルには含めない。読み込んだ時は、そのファイルを書き出した日時にする |
 | review_requested_version | レビューのお願いを出したアプリの版 | 空なら、まだ出していない |
 | whats_new_seen_version | 最後に見たお知らせの版 | 空なら、まだ見ていない。最初の設定を終えた時は、その時の一番新しい版にする |
 | review_seen_reports | 開いた締めのレポートの期間の鍵（`month:2026-10-01` の形）を , でつないだもの | 週・月・年ごとに、最後に開いた 1 つだけを残す |

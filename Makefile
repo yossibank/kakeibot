@@ -92,7 +92,8 @@ verify: verify-docs
 	scripts/verify.sh android-build $(GRADLE) :app:assembleDebug
 
 verify-docs:
-	scripts/verify.sh docs-check scripts/docs-check.py
+	scripts/verify.sh docs-check-test scripts/docs-check-test.py
+	scripts/verify.sh docs-check scripts/docs-check.py --terms $(CLAUDE_CONFIG)/docs/config/development.md
 	scripts/verify.sh json-format scripts/json-format.sh check
 	scripts/verify.sh scenarios-check-test scripts/scenarios-check-test.py
 	scripts/verify.sh scenarios-check scripts/scenarios-check.py

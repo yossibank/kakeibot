@@ -44,7 +44,7 @@
 
 | 項目 | 内容 |
 | --- | --- |
-| 理由 | Core を Kotlin に移すとき、iOS のどこに当たるかを追いやすい。`:core` は Android に頼らず、速くテストできる |
+| 理由 | Core を Kotlin に移す時、iOS のどこに当たるかを追いやすい。`:core` は Android に頼らず、速くテストできる |
 | 却下 | 1 つのモジュールにまとめる |
 
 ### Store のモジュール
@@ -166,7 +166,7 @@
 | 理由 | 文書を書くのはほぼ Claude なので、書いたその場で直せる。フックが見ない文書は `make verify-docs` で見る |
 
 > [!IMPORTANT]
-> 文書と実物の一致は、`scripts/docs-check.py` で確かめる。見るものは [architecture のリポジトリ](../architecture.md#-リポジトリ)にある。文書だけの PR では、`make verify-docs` で走らせる。
+> 文書と実物の一致は、`scripts/docs-check.py` で確かめる。見るものは [architecture の確かめるスクリプト](../architecture.md#確かめるスクリプト)にある。文書だけの PR では、`make verify-docs` で走らせる。
 
 ## テストの走らせ方
 
@@ -182,7 +182,7 @@
 
 > [!IMPORTANT]
 > - PR を作る前に、Claude が手元で `make test` を 1 回走らせ、結果を PR の本文に書く。
-> - push し直すときは、Swift か fixtures を変えたときだけ走らせ直す。
+> - push し直す時は、Swift か fixtures を変えた時だけ走らせ直す。
 > - 文書だけの PR では走らせない。
 > - ビルドは別に走らせず、`make test` のビルドで兼ねる。
 > - ビルドとテストの出力は xcbeautify で整える。
@@ -199,7 +199,7 @@
 | 却下 | 英語で書いて日本語に訳す |
 
 > [!IMPORTANT]
-> ほかの言語は、出すときに訳を足す。
+> ほかの言語は、出す時に訳を足す。
 
 ## 画面の言葉づかい
 

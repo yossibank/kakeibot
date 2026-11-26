@@ -2,6 +2,7 @@
 
 > [!NOTE]
 > kakeibot が端末に保存する表の関係・形・決まりと、最初に入るデータが分かる。
+> 予算・固定費・ごほうび・スタンプの表は [data-budget](data-budget.md) にある。
 > 言葉の対応は [glossary](glossary.md) にある。
 
 ## 🗺️ 表の関係
@@ -50,7 +51,7 @@ erDiagram
 - 月は `YYYY-MM` にする。期間との対応は下の表にある。
 - 日時は UTC の ISO 8601 にする。
 - 財布（`Wallet`）・カテゴリ・タグ・スタンプの一覧のアイコンは、ふだんは `archived_at` でしまう。
-- 財布とカテゴリは、記録が無いときだけ消せる。使っている固定費（`Recurring`）・テンプレート（`EntryTemplate`）・評価額・予算・タグも一緒に消す。
+- 財布とカテゴリは、記録が無い時だけ消せる。使っている固定費（`Recurring`）・テンプレート（`EntryTemplate`）・評価額・予算・タグも一緒に消す。
 - 残高・貯金箱の残高は保存せず、記録と評価額から計算する。
 
 月の始まりごとに、期間と月の呼び方を次の表に並べる。理由は [decisions/periods.md の「期間の呼び方」](decisions/periods.md#期間の呼び方)にある。
@@ -63,7 +64,7 @@ erDiagram
 
 ## 🚀 最初に入るデータ
 
-App Group の DB を開いたときに財布もカテゴリも無ければ、次を入れる。理由は [decisions/setup.md の「最初の財布とカテゴリ」](decisions/setup.md#最初の財布とカテゴリ)にある。
+App Group の DB を開いた時に財布もカテゴリも無ければ、次を入れる。理由は [decisions/setup.md の「最初の財布とカテゴリ」](decisions/setup.md#最初の財布とカテゴリ)にある。
 
 | 表 | 中身 |
 | --- | --- |
@@ -73,7 +74,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 どれにも、絵柄（`glyph`）と色の icon を 1 つずつ付ける。
 
-最初の設定を開いたときにテンプレートが 1 つも無ければ、支出のテンプレートを入れる。金額は空にし、口座は最初の現金の口座にする。
+最初の設定を開いた時にテンプレートが 1 つも無ければ、支出のテンプレートを入れる。金額は空にし、口座は最初の現金の口座にする。
 
 | 名前 | カテゴリ |
 | --- | --- |
@@ -82,7 +83,16 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 | 電車 | 交通 |
 | 日用品 | 日用品 |
 
-スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は `star`・`party`・`trophy`・`cake`・`fitness`・`travel`・`sun`・`moon` の順にする。
+スタンプの一覧が 1 つも無ければ（しまったものも数える）、shelf_icon を入れる。絵柄は、次の順にする。
+
+1. `star`
+2. `party`
+3. `trophy`
+4. `cake`
+5. `fitness`
+6. `travel`
+7. `sun`
+8. `moon`
 
 同期を入れて最初の取得を終えるまでは、財布・カテゴリ・shelf_icon を入れない。`sync_state.engine_state` が空の間がそれに当たる。
 
@@ -90,7 +100,7 @@ App Group の DB を開いたときに財布もカテゴリも無ければ、次
 
 表ごとに、列と型と補足を書く。型は SQLite の型で書く。
 
-設定と振り返りの表は [data-settings](data-settings.md) にある。同期のための表は [data-sync](data-sync.md) にある。
+予算・固定費・ごほうび・スタンプの表は [data-budget](data-budget.md) にある。設定と振り返りの表は [data-settings](data-settings.md) にある。同期のための表は [data-sync](data-sync.md) にある。
 
 ### icon
 
@@ -259,120 +269,17 @@ emoji・text・glyph のどれかは必須。新しい版で足した glyph を�
 | id | TEXT | |
 | name | TEXT | |
 | type | TEXT | `expense` `income` |
-| amount | INTEGER | 空なら使うときに入れる。入れるなら 1 以上 |
+| amount | INTEGER | 空なら使う時に入れる。入れるなら 1 以上 |
 | category_id | TEXT | |
 | tag_id | TEXT | 空でもよい。入れるなら category_id のタグ |
 | wallet_id | TEXT | |
 | memo | TEXT | |
-| bill_shift | INTEGER | 0〜2。wallet_id がカードのとき、使った日の何回あとの引き落としに入れるか。カードでなければ 0 |
+| bill_shift | INTEGER | 0〜2。wallet_id がカードの時、使った日の何回あとの引き落としに入れるか。カードでなければ 0 |
 | sort_order | INTEGER | |
 | archived_at | TEXT | |
 | created_at / updated_at | TEXT | |
 
 テンプレートは `archived_at` でしまうか、消す。消すと、記録の `template_id` を空にする。
-
-### budget
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| id | TEXT | |
-| category_id | TEXT | 空なら月全体 |
-| from_month | TEXT | この月から有効 |
-| amount | INTEGER | 空ならこの月から予算なし |
-
-ある月の予算は、`from_month` がその月以前でいちばん新しい行である。`(category_id, from_month)` は重複禁止（月全体は部分インデックスで防ぐ）。額を前の月と同じに戻したら、その月の行を消す。
-
-月全体の予算に、次の行があるとする。
-
-| from_month | amount |
-| --- | --- |
-| `2026-01` | 100000 |
-| `2026-04` | 120000 |
-| `2026-07` | 空 |
-
-このとき、月ごとに使う行と予算は、次の表になる。
-
-| 月 | 使う行 | 予算 |
-| --- | --- | --- |
-| `2026-03` | `2026-01` | 100,000 円 |
-| `2026-04` | `2026-04` | 120,000 円 |
-| `2026-08` | `2026-07` | なし |
-
-### recurring
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| id | TEXT | |
-| type / amount / category_id / wallet_id / to_wallet_id / memo | entry と同じ | 決まりも entry と同じ |
-| frequency | TEXT | `monthly` `yearly` |
-| month | INTEGER | yearly だけ |
-| day | INTEGER | 1〜31。月末を超えたらその月の最終日 |
-| holiday_shift | TEXT | `none` `previous` `next`。休日に当たったら、そのまま・前の平日・次の平日にする |
-| closing_day | INTEGER | 振替だけで、1〜31（31 は末日）。あれば、記録の額を振替先のカードの利用分にし、amount は 0 にする |
-| fee | INTEGER | 振替だけで、1 以上。あれば、記録するときに手数料も記録する |
-| bill_shift | INTEGER | 0〜2。テンプレートと同じ。振替では 0 |
-| final_amount | INTEGER | 最後の回の額で、end_date があり決まった額のときだけ入る。空なら最後の回も amount |
-| start_date / end_date | TEXT | end_date は空でもよい |
-| remind_days_before | INTEGER | 空なら知らせない |
-| generated_until | TEXT | どの日まで記録を作ったか |
-| sort_order | INTEGER | 設定の一覧の並び |
-| archived_at | TEXT | しまっている間は記録を作らない |
-| created_at / updated_at | TEXT | |
-
-### reward_rule
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| id | TEXT | |
-| name | TEXT | 「自炊した日」 |
-| amount | INTEGER | |
-| icon_id | TEXT | |
-| is_active | INTEGER | |
-| sort_order | INTEGER | |
-| created_at / updated_at | TEXT | |
-
-### reward_log
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| id | TEXT | |
-| rule_id | TEXT | |
-| date | TEXT | |
-| amount | INTEGER | その時点の額を写す |
-| created_at | TEXT | |
-
-`(rule_id, date)` は重複禁止。
-
-### reward_goal
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| id | TEXT | |
-| name | TEXT | |
-| target_amount | INTEGER | |
-| purchased_at | TEXT | |
-| entry_id | TEXT | 買ったときの記録。その記録を消すと空にする |
-| created_at / updated_at | TEXT | |
-
-貯金箱の残高 ＝ reward_log の合計 − 買った目標の target_amount の合計。
-
-### calendar_stamp
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| id | TEXT | |
-| date | TEXT | |
-| icon_id | TEXT | |
-| created_at | TEXT | |
-
-date ごとに 1 つまで（date に一意の索引を付ける）。押し直すと置き換える。
-
-### no_spend_day
-
-| 列 | 型 | 補足 |
-| --- | --- | --- |
-| date | TEXT | 主キー |
-| created_at | TEXT | |
 
 ## 📝 表の形の変更
 
