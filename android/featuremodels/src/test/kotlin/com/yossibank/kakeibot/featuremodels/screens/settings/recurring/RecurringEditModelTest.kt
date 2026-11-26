@@ -7,6 +7,7 @@ import com.yossibank.kakeibot.core.concepts.notification.NotificationAuthorizati
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.notification.NotificationPermission
 import com.yossibank.kakeibot.featuremodels.support.FakePermission
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.date
@@ -25,10 +26,10 @@ class RecurringEditModelTest {
     @Test
     fun warnsThatRemindersCannotArriveWhenDenied() = modelTest(today = "2026-10-17") { setup ->
         val client = FakePermission(authorization = NotificationAuthorization.denied)
-        val model = setup.editModel()
+        val model = setup.editModel(permission = client.permission)
         model.load()
 
-        model.refreshAuthorization(client.permission)
+        model.refreshAuthorization()
         val withoutReminder = model.output.isNotificationDenied
         model.state.update { copy(remindDaysBefore = 1) }
 
@@ -39,11 +40,11 @@ class RecurringEditModelTest {
     @Test
     fun doesNotWarnBeforeAskingForReminders() = modelTest(today = "2026-10-17") { setup ->
         val client = FakePermission(authorization = NotificationAuthorization.notDetermined)
-        val model = setup.editModel()
+        val model = setup.editModel(permission = client.permission)
         model.load()
         model.state.update { copy(remindDaysBefore = 1) }
 
-        model.refreshAuthorization(client.permission)
+        model.refreshAuthorization()
 
         assertFalse(model.output.isNotificationDenied)
     }
@@ -51,11 +52,11 @@ class RecurringEditModelTest {
     @Test
     fun doesNotWarnWhenRemindersAreAllowed() = modelTest(today = "2026-10-17") { setup ->
         val client = FakePermission(authorization = NotificationAuthorization.allowed)
-        val model = setup.editModel()
+        val model = setup.editModel(permission = client.permission)
         model.load()
         model.state.update { copy(remindDaysBefore = 1) }
 
-        model.refreshAuthorization(client.permission)
+        model.refreshAuthorization()
 
         assertFalse(model.output.isNotificationDenied)
     }
@@ -63,22 +64,22 @@ class RecurringEditModelTest {
     @Test
     fun asksPermissionOnlyWhenSavingWithReminder() = modelTest(today = "2026-10-17") { setup ->
         val client = FakePermission(authorization = NotificationAuthorization.notDetermined)
-        val without = setup.editModel()
+        val without = setup.editModel(permission = client.permission)
         without.load()
         without.press(5)
         without.state.update { copy(memo = "家賃") }
 
-        without.save(client.permission)
+        without.flow.save()
         val askedWithout = client.requested
 
-        val model = setup.editModel()
+        val model = setup.editModel(permission = client.permission)
         model.load()
         model.press(5)
         model.state.update { copy(memo = "保険", remindDaysBefore = 1) }
 
-        val saved = model.save(client.permission)
+        val saved = model.flow.save()
 
-        assertTrue(saved)
+        assertNotNull(saved)
         assertFalse(askedWithout)
         assertTrue(client.requested)
     }
@@ -90,8 +91,8 @@ class RecurringEditModelTest {
 
         assertTrue(adding.state.isScheduleOpen)
         assertFalse(editing.state.isScheduleOpen)
-        assertFalse(adding.output.isEditing)
-        assertTrue(editing.output.isEditing)
+        assertFalse(adding.flow.output.isEditing)
+        assertTrue(editing.flow.output.isEditing)
     }
 
     @Test
@@ -104,7 +105,7 @@ class RecurringEditModelTest {
         assertNull(model.state.form.categoryId)
         assertNotNull(model.state.form.toWalletId)
         assertNotEquals(model.state.form.walletId, model.state.form.toWalletId)
-        assertFalse(model.output.isChanged)
+        assertFalse(model.flow.output.isChanged)
     }
 
     @Test
@@ -112,9 +113,9 @@ class RecurringEditModelTest {
         val model = setup.editModel()
         model.load()
 
-        model.state.isScheduleOpen = false
+        model.state.toggleSchedule()
 
-        assertFalse(model.output.isChanged)
+        assertFalse(model.flow.output.isChanged)
     }
 
     @Test
@@ -124,11 +125,11 @@ class RecurringEditModelTest {
 
         model.press(7, 8, 0, 0, 0)
         model.state.update { copy(memo = "家賃", day = 27, startDate = date("2026-09-01")) }
-        val title = model.output.saveTitle
-        val saved = model.save()
+        val title = model.flow.output.saveTitle
+        val saved = model.flow.save()
         val entries = setup.database.entryList().entries
 
-        assertTrue(saved)
+        assertNotNull(saved)
         assertEquals("追加する", title)
         assertEquals(1, setup.database.recurrings().size)
         assertEquals(listOf("2026-09-27"), entries.map { it.date.toString() })
@@ -160,10 +161,10 @@ class RecurringEditModelTest {
         model.select(type = Entry.Kind.transfer)
         model.press(3, 0, 0, 0, 0)
         model.state.update { copy(day = 26, startDate = date("2026-09-01")) }
-        val saved = model.save()
+        val saved = model.flow.save()
         val entry = setup.database.entryList().entries.first()
 
-        assertTrue(saved)
+        assertNotNull(saved)
         assertEquals("振替元", model.output.walletTitle)
         assertEquals(Entry.Kind.transfer, entry.type)
         assertNull(entry.categoryId)
@@ -179,11 +180,11 @@ class RecurringEditModelTest {
         model.select(type = Entry.Kind.transfer)
         model.press(5)
         model.state.update { copy(toWalletId = walletId) }
-        val saved = model.save()
+        val saved = model.flow.save()
 
-        assertFalse(saved)
+        assertNull(saved)
         assertEquals("振替元と振替先を別にしてください", model.state.task.message)
-        assertEquals("振替元と振替先を別にしてください", model.output.saveTitle)
+        assertEquals("振替元と振替先を別にしてください", model.flow.output.saveTitle)
     }
 
     @Test
@@ -191,11 +192,11 @@ class RecurringEditModelTest {
         val model = setup.editModel()
         model.load()
 
-        val saved = model.save()
+        val saved = model.flow.save()
 
-        assertFalse(saved)
+        assertNull(saved)
         assertEquals("金額を入れてください", model.state.task.message)
-        assertFalse(model.output.canSave)
+        assertFalse(model.flow.output.canSave)
     }
 
     @Test
@@ -204,16 +205,16 @@ class RecurringEditModelTest {
         val model = setup.editModel(editingId = recurring.id)
 
         model.load()
-        val loaded = model.output.isChanged
-        val title = model.output.saveTitle
+        val loaded = model.flow.output.isChanged
+        val title = model.flow.output.saveTitle
         model.state.update { copy(memo = "家賃と管理費") }
-        val saved = model.save()
+        val saved = model.flow.save()
 
         assertFalse(loaded)
         assertEquals("変更を保存", title)
         assertEquals(78000, model.output.amount)
-        assertTrue(model.output.isChanged)
-        assertTrue(saved)
+        assertTrue(model.flow.output.isChanged)
+        assertNotNull(saved)
         assertEquals(listOf("家賃と管理費"), setup.database.recurrings().map { it.memo })
         assertEquals(listOf(78000), setup.database.recurrings().map { it.amount })
     }
@@ -224,9 +225,9 @@ class RecurringEditModelTest {
         val model = setup.editModel(editingId = recurring.id)
         model.load()
 
-        val hidden = model.setHidden(isHidden = true)
+        val hidden = model.flow.setHidden(isHidden = true)
         val visible = setup.database.recurrings()
-        val deletion = model.delete()
+        val deletion = model.flow.delete()
 
         assertTrue(hidden)
         assertTrue(model.input.isHidden)
@@ -322,11 +323,13 @@ class RecurringEditModelTest {
     private fun ModelTestSetup.editModel(
         type: Entry.Kind = Entry.Kind.expense,
         editingId: Identifier<Recurring>? = null,
+        permission: NotificationPermission = NotificationPermission.allowed,
     ) = RecurringEditModel(
         parts = parts,
         today = today,
         type = type,
         editingId = editingId,
+        permission = permission,
     )
 
     private suspend fun ModelTestSetup.loanModel(): RecurringEditModel {

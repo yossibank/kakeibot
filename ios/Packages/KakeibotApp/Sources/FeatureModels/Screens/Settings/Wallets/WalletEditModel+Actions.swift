@@ -24,10 +24,7 @@ public extension WalletEditModel {
             )
 
             await loadBalance()
-
-            if state.prompt.panel == .valuation {
-                state.closePanel()
-            }
+            state.panel.close(.valuation)
 
             return true
         } catch {
@@ -144,15 +141,14 @@ public extension WalletEditModel {
             )
 
             guard
-                !isEditing,
+                !output.isEditing,
                 output.asksPayment
             else {
-                await finishSave(wallet)
                 return wallet
             }
 
             state.payment.addedWallet = wallet
-            state.payment.isAsking = true
+            state.payment.shown.show(.asking)
 
             return wallet
         } catch {
@@ -166,7 +162,7 @@ public extension WalletEditModel {
             return
         }
 
-        state.outcome.send(SettingsEditOutcome(saved: wallet))
+        flow.finish(saved: wallet)
     }
 }
 

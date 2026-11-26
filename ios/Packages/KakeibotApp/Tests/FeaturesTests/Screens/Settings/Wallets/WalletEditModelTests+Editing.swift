@@ -12,10 +12,10 @@ extension WalletEditModelTests {
         let bank = try await setup.wallet(named: "銀行")
         let model = WalletEditModel(parts: .system(setup.database), editing: bank.id)
         await model.load()
-        let loaded = model.state.name
-        let isChanged = model.isChanged
+        let loaded = model.state.fields.name
+        let isChanged = model.flow.output.isChanged
 
-        model.state.name = "ゆうちょ"
+        model.state.fields.name = "ゆうちょ"
         model.state.press(.clear)
         model.state.press(.digit(1))
         model.state.press(.digit(2))
@@ -25,7 +25,7 @@ extension WalletEditModelTests {
 
         #expect(loaded == "銀行")
         #expect(!isChanged)
-        #expect(!model.output.needsHideConfirmation)
+        #expect(!model.flow.output.asksBeforeHiding)
         #expect(saved.id == bank.id)
         #expect(saved.name == "ゆうちょ")
         #expect(saved.initialBalance == 120_000)
@@ -35,7 +35,7 @@ extension WalletEditModelTests {
     func savesLoanAmountAndClearsItWhenKindChanges() async throws {
         let setup = try await Setup()
         let adding = WalletEditModel(parts: .system(setup.database))
-        adding.state.name = "奨学金"
+        adding.state.fields.name = "奨学金"
         adding.state.setKind(.loan)
         adding.state.pressLoanAmount(.digit(3))
         adding.state.pressLoanAmount(.doubleZero)
@@ -46,7 +46,7 @@ extension WalletEditModelTests {
         let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         let loaded = model.state.loanAmount.amount
-        let isChanged = model.isChanged
+        let isChanged = model.flow.output.isChanged
         let repaid = model.output.repaidText
         model.state.setKind(.bank)
         let changed = try #require(await model.save())
@@ -64,7 +64,7 @@ extension WalletEditModelTests {
     func showsRepaidOnNewLoanOnlyAfterBalance() async throws {
         let setup = try await Setup()
         let model = WalletEditModel(parts: .system(setup.database))
-        model.state.name = "奨学金"
+        model.state.fields.name = "奨学金"
         model.state.setKind(.loan)
         model.state.pressLoanAmount(.digit(3))
         model.state.pressLoanAmount(.doubleZero)
@@ -104,7 +104,7 @@ extension WalletEditModelTests {
         await model.load()
 
         #expect(model.input.balance == 5000)
-        #expect(model.output.needsHideConfirmation)
+        #expect(model.flow.output.asksBeforeHiding)
     }
 
     @Test
@@ -115,7 +115,7 @@ extension WalletEditModelTests {
         await entry.load()
 
         let editor = entry.newWalletModel()
-        editor.state.name = "楽天カード"
+        editor.state.fields.name = "楽天カード"
         editor.state.setKind(.card)
         let saved = try #require(await editor.save())
         await entry.reloadWallets()
@@ -132,13 +132,13 @@ extension WalletEditModelTests {
         let bank = try await setup.wallet(named: "銀行")
 
         let bankModel = WalletEditModel(parts: .system(setup.database), editing: bank.id)
-        let hid = await bankModel.setHidden(true)
+        await bankModel.flow.setHidden(true).value
 
         let cashModel = WalletEditModel(parts: .system(setup.database), editing: cash.id)
-        let refused = await cashModel.setHidden(true)
+        await cashModel.flow.setHidden(true).value
 
-        #expect(hid)
-        #expect(!refused)
+        #expect(bankModel.flow.state.outcome.value?.isHidden == true)
+        #expect(cashModel.flow.state.outcome.value == nil)
         #expect(cashModel.state.errorNotice.message == "最後の 1 つの口座は非表示にできません")
     }
 }

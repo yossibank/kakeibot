@@ -97,7 +97,7 @@ private extension RecurringLoanPlan {
 
 private extension RecurringLoanPlan {
     var totalTitle: String {
-        model.isEditing ? "これから返す額" : "返す総額"
+        model.flow.output.isEditing ? "これから返す額" : "返す総額"
     }
 
     var noteText: String? {

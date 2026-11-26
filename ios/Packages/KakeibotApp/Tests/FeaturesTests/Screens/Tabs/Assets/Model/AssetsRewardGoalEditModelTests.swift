@@ -12,12 +12,12 @@ struct AssetsRewardGoalEditModelTests {
         let database = try AppDatabase.inMemory()
         let model = AssetsRewardGoalEditModel(parts: .system(database))
 
-        let changedBeforeInput = model.output.isChanged
+        let changedBeforeInput = model.flow.output.isChanged
 
-        model.state.name = "新しい靴"
+        model.state.fields.name = "新しい靴"
 
         #expect(!changedBeforeInput)
-        #expect(model.output.isChanged)
+        #expect(model.flow.output.isChanged)
     }
 
     @Test
@@ -34,16 +34,16 @@ struct AssetsRewardGoalEditModelTests {
         let adding = AssetsRewardGoalEditModel(parts: .system(database))
         let editing = AssetsRewardGoalEditModel(parts: .system(database), editing: goal)
 
-        let panelWhenAdding = adding.state.prompt.panel
-        let panelWhenEditing = editing.state.prompt.panel
+        let panelWhenAdding = adding.state.panel.current
+        let panelWhenEditing = editing.state.panel.current
 
-        adding.state.closePanel()
-        editing.state.open(.amount)
+        adding.state.panel.closeAll()
+        editing.state.panel.show(.amount)
 
         #expect(panelWhenAdding == .amount)
         #expect(panelWhenEditing == nil)
-        #expect(adding.state.prompt.panel == nil)
-        #expect(editing.state.prompt.panel == .amount)
+        #expect(adding.state.panel.current == nil)
+        #expect(editing.state.panel.current == .amount)
     }
 
     @Test
@@ -59,10 +59,10 @@ struct AssetsRewardGoalEditModelTests {
 
         let model = AssetsRewardGoalEditModel(parts: .system(database), editing: goal)
 
-        let changedBeforeEdit = model.output.isChanged
+        let changedBeforeEdit = model.flow.output.isChanged
 
         model.state.press(.digit(5))
-        let changedAfterEdit = model.output.isChanged
+        let changedAfterEdit = model.flow.output.isChanged
 
         #expect(!changedBeforeEdit)
         #expect(changedAfterEdit)
@@ -72,11 +72,11 @@ struct AssetsRewardGoalEditModelTests {
     func savesNewGoal() async throws {
         let database = try AppDatabase.inMemory()
         let model = AssetsRewardGoalEditModel(parts: .system(database))
-        model.state.name = "新しい靴"
+        model.state.fields.name = "新しい靴"
         model.state.press(.digit(5))
         model.state.press(.doubleZero)
 
-        let isSaved = await model.save()
+        let isSaved = await model.save() != nil
         let goals = try await database.rewardBank().waitingGoals
 
         #expect(isSaved)
@@ -88,13 +88,13 @@ struct AssetsRewardGoalEditModelTests {
     func tellsWhenGoalCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
         let model = AssetsRewardGoalEditModel(parts: .system(database))
-        model.state.name = "新しい靴"
+        model.state.fields.name = "新しい靴"
         model.state.press(.digit(5))
         try await database.failWrites(to: "reward_goal")
 
-        let isSaved = await model.save()
+        let isSaved = await model.save() != nil
 
-        #expect(isSaved == false)
+        #expect(!isSaved)
         #expect(model.state.errorNotice.message == "目標を保存できませんでした")
     }
 
@@ -105,11 +105,10 @@ struct AssetsRewardGoalEditModelTests {
         let goal = try await database.saveRewardGoal(draft, at: Date())
         let model = AssetsRewardGoalEditModel(parts: .system(database), editing: goal)
 
-        let isDeleted = await model.delete()
+        await model.flow.delete().value
         let goals = try await database.rewardBank().waitingGoals
 
-        #expect(isDeleted)
-        #expect(model.state.outcome.value?.closes == true)
+        #expect(model.flow.state.outcome.value?.closes == true)
         #expect(goals.isEmpty)
     }
 
@@ -122,12 +121,11 @@ struct AssetsRewardGoalEditModelTests {
         let adding = AssetsRewardGoalEditModel(parts: .system(database))
         try await database.failWrites(to: "reward_goal")
 
-        let isDeleted = await model.delete()
-        let isNewDeleted = await adding.delete()
+        await model.flow.delete().value
+        await adding.flow.delete().value
 
-        #expect(isDeleted == false)
-        #expect(isNewDeleted == false)
-        #expect(model.state.outcome.value == nil)
+        #expect(model.flow.state.outcome.value == nil)
+        #expect(adding.flow.state.outcome.value == nil)
         #expect(model.state.errorNotice.message == "目標を削除できませんでした")
         #expect(adding.state.errorNotice.message == nil)
     }

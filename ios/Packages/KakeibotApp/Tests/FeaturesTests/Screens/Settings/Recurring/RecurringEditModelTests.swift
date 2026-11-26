@@ -27,14 +27,14 @@ struct RecurringEditModelTests {
         let setup = try await HomeModelTests.Setup()
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
-        model.state.open(.amount)
-        model.state.open(.holiday)
-        let opened = model.state.prompt.panel
+        model.state.panel.show(.amount)
+        model.state.panel.show(.holiday)
+        let opened = model.state.panel.current
 
-        model.state.closePanel()
+        model.state.panel.closeAll()
 
         #expect(opened == .holiday)
-        #expect(model.state.prompt.panel == nil)
+        #expect(model.state.panel.current == nil)
     }
 
     @Test
@@ -66,7 +66,7 @@ struct RecurringEditModelTests {
         #expect(model.state.categoryId == nil)
         #expect(model.state.toWalletId != nil)
         #expect(model.state.toWalletId != model.state.walletId)
-        #expect(model.isChanged == false)
+        #expect(model.flow.output.isChanged == false)
     }
 
     @Test
@@ -99,7 +99,7 @@ struct RecurringEditModelTests {
 
         model.state.schedule.isOpen = false
 
-        #expect(model.isChanged == false)
+        #expect(model.flow.output.isChanged == false)
     }
 
     @Test
@@ -113,10 +113,10 @@ struct RecurringEditModelTests {
         model.state.press(.digit(8))
         model.state.press(.doubleZero)
         model.state.press(.digit(0))
-        model.state.memo = "家賃"
+        model.state.fields.memo = "家賃"
         model.state.schedule.day = 27
         model.state.schedule.startDate = start
-        let saved = await model.save()
+        let saved = await model.save() != nil
         let snapshot = try setup.database.snapshot()
 
         #expect(saved)
@@ -136,7 +136,7 @@ struct RecurringEditModelTests {
         )
         await without.load()
         without.state.press(.digit(5))
-        without.state.memo = "家賃"
+        without.state.fields.memo = "家賃"
 
         _ = await without.save(permission: client.permission)
         let askedWithout = await client.requested
@@ -144,10 +144,10 @@ struct RecurringEditModelTests {
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
         model.state.press(.digit(5))
-        model.state.memo = "保険"
+        model.state.fields.memo = "保険"
         model.state.schedule.remindDaysBefore = 1
 
-        let saved = await model.save(permission: client.permission)
+        let saved = await model.save(permission: client.permission) != nil
         let asked = await client.requested
         let rescheduled = await client.rescheduled
 
@@ -206,8 +206,8 @@ struct RecurringEditModelTests {
         #expect(model.output.isCardBill)
         #expect(model.state.schedule.closingDay == 31)
         #expect(model.state.schedule.day == 27)
-        #expect(model.state.memo == "カード")
-        #expect(model.canSave)
+        #expect(model.state.fields.memo == "カード")
+        #expect(model.flow.output.canSave)
     }
 
     @Test
@@ -236,8 +236,8 @@ struct RecurringEditModelTests {
         #expect(model.state.toWalletId == loan.id)
         #expect(!model.output.isCardBill)
         #expect(model.state.schedule.closingDay == nil)
-        #expect(model.state.memo == "奨学金の返済")
-        #expect(!model.canSave)
+        #expect(model.state.fields.memo == "奨学金の返済")
+        #expect(!model.flow.output.canSave)
     }
 
     @Test
@@ -303,7 +303,7 @@ struct RecurringEditModelTests {
         model.state.press(.digit(0))
         model.state.schedule.day = 26
         model.state.schedule.startDate = start
-        let saved = await model.save()
+        let saved = await model.save() != nil
         let entry = try #require(setup.database.snapshot().entries.first)
 
         #expect(saved)
@@ -323,7 +323,7 @@ struct RecurringEditModelTests {
         model.select(.transfer)
         model.state.press(.digit(5))
         model.state.toWalletId = model.state.walletId
-        let saved = await model.save()
+        let saved = await model.save() != nil
 
         #expect(!saved)
         #expect(model.state.errorNotice.message == "振替元と振替先を別にしてください")
@@ -335,7 +335,7 @@ struct RecurringEditModelTests {
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
-        let saved = await model.save()
+        let saved = await model.save() != nil
 
         #expect(!saved)
         #expect(model.state.errorNotice.message == "金額を入れてください")

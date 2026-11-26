@@ -97,10 +97,10 @@ extension ScreenFlowTests {
             editor.state.press(key)
         }
 
-        editor.state.memo = "家賃"
+        editor.state.fields.memo = "家賃"
         editor.state.schedule.day = 10
         editor.state.schedule.startDate = start
-        let isSaved = await editor.save()
+        let isSaved = await editor.save() != nil
         await tabs.wait {
             $0.amounts.allSatisfy { $0 == [78000, 78000] }
                 && $0.home.output.periodRecurrings.map(\.status) == [.done]

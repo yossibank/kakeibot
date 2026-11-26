@@ -4,6 +4,10 @@ import Foundation
 import Observation
 
 public extension CategoryEditModel {
+    struct Fields: ScreenEditable {
+        public var name = ""
+    }
+
     struct TagEdit: Hashable, Sendable {
         public let target: Target
 
@@ -12,15 +16,13 @@ public extension CategoryEditModel {
 
     @MainActor
     @Observable
-    final class State: SettingsEditState {
+    final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Never>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<EntryCategory>>()
-        public var name = ""
-        public var isMovingTag = false
-        public var ignoresKeyboard = false
+        public var fields = Fields()
 
         public internal(set) var ready = ScreenOutcome<Void>()
+        public internal(set) var isMovingTag = false
+        public internal(set) var ignoresKeyboard = false
 
         public private(set) var tags: [EditingTag] = []
         public private(set) var tagProblem: String?
@@ -38,6 +40,18 @@ public extension CategoryEditModel.TagEdit {
 }
 
 public extension CategoryEditModel.State {
+    func setMovingTag(_ isMoving: Bool) {
+        if isMovingTag != isMoving {
+            isMovingTag = isMoving
+        }
+    }
+
+    func setIgnoresKeyboard(_ ignores: Bool) {
+        if ignoresKeyboard != ignores {
+            ignoresKeyboard = ignores
+        }
+    }
+
     func addTag(_ name: String) -> Bool {
         let draft = EntryTagDraft(name: name)
 
@@ -141,7 +155,7 @@ extension CategoryEditModel.State {
         _ draft: EntryCategoryDraft,
         tags: [CategoryEditModel.EditingTag]
     ) {
-        name = draft.name
+        fields.name = draft.name
         icon.apply(draft.icon)
         self.tags = tags
     }

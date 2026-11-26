@@ -11,7 +11,7 @@ fun RecurringEditModel.open(panel: RecurringPanel) {
         prepareCount()
     }
 
-    state.panel = panel
+    state.panel.show(panel)
 }
 
 fun RecurringEditModel.prepareCount() {

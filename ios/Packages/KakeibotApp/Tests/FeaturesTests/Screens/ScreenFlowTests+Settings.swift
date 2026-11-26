@@ -124,7 +124,8 @@ extension ScreenFlowTests {
         )
         await settings.load()
 
-        let isHidden = await settings.setHidden(true)
+        await settings.flow.setHidden(true).value
+        let isHidden = settings.flow.output.isHidden
         await tabs.wait { $0.balance(of: setup.bank) == nil }
         await draft.reloadWallets()
 
@@ -137,7 +138,8 @@ extension ScreenFlowTests {
         #expect(draft.output.wallets.map(\.id) == [setup.cash])
         #expect(draft.state.payment.walletId == setup.cash)
 
-        let isShown = await settings.setHidden(false)
+        await settings.flow.setHidden(false).value
+        let isShown = !settings.flow.output.isHidden
         await tabs.wait { $0.balance(of: setup.bank) == 5000 }
         await draft.reloadWallets()
         tabs.close()
@@ -165,7 +167,7 @@ extension ScreenFlowTests {
 
         await settings.load()
 
-        try await settings.saveHidden(categoryID, isHidden: true)
+        await settings.flow.setHidden(true).value
         await tabs.wait { $0.lists.allSatisfy { $0?.categories[categoryID]?.archivedAt != nil } }
         await draft.reloadCategories()
         tabs.close()

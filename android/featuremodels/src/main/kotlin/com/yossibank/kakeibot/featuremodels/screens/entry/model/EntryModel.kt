@@ -16,6 +16,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import com.yossibank.kakeibot.featuremodels.shared.notice.EntryChange
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.insertDefaultsIfEmpty
@@ -83,8 +84,10 @@ class EntryModel(
     ) {
         val task = ModelTask()
         val outcome = ScreenOutcome<Outcome>()
+        val presented = Shown<Presented>()
 
         var today: LocalDate by mutableStateOf(today)
+            internal set
 
         var form: EntryForm by mutableStateOf(EntryForm(date = date))
             private set
@@ -103,17 +106,6 @@ class EntryModel(
 
         var voiceFilled: VoiceFilled? by mutableStateOf(null)
             private set
-
-        var presented: Presented? by mutableStateOf(null)
-            private set
-
-        fun present(presented: Presented) {
-            this.presented = presented
-        }
-
-        fun dismiss() {
-            presented = null
-        }
 
         fun update(change: EntryForm.() -> EntryForm) {
             form = form.change()
@@ -239,6 +231,10 @@ class EntryModel(
         val database: AppDatabase,
         val clock: ScreenClock,
     )
+
+    fun setToday(today: LocalDate) {
+        state.today = today
+    }
 
     suspend fun load() {
         val database = dependencies.database

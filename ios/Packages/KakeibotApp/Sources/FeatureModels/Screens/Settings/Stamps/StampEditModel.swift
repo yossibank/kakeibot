@@ -6,9 +6,10 @@ import Store
 
 @MainActor
 @Observable
-public final class StampEditModel {
+public final class StampEditModel: ScreenPerforming {
     public let state: State
     public let input: Input
+    public let flow: EditFlow<Void>
 
     let dependencies: ScreenParts
 
@@ -20,26 +21,27 @@ public final class StampEditModel {
 
         self.state = state
         self.input = Input(editingId: id, baseline: state.icon.draft)
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        flow.connect(self)
     }
 }
 
 public extension StampEditModel {
     @MainActor
     @Observable
-    final class State: SettingsEditState {
+    final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Never>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public let icon = SettingsIconEditorModel(glyph: .star)
     }
 
     @MainActor
     @Observable
-    final class Input: SettingsEditHidingInput {
-        public internal(set) var isHidden = false
+    final class Input {
         public internal(set) var baseline: IconDraft?
+        public internal(set) var isHidden = false
 
         public let editingId: ShelfIcon.ID?
 
@@ -80,7 +82,7 @@ public extension StampEditModel {
     }
 
     @discardableResult
-    func save() async -> Bool {
+    func save() async -> Void? {
         do {
             try await dependencies.database.save(
                 state.icon.draft,
@@ -88,12 +90,10 @@ public extension StampEditModel {
                 at: dependencies.clock.now
             )
 
-            await finishSave()
-
-            return true
+            return ()
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return false
+            return nil
         }
     }
 }
@@ -102,29 +102,46 @@ private extension StampEditModel {
     static let loadFailedMessage = "スタンプを読めませんでした"
 }
 
-extension StampEditModel: SettingsEditRemoving {
-    public var edited: IconDraft {
-        state.icon.draft
+extension StampEditModel: EditFlowSource {
+    var isEditing: Bool {
+        input.editingId != nil
     }
 
-    public var problemMessage: String? {
+    var isChanged: Bool {
+        input.baseline.map { $0 != state.icon.draft } ?? false
+    }
+
+    var problem: String? {
         state.icon.draft.problems.first?.message
     }
 
-    public func remove(_ id: ShelfIcon.ID) async throws -> Deletion {
-        try await dependencies.database.deleteShelfIcon(id)
+    var isHidden: Bool {
+        input.isHidden
     }
 
-    public func saveHidden(
-        _ id: ShelfIcon.ID,
-        isHidden: Bool
-    ) async throws {
+    func store() async -> Void? {
+        await save()
+    }
+
+    func storeHidden(_ isHidden: Bool) async throws {
+        guard let editingId = input.editingId else {
+            return
+        }
+
         try await dependencies.database.setHidden(
-            id,
+            editingId,
             isHidden: isHidden,
             at: dependencies.clock.now
         )
 
         input.isHidden = isHidden
+    }
+
+    func remove() async throws -> Deletion? {
+        guard let editingId = input.editingId else {
+            return nil
+        }
+
+        return try await dependencies.database.deleteShelfIcon(editingId)
     }
 }

@@ -3,7 +3,7 @@ import DesignSystem
 import Observation
 
 public extension RecurringEditModel {
-    struct Schedule {
+    struct Schedule: ScreenEditable {
         public var frequency: Recurring.Frequency = .monthly
         public var month: Int
         public var day: Int
@@ -18,7 +18,7 @@ public extension RecurringEditModel {
         private(set) var isHolidayShiftChosen = false
     }
 
-    struct Repayment {
+    struct Repayment: ScreenEditable {
         public internal(set) var countCalculator = AmountCalculator()
 
         public private(set) var isCountAuto = true
@@ -37,6 +37,11 @@ public extension RecurringEditModel {
         case remind
     }
 
+    struct Fields: ScreenEditable {
+        public var memo = ""
+        public var billShift = 0
+    }
+
     struct Calculators {
         public internal(set) var amount = AmountCalculator()
         public internal(set) var fee = AmountCalculator()
@@ -44,22 +49,19 @@ public extension RecurringEditModel {
 
     @MainActor
     @Observable
-    final class State: SettingsEditState {
+    final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Panel>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-        public var categoryId: EntryCategory.ID?
-        public var toWalletId: Wallet.ID?
-        public var memo = ""
-        public var billShift = 0
+        public var panel = Shown<Panel>()
+        public var fields = Fields()
         public var schedule: Schedule
+        public var repayment = Repayment()
 
         public private(set) var walletId: Wallet.ID?
         public private(set) var calculators = Calculators()
 
         public internal(set) var type: Entry.Kind
-
-        public var repayment = Repayment()
+        public internal(set) var categoryId: EntryCategory.ID?
+        public internal(set) var toWalletId: Wallet.ID?
 
         init(
             type: Entry.Kind,
@@ -128,7 +130,11 @@ public extension RecurringEditModel.State {
         }
 
         walletId = id
-        billShift = 0
+        fields.billShift = 0
+    }
+
+    func selectDestination(_ id: Wallet.ID) {
+        toWalletId = id
     }
 
     func press(_ key: AmountCalculator.Key) {
@@ -151,14 +157,14 @@ extension RecurringEditModel.State {
         categoryId = draft.categoryId
         walletId = draft.walletId
         toWalletId = draft.toWalletId
-        memo = draft.memo
+        fields.memo = draft.memo
         schedule.frequency = draft.frequency
         schedule.month = draft.month
         schedule.day = draft.day
         schedule.load(draft.holidayShift)
         schedule.closingDay = draft.closingDay
         calculators.fee = AmountCalculator(amount: draft.fee)
-        billShift = draft.billShift
+        fields.billShift = draft.billShift
         schedule.startDate = draft.startDate
         schedule.endDate = draft.endDate
         schedule.remindDaysBefore = draft.remindDaysBefore

@@ -17,7 +17,7 @@ public extension RecurringEditModel.Output {
         let holiday = RecurringText.holidayNote(schedule.holidayShift)
         let detail = [text, holiday].rowDetail ?? text
         let closing = canUseClosingDay ? schedule.closingDay.map(RecurringText.closingNote) : nil
-        let name = state.memo.trimmingCharacters(in: .whitespaces)
+        let name = state.fields.memo.trimmingCharacters(in: .whitespaces)
         let destination = type == .transfer ? selectedDestination?.name : nil
         let place = [selectedWallet?.name, destination].compactMap(\.self).joined(separator: " → ")
         let rowPlace = place.isEmpty ? nil : place

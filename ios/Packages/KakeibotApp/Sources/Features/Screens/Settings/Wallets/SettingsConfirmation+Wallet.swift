@@ -1,38 +1,5 @@
 import Core
 import DesignSystem
-import SwiftUI
-
-extension View {
-    func confirmsWalletHide(
-        balance: Int,
-        isPresented: Binding<Bool>,
-        onConfirm: @escaping () -> Void
-    ) -> some View {
-        settingsConfirmation(
-            .hidingWallet(balance: balance),
-            isPresented: isPresented,
-            onConfirm: onConfirm
-        )
-    }
-
-    func confirmsWalletDelete(
-        hasEntries: Bool,
-        isPresented: Binding<Bool>,
-        onHide: @escaping () -> Void,
-        onConfirm: @escaping () -> Void
-    ) -> some View {
-        settingsConfirmation(
-            .deletingWallet(hasEntries: hasEntries),
-            isPresented: isPresented
-        ) {
-            if hasEntries {
-                onHide()
-            } else {
-                onConfirm()
-            }
-        }
-    }
-}
 
 extension SettingsConfirmation {
     static func hidingWallet(balance: Int) -> SettingsConfirmation {

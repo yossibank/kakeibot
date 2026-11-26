@@ -16,9 +16,9 @@ struct ThemeEditModelTests {
             base: ThemePreset.forest.palette
         )
 
-        model.state.draft.name = "森の夜"
+        model.state.rename("森の夜")
 
-        let isSaved = await model.save()
+        let isSaved = await model.save() != nil
         let themes = try await setup.database.customThemes()
         let choice = try await setup.database.setting(.theme)
 
@@ -37,7 +37,7 @@ struct ThemeEditModelTests {
             base: ThemePreset.forest.palette
         )
 
-        creating.state.draft.name = "森の夜"
+        creating.state.rename("森の夜")
         _ = await creating.save()
         let theme = try #require(try await setup.database.customThemes().first)
 
@@ -47,7 +47,8 @@ struct ThemeEditModelTests {
             base: ThemePreset.forest.palette
         )
 
-        let deletion = try #require(await editing.delete())
+        await editing.flow.delete().value
+        let deletion = try #require(editing.flow.state.outcome.value?.deletion)
         let afterDelete = try await setup.database.setting(.theme)
 
         let switcher = AppIconListModelTests.Switcher(name: nil)
@@ -103,7 +104,7 @@ struct ThemeEditModelTests {
         model.state.draft.name = "読めない"
         model.state.draft.text = model.state.draft.background
 
-        #expect(!model.canSave)
-        #expect(model.saveTitle == "文字が読みにくい色です")
+        #expect(!model.flow.output.canSave)
+        #expect(model.flow.output.saveTitle == "文字が読みにくい色です")
     }
 }

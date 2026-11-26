@@ -1,6 +1,5 @@
 package com.yossibank.kakeibot.features.screens.settings.budgets
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -38,7 +37,6 @@ import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.components.button.PrimaryButton
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.modal.BottomDrawer
-import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.components.text.FittedText
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
@@ -50,33 +48,28 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel
-import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.close
-import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.saveTitle
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.suggestions
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.features.shared.model.EditSheet
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 
 @Composable
 fun BudgetKeypadDrawer(model: BudgetListModel) {
     if (model.state.editing != null) {
-        BackHandler(onBack = model::close)
+        EditSheet(
+            flow = model.flow,
+            onClose = model.state::cancelEditing,
+        )
     }
 
     BottomDrawer(
         item = model.state.editing,
         title = { it.title },
-        onClose = model::close,
+        onClose = model.flow::close,
         padding = drawerPadding,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Drawer(model = model)
-    }
-
-    if (model.state.isConfirmingDiscard) {
-        DiscardDialog(
-            onDiscard = model.state::cancelEditing,
-            onKeep = { model.state.isConfirmingDiscard = false },
-        )
     }
 }
 
@@ -123,10 +116,10 @@ private fun ColumnScope.Drawer(model: BudgetListModel) {
     }
 
     PrimaryButton(
-        title = model.output.saveTitle,
-        onClick = { model.perform { it.save() } },
+        title = model.flow.output.saveTitle,
+        onClick = { model.flow.perform { it.save() } },
         modifier = Modifier.fillMaxWidth(),
-        isEnabled = model.output.canSave,
+        isEnabled = model.flow.output.canSave,
     )
 
     if (model.output.editingAmount != null) {

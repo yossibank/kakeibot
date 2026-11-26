@@ -273,7 +273,7 @@ private fun Schedule(model: RecurringEditModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 44.dp)
-                .clickable { model.state.isScheduleOpen = !model.state.isScheduleOpen },
+                .clickable(onClick = model.state::toggleSchedule),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

@@ -10,6 +10,7 @@ public final class AssetsRewardGoalEditModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
+    public let flow: EditFlow<Void>
 
     let dependencies: ScreenParts
 
@@ -21,17 +22,17 @@ public final class AssetsRewardGoalEditModel: ScreenPerforming {
         let name = goal?.name ?? ""
         let amount = goal?.targetAmount ?? 0
         let state = State(name: name, amount: amount, panel: goal == nil ? .amount : nil)
-
-        let input = Input(
-            baseline: RewardGoalDraft(name: name, targetAmount: amount),
-            editing: goal,
-            balance: balance
-        )
+        let baseline = RewardGoalDraft(name: name, targetAmount: amount)
+        let input = Input(editingId: goal?.id, baseline: baseline, balance: balance)
+        let output = Output(input: input, state: state)
 
         self.state = state
         self.input = input
-        self.output = Output(input: input, state: state)
+        self.output = output
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        flow.connect(self)
     }
 }
 
@@ -40,13 +41,16 @@ public extension AssetsRewardGoalEditModel {
         case amount
     }
 
+    struct Fields: ScreenEditable {
+        public var name: String
+    }
+
     @MainActor
     @Observable
-    final class State: SettingsEditState {
+    final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var prompt = SettingsEditPrompt<Panel>()
-        public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-        public var name: String
+        public var panel: Shown<Panel>
+        public var fields: Fields
 
         public private(set) var calculator: AmountCalculator
 
@@ -55,26 +59,27 @@ public extension AssetsRewardGoalEditModel {
             amount: Int,
             panel: Panel?
         ) {
-            self.name = name
+            self.panel = Shown(panel)
+            self.fields = Fields(name: name)
             self.calculator = AmountCalculator(amount: amount)
-            prompt.panel = panel
         }
     }
 
     @MainActor
     @Observable
     final class Input {
-        let baseline: RewardGoalDraft
-        let editing: RewardGoal?
+        public let editingId: RewardGoal.ID?
+        public let baseline: RewardGoalDraft
+
         let balance: Int
 
         init(
+            editingId: RewardGoal.ID?,
             baseline: RewardGoalDraft,
-            editing: RewardGoal?,
             balance: Int
         ) {
+            self.editingId = editingId
             self.baseline = baseline
-            self.editing = editing
             self.balance = balance
         }
     }
@@ -96,36 +101,18 @@ public extension AssetsRewardGoalEditModel {
 
 public extension AssetsRewardGoalEditModel {
     @discardableResult
-    func save() async -> Bool {
+    func save() async -> Void? {
         do {
             try await dependencies.database.saveRewardGoal(
                 output.draft,
-                editing: input.editing?.id,
+                editing: input.editingId,
                 at: dependencies.clock.now
             )
 
-            state.outcome.send(SettingsEditOutcome(saved: ()))
-
-            return true
+            return ()
         } catch {
             state.errorNotice.show(Self.saveFailedMessage, for: error)
-            return false
-        }
-    }
-
-    @discardableResult
-    func delete() async -> Bool {
-        guard let editing = input.editing else {
-            return false
-        }
-
-        do {
-            try await dependencies.database.deleteRewardGoal(editing.id)
-            state.outcome.send(SettingsEditOutcome())
-            return true
-        } catch {
-            state.errorNotice.show(Self.deleteFailedMessage, for: error)
-            return false
+            return nil
         }
     }
 }
@@ -136,20 +123,8 @@ private extension AssetsRewardGoalEditModel {
 }
 
 public extension AssetsRewardGoalEditModel.Output {
-    var isEditing: Bool {
-        input.editing != nil
-    }
-
     var draft: RewardGoalDraft {
-        RewardGoalDraft(name: state.name, targetAmount: state.calculator.amount)
-    }
-
-    var isChanged: Bool {
-        draft != input.baseline
-    }
-
-    var canSave: Bool {
-        draft.problems.isEmpty
+        RewardGoalDraft(name: state.fields.name, targetAmount: state.calculator.amount)
     }
 
     var remaining: Int {
@@ -163,17 +138,42 @@ public extension AssetsRewardGoalEditModel.Output {
 
         return Double(input.balance) / Double(state.calculator.amount)
     }
-
-    var saveTitle: String {
-        SettingsSaveTitle.text(
-            problem: draft.problems.first?.message,
-            isEditing: isEditing
-        )
-    }
 }
 
 public extension AssetsRewardGoalEditModel.State {
     func press(_ key: AmountCalculator.Key) {
         calculator.press(key)
+    }
+}
+
+extension AssetsRewardGoalEditModel: EditFlowSource {
+    var isEditing: Bool {
+        input.editingId != nil
+    }
+
+    var isChanged: Bool {
+        input.baseline != output.draft
+    }
+
+    var problem: String? {
+        output.draft.problems.first?.message
+    }
+
+    func store() async -> Void? {
+        await save()
+    }
+
+    func remove() async throws -> Deletion? {
+        guard let editingId = input.editingId else {
+            return nil
+        }
+
+        try await dependencies.database.deleteRewardGoal(editingId)
+
+        return nil
+    }
+
+    func deleteFailedMessage(for _: any Error) -> String {
+        Self.deleteFailedMessage
     }
 }

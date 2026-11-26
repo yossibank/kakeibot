@@ -9,7 +9,6 @@ public struct RewardRuleEditSheet: View {
 
     @FocusState private var focus: Field?
 
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.themeStyle.corner) private var corner
 
     private let onDelete: (Deletion) -> Void
@@ -28,7 +27,7 @@ public struct RewardRuleEditSheet: View {
 
     public var body: some View {
         content
-            .settingsDrawerLayer(item: model.state.prompt.panel) {
+            .settingsDrawerLayer(item: model.state.panel.current) {
                 closePanel()
             } drawer: { panel in
                 drawerView(panel)
@@ -50,22 +49,12 @@ public struct RewardRuleEditSheet: View {
                     }
             }
             .errorBanner(Bindable(model.state).errorNotice)
-            .settingsEditConfirmations(edit)
-            .confirmation(
-                isPresented: Bindable(model.state).prompt.isConfirmingDelete,
-                systemImage: deleteImage,
-                title: deleteTitle,
-                message: deleteMessage,
-                keepTitle: "やめる",
-                confirmTitle: deleteConfirmTitle,
-                role: deleteRole
-            ) {
-                if model.input.hasLogs {
-                    edit.toggleHidden()
-                } else {
-                    edit.delete()
-                }
-            }
+            .editSheet(
+                model.flow,
+                deleting: deletion,
+                onHide: onHide,
+                onDelete: onDelete
+            )
             .onChange(of: focus) {
                 if focus != nil {
                     hidePanel()
@@ -98,7 +87,7 @@ private extension RewardRuleEditSheet {
 
             SettingsField(
                 "自炊した日など",
-                text: Bindable(model.state).name,
+                text: Bindable(model.state).fields.name,
                 focus: $focus,
                 field: .name
             )
@@ -125,17 +114,19 @@ private extension RewardRuleEditSheet {
 
     var editHeader: some View {
         SettingsEditHeader(
-            isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-            title: model.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
-            isEditing: model.isEditing,
-            isHidden: model.input.isHidden,
-            canDelete: !(model.input.isHidden && model.input.hasLogs)
+            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            title: model.flow.output.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
+            isEditing: model.flow.output.isEditing,
+            isHidden: model.flow.output.isHidden,
+            canDelete: !(model.flow.output.isHidden && model.input.hasLogs)
         ) {
-            edit.close()
+            closePanel()
+            model.flow.close()
         } onHide: {
-            edit.toggleHidden()
+            closePanel()
+            model.flow.toggleHidden()
         } onDelete: {
-            model.state.prompt.isConfirmingDelete = true
+            model.flow.state.prompt.show(.delete)
         }
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
@@ -149,7 +140,7 @@ private extension RewardRuleEditSheet {
             } label: {
                 RewardRuleTile(
                     icon: model.state.icon.preview,
-                    name: model.state.name.isEmpty ? "名前" : model.state.name,
+                    name: model.state.fields.name.isEmpty ? "名前" : model.state.fields.name,
                     amount: model.output.amount ?? 0,
                     total: nil,
                     isHidden: false
@@ -177,10 +168,11 @@ private extension RewardRuleEditSheet {
     }
 
     var saveButton: some View {
-        PrimaryButton(model.saveTitle) {
-            edit.save()
+        PrimaryButton(model.flow.output.saveTitle) {
+            closePanel()
+            model.flow.save()
         }
-        .disabled(!model.canSave)
+        .disabled(!model.flow.output.canSave)
     }
 
     func drawerView(_ panel: Panel) -> some View {
@@ -203,39 +195,23 @@ private extension RewardRuleEditSheet {
         model.output.amount == nil ? "金額を入れる" : nil
     }
 
-    var deleteImage: String {
-        model.input.hasLogs ? "eye.slash" : "trash"
-    }
+    var deletion: SettingsConfirmation {
+        guard model.input.hasLogs else {
+            return SettingsConfirmation(
+                systemImage: "trash",
+                title: "この決まりを削除しますか",
+                message: nil,
+                confirmTitle: "削除する"
+            )
+        }
 
-    var deleteTitle: String {
-        model.input.hasLogs ? "この決まりは削除できません" : "この決まりを削除しますか"
-    }
-
-    var deleteMessage: String? {
-        model.input.hasLogs ? "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます" : nil
-    }
-
-    var deleteConfirmTitle: String {
-        model.input.hasLogs ? "非表示にする" : "削除する"
-    }
-
-    var deleteRole: ConfirmCard.Role {
-        model.input.hasLogs ? .suggestion : .destructive
-    }
-
-    var edit: SettingsEditController<RewardRuleEditModel> {
-        SettingsEditController(
-            model: model,
-            dismiss: dismiss,
-            restsOnHide: true,
-            onRest: {
-                closePanel()
-            },
-            onHide: onHide,
-            onDelete: onDelete,
-            onSave: {
-                await $0.save()
-            }
+        return SettingsConfirmation(
+            systemImage: "eye.slash",
+            title: "この決まりは削除できません",
+            message: "貯めた記録があります。非表示にすると、貯めた分を残したまま一覧から外せます",
+            confirmTitle: "非表示にする",
+            role: .suggestion,
+            confirmsHide: true
         )
     }
 
@@ -243,13 +219,13 @@ private extension RewardRuleEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            model.state.open(panel)
+            model.state.panel.show(panel)
         }
     }
 
     func hidePanel() {
         withAnimation(.snappy) {
-            model.state.closePanel()
+            model.state.panel.closeAll()
         }
     }
 

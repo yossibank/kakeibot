@@ -11,12 +11,12 @@ struct RewardRuleEditModelTests {
     func addsRule() async throws {
         let database = try AppDatabase.inMemory()
         let model = RewardRuleEditModel(parts: .system(database))
-        model.state.name = "自炊した日"
+        model.state.fields.name = "自炊した日"
         model.state.press(.digit(5))
         model.state.press(.digit(0))
         model.state.press(.digit(0))
 
-        let isSaved = await model.save()
+        let isSaved = await model.save() != nil
         let list = try await database.rewardRuleList()
 
         #expect(isSaved)
@@ -29,10 +29,10 @@ struct RewardRuleEditModelTests {
         let database = try AppDatabase.inMemory()
         let model = RewardRuleEditModel(parts: .system(database))
 
-        model.state.name = "自炊した日"
+        model.state.fields.name = "自炊した日"
 
-        #expect(!model.canSave)
-        #expect(model.saveTitle == "金額を入れてください")
+        #expect(!model.flow.output.canSave)
+        #expect(model.flow.output.saveTitle == "金額を入れてください")
     }
 
     @Test
@@ -44,13 +44,13 @@ struct RewardRuleEditModelTests {
         let model = RewardRuleEditModel(parts: .system(database), editing: rule.id)
         await model.load()
 
-        let loaded = model.state.name
-        let isChanged = model.isChanged
-        model.state.name = "お弁当の日"
+        let loaded = model.state.fields.name
+        let isChanged = model.flow.output.isChanged
+        model.state.fields.name = "お弁当の日"
 
         #expect(loaded == "自炊した日")
         #expect(!isChanged)
-        #expect(model.isChanged)
+        #expect(model.flow.output.isChanged)
         #expect(model.output.amount == 500)
     }
 
@@ -58,13 +58,13 @@ struct RewardRuleEditModelTests {
     func tellsWhenRuleCannotBeSaved() async throws {
         let database = try AppDatabase.inMemory()
         let model = RewardRuleEditModel(parts: .system(database))
-        model.state.name = "自炊した日"
+        model.state.fields.name = "自炊した日"
         model.state.press(.digit(5))
         try await database.failWrites(to: "reward_rule")
 
-        let isSaved = await model.save()
+        let isSaved = await model.save() != nil
 
-        #expect(isSaved == false)
+        #expect(!isSaved)
         #expect(model.state.errorNotice.message == "保存できませんでした")
     }
 
@@ -75,11 +75,11 @@ struct RewardRuleEditModelTests {
         let model = RewardRuleEditModel(parts: .system(database), editing: rule.id)
         await model.load()
 
-        let deletion = await model.delete()
+        await model.flow.delete().value
         let rules = try await database.rewardRuleList().rules
 
         #expect(model.input.hasLogs == false)
-        #expect(deletion != nil)
+        #expect(model.flow.state.outcome.value?.deletion != nil)
         #expect(rules.isEmpty)
     }
 
@@ -92,11 +92,11 @@ struct RewardRuleEditModelTests {
         let model = RewardRuleEditModel(parts: .system(database), editing: rule.id)
         await model.load()
 
-        let deletion = await model.delete()
+        await model.flow.delete().value
         let rules = try await database.rewardRuleList().rules
 
         #expect(model.input.hasLogs)
-        #expect(deletion == nil)
+        #expect(model.flow.state.outcome.value == nil)
         #expect(model.state.errorNotice.message == "削除できませんでした")
         #expect(rules.map(\.id) == [rule.id])
     }
@@ -108,11 +108,11 @@ struct RewardRuleEditModelTests {
         let model = RewardRuleEditModel(parts: .system(database), editing: rule.id)
         await model.load()
 
-        let isHidden = await model.setHidden(true)
+        await model.flow.setHidden(true).value
         let rules = try await database.rewardRuleList().rules
 
-        #expect(isHidden)
-        #expect(model.input.isHidden)
+        #expect(model.flow.state.outcome.value?.isHidden == true)
+        #expect(model.flow.output.isHidden)
         #expect(rules.first?.isActive == false)
     }
 }

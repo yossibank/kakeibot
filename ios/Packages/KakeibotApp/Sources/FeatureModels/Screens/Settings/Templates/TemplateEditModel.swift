@@ -6,51 +6,59 @@ import Store
 
 @MainActor
 @Observable
-public final class TemplateEditModel {
+public final class TemplateEditModel: ScreenPerforming {
     public let state: State
     public let input: Input
     public let output: Output
+    public let flow: EditFlow<EntryTemplate>
 
     let dependencies: ScreenParts
 
-    public init(
+    public convenience init(
         parts: ScreenParts,
         type: Entry.Kind,
         editing id: EntryTemplate.ID? = nil
     ) {
-        let state = State(type: type)
-        let input = Input(editingId: id)
-
-        self.state = state
-        self.input = input
-        self.output = Output(input: input, state: state)
-        self.dependencies = parts
+        self.init(parts: parts, state: State(type: type), editing: id)
     }
 
-    public init(
+    public convenience init(
         parts: ScreenParts,
         draft: EntryTemplateDraft
     ) {
         let state = State(type: draft.type)
-        let input = Input(editingId: nil)
 
         state.apply(draft)
 
+        self.init(parts: parts, state: state, editing: nil)
+    }
+
+    private init(
+        parts: ScreenParts,
+        state: State,
+        editing id: EntryTemplate.ID?
+    ) {
+        let input = Input(editingId: id)
+        let output = Output(input: input, state: state)
+
         self.state = state
         self.input = input
-        self.output = Output(input: input, state: state)
+        self.output = output
+        self.flow = EditFlow()
         self.dependencies = parts
+
+        flow.connect(self)
     }
 }
 
 public extension TemplateEditModel {
     @MainActor
     @Observable
-    final class Input: SettingsEditHidingInput {
-        public internal(set) var isHidden = false
+    final class Input {
         public internal(set) var options: EntryOptions?
         public internal(set) var cardBills: [Recurring] = []
         public internal(set) var baseline: EntryTemplateDraft?
+        public internal(set) var isHidden = false
 
         public let editingId: EntryTemplate.ID?
 
@@ -67,6 +75,12 @@ public extension TemplateEditModel {
             kind: category.kind,
             editing: category.id
         )
+    }
+
+    func openTags() {
+        if let category = output.selectedCategory {
+            state.tagCategory.show(category)
+        }
     }
 
     func reloadTags() async {
@@ -109,15 +123,11 @@ public extension TemplateEditModel {
         }
 
         do {
-            let template = try await dependencies.database.saveTemplate(
+            return try await dependencies.database.saveTemplate(
                 output.draft,
                 editing: input.editingId,
                 at: dependencies.clock.now
             )
-
-            await finishSave(template)
-
-            return template
         } catch {
             state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
             return nil
@@ -145,31 +155,50 @@ private extension TemplateEditModel {
     }
 }
 
-extension TemplateEditModel: SettingsEditRemoving {
-    public static let deleteFailedMessage = SettingsEditMessage.saveFailed
-
-    public var edited: EntryTemplateDraft {
-        output.draft
+extension TemplateEditModel: EditFlowSource {
+    var isEditing: Bool {
+        input.editingId != nil
     }
 
-    public var problemMessage: String? {
+    var isChanged: Bool {
+        input.baseline.map { $0 != output.draft } ?? false
+    }
+
+    var problem: String? {
         output.problemMessage
     }
 
-    public func remove(_ id: EntryTemplate.ID) async throws -> Deletion {
-        try await dependencies.database.deleteTemplate(id)
+    var isHidden: Bool {
+        input.isHidden
     }
 
-    public func saveHidden(
-        _ id: EntryTemplate.ID,
-        isHidden: Bool
-    ) async throws {
+    func store() async -> EntryTemplate? {
+        await save()
+    }
+
+    func storeHidden(_ isHidden: Bool) async throws {
+        guard let editingId = input.editingId else {
+            return
+        }
+
         try await dependencies.database.setHidden(
-            id,
+            editingId,
             isHidden: isHidden,
             at: dependencies.clock.now
         )
 
         input.isHidden = isHidden
+    }
+
+    func remove() async throws -> Deletion? {
+        guard let editingId = input.editingId else {
+            return nil
+        }
+
+        return try await dependencies.database.deleteTemplate(editingId)
+    }
+
+    func deleteFailedMessage(for _: any Error) -> String {
+        SettingsEditMessage.saveFailed
     }
 }

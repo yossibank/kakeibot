@@ -73,7 +73,7 @@ extension TemplateEditSheet {
 
             TextField(
                 "メモ",
-                text: Bindable(model.state).memo,
+                text: Bindable(model.state).fields.memo,
                 prompt: Text("メモを書く").foregroundStyle(Palette.hint),
                 axis: .vertical
             )
@@ -97,7 +97,7 @@ private extension TemplateEditSheet {
             HStack(spacing: 8) {
                 TextField(
                     "名前",
-                    text: Bindable(model.state).name,
+                    text: Bindable(model.state).fields.name,
                     prompt: Text("名前を入れる").foregroundStyle(Palette.hint)
                 )
                 .font(TemplateCardSize.large.nameFont(in: themeStyle))
@@ -173,7 +173,7 @@ private extension TemplateEditSheet {
 
     var nameLine: Color {
         if model.state.errorNotice.message != nil,
-           model.state.name.isEmpty {
+           model.state.fields.name.isEmpty {
             Palette.rose
         } else if focus == .name {
             Palette.accent
@@ -183,6 +183,6 @@ private extension TemplateEditSheet {
     }
 
     var previewName: String {
-        model.state.name.isEmpty ? "名前" : model.state.name
+        model.state.fields.name.isEmpty ? "名前" : model.state.fields.name
     }
 }

@@ -52,7 +52,7 @@ fun RecurringLoanPlan(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
-                    Caption(text = if (model.output.isEditing) "これから返す額" else "返す総額")
+                    Caption(text = if (model.flow.output.isEditing) "これから返す額" else "返す総額")
 
                     AmountText(
                         amount = total.clamped,

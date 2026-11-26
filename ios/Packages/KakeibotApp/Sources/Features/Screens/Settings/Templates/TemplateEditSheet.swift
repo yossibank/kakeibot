@@ -10,8 +10,6 @@ public struct TemplateEditSheet: View {
 
     @Environment(\.themeStyle) var themeStyle
 
-    @Environment(\.dismiss) private var dismiss
-
     let onSave: (EntryTemplate) -> Void
     let onDelete: (Deletion) -> Void
     let onHide: () -> Void
@@ -34,23 +32,23 @@ public struct TemplateEditSheet: View {
             layeredContent
                 .haptic(.selection, trigger: model.state.categoryId)
                 .haptic(.selection, trigger: model.state.walletId)
-                .settingsEditConfirmations(edit)
-                .confirmation(
-                    isPresented: Bindable(model.state).prompt.isConfirmingDelete,
-                    systemImage: "trash",
-                    title: "このテンプレートを削除しますか",
-                    message: "このテンプレートで記録したものは残ります",
-                    keepTitle: "やめる",
-                    confirmTitle: "削除する"
-                ) {
-                    edit.delete()
-                }
+                .editSheet(
+                    model.flow,
+                    deleting: "このテンプレートを削除しますか",
+                    note: "このテンプレートで記録したものは残ります",
+                    onHide: onHide,
+                    onDelete: onDelete,
+                    onSaved: onSave
+                )
                 .onChange(of: focus) {
                     if focus == .name {
                         hidePanel()
                     }
                 }
-                .sheet(item: Bindable(model.state).tagCategory, onDismiss: reloadTags) { category in
+                .sheet(
+                    item: Bindable(model.state).tagCategory.item,
+                    onDismiss: reloadTags
+                ) { category in
                     CategoryEditSheet(
                         model: model.editCategoryModel(category),
                         startsAddingTag: true
@@ -74,37 +72,22 @@ extension TemplateEditSheet {
 
 extension TemplateEditSheet {
     var drawerPanel: Panel? {
-        model.state.prompt.panel == .memo ? nil : model.state.prompt.panel
-    }
-
-    var edit: SettingsEditController<TemplateEditModel> {
-        SettingsEditController(
-            model: model,
-            dismiss: dismiss,
-            onRest: {
-                closePanel()
-            },
-            onHide: onHide,
-            onDelete: onDelete,
-            onSaved: onSave,
-            onSave: {
-                await $0.save()
-            }
-        )
+        model.state.panel.isShowing(.memo) ? nil : model.state.panel.current
     }
 
     var saveButton: some View {
-        PrimaryButton(model.saveTitle) {
-            edit.save()
+        PrimaryButton(model.flow.output.saveTitle) {
+            closePanel()
+            model.flow.save()
         }
-        .disabled(!model.canSave)
+        .disabled(!model.flow.output.canSave)
     }
 
     func open(_ panel: Panel) {
         focus = nil
 
         withAnimation(.snappy) {
-            model.state.open(panel)
+            model.state.panel.show(panel)
         }
     }
 
@@ -129,7 +112,7 @@ private extension TemplateEditSheet {
                 }
             }
 
-            if !model.isEditing {
+            if !model.flow.output.isEditing {
                 capsulePreview
             }
         } save: {
@@ -140,7 +123,7 @@ private extension TemplateEditSheet {
     var layeredContent: some View {
         content
             .ignoresSafeArea(keyboardRegions)
-            .floatingInput(isPresented: model.state.prompt.panel == .memo) {
+            .floatingInput(isPresented: model.state.panel.isShowing(.memo)) {
                 closePanel()
             } card: {
                 memoCard
@@ -156,17 +139,18 @@ private extension TemplateEditSheet {
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
-                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
+                    isMenuOpen: Bindable(model.flow.state).prompt[.menu],
                     title: title,
-                    isEditing: model.isEditing,
-                    isHidden: model.input.isHidden,
+                    isEditing: model.flow.output.isEditing,
+                    isHidden: model.flow.output.isHidden,
                     subtitle: model.output.typeName
                 ) {
-                    edit.close()
+                    closePanel()
+                    model.flow.close()
                 } onHide: {
-                    edit.toggleHidden()
+                    model.flow.toggleHidden()
                 } onDelete: {
-                    model.state.prompt.isConfirmingDelete = true
+                    model.flow.state.prompt.show(.delete)
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -184,15 +168,15 @@ private extension TemplateEditSheet {
 
 private extension TemplateEditSheet {
     var title: String {
-        model.isEditing ? "テンプレートを編集" : "テンプレートを追加"
+        model.flow.output.isEditing ? "テンプレートを編集" : "テンプレートを追加"
     }
 
     var keyboardRegions: SafeAreaRegions {
-        model.state.prompt.panel == .memo ? .keyboard : []
+        model.state.panel.isShowing(.memo) ? .keyboard : []
     }
 
     var memoValue: String {
-        model.state.memo.isEmpty ? "なし" : model.state.memo
+        model.state.fields.memo.isEmpty ? "なし" : model.state.fields.memo
     }
 
     var detailItems: [SettingsRowList<Panel>.Item] {
@@ -209,7 +193,7 @@ private extension TemplateEditSheet {
                 systemImage: "square.and.pencil",
                 title: "メモ",
                 value: memoValue,
-                isEmpty: model.state.memo.isEmpty
+                isEmpty: model.state.fields.memo.isEmpty
             )
         ]
     }
@@ -234,7 +218,7 @@ private extension TemplateEditSheet {
 
     func hidePanel() {
         withAnimation(.snappy) {
-            model.state.closePanel()
+            model.state.panel.closeAll()
         }
     }
 }

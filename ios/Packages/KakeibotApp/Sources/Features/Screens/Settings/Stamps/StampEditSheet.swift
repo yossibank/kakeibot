@@ -8,8 +8,6 @@ public struct StampEditSheet: View {
 
     @FocusState private var focus: Field?
 
-    @Environment(\.dismiss) private var dismiss
-
     private let onDelete: (Deletion) -> Void
     private let onHide: () -> Void
 
@@ -39,23 +37,26 @@ public struct StampEditSheet: View {
                 )
             }
         } save: {
-            PrimaryButton(model.saveTitle) {
-                edit.save()
+            PrimaryButton(model.flow.output.saveTitle) {
+                focus = nil
+                model.flow.save()
             }
-            .disabled(!model.canSave)
+            .disabled(!model.flow.output.canSave)
         }
         .overlay(alignment: .top) {
             SettingsEditHeader(
-                isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-                title: model.isEditing ? "スタンプを編集" : "スタンプを追加",
-                isEditing: model.isEditing,
-                isHidden: model.input.isHidden
+                isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+                title: model.flow.output.isEditing ? "スタンプを編集" : "スタンプを追加",
+                isEditing: model.flow.output.isEditing,
+                isHidden: model.flow.output.isHidden
             ) {
-                edit.close()
+                focus = nil
+                model.flow.close()
             } onHide: {
-                edit.toggleHidden()
+                focus = nil
+                model.flow.toggleHidden()
             } onDelete: {
-                model.state.prompt.isConfirmingDelete = true
+                model.flow.state.prompt.show(.delete)
             }
             .padding(.horizontal, SettingsSpacing.side)
             .padding(.top, SettingsSpacing.top)
@@ -66,17 +67,13 @@ public struct StampEditSheet: View {
         }
         .backdrop()
         .errorBanner(Bindable(model.state).errorNotice)
-        .settingsEditConfirmations(edit)
-        .confirmation(
-            isPresented: Bindable(model.state).prompt.isConfirmingDelete,
-            systemImage: "trash",
-            title: "このスタンプを削除しますか",
-            message: "カレンダーに押したスタンプは残ります",
-            keepTitle: "やめる",
-            confirmTitle: "削除する"
-        ) {
-            edit.delete()
-        }
+        .editSheet(
+            model.flow,
+            deleting: "このスタンプを削除しますか",
+            note: "カレンダーに押したスタンプは残ります",
+            onHide: onHide,
+            onDelete: onDelete
+        )
         .task {
             await model.load()
         }
@@ -87,24 +84,6 @@ public struct StampEditSheet: View {
 private extension StampEditSheet {
     enum Field: Hashable {
         case text
-    }
-}
-
-private extension StampEditSheet {
-    var edit: SettingsEditController<StampEditModel> {
-        SettingsEditController(
-            model: model,
-            dismiss: dismiss,
-            restsOnHide: true,
-            onRest: {
-                focus = nil
-            },
-            onHide: onHide,
-            onDelete: onDelete,
-            onSave: {
-                await $0.save()
-            }
-        )
     }
 }
 

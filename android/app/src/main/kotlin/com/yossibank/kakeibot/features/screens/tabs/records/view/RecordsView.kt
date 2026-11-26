@@ -64,12 +64,12 @@ fun RecordsView(
         )
     }
 
-    SideEffect {
-        model.state.today = today
-    }
-
     LaunchedEffect(model) {
         model.observe()
+    }
+
+    SideEffect {
+        model.setToday(today)
     }
 
     model.state.task.Timer()

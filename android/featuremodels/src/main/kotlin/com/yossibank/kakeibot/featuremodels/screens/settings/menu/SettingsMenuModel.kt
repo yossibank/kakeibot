@@ -47,6 +47,11 @@ class SettingsMenuModel(
         val task = ModelTask()
 
         var screen: Screen by mutableStateOf(screen)
+            private set
+
+        fun open(screen: Screen) {
+            this.screen = screen
+        }
     }
 
     class Input {

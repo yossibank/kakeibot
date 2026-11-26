@@ -1,6 +1,5 @@
 package com.yossibank.kakeibot.features.screens.settings.templates
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -67,7 +66,7 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.templates.TemplateE
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
-import com.yossibank.kakeibot.features.shared.model.OnOutcome
+import com.yossibank.kakeibot.features.shared.model.EditSheet
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
@@ -97,16 +96,16 @@ fun TemplateEditSheet(
 
     model.state.task.Timer()
 
-    OnOutcome(model.state.outcome) { outcome ->
-        outcome.saved?.let(onSave)
-    }
-
-    BackHandler(onBack = onClose)
+    EditSheet(
+        flow = model.flow,
+        onSaved = onSave,
+        onClose = onClose,
+    )
 
     SettingsFrame(
         title = "テンプレートを追加",
         isRoot = true,
-        onBack = onClose,
+        onBack = model.flow::close,
         followsKeyboard = true,
     ) {
         Column(
@@ -268,13 +267,13 @@ fun TemplateEditSheet(
         )
 
         PrimaryButton(
-            title = model.output.saveTitle,
+            title = model.flow.output.saveTitle,
             onClick = {
                 focus.clearFocus()
-                model.perform { it.save() }
+                model.flow.perform { it.save() }
             },
             modifier = Modifier.fillMaxWidth(),
-            isEnabled = model.output.canSave,
+            isEnabled = model.flow.output.canSave,
         )
     }
 }

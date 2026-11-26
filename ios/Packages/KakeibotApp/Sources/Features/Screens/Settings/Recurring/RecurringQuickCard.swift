@@ -88,7 +88,7 @@ private extension RecurringQuickCard {
 
             if model.output.billRecurring != nil {
                 SettingsBillShiftPicker(
-                    shift: Bindable(model.state).billShift,
+                    shift: Bindable(model.state).fields.billShift,
                     dates: model.output.billDates
                 )
             }
@@ -108,7 +108,7 @@ private extension RecurringQuickCard {
                 icon: model.output.icon(for: wallet),
                 isSelected: model.state.toWalletId == wallet.id
             ) {
-                model.state.toWalletId = wallet.id
+                model.state.selectDestination(wallet.id)
             }
         }
     }

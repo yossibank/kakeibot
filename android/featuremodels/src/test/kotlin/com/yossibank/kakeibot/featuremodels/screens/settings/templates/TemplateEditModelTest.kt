@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.templates
@@ -30,6 +31,24 @@ class TemplateEditModelTest {
     }
 
     @Test
+    fun asksBeforeDiscardingChanges() = modelTest(today = "2026-10-17") { setup ->
+        val model = setup.templateModel(type = Entry.Kind.expense)
+        model.load()
+
+        val changedAfterLoad = model.flow.output.isChanged
+        model.state.update { copy(name = "ランチ") }
+        model.flow.close()
+        val asked = model.flow.state.prompt.isShowing(EditFlow.Prompt.discard)
+        val pending = model.flow.state.outcome.value
+        model.flow.discard()
+
+        assertFalse(changedAfterLoad)
+        assertTrue(asked)
+        assertNull(pending)
+        assertEquals(true, model.flow.state.outcome.value?.closes)
+    }
+
+    @Test
     fun choosesFirstCategoryAndWalletOnLoad() = modelTest(today = "2026-10-17") { setup ->
         val options = setup.options()
         val model = setup.templateModel(type = Entry.Kind.income)
@@ -46,14 +65,14 @@ class TemplateEditModelTest {
         val model = setup.templateModel(type = Entry.Kind.expense)
         model.load()
 
-        val empty = model.output.saveTitle
-        val canSaveWithoutName = model.output.canSave
+        val empty = model.flow.output.saveTitle
+        val canSaveWithoutName = model.flow.output.canSave
         model.state.update { copy(name = "ランチ") }
 
         assertEquals("名前を入れてください", empty)
         assertFalse(canSaveWithoutName)
-        assertEquals("追加する", model.output.saveTitle)
-        assertTrue(model.output.canSave)
+        assertEquals("追加する", model.flow.output.saveTitle)
+        assertTrue(model.flow.output.canSave)
     }
 
     @Test
@@ -61,13 +80,13 @@ class TemplateEditModelTest {
         val model = setup.templateModel(type = Entry.Kind.expense)
         model.load()
 
-        val refused = model.save()
+        val refused = model.flow.save()
         val refusal = model.state.task.message
         model.state.update { copy(name = "ランチ") }
         model.state.press(AmountCalculator.Key.Digit(9))
         model.state.press(AmountCalculator.Key.Digit(8))
         model.state.press(AmountCalculator.Key.Digit(0))
-        val saved = model.save()
+        val saved = model.flow.save()
         val templates = setup.database.templates()
 
         assertNull(refused)
@@ -81,7 +100,7 @@ class TemplateEditModelTest {
     fun keepsNoticeWhenInputChanges() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.templateModel(type = Entry.Kind.expense)
         model.load()
-        model.save()
+        model.flow.save()
 
         model.state.press(AmountCalculator.Key.Digit(9))
 
@@ -93,11 +112,11 @@ class TemplateEditModelTest {
         val model = setup.templateModel(type = Entry.Kind.income)
         model.state.update { copy(name = "給料", categoryId = null, walletId = null) }
 
-        model.save()
+        model.flow.save()
         val category = model.state.task.message
         model.load()
         model.state.update { copy(walletId = null) }
-        model.save()
+        model.flow.save()
 
         assertEquals("カテゴリを選んでください", category)
         assertEquals("入金先を選んでください", model.state.task.message)

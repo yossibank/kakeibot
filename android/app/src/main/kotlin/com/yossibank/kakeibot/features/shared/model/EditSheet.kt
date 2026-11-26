@@ -1,5 +1,6 @@
-package com.yossibank.kakeibot.features.screens.settings.recurring
+package com.yossibank.kakeibot.features.shared.model
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -12,60 +13,86 @@ import com.yossibank.kakeibot.designsystem.components.modal.DiscardDialog
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.RecurringEditPrompt
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
+import com.yossibank.kakeibot.featuremodels.shared.model.perform
+import com.yossibank.kakeibot.featuremodels.shared.notice.Deletion
 
 @Composable
-fun RecurringEditDialogs(
-    prompt: RecurringEditPrompt?,
-    isHidden: Boolean,
-    canSave: Boolean,
-    onDismiss: (RecurringEditPrompt) -> Unit,
-    onDiscard: () -> Unit,
-    onDelete: () -> Unit,
-    onSaveHiding: () -> Unit,
-    onDiscardHiding: () -> Unit,
+fun <Saved : Any> EditSheet(
+    flow: EditFlow<Saved>,
+    deleting: String = "",
+    note: String? = null,
+    onHide: () -> Unit = {},
+    onDelete: (Deletion) -> Unit = {},
+    onSaved: (Saved) -> Unit = {},
+    onClose: () -> Unit,
 ) {
-    val current = prompt ?: return
-    val dismiss = { onDismiss(current) }
+    OnOutcome(flow.state.outcome) { outcome ->
+        outcome.saved?.let(onSaved)
 
-    when (current) {
-        RecurringEditPrompt.Discard -> {
+        if (outcome.isHidden == true) {
+            onHide()
+        }
+
+        outcome.deletion?.let(onDelete)
+
+        if (outcome.closes) {
+            onClose()
+        }
+    }
+
+    BackHandler(onBack = flow::back)
+
+    PromptDialogs(
+        flow = flow,
+        deleting = deleting,
+        note = note,
+    )
+}
+
+@Composable
+private fun PromptDialogs(
+    flow: EditFlow<*>,
+    deleting: String,
+    note: String?,
+) {
+    when (val prompt = flow.state.prompt.current) {
+        EditFlow.Prompt.discard -> {
             DiscardDialog(
-                onDiscard = {
-                    dismiss()
-                    onDiscard()
-                },
-                onKeep = dismiss,
+                onDiscard = flow::discard,
+                onKeep = { flow.state.prompt.close(prompt) },
             )
         }
 
-        RecurringEditPrompt.Delete -> {
+        EditFlow.Prompt.delete -> {
             DeleteDialog(
-                title = "この固定費を削除しますか",
-                message = "これまでに作った記録は残ります",
+                title = deleting,
+                message = note,
                 onConfirm = {
-                    dismiss()
-                    onDelete()
+                    flow.state.prompt.close(prompt)
+                    flow.perform { it.delete() }
                 },
-                onDismiss = dismiss,
+                onDismiss = { flow.state.prompt.close(prompt) },
             )
         }
 
-        RecurringEditPrompt.Hide -> {
+        EditFlow.Prompt.hideChanges -> {
             UnsavedHideDialog(
-                isHidden = isHidden,
-                canSave = canSave,
+                isHidden = flow.output.isHidden,
+                canSave = flow.output.canSave,
                 onSave = {
-                    dismiss()
-                    onSaveHiding()
+                    flow.state.prompt.close(prompt)
+                    flow.perform { it.saveTogglingHidden() }
                 },
                 onDiscard = {
-                    dismiss()
-                    onDiscardHiding()
+                    flow.state.prompt.close(prompt)
+                    flow.perform { it.setHidden(!it.output.isHidden) }
                 },
-                onKeep = dismiss,
+                onKeep = { flow.state.prompt.close(prompt) },
             )
         }
+
+        EditFlow.Prompt.menu, EditFlow.Prompt.hide, null -> {}
     }
 }
 

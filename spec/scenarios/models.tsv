@@ -425,6 +425,7 @@ recurring-edit.hides-and-deletes-existing-recurring		RecurringEditModelTest/hide
 recurring-edit.fails-to-load-missing-recurring		RecurringEditModelTest/failsToLoadMissingRecurring	Androidのみ	編集する固定費が無い時に「固定費を読めませんでした」を出す。iOS にテストが無い
 recurring-edit.uses-closing-day-only-for-card-transfer		RecurringEditModelTest/usesClosingDayOnlyForCardTransfer	Androidのみ	締め日はカードへの振替の時だけ下書きに残す。iOS にこのテストが無い
 recurring-edit.does-not-warn-before-asking-for-reminders		RecurringEditModelTest/doesNotWarnBeforeAskingForReminders	Androidのみ	まだ許可を尋ねていない時は「届かない」を出さない。iOS にこのテストが無い
+recurring-edit-prompt.closes-panel-before-asking-to-discard		RecurringEditModelPromptTest/closesPanelBeforeAskingToDiscard	Androidのみ	戻る操作はパネルを先に閉じ、閉じる操作は変わっていれば捨てる確認を出す。iOS は画面で行う
 recurring-list.lists-with-schedule-and-next-date	RecurringListModelTests/listsWithScheduleAndNextDate	RecurringListModelTest/listsWithScheduleAndNextDate	対応	
 recurring-list.totals-month-from-month-start-day	RecurringListModelTests/totalsMonthFromMonthStartDay	RecurringListModelTest/totalsMonthFromMonthStartDay	対応	
 recurring-list.hides-and-shows-recurring	RecurringListModelTests/hidesAndShowsRecurring	RecurringListModelTest/hidesAndShowsRecurring	対応	
@@ -437,6 +438,7 @@ template-edit.opens-one-panel-at-a-time	TemplateEditModelTests/opensOnePanelAtAT
 template-edit.names-what-is-missing-on-save-button	TemplateEditModelTests/namesWhatIsMissingOnSaveButton	TemplateEditModelTest/namesWhatIsMissingOnSaveButton	対応	
 template-edit.saves-new-template-with-defaults	TemplateEditModelTests/savesNewTemplateWithDefaults	TemplateEditModelTest/savesNewTemplateWithDefaults	対応	名前が無い時は save の結果で確かめる
 template-edit.loads-existing-template-and-tracks-changes	TemplateEditModelTests/loadsExistingTemplateAndTracksChanges		未移植	既にあるテンプレートを編集する入口（editing・isChanged）が無い
+template-edit.asks-before-discarding-changes	TemplateEditModelTests/asksBeforeDiscardingChanges	TemplateEditModelTest/asksBeforeDiscardingChanges	対応	
 template-edit.keeps-notice-when-input-changes	TemplateEditModelTests/keepsNoticeWhenInputChanges	TemplateEditModelTest/keepsNoticeWhenInputChanges	対応	
 template-edit.chooses-first-category-and-wallet-on-load		TemplateEditModelTest/choosesFirstCategoryAndWalletOnLoad	Androidのみ	読み込みで最初のカテゴリと口座を選ぶ。iOS にこれだけのテストが無い
 template-edit.names-missing-wallet-by-type		TemplateEditModelTest/namesMissingWalletByType	Androidのみ	カテゴリと口座が無い時の知らせの文を確かめる。iOS にテストが無い
@@ -479,18 +481,32 @@ settings-board.deletes-every-hidden-item	SettingsBoardModelTests/deletesEveryHid
 settings-board.notes-hidden-items-in-use-with-the-deletion	SettingsBoardModelTests/notesHiddenItemsInUseWithTheDeletion		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.informs-when-every-hidden-item-is-in-use	SettingsBoardModelTests/informsWhenEveryHiddenItemIsInUse		未移植	記録がある物を残して消す一覧（カテゴリ・口座）が Android に無い
 settings-board.tells-when-some-hidden-items-cannot-be-deleted	SettingsBoardModelTests/tellsWhenSomeHiddenItemsCannotBeDeleted	RecurringListModelTest/tellsWhenSomeHiddenRecurringsCannotBeDeleted	対応	消せた分の取り消しが返ることも確かめる
-settings-edit-outcome.places-saved-value-in-outcome	SettingsEditOutcomeTests/placesSavedValueInOutcome	SettingsEditOutcomeTest/placesSavedValueInOutcome	対応	
-settings-edit-outcome.places-no-outcome-when-save-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenSaveFails	SettingsEditOutcomeTest/placesNoOutcomeWhenSaveFails	対応	
-settings-edit-outcome.reports-each-save-as-change	SettingsEditOutcomeTests/reportsEachSaveAsChange	SettingsEditOutcomeTest/reportsEachSaveAsChange	対応	
-settings-edit-outcome.places-hidden-in-outcome	SettingsEditOutcomeTests/placesHiddenInOutcome	SettingsEditOutcomeTest/placesHiddenInOutcome	対応	
-settings-edit-outcome.places-no-outcome-when-hiding-fails	SettingsEditOutcomeTests/placesNoOutcomeWhenHidingFails	SettingsEditOutcomeTest/placesNoOutcomeWhenHidingFails	対応	
-settings-edit-outcome.places-deletion-in-outcome	SettingsEditOutcomeTests/placesDeletionInOutcome	SettingsEditOutcomeTest/placesDeletionInOutcome	対応	
-settings-edit-outcome.places-save-and-hide-in-one-outcome	SettingsEditOutcomeTests/placesSaveAndHideInOneOutcome	SettingsEditOutcomeTest/placesSaveAndHideInOneOutcome	対応	
-settings-edit-outcome.keeps-sheet-open-when-hiding-after-save-fails	SettingsEditOutcomeTests/keepsSheetOpenWhenHidingAfterSaveFails	SettingsEditOutcomeTest/keepsSheetOpenWhenHidingAfterSaveFails	対応	
-settings-edit-outcome.saves-without-hiding-after-failed-save-and-hide	SettingsEditOutcomeTests/savesWithoutHidingAfterFailedSaveAndHide	SettingsEditOutcomeTest/savesWithoutHidingAfterFailedSaveAndHide	対応	
-settings-edit-prompt.shows-one-prompt-at-a-time	SettingsEditPromptTests/showsOnePromptAtATime	RecurringEditModelPromptTest/showsOnePromptAtATime	対応	操作のメニューが無く、非表示と削除の確認で確かめる
-settings-edit-prompt.closes-only-the-prompt-in-front	SettingsEditPromptTests/closesOnlyThePromptInFront	RecurringEditModelPromptTest/closesOnlyThePromptInFront	対応	
-settings-edit-prompt.keeps-panel-open-behind-prompt	SettingsEditPromptTests/keepsPanelOpenBehindPrompt	RecurringEditModelPromptTest/keepsPanelOpenBehindPrompt	対応	報酬の規則の画面が無く、固定費の編集で確かめる
+edit-flow.places-saved-value-in-outcome	EditFlowTests/placesSavedValueInOutcome	EditFlowOutcomeTest/placesSavedValueInOutcome	対応	
+edit-flow.places-no-outcome-when-save-fails	EditFlowTests/placesNoOutcomeWhenSaveFails	EditFlowOutcomeTest/placesNoOutcomeWhenSaveFails	対応	
+edit-flow.reports-each-save-as-change	EditFlowTests/reportsEachSaveAsChange	EditFlowOutcomeTest/reportsEachSaveAsChange	対応	
+edit-flow.places-hidden-in-outcome	EditFlowTests/placesHiddenInOutcome	EditFlowOutcomeTest/placesHiddenInOutcome	対応	
+edit-flow.places-no-outcome-when-hiding-fails	EditFlowTests/placesNoOutcomeWhenHidingFails	EditFlowOutcomeTest/placesNoOutcomeWhenHidingFails	対応	
+edit-flow.places-deletion-in-outcome	EditFlowTests/placesDeletionInOutcome	EditFlowOutcomeTest/placesDeletionInOutcome	対応	
+edit-flow.places-save-and-hide-in-one-outcome	EditFlowTests/placesSaveAndHideInOneOutcome	EditFlowOutcomeTest/placesSaveAndHideInOneOutcome	対応	
+edit-flow.keeps-sheet-open-when-hiding-after-save-fails	EditFlowTests/keepsSheetOpenWhenHidingAfterSaveFails	EditFlowOutcomeTest/keepsSheetOpenWhenHidingAfterSaveFails	対応	
+edit-flow.saves-without-hiding-after-failed-save-and-hide	EditFlowTests/savesWithoutHidingAfterFailedSaveAndHide	EditFlowOutcomeTest/savesWithoutHidingAfterFailedSaveAndHide	対応	
+edit-flow.keeps-panel-open-behind-prompt	EditFlowTests/keepsPanelOpenBehindPrompt	RecurringEditModelPromptTest/keepsPanelOpenBehindPrompt	対応	報酬の規則の画面が無く、固定費の編集で確かめる
+edit-flow.closes-without-asking-when-unchanged	EditFlowTests/closesWithoutAskingWhenUnchanged	EditFlowTest/closesWithoutAskingWhenUnchanged	対応	
+edit-flow.asks-before-discarding-changes	EditFlowTests/asksBeforeDiscardingChanges	EditFlowTest/asksBeforeDiscardingChanges	対応	
+edit-flow.ignores-second-save-while-saving	EditFlowTests/ignoresSecondSaveWhileSaving	EditFlowTest/ignoresSecondSaveWhileSaving	対応	
+edit-flow.names-problem-instead-of-saving	EditFlowTests/namesProblemInsteadOfSaving	EditFlowTest/namesProblemInsteadOfSaving	対応	
+edit-flow.names-save-by-whether-editing	EditFlowTests/namesSaveByWhetherEditing	EditFlowTest/namesSaveByWhetherEditing	対応	
+edit-flow.asks-before-hiding-changes	EditFlowTests/asksBeforeHidingChanges	EditFlowTest/asksBeforeHidingChanges	対応	
+edit-flow.asks-before-hiding-when-source-asks	EditFlowTests/asksBeforeHidingWhenSourceAsks	EditFlowTest/asksBeforeHidingWhenSourceAsks	対応	
+edit-flow.keeps-sheet-open-when-nothing-to-delete	EditFlowTests/keepsSheetOpenWhenNothingToDelete	EditFlowTest/keepsSheetOpenWhenNothingToDelete	対応	
+edit-flow.puts-open-part-away-before-closing-on-back		EditFlowTest/putsOpenPartAwayBeforeClosingOnBack	Androidのみ	戻るの操作は、開いている枠を先に閉じる。Android の戻るのボタンだけにある
+task.returns-value-and-marks-running	ModelTaskTests/returnsValueAndMarksRunning	ModelTaskTest/returnsValueAndMarksRunning	対応	
+task.runs-action-while-running	ModelTaskTests/runsActionWhileRunning	ModelTaskTest/runsActionWhileRunning	対応	
+task.stops-running-after-failure	ModelTaskTests/stopsRunningAfterFailure	ModelTaskTest/stopsRunningAfterFailure	対応	
+shown.shows-one-prompt-at-a-time	ShownTests/showsOnePromptAtATime	RecurringEditModelPromptTest/showsOnePromptAtATime ShownTest/showsOnePromptAtATime	対応	
+shown.closes-only-the-prompt-in-front	ShownTests/closesOnlyThePromptInFront	RecurringEditModelPromptTest/closesOnlyThePromptInFront ShownTest/closesOnlyThePromptInFront	対応	
+shown.closes-whatever-is-shown	ShownTests/closesWhateverIsShown	ShownTest/closesWhateverIsShown	対応	
+shown.sets-and-clears-item	ShownTests/setsAndClearsItem		iOSのみ	SwiftUI の Binding に渡す item の口で、Compose には要らない
 settings-fold.keeps-closed-hint-per-screen	SettingsFoldModelTests/keepsClosedHintPerScreen	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	別の画面の説明カードが開いたままなことは確かめていない
 settings-fold.remembers-closed-hidden-list	SettingsFoldModelTests/remembersClosedHiddenList	RecurringListModelTest/remembersClosedHintAndHiddenList	対応	
 settings-fold.shares-hint-between-models-of-one-screen	SettingsFoldModelTests/sharesHintBetweenModelsOfOneScreen		未移植	ウィジェットの置き方・アプリアイコン・テーマの見た目の画面が Android に無い

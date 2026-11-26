@@ -39,6 +39,7 @@ class HomeModel(
         val task = ModelTask()
 
         var today: LocalDate by mutableStateOf(today)
+            internal set
 
         var isListFailed: Boolean by mutableStateOf(false)
             internal set
@@ -113,6 +114,10 @@ class HomeModel(
         val entryList: Flow<EntryList>,
         val round: ObservationRound,
     )
+
+    fun setToday(today: LocalDate) {
+        state.today = today
+    }
 
     suspend fun observe() {
         dependencies.round.each { observeOverview() }

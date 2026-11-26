@@ -105,7 +105,7 @@ fun RecurringListView(
     }
 
     SideEffect {
-        model.state.today = today
+        model.setToday(today)
     }
 
     val hiddenNotice = model.state.hidden
@@ -126,10 +126,10 @@ fun RecurringListView(
     BackHandler(onBack = onBack)
 
     val actions = RecurringRowActions(
-        onOpen = { model.state.openId = it },
-        onEdit = { model.state.editing = Editing.Existing(it) },
+        onOpen = model.state::open,
+        onEdit = { model.state.editing.show(Editing.Existing(it)) },
         onHide = { id -> model.perform { it.hide(id) } },
-        onDelete = { model.state.ask(DeleteTarget.One(it)) },
+        onDelete = { model.state.deleting.show(DeleteTarget.One(it)) },
     )
 
     SettingsFrame(
@@ -187,11 +187,11 @@ fun RecurringListView(
             }
 
             AnimatedVisibility(
-                visible = model.state.editing != null,
+                visible = model.state.editing.current != null,
                 enter = slideInHorizontally { it },
                 exit = slideOutHorizontally { it },
             ) {
-                val current = remember { model.state.editing }
+                val current = remember { model.state.editing.current }
 
                 if (current != null) {
                     RecurringEditSheet(
@@ -199,7 +199,7 @@ fun RecurringListView(
                         today = today,
                         type = model.state.type,
                         editingId = (current as? Editing.Existing)?.id,
-                        onClose = { model.state.editing = null },
+                        onClose = { model.state.editing.close(current) },
                         onDelete = deletedNotice::show,
                         onHide = { (current as? Editing.Existing)?.id?.let(hiddenNotice::show) },
                     )
@@ -260,7 +260,7 @@ fun RecurringListView(
                     rows = model.output.hiddenRows,
                     isOpen = model.input.hiddenList.isClosed != true,
                     onToggle = { model.perform { it.toggleHiddenList() } },
-                    onDeleteAll = { model.state.ask(DeleteTarget.AllHidden) },
+                    onDeleteAll = { model.state.deleting.show(DeleteTarget.AllHidden) },
                     onEdit = actions.onEdit,
                     onShow = { id -> model.perform { it.show(id) } },
                 )
@@ -272,21 +272,21 @@ fun RecurringListView(
         } else {
             PrimaryButton(
                 title = "${model.state.type.title}の固定費を追加",
-                onClick = { model.state.editing = Editing.New },
+                onClick = { model.state.editing.show(Editing.New) },
                 modifier = Modifier.fillMaxWidth(),
                 icon = R.drawable.ic_add,
             )
         }
     }
 
-    model.state.deleting?.let { target ->
+    model.state.deleting.current?.let { target ->
         val isAll = target == DeleteTarget.AllHidden
 
         DeleteDialog(
             title = if (isAll) "非表示の固定費をまとめて削除しますか" else "この固定費を削除しますか",
             message = "これまでに作った記録は残ります",
             onConfirm = {
-                model.state.closePrompt(target)
+                model.state.deleting.close(target)
 
                 model.perform {
                     when (target) {
@@ -295,7 +295,7 @@ fun RecurringListView(
                     }
                 }
             },
-            onDismiss = { model.state.closePrompt(target) },
+            onDismiss = { model.state.deleting.close(target) },
         )
     }
 }

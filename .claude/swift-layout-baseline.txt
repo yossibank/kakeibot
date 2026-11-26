@@ -1,1 +1,0 @@
-ios/Packages/KakeibotApp/Sources/DesignSystem/Components/Icon/IconGlyph+Symbol.swift: L8: 1 つの関数は 60 行までにする

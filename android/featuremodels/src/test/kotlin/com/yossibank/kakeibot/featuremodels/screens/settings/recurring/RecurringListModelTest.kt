@@ -250,18 +250,18 @@ class RecurringListModelTest {
         val model = RecurringListModel(parts = setup.parts, today = setup.today)
         val one = DeleteTarget.One(Identifier())
 
-        model.state.ask(one)
-        model.state.ask(DeleteTarget.AllHidden)
-        val asked = model.state.deleting
+        model.state.deleting.show(one)
+        model.state.deleting.show(DeleteTarget.AllHidden)
+        val asked = model.state.deleting.current
 
-        model.state.closePrompt(one)
-        val kept = model.state.deleting
+        model.state.deleting.close(one)
+        val kept = model.state.deleting.current
 
-        model.state.closePrompt(DeleteTarget.AllHidden)
+        model.state.deleting.close(DeleteTarget.AllHidden)
 
         assertEquals(DeleteTarget.AllHidden, asked)
         assertEquals(DeleteTarget.AllHidden, kept)
-        assertNull(model.state.deleting)
+        assertNull(model.state.deleting.current)
     }
 
     @Test
@@ -269,14 +269,14 @@ class RecurringListModelTest {
         val model = RecurringListModel(parts = setup.parts, today = setup.today)
         val editing = Identifier<Recurring>()
         val open = Identifier<Recurring>()
-        model.state.openId = open
+        model.state.open(open)
 
-        model.state.editing = Editing.Existing(editing)
+        model.state.editing.show(Editing.Existing(editing))
 
-        assertEquals(Editing.Existing(editing), model.state.editing)
-        assertEquals(editing, (model.state.editing as? Editing.Existing)?.id)
+        assertEquals(Editing.Existing(editing), model.state.editing.current)
+        assertEquals(editing, (model.state.editing.current as? Editing.Existing)?.id)
         assertEquals(open, model.state.openId)
-        assertNull(model.state.deleting)
+        assertNull(model.state.deleting.current)
     }
 
     @Test

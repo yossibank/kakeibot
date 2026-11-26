@@ -4,6 +4,7 @@ import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.screens.settings.budgets.BudgetListModel.Target
+import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup
 import com.yossibank.kakeibot.featuremodels.support.ModelWait
 import com.yossibank.kakeibot.featuremodels.support.failingEntryList
@@ -35,15 +36,15 @@ class BudgetListModelTest {
         val food = model.output.categories.first()
 
         model.startEditing(Target.Total)
-        val emptyTitle = model.output.saveTitle
+        val emptyTitle = model.flow.output.saveTitle
         model.press(1, 2, 0, 0, 0, 0)
-        val title = model.output.saveTitle
-        model.save()
+        val title = model.flow.output.saveTitle
+        model.flow.save()
         ModelWait.until { model.output.totalAmount != null }
 
         model.startEditing(Target.Category(food))
         model.press(3, 0, 0, 0, 0)
-        model.save()
+        model.flow.save()
         ModelWait.until { model.output.amount(food.id) != null }
         val budgets = setup.database.budgets()
 
@@ -147,22 +148,25 @@ class BudgetListModelTest {
         ModelWait.until { model.output.totalAmount != null }
 
         model.startEditing(Target.Total)
-        model.close()
-        val unchanged = model.state.editing
+        model.flow.close()
+        val unchanged = model.flow.state.outcome.value?.closes
+        val closedOnce = model.flow.state.outcome.count
+        model.state.cancelEditing()
 
         model.startEditing(Target.Total)
         model.press(1)
-        model.close()
-        val isAsking = model.state.isConfirmingDiscard
+        model.flow.close()
+        val isAsking = model.flow.state.prompt.isShowing(EditFlow.Prompt.discard)
         val kept = model.state.editing
 
-        model.state.cancelEditing()
+        model.flow.discard()
 
-        assertNull(unchanged)
+        assertEquals(true, unchanged)
+        assertEquals(1, closedOnce)
         assertTrue(isAsking)
         assertEquals(Target.Total, kept)
-        assertFalse(model.state.isConfirmingDiscard)
-        assertNull(model.state.editing)
+        assertNull(model.flow.state.prompt.current)
+        assertEquals(2, model.flow.state.outcome.count)
     }
 
     @Test

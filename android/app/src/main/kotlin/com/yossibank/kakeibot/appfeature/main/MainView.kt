@@ -99,8 +99,8 @@ private fun MainLayers(
     today: LocalDate,
     model: MainModel,
 ) {
-    val sheet = model.state.sheet
-    val close = { model.state.sheet = null }
+    val sheet = model.state.sheet.current
+    val close = model.state.sheet::closeAll
     val notice = remember(parts) { EntryNoticeModel(parts) }
 
     LaunchedEffect(notice.state.count) {
@@ -203,11 +203,11 @@ private fun MainTabs(
                         HomeView(
                             parts = parts,
                             today = today,
-                            onOpenBudget = { model.state.sheet = MainModel.Sheet.Budget },
+                            onOpenBudget = { model.state.sheet.show(MainModel.Sheet.Budget) },
                             onOpenEntry = model::openEntry,
                             onAddEntry = { model.openEntry(editing = null) },
                             onOpenSettings = {
-                                model.state.sheet = MainModel.Sheet.Settings()
+                                model.state.sheet.show(MainModel.Sheet.Settings())
                             },
                         )
                     }

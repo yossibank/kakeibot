@@ -21,6 +21,3 @@ val BudgetListModel.Output.recurringText: String
         val amount = AmountText.text(amount = recurringExpense.clamped)
         return "この月の固定費は $amount。予算の目安にできます"
     }
-
-val BudgetListModel.Output.saveTitle: String
-    get() = if (canSave) "${month?.month ?: ""}月からこの額にする" else "金額を入れてください"

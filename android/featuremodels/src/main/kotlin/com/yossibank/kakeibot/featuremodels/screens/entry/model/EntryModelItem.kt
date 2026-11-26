@@ -5,11 +5,12 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 
 const val RECENT_ITEM_NAME_LIMIT = 50
 
-var EntryModel.State.store: String
+val EntryModel.State.store: String
     get() = form.store
-    set(value) {
-        update { withStore(value) }
-    }
+
+fun EntryModel.State.setStore(store: String) {
+    update { withStore(store) }
+}
 
 fun EntryModel.addItem(item: EntryItem.Draft) {
     changeItems {

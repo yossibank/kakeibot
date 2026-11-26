@@ -8,8 +8,6 @@ public struct ThemeEditSheet: View {
 
     @FocusState private var focus: Field?
 
-    @Environment(\.dismiss) private var dismiss
-
     private let onDelete: (Deletion) -> Void
 
     public init(
@@ -28,10 +26,10 @@ public struct ThemeEditSheet: View {
             form
 
             if focus == nil {
-                PrimaryButton(model.saveTitle) {
+                PrimaryButton(model.flow.output.saveTitle) {
                     save()
                 }
-                .disabled(!model.canSave)
+                .disabled(!model.flow.output.canSave)
                 .transition(.opacity)
             }
         }
@@ -45,31 +43,12 @@ public struct ThemeEditSheet: View {
         }
         .backdrop()
         .errorBanner(Bindable(model.state).errorNotice)
-        .confirmsDiscard(
-            when: model.isChanged,
-            isPresented: Bindable(model.state).prompt.isConfirmingDiscard
-        ) {
-            dismiss()
-        }
-        .confirmation(
-            isPresented: Bindable(model.state).prompt.isConfirmingDelete,
-            systemImage: "trash",
-            title: "このテーマを削除しますか",
-            message: "選んでいるときは、ホワイトに戻ります",
-            keepTitle: "やめる",
-            confirmTitle: "削除する"
-        ) {
-            model.perform {
-                await $0.delete()
-            }
-        }
-        .onOutcome(model.state.outcome) { outcome in
-            if let deletion = outcome.deletion {
-                onDelete(deletion)
-            }
-
-            dismiss()
-        }
+        .editSheet(
+            model.flow,
+            deleting: "このテーマを削除しますか",
+            note: "選んでいるときは、ホワイトに戻ります",
+            onDelete: onDelete
+        )
     }
 }
 
@@ -82,16 +61,16 @@ private extension ThemeEditSheet {
 private extension ThemeEditSheet {
     var header: some View {
         SettingsEditHeader(
-            isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-            title: model.isEditing ? "テーマを編集" : "テーマを追加",
-            isEditing: model.isEditing,
+            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            title: model.flow.output.isEditing ? "テーマを編集" : "テーマを追加",
+            isEditing: model.flow.output.isEditing,
             isHidden: false,
             canHide: false
         ) {
             close()
         } onHide: {} onDelete: {
             focus = nil
-            model.state.prompt.isConfirmingDelete = true
+            model.flow.state.prompt.show(.delete)
         }
     }
 
@@ -104,7 +83,7 @@ private extension ThemeEditSheet {
 
                 SettingsField(
                     "名前",
-                    text: Bindable(model.state).draft.name,
+                    text: name,
                     focus: $focus,
                     field: .name
                 )
@@ -185,6 +164,14 @@ private extension ThemeEditSheet {
         GridItem(.adaptive(minimum: 36), spacing: 8)
     ]
 
+    var name: Binding<String> {
+        Binding {
+            model.state.draft.name
+        } set: { name in
+            model.state.rename(name)
+        }
+    }
+
     func colorBinding(_ slot: ThemeEditModel.Slot) -> Binding<Color> {
         Binding {
             Color(hex: model.state.draft[keyPath: slot.keyPath]) ?? .clear
@@ -195,19 +182,11 @@ private extension ThemeEditSheet {
 
     func close() {
         focus = nil
-
-        if model.isChanged {
-            model.state.prompt.isConfirmingDiscard = true
-        } else {
-            dismiss()
-        }
+        model.flow.close()
     }
 
     func save() {
         focus = nil
-
-        model.perform {
-            await $0.save()
-        }
+        model.flow.save()
     }
 }

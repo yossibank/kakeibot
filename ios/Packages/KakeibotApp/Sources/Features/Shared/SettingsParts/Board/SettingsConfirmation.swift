@@ -4,7 +4,7 @@ import SwiftUI
 struct SettingsConfirmation {
     let systemImage: String
     let title: String
-    let message: String
+    let message: String?
     let confirmTitle: String
 
     var role: ConfirmCard.Role = .destructive

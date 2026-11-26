@@ -148,7 +148,7 @@ extension EntryModelTests {
     func reportsAddedCategory() async throws {
         let model = try await Self.newModel()
         let editor = model.newCategoryModel()
-        editor.state.name = "おやつ"
+        editor.state.fields.name = "おやつ"
         let saved = try #require(await editor.save())
 
         await model.addCategory(saved.id)
@@ -161,7 +161,7 @@ extension EntryModelTests {
     func choosesAddedWalletAfterSheet() async throws {
         let model = try await Self.newModel()
         let editor = model.newWalletModel()
-        editor.state.name = "へそくり"
+        editor.state.fields.name = "へそくり"
         let wallet = try #require(await editor.save())
         let added = EntryModel.AddedWallet(wallet: wallet, role: .source)
 

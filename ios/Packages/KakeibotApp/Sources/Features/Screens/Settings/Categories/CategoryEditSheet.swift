@@ -9,8 +9,6 @@ public struct CategoryEditSheet: View {
     @FocusState var focus: Field?
     @FocusState var isTagFocused: Bool?
 
-    @Environment(\.dismiss) var dismiss
-
     @State private var layout = Layout()
 
     @Environment(\.themeStyle.corner) private var corner
@@ -56,26 +54,16 @@ public struct CategoryEditSheet: View {
             below: layout.iconBottom
         )
         .errorBanner(Bindable(model.state).errorNotice)
-        .settingsEditConfirmations(edit)
-        .confirmation(
-            isPresented: Bindable(model.state).prompt.isConfirmingDelete,
-            systemImage: deleteImage,
-            title: deleteTitle,
-            message: deleteMessage,
-            keepTitle: "やめる",
-            confirmTitle: deleteConfirmTitle,
-            role: deleteRole
-        ) {
-            if model.input.hasEntries {
-                edit.toggleHidden()
-            } else {
-                edit.delete()
-            }
-        }
+        .editSheet(
+            model.flow,
+            deleting: deletion,
+            onHide: onHide,
+            onDelete: onDelete,
+            onSaved: onSave
+        )
         .onChange(of: focus) {
-            if focus != nil,
-               model.state.ignoresKeyboard {
-                model.state.ignoresKeyboard = false
+            if focus != nil {
+                model.state.setIgnoresKeyboard(false)
             }
         }
         .onOutcome(model.state.ready) { _ in
@@ -117,7 +105,7 @@ private extension CategoryEditSheet {
 
             SettingsField(
                 "名前",
-                text: Bindable(model.state).name,
+                text: Bindable(model.state).fields.name,
                 focus: $focus,
                 field: .name
             )
@@ -126,10 +114,10 @@ private extension CategoryEditSheet {
                 tags
             }
         } save: {
-            PrimaryButton(model.saveTitle) {
-                edit.save()
+            PrimaryButton(model.flow.output.saveTitle) {
+                save()
             }
-            .disabled(!model.canSave)
+            .disabled(!model.flow.output.canSave)
         }
         .scrollDisabled(model.state.isMovingTag)
         .overlay(alignment: .top) {
@@ -146,18 +134,19 @@ private extension CategoryEditSheet {
 
     var header: some View {
         SettingsEditHeader(
-            isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-            title: model.isEditing ? "カテゴリを編集" : "カテゴリを追加",
-            isEditing: model.isEditing,
-            isHidden: model.input.isHidden,
-            canDelete: !(model.input.isHidden && model.input.hasEntries),
+            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            title: model.flow.output.isEditing ? "カテゴリを編集" : "カテゴリを追加",
+            isEditing: model.flow.output.isEditing,
+            isHidden: model.flow.output.isHidden,
+            canDelete: !(model.flow.output.isHidden && model.input.hasEntries),
             subtitle: kindName
         ) {
-            edit.close()
+            focus = nil
+            model.flow.close()
         } onHide: {
-            edit.toggleHidden()
+            model.flow.toggleHidden()
         } onDelete: {
-            model.state.prompt.isConfirmingDelete = true
+            model.flow.state.prompt.show(.delete)
         }
     }
 
@@ -173,7 +162,7 @@ private extension CategoryEditSheet {
             } label: {
                 CategoryTileFace(
                     icon: model.state.icon.preview,
-                    name: model.state.name.isEmpty ? "名前" : model.state.name,
+                    name: model.state.fields.name.isEmpty ? "名前" : model.state.fields.name,
                     isHidden: false
                 )
                 .frame(width: 80, height: 78)
@@ -203,9 +192,7 @@ private extension CategoryEditSheet {
                 model.state.moveTag(id, to: index)
             }
             .onPreferenceChange(TagLineMovingKey.self) { isMoving in
-                if model.state.isMovingTag != isMoving {
-                    model.state.isMovingTag = isMoving
-                }
+                model.state.setMovingTag(isMoving)
             }
 
             if model.state.tags.count > 1 {
@@ -242,24 +229,22 @@ private extension CategoryEditSheet {
         Color(hex: model.state.icon.color) ?? Palette.subtext
     }
 
-    var deleteImage: String {
-        model.input.hasEntries ? "eye.slash" : "trash"
-    }
+    var deletion: SettingsConfirmation {
+        guard model.input.hasEntries else {
+            return .delete(
+                title: "このカテゴリを削除しますか",
+                message: "使っている固定費・テンプレート・予算・タグも消えます"
+            )
+        }
 
-    var deleteTitle: String {
-        model.input.hasEntries ? "このカテゴリは削除できません" : "このカテゴリを削除しますか"
-    }
-
-    var deleteMessage: String {
-        model.input.hasEntries ? Self.hasEntriesMessage : "使っている固定費・テンプレート・予算・タグも消えます"
-    }
-
-    var deleteConfirmTitle: String {
-        model.input.hasEntries ? "非表示にする" : "削除する"
-    }
-
-    var deleteRole: ConfirmCard.Role {
-        model.input.hasEntries ? .suggestion : .destructive
+        return SettingsConfirmation(
+            systemImage: "eye.slash",
+            title: "このカテゴリは削除できません",
+            message: Self.hasEntriesMessage,
+            confirmTitle: "非表示にする",
+            role: .suggestion,
+            confirmsHide: true
+        )
     }
 
     var keyboardRegions: SafeAreaRegions {

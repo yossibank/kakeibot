@@ -32,14 +32,14 @@ public extension TemplateEditModel.Output {
 
     var draft: EntryTemplateDraft {
         EntryTemplateDraft(
-            name: state.name,
+            name: state.fields.name,
             type: state.type,
             amount: amount,
             categoryId: state.categoryId,
             tagId: state.tagId,
             walletId: state.walletId,
-            memo: state.memo,
-            billShift: billRecurring == nil ? 0 : state.billShift
+            memo: state.fields.memo,
+            billShift: billRecurring == nil ? 0 : state.fields.billShift
         )
     }
 

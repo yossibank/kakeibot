@@ -11,6 +11,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -54,7 +55,7 @@ class MainModel(
         visitedTabs: Set<Tab>,
         sheet: Sheet?,
     ) {
-        var sheet: Sheet? by mutableStateOf(sheet)
+        val sheet = Shown(sheet)
 
         var tab: Tab by mutableStateOf(tab)
             private set
@@ -96,9 +97,11 @@ class MainModel(
         internal fun openSettings(recurring: Identifier<Recurring>) {
             round += 1
 
-            sheet = Sheet.Settings(
-                recurring = recurring,
-                round = round,
+            sheet.show(
+                Sheet.Settings(
+                    recurring = recurring,
+                    round = round,
+                ),
             )
         }
     }
@@ -108,7 +111,7 @@ class MainModel(
     )
 
     suspend fun open(route: PlannedNotification.Route) {
-        if (state.sheet != null) {
+        if (state.sheet.current != null) {
             closeSheet()
         }
 
@@ -119,7 +122,7 @@ class MainModel(
 
             is PlannedNotification.Route.Entry -> {
                 state.select(Tab.Home)
-                state.sheet = Sheet.Entry(editing = null, date = route.date)
+                state.sheet.show(Sheet.Entry(editing = null, date = route.date))
             }
 
             else -> {
@@ -129,11 +132,11 @@ class MainModel(
     }
 
     fun openEntry(editing: Identifier<Record>?) {
-        state.sheet = Sheet.Entry(editing = editing)
+        state.sheet.show(Sheet.Entry(editing = editing))
     }
 
     private suspend fun closeSheet() {
-        state.sheet = null
+        state.sheet.closeAll()
         delay(dependencies.closeDelay)
     }
 

@@ -3,20 +3,9 @@ import FeatureModels
 import SwiftUI
 
 extension CategoryEditSheet {
-    var edit: SettingsEditController<CategoryEditModel> {
-        SettingsEditController(
-            model: model,
-            dismiss: dismiss,
-            onRest: {
-                focus = nil
-            },
-            onHide: onHide,
-            onDelete: onDelete,
-            onSaved: onSave,
-            onSave: {
-                await $0.save()
-            }
-        )
+    func save() {
+        focus = nil
+        model.flow.save()
     }
 
     func addTag() {
@@ -43,7 +32,7 @@ extension CategoryEditSheet {
         closeTag()
 
         if startsAddingTag {
-            edit.save()
+            save()
         }
     }
 
@@ -51,7 +40,7 @@ extension CategoryEditSheet {
         closeTag()
 
         if startsAddingTag {
-            dismiss()
+            model.flow.discard()
         }
     }
 }
@@ -59,7 +48,7 @@ extension CategoryEditSheet {
 private extension CategoryEditSheet {
     func showTag(_ target: TagEdit.Target) {
         focus = nil
-        model.state.ignoresKeyboard = true
+        model.state.setIgnoresKeyboard(true)
 
         withAnimation(.snappy(duration: 0.25)) {
             model.state.showTag(target)

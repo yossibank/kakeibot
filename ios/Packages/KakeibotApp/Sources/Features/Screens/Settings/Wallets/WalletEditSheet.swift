@@ -9,7 +9,6 @@ public struct WalletEditSheet: View {
 
     @FocusState var focus: Field?
 
-    @Environment(\.dismiss) var dismiss
     @Environment(\.themeStyle.corner) var corner
 
     let onSave: (Wallet) -> Void
@@ -40,36 +39,29 @@ public struct WalletEditSheet: View {
             below: layout.iconBottom
         )
         .errorBanner(Bindable(model.state).errorNotice)
-        .deletionNotice(Bindable(model.state).valuationDeletion) { deletion in
+        .deletionNotice(valuationDeletion) { deletion in
             model.perform {
                 await $0.restore(deletion)
             }
         }
-        .settingsEditConfirmations(edit)
-        .confirmsWalletDelete(
-            hasEntries: model.input.hasEntries,
-            isPresented: Bindable(model.state).prompt.isConfirmingDelete
-        ) {
-            toggleHidden()
-        } onConfirm: {
-            edit.delete()
-        }
-        .confirmsWalletHide(
-            balance: model.input.balance,
-            isPresented: Bindable(model.state).prompt.isConfirmingHide
-        ) {
-            edit.toggleHidden()
-        }
+        .editSheet(
+            model.flow,
+            deleting: .deletingWallet(hasEntries: model.input.hasEntries),
+            hiding: .hidingWallet(balance: model.input.balance),
+            onHide: onHide,
+            onDelete: onDelete,
+            onSaved: onSave
+        )
         .onChange(of: model.state.kind) {
             focus = nil
         }
-        .sheet(isPresented: Bindable(model.state).payment.isEditing) {
+        .sheet(isPresented: Bindable(model.state).payment.shown[.editing]) {
             closePayment()
         } content: {
             RecurringEditSheet(model: model.paymentModel())
         }
         .confirmation(
-            isPresented: Bindable(model.state).payment.isAsking,
+            isPresented: Bindable(model.state).payment.shown[.asking],
             systemImage: "repeat",
             title: model.output.paymentQuestion,
             message: model.output.paymentQuestionNote,
@@ -78,7 +70,7 @@ public struct WalletEditSheet: View {
             role: .suggestion,
             onKeep: model.finishAddedWallet
         ) {
-            model.state.payment.isEditing = true
+            model.state.payment.shown.show(.editing)
         }
         .task {
             await model.load()
@@ -92,7 +84,7 @@ private extension WalletEditSheet {
         ZStack(alignment: .bottom) {
             content
 
-            if model.state.prompt.panel == .amount {
+            if model.state.panel.isShowing(.amount) {
                 amountDrawer(
                     "最初の残高",
                     calculator: model.state.calculator,
@@ -103,7 +95,7 @@ private extension WalletEditSheet {
                 )
             }
 
-            if model.state.prompt.panel == .valuation {
+            if model.state.panel.isShowing(.valuation) {
                 amountDrawer(
                     "今の評価額",
                     calculator: model.state.valuation,
@@ -118,7 +110,7 @@ private extension WalletEditSheet {
                 }
             }
 
-            if model.state.prompt.panel == .loanAmount {
+            if model.state.panel.isShowing(.loanAmount) {
                 amountDrawer(
                     "最初に借りた額",
                     calculator: model.state.loanAmount,
@@ -128,7 +120,7 @@ private extension WalletEditSheet {
                 )
             }
         }
-        .animation(.snappy, value: model.state.prompt.panel)
+        .animation(.snappy, value: model.state.panel)
     }
 }
 

@@ -21,24 +21,8 @@ extension WalletEditSheet {
 }
 
 extension WalletEditSheet {
-    var edit: SettingsEditController<WalletEditModel> {
-        SettingsEditController(
-            model: model,
-            dismiss: dismiss,
-            onRest: {
-                focus = nil
-            },
-            onHide: onHide,
-            onDelete: onDelete,
-            onSaved: onSave,
-            onSave: {
-                await $0.save()
-            }
-        )
-    }
-
     var title: String {
-        model.isEditing ? "口座を編集" : "口座を追加"
+        model.flow.output.isEditing ? "口座を編集" : "口座を追加"
     }
 
     var paymentItems: [SettingsRowList<Panel>.Item] {
@@ -71,12 +55,22 @@ extension WalletEditSheet {
         return payment + loan
     }
 
+    var valuationDeletion: Binding<Deletion?> {
+        Binding {
+            model.state.valuationDeletion
+        } set: { deletion in
+            if deletion == nil {
+                model.state.dismissValuationDeletion()
+            }
+        }
+    }
+
     var noteColor: Color {
         Color(hex: model.state.icon.color) ?? Palette.subtext
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
-        let isEntering = model.state.prompt.panel == .valuation
+        let isEntering = model.state.panel.isShowing(.valuation)
         let amount = isEntering ? model.state.valuation.amount : model.input.balance
 
         return [
@@ -92,7 +86,7 @@ extension WalletEditSheet {
     }
 
     var previewName: String {
-        model.state.name.isEmpty ? "名前" : model.state.name
+        model.state.fields.name.isEmpty ? "名前" : model.state.fields.name
     }
 
     var balanceHint: String {
@@ -112,12 +106,12 @@ extension WalletEditSheet {
     }
 
     var amountStroke: Color {
-        model.state.prompt.panel == .amount ? signColor : signColor.opacity(.muted)
+        model.state.panel.isShowing(.amount) ? signColor : signColor.opacity(.muted)
     }
 
     func open(_ panel: Panel) {
         switch panel {
-        case .payment: model.state.payment.isEditing = true
+        case .payment: model.state.payment.shown.show(.editing)
         case .valuation: openValuation()
         case .loanAmount: openLoanAmount()
         }
@@ -154,9 +148,9 @@ extension WalletEditSheet {
     func show(_ drawer: WalletEditModel.Drawer?) {
         withAnimation(.snappy) {
             if let drawer {
-                model.state.open(drawer)
+                model.state.panel.show(drawer)
             } else {
-                model.state.closePanel()
+                model.state.panel.closeAll()
             }
         }
     }
@@ -178,14 +172,8 @@ extension WalletEditSheet {
         }
     }
 
-    func toggleHidden() {
+    func save() {
         focus = nil
-
-        guard !model.output.needsHideConfirmation else {
-            model.state.prompt.isConfirmingHide = true
-            return
-        }
-
-        edit.toggleHidden()
+        model.flow.save()
     }
 }

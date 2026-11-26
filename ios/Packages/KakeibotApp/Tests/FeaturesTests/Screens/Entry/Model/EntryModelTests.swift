@@ -294,7 +294,7 @@ struct EntryModelTests {
         let model = try await Self.newModel()
         model.select(.income)
         let editor = model.newCategoryModel()
-        editor.state.name = "配当"
+        editor.state.fields.name = "配当"
         editor.state.icon.glyph = .invest
 
         let saved = try #require(await editor.save())
