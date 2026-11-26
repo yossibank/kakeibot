@@ -111,7 +111,7 @@ iOS で分けたファイルと変えた名前のうち、次のものは Androi
 | `AppDatabase+IconBacked`・`AppDatabase+Ordering` | `writes/methods/AppDatabaseIconBacked.kt`・`AppDatabaseOrdering.kt` |
 | 行の型が表の操作を持つ。`SortableRecord`・`HidableRecord` など | 書き込みの束ねが表の操作を持つ。`SortableTable`・`HidableTable` など |
 | 汎用の関数に型を渡す | 汎用の関数に、`writes/types/` の束ね（`WalletTable` など）を渡す |
-| `Store/Writes/Types/IconBackedDraft` | `core/shared/IconBackedDraft.kt` |
+| `Store/Writes/Types/IconBackedDraft` | `core/shared/IconBackedDraft.kt`・`IconHoldingDraft.kt`（既定の処理） |
 
 Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す。iOS の同じ名前のプロトコルとは役割が違う。
 

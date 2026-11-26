@@ -28,7 +28,6 @@ format:
 	python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py --fix $$(git ls-files --cached --others --exclude-standard '*.swift')
 	python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-layout-check.py --fix $$(git ls-files --cached --others --exclude-standard '*.kt')
 	mint run swiftformat .
-	python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-layout-check.py --fix $$(git ls-files --cached --others --exclude-standard '*.kt')
 	$(KTLINT) --format
 	scripts/json-format.sh write
 

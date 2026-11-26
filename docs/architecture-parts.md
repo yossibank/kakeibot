@@ -77,6 +77,7 @@
 | `save(table, …)`・`reorder(table, …)`・`setHidden(table, …)` | Android の同じ関数。表ごとの束ね（`WalletTable` など）を渡す | `store/writes/methods/` |
 | `SortableTable`・`HidableTable`・`ArchivableTable`・`IconBackedTable` | Android の表の束ね。表の名前・エラー・DAO の呼び方を持つ | `store/records/protocols/` |
 | `IconBackedDraft`（Kotlin） | アイコン付きの 1 件の下書き。行を作る・直す操作を持つ | `core/shared/` |
+| `IconHoldingDraft`（Kotlin） | `icon` と `problems` を持つ下書きの、`IconBackedDraft` の既定の処理 | `core/shared/` |
 | `InsertableDao`・`UpdatableDao` | Room の DAO の insert と update。`@Query` は表ごとの DAO に残す | `store/records/protocols/` |
 
 ## 🪜 設定の一覧の画面を足す
