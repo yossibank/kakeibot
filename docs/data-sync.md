@@ -2,7 +2,8 @@
 
 > [!NOTE]
 > 端末間の同期のために持つ表の形が分かる。
-> 同期する表は [data](data.md) と [data-settings](data-settings.md)、決定は [decisions/sync.md](decisions/sync.md) にある。
+> 同期する表は [data](data.md)・[data-budget](data-budget.md)・[data-settings](data-settings.md) にある。
+> 決定は [decisions/sync.md](decisions/sync.md) と [decisions/sharing.md](decisions/sharing.md) にある。
 
 ## 🗺️ 表の流れ
 
@@ -10,7 +11,7 @@
 
 ```mermaid
 flowchart LR
-    tables["data・data-settings の表"] -->|"トリガーで記録する"| change["sync_change"]
+    tables["data・data-budget・data-settings の表"] -->|"トリガーで記録する"| change["sync_change"]
     change -->|"送る。送れたら消す"| cloud["iCloud"]
     cloud -->|"受け取る"| check{"入れられるか"}
     check -->|"入れる。applying の間は記録しない"| tables
@@ -41,7 +42,7 @@ flowchart LR
 
 ### sync_change
 
-まだ送っていない行。data と data-settings の表のすべてに、行を足す・変える・消すと、ここに記録するトリガーを持つ。
+まだ送っていない行。data・data-budget・data-settings の表は、すべてトリガーを持つ。行を足す・変える・消すと、トリガーがここに記録する。
 トリガーは、同期を入れているか、sync_share に行があるときだけ記録する。
 
 | 列 | 型 | 補足 |

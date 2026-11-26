@@ -73,7 +73,7 @@ AI は使わない。通信は、iCloud の同期と共有だけに使う。
 
 端末間の同期と家族との共有は、iCloud（CloudKit）で作る。サーバーは持たず、記録は使う人の iCloud に置く。iOS だけで動き、Android は対象にしない。
 
-同期と共有の決定は [decisions/sync.md](decisions/sync.md) にある。
+同期の決定は [decisions/sync.md](decisions/sync.md)、共有の決定は [decisions/sharing.md](decisions/sharing.md) にある。
 
 ## ❓ 未決
 

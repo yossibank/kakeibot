@@ -32,9 +32,10 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | 作業 | 先に読む | 終えたら直す |
 | --- | --- | --- |
 | 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md)、[architecture-parts](docs/architecture-parts.md) | overview、roadmap、architecture-screens の「画面とフォルダ」 |
-| ターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | [architecture](docs/architecture.md)、[architecture-packages](docs/architecture-packages.md)、[architecture-packages-app](docs/architecture-packages-app.md)、[architecture-naming](docs/architecture-naming.md)。Android は [architecture-android](docs/architecture-android.md)、[architecture-android-app](docs/architecture-android-app.md) も | architecture、architecture-packages、architecture-packages-app、architecture-naming。Android は architecture-android、architecture-android-app も |
+| iOS のターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | architecture、architecture-packages、architecture-packages-app、architecture-naming | 先に読む文書のすべて |
+| Android のモジュール・依存・フォルダを変える、ファイルを足す・名前を変える | iOS の行の文書も読む。architecture-android、architecture-android-app、architecture-android-flow | 先に読む文書のすべて |
 | 画面の組み立て・見張り・通知とウィジェットの流れを変える | [architecture-screens](docs/architecture-screens.md)、[architecture-screens-flow](docs/architecture-screens-flow.md) | architecture-screens、architecture-screens-flow |
-| 表の形を変える | [data](docs/data.md)、[data-settings](docs/data-settings.md)、[data-sync](docs/data-sync.md) | 変えた表の文書。書き出しに響くなら export-format も |
+| 表の形を変える | [data](docs/data.md)、[data-budget](docs/data-budget.md)、[data-settings](docs/data-settings.md)、[data-sync](docs/data-sync.md) | 変えた表の文書。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
 | fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |
 | 画面のモデルのテストを足す・消す・名前を変える | [scenarios](spec/scenarios.md) | `spec/scenarios/models.tsv`。違いを見つけたら scenarios も |

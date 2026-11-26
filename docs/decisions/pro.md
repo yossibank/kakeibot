@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > 何を Pro にし、どう売るかの決定と、その理由が分かる。
-> 同期と共有の決定は [sync](sync.md) にある。
+> 同期の決定は [sync](sync.md)、共有の決定は [sharing](sharing.md) にある。
 
 ## Pro の中身と売り方
 

@@ -59,10 +59,12 @@ flowchart LR
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
 | Android の画面とモデル | [docs/architecture-android-app.md](docs/architecture-android-app.md) |
+| Android の画面とモデルのやり取り | [docs/architecture-android-flow.md](docs/architecture-android-flow.md) |
 | 画面の組み立て・通知とウィジェット・画面のフォルダ | [docs/architecture-screens.md](docs/architecture-screens.md) |
 | 画面とモデルのやり取り・見張り・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
 | 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | データの形 | [docs/data.md](docs/data.md) |
+| 予算・固定費・ごほうび・スタンプの表 | [docs/data-budget.md](docs/data-budget.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |
 | 同期のための表 | [docs/data-sync.md](docs/data-sync.md) |
 | なぜそう決めたか | [docs/decisions/](docs/decisions/) |

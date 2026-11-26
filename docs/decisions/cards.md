@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > カードの利用分の振替、請求を次に回すこと、これからの引き落としの決定が分かる。
-> 固定費と予算の決定は [budget](budget.md)、言葉の対応は [glossary](../glossary.md) にある。
+> 固定費の決定は [recurring](recurring.md)、予算の決定は [budget](budget.md)、言葉の対応は [glossary](../glossary.md) にある。
 
 ## 利用分の振替
 
