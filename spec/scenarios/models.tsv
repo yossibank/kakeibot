@@ -30,7 +30,7 @@ entry.places-no-outcome-when-saving-fails	EntryModelTests/placesNoOutcomeWhenSav
 entry.continues-with-next-entry-after-saving	EntryModelTests/continuesWithNextEntryAfterSaving	EntryModelOutcomeTest/continuesWithNextEntryAfterSaving	対応	
 entry.places-deleted-change-and-begins-closing	EntryModelTests/placesDeletedChangeAndBeginsClosing	EntryModelOutcomeTest/placesClosedAfterDeleting	対応	Android は閉じ始めの旗が無く、変更を持つ閉じる結果を確かめる
 entry.ignores-saving-while-running	EntryModelTests/ignoresSavingWhileRunning	EntryModelOutcomeTest/ignoresSavingWhileRunning	対応	
-entry.ignores-deleting-while-running	EntryModelTests/ignoresDeletingWhileRunning		未確認	Android も実行中は削除を断るが、テストが無い
+entry.ignores-deleting-while-running	EntryModelTests/ignoresDeletingWhileRunning	EntryModelOutcomeTest/ignoresDeletingWhileRunning	対応	
 entry.receives-deletion-from-child-sheet	EntryModelTests/receivesDeletionFromChildSheet		未移植	入力から口座・カテゴリを直すシートが無い
 entry.moves-category-after-recording-again	EntryModelTests/movesCategoryAfterRecordingAgain		未移植	記録し直した後に、カテゴリの棚を動かす結果（categoryMoved）が無い
 entry.places-hidden-category-and-moves-back-on-undo	EntryModelTests/placesHiddenCategoryAndMovesBackOnUndo		未移植	入力からカテゴリを非表示にする所が無い
