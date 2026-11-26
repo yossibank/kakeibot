@@ -1,1 +1,0 @@
-android/featuremodels/src/main/kotlin/com/yossibank/kakeibot/featuremodels/screens/entry/voice/EntryVoiceFlow.kt: K3: 画面のモデルの値は、state・input・output・dependencies の順に並べる

@@ -52,7 +52,6 @@ claude-config の並びの検査が見送る、今ある並びの外れを持つ
 | パス | 見送る検査 |
 | --- | --- |
 | `.claude/swift-layout-baseline.txt` | swift-layout-check の Swift の並び |
-| `.claude/kotlin-layout-baseline.txt` | kotlin-layout-check の Kotlin の並び |
 
 ### spec と store
 
