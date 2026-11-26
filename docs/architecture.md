@@ -13,35 +13,64 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## 📂 リポジトリ
 
-共通の木に、次のものを足している。
+共通の木に、次のものを足している。足したものの種類で、小見出しを分ける。
+
+### Android
 
 | パス | 中身 |
 | --- | --- |
 | `android/` | Android の Gradle のプロジェクト。中身は [architecture-android](architecture-android.md) にある |
 | `android/.editorconfig` | claude-config の `kotlin-core.md` に合わせた ktlint の設定。`make format` と pre-commit で直し、`make verify` で確かめる |
-| `scripts/docs-check.py` | 文書と実物の一致を確かめ、`make verify-docs` で走る。リンク先とその見出し、Makefile の入口を見る |
-| `scripts/docs-check.py` のフォルダの木 | [architecture-packages](architecture-packages.md) と [architecture-packages-app](architecture-packages-app.md) の木を見る |
-| `scripts/docs-check.py` の fixtures | fixtures の `description` と `summary` も見る |
-| `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
-| `scripts/docs-check.py` の届く文書 | `docs/`・`spec/` の `.md` が、README の文書の表か[決定の索引](decisions/README.md)からリンクされているかも見る |
-| `scripts/docs-check-test.py` | `docs-check.py` の届く文書の検査を、仮の文書に通して確かめる。`make verify-docs` で走る |
-| `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数かを確かめ、`make verify` で走る。2 以下と、式の中の値は見ない |
-| `.claude/swift-layout-baseline.txt` | claude-config の swift-layout-check が見送る、今ある Swift の並びの外れ。`make verify` で確かめ、直したら行を消す |
-| `.claude/kotlin-layout-baseline.txt` | claude-config の kotlin-layout-check が見送る、今ある Kotlin の並びの外れ。`make verify` で確かめ、直したら行を消す |
-| `scripts/no-warnings.sh` | `make verify` のアプリのビルドを包み、外のパッケージを除いた `warning:` で失敗にする。差分ビルドなので、組み直したファイルの警告だけを見る |
-| `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON を整形する。`make format` と pre-commit で直し、`make verify-docs` で確かめる |
-| claude-config の書き方を確かめるフック | `docs-check.py`・`swift-style-check.py`・`kotlin-style-check.py`。`.md` は `make verify-docs`、`.swift` と `.kt` は `make verify` で全部にかける |
-| `scripts/scenarios-check.py` | 画面のモデルのテストと [scenarios](../spec/scenarios.md) の一覧の一致を確かめ、`make verify-docs` で走る。`make scenarios` で区分ごとの件数を出す |
-| `scripts/scenarios-check-test.py` | `scenarios-check.py` を、仮のテストと一覧に通して確かめる。`make verify-docs` で走る |
+
+### 確かめるスクリプト
+
+| スクリプト | 見るもの | 走る make |
+| --- | --- | --- |
+| `scripts/docs-check.py` | 文書と実物の一致。見るものは下の箇条書きにある | `make verify-docs` |
+| `scripts/docs-check-test.py` | `docs-check.py` の届く文書の検査を、仮の文書に通して確かめる | `make verify-docs` |
+| `scripts/scenarios-check.py` | 画面のモデルのテストと [scenarios](../spec/scenarios.md) の一覧の一致。`make scenarios` で区分ごとの件数を出す | `make verify-docs` |
+| `scripts/scenarios-check-test.py` | `scenarios-check.py` を、仮のテストと一覧に通して確かめる | `make verify-docs` |
+| `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON の整形。`make format` と pre-commit で直す | `make verify-docs` |
+| `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数か。2 以下と、式の中の値は見ない | `make verify` |
+| `scripts/no-warnings.sh` | アプリのビルドを包み、外のパッケージを除いた `warning:` で失敗にする。差分ビルドなので、組み直したファイルの警告だけを見る | `make verify` |
+| claude-config の `docs-check.py` | `.md` の書き方を、全部のファイルにかける | `make verify-docs` |
+| claude-config の `swift-style-check.py`・`kotlin-style-check.py` | `.swift` と `.kt` の書き方を、全部のファイルにかける | `make verify` |
+
+`scripts/docs-check.py` は、次のものを見る。
+
+- リンク先とその見出し、Makefile の入口
+- [architecture-packages](architecture-packages.md) と [architecture-packages-app](architecture-packages-app.md) のフォルダの木
+- fixtures の `description` と `summary`
+- `Package.swift` のテストのターゲットと、テストプランの中身が一致するか
+- `docs/`・`spec/` の `.md` が、README の文書の表か[決定の索引](decisions/README.md)からリンクされているか
+
+### 基準線
+
+claude-config の並びの検査が見送る、今ある並びの外れを持つ。`make verify` で確かめ、直したら行を消す。
+
+| パス | 見送る検査 |
+| --- | --- |
+| `.claude/swift-layout-baseline.txt` | swift-layout-check の Swift の並び |
+| `.claude/kotlin-layout-baseline.txt` | kotlin-layout-check の Kotlin の並び |
+
+### spec と store
+
+| パス | 中身 |
+| --- | --- |
 | `spec/` | `export-format.md`、`fixtures.md`、`fixtures/`、`scenarios.md`、`scenarios/` |
 | `spec/scenarios/` | 画面のモデルのテストを iOS と Android で結び付けた一覧（`models.tsv`） |
 | `spec/fixtures/` | フォルダ名は、Core のフォルダ名の小文字にそろえる |
 | `.claude/rules/` | spec の文書の役割 |
-| `.claude/snapshots/` | `ui-snapshot` で描くセット。名前は描く場所（`tabs-`・`entry-`・`settings-`・`components`・`widget`・`store`）で始める |
-| `scripts/snapshot-scroll.py` | セットの `patch.py` から呼ぶ。スクロールを伸ばして全体を描けるようにし、ガラスの効果を背景に変える |
-| `.claude/snapshots/store/` | `store/screenshots/raw/` の画面に文言を重ね、ストアのスクリーンショットを描く |
 | `store/ja/`・`en-US/`・`app-id.txt` | App Store の掲載情報と ID |
 | `store/screenshots/` | ストアに出す画像。大きさごとのフォルダに置き、元の画面は `raw/` |
+
+### スナップショット
+
+| パス | 中身 |
+| --- | --- |
+| `.claude/snapshots/` | `ui-snapshot` で描くセット。名前は描く場所（`tabs-`・`entry-`・`settings-`・`components`・`widget`・`store`）で始める |
+| `.claude/snapshots/store/` | `store/screenshots/raw/` の画面に文言を重ね、ストアのスクリーンショットを描く |
+| `scripts/snapshot-scroll.py` | セットの `patch.py` から呼ぶ。スクロールを伸ばして全体を描けるようにし、ガラスの効果を背景に変える |
 
 ## 📱 ios
 

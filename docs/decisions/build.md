@@ -166,7 +166,7 @@
 | 理由 | 文書を書くのはほぼ Claude なので、書いたその場で直せる。フックが見ない文書は `make verify-docs` で見る |
 
 > [!IMPORTANT]
-> 文書と実物の一致は、`scripts/docs-check.py` で確かめる。見るものは [architecture のリポジトリ](../architecture.md#-リポジトリ)にある。文書だけの PR では、`make verify-docs` で走らせる。
+> 文書と実物の一致は、`scripts/docs-check.py` で確かめる。見るものは [architecture の確かめるスクリプト](../architecture.md#確かめるスクリプト)にある。文書だけの PR では、`make verify-docs` で走らせる。
 
 ## テストの走らせ方
 
