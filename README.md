@@ -34,7 +34,7 @@ flowchart LR
 | 部分 | 中身 |
 | --- | --- |
 | 計算 | 両 OS のテストが `spec/fixtures/` を読み、結果をそろえる |
-| iOS のパッケージ | [architecture-packages](docs/architecture-packages.md) |
+| iOS のパッケージ | [architecture-packages](docs/architecture-packages.md)、[architecture-packages-app](docs/architecture-packages-app.md) |
 | Android のモジュール | [architecture-android](docs/architecture-android.md) |
 
 ## 💻 実行環境
@@ -54,11 +54,13 @@ flowchart LR
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | どう作るか | [docs/architecture.md](docs/architecture.md) |
 | 道具とコマンド | [docs/development.md](docs/development.md) |
-| パッケージの依存とフォルダ | [docs/architecture-packages.md](docs/architecture-packages.md) |
+| パッケージの依存とフォルダの木 | [docs/architecture-packages.md](docs/architecture-packages.md) |
+| KakeibotApp のフォルダの中身 | [docs/architecture-packages-app.md](docs/architecture-packages-app.md) |
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
 | Android の画面とモデル | [docs/architecture-android-app.md](docs/architecture-android-app.md) |
-| 画面の組み立て・見張り・通知とウィジェット | [docs/architecture-screens.md](docs/architecture-screens.md) |
+| 画面の組み立て・通知とウィジェット・画面のフォルダ | [docs/architecture-screens.md](docs/architecture-screens.md) |
+| 画面とモデルのやり取り・見張り・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
 | 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | データの形 | [docs/data.md](docs/data.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |

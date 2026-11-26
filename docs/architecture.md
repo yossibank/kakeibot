@@ -68,7 +68,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## 📦 パッケージ
 
-2 つのパッケージの依存の向きと、フォルダごとの中身は、[architecture-packages](architecture-packages.md) にある。
+2 つのパッケージの依存の向きとフォルダの木は、[architecture-packages](architecture-packages.md) にある。KakeibotApp のフォルダの中身は、[architecture-packages-app](architecture-packages-app.md) にある。
 
 ## 🧪 テスト
 

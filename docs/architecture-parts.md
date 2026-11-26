@@ -35,7 +35,7 @@
 
 ## 📱 モデルから画面へ返す型
 
-モデルの `state` に置き、画面が変化を受ける型である。受け方は、[architecture-screens](architecture-screens.md) の「モデルから画面へ結果を返す」にある。
+モデルの `state` に置き、画面が変化を受ける型である。受け方は、[architecture-screens-flow の「モデルから画面へ結果を返す」](architecture-screens-flow.md#️-モデルから画面へ結果を返す)にある。
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
