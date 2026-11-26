@@ -21,13 +21,11 @@ public enum Percent {
         }
 
         var percents = parts.map { $0 * 100 / whole }
-
         let rest = 100 - percents.reduce(0, +)
 
         let order = parts.indices.sorted { lhs, rhs in
             let lhsRest = parts[lhs] * 100 % whole
             let rhsRest = parts[rhs] * 100 % whole
-
             return lhsRest == rhsRest ? lhs < rhs : lhsRest > rhsRest
         }
 

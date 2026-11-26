@@ -97,6 +97,12 @@ public struct ThemeEditSheet: View {
 }
 
 private extension ThemeEditSheet {
+    enum Field: Hashable {
+        case name
+    }
+}
+
+private extension ThemeEditSheet {
     var header: some View {
         SettingsEditHeader(
             isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
@@ -169,10 +175,6 @@ private extension ThemeEditSheet {
 }
 
 private extension ThemeEditSheet {
-    enum Field: Hashable {
-        case name
-    }
-
     static let fade: CGFloat = 16
 
     static let swatchColumns = [

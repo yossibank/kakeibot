@@ -42,6 +42,23 @@ public struct ChipButton<Content: View>: View {
     }
 }
 
+public extension ChipButton {
+    enum Size: Sendable {
+        case regular
+        case large
+    }
+
+    enum Outline: Sendable {
+        case solid
+        case dashed
+    }
+
+    enum Width: Sendable {
+        case fit
+        case fill
+    }
+}
+
 public extension ChipButton where Content == ChipLabel {
     init(
         _ title: String,
@@ -59,23 +76,6 @@ public extension ChipButton where Content == ChipLabel {
         ) {
             ChipLabel(title: title, systemImage: systemImage)
         }
-    }
-}
-
-public extension ChipButton {
-    enum Size: Sendable {
-        case regular
-        case large
-    }
-
-    enum Outline: Sendable {
-        case solid
-        case dashed
-    }
-
-    enum Width: Sendable {
-        case fit
-        case fill
     }
 }
 

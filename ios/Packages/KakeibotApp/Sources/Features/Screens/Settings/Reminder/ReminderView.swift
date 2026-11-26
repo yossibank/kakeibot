@@ -245,9 +245,7 @@ private extension ReminderView {
             }
         }
     }
-}
 
-private extension ReminderView {
     var hint: SettingsFold {
         SettingsFold(\.hint, in: model)
     }

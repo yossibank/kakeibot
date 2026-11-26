@@ -20,15 +20,6 @@ public struct Backdrop: View {
     }
 }
 
-public extension View {
-    func backdrop() -> some View {
-        background {
-            Backdrop()
-                .ignoresSafeArea()
-        }
-    }
-}
-
 private extension Backdrop {
     @ViewBuilder
     var pattern: some View {
@@ -92,9 +83,17 @@ private extension Backdrop {
 
         margin.move(to: CGPoint(x: marginX, y: 0))
         margin.addLine(to: CGPoint(x: marginX, y: size.height))
-
         context.stroke(rules, with: .color(Self.ink), lineWidth: 0.8)
         context.stroke(margin, with: .color(Self.marginInk), lineWidth: 0.8)
+    }
+}
+
+public extension View {
+    func backdrop() -> some View {
+        background {
+            Backdrop()
+                .ignoresSafeArea()
+        }
     }
 }
 

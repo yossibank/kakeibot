@@ -262,6 +262,7 @@ extension SyncEngine: CKSyncEngineDelegate {
         }
 
         let saves = batch?.recordsToSave.compactMap { SyncRecordID($0.recordID) } ?? []
+
         try? await database.noteSyncSends(saves)
         await dequeueMissing()
 

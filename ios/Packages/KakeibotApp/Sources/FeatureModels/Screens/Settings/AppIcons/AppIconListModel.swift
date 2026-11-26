@@ -27,7 +27,15 @@ public extension AppIconListModel {
             self.current = current
         }
     }
+}
 
+extension AppIconListModel {
+    struct Dependencies {
+        let switcher: AppIconSwitcher
+    }
+}
+
+public extension AppIconListModel {
     func select(_ choice: AppIconChoice) async {
         guard choice != input.current else {
             return
@@ -43,12 +51,6 @@ public extension AppIconListModel {
             input.current = previous
             state.errorNotice.show(Self.changeFailedMessage)
         }
-    }
-}
-
-extension AppIconListModel {
-    struct Dependencies {
-        let switcher: AppIconSwitcher
     }
 }
 

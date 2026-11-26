@@ -1,12 +1,6 @@
 import SwiftUI
 
 public struct Scrim: View {
-    public enum Level {
-        case drawer
-        case menu
-        case modal
-    }
-
     private let level: Level
 
     public init(_ level: Level) {
@@ -16,6 +10,14 @@ public struct Scrim: View {
     public var body: some View {
         Palette.scrim
             .opacity(opacity)
+    }
+}
+
+public extension Scrim {
+    enum Level {
+        case drawer
+        case menu
+        case modal
     }
 }
 

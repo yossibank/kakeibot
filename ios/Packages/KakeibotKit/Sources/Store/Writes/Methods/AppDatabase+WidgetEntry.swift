@@ -7,7 +7,9 @@ public extension AppDatabase {
         case templateNotFound
         case amountMissing
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func recordFromWidget(
         _ id: EntryTemplate.ID,

@@ -26,6 +26,7 @@ extension VoiceText {
         }
 
         let value = total + section + (current ?? 0)
+
         return value > 0 ? value : nil
     }
 
@@ -77,6 +78,7 @@ extension VoiceText {
         if let match = text.firstMatch(of: Self.weekdayPattern),
            let weekday = Self.weekdays[String(match.output.2)] {
             let isLastWeek = match.output.1 != nil
+
             return Found(
                 value: Self.recent(weekday, lastWeek: isLastWeek, today: today),
                 range: match.range
@@ -102,7 +104,6 @@ extension VoiceText {
 
 private extension VoiceText {
     static let maxAmount = 999_999_999
-
     static let maxDaysAgo = 60
 
     static let relativeDays: [(String, Int)] = [

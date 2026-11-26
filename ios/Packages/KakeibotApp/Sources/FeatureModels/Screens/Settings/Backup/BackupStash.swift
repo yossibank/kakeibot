@@ -23,7 +23,9 @@ public extension BackupStash {
         public let url: URL
         public let data: Data
     }
+}
 
+public extension BackupStash {
     static var standard: BackupStash {
         let base = URL.applicationSupportDirectory
 

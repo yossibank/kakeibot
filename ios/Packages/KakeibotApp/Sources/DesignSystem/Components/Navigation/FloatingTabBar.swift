@@ -54,7 +54,9 @@ public extension FloatingTabBar {
             self.value = value
         }
     }
+}
 
+public extension FloatingTabBar {
     static var height: CGFloat {
         64
     }
@@ -65,6 +67,24 @@ public extension FloatingTabBar {
 }
 
 private extension FloatingTabBar {
+    var dragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                withAnimation(.interactiveSpring) {
+                    dragX = value.location.x
+                }
+            }
+            .onEnded { value in
+                let index = index(at: value.location.x)
+
+                selection = items[index].value
+
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                    dragX = nil
+                }
+            }
+    }
+
     var tabs: some View {
         let indexedItems = Array(items.enumerated())
 
@@ -206,24 +226,6 @@ private extension FloatingTabBar {
         return min(max(dragX - itemWidth / 2, 0), maxX)
     }
 
-    var dragGesture: some Gesture {
-        DragGesture(minimumDistance: 0)
-            .onChanged { value in
-                withAnimation(.interactiveSpring) {
-                    dragX = value.location.x
-                }
-            }
-            .onEnded { value in
-                let index = index(at: value.location.x)
-
-                selection = items[index].value
-
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                    dragX = nil
-                }
-            }
-    }
-
     func index(at x: CGFloat) -> Int {
         guard itemWidth > 0 else {
             return selectedIndex ?? 0
@@ -236,14 +238,6 @@ private extension FloatingTabBar {
 }
 
 private struct PressStyle: ButtonStyle {
-    static var usesGlass: Bool {
-        if #available(iOS 26, *) {
-            true
-        } else {
-            false
-        }
-    }
-
     func makeBody(configuration: Configuration) -> some View {
         let isShrinking = configuration.isPressed && !Self.usesGlass
         let scale: CGFloat = isShrinking ? 0.92 : 1
@@ -251,6 +245,16 @@ private struct PressStyle: ButtonStyle {
         return configuration.label
             .scaleEffect(scale)
             .animation(.spring(response: 0.25), value: configuration.isPressed)
+    }
+}
+
+extension PressStyle {
+    static var usesGlass: Bool {
+        if #available(iOS 26, *) {
+            true
+        } else {
+            false
+        }
     }
 }
 

@@ -20,6 +20,7 @@ public final class AssetsAdjustmentModel: ScreenPerforming {
         today: LocalDate
     ) {
         let state = State()
+
         let input = Input(
             wallet: wallet,
             balance: balance,
@@ -43,10 +44,6 @@ public extension AssetsAdjustmentModel {
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
 
         public private(set) var calculator = AmountCalculator()
-
-        public func press(_ key: AmountCalculator.Key) {
-            calculator.press(key)
-        }
     }
 
     @MainActor
@@ -76,30 +73,6 @@ public extension AssetsAdjustmentModel {
         let input: Input
         let state: State
 
-        public var difference: Int {
-            state.calculator.amount - input.balance
-        }
-
-        public var canSave: Bool {
-            difference != 0
-        }
-
-        public var isChanged: Bool {
-            state.calculator.amount != input.openingAmount
-        }
-
-        public var differenceText: String {
-            canSave ? Yen.text(difference, type: .income) : "なし"
-        }
-
-        public var differenceNote: String {
-            canSave ? "差は今日の記録に入ります" : "記録の残高と同じです"
-        }
-
-        public var saveTitle: String {
-            canSave ? "\(differenceText) で合わせる" : "合わせる"
-        }
-
         init(
             input: Input,
             state: State
@@ -108,7 +81,9 @@ public extension AssetsAdjustmentModel {
             self.state = state
         }
     }
+}
 
+public extension AssetsAdjustmentModel {
     @discardableResult
     func save() async -> Bool {
         guard output.canSave else {
@@ -135,4 +110,36 @@ public extension AssetsAdjustmentModel {
 
 private extension AssetsAdjustmentModel {
     static let saveFailedMessage = "残高を合わせられませんでした"
+}
+
+public extension AssetsAdjustmentModel.Output {
+    var difference: Int {
+        state.calculator.amount - input.balance
+    }
+
+    var canSave: Bool {
+        difference != 0
+    }
+
+    var isChanged: Bool {
+        state.calculator.amount != input.openingAmount
+    }
+
+    var differenceText: String {
+        canSave ? Yen.text(difference, type: .income) : "なし"
+    }
+
+    var differenceNote: String {
+        canSave ? "差は今日の記録に入ります" : "記録の残高と同じです"
+    }
+
+    var saveTitle: String {
+        canSave ? "\(differenceText) で合わせる" : "合わせる"
+    }
+}
+
+public extension AssetsAdjustmentModel.State {
+    func press(_ key: AmountCalculator.Key) {
+        calculator.press(key)
+    }
 }

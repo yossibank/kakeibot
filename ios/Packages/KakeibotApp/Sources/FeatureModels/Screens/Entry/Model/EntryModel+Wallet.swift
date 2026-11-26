@@ -32,7 +32,9 @@ public extension EntryModel {
         public let title: String
         public let period: ClosedRange<LocalDate>?
     }
+}
 
+public extension EntryModel {
     func setWallet(_ id: Wallet.ID?) {
         state.setWallet(
             id,
@@ -109,9 +111,7 @@ public extension EntryModel {
         let isUsual = date == output.billChoices.first?.date
         state.payment.billMonth = isUsual ? nil : output.billRecurring?.occurrenceMonth(of: date)
     }
-}
 
-public extension EntryModel {
     internal func loadHistory() async throws {
         input.history = try await dependencies.database.latestEntryList()
         updateToday()

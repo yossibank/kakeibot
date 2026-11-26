@@ -39,6 +39,7 @@ private extension EntryVoiceFinishButton {
         }
 
         let passed = date.timeIntervalSince(start) / duration
+
         return min(max(passed, 0), 1)
     }
 }

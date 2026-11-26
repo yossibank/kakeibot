@@ -41,9 +41,7 @@ extension SettingsAutoScroll {
     func stop() {
         speed = 0
         onStep = nil
-
         task?.cancel()
-
         task = nil
     }
 }
@@ -87,12 +85,6 @@ private extension SettingsAutoScroll {
     }
 }
 
-extension View {
-    func settingsAutoScroll(_ autoScroll: SettingsAutoScroll) -> some View {
-        modifier(SettingsAutoScrollModifier(autoScroll: autoScroll))
-    }
-}
-
 private struct SettingsAutoScrollModifier: ViewModifier {
     @Bindable var autoScroll: SettingsAutoScroll
 
@@ -123,5 +115,11 @@ private extension SettingsAutoScrollModifier {
     struct Metrics: Equatable {
         let offset: CGFloat
         let maxOffset: CGFloat
+    }
+}
+
+extension View {
+    func settingsAutoScroll(_ autoScroll: SettingsAutoScroll) -> some View {
+        modifier(SettingsAutoScrollModifier(autoScroll: autoScroll))
     }
 }

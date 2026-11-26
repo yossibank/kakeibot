@@ -113,22 +113,6 @@ public extension Recurring {
     }
 }
 
-public extension [Entry] {
-    var billedTotal: Int {
-        reduce(0) { $0 + Recurring.usage(of: $1) }
-    }
-}
-
-public extension [Recurring] {
-    func cardBill(paidBy walletId: Wallet.ID?) -> Recurring? {
-        first { recurring in
-            recurring.type == .transfer
-                && recurring.isCardBill
-                && recurring.toWalletId == walletId
-        }
-    }
-}
-
 private extension Recurring {
     static func usage(of entry: Entry) -> Int {
         switch entry.type {
@@ -147,5 +131,21 @@ private extension Recurring {
         }
 
         return month == occurrenceMonth(of: date)
+    }
+}
+
+public extension [Entry] {
+    var billedTotal: Int {
+        reduce(0) { $0 + Recurring.usage(of: $1) }
+    }
+}
+
+public extension [Recurring] {
+    func cardBill(paidBy walletId: Wallet.ID?) -> Recurring? {
+        first { recurring in
+            recurring.type == .transfer
+                && recurring.isCardBill
+                && recurring.toWalletId == walletId
+        }
     }
 }

@@ -17,6 +17,7 @@ enum EntryVoiceInterpreter {
         }
 
         let session = makeSession()
+
         session.prewarm()
         prepared = session
     }
@@ -45,6 +46,7 @@ enum EntryVoiceInterpreter {
         }
 
         let session = prepared ?? makeSession()
+
         prepared = nil
 
         do {

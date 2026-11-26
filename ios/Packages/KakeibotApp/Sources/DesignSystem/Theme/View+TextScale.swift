@@ -135,7 +135,9 @@ private struct ProposedWidth: Layout {
             )
         )
     }
+}
 
+extension ProposedWidth {
     func explicitAlignment(
         of guide: VerticalAlignment,
         in bounds: CGRect,

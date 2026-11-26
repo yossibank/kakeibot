@@ -6,7 +6,6 @@ import Store
 public extension EntryModel.Output {
     var recentTransfers: [Entry] {
         let fees = feesByTransfer
-
         var seen: Set<String> = []
 
         let unique = manualTransfers.filter { entry in
@@ -21,9 +20,7 @@ public extension EntryModel.Output {
     var frequentRoutes: [EntryModel.TransferRoute] {
         let routes = manualTransfers.compactMap(Self.route(of:))
         let counts = Dictionary(routes.map { ($0, 1) }, uniquingKeysWith: +)
-
         var seen: Set<EntryModel.TransferRoute> = []
-
         let ordered = routes.filter { seen.insert($0).inserted }
 
         let sorted = ordered.enumerated().sorted { lhs, rhs in

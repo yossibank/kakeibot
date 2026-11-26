@@ -38,12 +38,19 @@ public extension HomeSectionListModel {
 
         public let hint = SettingsFoldInput.hint(.homeSections)
     }
+}
 
+extension HomeSectionListModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+}
+
+public extension HomeSectionListModel {
     func load() async {
         do {
             let order = try await dependencies.database.setting(.homeSections)
             let hidden = try await dependencies.database.setting(.homeHiddenSections)
-
             state.layout = HomeLayout(order: order, hidden: hidden)
         } catch {
             state.errorNotice.show(SettingMessage.loadFailed)
@@ -95,12 +102,6 @@ public extension HomeSectionListModel {
         } catch {
             state.errorNotice.show(SettingMessage.saveFailed, for: error)
         }
-    }
-}
-
-extension HomeSectionListModel {
-    struct Dependencies {
-        let database: AppDatabase
     }
 }
 

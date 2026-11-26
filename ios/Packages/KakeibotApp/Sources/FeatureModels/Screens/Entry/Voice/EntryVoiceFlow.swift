@@ -45,22 +45,10 @@ public extension EntryVoiceFlow {
         var clock: ScreenClock
         var silence: Duration
         var noticeDuration: Duration
-
-        static func live(clock: ScreenClock) -> Dependencies {
-            Dependencies(
-                isAvailable: EntryVoiceReader.isAvailable,
-                isDenied: EntryVoiceReader.isDenied,
-                requestPermission: EntryVoiceReader.requestPermission,
-                makeSource: EntryVoiceReader.makeSource,
-                prepare: EntryVoiceReader.prepare,
-                choose: EntryVoiceReader.choose,
-                clock: clock,
-                silence: .seconds(1),
-                noticeDuration: .seconds(4)
-            )
-        }
     }
+}
 
+public extension EntryVoiceFlow {
     internal static let failedMessage = "声を聞き取れませんでした。もう一度押してください"
 
     static let levelCount = 16
@@ -117,6 +105,7 @@ public extension EntryVoiceFlow {
             reset()
             state.countEnd()
             model.state.errorNotice.show(Self.failedMessage)
+
             return
         }
 
@@ -137,9 +126,7 @@ public extension EntryVoiceFlow {
         input.silenceTask?.cancel()
         input.levels = Self.quietLevels
         state.finish()
-
         await source.finish()
-
         await read(input.transcript, in: session)
         reset()
     }
@@ -230,6 +217,7 @@ private extension EntryVoiceFlow {
             input.silenceTask?.cancel()
             input.silenceTask = nil
             state.clearSilence()
+
             return
         }
 
@@ -244,6 +232,7 @@ private extension EntryVoiceFlow {
         }
 
         let silence = dependencies.silence
+
         state.startSilence(at: dependencies.clock.now)
 
         input.silenceTask = Task { [weak self] in
@@ -325,5 +314,21 @@ private extension EntryVoiceFlow {
         input.session = nil
         state.reset()
         input.preview = nil
+    }
+}
+
+extension EntryVoiceFlow.Dependencies {
+    static func live(clock: ScreenClock) -> EntryVoiceFlow.Dependencies {
+        EntryVoiceFlow.Dependencies(
+            isAvailable: EntryVoiceReader.isAvailable,
+            isDenied: EntryVoiceReader.isDenied,
+            requestPermission: EntryVoiceReader.requestPermission,
+            makeSource: EntryVoiceReader.makeSource,
+            prepare: EntryVoiceReader.prepare,
+            choose: EntryVoiceReader.choose,
+            clock: clock,
+            silence: .seconds(1),
+            noticeDuration: .seconds(4)
+        )
     }
 }

@@ -45,10 +45,6 @@ private extension ProComparison {
         let title: String
         let free: Mark
         let pro: Mark
-
-        var id: String {
-            title
-        }
     }
 
     enum Mark {
@@ -56,18 +52,6 @@ private extension ProComparison {
         case no
         case text(String)
     }
-
-    static let columnWidth: CGFloat = 76
-
-    static let rows = [
-        Row(title: "記録・予算・振り返り", free: .yes, pro: .yes),
-        Row(title: "ウィジェット・バックアップ", free: .yes, pro: .yes),
-        Row(title: "レシートの読み取り", free: .text("3 回まで"), pro: .text("制限なし")),
-        Row(title: "端末間の同期", free: .no, pro: .yes),
-        Row(title: "家族との共有", free: .text("招待されたら"), pro: .yes),
-        Row(title: "テーマを作る", free: .no, pro: .yes),
-        Row(title: "4 つの字体", free: .no, pro: .yes)
-    ]
 }
 
 private extension ProComparison {
@@ -106,5 +90,25 @@ private extension ProComparison {
         }
         .foregroundStyle(color)
         .frame(width: Self.columnWidth)
+    }
+}
+
+private extension ProComparison {
+    static let columnWidth: CGFloat = 76
+
+    static let rows = [
+        Row(title: "記録・予算・振り返り", free: .yes, pro: .yes),
+        Row(title: "ウィジェット・バックアップ", free: .yes, pro: .yes),
+        Row(title: "レシートの読み取り", free: .text("3 回まで"), pro: .text("制限なし")),
+        Row(title: "端末間の同期", free: .no, pro: .yes),
+        Row(title: "家族との共有", free: .text("招待されたら"), pro: .yes),
+        Row(title: "テーマを作る", free: .no, pro: .yes),
+        Row(title: "4 つの字体", free: .no, pro: .yes)
+    ]
+}
+
+extension ProComparison.Row {
+    var id: String {
+        title
     }
 }

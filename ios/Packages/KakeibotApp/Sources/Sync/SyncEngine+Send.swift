@@ -16,7 +16,6 @@ extension SyncEngine {
         let remaining = changes.filter { !failed.contains($0.key) }
 
         self.owners = owners
-
         await enqueue(remaining)
     }
 
@@ -35,6 +34,7 @@ extension SyncEngine {
             }
 
             let systemFields = try? await database.syncSystemFields(for: id)
+
             return try? local.record(in: recordID.zoneID, systemFields: systemFields)
         } catch {
             return nil
@@ -50,7 +50,6 @@ extension SyncEngine {
 
         missing = []
         engine?.state.remove(pendingRecordZoneChanges: saves)
-
         await enqueuePending()
     }
 
@@ -71,7 +70,6 @@ extension SyncEngine {
         }
 
         engine?.state.add(pendingRecordZoneChanges: deletions)
-
         try? await database.saveSyncSystemFields(systemFields)
         try? await database.removeSyncSystemFields(settled.deleted)
         try? await database.removeSyncChanges(settled.finished)

@@ -1,5 +1,15 @@
 import Foundation
 
+private extension ThemePalette {
+    struct Mixes: Sendable {
+        let backgroundBottom: (UInt32, Double)
+        let panel: (UInt32, Double)
+        let cardBottom: (UInt32?, Double)
+        let accentDeep: (UInt32, Double)
+        let accentStrong: (UInt32, Double)
+    }
+}
+
 public extension ThemePalette {
     init(
         background: UInt32,
@@ -39,14 +49,6 @@ public extension ThemePalette {
 }
 
 private extension ThemePalette {
-    struct Mixes: Sendable {
-        let backgroundBottom: (UInt32, Double)
-        let panel: (UInt32, Double)
-        let cardBottom: (UInt32?, Double)
-        let accentDeep: (UInt32, Double)
-        let accentStrong: (UInt32, Double)
-    }
-
     static func mix(
         _ color: UInt32,
         _ target: (UInt32, Double)
@@ -57,7 +59,6 @@ private extension ThemePalette {
             let from = Double((color >> shift) & 0xFF)
             let to = Double((other >> shift) & 0xFF)
             let mixed = (from + (to - from) * ratio).rounded()
-
             return UInt32(mixed) << shift
         }
 

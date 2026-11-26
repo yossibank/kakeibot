@@ -17,10 +17,6 @@ public extension AssetsModel {
         public let wallet: String?
         public let change: Int
         public let balance: Int
-
-        public var id: Source {
-            source
-        }
     }
 
     struct Outlook: Equatable, Sendable {
@@ -29,12 +25,24 @@ public extension AssetsModel {
         public let items: [OutlookItem]
         public let later: [Plan]
     }
+
+    struct MonthTotal: Equatable, Sendable {
+        public let month: YearMonth
+        public let total: Int
+        public let netWorth: Int
+    }
 }
 
 public extension AssetsModel.OutlookItem {
     enum Source: Hashable, Sendable {
         case plan(Entry.ID)
         case recurring(Recurring.ID, LocalDate)
+    }
+}
+
+public extension AssetsModel.OutlookItem {
+    var id: Source {
+        source
     }
 
     var isRecurring: Bool {
@@ -83,14 +91,6 @@ public extension AssetsModel.Outlook {
         }
 
         return lowest
-    }
-}
-
-public extension AssetsModel {
-    struct MonthTotal: Equatable, Sendable {
-        public let month: YearMonth
-        public let total: Int
-        public let netWorth: Int
     }
 }
 

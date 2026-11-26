@@ -22,6 +22,17 @@ public extension Budget {
     typealias ID = Identifier<Budget>
 }
 
+extension Budget: Codable {
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(id, forKey: .id)
+        try container.encodeOrNull(categoryId, forKey: .categoryId)
+        try container.encode(fromMonth, forKey: .fromMonth)
+        try container.encodeOrNull(amount, forKey: .amount)
+    }
+}
+
 public extension [Budget] {
     func amount(
         for categoryId: EntryCategory.ID?,
@@ -52,16 +63,5 @@ public extension [Budget] {
 
             return total + budget - expense(current)
         }
-    }
-}
-
-extension Budget: Codable {
-    public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode(id, forKey: .id)
-        try container.encodeOrNull(categoryId, forKey: .categoryId)
-        try container.encode(fromMonth, forKey: .fromMonth)
-        try container.encodeOrNull(amount, forKey: .amount)
     }
 }

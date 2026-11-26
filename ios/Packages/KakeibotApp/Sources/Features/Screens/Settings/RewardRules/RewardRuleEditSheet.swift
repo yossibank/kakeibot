@@ -93,6 +93,19 @@ public struct RewardRuleEditSheet: View {
 }
 
 private extension RewardRuleEditSheet {
+    enum Field: Hashable {
+        case name
+        case text
+    }
+
+    struct Layout {
+        var iconBottom: CGFloat = 0
+    }
+
+    typealias Panel = RewardRuleEditModel.Panel
+}
+
+private extension RewardRuleEditSheet {
     var content: some View {
         SettingsEditForm(showsSave: focus == nil) {
             SettingsPreviewSection(note: "ごほうび貯金箱では、このタイルで並びます") {
@@ -178,17 +191,6 @@ private extension RewardRuleEditSheet {
 }
 
 private extension RewardRuleEditSheet {
-    enum Field: Hashable {
-        case name
-        case text
-    }
-
-    struct Layout {
-        var iconBottom: CGFloat = 0
-    }
-
-    typealias Panel = RewardRuleEditModel.Panel
-
     var amountPrompt: String? {
         model.output.amount == nil ? "金額を入れる" : nil
     }
@@ -249,10 +251,10 @@ private extension RewardRuleEditSheet {
     }
 }
 
+extension RewardRuleEditSheet: SettingsEditSheet {}
+
 #Preview {
     if let parts = ScreenParts.preview() {
         RewardRuleEditSheet(model: RewardRuleEditModel(parts: parts))
     }
 }
-
-extension RewardRuleEditSheet: SettingsEditSheet {}

@@ -143,9 +143,7 @@ private extension SyncChoiceCard {
 
         return updatedAt.formatted(.dateTime.month(.defaultDigits).day().hour().minute())
     }
-}
 
-private extension SyncChoiceCard {
     func use(_ side: SyncChoice.Side) {
         switch side {
         case .local: onUseLocal()

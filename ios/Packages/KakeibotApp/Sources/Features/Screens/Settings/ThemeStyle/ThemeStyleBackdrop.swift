@@ -26,8 +26,6 @@ struct ThemeStyleBackdrop: View {
 }
 
 private extension ThemeStyleBackdrop {
-    static let height: CGFloat = 112
-
     var card: some View {
         VStack(alignment: .leading, spacing: 8) {
             Capsule()
@@ -47,4 +45,8 @@ private extension ThemeStyleBackdrop {
         .card(cornerRadius: 12)
         .padding(.horizontal, 12)
     }
+}
+
+private extension ThemeStyleBackdrop {
+    static let height: CGFloat = 112
 }

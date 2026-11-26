@@ -36,9 +36,9 @@ private extension EntryReceiptArt {
     struct Layout {
         var scan: CGFloat = 0
     }
+}
 
-    static let lineWidths: [CGFloat] = [0.7, 0.5, 0.8, 0.6]
-
+private extension EntryReceiptArt {
     var flat: some View {
         ZStack(alignment: .bottom) {
             Capsule()
@@ -160,6 +160,10 @@ private extension EntryReceiptArt {
     }
 }
 
+private extension EntryReceiptArt {
+    static let lineWidths: [CGFloat] = [0.7, 0.5, 0.8, 0.6]
+}
+
 private struct FinderCorners: Shape {
     let length: CGFloat
 
@@ -169,15 +173,12 @@ private struct FinderCorners: Shape {
         path.move(to: CGPoint(x: rect.minX, y: rect.minY + length))
         path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
         path.addLine(to: CGPoint(x: rect.minX + length, y: rect.minY))
-
         path.move(to: CGPoint(x: rect.maxX - length, y: rect.minY))
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + length))
-
         path.move(to: CGPoint(x: rect.maxX, y: rect.maxY - length))
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
         path.addLine(to: CGPoint(x: rect.maxX - length, y: rect.maxY))
-
         path.move(to: CGPoint(x: rect.minX + length, y: rect.maxY))
         path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
         path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - length))

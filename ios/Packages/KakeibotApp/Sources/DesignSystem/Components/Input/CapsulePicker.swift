@@ -83,21 +83,6 @@ public extension CapsulePicker {
         case regular
         case small
         case wide
-
-        var font: Font.TextStyle {
-            switch self {
-            case .regular, .wide: .footnote
-            case .small: .caption
-            }
-        }
-
-        var segment: CGSize {
-            switch self {
-            case .regular: CGSize(width: 72, height: 30)
-            case .small: CGSize(width: 56, height: 26)
-            case .wide: CGSize(width: 104, height: 32)
-            }
-        }
     }
 
     struct Option {
@@ -111,6 +96,48 @@ public extension CapsulePicker {
             self.title = title
             self.value = value
         }
+    }
+}
+
+private extension CapsulePicker {
+    var dragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                let start = CGFloat(shownIndex) * segmentWidth
+                let touch = value.startLocation.x - Self.inset
+                let range = start...(start + segmentWidth)
+
+                guard range.contains(touch) else {
+                    return
+                }
+
+                let offset = start + value.translation.width
+
+                thumbOffset = min(max(offset, 0), maxOffset)
+            }
+            .onEnded { value in
+                let center = thumbOffset.map { $0 + segmentWidth / 2 }
+                let x = center ?? value.location.x - Self.inset
+                let index = index(at: x)
+
+                withAnimation(Self.spring) {
+                    thumbOffset = nil
+
+                    guard index != selectedIndex else {
+                        pendingIndex = nil
+                        return
+                    }
+
+                    let value = options[index].value
+
+                    pendingIndex = index
+                    selection = value
+
+                    if selection != value {
+                        pendingIndex = nil
+                    }
+                }
+            }
     }
 }
 
@@ -224,49 +251,26 @@ private extension CapsulePicker {
         index(at: thumbX + segmentWidth / 2)
     }
 
-    var dragGesture: some Gesture {
-        DragGesture(minimumDistance: 0)
-            .onChanged { value in
-                let start = CGFloat(shownIndex) * segmentWidth
-                let touch = value.startLocation.x - Self.inset
-                let range = start...(start + segmentWidth)
-
-                guard range.contains(touch) else {
-                    return
-                }
-
-                let offset = start + value.translation.width
-
-                thumbOffset = min(max(offset, 0), maxOffset)
-            }
-            .onEnded { value in
-                let center = thumbOffset.map { $0 + segmentWidth / 2 }
-                let x = center ?? value.location.x - Self.inset
-                let index = index(at: x)
-
-                withAnimation(Self.spring) {
-                    thumbOffset = nil
-
-                    guard index != selectedIndex else {
-                        pendingIndex = nil
-                        return
-                    }
-
-                    let value = options[index].value
-
-                    pendingIndex = index
-                    selection = value
-
-                    if selection != value {
-                        pendingIndex = nil
-                    }
-                }
-            }
-    }
-
     func index(at x: CGFloat) -> Int {
         let index = Int((x / segmentWidth).rounded(.down))
         return min(max(index, 0), options.count - 1)
+    }
+}
+
+extension CapsulePicker.Size {
+    var font: Font.TextStyle {
+        switch self {
+        case .regular, .wide: .footnote
+        case .small: .caption
+        }
+    }
+
+    var segment: CGSize {
+        switch self {
+        case .regular: CGSize(width: 72, height: 30)
+        case .small: CGSize(width: 56, height: 26)
+        case .wide: CGSize(width: 104, height: 32)
+        }
     }
 }
 

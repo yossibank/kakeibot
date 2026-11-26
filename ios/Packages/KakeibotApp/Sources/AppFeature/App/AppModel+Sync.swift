@@ -13,7 +13,6 @@ extension AppModel {
 
         await state.syncEngine?.stop()
         await state.sharedSyncEngine?.stop()
-
         state.syncEngine = nil
         state.sharedSyncEngine = nil
 
@@ -26,7 +25,6 @@ extension AppModel {
 
         state.syncEngine = engine
         state.sharedSyncEngine = sharedEngine
-
         await engine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
         await sharedEngine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
 
@@ -73,6 +71,7 @@ extension AppModel {
                 Self.logger.error(
                     "\(Self.shareFailedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
                 )
+
                 state.notice.show(Self.shareFailedMessage)
             }
         }
@@ -80,7 +79,6 @@ extension AppModel {
         let engine = state.sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
 
         state.sharedSyncEngine = engine
-
         await engine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
         await engine.fetchChanges()
     }

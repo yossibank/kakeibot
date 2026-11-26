@@ -47,7 +47,9 @@ private extension ReviewView {
             Image(systemName: "calendar")
         }
     }
+}
 
+private extension ReviewView {
     static func outlookName(of scale: ReviewPeriod.Scale) -> String {
         switch scale {
         case .week: "週末"

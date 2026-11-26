@@ -76,12 +76,16 @@ public extension EntryDraft {
         case itemNameEmpty
         case itemQuantityNotPositive
     }
+}
 
+public extension EntryDraft {
     var problems: [Problem] {
         let amountProblems: [Problem] = amount < 1 ? [.amountNotPositive] : []
+
         let tagProblems: [Problem] = tagId != nil && categoryId == nil
             ? [.tagWithoutCategory]
             : []
+
         return amountProblems + typeProblems + tagProblems + feeProblems + itemProblems
     }
 
@@ -159,15 +163,19 @@ private extension EntryDraft {
 
     var itemProblems: [Problem] {
         let items = items ?? []
+
         let transferProblems: [Problem] = type == .transfer && !items.isEmpty
             ? [.itemsOnTransfer]
             : []
+
         let nameProblems: [Problem] = items.contains { $0.trimmedName.isEmpty }
             ? [.itemNameEmpty]
             : []
+
         let quantityProblems: [Problem] = items.contains { $0.quantity < 1 }
             ? [.itemQuantityNotPositive]
             : []
+
         return transferProblems + nameProblems + quantityProblems
     }
 

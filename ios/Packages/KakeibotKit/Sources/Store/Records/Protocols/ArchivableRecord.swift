@@ -18,7 +18,6 @@ public extension ArchivableRecord {
 
         record.archivedAt = isHidden ? now : nil
         record.updatedAt = now
-
         try record.update(db)
     }
 }

@@ -10,7 +10,9 @@ public extension WidgetGuidePlace {
         public let title: String
         public let detail: String
     }
+}
 
+public extension WidgetGuidePlace {
     var title: String {
         switch self {
         case .home: "ホーム画面"

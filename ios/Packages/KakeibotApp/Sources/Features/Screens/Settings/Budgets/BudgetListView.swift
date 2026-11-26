@@ -328,11 +328,13 @@ private extension BudgetListView {
 
     var unbudgeted: [EntryCategory] {
         let rest = model.output.categories.filter { model.output.amount(for: $0.id) == nil }
+
         let order = rest.enumerated().sorted { lhs, rhs in
             let spent = (
                 model.output.spent(for: lhs.element.id),
                 model.output.spent(for: rhs.element.id)
             )
+
             return spent.0 == spent.1 ? lhs.offset < rhs.offset : spent.0 > spent.1
         }
 
@@ -351,16 +353,14 @@ private extension BudgetListView {
         model.state.cleared.map { "\($0.target.title)をなくしました" } ?? ""
     }
 
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+
     func openDrawer(_ target: BudgetListModel.Target) {
         withAnimation(.snappy) {
             model.startEditing(target)
         }
-    }
-}
-
-private extension BudgetListView {
-    var hint: SettingsFold {
-        SettingsFold(\.hint, in: model)
     }
 }
 

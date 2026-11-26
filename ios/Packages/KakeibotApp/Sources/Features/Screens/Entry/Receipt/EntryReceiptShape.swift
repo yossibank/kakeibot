@@ -20,7 +20,6 @@ struct EntryReceiptShape: Shape {
         let depth = tooth / 2
         let count = max(1, Int((rect.width / tooth).rounded()))
         let step = rect.width / CGFloat(count)
-
         var path = Path()
 
         if hasTopEdge {
@@ -28,7 +27,6 @@ struct EntryReceiptShape: Shape {
 
             for index in 0..<count {
                 let left = rect.minX + step * CGFloat(index)
-
                 path.addLine(to: CGPoint(x: left + step / 2, y: rect.minY))
                 path.addLine(to: CGPoint(x: left + step, y: rect.minY + depth))
             }
@@ -42,7 +40,6 @@ struct EntryReceiptShape: Shape {
 
             for index in 0..<count {
                 let right = rect.maxX - step * CGFloat(index)
-
                 path.addLine(to: CGPoint(x: right - step / 2, y: rect.maxY))
                 path.addLine(to: CGPoint(x: right - step, y: rect.maxY - depth))
             }

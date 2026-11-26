@@ -45,7 +45,9 @@ public extension SettingsMenuResetModel {
             self.input = input
         }
     }
+}
 
+public extension SettingsMenuResetModel {
     @discardableResult
     func prepare() async -> Bool {
         do {
@@ -54,7 +56,6 @@ public extension SettingsMenuResetModel {
         } catch {
             state.errorNotice.show(Self.loadFailedMessage, for: error)
             state.isConfirming = false
-
             return false
         }
 
@@ -74,23 +75,6 @@ public extension SettingsMenuResetModel {
         } catch {
             state.errorNotice.show(Self.deleteFailedMessage, for: error)
         }
-    }
-}
-
-public extension SettingsMenuResetModel.Output {
-    func message(isSyncing: Bool) -> String {
-        let amount = input.count.formatted(.number)
-        var text = "記録・評価額・スタンプなど\(amount)件を削除します。口座・カテゴリ・設定は残ります。元に戻せません。"
-
-        if isSyncing {
-            text += "ほかの端末からも消えます。"
-        }
-
-        if input.hasSharedWallets {
-            text += "共有中の口座の記録は残ります。"
-        }
-
-        return text
     }
 }
 
@@ -114,5 +98,22 @@ private extension SettingsMenuResetModel {
         }
 
         return false
+    }
+}
+
+public extension SettingsMenuResetModel.Output {
+    func message(isSyncing: Bool) -> String {
+        let amount = input.count.formatted(.number)
+        var text = "記録・評価額・スタンプなど\(amount)件を削除します。口座・カテゴリ・設定は残ります。元に戻せません。"
+
+        if isSyncing {
+            text += "ほかの端末からも消えます。"
+        }
+
+        if input.hasSharedWallets {
+            text += "共有中の口座の記録は残ります。"
+        }
+
+        return text
     }
 }

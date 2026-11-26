@@ -3,6 +3,14 @@ import DesignSystem
 import Foundation
 import Store
 
+extension EntryModel.Output {
+    struct MonthSummary {
+        let overview: MonthOverview
+        let budgetUsage: BudgetUsage?
+        let entries: [Entry]
+    }
+}
+
 public extension EntryModel.Output {
     var memoPrompt: String {
         switch state.type {
@@ -72,6 +80,7 @@ public extension EntryModel.Output {
         }
 
         let value = "\(usage.remainingAmountText) → \(label)\(after.remainingAmountText)"
+
         return EntryModel.NoteLine(title: title, value: value)
     }
 
@@ -131,12 +140,6 @@ public extension EntryModel.Output {
 }
 
 extension EntryModel.Output {
-    struct MonthSummary {
-        let overview: MonthOverview
-        let budgetUsage: BudgetUsage?
-        let entries: [Entry]
-    }
-
     var currentMonth: MonthSummary {
         monthCache.value {
             makeMonthSummary()

@@ -24,16 +24,10 @@ public extension HomeLayout {
     enum Slot: Hashable, Sendable {
         case section(HomeSection)
         case boundary
-
-        public var section: HomeSection? {
-            guard case let .section(section) = self else {
-                return nil
-            }
-
-            return section
-        }
     }
+}
 
+public extension HomeLayout {
     static let standard = Self()
 
     var visible: [HomeSection] {
@@ -99,5 +93,15 @@ public extension HomeLayout {
         }
 
         hidden.insert(section)
+    }
+}
+
+public extension HomeLayout.Slot {
+    var section: HomeSection? {
+        guard case let .section(section) = self else {
+            return nil
+        }
+
+        return section
     }
 }

@@ -31,6 +31,7 @@ extension WidgetTimelineProvider {
             let now = Date()
             let timeline = await Self.timeline(at: now, isPreview: isPreview)
             let entry = timeline.entries.first ?? .sample(at: now)
+
             completion(entry)
         }
     }

@@ -46,7 +46,9 @@ public extension AmountCalculator {
         public let base: Int
         public let rate: TaxRate
     }
+}
 
+public extension AmountCalculator {
     static let maxValue = 999_999_999
 
     var value: Int {

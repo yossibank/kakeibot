@@ -68,12 +68,6 @@ public extension TwoColumnLayout {
     }
 }
 
-public extension View {
-    func layoutColumn(_ column: TwoColumnLayout.Column) -> some View {
-        layoutValue(key: TwoColumnKey.self, value: column)
-    }
-}
-
 private extension TwoColumnLayout {
     func frames(
         of subviews: Subviews,
@@ -114,7 +108,9 @@ private extension TwoColumnLayout {
             case .trailing:
                 let x = columnWidth + spacing
                 let frame = CGRect(x: x, y: trailingY, width: columnWidth, height: height)
+
                 trailingY += height + spacing
+
                 return frame
             }
         }
@@ -123,4 +119,10 @@ private extension TwoColumnLayout {
 
 private struct TwoColumnKey: LayoutValueKey {
     static let defaultValue = TwoColumnLayout.Column.leading
+}
+
+public extension View {
+    func layoutColumn(_ column: TwoColumnLayout.Column) -> some View {
+        layoutValue(key: TwoColumnKey.self, value: column)
+    }
 }

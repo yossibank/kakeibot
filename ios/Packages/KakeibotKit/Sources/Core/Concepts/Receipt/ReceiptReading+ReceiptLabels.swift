@@ -41,6 +41,7 @@ public extension ReceiptReading {
             ? ReceiptLine.storeName($0.text)
             : nil
         }
+
         self.date = line(labels.dateLine)?.date
         self.total = line(labels.totalLine).flatMap(Self.total)
 

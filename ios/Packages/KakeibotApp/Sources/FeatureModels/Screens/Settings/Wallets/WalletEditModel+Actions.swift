@@ -22,6 +22,7 @@ public extension WalletEditModel {
                 on: dependencies.clock.today,
                 at: dependencies.clock.now
             )
+
             await loadBalance()
 
             if state.prompt.panel == .valuation {
@@ -39,8 +40,8 @@ public extension WalletEditModel {
     func deleteValuation(_ id: Valuation.ID) async -> Deletion? {
         do {
             let deletion = try await dependencies.database.deleteValuation(id)
-            await loadBalance()
 
+            await loadBalance()
             state.valuationDeletion = deletion
 
             return deletion
@@ -73,9 +74,7 @@ public extension WalletEditModel {
             }
 
             apply(list, to: wallet)
-
             try await refreshLock(of: wallet, in: list)
-
             input.baseline?.recordedKind = input.recordedKind
             input.baseline?.hasValuations = input.hasValuations
         } catch {
@@ -103,12 +102,9 @@ public extension WalletEditModel {
 
             state.apply(stored)
             apply(list, to: wallet)
-
             try await refreshLock(of: wallet, in: list)
-
             input.isHidden = wallet.archivedAt != nil
             input.baseline = output.draft
-
             await loadPayment()
         } catch {
             state.errorNotice.show(Self.loadFailedMessage)
@@ -184,7 +180,6 @@ private extension WalletEditModel {
         recurrings: [Recurring]
     ) -> Bool {
         let hasEntries = Self.hasEntries(of: wallet, in: list)
-
         let hasValuations = list.valuations.contains { $0.walletId == wallet.id }
 
         let hasRecurrings = recurrings.contains { recurring in

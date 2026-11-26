@@ -11,11 +11,6 @@ struct FeatureArtMiniHome: View {
 }
 
 private extension FeatureArtMiniHome {
-    static let width: CGFloat = 300
-    static let height: CGFloat = 536
-}
-
-private extension FeatureArtMiniHome {
     var screen: some View {
         VStack(spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -135,4 +130,9 @@ private extension FeatureArtMiniHome {
         }
         .frame(maxWidth: .infinity)
     }
+}
+
+private extension FeatureArtMiniHome {
+    static let width: CGFloat = 300
+    static let height: CGFloat = 536
 }

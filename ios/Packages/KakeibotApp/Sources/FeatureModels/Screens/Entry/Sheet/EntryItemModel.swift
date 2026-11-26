@@ -67,7 +67,9 @@ public extension EntryItemModel {
             self.isSlipOpen = isSlipOpen
         }
     }
+}
 
+public extension EntryItemModel {
     func reset(for entry: EntryModel) {
         state.draft = Draft(taxRate: entry.state.items.list.last?.taxRate)
     }
@@ -122,7 +124,6 @@ public extension EntryItemModel {
         in entry: EntryModel
     ) {
         state.draft.shiftEditing(afterRestoring: removed.index)
-
         entry.state.restoreItem(removed)
     }
 

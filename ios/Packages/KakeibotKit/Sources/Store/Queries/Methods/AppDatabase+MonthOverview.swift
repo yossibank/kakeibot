@@ -14,7 +14,6 @@ public extension AppDatabase {
         try await writer.read { db in
             let list = try Self.entryList(in: db, includesItems: false)
             let plan = try Self.monthPlan(on: today, in: db)
-
             return plan.overview(with: list)
         }
     }

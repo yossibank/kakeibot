@@ -30,14 +30,6 @@ extension WhatsNewModel {
         init(version: String) {
             self.version = version
         }
-
-        func choose(_ version: String) {
-            guard version != self.version else {
-                return
-            }
-
-            self.version = version
-        }
     }
 
     @MainActor
@@ -55,11 +47,6 @@ extension WhatsNewModel {
         let input: Input
         let state: State
 
-        var release: WhatsNewRelease? {
-            let releases = WhatsNewRelease.all
-            return releases.first { $0.version == state.version } ?? releases.first
-        }
-
         init(
             input: Input,
             state: State
@@ -67,9 +54,26 @@ extension WhatsNewModel {
             self.input = input
             self.state = state
         }
+    }
+}
 
-        func isNew(_ release: WhatsNewRelease) -> Bool {
-            AppVersion.isNewer(release.version, than: input.seenVersion)
+extension WhatsNewModel.Output {
+    var release: WhatsNewRelease? {
+        let releases = WhatsNewRelease.all
+        return releases.first { $0.version == state.version } ?? releases.first
+    }
+
+    func isNew(_ release: WhatsNewRelease) -> Bool {
+        AppVersion.isNewer(release.version, than: input.seenVersion)
+    }
+}
+
+extension WhatsNewModel.State {
+    func choose(_ version: String) {
+        guard version != self.version else {
+            return
         }
+
+        self.version = version
     }
 }

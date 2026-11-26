@@ -49,7 +49,6 @@ public extension CardBill {
         let cardIds = wallets.filter { $0.kind == .card }.map(\.id)
         let cards = Set(cardIds)
         let tomorrow = today.adding(days: 1)
-
         var paid: [Wallet.ID: Int] = [:]
 
         return recurrings

@@ -2,6 +2,14 @@ import Core
 import Foundation
 import GRDB
 
+private extension AppDatabase {
+    enum Outcome {
+        case applied
+        case skipped
+        case blocked
+    }
+}
+
 public extension AppDatabase {
     func applySyncChanges(
         saved: [SyncRecord],
@@ -23,7 +31,6 @@ public extension AppDatabase {
             let changedEntryIDs = changedKeys.filter { $0.table == .entry }.map(\.id)
             let entryIDs = changedEntryIDs + waitingIDs
             let entriesBefore = try Self.cardEntries(entryIDs, in: db)
-
             var blocked: [SyncKey] = []
             var cardBills = CardBillChange(before: entriesBefore)
 
@@ -55,9 +62,7 @@ public extension AppDatabase {
             }
 
             try Self.retryWaiting(in: db, at: now)
-
             cardBills.after = try Self.cardEntries(entryIDs, in: db)
-
             try Self.setApplying(false, in: db)
             try Self.recalculateCardBills(cardBills, in: db, at: now)
         }
@@ -65,12 +70,6 @@ public extension AppDatabase {
 }
 
 private extension AppDatabase {
-    enum Outcome {
-        case applied
-        case skipped
-        case blocked
-    }
-
     static func cardEntries(
         _ ids: [String],
         in db: Database
@@ -212,7 +211,6 @@ private extension AppDatabase {
                 }
 
                 try removeWaiting(record.key, in: db)
-
                 progressed = true
             }
         }

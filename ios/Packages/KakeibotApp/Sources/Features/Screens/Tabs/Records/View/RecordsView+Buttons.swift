@@ -67,9 +67,7 @@ extension RecordsView {
         }
         .buttonStyle(.plain)
     }
-}
 
-extension RecordsView {
     func finishSelecting() {
         withAnimation(.snappy) {
             model.state.finishSelecting()

@@ -27,7 +27,6 @@ extension RewardRule: HidableRecord, IconBackedRecord {
 
         rule.isActive = !isHidden
         rule.updatedAt = now
-
         try rule.update(db)
     }
 }

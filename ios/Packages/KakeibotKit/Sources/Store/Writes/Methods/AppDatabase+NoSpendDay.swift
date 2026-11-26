@@ -6,7 +6,9 @@ public extension AppDatabase {
     enum NoSpendDayError: Error, Equatable {
         case hasExpense
     }
+}
 
+public extension AppDatabase {
     func markNoSpendDay(
         _ date: LocalDate,
         at now: Date

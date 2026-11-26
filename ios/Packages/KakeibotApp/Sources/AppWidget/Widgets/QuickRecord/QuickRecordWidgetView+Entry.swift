@@ -26,14 +26,6 @@ extension QuickRecordWidgetView {
         .modifier(QuickRecordEntryOutline())
     }
 
-    func entryTileLink(padding: CGFloat) -> some View {
-        entryLink {
-            entryTileFace(padding: padding)
-        }
-    }
-}
-
-extension QuickRecordWidgetView {
     @ViewBuilder
     var receiptLink: some View {
         if let url = PlannedNotification.Route.receipt.url {
@@ -52,14 +44,15 @@ extension QuickRecordWidgetView {
             }
         }
     }
+
+    func entryTileLink(padding: CGFloat) -> some View {
+        entryLink {
+            entryTileFace(padding: padding)
+        }
+    }
 }
 
 private extension QuickRecordWidgetView {
-    var entryURL: URL? {
-        let today = LocalDate(entry.date, in: .current)
-        return PlannedNotification.Route.entry(today).url
-    }
-
     @ViewBuilder
     func entryLink(@ViewBuilder content: () -> some View) -> some View {
         if let url = entryURL {
@@ -105,6 +98,13 @@ private extension QuickRecordWidgetView {
         .padding(.vertical, padding)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .modifier(QuickRecordEntryOutline())
+    }
+}
+
+private extension QuickRecordWidgetView {
+    var entryURL: URL? {
+        let today = LocalDate(entry.date, in: .current)
+        return PlannedNotification.Route.entry(today).url
     }
 }
 

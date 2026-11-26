@@ -33,8 +33,10 @@ extension FeatureArt {
 }
 
 private extension FeatureArt {
-    static let width: CGFloat = 330
-    static let height: CGFloat = 170
+    struct FontSample: Hashable {
+        let font: ThemeFont
+        let title: String
+    }
 }
 
 private extension FeatureArt {
@@ -253,11 +255,8 @@ private extension FeatureArt {
 }
 
 private extension FeatureArt {
-    struct FontSample: Hashable {
-        let font: ThemeFont
-        let title: String
-    }
-
+    static let width: CGFloat = 330
+    static let height: CGFloat = 170
     static let themeSamples: [ThemePreset] = [.sage, .navy]
     static let themeWidth: CGFloat = 92
 

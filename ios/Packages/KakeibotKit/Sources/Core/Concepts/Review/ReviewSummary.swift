@@ -21,7 +21,9 @@ public extension ReviewSummary {
         public let byCategory: [EntryCategory.ID: Int]
         public let byWallet: [Wallet.ID: Int]
     }
+}
 
+public extension ReviewSummary {
     var balance: Int {
         income.total - expense.total
     }

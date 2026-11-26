@@ -212,6 +212,10 @@ private extension BackupView {
         model.state.file?.kind == .csv ? .commaSeparatedText : .json
     }
 
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+
     func exportFile(_ kind: BackupModel.FileKind) {
         model.perform {
             await $0.makeFile(kind)
@@ -236,12 +240,6 @@ private extension BackupView {
         model.perform {
             await $0.readPrevious(item)
         }
-    }
-}
-
-private extension BackupView {
-    var hint: SettingsFold {
-        SettingsFold(\.hint, in: model)
     }
 }
 

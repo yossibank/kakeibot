@@ -8,7 +8,6 @@ public extension RecordsModel {
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-
         public var today: LocalDate
         public var selectedDate: LocalDate?
         public var isSearching = false

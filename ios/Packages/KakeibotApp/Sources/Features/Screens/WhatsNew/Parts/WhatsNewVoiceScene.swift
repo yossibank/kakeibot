@@ -28,8 +28,6 @@ extension WhatsNewVoiceScene {
 }
 
 private extension WhatsNewVoiceScene {
-    static let bars: [CGFloat] = [4, 8, 14, 22, 30, 22, 26, 16, 10, 6, 4]
-
     var amountRow: some View {
         HStack(spacing: 4) {
             Text("金額")
@@ -125,4 +123,8 @@ private extension WhatsNewVoiceScene {
         .textFont(size: .micro, weight: .semibold)
         .frame(height: 28)
     }
+}
+
+private extension WhatsNewVoiceScene {
+    static let bars: [CGFloat] = [4, 8, 14, 22, 30, 22, 26, 16, 10, 6, 4]
 }

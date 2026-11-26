@@ -128,6 +128,28 @@ public struct EntryRow: View {
     }
 }
 
+public extension EntryRow {
+    struct Route: Equatable, Sendable {
+        public let source: String
+        public let destination: String
+
+        public init(
+            source: String,
+            destination: String
+        ) {
+            self.source = source
+            self.destination = destination
+        }
+    }
+}
+
+private extension EntryRow {
+    struct DetailMemo {
+        let detail: String
+        let memo: String
+    }
+}
+
 private extension EntryRow {
     func tagCard(_ tag: String) -> some View {
         TagCard(tag, size: .small)
@@ -145,11 +167,6 @@ private extension EntryRow {
 }
 
 private extension EntryRow {
-    struct DetailMemo {
-        let detail: String
-        let memo: String
-    }
-
     var detailMemo: DetailMemo? {
         guard
             route == nil,
@@ -160,21 +177,6 @@ private extension EntryRow {
         }
 
         return DetailMemo(detail: detail, memo: memo)
-    }
-}
-
-public extension EntryRow {
-    struct Route: Equatable, Sendable {
-        public let source: String
-        public let destination: String
-
-        public init(
-            source: String,
-            destination: String
-        ) {
-            self.source = source
-            self.destination = destination
-        }
     }
 }
 

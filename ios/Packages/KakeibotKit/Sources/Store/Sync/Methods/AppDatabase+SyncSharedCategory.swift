@@ -44,6 +44,7 @@ extension AppDatabase {
             try returnTags(of: id, to: own, in: db)
             try replaceCategory(id, with: own, in: db)
             try db.execute(sql: "DELETE FROM category WHERE id = ?", arguments: [id])
+
             try db.execute(
                 sql: "DELETE FROM icon WHERE id = ?",
                 arguments: [category.iconId.description]

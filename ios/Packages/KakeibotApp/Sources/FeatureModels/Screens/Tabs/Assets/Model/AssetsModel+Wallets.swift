@@ -70,7 +70,6 @@ extension AssetsModel.WalletSection {
     static func sections(of rows: [AssetsModel.WalletRow]) -> [Self] {
         Wallet.Kind.Role.allCases.compactMap { role in
             let members = rows.filter { $0.wallet.kind.role == role }
-
             return members.isEmpty ? nil : Self(role: role, rows: members)
         }
     }

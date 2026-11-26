@@ -22,6 +22,20 @@ public final class SyncShareSheet: NSObject {
     }
 }
 
+private extension SyncShareSheet {
+    final class ShareController: UICloudSharingController {
+        var onDismiss: (() -> Void)?
+
+        override func viewDidDisappear(_ animated: Bool) {
+            super.viewDidDisappear(animated)
+
+            if isBeingDismissed {
+                onDismiss?()
+            }
+        }
+    }
+}
+
 public extension SyncShareSheet {
     static func present(
         _ share: CKShare,
@@ -43,7 +57,6 @@ public extension SyncShareSheet {
         let controller = ShareController(share: share, container: container)
 
         controller.availablePermissions = [.allowPrivate, .allowReadWrite]
-
         controller.delegate = sheet
 
         controller.onDismiss = { [weak sheet, weak controller] in
@@ -51,24 +64,11 @@ public extension SyncShareSheet {
         }
 
         shown = sheet
-
         presenter.present(controller, animated: true)
     }
 }
 
 private extension SyncShareSheet {
-    final class ShareController: UICloudSharingController {
-        var onDismiss: (() -> Void)?
-
-        override func viewDidDisappear(_ animated: Bool) {
-            super.viewDidDisappear(animated)
-
-            if isBeingDismissed {
-                onDismiss?()
-            }
-        }
-    }
-
     static let thumbnail: Data? = {
         let configuration = UIImage.SymbolConfiguration(pointSize: 120, weight: .light)
         let symbol = UIImage(systemName: "person.2.circle.fill", withConfiguration: configuration)

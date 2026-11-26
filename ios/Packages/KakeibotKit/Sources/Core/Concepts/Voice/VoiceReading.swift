@@ -35,7 +35,9 @@ public extension VoiceReading {
             self.walletIndex = walletIndex
         }
     }
+}
 
+public extension VoiceReading {
     var count: Int {
         let fields: [Any?] = [amount, date, categoryId, walletId, memo]
         return fields.count { $0 != nil }

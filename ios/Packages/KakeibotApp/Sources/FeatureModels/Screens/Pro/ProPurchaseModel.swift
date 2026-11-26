@@ -27,20 +27,12 @@ public extension ProPurchaseModel {
     enum Work: Sendable {
         case purchase
         case restore
-
-        public var title: String {
-            switch self {
-            case .purchase: "確かめています"
-            case .restore: "購入を確かめています"
-            }
-        }
     }
 
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-
         public var outcome = ScreenOutcome<Work>()
 
         public internal(set) var working: Work?
@@ -61,18 +53,6 @@ public extension ProPurchaseModel {
         let input: Input
         let state: State
 
-        public var isWorking: Bool {
-            state.working != nil
-        }
-
-        public var purchaseTitle: String {
-            guard let price = input.price else {
-                return "購入する"
-            }
-
-            return "\(price) で購入する"
-        }
-
         init(
             input: Input,
             state: State
@@ -81,7 +61,15 @@ public extension ProPurchaseModel {
             self.state = state
         }
     }
+}
 
+extension ProPurchaseModel {
+    struct Dependencies {
+        let store: ProStore
+    }
+}
+
+public extension ProPurchaseModel {
     func load() async {
         guard let price = try? await dependencies.store.price() else {
             return
@@ -132,12 +120,6 @@ public extension ProPurchaseModel {
     }
 }
 
-extension ProPurchaseModel {
-    struct Dependencies {
-        let store: ProStore
-    }
-}
-
 private extension ProPurchaseModel {
     static let purchaseFailedMessage = "購入できませんでした。時間をおいて試してください"
     static let restoreFailedMessage = "購入を復元できませんでした。時間をおいて試してください"
@@ -171,8 +153,33 @@ private extension ProPurchaseModel {
             Self.logger.error(
                 "\(failedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
             )
+
             state.errorNotice.show(failedMessage)
+
             return nil
+        }
+    }
+}
+
+public extension ProPurchaseModel.Output {
+    var isWorking: Bool {
+        state.working != nil
+    }
+
+    var purchaseTitle: String {
+        guard let price = input.price else {
+            return "購入する"
+        }
+
+        return "\(price) で購入する"
+    }
+}
+
+public extension ProPurchaseModel.Work {
+    var title: String {
+        switch self {
+        case .purchase: "確かめています"
+        case .restore: "購入を確かめています"
         }
     }
 }

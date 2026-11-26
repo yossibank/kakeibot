@@ -32,33 +32,19 @@ public extension EntryNoticeModel {
     @Observable
     final class State {
         public private(set) var notice: Notice?
-
-        func show(_ notice: Notice) {
-            self.notice = notice
-        }
-
-        func clear() {
-            notice = nil
-        }
     }
 
     @MainActor
     final class Output {
         let state: State
 
-        public var change: EntryChange? {
-            if case let .changed(change) = state.notice {
-                change
-            } else {
-                nil
-            }
-        }
-
         init(state: State) {
             self.state = state
         }
     }
+}
 
+public extension EntryNoticeModel {
     func show(_ change: EntryChange) {
         state.show(.changed(change))
     }
@@ -75,6 +61,7 @@ public extension EntryNoticeModel {
 
             case let .batch(batch):
                 let items = batch.kind == .deleted ? batch.items : nil
+
                 try await dependencies.database.restoreEntries(
                     batch.previous,
                     items: items,
@@ -118,11 +105,14 @@ public extension EntryNoticeModel {
     func deleteEntries(_ ids: [Entry.ID]) async {
         do {
             let items = try await dependencies.database.entryItems(of: ids)
+
             let previous = try await dependencies.database.deleteEntries(
                 ids,
                 at: dependencies.clock.now
             )
+
             let batch = EntryBatch(kind: .deleted, previous: previous, items: items)
+
             state.show(.batch(batch))
         } catch {
             state.show(.failed(Self.deleteFailedMessage))
@@ -144,6 +134,7 @@ public extension EntryNoticeModel {
 
         do {
             let items = try await dependencies.database.entryItems(of: id)
+
             let deleted = try await dependencies.database.deleteEntry(
                 id,
                 at: dependencies.clock.now
@@ -184,35 +175,6 @@ public extension EntryNoticeModel {
     }
 }
 
-public extension EntryNoticeModel.Notice {
-    static let batchSeconds = 8
-
-    var message: String {
-        switch self {
-        case let .changed(change): change.message
-        case let .batch(batch): batch.message
-        case .undone: "取り消しました"
-        case let .failed(message): message
-        }
-    }
-
-    var seconds: Int {
-        switch self {
-        case .changed, .failed: 4
-        case .batch: Self.batchSeconds
-        case .undone: 2
-        }
-    }
-
-    var dismissesOnTap: Bool {
-        switch self {
-        case let .changed(change): !change.isDeletion
-        case .batch: false
-        case .undone, .failed: true
-        }
-    }
-}
-
 private extension EntryNoticeModel {
     static let undoFailedMessage = "取り消せませんでした"
     static let deleteFailedMessage = "削除できませんでした"
@@ -249,6 +211,55 @@ private extension EntryNoticeModel {
                 items: change.items,
                 at: dependencies.clock.now
             )
+        }
+    }
+}
+
+public extension EntryNoticeModel.Output {
+    var change: EntryChange? {
+        if case let .changed(change) = state.notice {
+            change
+        } else {
+            nil
+        }
+    }
+}
+
+extension EntryNoticeModel.State {
+    func show(_ notice: EntryNoticeModel.Notice) {
+        self.notice = notice
+    }
+
+    func clear() {
+        notice = nil
+    }
+}
+
+public extension EntryNoticeModel.Notice {
+    static let batchSeconds = 8
+
+    var message: String {
+        switch self {
+        case let .changed(change): change.message
+        case let .batch(batch): batch.message
+        case .undone: "取り消しました"
+        case let .failed(message): message
+        }
+    }
+
+    var seconds: Int {
+        switch self {
+        case .changed, .failed: 4
+        case .batch: Self.batchSeconds
+        case .undone: 2
+        }
+    }
+
+    var dismissesOnTap: Bool {
+        switch self {
+        case let .changed(change): !change.isDeletion
+        case .batch: false
+        case .undone, .failed: true
         }
     }
 }

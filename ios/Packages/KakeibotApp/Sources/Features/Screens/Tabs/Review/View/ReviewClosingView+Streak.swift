@@ -3,6 +3,14 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
+private extension ReviewClosingView {
+    enum DayMark {
+        case recorded
+        case noSpend
+        case empty
+    }
+}
+
 extension ReviewClosingView {
     var streakCard: some View {
         let streak = content.streak
@@ -75,37 +83,6 @@ extension ReviewClosingView {
 }
 
 private extension ReviewClosingView {
-    enum DayMark {
-        case recorded
-        case noSpend
-        case empty
-    }
-
-    static let dayHeight: CGFloat = 32
-    static let circleSize: CGFloat = 28
-
-    static var recordedFill: RadialGradient {
-        RadialGradient(
-            colors: [Palette.accentDeep, Palette.accent],
-            center: .topLeading,
-            startRadius: 0,
-            endRadius: 32
-        )
-    }
-
-    var calendarWeeks: [[LocalDate?]] {
-        let weekdays = Weekday.week(startingOn: content.weekStart)
-        let start = content.range.lowerBound
-        let blanks = weekdays.firstIndex(of: start.weekday) ?? 0
-        let days = (0..<totalDays).map { start.adding(days: $0) }
-        let cells: [LocalDate?] = Array(repeating: nil, count: blanks) + days
-
-        return stride(from: 0, to: cells.count, by: 7).map { index in
-            let week = Array(cells[index..<min(index + 7, cells.count)])
-            return week + Array(repeating: nil, count: 7 - week.count)
-        }
-    }
-
     var calendar: some View {
         let weekdays = Weekday.week(startingOn: content.weekStart)
 
@@ -240,6 +217,33 @@ private extension ReviewClosingView {
                 .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity)
+    }
+}
+
+private extension ReviewClosingView {
+    static let dayHeight: CGFloat = 32
+    static let circleSize: CGFloat = 28
+
+    static var recordedFill: RadialGradient {
+        RadialGradient(
+            colors: [Palette.accentDeep, Palette.accent],
+            center: .topLeading,
+            startRadius: 0,
+            endRadius: 32
+        )
+    }
+
+    var calendarWeeks: [[LocalDate?]] {
+        let weekdays = Weekday.week(startingOn: content.weekStart)
+        let start = content.range.lowerBound
+        let blanks = weekdays.firstIndex(of: start.weekday) ?? 0
+        let days = (0..<totalDays).map { start.adding(days: $0) }
+        let cells: [LocalDate?] = Array(repeating: nil, count: blanks) + days
+
+        return stride(from: 0, to: cells.count, by: 7).map { index in
+            let week = Array(cells[index..<min(index + 7, cells.count)])
+            return week + Array(repeating: nil, count: 7 - week.count)
+        }
     }
 
     static func textColor(of mark: DayMark) -> Color {

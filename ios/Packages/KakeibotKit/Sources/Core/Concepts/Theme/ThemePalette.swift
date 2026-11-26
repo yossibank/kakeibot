@@ -56,7 +56,9 @@ public extension ThemePalette {
         case subtext
         case hint
     }
+}
 
+public extension ThemePalette {
     static let night = ThemePalette(
         backgroundTop: 0x16223D,
         backgroundBottom: 0x080C16,

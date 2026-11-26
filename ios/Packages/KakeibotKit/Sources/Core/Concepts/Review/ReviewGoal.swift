@@ -51,7 +51,9 @@ public extension ReviewGoal {
         case count
         case average
     }
+}
 
+public extension ReviewGoal {
     var isAchieved: Bool? {
         result.map { $0 <= target }
     }

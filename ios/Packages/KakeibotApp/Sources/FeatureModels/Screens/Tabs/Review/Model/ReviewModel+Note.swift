@@ -7,7 +7,9 @@ public extension ReviewModel {
         let period: String
         let basis: String?
     }
+}
 
+public extension ReviewModel {
     func refreshNotes() async {
         let now = dependencies.clock.now
         let key = Self.summaryKey(output.period.commentKey)
@@ -54,37 +56,7 @@ public extension ReviewModel {
         )
 
         try? await dependencies.database.saveReviewComment(comment)
-
         input.notes[key] = body
-    }
-}
-
-public extension ReviewModel.Output {
-    var closingNotes: ReviewClosing.Notes {
-        let range = period.range
-        let history = (1...ReviewModel.averagePeriods).map { period.adding(-$0).range }
-        let rising = closingContent.rows.filter { $0.row.tone == .more }
-
-        let pairs = rising.compactMap { item in
-            let why = ReviewCompare.why(
-                entries: entries,
-                categoryId: item.id,
-                in: range,
-                history: history
-            )
-
-            return why.map { (item.id, $0) }
-        }
-
-        return ReviewClosing.Notes(
-            summary: input.notes[ReviewModel.summaryKey(period.commentKey)],
-            whys: Dictionary(uniqueKeysWithValues: pairs)
-        )
-    }
-
-    var noteTrigger: ReviewModel.NoteTrigger {
-        let basis = input.list == nil ? nil : closingFacts.basis
-        return ReviewModel.NoteTrigger(period: period.commentKey, basis: basis)
     }
 }
 
@@ -123,6 +95,35 @@ private extension ReviewModel {
         }
 
         return await ReviewNoteWriter.summary(facts: facts, scale: scale, categories: categories)
+    }
+}
+
+public extension ReviewModel.Output {
+    var closingNotes: ReviewClosing.Notes {
+        let range = period.range
+        let history = (1...ReviewModel.averagePeriods).map { period.adding(-$0).range }
+        let rising = closingContent.rows.filter { $0.row.tone == .more }
+
+        let pairs = rising.compactMap { item in
+            let why = ReviewCompare.why(
+                entries: entries,
+                categoryId: item.id,
+                in: range,
+                history: history
+            )
+
+            return why.map { (item.id, $0) }
+        }
+
+        return ReviewClosing.Notes(
+            summary: input.notes[ReviewModel.summaryKey(period.commentKey)],
+            whys: Dictionary(uniqueKeysWithValues: pairs)
+        )
+    }
+
+    var noteTrigger: ReviewModel.NoteTrigger {
+        let basis = input.list == nil ? nil : closingFacts.basis
+        return ReviewModel.NoteTrigger(period: period.commentKey, basis: basis)
     }
 }
 

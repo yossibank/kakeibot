@@ -226,13 +226,11 @@ private extension ThemeStyleLookView {
     static let markSize: CGFloat = 30
     static let stampSize: CGFloat = 26
 
-    static func tabTitle(_ showsTitles: Bool) -> String {
-        showsTitles ? "出す" : "出さない"
-    }
-}
-
-private extension ThemeStyleLookView {
     var hint: SettingsFold {
         SettingsFold(\.lookHint, in: model)
+    }
+
+    static func tabTitle(_ showsTitles: Bool) -> String {
+        showsTitles ? "出す" : "出さない"
     }
 }

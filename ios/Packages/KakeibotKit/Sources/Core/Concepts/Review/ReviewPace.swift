@@ -34,7 +34,9 @@ public extension ReviewPace {
         case fast
         case over
     }
+}
 
+public extension ReviewPace {
     var daysLeft: Int {
         totalDays - elapsedDays + 1
     }

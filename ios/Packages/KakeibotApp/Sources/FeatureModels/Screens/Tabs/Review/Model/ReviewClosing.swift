@@ -21,10 +21,6 @@ public extension ReviewClosing {
     struct CompareRow: Identifiable {
         public let name: String
         public let row: ReviewCompare.Row
-
-        public var id: EntryCategory.ID {
-            row.categoryId
-        }
     }
 
     struct Special {
@@ -57,5 +53,11 @@ public extension ReviewClosing {
         case none
         case rest
         case goal(ReviewGoalItem, reason: Reason?)
+    }
+}
+
+public extension ReviewClosing.CompareRow {
+    var id: EntryCategory.ID {
+        row.categoryId
     }
 }

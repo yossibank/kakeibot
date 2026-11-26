@@ -20,7 +20,9 @@ public extension SyncChoice {
         case local
         case cloud
     }
+}
 
+public extension SyncChoice {
     var newer: Side? {
         let localMinute = local.updatedAt.map(Self.minute)
         let cloudMinute = cloud.updatedAt.map(Self.minute)

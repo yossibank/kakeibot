@@ -92,22 +92,23 @@ struct RecordsCalendarCell: View {
     }
 }
 
-extension RecordsCalendarCell: Equatable {
-    nonisolated static func == (
-        lhs: RecordsCalendarCell,
-        rhs: RecordsCalendarCell
-    ) -> Bool {
-        lhs.day == rhs.day
-            && lhs.dayColor == rhs.dayColor
-            && lhs.isShown == rhs.isShown
-            && lhs.isToday == rhs.isToday
-            && lhs.isDimmed == rhs.isDimmed
-            && lhs.stamp == rhs.stamp
-            && lhs.expense == rhs.expense
-            && lhs.income == rhs.income
-            && lhs.isNoSpend == rhs.isNoSpend
-            && lhs.hasUpcoming == rhs.hasUpcoming
-            && lhs.heat == rhs.heat
+private extension RecordsCalendarCell {
+    func markLine(@ViewBuilder _ content: () -> some View) -> some View {
+        Color.clear
+            .frame(height: Self.markLineHeight)
+            .overlay {
+                content()
+            }
+    }
+
+    func markAmount(
+        _ amount: Int,
+        type: Entry.Kind
+    ) -> some View {
+        AmountText(amount, type: type, font: .size(.caption), isCompact: true)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .padding(.horizontal, 2)
     }
 }
 
@@ -126,29 +127,32 @@ private extension RecordsCalendarCell {
 
     var bothAmounts: AttributedString {
         var expenseText = AttributedString(Yen.compactText(expense, type: .expense))
+
         expenseText.foregroundColor = Palette.accentStrong
 
         var incomeText = AttributedString(Yen.compactText(income, type: .income))
+
         incomeText.foregroundColor = Palette.accent
 
         return expenseText + AttributedString("\n") + incomeText
     }
+}
 
-    func markLine(@ViewBuilder _ content: () -> some View) -> some View {
-        Color.clear
-            .frame(height: Self.markLineHeight)
-            .overlay {
-                content()
-            }
-    }
-
-    func markAmount(
-        _ amount: Int,
-        type: Entry.Kind
-    ) -> some View {
-        AmountText(amount, type: type, font: .size(.caption), isCompact: true)
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-            .padding(.horizontal, 2)
+extension RecordsCalendarCell: Equatable {
+    nonisolated static func == (
+        lhs: RecordsCalendarCell,
+        rhs: RecordsCalendarCell
+    ) -> Bool {
+        lhs.day == rhs.day
+            && lhs.dayColor == rhs.dayColor
+            && lhs.isShown == rhs.isShown
+            && lhs.isToday == rhs.isToday
+            && lhs.isDimmed == rhs.isDimmed
+            && lhs.stamp == rhs.stamp
+            && lhs.expense == rhs.expense
+            && lhs.income == rhs.income
+            && lhs.isNoSpend == rhs.isNoSpend
+            && lhs.hasUpcoming == rhs.hasUpcoming
+            && lhs.heat == rhs.heat
     }
 }

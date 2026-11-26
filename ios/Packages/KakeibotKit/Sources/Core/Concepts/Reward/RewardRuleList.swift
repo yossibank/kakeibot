@@ -27,7 +27,9 @@ public extension RewardRuleList {
             self.amount = amount
         }
     }
+}
 
+public extension RewardRuleList {
     func total(of rule: RewardRule) -> Total? {
         totals[rule.id]
     }

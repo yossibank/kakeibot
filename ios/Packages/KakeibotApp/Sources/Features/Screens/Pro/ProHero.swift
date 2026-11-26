@@ -72,6 +72,17 @@ struct ProHero: View {
 }
 
 private extension ProHero {
+    var promises: some View {
+        ForEach(Self.promiseTitles, id: \.self) { title in
+            Label(title, systemImage: "checkmark")
+                .textFont(.caption2, weight: .semibold)
+                .foregroundStyle(.white.opacity(0.9))
+                .labelStyle(PromiseLabelStyle())
+        }
+    }
+}
+
+private extension ProHero {
     static let ink = Color(red: 0.12, green: 0.1, blue: 0.08)
 
     static let promiseTitles = [
@@ -102,26 +113,13 @@ private extension ProHero {
             endPoint: .bottom
         )
     }
-}
 
-private extension ProHero {
     var radius: CGFloat {
         corner.radius(24)
     }
 
     var innerRadius: CGFloat {
         max(radius - 4, 0)
-    }
-}
-
-private extension ProHero {
-    var promises: some View {
-        ForEach(Self.promiseTitles, id: \.self) { title in
-            Label(title, systemImage: "checkmark")
-                .textFont(.caption2, weight: .semibold)
-                .foregroundStyle(.white.opacity(0.9))
-                .labelStyle(PromiseLabelStyle())
-        }
     }
 }
 

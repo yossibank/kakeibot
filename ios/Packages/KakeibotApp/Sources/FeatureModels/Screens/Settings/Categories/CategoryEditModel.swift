@@ -64,22 +64,6 @@ public extension CategoryEditModel {
         let input: Input
         let state: State
 
-        public var draft: EntryCategoryDraft {
-            EntryCategoryDraft(
-                kind: input.kind,
-                name: state.name,
-                mark: state.icon.mark,
-                color: state.icon.color
-            )
-        }
-
-        var snapshot: Snapshot {
-            Snapshot(
-                draft: draft,
-                tags: state.tags.map(\.draft)
-            )
-        }
-
         init(
             input: Input,
             state: State
@@ -89,9 +73,15 @@ public extension CategoryEditModel {
         }
     }
 
+    struct Snapshot: Equatable {
+        let draft: EntryCategoryDraft
+        let tags: [EntryTagDraft]
+    }
+}
+
+public extension CategoryEditModel {
     func start() async {
         await load()
-
         state.ready.send(())
     }
 
@@ -117,7 +107,6 @@ public extension CategoryEditModel {
             let tags = list.tags.filter { $0.categoryId == editingId }
 
             state.apply(loaded, tags: tags.map(EditingTag.init))
-
             input.isHidden = category.archivedAt != nil
             input.hasEntries = entries.contains { $0.categoryId == editingId }
             input.baseline = output.snapshot
@@ -146,16 +135,29 @@ public extension CategoryEditModel {
     }
 }
 
-public extension CategoryEditModel {
-    struct Snapshot: Equatable {
-        let draft: EntryCategoryDraft
-        let tags: [EntryTagDraft]
-    }
-}
-
 private extension CategoryEditModel {
     static let loadFailedMessage = "カテゴリを読めませんでした"
     static let inUseMessage = "記録があるので削除できません。非表示にできます"
+}
+
+public extension CategoryEditModel.Output {
+    var draft: EntryCategoryDraft {
+        EntryCategoryDraft(
+            kind: input.kind,
+            name: state.name,
+            mark: state.icon.mark,
+            color: state.icon.color
+        )
+    }
+}
+
+extension CategoryEditModel.Output {
+    var snapshot: CategoryEditModel.Snapshot {
+        CategoryEditModel.Snapshot(
+            draft: draft,
+            tags: state.tags.map(\.draft)
+        )
+    }
 }
 
 extension CategoryEditModel.EditingTag {

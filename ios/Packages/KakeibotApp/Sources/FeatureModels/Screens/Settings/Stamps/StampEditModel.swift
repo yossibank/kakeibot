@@ -39,7 +39,6 @@ public extension StampEditModel {
     @Observable
     final class Input: SettingsEditHidingInput {
         public internal(set) var isHidden = false
-
         public internal(set) var baseline: IconDraft?
 
         public let editingId: ShelfIcon.ID?
@@ -52,7 +51,9 @@ public extension StampEditModel {
             self.baseline = baseline
         }
     }
+}
 
+public extension StampEditModel {
     func load() async {
         guard let editingId = input.editingId else {
             return
@@ -71,7 +72,6 @@ public extension StampEditModel {
             }
 
             state.icon.apply(saved)
-
             input.isHidden = shelfIcon.archivedAt != nil
             input.baseline = state.icon.draft
         } catch {

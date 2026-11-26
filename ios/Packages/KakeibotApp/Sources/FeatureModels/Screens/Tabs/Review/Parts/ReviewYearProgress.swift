@@ -24,7 +24,9 @@ public extension ReviewYearProgress {
         case current
         case upcoming
     }
+}
 
+public extension ReviewYearProgress {
     var closedMonths: [Month] {
         months.filter { $0.state == .closed && $0.total > 0 }
     }

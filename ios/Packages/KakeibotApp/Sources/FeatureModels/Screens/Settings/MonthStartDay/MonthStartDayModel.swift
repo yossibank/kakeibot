@@ -48,7 +48,15 @@ public extension MonthStartDayModel {
             self.input = input
         }
     }
+}
 
+extension MonthStartDayModel {
+    struct Dependencies {
+        let database: AppDatabase
+    }
+}
+
+public extension MonthStartDayModel {
     func load() async {
         do {
             input.startDay = try await dependencies.database.setting(.monthStartDay)
@@ -65,6 +73,18 @@ public extension MonthStartDayModel {
     func choose(_ shift: HolidayShift) async {
         let chosen = input.startDay.shifted(by: shift)
         await save(chosen)
+    }
+}
+
+private extension MonthStartDayModel {
+    func save(_ startDay: MonthStartDay) async {
+        let previous = input.startDay
+
+        input.startDay = startDay
+
+        await saveSetting(startDay, for: .monthStartDay, in: dependencies.database) {
+            input.startDay = previous
+        }
     }
 }
 
@@ -93,24 +113,6 @@ public extension MonthStartDayModel.Output {
         }
 
         return "\(PeriodText.weekdayDate(unshifted))を \(PeriodText.weekdayDate(start))にずらしています"
-    }
-}
-
-extension MonthStartDayModel {
-    struct Dependencies {
-        let database: AppDatabase
-    }
-}
-
-private extension MonthStartDayModel {
-    func save(_ startDay: MonthStartDay) async {
-        let previous = input.startDay
-
-        input.startDay = startDay
-
-        await saveSetting(startDay, for: .monthStartDay, in: dependencies.database) {
-            input.startDay = previous
-        }
     }
 }
 

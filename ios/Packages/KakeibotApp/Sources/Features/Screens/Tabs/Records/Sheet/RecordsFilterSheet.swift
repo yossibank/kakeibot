@@ -71,12 +71,10 @@ private extension RecordsFilterSheet {
         let category: EntryCategory
         let icon: Icon?
         let tags: [TagLine<EntryTag.ID>.Item]
-
-        var id: EntryCategory.ID {
-            category.id
-        }
     }
+}
 
+private extension RecordsFilterSheet {
     var header: some View {
         HStack {
             RingButton(systemImage: "xmark") {
@@ -337,5 +335,11 @@ private extension RecordsFilterSheet {
         } else {
             filter[keyPath: keyPath].insert(id)
         }
+    }
+}
+
+extension RecordsFilterSheet.TagGroup {
+    var id: EntryCategory.ID {
+        category.id
     }
 }

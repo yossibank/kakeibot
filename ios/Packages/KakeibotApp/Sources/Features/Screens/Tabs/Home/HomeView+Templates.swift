@@ -123,6 +123,7 @@ private extension HomeView {
         let indexed = templates.enumerated()
         let top = indexed.filter { $0.offset.isMultiple(of: 2) }.map(\.element)
         let bottom = indexed.filter { !$0.offset.isMultiple(of: 2) }.map(\.element)
+
         return [top, bottom]
     }
 

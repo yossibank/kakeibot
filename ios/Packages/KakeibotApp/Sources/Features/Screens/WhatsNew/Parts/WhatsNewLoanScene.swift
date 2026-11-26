@@ -29,10 +29,6 @@ extension WhatsNewLoanScene {
 }
 
 private extension WhatsNewLoanScene {
-    static let count = 36
-    static let amount = 50000
-    static let lastAmount = 12300
-
     var countRow: some View {
         HStack(spacing: 8) {
             Image(systemName: "number")
@@ -99,4 +95,10 @@ private extension WhatsNewLoanScene {
         .card(cornerRadius: 12)
         .padding(.horizontal, 4)
     }
+}
+
+private extension WhatsNewLoanScene {
+    static let count = 36
+    static let amount = 50000
+    static let lastAmount = 12300
 }

@@ -20,7 +20,9 @@ extension SyncRoute {
         case sendAgain
         case skip
     }
+}
 
+extension SyncRoute {
     var receivesOwnZoneDeletion: Bool {
         knowsZones
     }

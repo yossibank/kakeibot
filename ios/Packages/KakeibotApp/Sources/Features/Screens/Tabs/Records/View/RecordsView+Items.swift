@@ -32,17 +32,6 @@ extension RecordsView {
 }
 
 private extension RecordsView {
-    static let itemIndent: CGFloat = 33
-
-    static let itemToggleTapOutsets = EdgeInsets(
-        top: 10,
-        leading: 8,
-        bottom: 10,
-        trailing: 8
-    )
-}
-
-private extension RecordsView {
     func itemToggle(
         _ row: EntryRowItem,
         isOpen: Bool
@@ -70,6 +59,15 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
+    static let itemIndent: CGFloat = 33
+
+    static let itemToggleTapOutsets = EdgeInsets(
+        top: 10,
+        leading: 8,
+        bottom: 10,
+        trailing: 8
+    )
+
     func toggleItems(_ id: Entry.ID) {
         withAnimation(.smooth(duration: 0.36)) {
             model.state.toggleItems(of: id)

@@ -25,44 +25,9 @@ private extension EntryTypeSwitch {
     struct Layout {
         var bounce: Double = 0
     }
+}
 
-    static let faceID = "face"
-
-    static var kinds: [Entry.Kind] {
-        [.expense, .income, .transfer]
-    }
-
-    static var gold: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent, Palette.accentDeep],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    static var keyFill: LinearGradient {
-        LinearGradient(
-            colors: [
-                Palette.cardTop.mix(with: .white, by: 0.12),
-                Palette.cardTop,
-                Palette.cardTop.mix(with: .black, by: 0.1)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
-    static var shine: LinearGradient {
-        LinearGradient(
-            stops: [
-                .init(color: .white.opacity(0.4), location: 0),
-                .init(color: .clear, location: 0.4)
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
+private extension EntryTypeSwitch {
     func key(_ kind: Entry.Kind) -> some View {
         let isSelected = selection == kind
         let shape = RoundedRectangle(cornerRadius: corner.radius(12))
@@ -131,6 +96,45 @@ private extension EntryTypeSwitch {
                         .strokeBorder(Palette.accent.opacity(.muted), lineWidth: 1)
                 }
         }
+    }
+}
+
+private extension EntryTypeSwitch {
+    static let faceID = "face"
+
+    static var kinds: [Entry.Kind] {
+        [.expense, .income, .transfer]
+    }
+
+    static var gold: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accentStrong, Palette.accent, Palette.accentDeep],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var keyFill: LinearGradient {
+        LinearGradient(
+            colors: [
+                Palette.cardTop.mix(with: .white, by: 0.12),
+                Palette.cardTop,
+                Palette.cardTop.mix(with: .black, by: 0.1)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    static var shine: LinearGradient {
+        LinearGradient(
+            stops: [
+                .init(color: .white.opacity(0.4), location: 0),
+                .init(color: .clear, location: 0.4)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
     func title(of kind: Entry.Kind) -> String {

@@ -88,7 +88,6 @@ public extension LocalDate {
         let offsetSeconds = timeZone.secondsFromGMT(for: noonAsUTC)
         let offset = TimeInterval(offsetSeconds)
         let noon = noonAsUTC.addingTimeInterval(-offset)
-
         var calendar = Calendar(identifier: .gregorian)
 
         calendar.timeZone = timeZone

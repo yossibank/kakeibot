@@ -9,6 +9,15 @@ struct CategoryBoard {
     let kind: EntryCategory.Kind
 }
 
+private extension CategoryBoard {
+    static var kindOptions: [CapsulePicker<EntryCategory.Kind>.Option] {
+        [
+            .init("支出", value: .expense),
+            .init("収入", value: .income)
+        ]
+    }
+}
+
 extension CategoryBoard: SettingsBoardSpec {
     typealias Destination = CategoryListModel.Destination
     typealias Editor = CategoryEditSheet
@@ -110,14 +119,5 @@ extension CategoryBoard: SettingsBoardSpec {
         }
 
         return id
-    }
-}
-
-private extension CategoryBoard {
-    static var kindOptions: [CapsulePicker<EntryCategory.Kind>.Option] {
-        [
-            .init("支出", value: .expense),
-            .init("収入", value: .income)
-        ]
     }
 }

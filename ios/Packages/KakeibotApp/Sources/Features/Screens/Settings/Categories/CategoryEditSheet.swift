@@ -100,6 +100,12 @@ extension CategoryEditSheet {
 }
 
 private extension CategoryEditSheet {
+    struct Layout {
+        var iconBottom: CGFloat = 0
+    }
+}
+
+private extension CategoryEditSheet {
     var content: some View {
         SettingsEditForm(showsSave: focus == nil && isTagFocused == nil) {
             preview
@@ -226,10 +232,6 @@ private extension CategoryEditSheet {
 }
 
 private extension CategoryEditSheet {
-    struct Layout {
-        var iconBottom: CGFloat = 0
-    }
-
     static let hasEntriesMessage = "記録があります。非表示にすると、記録を残したまま一覧から外せます"
 
     var kindName: String {
@@ -288,17 +290,6 @@ private extension CategoryEditSheet {
     }
 }
 
-#Preview {
-    if let parts = ScreenParts.preview() {
-        CategoryEditSheet(
-            model: CategoryEditModel(
-                parts: parts,
-                kind: .expense
-            )
-        )
-    }
-}
-
 extension CategoryEditSheet: SettingsEditSheet {
     init(
         model: CategoryEditModel,
@@ -311,6 +302,17 @@ extension CategoryEditSheet: SettingsEditSheet {
             onSave: { _ in },
             onDelete: onDelete,
             onHide: onHide
+        )
+    }
+}
+
+#Preview {
+    if let parts = ScreenParts.preview() {
+        CategoryEditSheet(
+            model: CategoryEditModel(
+                parts: parts,
+                kind: .expense
+            )
         )
     }
 }

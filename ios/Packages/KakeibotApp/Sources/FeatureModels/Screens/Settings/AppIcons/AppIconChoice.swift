@@ -41,6 +41,7 @@ public enum AppIconChoice: CaseIterable, Sendable {
 
     public init(alternateName: String?) {
         let choice = Self.allCases.first { $0.alternateName == alternateName }
+
         self = choice ?? .white
     }
 }
@@ -51,7 +52,9 @@ public extension AppIconChoice {
         public let yen: [String]
         public let dial: [String]
     }
+}
 
+public extension AppIconChoice {
     var title: String {
         switch self {
         case .navy: "ネイビー"

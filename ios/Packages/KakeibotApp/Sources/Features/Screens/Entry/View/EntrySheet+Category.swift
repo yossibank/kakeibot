@@ -86,9 +86,7 @@ extension EntrySheet {
             }
             .transition(Self.menuTransition)
     }
-}
 
-extension EntrySheet {
     func useTemplate(_ template: EntryTemplate) {
         withAnimation(.snappy) {
             model.apply(template)

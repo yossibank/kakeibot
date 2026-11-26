@@ -3,6 +3,13 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
+private extension EntrySheet {
+    struct QuickDay {
+        let title: String
+        let offset: Int
+    }
+}
+
 extension EntrySheet {
     var deckPanel: some View {
         VStack(spacing: Self.panelInset) {
@@ -40,9 +47,7 @@ extension EntrySheet {
             }
         }
     }
-}
 
-extension EntrySheet {
     func show(_ next: EntryModel.Deck) {
         if next != .amount,
            voice.state.step == .listening {
@@ -84,75 +89,12 @@ extension EntrySheet {
 }
 
 private extension EntrySheet {
-    static let amountTitleHeight: CGFloat = 28
-    static let panelInset: CGFloat = 12
-    static let dateSpacing: CGFloat = 8
-    static let maxKeyHeight: CGFloat = 64
-
-    static var panelNeed: CGFloat {
-        let chips = ChipButton<ChipLabel>.Size.regular.height
-        let calendar = MonthCalendar.height(isCompact: true)
-        let dateDeck = chips + dateSpacing + calendar
-        return panelInset * 3 + saveHeight + dateDeck
-    }
-
-    static var pillMark: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
-    static var pillFill: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accent.opacity(.subtle), .clear],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-    }
-
     static var wellFill: some ShapeStyle {
         Palette.panel
             .mix(with: Palette.accent, by: 0.02)
             .shadow(.inner(color: Palette.shadow.opacity(.faint), radius: 4, y: 2))
     }
 
-    var deckTransition: AnyTransition {
-        let isForward = model.state.screen.isForward
-        let entering: Edge = isForward ? .trailing : .leading
-        let leaving: Edge = isForward ? .leading : .trailing
-
-        return .asymmetric(
-            insertion: .move(edge: entering).combined(with: .opacity),
-            removal: .move(edge: leaving).combined(with: .opacity)
-        )
-    }
-
-    var panelShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(20))
-    }
-
-    var dateBinding: Binding<LocalDate> {
-        Binding(
-            get: {
-                model.state.payment.date
-            },
-            set: { date in
-                withAnimation(.snappy) {
-                    model.state.setDate(date)
-                }
-            }
-        )
-    }
-
-    func slipGrowth(forPanel height: CGFloat) -> CGFloat {
-        let spare = height + layout.slipGrowth - Self.panelNeed
-        return min(max(spare, 0), EntrySlip.growthLimit)
-    }
-}
-
-private extension EntrySheet {
     @ViewBuilder
     var deckContent: some View {
         switch deck {
@@ -285,14 +227,70 @@ private extension EntrySheet {
 }
 
 private extension EntrySheet {
-    struct QuickDay {
-        let title: String
-        let offset: Int
-    }
+    static let amountTitleHeight: CGFloat = 28
+    static let panelInset: CGFloat = 12
+    static let dateSpacing: CGFloat = 8
+    static let maxKeyHeight: CGFloat = 64
 
     static let quickDays = [
         QuickDay(title: "今日", offset: 0),
         QuickDay(title: "昨日", offset: -1),
         QuickDay(title: "おととい", offset: -2)
     ]
+
+    static var panelNeed: CGFloat {
+        let chips = ChipButton<ChipLabel>.Size.regular.height
+        let calendar = MonthCalendar.height(isCompact: true)
+        let dateDeck = chips + dateSpacing + calendar
+        return panelInset * 3 + saveHeight + dateDeck
+    }
+
+    static var pillMark: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accentStrong, Palette.accent],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    static var pillFill: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accent.opacity(.subtle), .clear],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+    }
+
+    var deckTransition: AnyTransition {
+        let isForward = model.state.screen.isForward
+        let entering: Edge = isForward ? .trailing : .leading
+        let leaving: Edge = isForward ? .leading : .trailing
+
+        return .asymmetric(
+            insertion: .move(edge: entering).combined(with: .opacity),
+            removal: .move(edge: leaving).combined(with: .opacity)
+        )
+    }
+
+    var panelShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(20))
+    }
+
+    var dateBinding: Binding<LocalDate> {
+        Binding(
+            get: {
+                model.state.payment.date
+            },
+            set: { date in
+                withAnimation(.snappy) {
+                    model.state.setDate(date)
+                }
+            }
+        )
+    }
+
+    func slipGrowth(forPanel height: CGFloat) -> CGFloat {
+        let spare = height + layout.slipGrowth - Self.panelNeed
+        return min(max(spare, 0), EntrySlip.growthLimit)
+    }
 }

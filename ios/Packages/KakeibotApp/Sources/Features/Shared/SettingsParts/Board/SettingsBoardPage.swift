@@ -90,31 +90,9 @@ private extension SettingsBoardPage {
     }
 
     typealias Prompt = SettingsBoardPrompt<Spec.Model.Item.ID>
+}
 
-    var grid: SettingsBoardGrid {
-        var grid = spec.grid
-
-        grid.width = layout.width
-
-        return grid
-    }
-
-    var controller: SettingsBoardController<Spec.Model> {
-        SettingsBoardController(
-            model: model,
-            drag: drag,
-            grid: grid
-        )
-    }
-
-    var hint: SettingsFold {
-        SettingsFold(\.hint, in: model)
-    }
-
-    var emptyNote: (systemImage: String, text: String) {
-        spec.emptyNote(in: model)
-    }
-
+private extension SettingsBoardPage {
     @ViewBuilder
     var board: some View {
         switch spec.layout {
@@ -213,6 +191,30 @@ private extension SettingsBoardPage {
         }
         .toolbar(.hidden, for: .navigationBar)
         .environment(\.isSettingsEditPushed, true)
+    }
+}
+
+private extension SettingsBoardPage {
+    var grid: SettingsBoardGrid {
+        var grid = spec.grid
+        grid.width = layout.width
+        return grid
+    }
+
+    var controller: SettingsBoardController<Spec.Model> {
+        SettingsBoardController(
+            model: model,
+            drag: drag,
+            grid: grid
+        )
+    }
+
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+
+    var emptyNote: (systemImage: String, text: String) {
+        spec.emptyNote(in: model)
     }
 
     func item(_ id: Spec.Model.Item.ID?) -> Spec.Model.Item? {

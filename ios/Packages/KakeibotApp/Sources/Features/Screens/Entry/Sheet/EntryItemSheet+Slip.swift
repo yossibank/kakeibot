@@ -8,7 +8,9 @@ extension EntryItemSheet {
         case store
         case name
     }
+}
 
+extension EntryItemSheet {
     var addBar: some View {
         PrimaryButton("＋ 品目を追加") {
             openSlip()
@@ -113,31 +115,6 @@ extension EntryItemSheet {
 }
 
 private extension EntryItemSheet {
-    static let taxOptions: [CapsulePicker<EntryItem.TaxRate?>.Option] = [
-        .init("税込", value: nil),
-        .init("8%", value: .reduced),
-        .init("10%", value: .standard)
-    ]
-
-    var slipTitle: String {
-        draft.editing.map { "品目 \($0.index + 1) を変更" } ?? "品目を追加"
-    }
-
-    var accessories: [Keypad.Accessory] {
-        [
-            Keypad.Accessory("値引", isActive: draft.isDiscount) {
-                items.state.draft.toggleDiscount()
-            },
-            Keypad.Accessory("半額") {
-                items.state.draft.halveUnit()
-            }
-        ]
-    }
-
-    var suggestions: [String] {
-        model.output.itemNameSuggestions(for: draft.name)
-    }
-
     var equation: some View {
         let lineColor = draft.isDiscount ? Palette.rose : Palette.accentStrong
 
@@ -217,6 +194,33 @@ private extension EntryItemSheet {
                 .sharedTextScale()
         }
     }
+}
+
+private extension EntryItemSheet {
+    static let taxOptions: [CapsulePicker<EntryItem.TaxRate?>.Option] = [
+        .init("税込", value: nil),
+        .init("8%", value: .reduced),
+        .init("10%", value: .standard)
+    ]
+
+    var slipTitle: String {
+        draft.editing.map { "品目 \($0.index + 1) を変更" } ?? "品目を追加"
+    }
+
+    var accessories: [Keypad.Accessory] {
+        [
+            Keypad.Accessory("値引", isActive: draft.isDiscount) {
+                items.state.draft.toggleDiscount()
+            },
+            Keypad.Accessory("半額") {
+                items.state.draft.halveUnit()
+            }
+        ]
+    }
+
+    var suggestions: [String] {
+        model.output.itemNameSuggestions(for: draft.name)
+    }
 
     func openSlip() {
         resetInput()
@@ -280,9 +284,7 @@ private extension EntryItemSheet {
 
     func withoutAnimation(_ change: () -> Void) {
         var transaction = Transaction()
-
         transaction.disablesAnimations = true
-
         withTransaction(transaction, change)
     }
 }

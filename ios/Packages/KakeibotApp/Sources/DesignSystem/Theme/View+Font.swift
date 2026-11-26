@@ -53,18 +53,6 @@ private struct ThemeFontModifier: ViewModifier {
     }
 }
 
-private struct SansFont: ViewModifier {
-    @Environment(\.themeStyle.textSize.scale) private var textSize
-    @Environment(\.sharedTextScale) private var shared
-
-    let size: FontSize
-    let weight: Font.Weight
-
-    func body(content: Content) -> some View {
-        content.font(.sans(size, weight: weight, scale: textSize, shared: shared))
-    }
-}
-
 private extension ThemeFontModifier {
     enum Role {
         case display
@@ -102,5 +90,17 @@ private extension ThemeFontModifier.Spec {
                 shared: shared
             )
         }
+    }
+}
+
+private struct SansFont: ViewModifier {
+    @Environment(\.themeStyle.textSize.scale) private var textSize
+    @Environment(\.sharedTextScale) private var shared
+
+    let size: FontSize
+    let weight: Font.Weight
+
+    func body(content: Content) -> some View {
+        content.font(.sans(size, weight: weight, scale: textSize, shared: shared))
     }
 }

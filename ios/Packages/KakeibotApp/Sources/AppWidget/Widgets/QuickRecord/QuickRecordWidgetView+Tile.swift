@@ -4,6 +4,14 @@ import SwiftUI
 import WidgetKit
 
 extension QuickRecordWidgetView {
+    static let tileRadius: CGFloat = 12
+    static let recordIconSize: CGFloat = 24
+    static let markSize: CGFloat = 20
+
+    var iconSize: CGFloat {
+        isLarge ? 30 : 26
+    }
+
     @ViewBuilder
     func tileButton(
         _ tile: QuickRecordWidgetSummary.Tile,
@@ -97,15 +105,5 @@ private extension QuickRecordWidgetView {
             .foregroundStyle(Palette.subtext)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
-    }
-}
-
-extension QuickRecordWidgetView {
-    static let tileRadius: CGFloat = 12
-    static let recordIconSize: CGFloat = 24
-    static let markSize: CGFloat = 20
-
-    var iconSize: CGFloat {
-        isLarge ? 30 : 26
     }
 }

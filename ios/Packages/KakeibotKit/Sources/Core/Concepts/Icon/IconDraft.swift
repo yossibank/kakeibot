@@ -19,7 +19,9 @@ public struct IconDraft: Draft, Hashable, Sendable {
 
 public extension IconDraft {
     typealias Mark = Icon.Mark
+}
 
+public extension IconDraft {
     static let maxTextLength = 3
 
     var problems: [DraftProblem] {

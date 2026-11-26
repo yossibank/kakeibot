@@ -16,23 +16,6 @@ public extension RecurringEditModel {
         public private(set) var holidayShift: HolidayShift = .none
 
         private(set) var isHolidayShiftChosen = false
-
-        public mutating func choose(_ shift: HolidayShift) {
-            holidayShift = shift
-            isHolidayShiftChosen = true
-        }
-
-        mutating func suggest(_ shift: HolidayShift) {
-            guard !isHolidayShiftChosen else {
-                return
-            }
-
-            holidayShift = shift
-        }
-
-        mutating func load(_ shift: HolidayShift) {
-            holidayShift = shift
-        }
     }
 
     struct Repayment {
@@ -41,24 +24,6 @@ public extension RecurringEditModel {
         public private(set) var isCountAuto = true
 
         private(set) var manualFinal: Int?
-
-        public mutating func useAutoCount() {
-            isCountAuto = true
-            manualFinal = nil
-        }
-
-        mutating func useManualCount(final amount: Int?) {
-            isCountAuto = false
-            manualFinal = amount
-        }
-
-        mutating func setCountAuto(_ isCountAuto: Bool) {
-            self.isCountAuto = isCountAuto
-        }
-
-        mutating func load(final amount: Int?) {
-            manualFinal = amount
-        }
     }
 
     enum Panel: Hashable, Sendable {
@@ -83,7 +48,6 @@ public extension RecurringEditModel {
         public var errorNotice = ErrorNotice()
         public var prompt = SettingsEditPrompt<Panel>()
         public var outcome = ScreenOutcome<SettingsEditOutcome<Void>>()
-
         public var categoryId: EntryCategory.ID?
         public var toWalletId: Wallet.ID?
         public var memo = ""
@@ -103,6 +67,7 @@ public extension RecurringEditModel {
             isScheduleOpen: Bool
         ) {
             self.type = type
+
             self.schedule = Schedule(
                 month: today.month,
                 day: today.day,
@@ -110,6 +75,49 @@ public extension RecurringEditModel {
                 isOpen: isScheduleOpen
             )
         }
+    }
+}
+
+public extension RecurringEditModel.Repayment {
+    mutating func useAutoCount() {
+        isCountAuto = true
+        manualFinal = nil
+    }
+}
+
+extension RecurringEditModel.Repayment {
+    mutating func useManualCount(final amount: Int?) {
+        isCountAuto = false
+        manualFinal = amount
+    }
+
+    mutating func setCountAuto(_ isCountAuto: Bool) {
+        self.isCountAuto = isCountAuto
+    }
+
+    mutating func load(final amount: Int?) {
+        manualFinal = amount
+    }
+}
+
+public extension RecurringEditModel.Schedule {
+    mutating func choose(_ shift: HolidayShift) {
+        holidayShift = shift
+        isHolidayShiftChosen = true
+    }
+}
+
+extension RecurringEditModel.Schedule {
+    mutating func suggest(_ shift: HolidayShift) {
+        guard !isHolidayShiftChosen else {
+            return
+        }
+
+        holidayShift = shift
+    }
+
+    mutating func load(_ shift: HolidayShift) {
+        holidayShift = shift
     }
 }
 

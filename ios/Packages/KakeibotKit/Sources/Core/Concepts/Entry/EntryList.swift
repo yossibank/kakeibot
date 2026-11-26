@@ -39,24 +39,6 @@ public struct EntryList: Sendable {
     }
 }
 
-extension EntryList: Equatable {
-    public static func == (
-        lhs: EntryList,
-        rhs: EntryList
-    ) -> Bool {
-        lhs.days == rhs.days
-            && lhs.categories == rhs.categories
-            && lhs.tags == rhs.tags
-            && lhs.wallets == rhs.wallets
-            && lhs.valuations == rhs.valuations
-            && lhs.adjustments == rhs.adjustments
-            && lhs.icons == rhs.icons
-            && lhs.cardBills == rhs.cardBills
-            && lhs.items == rhs.items
-            && lhs.sharedWalletIds == rhs.sharedWalletIds
-    }
-}
-
 public extension EntryList {
     func isShared(_ wallet: Wallet) -> Bool {
         sharedWalletIds.contains(wallet.id)
@@ -82,8 +64,25 @@ public extension EntryList {
     ) -> Int {
         budgets.carryover(into: month, from: start) { month in
             let period = month.period(startingOn: startDay)
-
             return days.within(period).expenseTotal
         }
+    }
+}
+
+extension EntryList: Equatable {
+    public static func == (
+        lhs: EntryList,
+        rhs: EntryList
+    ) -> Bool {
+        lhs.days == rhs.days
+            && lhs.categories == rhs.categories
+            && lhs.tags == rhs.tags
+            && lhs.wallets == rhs.wallets
+            && lhs.valuations == rhs.valuations
+            && lhs.adjustments == rhs.adjustments
+            && lhs.icons == rhs.icons
+            && lhs.cardBills == rhs.cardBills
+            && lhs.items == rhs.items
+            && lhs.sharedWalletIds == rhs.sharedWalletIds
     }
 }

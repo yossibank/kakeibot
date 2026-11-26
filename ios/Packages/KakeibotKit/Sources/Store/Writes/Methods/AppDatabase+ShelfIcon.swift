@@ -7,7 +7,9 @@ public extension AppDatabase {
         case shelfIconNotFound
         case iconNotFound
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func deleteShelfIcon(_ id: ShelfIcon.ID) async throws -> Deletion {
         try await writer.write { db in

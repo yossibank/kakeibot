@@ -58,7 +58,9 @@ public struct ThemeDraft: Draft, Hashable, Sendable {
 
 public extension ThemeDraft {
     typealias Problem = DraftProblem
+}
 
+public extension ThemeDraft {
     static let maxNameLength = 12
 
     var palette: ThemePalette? {

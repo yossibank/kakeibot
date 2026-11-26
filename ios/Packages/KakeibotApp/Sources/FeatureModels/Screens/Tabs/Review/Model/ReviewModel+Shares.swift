@@ -3,6 +3,27 @@ import DesignSystem
 import Foundation
 import Store
 
+private extension ReviewModel {
+    struct Ranked {
+        let share: Share
+        let sortOrder: Int
+    }
+}
+
+private extension ReviewModel {
+    static func sorted(_ ranked: [Ranked]) -> [Share] {
+        ranked
+            .sorted { lhs, rhs in
+                if lhs.share.amount != rhs.share.amount {
+                    return lhs.share.amount > rhs.share.amount
+                }
+
+                return lhs.sortOrder < rhs.sortOrder
+            }
+            .map(\.share)
+    }
+}
+
 public extension ReviewModel.Output {
     var budgetUsage: BudgetUsage? {
         usage(for: nil, spent: summary.expense.total)
@@ -130,25 +151,6 @@ extension ReviewModel.Output {
             into: month,
             startingOn: input.monthStartDay
         ) ?? 0
-    }
-}
-
-private extension ReviewModel {
-    struct Ranked {
-        let share: Share
-        let sortOrder: Int
-    }
-
-    static func sorted(_ ranked: [Ranked]) -> [Share] {
-        ranked
-            .sorted { lhs, rhs in
-                if lhs.share.amount != rhs.share.amount {
-                    return lhs.share.amount > rhs.share.amount
-                }
-
-                return lhs.sortOrder < rhs.sortOrder
-            }
-            .map(\.share)
     }
 }
 

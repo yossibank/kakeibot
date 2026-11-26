@@ -16,7 +16,9 @@ public extension Deletion {
         case valuation
         case adjustment
     }
+}
 
+public extension Deletion {
     var subject: Subject? {
         if !wallets.isEmpty {
             return Subject(.wallet, names: wallets.map(\.name))
@@ -65,6 +67,7 @@ private extension Deletion.Subject {
     ) {
         self.kind = kind
         self.count = names.count
+
         self.names = names.compactMap { name in
             name.flatMap { $0.isEmpty ? nil : $0 }
         }

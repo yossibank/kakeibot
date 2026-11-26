@@ -41,6 +41,10 @@ struct SettingsIconEditor<Field: Hashable>: View {
 }
 
 private extension SettingsIconEditor {
+    typealias MarkOption = CapsulePicker<SettingsIconEditorModel.MarkKind>.Option
+}
+
+private extension SettingsIconEditor {
     var colors: some View {
         LazyVGrid(columns: Self.colorColumns, spacing: 4) {
             ForEach(SettingsIconEditorModel.colors, id: \.self) { hex in
@@ -194,8 +198,6 @@ private extension SettingsIconEditor {
 }
 
 private extension SettingsIconEditor {
-    typealias MarkOption = CapsulePicker<SettingsIconEditorModel.MarkKind>.Option
-
     static var markOptions: [MarkOption] {
         [
             .init("絵柄", value: .glyph),

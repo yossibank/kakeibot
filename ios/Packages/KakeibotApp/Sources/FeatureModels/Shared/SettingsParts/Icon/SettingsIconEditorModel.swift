@@ -38,7 +38,9 @@ public extension SettingsIconEditorModel {
         public let title: String
         public let emojis: [String]
     }
+}
 
+public extension SettingsIconEditorModel {
     static let colors = [
         "#E07A5F", "#E76F51", "#F28482", "#F4A261",
         "#F6BD60", "#F2CC8F", "#E9C46A", "#C9A465",

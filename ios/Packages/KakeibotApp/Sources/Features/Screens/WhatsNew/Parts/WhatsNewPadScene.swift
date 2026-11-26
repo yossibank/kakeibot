@@ -31,8 +31,6 @@ extension WhatsNewPadScene {
 }
 
 private extension WhatsNewPadScene {
-    static let keys = ["1", "2", "8", "0"]
-
     var sidebar: some View {
         VStack(alignment: .leading, spacing: 4) {
             Capsule()
@@ -176,4 +174,8 @@ private extension WhatsNewPadScene {
             }
         }
     }
+}
+
+private extension WhatsNewPadScene {
+    static let keys = ["1", "2", "8", "0"]
 }

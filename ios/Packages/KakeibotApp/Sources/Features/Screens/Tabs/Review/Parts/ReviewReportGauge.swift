@@ -42,20 +42,6 @@ extension ReviewReportGauge {
 }
 
 private extension ReviewReportGauge {
-    var lineWidth: CGFloat {
-        size / 16
-    }
-
-    var needleAngle: Double {
-        let elapsed = min(max(pace.elapsedRatio, 0), 1)
-        let sweep = ReviewReportGaugeArc.sweepDegrees
-        return -sweep / 2 + sweep * elapsed
-    }
-
-    var percentText: String {
-        "\(ReviewPace.percent(pace.usedRatio))%"
-    }
-
     var needle: some View {
         ZStack {
             ReviewReportGaugeNeedle(length: size / 3, width: 3.6)
@@ -114,9 +100,30 @@ private extension ReviewReportGauge {
     }
 }
 
+private extension ReviewReportGauge {
+    var lineWidth: CGFloat {
+        size / 16
+    }
+
+    var needleAngle: Double {
+        let elapsed = min(max(pace.elapsedRatio, 0), 1)
+        let sweep = ReviewReportGaugeArc.sweepDegrees
+        return -sweep / 2 + sweep * elapsed
+    }
+
+    var percentText: String {
+        "\(ReviewPace.percent(pace.usedRatio))%"
+    }
+}
+
 private struct ReviewReportGaugeArc {
     let progress: Double
     let inset: CGFloat
+}
+
+private extension ReviewReportGaugeArc {
+    static let startDegrees = 150.0
+    static let sweepDegrees = 240.0
 }
 
 extension ReviewReportGaugeArc: Shape {
@@ -138,15 +145,22 @@ extension ReviewReportGaugeArc: Shape {
     }
 }
 
-private extension ReviewReportGaugeArc {
-    static let startDegrees = 150.0
-    static let sweepDegrees = 240.0
-}
-
 private struct ReviewReportGaugeTicks {
     let count: Int
     let length: CGFloat
     let inset: CGFloat
+}
+
+private extension ReviewReportGaugeTicks {
+    static func point(
+        from center: CGPoint,
+        at radians: Double,
+        radius: CGFloat
+    ) -> CGPoint {
+        let x = center.x + cos(radians) * radius
+        let y = center.y + sin(radians) * radius
+        return CGPoint(x: x, y: y)
+    }
 }
 
 extension ReviewReportGaugeTicks: Shape {
@@ -168,18 +182,6 @@ extension ReviewReportGaugeTicks: Shape {
                 path.addLine(to: end)
             }
         }
-    }
-}
-
-private extension ReviewReportGaugeTicks {
-    static func point(
-        from center: CGPoint,
-        at radians: Double,
-        radius: CGFloat
-    ) -> CGPoint {
-        let x = center.x + cos(radians) * radius
-        let y = center.y + sin(radians) * radius
-        return CGPoint(x: x, y: y)
     }
 }
 

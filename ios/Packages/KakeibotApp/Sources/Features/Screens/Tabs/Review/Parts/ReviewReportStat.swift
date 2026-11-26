@@ -59,8 +59,6 @@ struct ReviewReportStat: View {
 }
 
 private extension ReviewReportStat {
-    static let valueHeight: CGFloat = 30
-
     var titleText: some View {
         Text(title)
             .textFont(.caption2)
@@ -107,4 +105,8 @@ private extension ReviewReportStat {
             }
         }
     }
+}
+
+private extension ReviewReportStat {
+    static let valueHeight: CGFloat = 30
 }

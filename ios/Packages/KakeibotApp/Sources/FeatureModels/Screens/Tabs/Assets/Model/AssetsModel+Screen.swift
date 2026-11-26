@@ -13,18 +13,6 @@ public extension AssetsModel {
         case adjustment(WalletRow)
         case outlook
         case entries(EntrySource)
-
-        public var id: Key {
-            switch self {
-            case .reward: .reward
-            case .newGoal: .newGoal
-            case let .newWallet(kind): .newWallet(kind)
-            case let .adjustment(row): .adjustment(row.id)
-            case .outlook: .outlook
-            case let .entries(.moved(bill)): .moved(bill.id)
-            case .entries(.unpaid): .unpaid
-            }
-        }
     }
 
     enum Opening: Equatable, Sendable {
@@ -34,10 +22,6 @@ public extension AssetsModel {
 
     struct GoalTarget: Equatable, Identifiable {
         public let goal: RewardGoal?
-
-        public var id: RewardGoal.ID? {
-            goal?.id
-        }
     }
 
     enum RewardChild: Equatable {
@@ -51,6 +35,12 @@ public extension AssetsModel {
     }
 }
 
+public extension AssetsModel.GoalTarget {
+    var id: RewardGoal.ID? {
+        goal?.id
+    }
+}
+
 public extension AssetsModel.Sheet {
     enum Key: Hashable, Sendable {
         case reward
@@ -60,6 +50,20 @@ public extension AssetsModel.Sheet {
         case outlook
         case moved(Recurring.ID)
         case unpaid
+    }
+}
+
+public extension AssetsModel.Sheet {
+    var id: Key {
+        switch self {
+        case .reward: .reward
+        case .newGoal: .newGoal
+        case let .newWallet(kind): .newWallet(kind)
+        case let .adjustment(row): .adjustment(row.id)
+        case .outlook: .outlook
+        case let .entries(.moved(bill)): .moved(bill.id)
+        case .entries(.unpaid): .unpaid
+        }
     }
 }
 

@@ -7,6 +7,20 @@ public enum Weekday: String, CaseIterable, Codable, Sendable {
     case saturday
     case sunday
 
+    init(daysSinceMonday days: Int) {
+        let index = (days % 7 + 7) % 7
+
+        self = Self.allCases[index]
+    }
+}
+
+public extension Weekday {
+    static func week(startingOn weekStart: Weekday) -> [Weekday] {
+        (0..<7).map { Weekday(daysSinceMonday: weekStart.daysSinceMonday + $0) }
+    }
+}
+
+extension Weekday {
     var daysSinceMonday: Int {
         switch self {
         case .monday: 0
@@ -17,15 +31,5 @@ public enum Weekday: String, CaseIterable, Codable, Sendable {
         case .saturday: 5
         case .sunday: 6
         }
-    }
-
-    init(daysSinceMonday days: Int) {
-        let index = (days % 7 + 7) % 7
-
-        self = Self.allCases[index]
-    }
-
-    public static func week(startingOn weekStart: Weekday) -> [Weekday] {
-        (0..<7).map { Weekday(daysSinceMonday: weekStart.daysSinceMonday + $0) }
     }
 }

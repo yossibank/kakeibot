@@ -18,7 +18,9 @@ public extension AppDatabase {
         case appGroupUnavailable
         case notMigrated
     }
+}
 
+public extension AppDatabase {
     static func appGroup() throws -> AppDatabase {
         let path = try groupPath()
         let pool = try DatabasePool(path: path, configuration: configuration)
@@ -83,7 +85,6 @@ private extension AppDatabase {
     static let groupIdentifier = "group.com.yossibank.kakeibot"
     static let fileName = "kakeibot.sqlite"
     static let busyTimeout: TimeInterval = 5
-
     static let migratedTemplate = try? makeMigratedTemplate()
 
     static var migrations: [(String, @Sendable (Database) throws -> Void)] {
@@ -161,9 +162,7 @@ private extension AppDatabase {
 
     static func makeMigratedTemplate() throws -> DatabaseQueue {
         let queue = try DatabaseQueue()
-
         try migrator.migrate(queue)
-
         return queue
     }
 

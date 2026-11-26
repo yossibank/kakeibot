@@ -23,7 +23,6 @@ public extension SyncEngine {
         let share = CKShare(recordZoneID: zoneID)
 
         share[CKShare.SystemFieldKey.title] = title
-
         _ = try await database.modifyRecordZones(saving: [zone], deleting: [])
 
         let (saved, _) = try await database.modifyRecords(saving: [share], deleting: [])

@@ -7,6 +7,16 @@ public struct SettingsEditPrompt<Panel: Hashable & Sendable>: Equatable, Sendabl
     public init() {}
 }
 
+private extension SettingsEditPrompt {
+    enum Asking {
+        case menu
+        case discard
+        case hideChanges
+        case hide
+        case delete
+    }
+}
+
 public extension SettingsEditPrompt {
     var isMenuOpen: Bool {
         get {
@@ -55,14 +65,6 @@ public extension SettingsEditPrompt {
 }
 
 private extension SettingsEditPrompt {
-    enum Asking {
-        case menu
-        case discard
-        case hideChanges
-        case hide
-        case delete
-    }
-
     mutating func set(
         _ asking: Asking,
         to isOn: Bool

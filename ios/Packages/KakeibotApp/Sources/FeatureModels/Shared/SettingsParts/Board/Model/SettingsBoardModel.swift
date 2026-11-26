@@ -61,7 +61,6 @@ public extension SettingsBoardModel {
 
         order.remove(at: from)
         order.insert(id, at: to)
-
         state.movingOrder = order
     }
 
@@ -91,7 +90,6 @@ public extension SettingsBoardModel {
         do {
             try await saveHidden(id, isHidden: true)
             await reload()
-
             state.removed.hiddenId = id
 
             return true
@@ -117,13 +115,14 @@ public extension SettingsBoardModel {
 
         do {
             let deletion = try await remove(id)
-            await reload()
 
+            await reload()
             state.removed.deletion = deletion
 
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error) ?? Self.deleteFailedText
+
             state.errorNotice.show(message, for: error)
             state.removed.deletion = nil
 

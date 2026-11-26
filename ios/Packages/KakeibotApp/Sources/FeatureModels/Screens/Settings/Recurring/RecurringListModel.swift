@@ -10,7 +10,6 @@ public final class RecurringListModel {
     public let state: State
     public let input: Input
     public let output: Output
-
     public let dependencies: ScreenParts
 
     public init(
@@ -37,7 +36,6 @@ public extension RecurringListModel {
     @Observable
     final class State: SettingsBoardState {
         public var errorNotice = ErrorNotice()
-
         public var type: Entry.Kind = .expense
         public var movingOrder: [Recurring.ID]?
         public var removed = SettingsBoardRemoved<Recurring.ID>()
@@ -59,7 +57,9 @@ public extension RecurringListModel {
             self.today = today
         }
     }
+}
 
+public extension RecurringListModel {
     static func title(of type: Entry.Kind) -> String {
         type == .transfer ? "振替" : "固定費"
     }
@@ -107,7 +107,6 @@ extension RecurringListModel: SettingsBoardModel {
     public func saveOrder(_ ids: [Recurring.ID]) async throws {
         let others = (input.snapshot ?? []).map(\.id).filter { !ids.contains($0) }
         let ordered = ids + others
-
         try await dependencies.database.reorder(ordered, at: dependencies.clock.now)
     }
 

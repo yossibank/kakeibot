@@ -56,8 +56,6 @@ struct EntryTransferPanel: View {
 }
 
 private extension EntryTransferPanel {
-    static let iconSize: CGFloat = 44
-
     var flow: some View {
         HStack(spacing: 4) {
             Image(systemName: "arrow.down")
@@ -216,6 +214,8 @@ private extension EntryTransferPanel {
 }
 
 private extension EntryTransferPanel {
+    static let iconSize: CGFloat = 44
+
     func title(_ role: EntryWalletDeck.Role) -> String {
         switch role {
         case .source: model.output.walletTitle

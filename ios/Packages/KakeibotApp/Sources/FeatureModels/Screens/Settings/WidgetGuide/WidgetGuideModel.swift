@@ -29,20 +29,22 @@ public extension WidgetGuideModel {
             self.place = place
             self.sample = sample
         }
+    }
+}
 
-        public func show(_ sample: WidgetGuideSample?) {
-            if shownSample != sample {
-                shownSample = sample
-            }
-
-            if let sample,
-               self.sample != sample {
-                self.sample = sample
-            }
+public extension WidgetGuideModel.State {
+    func show(_ sample: WidgetGuideSample?) {
+        if shownSample != sample {
+            shownSample = sample
         }
 
-        public func showChosenSample() {
-            show(sample)
+        if let sample,
+           self.sample != sample {
+            self.sample = sample
         }
+    }
+
+    func showChosenSample() {
+        show(sample)
     }
 }

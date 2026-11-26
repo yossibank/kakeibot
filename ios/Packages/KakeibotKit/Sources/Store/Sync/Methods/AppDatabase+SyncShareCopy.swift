@@ -8,7 +8,9 @@ extension AppDatabase {
         var tags: [String: String] = [:]
         var keys: [SyncKey] = []
     }
+}
 
+extension AppDatabase {
     static func copyOwnCategories(
         for walletID: String,
         in db: Database
@@ -35,7 +37,6 @@ extension AppDatabase {
             let newCategoryID = copy.category
 
             copied.categories[categoryID] = newCategoryID
-
             copied.keys.append(SyncKey(table: .icon, id: copy.icon))
             copied.keys.append(SyncKey(table: .category, id: newCategoryID))
 
@@ -55,9 +56,7 @@ extension AppDatabase {
 
             for tagID in tags {
                 let newTagID = try copyTag(tagID, to: newCategoryID, in: db)
-
                 copied.tags[tagID] = newTagID
-
                 copied.keys.append(SyncKey(table: .tag, id: newTagID))
             }
         }

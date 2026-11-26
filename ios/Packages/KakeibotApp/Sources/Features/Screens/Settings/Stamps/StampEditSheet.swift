@@ -88,7 +88,9 @@ private extension StampEditSheet {
     enum Field: Hashable {
         case text
     }
+}
 
+private extension StampEditSheet {
     var edit: SettingsEditController<StampEditModel> {
         SettingsEditController(
             model: model,
@@ -106,10 +108,10 @@ private extension StampEditSheet {
     }
 }
 
+extension StampEditSheet: SettingsEditSheet {}
+
 #Preview {
     if let parts = ScreenParts.preview() {
         StampEditSheet(model: StampEditModel(parts: parts))
     }
 }
-
-extension StampEditSheet: SettingsEditSheet {}

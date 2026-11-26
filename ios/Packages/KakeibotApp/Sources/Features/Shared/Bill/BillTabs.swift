@@ -28,14 +28,6 @@ struct BillTabs: View {
 }
 
 private extension BillTabs {
-    static var selectedFace: LinearGradient {
-        LinearGradient(
-            colors: [Palette.accent, Palette.accentDeep],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-    }
-
     func tab(
         _ page: BillPage,
         isSelected: Bool
@@ -81,5 +73,15 @@ private extension BillTabs {
             }
         }
         .contentShape(shape)
+    }
+}
+
+private extension BillTabs {
+    static var selectedFace: LinearGradient {
+        LinearGradient(
+            colors: [Palette.accent, Palette.accentDeep],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 }

@@ -4,10 +4,6 @@ public extension RecordsModel {
     enum BatchTarget: Hashable, Identifiable, Sendable {
         case category(Entry.Kind)
         case wallet
-
-        public var id: Self {
-            self
-        }
     }
 
     enum FilterTab: Hashable, Sendable {
@@ -24,24 +20,6 @@ public extension RecordsModel {
         case batch(BatchTarget)
         case filter
         case adjustment(AdjustmentRow)
-
-        public var id: Key {
-            switch self {
-            case let .markMenu(date): .markMenu(date)
-            case let .stamp(date): .stamp(date)
-            case let .reward(date): .reward(date)
-            case let .batch(target): .batch(target)
-            case .filter: .filter
-            case let .adjustment(row): .adjustment(row.id)
-            }
-        }
-
-        public var isSheet: Bool {
-            switch self {
-            case .markMenu: false
-            case .stamp, .reward, .batch, .filter, .adjustment: true
-            }
-        }
     }
 
     struct Screen {
@@ -64,6 +42,32 @@ public extension RecordsModel.Presented {
         case batch(RecordsModel.BatchTarget)
         case filter
         case adjustment(Adjustment.ID)
+    }
+}
+
+public extension RecordsModel.Presented {
+    var id: Key {
+        switch self {
+        case let .markMenu(date): .markMenu(date)
+        case let .stamp(date): .stamp(date)
+        case let .reward(date): .reward(date)
+        case let .batch(target): .batch(target)
+        case .filter: .filter
+        case let .adjustment(row): .adjustment(row.id)
+        }
+    }
+
+    var isSheet: Bool {
+        switch self {
+        case .markMenu: false
+        case .stamp, .reward, .batch, .filter, .adjustment: true
+        }
+    }
+}
+
+public extension RecordsModel.BatchTarget {
+    var id: Self {
+        self
     }
 }
 

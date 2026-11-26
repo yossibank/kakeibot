@@ -33,6 +33,56 @@ struct EntryItemSheet: View {
     }
 }
 
+extension EntryItemSheet {
+    struct Layout {
+        var scrollPosition = ScrollPosition()
+        var scrollGeometry: ScrollGeometry?
+        var slipHeight: CGFloat = 0
+        var barHeight: CGFloat = 0
+    }
+}
+
+extension EntryItemSheet {
+    static let noticeBottom: CGFloat = 76
+    static let discountIndent: CGFloat = 12
+    static let taxModeWidth: CGFloat = 136
+
+    static let taxModeOptions: [CapsulePicker<Bool>.Option] = [
+        .init("外税", value: false),
+        .init("内税", value: true)
+    ]
+
+    var draft: EntryItemModel.Draft {
+        items.state.draft
+    }
+
+    var showsRates: Bool {
+        Set(model.state.items.list.map(\.taxRate)).count > 1
+    }
+
+    var receiptShape: EntryReceiptShape {
+        EntryReceiptShape(tooth: 12, hasTopEdge: true)
+    }
+
+    var dateText: String {
+        let date = model.state.payment.date
+        return "\(date.year)/\(PeriodText.weekdayDate(date))"
+    }
+
+    init(
+        model: EntryModel,
+        isSlipOpen: Bool = false
+    ) {
+        _items = State(initialValue: model.newItemModel(isSlipOpen: isSlipOpen))
+
+        self.model = model
+    }
+
+    func restore(_ removed: EntryModel.RemovedItem) {
+        items.restore(removed, in: model)
+    }
+}
+
 private extension EntryItemSheet {
     var content: some View {
         VStack(spacing: 0) {
@@ -109,56 +159,6 @@ private extension EntryItemSheet {
                     focus = nil
                 }
         }
-    }
-}
-
-extension EntryItemSheet {
-    init(
-        model: EntryModel,
-        isSlipOpen: Bool = false
-    ) {
-        _items = State(initialValue: model.newItemModel(isSlipOpen: isSlipOpen))
-
-        self.model = model
-    }
-}
-
-extension EntryItemSheet {
-    struct Layout {
-        var scrollPosition = ScrollPosition()
-        var scrollGeometry: ScrollGeometry?
-        var slipHeight: CGFloat = 0
-        var barHeight: CGFloat = 0
-    }
-
-    static let noticeBottom: CGFloat = 76
-    static let discountIndent: CGFloat = 12
-    static let taxModeWidth: CGFloat = 136
-
-    static let taxModeOptions: [CapsulePicker<Bool>.Option] = [
-        .init("外税", value: false),
-        .init("内税", value: true)
-    ]
-
-    var draft: EntryItemModel.Draft {
-        items.state.draft
-    }
-
-    var showsRates: Bool {
-        Set(model.state.items.list.map(\.taxRate)).count > 1
-    }
-
-    var receiptShape: EntryReceiptShape {
-        EntryReceiptShape(tooth: 12, hasTopEdge: true)
-    }
-
-    var dateText: String {
-        let date = model.state.payment.date
-        return "\(date.year)/\(PeriodText.weekdayDate(date))"
-    }
-
-    func restore(_ removed: EntryModel.RemovedItem) {
-        items.restore(removed, in: model)
     }
 }
 

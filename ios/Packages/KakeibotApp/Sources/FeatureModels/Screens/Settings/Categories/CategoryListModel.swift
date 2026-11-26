@@ -10,7 +10,6 @@ public final class CategoryListModel {
     public let state: State
     public let input: SettingsBoardSnapshotInput<CategoryList>
     public let output: Output
-
     public let dependencies: ScreenParts
 
     public init(
@@ -37,7 +36,6 @@ public extension CategoryListModel {
     @Observable
     final class State: SettingsBoardState {
         public var errorNotice = ErrorNotice()
-
         public var kind: EntryCategory.Kind
         public var movingOrder: [EntryCategory.ID]?
         public var removed = SettingsBoardRemoved<EntryCategory.ID>()
@@ -54,11 +52,6 @@ public extension CategoryListModel {
 
         let input: SettingsBoardSnapshotInput<CategoryList>
 
-        public var items: [EntryCategory] {
-            let categories = input.snapshot?.categories ?? []
-            return categories.filter { $0.kind == state.kind }
-        }
-
         init(
             input: SettingsBoardSnapshotInput<CategoryList>,
             state: State
@@ -66,10 +59,17 @@ public extension CategoryListModel {
             self.input = input
             self.state = state
         }
+    }
+}
 
-        public func icon(for category: EntryCategory) -> Icon? {
-            input.snapshot?.icons[category.iconId]
-        }
+public extension CategoryListModel.Output {
+    var items: [EntryCategory] {
+        let categories = input.snapshot?.categories ?? []
+        return categories.filter { $0.kind == state.kind }
+    }
+
+    func icon(for category: EntryCategory) -> Icon? {
+        input.snapshot?.icons[category.iconId]
     }
 }
 

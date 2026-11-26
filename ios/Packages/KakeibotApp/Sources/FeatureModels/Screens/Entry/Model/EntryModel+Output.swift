@@ -131,7 +131,6 @@ extension EntryModel.Output {
             .map(\.amount)
 
         var seen: Set<Int> = []
-
         let ordered = (used + FeeChoiceRow.defaultChoices).filter { seen.insert($0).inserted }
 
         return Array(ordered.prefix(FeeChoiceRow.defaultChoices.count))

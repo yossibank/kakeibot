@@ -52,7 +52,9 @@ public extension EntryTemplateDraft {
         case missingCategory
         case missingWallet
     }
+}
 
+public extension EntryTemplateDraft {
     var problems: [Problem] {
         var problems: [Problem] = []
 
@@ -106,7 +108,6 @@ public extension EntryTemplateDraft {
         at now: Date
     ) throws -> EntryTemplate {
         let fields = try validated()
-
         var updated = template
 
         updated.name = trimmedName

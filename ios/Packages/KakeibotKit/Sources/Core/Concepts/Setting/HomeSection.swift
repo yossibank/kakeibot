@@ -7,8 +7,10 @@ public enum HomeSection: String, CaseIterable, Codable, Identifiable, Sendable {
     case stamps
 
     public static let standard: [Self] = [.budget, .customize, .templates, .recent]
+}
 
-    public var id: Self {
+public extension HomeSection {
+    var id: Self {
         self
     }
 }

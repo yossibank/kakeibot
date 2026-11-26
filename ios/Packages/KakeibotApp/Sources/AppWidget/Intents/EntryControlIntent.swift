@@ -5,7 +5,9 @@ import Notifications
 
 struct EntryControlIntent: AppIntent {
     static let openAppWhenRun = true
+}
 
+extension EntryControlIntent {
     static var title: LocalizedStringResource {
         "入力シートを開く"
     }

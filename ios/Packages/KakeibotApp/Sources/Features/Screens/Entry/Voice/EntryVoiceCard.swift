@@ -32,40 +32,6 @@ struct EntryVoiceCard: View {
 }
 
 private extension EntryVoiceCard {
-    static let minHeight: CGFloat = 268
-    static let transcriptHeight: CGFloat = 92
-    static let example = "例：昨日 ランチ 980円 カードで"
-    static let largeTextLimit = 36
-    static let mediumTextLimit = 64
-    static let cancelWidth: CGFloat = 104
-    static let waveHeight: CGFloat = 40
-
-    var isReading: Bool {
-        flow.state.step == .reading
-    }
-
-    var transcriptStyle: Font.TextStyle {
-        switch flow.input.transcript.text.count {
-        case ..<Self.largeTextLimit: .title3
-        case ..<Self.mediumTextLimit: .body
-        default: .subheadline
-        }
-    }
-
-    var spoken: AttributedString {
-        var settled = AttributedString(flow.input.transcript.settled)
-        settled.foregroundColor = Palette.accentStrong
-
-        var pending = AttributedString(flow.input.transcript.pending)
-        pending.foregroundColor = Palette.subtext
-
-        return settled + pending
-    }
-
-    var slotShape: RoundedRectangle {
-        RoundedRectangle(cornerRadius: corner.radius(16))
-    }
-
     var listening: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
@@ -233,6 +199,44 @@ private extension EntryVoiceCard {
     }
 }
 
+private extension EntryVoiceCard {
+    static let minHeight: CGFloat = 268
+    static let transcriptHeight: CGFloat = 92
+    static let example = "例：昨日 ランチ 980円 カードで"
+    static let largeTextLimit = 36
+    static let mediumTextLimit = 64
+    static let cancelWidth: CGFloat = 104
+    static let waveHeight: CGFloat = 40
+
+    var isReading: Bool {
+        flow.state.step == .reading
+    }
+
+    var transcriptStyle: Font.TextStyle {
+        switch flow.input.transcript.text.count {
+        case ..<Self.largeTextLimit: .title3
+        case ..<Self.mediumTextLimit: .body
+        default: .subheadline
+        }
+    }
+
+    var spoken: AttributedString {
+        var settled = AttributedString(flow.input.transcript.settled)
+
+        settled.foregroundColor = Palette.accentStrong
+
+        var pending = AttributedString(flow.input.transcript.pending)
+
+        pending.foregroundColor = Palette.subtext
+
+        return settled + pending
+    }
+
+    var slotShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: corner.radius(16))
+    }
+}
+
 private struct SlotRows: Layout {
     let spacing: CGFloat
 
@@ -263,7 +267,9 @@ private struct SlotRows: Layout {
             )
         }
     }
+}
 
+extension SlotRows {
     func frames(
         of subviews: Subviews,
         width: CGFloat
@@ -283,8 +289,10 @@ private struct SlotRows: Layout {
             }
 
             let frame = CGRect(origin: CGPoint(x: x, y: y), size: fitted)
+
             x += fitted.width + spacing
             rowHeight = max(rowHeight, fitted.height)
+
             return frame
         }
     }

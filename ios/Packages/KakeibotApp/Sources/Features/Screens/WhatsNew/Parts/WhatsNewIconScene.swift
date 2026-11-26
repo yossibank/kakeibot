@@ -29,13 +29,6 @@ extension WhatsNewIconScene {
 }
 
 private extension WhatsNewIconScene {
-    static let symbols = [
-        ["figure.climbing", "film.stack", "dryer"],
-        ["giftcard", "play.rectangle", "figure.bowling"]
-    ]
-
-    static let emojis = ["🍚", "🍗", "🌮", "🍲"]
-
     var row: some View {
         HStack(spacing: 8) {
             Image(systemName: "tag")
@@ -88,4 +81,13 @@ private extension WhatsNewIconScene {
         .padding(8)
         .card(cornerRadius: 12)
     }
+}
+
+private extension WhatsNewIconScene {
+    static let symbols = [
+        ["figure.climbing", "film.stack", "dryer"],
+        ["giftcard", "play.rectangle", "figure.bowling"]
+    ]
+
+    static let emojis = ["🍚", "🍗", "🌮", "🍲"]
 }

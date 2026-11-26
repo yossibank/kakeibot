@@ -32,20 +32,6 @@ enum TemplateCardStyle {
     }
 }
 
-public extension View {
-    func templateCardFace(
-        cornerRadius: CGFloat,
-        shadowRadius: CGFloat
-    ) -> some View {
-        modifier(
-            TemplateCardFace(
-                cornerRadius: cornerRadius,
-                shadowRadius: shadowRadius
-            )
-        )
-    }
-}
-
 private struct TemplateCardFace: ViewModifier {
     @Environment(\.themeStyle.corner) private var corner
 
@@ -80,5 +66,19 @@ private struct TemplateCardFace: ViewModifier {
                     .inset(by: 4)
                     .strokeBorder(Palette.accent.opacity(.subtle), lineWidth: 0.5)
             }
+    }
+}
+
+public extension View {
+    func templateCardFace(
+        cornerRadius: CGFloat,
+        shadowRadius: CGFloat
+    ) -> some View {
+        modifier(
+            TemplateCardFace(
+                cornerRadius: cornerRadius,
+                shadowRadius: shadowRadius
+            )
+        )
     }
 }

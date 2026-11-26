@@ -78,6 +78,12 @@ struct HomeCustomizeCard: View {
 }
 
 private extension HomeCustomizeCard {
+    struct Layout {
+        var glow: [SetupItem: Double] = [:]
+    }
+}
+
+private extension HomeCustomizeCard {
     func tile(_ item: SetupItem) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: item.systemImage)
@@ -113,10 +119,6 @@ private extension HomeCustomizeCard {
 }
 
 private extension HomeCustomizeCard {
-    struct Layout {
-        var glow: [SetupItem: Double] = [:]
-    }
-
     static let tileSize = CGSize(width: 116, height: 96)
     static let cornerRadius: CGFloat = 20
     static let textScale: CGFloat = 0.8

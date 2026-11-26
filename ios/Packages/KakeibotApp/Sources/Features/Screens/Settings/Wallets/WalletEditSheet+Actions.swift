@@ -18,7 +18,9 @@ extension WalletEditSheet {
         case valuation
         case loanAmount
     }
+}
 
+extension WalletEditSheet {
     var edit: SettingsEditController<WalletEditModel> {
         SettingsEditController(
             model: model,
@@ -123,7 +125,6 @@ extension WalletEditSheet {
 
     func openAmount() {
         focus = nil
-
         show(.amount)
     }
 
@@ -133,9 +134,7 @@ extension WalletEditSheet {
 
     func openValuation() {
         focus = nil
-
         model.startValuation()
-
         show(.valuation)
     }
 
@@ -145,7 +144,6 @@ extension WalletEditSheet {
 
     func openLoanAmount() {
         focus = nil
-
         show(.loanAmount)
     }
 

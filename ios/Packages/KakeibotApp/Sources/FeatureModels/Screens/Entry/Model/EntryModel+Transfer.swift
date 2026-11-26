@@ -13,7 +13,9 @@ public extension EntryModel {
         public let title: String
         public let amount: Int
     }
+}
 
+public extension EntryModel {
     static let recentTransferLimit = 3
     static let frequentRouteLimit = 6
     static let destinationTitle = "振替先"

@@ -36,12 +36,9 @@ private extension WhatsNewUpcomingScene {
         let name: String
         let amount: Int
     }
+}
 
-    static let recurrings = [
-        Recurring(name: "家賃", amount: 85000),
-        Recurring(name: "スマホ", amount: 3000)
-    ]
-
+private extension WhatsNewUpcomingScene {
     var captions: some View {
         VStack(alignment: .leading, spacing: 4) {
             caption("これから")
@@ -140,4 +137,11 @@ private extension WhatsNewUpcomingScene {
         .textFont(size: .caption)
         .frame(height: 28)
     }
+}
+
+private extension WhatsNewUpcomingScene {
+    static let recurrings = [
+        Recurring(name: "家賃", amount: 85000),
+        Recurring(name: "スマホ", amount: 3000)
+    ]
 }

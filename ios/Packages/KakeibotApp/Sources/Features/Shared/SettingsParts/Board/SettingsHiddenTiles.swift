@@ -42,14 +42,40 @@ struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
     }
 }
 
-private extension SettingsHiddenTiles {
-    var columns: [GridItem] {
-        Array(
-            repeating: GridItem(.flexible(), spacing: grid.spacing),
-            count: grid.columns
+extension SettingsHiddenTiles {
+    init<Model: SettingsBoardModel>(
+        fold: SettingsFold,
+        title: String,
+        grid: SettingsBoardGrid,
+        controller: SettingsBoardController<Model>,
+        space: String,
+        layout: SettingsBoardLayout,
+        @ViewBuilder face: @escaping (Item) -> Face,
+        onTap: @escaping (Item) -> Void,
+        onDeleteAll: @escaping () -> Void
+    ) where Model.Item == Item {
+        self.init(
+            fold: fold,
+            title: title,
+            items: controller.model.output.hidden,
+            drag: controller.drag,
+            grid: grid,
+            space: space,
+            layout: layout,
+            face: face,
+            onTap: onTap,
+            onFollow: { id, location in
+                controller.followHidden(id, to: location)
+            },
+            onDrop: {
+                controller.dropHidden()
+            },
+            onDeleteAll: onDeleteAll
         )
     }
+}
 
+private extension SettingsHiddenTiles {
     func tile(_ item: Item) -> some View {
         let lifted = drag.hiddenOffset(of: item.id)
         let isLifted = lifted != nil
@@ -82,35 +108,11 @@ private extension SettingsHiddenTiles {
     }
 }
 
-extension SettingsHiddenTiles {
-    init<Model: SettingsBoardModel>(
-        fold: SettingsFold,
-        title: String,
-        grid: SettingsBoardGrid,
-        controller: SettingsBoardController<Model>,
-        space: String,
-        layout: SettingsBoardLayout,
-        @ViewBuilder face: @escaping (Item) -> Face,
-        onTap: @escaping (Item) -> Void,
-        onDeleteAll: @escaping () -> Void
-    ) where Model.Item == Item {
-        self.init(
-            fold: fold,
-            title: title,
-            items: controller.model.output.hidden,
-            drag: controller.drag,
-            grid: grid,
-            space: space,
-            layout: layout,
-            face: face,
-            onTap: onTap,
-            onFollow: { id, location in
-                controller.followHidden(id, to: location)
-            },
-            onDrop: {
-                controller.dropHidden()
-            },
-            onDeleteAll: onDeleteAll
+private extension SettingsHiddenTiles {
+    var columns: [GridItem] {
+        Array(
+            repeating: GridItem(.flexible(), spacing: grid.spacing),
+            count: grid.columns
         )
     }
 }

@@ -10,7 +10,6 @@ public final class TemplateListModel {
     public let state: State
     public let input: Input
     public let output: Output
-
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
@@ -34,7 +33,6 @@ public extension TemplateListModel {
     @Observable
     final class State: SettingsBoardState {
         public var errorNotice = ErrorNotice()
-
         public var type: Entry.Kind = .expense
         public var movingOrder: [EntryTemplate.ID]?
         public var removed = SettingsBoardRemoved<EntryTemplate.ID>()
@@ -57,11 +55,6 @@ public extension TemplateListModel {
 
         let input: Input
 
-        public var items: [EntryTemplate] {
-            let templates = input.snapshot ?? []
-            return templates.filter { $0.type == state.type }
-        }
-
         init(
             input: Input,
             state: State
@@ -69,16 +62,10 @@ public extension TemplateListModel {
             self.input = input
             self.state = state
         }
-
-        public func icon(for template: EntryTemplate) -> Icon? {
-            input.list?.icon(for: template)
-        }
-
-        public func detail(for template: EntryTemplate) -> String {
-            input.list?.detail(for: template) ?? ""
-        }
     }
+}
 
+public extension TemplateListModel {
     func load() async {
         do {
             input.snapshot = try await read()
@@ -100,6 +87,21 @@ public extension TemplateListModel {
                 )
             }
         ])
+    }
+}
+
+public extension TemplateListModel.Output {
+    var items: [EntryTemplate] {
+        let templates = input.snapshot ?? []
+        return templates.filter { $0.type == state.type }
+    }
+
+    func icon(for template: EntryTemplate) -> Icon? {
+        input.list?.icon(for: template)
+    }
+
+    func detail(for template: EntryTemplate) -> String {
+        input.list?.detail(for: template) ?? ""
     }
 }
 
@@ -129,7 +131,6 @@ extension TemplateListModel: SettingsBoardModel {
     public func saveOrder(_ ids: [EntryTemplate.ID]) async throws {
         let others = (input.snapshot ?? []).map(\.id).filter { !ids.contains($0) }
         let ordered = ids + others
-
         try await dependencies.database.reorder(ordered, at: dependencies.clock.now)
     }
 

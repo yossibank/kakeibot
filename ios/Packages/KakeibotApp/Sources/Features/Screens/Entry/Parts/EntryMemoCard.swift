@@ -5,7 +5,6 @@ import SwiftUI
 
 struct EntryMemoCard: View {
     let model: EntryModel
-
     let isFocused: FocusState<Bool>.Binding
     let onDone: () -> Void
 

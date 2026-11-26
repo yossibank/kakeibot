@@ -1,5 +1,41 @@
 import Foundation
 
+private extension ReviewGoal {
+    struct Scope {
+        let count: Int
+        let amount: Int
+        let pastCount: Double
+        let pastAmount: Double
+
+        init(
+            current: [Entry],
+            past: [Entry],
+            memo: String?,
+            periods: Int
+        ) {
+            let matches: (Entry) -> Bool = { entry in
+                memo == nil || ReviewGoal.normalizedMemo(entry.memo) == memo
+            }
+
+            let now = current.filter(matches)
+            let before = past.filter(matches)
+            let divisor = Double(max(periods, 1))
+
+            self.count = now.count
+            self.amount = now.reduce(0) { $0 + $1.amount }
+            self.pastCount = Double(before.count) / divisor
+            self.pastAmount = Double(before.reduce(0) { $0 + $1.amount }) / divisor
+        }
+    }
+
+    struct Shape {
+        let kind: Kind
+        let baseline: Int
+        let target: Int
+        let saving: Int
+    }
+}
+
 public extension ReviewGoal {
     static let memoMinimum = 2
 
@@ -45,7 +81,6 @@ public extension ReviewGoal {
         let progress = progress(of: entries, in: range, today: range.upperBound)
         let result = current(of: progress)
         let reduced = max(baseline - result, 0)
-
         var goal = self
 
         goal.result = result
@@ -111,58 +146,6 @@ private extension ReviewGoal {
             createdAt: now
         )
     }
-}
-
-private extension ReviewGoal {
-    struct Scope {
-        let count: Int
-        let amount: Int
-        let pastCount: Double
-        let pastAmount: Double
-
-        var unitPrice: Int {
-            count > 0 ? amount / count : 0
-        }
-
-        var pastUnitPrice: Int {
-            pastCount > 0 ? Int(pastAmount / pastCount) : unitPrice
-        }
-
-        var countEffect: Double {
-            (Double(count) - pastCount) * Double(pastUnitPrice)
-        }
-
-        var priceEffect: Double {
-            Double(unitPrice - pastUnitPrice) * Double(count)
-        }
-
-        init(
-            current: [Entry],
-            past: [Entry],
-            memo: String?,
-            periods: Int
-        ) {
-            let matches: (Entry) -> Bool = { entry in
-                memo == nil || ReviewGoal.normalizedMemo(entry.memo) == memo
-            }
-
-            let now = current.filter(matches)
-            let before = past.filter(matches)
-            let divisor = Double(max(periods, 1))
-
-            self.count = now.count
-            self.amount = now.reduce(0) { $0 + $1.amount }
-            self.pastCount = Double(before.count) / divisor
-            self.pastAmount = Double(before.reduce(0) { $0 + $1.amount }) / divisor
-        }
-    }
-
-    struct Shape {
-        let kind: Kind
-        let baseline: Int
-        let target: Int
-        let saving: Int
-    }
 
     static func focusMemo(
         current: [Entry],
@@ -175,7 +158,6 @@ private extension ReviewGoal {
             let now = current.count { normalizedMemo($0.memo) == name }
             let before = past.count { normalizedMemo($0.memo) == name }
             let rise = Double(now) - Double(before) / Double(max(periods, 1))
-
             return (name: name, rise: rise)
         }
 
@@ -218,5 +200,23 @@ private extension ReviewGoal {
             target: target,
             saving: (scope.unitPrice - target) * scope.count
         )
+    }
+}
+
+extension ReviewGoal.Scope {
+    var unitPrice: Int {
+        count > 0 ? amount / count : 0
+    }
+
+    var pastUnitPrice: Int {
+        pastCount > 0 ? Int(pastAmount / pastCount) : unitPrice
+    }
+
+    var countEffect: Double {
+        (Double(count) - pastCount) * Double(pastUnitPrice)
+    }
+
+    var priceEffect: Double {
+        Double(unitPrice - pastUnitPrice) * Double(count)
     }
 }

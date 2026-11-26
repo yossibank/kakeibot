@@ -11,8 +11,10 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
     case teal
     case wine
     case plum
+}
 
-    public var title: String {
+public extension ThemePreset {
+    var title: String {
         switch self {
         case .navy: "ネイビー"
         case .black: "ブラック"
@@ -29,7 +31,7 @@ public enum ThemePreset: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    public var palette: ThemePalette {
+    var palette: ThemePalette {
         switch self {
         case .navy:
             .night

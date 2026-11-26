@@ -41,10 +41,6 @@ struct RecordsSearchHistory: View {
 }
 
 private extension RecordsSearchHistory {
-    static let undoSeconds = 5
-}
-
-private extension RecordsSearchHistory {
     var guide: some View {
         VStack(spacing: 8) {
             Text("メモ・カテゴリ・タグ・口座の名前や、金額で探せます")
@@ -127,6 +123,8 @@ private extension RecordsSearchHistory {
 }
 
 private extension RecordsSearchHistory {
+    static let undoSeconds = 5
+
     func clear() {
         withAnimation(.snappy) {
             clearedWords = words

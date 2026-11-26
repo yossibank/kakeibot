@@ -7,7 +7,9 @@ public extension ReviewModel {
         let period: String
         let goalId: ReviewGoal.ID?
     }
+}
 
+public extension ReviewModel {
     func refreshReason() async {
         let now = dependencies.clock.now
         let key = output.period.commentKey
@@ -52,26 +54,7 @@ public extension ReviewModel {
         )
 
         try? await dependencies.database.saveReviewComment(comment)
-
         input.reasons[key] = body
-    }
-}
-
-extension ReviewModel.Output {
-    public var reasonTrigger: ReviewModel.ReasonTrigger {
-        let next = period.adding(1).commentKey
-        let goal = input.goals.first { $0.period == next }
-        return ReviewModel.ReasonTrigger(period: period.commentKey, goalId: goal?.id)
-    }
-
-    func goalReason(for item: ReviewGoalItem) -> ReviewClosing.Reason? {
-        if let written = input.reasons[period.commentKey] {
-            return ReviewClosing.Reason(text: written, isWritten: true)
-        }
-
-        return factReason(for: item).map { text in
-            ReviewClosing.Reason(text: text, isWritten: false)
-        }
     }
 }
 
@@ -90,6 +73,24 @@ private extension ReviewModel {
             scale: scale,
             categories: categories
         )
+    }
+}
+
+extension ReviewModel.Output {
+    public var reasonTrigger: ReviewModel.ReasonTrigger {
+        let next = period.adding(1).commentKey
+        let goal = input.goals.first { $0.period == next }
+        return ReviewModel.ReasonTrigger(period: period.commentKey, goalId: goal?.id)
+    }
+
+    func goalReason(for item: ReviewGoalItem) -> ReviewClosing.Reason? {
+        if let written = input.reasons[period.commentKey] {
+            return ReviewClosing.Reason(text: written, isWritten: true)
+        }
+
+        return factReason(for: item).map { text in
+            ReviewClosing.Reason(text: text, isWritten: false)
+        }
     }
 }
 
@@ -123,7 +124,6 @@ private extension ReviewModel.Output {
         let spent = reasonRow.map { row in
             let amount = ReviewYen.text(row.row.amount)
             let average = ReviewYen.text(row.row.average)
-
             return "\(item.categoryName)は、この\(unit)に \(amount) 使いました。いつもは \(average) です。"
         }
 

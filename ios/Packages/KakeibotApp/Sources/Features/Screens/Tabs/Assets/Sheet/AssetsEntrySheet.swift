@@ -65,85 +65,6 @@ extension AssetsEntrySheet {
     }
 }
 
-extension AssetsEntrySheet.Content {
-    init(_ source: AssetsModel.EntrySource) {
-        switch source {
-        case let .moved(row): self = .moved(row)
-        case let .unpaid(rows): self = .unpaid(of: rows)
-        }
-    }
-
-    static func moved(_ row: AssetsModel.UpcomingBill) -> Self {
-        let count = row.movedIn.count + row.movedOut.count
-        let day = PeriodText.weekdayDate(row.bill.date)
-
-        let sections: [AssetsEntrySheet.Section] = [
-            .init(id: "moved-in", title: "この引き落としに入れた", rows: row.movedIn),
-            .init(id: "moved-out", title: "後の引き落としに回した", rows: row.movedOut)
-        ]
-
-        return Self(
-            id: "moved-\(row.id)",
-            amount: row.bill.amount,
-            title: "回した記録",
-            note: "\(row.title) · \(count) 件 · \(day)に引き落とし",
-            groups: [.init(id: "moved", sections: sections)]
-        )
-    }
-
-    static func unpaid(of rows: [AssetsModel.WalletRow]) -> Self {
-        let cards = rows.compactMap { row in
-            row.unpaid.map { (row, $0) }
-        }
-
-        let groups = cards.map { row, unpaid in
-            AssetsEntrySheet.Group(
-                title: row.wallet.name,
-                amount: unpaid.total,
-                id: "unpaid-\(row.id)",
-                sections: sections(of: unpaid, in: row)
-            )
-        }
-
-        let count = cards.reduce(0) { $0 + $1.1.count }
-        let total = cards.reduce(0) { $0 + $1.1.total }
-        let name = cards.count == 1 ? cards.first?.0.wallet.name : nil
-
-        return Self(
-            id: "unpaid",
-            amount: total,
-            title: "未払いの記録",
-            note: "\(name ?? "カード \(cards.count) 枚") · \(count) 件",
-            groups: groups
-        )
-    }
-}
-
-private extension AssetsEntrySheet.Content {
-    static func sections(
-        of unpaid: AssetsModel.Unpaid,
-        in row: AssetsModel.WalletRow
-    ) -> [AssetsEntrySheet.Section] {
-        let bills = unpaid.bills.map { group in
-            AssetsEntrySheet.Section(
-                amount: group.total,
-                bill: group.bill,
-                id: "bill-\(group.bill.recurring.id)-\(group.bill.date)",
-                title: "\(Recurring.billText(paidOn: group.bill.date)) · \(group.rows.count) 件",
-                rows: group.rows
-            )
-        }
-
-        let later = AssetsEntrySheet.Section(
-            id: "later-\(row.id)",
-            title: "その後に引き落とす",
-            rows: unpaid.later
-        )
-
-        return bills + [later]
-    }
-}
-
 private extension AssetsEntrySheet {
     func groupView(_ group: Group) -> some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -240,5 +161,84 @@ private extension AssetsEntrySheet {
             }
         }
         .padding(.bottom, 4)
+    }
+}
+
+extension AssetsEntrySheet.Content {
+    init(_ source: AssetsModel.EntrySource) {
+        switch source {
+        case let .moved(row): self = .moved(row)
+        case let .unpaid(rows): self = .unpaid(of: rows)
+        }
+    }
+
+    static func moved(_ row: AssetsModel.UpcomingBill) -> Self {
+        let count = row.movedIn.count + row.movedOut.count
+        let day = PeriodText.weekdayDate(row.bill.date)
+
+        let sections: [AssetsEntrySheet.Section] = [
+            .init(id: "moved-in", title: "この引き落としに入れた", rows: row.movedIn),
+            .init(id: "moved-out", title: "後の引き落としに回した", rows: row.movedOut)
+        ]
+
+        return Self(
+            id: "moved-\(row.id)",
+            amount: row.bill.amount,
+            title: "回した記録",
+            note: "\(row.title) · \(count) 件 · \(day)に引き落とし",
+            groups: [.init(id: "moved", sections: sections)]
+        )
+    }
+
+    static func unpaid(of rows: [AssetsModel.WalletRow]) -> Self {
+        let cards = rows.compactMap { row in
+            row.unpaid.map { (row, $0) }
+        }
+
+        let groups = cards.map { row, unpaid in
+            AssetsEntrySheet.Group(
+                title: row.wallet.name,
+                amount: unpaid.total,
+                id: "unpaid-\(row.id)",
+                sections: sections(of: unpaid, in: row)
+            )
+        }
+
+        let count = cards.reduce(0) { $0 + $1.1.count }
+        let total = cards.reduce(0) { $0 + $1.1.total }
+        let name = cards.count == 1 ? cards.first?.0.wallet.name : nil
+
+        return Self(
+            id: "unpaid",
+            amount: total,
+            title: "未払いの記録",
+            note: "\(name ?? "カード \(cards.count) 枚") · \(count) 件",
+            groups: groups
+        )
+    }
+}
+
+private extension AssetsEntrySheet.Content {
+    static func sections(
+        of unpaid: AssetsModel.Unpaid,
+        in row: AssetsModel.WalletRow
+    ) -> [AssetsEntrySheet.Section] {
+        let bills = unpaid.bills.map { group in
+            AssetsEntrySheet.Section(
+                amount: group.total,
+                bill: group.bill,
+                id: "bill-\(group.bill.recurring.id)-\(group.bill.date)",
+                title: "\(Recurring.billText(paidOn: group.bill.date)) · \(group.rows.count) 件",
+                rows: group.rows
+            )
+        }
+
+        let later = AssetsEntrySheet.Section(
+            id: "later-\(row.id)",
+            title: "その後に引き落とす",
+            rows: unpaid.later
+        )
+
+        return bills + [later]
     }
 }

@@ -2,11 +2,6 @@ import DesignSystem
 import SwiftUI
 
 struct SettingsCaption: View {
-    enum Kind {
-        case info
-        case caution
-    }
-
     let text: String
     let kind: Kind
 
@@ -25,6 +20,13 @@ struct SettingsCaption: View {
         .textFont(.caption)
         .foregroundStyle(color)
         .padding(.leading, 8)
+    }
+}
+
+extension SettingsCaption {
+    enum Kind {
+        case info
+        case caution
     }
 }
 

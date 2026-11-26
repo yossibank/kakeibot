@@ -49,31 +49,20 @@ public extension ThemeListModel {
     final class Output {
         let input: Input
 
-        public var currentPalette: ThemePalette {
-            palette(of: input.current)
-        }
-
         init(input: Input) {
             self.input = input
         }
-
-        public func theme(of choice: ThemeChoice) -> Theme? {
-            guard case let .custom(id) = choice else {
-                return nil
-            }
-
-            return input.customThemes.first { $0.id == id }
-        }
-
-        public func palette(of choice: ThemeChoice) -> ThemePalette {
-            switch choice {
-            case .system: ThemePreset.white.palette
-            case let .preset(preset): preset.palette
-            case .custom: theme(of: choice)?.palette ?? ThemePreset.white.palette
-            }
-        }
     }
+}
 
+extension ThemeListModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let appIcon: AppIconListModel
+    }
+}
+
+public extension ThemeListModel {
     func load() async {
         do {
             input.current = try await dependencies.database.setting(.theme)
@@ -133,15 +122,30 @@ public extension ThemeListModel {
     }
 }
 
-extension ThemeListModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let appIcon: AppIconListModel
-    }
-}
-
 private extension ThemeListModel {
     static let restoreFailedMessage = "元に戻せませんでした"
+}
+
+public extension ThemeListModel.Output {
+    var currentPalette: ThemePalette {
+        palette(of: input.current)
+    }
+
+    func theme(of choice: ThemeChoice) -> Theme? {
+        guard case let .custom(id) = choice else {
+            return nil
+        }
+
+        return input.customThemes.first { $0.id == id }
+    }
+
+    func palette(of choice: ThemeChoice) -> ThemePalette {
+        switch choice {
+        case .system: ThemePreset.white.palette
+        case let .preset(preset): preset.palette
+        case .custom: theme(of: choice)?.palette ?? ThemePreset.white.palette
+        }
+    }
 }
 
 extension ThemeListModel: SettingsFoldModel {

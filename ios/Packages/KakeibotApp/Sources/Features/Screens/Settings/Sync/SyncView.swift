@@ -208,6 +208,10 @@ private extension SyncView {
         }
     }
 
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: model)
+    }
+
     static func hasFinishedSyncing(
         from old: SyncProgress?,
         to new: SyncProgress?
@@ -302,12 +306,6 @@ private extension SyncView {
         model.perform {
             await $0.useCloudData()
         }
-    }
-}
-
-private extension SyncView {
-    var hint: SettingsFold {
-        SettingsFold(\.hint, in: model)
     }
 }
 

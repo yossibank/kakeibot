@@ -18,6 +18,18 @@ struct QuickRecordWidgetView: View {
     }
 }
 
+private extension QuickRecordWidgetView {
+    struct Metrics {
+        let top: CGFloat
+        let bottom: CGFloat
+        let spacing: CGFloat
+        let headerHeight: CGFloat
+        let gridSpacing: CGFloat
+        let tilePadding: CGFloat
+        let todaySlots: Int
+    }
+}
+
 extension QuickRecordWidgetView {
     static let badgeSize = TemplateBadge.Size.small.diameter
 
@@ -246,16 +258,6 @@ private extension QuickRecordWidgetView {
 }
 
 private extension QuickRecordWidgetView {
-    struct Metrics {
-        let top: CGFloat
-        let bottom: CGFloat
-        let spacing: CGFloat
-        let headerHeight: CGFloat
-        let gridSpacing: CGFloat
-        let tilePadding: CGFloat
-        let todaySlots: Int
-    }
-
     static let columns = 2
     static let todayTitleHeight: CGFloat = 14
     static let recordRowHeight: CGFloat = 30
@@ -314,6 +316,7 @@ private extension QuickRecordWidgetView {
         ]
 
         let fitting = candidates.first { requiredHeight(of: $0) <= height }
+
         return fitting ?? Self.compact.limited(1)
     }
 
@@ -330,6 +333,7 @@ private extension QuickRecordWidgetView {
         let slots = CGFloat(metrics.todaySlots)
         let rule = Self.ruleHeight + metrics.spacing * 2
         let records = slots * Self.recordRowHeight + (slots - 1) * Self.todaySpacing
+
         return base + rule + Self.todayTitleHeight + Self.todaySpacing + records
     }
 }

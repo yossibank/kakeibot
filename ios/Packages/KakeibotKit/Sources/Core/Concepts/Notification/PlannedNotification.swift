@@ -32,17 +32,6 @@ public extension PlannedNotification {
         case newTemplate
         case receipt
 
-        public var link: String {
-            switch self {
-            case .home: "home"
-            case let .entry(date): "entry/\(date)"
-            case let .recurring(id): "recurring/\(id)"
-            case let .template(id): "template/\(id)"
-            case .newTemplate: "new-template"
-            case .receipt: "receipt"
-            }
-        }
-
         public init?(link: String) {
             switch link {
             case "home":
@@ -94,8 +83,23 @@ public extension PlannedNotification {
             }
         }
     }
+}
 
+public extension PlannedNotification {
     var identifier: String {
         [key, date.description, time.description, title, body].joined(separator: "|")
+    }
+}
+
+public extension PlannedNotification.Route {
+    var link: String {
+        switch self {
+        case .home: "home"
+        case let .entry(date): "entry/\(date)"
+        case let .recurring(id): "recurring/\(id)"
+        case let .template(id): "template/\(id)"
+        case .newTemplate: "new-template"
+        case .receipt: "receipt"
+        }
     }
 }

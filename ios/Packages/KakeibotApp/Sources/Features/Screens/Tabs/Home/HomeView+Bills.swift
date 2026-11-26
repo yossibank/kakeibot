@@ -48,11 +48,6 @@ extension HomeView {
 }
 
 private extension HomeView {
-    static let billTitle = "これからの引き落とし"
-    static let billInset: CGFloat = 16
-}
-
-private extension HomeView {
     func billList(_ page: BillPage) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             ForEach(page.bills, id: \.recurring.id) { bill in
@@ -72,4 +67,9 @@ private extension HomeView {
             }
         }
     }
+}
+
+private extension HomeView {
+    static let billTitle = "これからの引き落とし"
+    static let billInset: CGFloat = 16
 }

@@ -88,12 +88,6 @@ public struct ThemeStyleTextView: View {
 }
 
 private extension ThemeStyleTextView {
-    var suggestsLarge: Bool {
-        dynamicTypeSize >= .xLarge && model.output.style.textSize != .large
-    }
-}
-
-private extension ThemeStyleTextView {
     var preview: some View {
         VStack(spacing: 12) {
             VStack(spacing: 4) {
@@ -171,18 +165,6 @@ private extension ThemeStyleTextView {
 }
 
 private extension ThemeStyleTextView {
-    func isLocked(_ font: ThemeFont) -> Bool {
-        ThemeStyleModel.isLocked(font, isPro: isPro)
-    }
-
-    func choose(_ offer: ThemeStyleModel.FontOffer) {
-        model.perform { [isPro] in
-            await $0.choose(offer, isPro: isPro)
-        }
-    }
-}
-
-private extension ThemeStyleTextView {
     static let intro = ThemeStyleIntroContent(
         systemImage: "textformat",
         headline: ("文字の大きさと字体を", "好みに変えられます"),
@@ -197,10 +179,22 @@ private extension ThemeStyleTextView {
     static let sampleRest = 125_560
     static let sampleAmount = 1280
     static let sampleText = "食費・財布"
-}
 
-private extension ThemeStyleTextView {
+    var suggestsLarge: Bool {
+        dynamicTypeSize >= .xLarge && model.output.style.textSize != .large
+    }
+
     var hint: SettingsFold {
         SettingsFold(\.textHint, in: model)
+    }
+
+    func isLocked(_ font: ThemeFont) -> Bool {
+        ThemeStyleModel.isLocked(font, isPro: isPro)
+    }
+
+    func choose(_ offer: ThemeStyleModel.FontOffer) {
+        model.perform { [isPro] in
+            await $0.choose(offer, isPro: isPro)
+        }
     }
 }

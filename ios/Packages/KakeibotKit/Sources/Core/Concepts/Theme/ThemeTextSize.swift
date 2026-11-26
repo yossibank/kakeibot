@@ -2,8 +2,10 @@ public enum ThemeTextSize: String, CaseIterable, Codable, Sendable {
     case small
     case standard
     case large
+}
 
-    public var scale: Double {
+public extension ThemeTextSize {
+    var scale: Double {
         switch self {
         case .small: 0.9
         case .standard: 1

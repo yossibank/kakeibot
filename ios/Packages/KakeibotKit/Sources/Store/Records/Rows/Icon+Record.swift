@@ -1,10 +1,6 @@
 import Core
 import GRDB
 
-extension Icon: StoreRecord {
-    public static let databaseTableName = "icon"
-}
-
 extension Icon {
     static func byID(
         _ ids: [ID],
@@ -13,6 +9,10 @@ extension Icon {
         let pairs = try fetchAll(db, keys: ids).map { ($0.id, $0) }
         return Dictionary(uniqueKeysWithValues: pairs)
     }
+}
+
+extension Icon: StoreRecord {
+    public static let databaseTableName = "icon"
 }
 
 extension Icon.Glyph: DatabaseValueConvertible {

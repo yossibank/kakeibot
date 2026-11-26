@@ -73,52 +73,10 @@ extension EntryGuideCard {
     }
 }
 
-extension EntryGuideCard.Guide {
-    static let items = Self(
-        title: "品目の使い方",
-        steps: [
-            .init(systemImage: "plus", title: "追加", detail: "「＋ 品目を追加」から、品名と単価・数量を入れます。"),
-            .init(systemImage: "hand.tap", title: "変更", detail: "品目を押すと、伝票で直せます。"),
-            .init(systemImage: "arrow.left", title: "削除", detail: "品目を左に滑らせると、削除できます。"),
-            .init(systemImage: "tag", title: "値引・半額", detail: "「値引」で値引の行に、「半額」で単価を半分にできます。"),
-            .init(systemImage: "equal", title: "調整", detail: "差額が出た時は、合計を品目の合計にそろえます。")
-        ],
-        buttonTitle: "分かりました"
-    )
-
-    static let receipt = Self(
-        title: "レシートの撮り方",
-        steps: [
-            .init(
-                systemImage: "rectangle.portrait",
-                title: "平らな所に置く",
-                detail: "折れやしわを伸ばし、机などに置いて撮ります。",
-                art: .flat
-            ),
-            .init(
-                systemImage: "sun.max",
-                title: "明るい所で撮る",
-                detail: "影や光の反射が文字に掛からないようにします。",
-                art: .bright
-            ),
-            .init(
-                systemImage: "viewfinder",
-                title: "1 枚ずつ端まで",
-                detail: "上から下まで枠に収めます。長いレシートは、縦に何枚かに分けて撮れます。",
-                art: .edges
-            )
-        ],
-        buttonTitle: "撮る"
-    )
-}
-
 private extension EntryGuideCard {
     struct Layout {
         var scale: CGFloat = 0.94
     }
-
-    static let maxWidth: CGFloat = 340
-    static let markSize: CGFloat = 32
 }
 
 private extension EntryGuideCard {
@@ -174,6 +132,50 @@ private extension EntryGuideCard {
                 }
         }
     }
+}
+
+private extension EntryGuideCard {
+    static let maxWidth: CGFloat = 340
+    static let markSize: CGFloat = 32
+}
+
+extension EntryGuideCard.Guide {
+    static let items = Self(
+        title: "品目の使い方",
+        steps: [
+            .init(systemImage: "plus", title: "追加", detail: "「＋ 品目を追加」から、品名と単価・数量を入れます。"),
+            .init(systemImage: "hand.tap", title: "変更", detail: "品目を押すと、伝票で直せます。"),
+            .init(systemImage: "arrow.left", title: "削除", detail: "品目を左に滑らせると、削除できます。"),
+            .init(systemImage: "tag", title: "値引・半額", detail: "「値引」で値引の行に、「半額」で単価を半分にできます。"),
+            .init(systemImage: "equal", title: "調整", detail: "差額が出た時は、合計を品目の合計にそろえます。")
+        ],
+        buttonTitle: "分かりました"
+    )
+
+    static let receipt = Self(
+        title: "レシートの撮り方",
+        steps: [
+            .init(
+                systemImage: "rectangle.portrait",
+                title: "平らな所に置く",
+                detail: "折れやしわを伸ばし、机などに置いて撮ります。",
+                art: .flat
+            ),
+            .init(
+                systemImage: "sun.max",
+                title: "明るい所で撮る",
+                detail: "影や光の反射が文字に掛からないようにします。",
+                art: .bright
+            ),
+            .init(
+                systemImage: "viewfinder",
+                title: "1 枚ずつ端まで",
+                detail: "上から下まで枠に収めます。長いレシートは、縦に何枚かに分けて撮れます。",
+                art: .edges
+            )
+        ],
+        buttonTitle: "撮る"
+    )
 }
 
 #Preview("品目") {

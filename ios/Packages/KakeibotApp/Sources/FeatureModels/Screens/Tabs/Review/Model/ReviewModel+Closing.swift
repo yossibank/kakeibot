@@ -7,7 +7,9 @@ extension ReviewModel {
         let budgets: [Budget]
         let carryoverFrom: YearMonth?
     }
+}
 
+extension ReviewModel {
     static let closingRows = 3
     static let streakLimit = 120
 }

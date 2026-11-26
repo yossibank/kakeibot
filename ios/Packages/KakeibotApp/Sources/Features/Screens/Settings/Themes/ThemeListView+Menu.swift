@@ -11,7 +11,9 @@ extension ThemeListView {
         let theme: Theme?
         let frame: CGRect
     }
+}
 
+extension ThemeListView {
     @ViewBuilder
     func menuLayer(_ menu: Menu) -> some View {
         Scrim(.menu)
@@ -72,15 +74,12 @@ extension ThemeListView {
         .offset(x: menuX(for: menu), y: menuY(for: menu))
         .transition(.opacity.combined(with: .scale(scale: 0.96)))
     }
-}
 
-extension ThemeListView {
     func openMenu(
         _ choice: ThemeChoice,
         frame: CGRect
     ) {
         model.state.press(nil)
-
         layout.menuFrame = frame
 
         withAnimation(.snappy(duration: 0.25)) {

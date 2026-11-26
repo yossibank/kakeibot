@@ -10,7 +10,6 @@ public final class StampListModel {
     public let state: SettingsBoardMovingState<ShelfIcon.ID>
     public let input: SettingsBoardSnapshotInput<ShelfIconList>
     public let output: Output
-
     public let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
@@ -31,10 +30,6 @@ public extension StampListModel {
 
         let input: SettingsBoardSnapshotInput<ShelfIconList>
 
-        public var items: [ShelfIcon] {
-            input.snapshot?.shelfIcons ?? []
-        }
-
         init(
             input: SettingsBoardSnapshotInput<ShelfIconList>,
             state: SettingsBoardMovingState<ShelfIcon.ID>
@@ -42,10 +37,16 @@ public extension StampListModel {
             self.input = input
             self.state = state
         }
+    }
+}
 
-        public func icon(for shelfIcon: ShelfIcon) -> Icon? {
-            input.snapshot?.icons[shelfIcon.iconId]
-        }
+public extension StampListModel.Output {
+    var items: [ShelfIcon] {
+        input.snapshot?.shelfIcons ?? []
+    }
+
+    func icon(for shelfIcon: ShelfIcon) -> Icon? {
+        input.snapshot?.icons[shelfIcon.iconId]
     }
 }
 

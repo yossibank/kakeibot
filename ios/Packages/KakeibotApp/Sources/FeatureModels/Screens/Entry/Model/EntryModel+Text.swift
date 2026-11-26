@@ -7,7 +7,9 @@ public extension EntryModel {
         public let title: String
         public let value: String
     }
+}
 
+public extension EntryModel {
     static func dateText(
         for date: LocalDate,
         today: LocalDate

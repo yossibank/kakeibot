@@ -33,14 +33,25 @@ struct AssetsAdjustmentSheet: View {
     }
 }
 
-private extension AssetsAdjustmentSheet {
-    static let slotSize: CGFloat = 44
-    static let shape = EntryReceiptShape(tooth: 12, hasTopEdge: true)
-}
+extension AssetsAdjustmentSheet {
+    var content: some View {
+        VStack(spacing: 20) {
+            header
 
-private extension AssetsAdjustmentSheet {
-    var differenceColor: Color {
-        model.output.difference < 0 ? Palette.rose : Palette.accent
+            slip
+
+            Keypad(
+                calculator: model.state.calculator,
+                onKey: model.state.press
+            )
+
+            PrimaryButton(model.output.saveTitle) {
+                model.perform {
+                    await $0.save()
+                }
+            }
+            .disabled(!model.output.canSave)
+        }
     }
 }
 
@@ -165,33 +176,18 @@ private extension AssetsAdjustmentSheet {
 }
 
 private extension AssetsAdjustmentSheet {
+    static let slotSize: CGFloat = 44
+    static let shape = EntryReceiptShape(tooth: 12, hasTopEdge: true)
+
+    var differenceColor: Color {
+        model.output.difference < 0 ? Palette.rose : Palette.accent
+    }
+
     func close() {
         if model.output.isChanged {
             model.state.prompt.isConfirmingDiscard = true
         } else {
             dismiss()
-        }
-    }
-}
-
-extension AssetsAdjustmentSheet {
-    var content: some View {
-        VStack(spacing: 20) {
-            header
-
-            slip
-
-            Keypad(
-                calculator: model.state.calculator,
-                onKey: model.state.press
-            )
-
-            PrimaryButton(model.output.saveTitle) {
-                model.perform {
-                    await $0.save()
-                }
-            }
-            .disabled(!model.output.canSave)
         }
     }
 }

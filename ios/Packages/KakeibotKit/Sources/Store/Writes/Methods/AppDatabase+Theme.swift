@@ -6,7 +6,9 @@ public extension AppDatabase {
     enum ThemeWriteError: Error, Equatable {
         case themeNotFound
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func saveTheme(
         _ draft: ThemeDraft,

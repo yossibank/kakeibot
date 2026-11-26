@@ -13,7 +13,9 @@ public extension ReviewCompare {
             self.memo = memo
         }
     }
+}
 
+public extension ReviewCompare {
     static func why(
         entries: [Entry],
         categoryId: EntryCategory.ID,

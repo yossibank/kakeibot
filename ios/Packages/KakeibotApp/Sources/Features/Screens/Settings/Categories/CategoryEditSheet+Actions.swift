@@ -59,7 +59,6 @@ extension CategoryEditSheet {
 private extension CategoryEditSheet {
     func showTag(_ target: TagEdit.Target) {
         focus = nil
-
         model.state.ignoresKeyboard = true
 
         withAnimation(.snappy(duration: 0.25)) {

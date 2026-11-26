@@ -36,7 +36,9 @@ extension QuickRecordWidgetSummary {
         let amount: Int
         let until: Date
     }
+}
 
+extension QuickRecordWidgetSummary {
     static let limit = 6
     static let recordLimit = 2
     static let undoInterval: TimeInterval = 5

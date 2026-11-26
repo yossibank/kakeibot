@@ -24,8 +24,6 @@ extension WhatsNewWidgetScene {
 }
 
 private extension WhatsNewWidgetScene {
-    static let tiles = Array(WidgetGuideStage.tiles[1...4])
-
     var widget: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("すぐ記録")
@@ -88,4 +86,8 @@ private extension WhatsNewWidgetScene {
         .frame(height: 40)
         .templateCardFace(cornerRadius: 8, shadowRadius: 2)
     }
+}
+
+private extension WhatsNewWidgetScene {
+    static let tiles = Array(WidgetGuideStage.tiles[1...4])
 }

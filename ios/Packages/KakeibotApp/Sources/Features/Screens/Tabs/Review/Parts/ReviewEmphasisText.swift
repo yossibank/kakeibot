@@ -24,7 +24,9 @@ extension ReviewEmphasisText {
         case text(Font.TextStyle)
         case display(FontSize)
     }
+}
 
+extension ReviewEmphasisText {
     static func parts(of why: ReviewCompare.Why) -> [ReviewEmphasisPart] {
         why.parts.map { part in
             switch part {
@@ -50,8 +52,10 @@ private extension ReviewEmphasisText {
         }
 
         var run = AttributedString(style.text)
+
         run.font = style.font
         run.foregroundColor = style.color
+
         return run
     }
 

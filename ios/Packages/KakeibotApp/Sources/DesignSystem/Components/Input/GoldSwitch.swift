@@ -43,10 +43,6 @@ public struct GoldSwitch<Label: View>: View {
 }
 
 private extension GoldSwitch {
-    var rim: Color {
-        isOn ? Palette.accentStrong.opacity(.strong) : Palette.outline
-    }
-
     var track: some View {
         let stateText = isOn ? "入" : "切"
         let textColor = isOn ? Palette.backgroundBottom : Palette.subtext
@@ -153,6 +149,10 @@ private extension GoldSwitch {
             startPoint: .top,
             endPoint: .center
         )
+    }
+
+    var rim: Color {
+        isOn ? Palette.accentStrong.opacity(.strong) : Palette.outline
     }
 }
 

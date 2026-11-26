@@ -3,6 +3,14 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
+private extension ReviewView {
+    enum DetailRow {
+        case recurring
+        case upcoming
+        case move
+    }
+}
+
 extension ReviewView {
     var detailCard: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -150,12 +158,6 @@ private extension ReviewView {
 }
 
 private extension ReviewView {
-    enum DetailRow {
-        case recurring
-        case upcoming
-        case move
-    }
-
     var hasRecurringRow: Bool {
         model.output.recurringTotal != nil
     }

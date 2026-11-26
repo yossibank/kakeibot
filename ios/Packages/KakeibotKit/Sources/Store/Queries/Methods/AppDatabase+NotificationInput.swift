@@ -16,9 +16,26 @@ public extension AppDatabase {
         try await writer.read { db in
             let list = try Self.entryList(in: db, includesItems: false)
             let part = try Self.notificationPart(from: start, in: db)
-
             return part.input(with: list)
         }
+    }
+}
+
+private extension AppDatabase {
+    static func notificationPart(
+        from start: LocalDate,
+        in db: Database
+    ) throws -> NotificationPart {
+        let markedDates = try NoSpendDay.filter(Column("date") >= start).fetchAll(db).map(\.date)
+        let recurrings = try recurrings(in: db)
+        let reminderTime = try setting(.reminderTime, in: db)
+
+        return NotificationPart(
+            start: start,
+            markedDates: markedDates,
+            recurrings: recurrings,
+            reminderTime: reminderTime
+        )
     }
 }
 
@@ -59,23 +76,5 @@ private extension NotificationPart {
                 amount: bill.shortage
             )
         }
-    }
-}
-
-private extension AppDatabase {
-    static func notificationPart(
-        from start: LocalDate,
-        in db: Database
-    ) throws -> NotificationPart {
-        let markedDates = try NoSpendDay.filter(Column("date") >= start).fetchAll(db).map(\.date)
-        let recurrings = try recurrings(in: db)
-        let reminderTime = try setting(.reminderTime, in: db)
-
-        return NotificationPart(
-            start: start,
-            markedDates: markedDates,
-            recurrings: recurrings,
-            reminderTime: reminderTime
-        )
     }
 }

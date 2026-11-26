@@ -41,7 +41,9 @@ private extension EntryRecentLines {
         var width: CGFloat = 0
         var height: CGFloat = 0
     }
+}
 
+private extension EntryRecentLines {
     static var spacing: CGFloat {
         8
     }
@@ -55,7 +57,6 @@ private extension EntryRecentLines {
             let gap = lines[target].indices.isEmpty ? 0 : Self.spacing
 
             lines[target].indices.append(index)
-
             lines[target].width += gap + size.width
             lines[target].height = max(lines[target].height, size.height)
         }

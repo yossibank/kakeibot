@@ -37,12 +37,14 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         .wallets,
         .recurrings
     ]
+}
 
-    public var id: Self {
+public extension SetupItem {
+    var id: Self {
         self
     }
 
-    public var title: String {
+    var title: String {
         switch self {
         case .budget: "月の予算"
         case .monthStart: "月の始まり"
@@ -60,7 +62,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         }
     }
 
-    public var systemImage: String {
+    var systemImage: String {
         switch self {
         case .budget: "chart.bar"
         case .monthStart: "calendar"
@@ -78,7 +80,7 @@ public enum SetupItem: String, CaseIterable, Hashable, Identifiable, Sendable {
         }
     }
 
-    public func isDone(in progress: SetupProgress) -> Bool {
+    func isDone(in progress: SetupProgress) -> Bool {
         switch self {
         case .budget: progress.hasBudget
         case .wallets: progress.hasWalletBalance

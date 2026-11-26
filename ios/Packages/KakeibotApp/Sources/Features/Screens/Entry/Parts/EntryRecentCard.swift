@@ -65,14 +65,6 @@ struct EntryRecentCard<Mark: View>: View {
 }
 
 private extension EntryRecentCard {
-    static var maxWidth: CGFloat {
-        240
-    }
-
-    static var height: CGFloat {
-        48
-    }
-
     @ViewBuilder
     var amountLabel: some View {
         if let amount {
@@ -87,5 +79,15 @@ private extension EntryRecentCard {
                 .foregroundStyle(Palette.hint)
                 .fixedSize()
         }
+    }
+}
+
+private extension EntryRecentCard {
+    static var maxWidth: CGFloat {
+        240
+    }
+
+    static var height: CGFloat {
+        48
     }
 }

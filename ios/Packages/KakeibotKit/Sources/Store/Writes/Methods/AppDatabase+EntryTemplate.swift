@@ -7,7 +7,9 @@ public extension AppDatabase {
         case templateNotFound
         case tagMismatch
     }
+}
 
+public extension AppDatabase {
     @discardableResult
     func saveTemplate(
         _ draft: EntryTemplateDraft,

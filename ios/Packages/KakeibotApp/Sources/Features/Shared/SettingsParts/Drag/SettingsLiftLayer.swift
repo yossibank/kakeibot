@@ -1,37 +1,6 @@
 import DesignSystem
 import SwiftUI
 
-extension View {
-    func settingsLiftLayer<ID: Hashable>(
-        _ drag: SettingsDrag<ID>,
-        size: CGSize? = nil,
-        scale: CGFloat,
-        @ViewBuilder tile: @escaping (ID) -> some View
-    ) -> some View {
-        let layer = SettingsLiftLayer(
-            drag: drag,
-            size: size,
-            scale: scale,
-            tile: tile
-        )
-
-        return modifier(layer)
-    }
-
-    func settingsLiftFrame<ID: Hashable>(
-        _ drag: SettingsDrag<ID>,
-        _ frames: ReferenceWritableKeyPath<SettingsDrag<ID>, [ID: CGRect]>,
-        id: ID,
-        in space: String
-    ) -> some View {
-        onGeometryChange(for: CGRect.self) { proxy in
-            proxy.frame(in: .named(space))
-        } action: { frame in
-            drag[keyPath: frames][id] = frame
-        }
-    }
-}
-
 private struct SettingsLiftLayer<ID: Hashable, Tile: View>: ViewModifier {
     @State private var layout = Layout()
 
@@ -63,7 +32,9 @@ private extension SettingsLiftLayer {
     struct Layout {
         var origin: CGPoint = .zero
     }
+}
 
+private extension SettingsLiftLayer {
     func floatingTile(_ floating: SettingsDrag<ID>.Floating) -> some View {
         let tileSize = floating.size ?? size ?? .zero
         let dock = dockArea
@@ -132,5 +103,36 @@ private extension SettingsLiftLayer {
         let height = area.height / tileSize.height
 
         return min(scale, width, height)
+    }
+}
+
+extension View {
+    func settingsLiftLayer<ID: Hashable>(
+        _ drag: SettingsDrag<ID>,
+        size: CGSize? = nil,
+        scale: CGFloat,
+        @ViewBuilder tile: @escaping (ID) -> some View
+    ) -> some View {
+        let layer = SettingsLiftLayer(
+            drag: drag,
+            size: size,
+            scale: scale,
+            tile: tile
+        )
+
+        return modifier(layer)
+    }
+
+    func settingsLiftFrame<ID: Hashable>(
+        _ drag: SettingsDrag<ID>,
+        _ frames: ReferenceWritableKeyPath<SettingsDrag<ID>, [ID: CGRect]>,
+        id: ID,
+        in space: String
+    ) -> some View {
+        onGeometryChange(for: CGRect.self) { proxy in
+            proxy.frame(in: .named(space))
+        } action: { frame in
+            drag[keyPath: frames][id] = frame
+        }
     }
 }

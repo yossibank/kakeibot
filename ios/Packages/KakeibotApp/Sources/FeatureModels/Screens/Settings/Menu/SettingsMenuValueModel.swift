@@ -50,10 +50,6 @@ public extension SettingsMenuValueModel {
         let input: Input
         let state: State
 
-        public var value: Value {
-            state.chosen ?? input.value
-        }
-
         init(
             input: Input,
             state: State
@@ -62,10 +58,18 @@ public extension SettingsMenuValueModel {
             self.state = state
         }
     }
+}
 
+extension SettingsMenuValueModel {
+    struct Dependencies {
+        let database: AppDatabase
+        let key: SettingKey<Value>
+    }
+}
+
+public extension SettingsMenuValueModel {
     func load() async {
         let key = dependencies.key
-
         input.value = await (try? dependencies.database.setting(key)) ?? key.defaultValue
         state.chosen = nil
     }
@@ -86,9 +90,8 @@ public extension SettingsMenuValueModel {
     }
 }
 
-extension SettingsMenuValueModel {
-    struct Dependencies {
-        let database: AppDatabase
-        let key: SettingKey<Value>
+public extension SettingsMenuValueModel.Output {
+    var value: Value {
+        state.chosen ?? input.value
     }
 }

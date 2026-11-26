@@ -64,10 +64,6 @@ struct SettingsEditHeader: View {
     }
 }
 
-extension EnvironmentValues {
-    @Entry var isSettingsEditPushed = false
-}
-
 private extension SettingsEditHeader {
     var scrim: some View {
         Scrim(.menu)
@@ -136,4 +132,8 @@ private extension SettingsEditHeader {
             isMenuOpen = isOpen
         }
     }
+}
+
+extension EnvironmentValues {
+    @Entry var isSettingsEditPushed = false
 }

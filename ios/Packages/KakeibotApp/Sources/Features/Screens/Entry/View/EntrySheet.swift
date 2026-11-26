@@ -161,6 +161,43 @@ public struct EntrySheet: View {
 }
 
 extension EntrySheet {
+    struct Layout {
+        var sheetWidth: CGFloat = 0
+        var panelHeight: CGFloat = 0
+        var slipGrowth: CGFloat = 0
+        var bottomInset: CGFloat = 0
+        var menuFrame: CGRect = .zero
+    }
+}
+
+extension EntrySheet {
+    nonisolated static let coordinateSpace = "EntrySheet"
+
+    static let menuInset: CGFloat = 12
+    static let liftInset: CGFloat = 12
+    static let saveHeight: CGFloat = 56
+
+    static var menuTransition: AnyTransition {
+        .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
+    }
+
+    var deck: EntryModel.Deck {
+        model.state.screen.deck
+    }
+
+    var today: LocalDate {
+        model.state.today
+    }
+
+    init(
+        model: EntryModel,
+        deck: EntryModel.Deck
+    ) {
+        self.init(model: model)
+
+        model.state.place(deck)
+    }
+
     var saveButtons: some View {
         EntryLiveSlot {
             HStack(spacing: 8) {
@@ -241,43 +278,6 @@ extension EntrySheet {
     func showNext(after change: EntryChange) {
         notice.show(change)
         show(EntryModel.Deck.start(for: model.state.type))
-    }
-}
-
-extension EntrySheet {
-    struct Layout {
-        var sheetWidth: CGFloat = 0
-        var panelHeight: CGFloat = 0
-        var slipGrowth: CGFloat = 0
-        var bottomInset: CGFloat = 0
-        var menuFrame: CGRect = .zero
-    }
-
-    nonisolated static let coordinateSpace = "EntrySheet"
-
-    static let menuInset: CGFloat = 12
-    static let liftInset: CGFloat = 12
-    static let saveHeight: CGFloat = 56
-
-    static var menuTransition: AnyTransition {
-        .scale(scale: 0.92, anchor: .bottom).combined(with: .opacity)
-    }
-
-    var deck: EntryModel.Deck {
-        model.state.screen.deck
-    }
-
-    var today: LocalDate {
-        model.state.today
-    }
-
-    init(
-        model: EntryModel,
-        deck: EntryModel.Deck
-    ) {
-        self.init(model: model)
-
-        model.state.place(deck)
     }
 }
 

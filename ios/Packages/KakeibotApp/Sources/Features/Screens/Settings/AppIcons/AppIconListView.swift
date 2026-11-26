@@ -47,10 +47,6 @@ public struct AppIconListView: View {
 }
 
 private extension AppIconListView {
-    var hint: SettingsFold {
-        SettingsFold(\.hint, in: hintModel)
-    }
-
     func section(
         _ title: String,
         isLight: Bool
@@ -83,6 +79,10 @@ private extension AppIconListView {
         ),
         count: 3
     )
+
+    var hint: SettingsFold {
+        SettingsFold(\.hint, in: hintModel)
+    }
 
     func choices(isLight: Bool) -> [AppIconChoice] {
         AppIconChoice.allCases.filter { $0.isLight == isLight }

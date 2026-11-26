@@ -34,7 +34,6 @@ extension Wallet: ArchivableRecord, IconBackedRecord {
 
         wallet.archivedAt = isHidden ? now : nil
         wallet.updatedAt = now
-
         try wallet.update(db)
     }
 }

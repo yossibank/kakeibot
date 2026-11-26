@@ -43,7 +43,6 @@ public extension PeriodRecurring {
                     .occurrences(from: period.lowerBound, through: period.upperBound)
                     .compactMap { occurrence in
                         let date = occurrence.date
-
                         let entry = recurring.record(of: occurrence, in: recorded)
 
                         let amount = entry?.amount

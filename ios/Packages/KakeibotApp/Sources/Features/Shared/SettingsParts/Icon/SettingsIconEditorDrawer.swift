@@ -50,6 +50,27 @@ struct SettingsIconEditorDrawer<Field: Hashable>: ViewModifier {
     }
 }
 
+private extension SettingsIconEditorDrawer {
+    struct Layout {
+        var top: CGFloat = 0
+    }
+}
+
+private extension SettingsIconEditorDrawer {
+    static var gap: CGFloat {
+        16
+    }
+
+    var inset: CGFloat {
+        max(below - layout.top + Self.gap, 0)
+    }
+
+    func close() {
+        focus.wrappedValue = nil
+        model.dismiss()
+    }
+}
+
 extension View {
     func iconEditorDrawer<Field: Hashable>(
         model: SettingsIconEditorModel,
@@ -65,24 +86,5 @@ extension View {
                 below: below
             )
         )
-    }
-}
-
-private extension SettingsIconEditorDrawer {
-    struct Layout {
-        var top: CGFloat = 0
-    }
-
-    static var gap: CGFloat {
-        16
-    }
-
-    var inset: CGFloat {
-        max(below - layout.top + Self.gap, 0)
-    }
-
-    func close() {
-        focus.wrappedValue = nil
-        model.dismiss()
     }
 }

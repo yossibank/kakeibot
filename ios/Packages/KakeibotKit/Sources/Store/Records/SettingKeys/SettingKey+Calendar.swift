@@ -28,17 +28,6 @@ public extension SettingKey where Value == MonthStartDay {
     }
 }
 
-private extension SettingKey where Value == HolidayShift {
-    static var monthStartShift: Self {
-        Self(
-            .monthStartShift,
-            default: .none,
-            decode: { HolidayShift(rawValue: $0) },
-            encode: { $0 == .none ? nil : $0.rawValue }
-        )
-    }
-}
-
 public extension SettingKey where Value == YearMonth? {
     static var budgetCarryoverFrom: Self {
         Self(optional: .budgetCarryoverFrom)
@@ -60,5 +49,16 @@ public extension SettingKey where Value == ReminderTime? {
 public extension SettingKey where Value == LaunchScreen {
     static var launchScreen: Self {
         Self(.launchScreen, default: .home)
+    }
+}
+
+private extension SettingKey where Value == HolidayShift {
+    static var monthStartShift: Self {
+        Self(
+            .monthStartShift,
+            default: .none,
+            decode: { HolidayShift(rawValue: $0) },
+            encode: { $0 == .none ? nil : $0.rawValue }
+        )
     }
 }

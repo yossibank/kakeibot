@@ -49,7 +49,16 @@ extension RecordsView {
         var calendarWidth: CGFloat = 0
         var stampPulse: Double = 0
     }
+}
 
+private extension RecordsView {
+    struct DayCardID: Hashable {
+        let date: LocalDate
+        let isSelecting: Bool
+    }
+}
+
+extension RecordsView {
     var selection: Set<Entry.ID>? {
         model.state.screen.selection
     }
@@ -252,13 +261,7 @@ private extension RecordsView {
 }
 
 private extension RecordsView {
-    struct DayCardID: Hashable {
-        let date: LocalDate
-        let isSelecting: Bool
-    }
-
     static let wideCalendarWidth: CGFloat = 560
-
     static let listWidth: CGFloat = 720
 
     static let layoutOptions: [CapsulePicker<RecordsLayout>.Option] = [

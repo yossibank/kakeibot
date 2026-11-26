@@ -59,7 +59,6 @@ extension Color {
             let palette = traits[PaletteTrait.self]
             let isRose = palette == ThemePreset.rose.palette
             let rgb = isRose ? alternative : palette.color(semantic)
-
             return UIColor(rgb: rgb)
         }
 
@@ -74,7 +73,6 @@ extension Color {
             let rgb = traits[PaletteTrait.self][keyPath: role]
             let isLight = traits.userInterfaceStyle == .light
             let alpha = isLight ? lightOpacity : 1
-
             return UIColor(rgb: rgb).withAlphaComponent(alpha)
         }
 

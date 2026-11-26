@@ -65,9 +65,7 @@ public extension RecordsModel.Output {
 
 private extension RecordsModel.Output {
     static let emptySelectionBlock = "記録を選んでください"
-}
 
-private extension RecordsModel.Output {
     func selectedEntries(_ ids: Set<Entry.ID>) -> [Entry] {
         let entries = input.list?.entries ?? []
         return entries.filter { ids.contains($0.id) }

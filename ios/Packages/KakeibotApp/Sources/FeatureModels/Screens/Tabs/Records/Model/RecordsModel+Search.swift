@@ -8,7 +8,9 @@ public extension RecordsModel {
         public let incomeTotal: Int
         public let range: ClosedRange<LocalDate>
     }
+}
 
+public extension RecordsModel {
     func rememberSearch(_ text: String) async {
         let words = EntrySearch.remembering(text, in: input.recentSearches)
 
@@ -17,7 +19,6 @@ public extension RecordsModel {
         }
 
         input.recentSearches = words
-
         await saveRecentSearches()
     }
 

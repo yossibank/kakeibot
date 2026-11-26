@@ -19,6 +19,28 @@ public extension View {
     }
 }
 
+private extension View {
+    @ViewBuilder
+    func proDestination(
+        isPresented: Binding<Bool>,
+        inSheet: Bool,
+        @ViewBuilder destination: @escaping () -> some View
+    ) -> some View {
+        if inSheet {
+            sheet(isPresented: isPresented) {
+                NavigationStack {
+                    destination()
+                }
+            }
+        } else {
+            navigationDestination(
+                isPresented: isPresented,
+                destination: destination
+            )
+        }
+    }
+}
+
 private struct ProOfferModifier: ViewModifier {
     @State private var model = ProOfferModel()
 
@@ -69,27 +91,5 @@ private struct ProOfferModifier: ViewModifier {
                     onUnlock: onUnlock
                 )
             }
-    }
-}
-
-private extension View {
-    @ViewBuilder
-    func proDestination(
-        isPresented: Binding<Bool>,
-        inSheet: Bool,
-        @ViewBuilder destination: @escaping () -> some View
-    ) -> some View {
-        if inSheet {
-            sheet(isPresented: isPresented) {
-                NavigationStack {
-                    destination()
-                }
-            }
-        } else {
-            navigationDestination(
-                isPresented: isPresented,
-                destination: destination
-            )
-        }
     }
 }

@@ -47,6 +47,7 @@ private extension SyncProgress {
         }
 
         let time = date.formatted(.dateTime.hour().minute())
+
         return "最新の状態です（\(time) に同期）"
     }
 }

@@ -30,6 +30,7 @@ private extension SyncParticipant {
         }
 
         let lookup = identity.lookupInfo
+
         return lookup?.emailAddress ?? lookup?.phoneNumber ?? ""
     }
 }

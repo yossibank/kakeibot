@@ -22,7 +22,9 @@ private extension BudgetWidgetView {
         let title: String
         let amount: Int
     }
+}
 
+private extension BudgetWidgetView {
     @ViewBuilder
     var content: some View {
         if let summary = entry.summary {

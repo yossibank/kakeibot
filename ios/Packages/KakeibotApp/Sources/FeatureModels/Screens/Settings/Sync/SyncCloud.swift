@@ -35,11 +35,17 @@ public struct SyncCloud: Sendable {
 
 public extension SyncCloud {
     typealias Account = @Sendable () async -> SyncAccount
+
     typealias Summary = @Sendable () async throws -> SyncSummary?
+
     typealias Delete = @Sendable () async throws -> Void
+
     typealias CreateShare = @Sendable (Wallet.ID, String) async throws -> Void
+
     typealias Stop = @MainActor () async -> Void
+
     typealias Fail = @MainActor () -> Void
+
     typealias ShowShare = @MainActor (
         Wallet.ID,
         String,
@@ -47,10 +53,15 @@ public extension SyncCloud {
         @escaping Fail
     ) async throws
         -> Void
-    typealias Participants = @Sendable (Wallet.ID, String) async throws -> [SyncParticipant]
-    typealias DeleteShare = @Sendable (Wallet.ID) async throws -> Void
-    typealias LeaveShare = @Sendable (Wallet.ID, String) async throws -> Void
 
+    typealias Participants = @Sendable (Wallet.ID, String) async throws -> [SyncParticipant]
+
+    typealias DeleteShare = @Sendable (Wallet.ID) async throws -> Void
+
+    typealias LeaveShare = @Sendable (Wallet.ID, String) async throws -> Void
+}
+
+public extension SyncCloud {
     static let unavailable = Self(
         account: {
             .noAccount

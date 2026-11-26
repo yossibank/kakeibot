@@ -27,12 +27,19 @@ public struct ProStore: Sendable {
 
 public extension ProStore {
     typealias Status = @Sendable () async -> ProStatus
-    typealias Updates = @Sendable () -> AsyncStream<ProStatus>
-    typealias Price = @Sendable () async throws -> String
-    typealias CachedPrice = @Sendable () -> String?
-    typealias Purchase = @Sendable () async throws -> ProStatus
-    typealias Restore = @Sendable () async throws -> ProStatus
 
+    typealias Updates = @Sendable () -> AsyncStream<ProStatus>
+
+    typealias Price = @Sendable () async throws -> String
+
+    typealias CachedPrice = @Sendable () -> String?
+
+    typealias Purchase = @Sendable () async throws -> ProStatus
+
+    typealias Restore = @Sendable () async throws -> ProStatus
+}
+
+public extension ProStore {
     static let unavailable = Self(
         status: {
             .locked

@@ -59,9 +59,7 @@ extension EntrySheet {
             }
         }
     }
-}
 
-extension EntrySheet {
     func open(_ sheet: EntryModel.Sheet) {
         model.state.open(sheet)
     }

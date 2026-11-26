@@ -14,7 +14,6 @@ public extension SettingsFoldModel {
     func loadFold(_ fold: KeyPath<Input, SettingsFoldInput>) async {
         let fold = input[keyPath: fold]
         let screens = try? await foldStore().database.setting(fold.key)
-
         fold.isClosed = screens?.contains(fold.screen) ?? false
     }
 

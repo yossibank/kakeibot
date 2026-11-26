@@ -28,7 +28,9 @@ public struct Valuation: Codable, Hashable, Identifiable, Sendable {
 
 public extension Valuation {
     typealias ID = Identifier<Valuation>
+}
 
+public extension Valuation {
     func includes(_ entry: Entry) -> Bool {
         includes(date: entry.date, createdAt: entry.createdAt)
     }
