@@ -13,6 +13,10 @@ public extension RecordsModel {
         case tag
     }
 
+    enum Prompt: Hashable, Sendable {
+        case delete
+    }
+
     enum Presented: Equatable, Identifiable {
         case markMenu(LocalDate)
         case stamp(LocalDate)

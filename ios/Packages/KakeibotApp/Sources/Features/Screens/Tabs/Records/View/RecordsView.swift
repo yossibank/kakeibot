@@ -222,7 +222,7 @@ private extension RecordsView {
                 }
             }
             .confirmation(
-                isPresented: Bindable(model.state).isConfirmingDelete,
+                isPresented: Bindable(model.state).prompt[.delete],
                 systemImage: "trash",
                 title: "\(model.output.pendingDeleteCount) 件の記録を削除しますか",
                 message: deleteUndoMessage,

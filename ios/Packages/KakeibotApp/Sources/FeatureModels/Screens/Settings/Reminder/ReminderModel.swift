@@ -63,12 +63,11 @@ public extension ReminderModel {
     final class Input {
         public internal(set) var time: ReminderTime?
         public internal(set) var authorization: NotificationAuthorization
-        public internal(set) var isLoaded = false
 
         public let hint = SettingsFoldInput.hint(.reminder)
 
         var lastTime: ReminderTime
-        var notifications: NotificationInput?
+        var notifications: Loadable<NotificationInput> = .loading
 
         let today: LocalDate
 
@@ -140,14 +139,14 @@ public extension ReminderModel {
 
         if let (time, notifications) = loaded {
             input.time = time
-            input.notifications = notifications
+            input.notifications = .loaded(notifications)
             input.lastTime = time ?? input.lastTime
         } else {
             state.errorNotice.show(Self.loadFailedMessage)
+            input.notifications = .failed
         }
 
         input.authorization = authorization
-        input.isLoaded = true
     }
 
     func setOn(_ isOn: Bool) async {
@@ -185,6 +184,10 @@ private extension ReminderModel {
 }
 
 public extension ReminderModel.Output {
+    var isSettled: Bool {
+        input.notifications.isSettled
+    }
+
     var isOn: Bool {
         input.time != nil
     }
@@ -194,7 +197,7 @@ public extension ReminderModel.Output {
     }
 
     var upcomingNotices: [PlannedNotification] {
-        guard let notifications = input.notifications else {
+        guard let notifications = input.notifications.value else {
             return []
         }
 

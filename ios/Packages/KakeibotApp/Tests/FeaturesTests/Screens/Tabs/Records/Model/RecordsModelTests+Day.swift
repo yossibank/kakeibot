@@ -188,7 +188,7 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(!model.state.isConfirmingDelete)
+        #expect(!model.state.prompt.isShowing(.delete))
         #expect(deleted == [firstNine])
 
         deleted = []
@@ -197,13 +197,13 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(model.state.isConfirmingDelete)
+        #expect(model.state.prompt.isShowing(.delete))
         #expect(model.output.pendingDeleteCount == 10)
         #expect(deleted.isEmpty)
 
         model.state.cancelDelete()
 
-        #expect(!model.state.isConfirmingDelete)
+        #expect(!model.state.prompt.isShowing(.delete))
         #expect(deleted.isEmpty)
 
         model.state.requestDelete(ids) {
@@ -214,7 +214,7 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(!model.state.isConfirmingDelete)
+        #expect(!model.state.prompt.isShowing(.delete))
         #expect(deleted == [ids])
     }
 }

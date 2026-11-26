@@ -35,7 +35,7 @@ public struct ReminderView: View {
         .animation(.snappy, value: model.output.isDenied)
         .animation(.snappy, value: isPickingTime)
         .animation(.snappy, value: model.state.previewDay)
-        .transaction(value: model.input.isLoaded) { transaction in
+        .transaction(value: model.output.isSettled) { transaction in
             transaction.disablesAnimations = true
         }
         .haptic(.selection, trigger: model.input.time)
