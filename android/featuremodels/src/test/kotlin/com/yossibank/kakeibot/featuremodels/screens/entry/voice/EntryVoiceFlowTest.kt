@@ -1,7 +1,13 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.voice
 
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.isDateFromVoice
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.isMemoFromVoice
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.isWalletFromVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.loadedModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.store
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallets
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceResult.Outcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.support.ModelTestDatabase
@@ -35,6 +41,74 @@ class EntryVoiceFlowTest {
     @After
     fun resetMain() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun appliesSpokenFieldsAndUndoesThem() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        val wallet = model.output.wallets.last()
+        val source = FakeVoiceSource()
+        val flow = voiceFlow(source)
+
+        flow.start(model, today = setup.today)
+        source.say("昨日コンビニで980円、${wallet.name}で")
+        val previewAmount = flow.output.listening?.preview?.amount
+        flow.finish()
+
+        assertEquals(980, previewAmount)
+        assertEquals(980, model.output.amount)
+        assertEquals(setup.today.adding(days = -1), model.state.form.date)
+        assertEquals(wallet.id, model.state.form.walletId)
+        assertEquals("コンビニ", model.state.store)
+        assertTrue(model.output.isDateFromVoice)
+        assertTrue(model.output.isWalletFromVoice)
+        assertTrue(model.output.isMemoFromVoice)
+        assertEquals(Outcome.Applied, flow.state.notice?.outcome)
+        assertEquals(4, flow.state.notice?.count)
+        assertEquals("声から 4 つ入れました", flow.state.notice?.title)
+        assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
+        assertTrue(source.isFinished)
+
+        flow.undoLast(model)
+
+        assertEquals(0, model.output.amount)
+        assertEquals(setup.today, model.state.form.date)
+        assertEquals("", model.state.form.memo)
+        assertFalse(model.output.isDateFromVoice)
+        assertNull(flow.state.notice)
+    }
+
+    @Test
+    fun keepsKeypadOpenWhenAmountIsMissing() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        val source = FakeVoiceSource()
+        val flow = voiceFlow(source)
+
+        flow.start(model, today = setup.today)
+        source.say("昨日のコンビニ")
+        flow.finish()
+
+        assertEquals(0, model.output.amount)
+        assertEquals(setup.today.adding(days = -1), model.state.form.date)
+        assertEquals(EntryModel.Field.Amount, model.state.field)
+        assertEquals(Outcome.MissingAmount, flow.state.notice?.outcome)
+        assertEquals("「昨日のコンビニ」", flow.state.notice?.message)
+        assertEquals(false, flow.state.notice?.canUndo)
+        assertNull(flow.state.undo)
+    }
+
+    @Test
+    fun tellsWhenNothingWasHeard() = modelTest(today = "2026-10-12") { setup ->
+        val model = setup.loadedModel()
+        val flow = voiceFlow(FakeVoiceSource())
+
+        flow.start(model, today = setup.today)
+        flow.finish()
+
+        assertEquals(Outcome.Unheard, flow.state.notice?.outcome)
+        assertEquals("聞き取れませんでした", flow.state.notice?.title)
+        assertNull(flow.state.notice?.message)
+        assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
     }
 
     @Test

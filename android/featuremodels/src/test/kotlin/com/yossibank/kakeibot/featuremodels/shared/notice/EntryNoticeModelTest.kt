@@ -3,12 +3,14 @@ package com.yossibank.kakeibot.featuremodels.shared.notice
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.item
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.loadedModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.press
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.transferModel
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.store.queries.methods.entryList
 import com.yossibank.kakeibot.store.queries.methods.noSpendDayUpdates
+import com.yossibank.kakeibot.store.writes.methods.entryItems
 import com.yossibank.kakeibot.store.writes.methods.markNoSpendDay
 import kotlinx.coroutines.flow.first
 import org.junit.Test
@@ -72,6 +74,31 @@ class EntryNoticeModelTest {
         assertTrue(deleted.isEmpty())
         assertEquals(listOf(saved.id), entries.map { it.id })
         assertEquals(listOf(980), entries.map { it.amount })
+    }
+
+    @Test
+    fun restoresItemsWhenUndoingDelete() = modelTest(today = "2026-10-12") { setup ->
+        val notice = EntryNoticeModel(setup.parts)
+
+        val saved = setup.save(
+            type = Entry.Kind.expense,
+            amount = 980,
+            on = setup.today,
+            items = listOf(item("牛乳", 396), item("食パン", 220)),
+        )
+
+        val model = setup.loadedModel(editing = saved.id)
+
+        model.delete()
+        val change = model.change
+        val deleted = setup.database.entryItems(of = saved.id)
+        notice.show(change)
+        notice.undo()
+        val restored = setup.database.entryItems(of = saved.id)
+
+        assertTrue(deleted.isEmpty())
+        assertEquals(listOf("牛乳", "食パン"), restored.map { it.name })
+        assertEquals(listOf(396, 220), restored.map { it.amount })
     }
 
     @Test

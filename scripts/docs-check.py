@@ -16,7 +16,10 @@ MAKE = re.compile(r"`make ([a-z][a-z-]*)")
 TARGET = re.compile(r"^([a-z][a-z-]*):", re.M)
 TEST_TARGET = re.compile(r"\.testTarget\(\s*name:\s*\"([^\"]+)\"")
 SAMPLES = {"export/export-v1.json"}
-DOC = os.path.join(ROOT, "docs", "architecture-packages.md")
+TREE_DOCS = [
+    os.path.join(ROOT, "docs", name)
+    for name in ("architecture-packages.md", "architecture-packages-app.md")
+]
 
 errors = []
 anchors = {}
@@ -84,7 +87,7 @@ def check_trees(path, lines):
     for number, line in enumerate(lines, 1):
         if FENCE.match(line):
             fenced = not fenced
-            close(stack, 0)
+            close(path, stack, 0)
             continue
         if not fenced:
             continue
@@ -98,7 +101,7 @@ def check_trees(path, lines):
         if not match:
             continue
         depth = len(match.group(1)) // 4 + 1
-        close(stack, depth)
+        close(path, stack, depth)
         parent = stack[-1][0]
         first = match.group(2).split("/")[0]
         stack[-1][2].append(first)
@@ -107,10 +110,10 @@ def check_trees(path, lines):
             error(path, number, f"木のフォルダが無い: {os.path.relpath(full, ROOT)}")
         if match.group(2).count("/") == 1:
             stack.append((full, number, []))
-    close(stack, 0)
+    close(path, stack, 0)
 
 
-def close(stack, depth):
+def close(path, stack, depth):
     while len(stack) > depth:
         folder, number, listed = stack.pop()
         if not listed or not os.path.isdir(folder):
@@ -121,7 +124,7 @@ def close(stack, depth):
         )
         for name in actual:
             if name not in listed:
-                error(DOC, number, f"木に無いフォルダ: {os.path.relpath(os.path.join(folder, name), ROOT)}")
+                error(path, number, f"木に無いフォルダ: {os.path.relpath(os.path.join(folder, name), ROOT)}")
 
 
 def check_make(path, text, targets):
@@ -186,7 +189,8 @@ def main():
         lines = text.split("\n")
         check_links(path, lines)
         check_make(path, text, targets)
-    check_trees(DOC, open(DOC, encoding="utf-8").read().split("\n"))
+    for path in TREE_DOCS:
+        check_trees(path, open(path, encoding="utf-8").read().split("\n"))
     check_fixtures()
     check_test_plan()
     print("\n".join(errors))

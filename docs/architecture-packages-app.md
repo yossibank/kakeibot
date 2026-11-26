@@ -1,12 +1,78 @@
 # KakeibotApp のフォルダ
 
 > [!NOTE]
-> KakeibotApp のフォルダごとの中身が分かる。
-> 依存の向きとフォルダの木と KakeibotKit は [architecture-packages](architecture-packages.md) にある。
+> KakeibotApp のフォルダの木と、フォルダごとの中身が分かる。
+> 依存の向きと KakeibotKit は [architecture-packages](architecture-packages.md) にある。
 
 ## 📂 フォルダの中身
 
-[architecture-packages の木](architecture-packages.md#kakeibotapp)のフォルダごとの中身は、次のとおり。
+KakeibotApp のフォルダは、次の木のとおりである。
+
+```text
+KakeibotApp/
+├── Sources/
+│   ├── AppFeature/
+│   │   ├── App/
+│   │   ├── Bridge/
+│   │   └── Main/
+│   ├── AppWidget/
+│   │   ├── Intents/
+│   │   ├── Shared/
+│   │   └── Widgets/
+│   │       ├── Budget/
+│   │       ├── EntryControl/
+│   │       └── QuickRecord/
+│   ├── DesignSystem/
+│   │   ├── Components/
+│   │   └── Theme/
+│   ├── FeatureModels/
+│   │   ├── Screens/
+│   │   │   ├── Entry/
+│   │   │   ├── Main/
+│   │   │   ├── Onboarding/
+│   │   │   ├── Pro/
+│   │   │   ├── Settings/
+│   │   │   └── Tabs/
+│   │   └── Shared/
+│   │       ├── Bill/
+│   │       ├── DateChoice/
+│   │       ├── EntryList/
+│   │       ├── Model/
+│   │       ├── Notice/
+│   │       ├── Notification/
+│   │       ├── Period/
+│   │       ├── Pro/
+│   │       ├── SettingsParts/
+│   │       ├── Setup/
+│   │       └── Stamp/
+│   ├── Features/
+│   │   ├── Screens/
+│   │   │   ├── Entry/
+│   │   │   ├── Onboarding/
+│   │   │   ├── Pro/
+│   │   │   ├── Settings/
+│   │   │   ├── Tabs/
+│   │   │   └── WhatsNew/
+│   │   └── Shared/
+│   │       ├── Bill/
+│   │       ├── DateChoice/
+│   │       ├── FeatureArt/
+│   │       ├── Model/
+│   │       ├── Notice/
+│   │       ├── Notification/
+│   │       ├── Period/
+│   │       ├── Placeholder/
+│   │       ├── Pro/
+│   │       ├── SettingsParts/
+│   │       ├── Setup/
+│   │       ├── Stamp/
+│   │       └── Wallet/
+│   ├── Notifications/
+│   └── Sync/
+└── Tests/
+```
+
+フォルダごとの中身は、次のとおり。
 
 | フォルダ | 中身 |
 | --- | --- |

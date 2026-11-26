@@ -1,8 +1,8 @@
 # パッケージの構成
 
 > [!NOTE]
-> 2 つのパッケージの依存の向きと、フォルダの木と、KakeibotKit のフォルダの中身が分かる。
-> KakeibotApp のフォルダの中身は [architecture-packages-app](architecture-packages-app.md) にある。
+> 2 つのパッケージの依存の向きと、KakeibotKit のフォルダの木と中身が分かる。
+> KakeibotApp のフォルダの木と中身は [architecture-packages-app](architecture-packages-app.md) にある。
 > 全体の構成は [architecture](architecture.md)、名前の決まりは [architecture-naming](architecture-naming.md) にある。
 
 ## 📦 パッケージ
@@ -138,70 +138,4 @@ KakeibotKit/
 
 ### KakeibotApp
 
-KakeibotApp のフォルダは、次の木のとおりである。
-
-```text
-KakeibotApp/
-├── Sources/
-│   ├── AppFeature/
-│   │   ├── App/
-│   │   ├── Bridge/
-│   │   └── Main/
-│   ├── AppWidget/
-│   │   ├── Intents/
-│   │   ├── Shared/
-│   │   └── Widgets/
-│   │       ├── Budget/
-│   │       ├── EntryControl/
-│   │       └── QuickRecord/
-│   ├── DesignSystem/
-│   │   ├── Components/
-│   │   └── Theme/
-│   ├── FeatureModels/
-│   │   ├── Screens/
-│   │   │   ├── Entry/
-│   │   │   ├── Main/
-│   │   │   ├── Onboarding/
-│   │   │   ├── Pro/
-│   │   │   ├── Settings/
-│   │   │   └── Tabs/
-│   │   └── Shared/
-│   │       ├── Bill/
-│   │       ├── DateChoice/
-│   │       ├── EntryList/
-│   │       ├── Model/
-│   │       ├── Notice/
-│   │       ├── Notification/
-│   │       ├── Period/
-│   │       ├── Pro/
-│   │       ├── SettingsParts/
-│   │       ├── Setup/
-│   │       └── Stamp/
-│   ├── Features/
-│   │   ├── Screens/
-│   │   │   ├── Entry/
-│   │   │   ├── Onboarding/
-│   │   │   ├── Pro/
-│   │   │   ├── Settings/
-│   │   │   ├── Tabs/
-│   │   │   └── WhatsNew/
-│   │   └── Shared/
-│   │       ├── Bill/
-│   │       ├── DateChoice/
-│   │       ├── FeatureArt/
-│   │       ├── Model/
-│   │       ├── Notice/
-│   │       ├── Notification/
-│   │       ├── Period/
-│   │       ├── Placeholder/
-│   │       ├── Pro/
-│   │       ├── SettingsParts/
-│   │       ├── Setup/
-│   │       ├── Stamp/
-│   │       └── Wallet/
-│   ├── Notifications/
-│   └── Sync/
-└── Tests/
-```
-
-KakeibotApp のフォルダごとの中身は、[architecture-packages-app](architecture-packages-app.md) にある。
+KakeibotApp のフォルダの木と中身は、[architecture-packages-app](architecture-packages-app.md) にある。

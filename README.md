@@ -54,8 +54,8 @@ flowchart LR
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | どう作るか | [docs/architecture.md](docs/architecture.md) |
 | 道具とコマンド | [docs/development.md](docs/development.md) |
-| パッケージの依存とフォルダの木 | [docs/architecture-packages.md](docs/architecture-packages.md) |
-| KakeibotApp のフォルダの中身 | [docs/architecture-packages-app.md](docs/architecture-packages-app.md) |
+| パッケージの依存と KakeibotKit のフォルダの木 | [docs/architecture-packages.md](docs/architecture-packages.md) |
+| KakeibotApp のフォルダの木と中身 | [docs/architecture-packages-app.md](docs/architecture-packages-app.md) |
 | 名前とファイルの置き場所 | [docs/architecture-naming.md](docs/architecture-naming.md) |
 | Android の構成 | [docs/architecture-android.md](docs/architecture-android.md) |
 | Android の画面とモデル | [docs/architecture-android-app.md](docs/architecture-android-app.md) |

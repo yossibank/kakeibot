@@ -19,7 +19,8 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | --- | --- |
 | `android/` | Android の Gradle のプロジェクト。中身は [architecture-android](architecture-android.md) にある |
 | `android/.editorconfig` | claude-config の `kotlin-core.md` に合わせた ktlint の設定。`make format` と pre-commit で直し、`make verify` で確かめる |
-| `scripts/docs-check.py` | 文書と実物の一致を確かめ、`make verify-docs` で走る。リンク先とその見出し、Makefile の入口、[architecture-packages](architecture-packages.md) の木を見る |
+| `scripts/docs-check.py` | 文書と実物の一致を確かめ、`make verify-docs` で走る。リンク先とその見出し、Makefile の入口を見る |
+| `scripts/docs-check.py` のフォルダの木 | [architecture-packages](architecture-packages.md) と [architecture-packages-app](architecture-packages-app.md) の木を見る |
 | `scripts/docs-check.py` の fixtures | fixtures の `description` と `summary` も見る |
 | `scripts/docs-check.py` のテストプラン | `Package.swift` のテストのターゲットと、テストプランの中身が一致するかも見る |
 | `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数かを確かめ、`make verify` で走る。2 以下と、式の中の値は見ない |
@@ -68,7 +69,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## 📦 パッケージ
 
-2 つのパッケージの依存の向きとフォルダの木は、[architecture-packages](architecture-packages.md) にある。KakeibotApp のフォルダの中身は、[architecture-packages-app](architecture-packages-app.md) にある。
+依存の向きと KakeibotKit のフォルダの木は、[architecture-packages](architecture-packages.md) にある。KakeibotApp のフォルダの木と中身は、[architecture-packages-app](architecture-packages-app.md) にある。
 
 ## 🧪 テスト
 
