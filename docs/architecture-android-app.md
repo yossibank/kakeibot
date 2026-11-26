@@ -26,7 +26,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `Keypad` の演算の記号 | `amount/AmountCalculatorOperationSymbol.kt` |
 | `FeeChoiceRow.defaultChoices` | `amount/FeeChoiceRow.kt` の `object FeeChoiceRow`。Composable は `designsystem/components/row/` に残す |
 | `Weekday+Name` | `datechoice/WeekdayName.kt` |
-| 無い | `notice/UndoNoticeState.kt`。取り消しの知らせの状態で、Android だけにある。モデルの `State` に置く |
+| 無い | `notice/UndoNoticeState.kt`。入力のシートの品目の取り消しだけが使う |
 | Features の `Deletion+Notice` の文 | `notice/DeletionNotice.kt`。削除の知らせの文を出す |
 | FeatureModels の `EntryNoticeModel`・`EntryChange` | `notice/` の同じ名前のファイル。知らせを消す時を数える `Timer` も、`State` に置く |
 
@@ -82,7 +82,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 下書きの決まり | 口座・カテゴリ・日付を変えたときの消し込みは、下書きの型の関数に置く |
 | 保存と読み込みの失敗 | `featuremodels/shared/model/` の `ModelTask` に通す。失敗の文と実行中かどうかを、`State` の `task` に持つ |
 | 失敗の知らせの消え方 | 押すか、出してから 6 秒たつと消える。入力を変えても、後で成功しても消さない |
-| 知らせを消すまでの秒 | 画面が `task.Timer()` で数える |
+| 知らせを消すまでの秒 | 失敗の知らせは画面の `task.Timer()` が、取り消しの知らせは `UndoNotice` が数える |
 | 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「端末の空き容量が足りません」に替える |
 | 端末の呼び名 | スマホとタブレットを呼び分けず、「端末」と書く。声の入力の案内も同じ語を使う |
 | 見張りの失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、それでも読めなければ `task` に文を出す |
@@ -92,8 +92,9 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 記録の一覧の見張り | `MainView` が 1 本を共有し、`ScreenParts` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 共有した見張りの持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
 | 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
-| タブの記録の一覧の失敗 | 4 つのタブのモデルは、記録の一覧を読めなかった時に `state.isListFailed` を立てる。見張りを始め直す時に下ろす |
+| 読み込みの段階 | `Loadable` で持つ。`task.observe` の `into` に渡すと、読めない時に `Failed` を入れる |
 | 見張りの回 | `MainModel` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
+| タブの外枠 | `features/shared/tab/` の `TabScreen`。見張り・知らせの時間・失敗の画面を持つ |
 | 記録の知らせ | `MainView` が `EntryNoticeModel` を持ち、タブの上に出す。`EntrySheet` が閉じる時に、結果の変更を渡す |
 | 知らせの入れ替え | 記録の知らせが出ると、`MainModel` の `noticeRound` を進める。タブは `TabNoticeRound` で、失敗の知らせを消す |
 | タブの失敗の知らせ | `TabNoticeRound` が `LocalTabNoticeShown` を呼び、出ている記録の知らせを消す |
@@ -131,7 +132,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 二度押し | 保存・削除・非表示は、`task` が動いている間は受けない |
 | 画面の側 | `features/shared/model/` の `EditSheet` を書く。確認と戻るを持ち、結果で `onSaved`・`onClose` などを呼ぶ |
 | 当てた画面 | 固定費の編集・テンプレートの追加・予算の数字の引き出し |
-| 取り消しの知らせ | モデルが、`state` の `UndoNoticeState` に出す。予算と固定費の一覧が当たる |
+| 取り消しの知らせ | モデルが、`state` の `UndoNotice` に出す。予算と固定費の一覧が当たる |
+| 子の画面の結果 | 親のモデルの `receive`・`receiveHidden` に渡す |
 | 入力の結果 | `EntryModel.Outcome` の `Closed` と `Continued` が、`EntryChange` を持つ |
 | 残す `rememberCoroutineScope` | `designsystem` の動きだけが持つ。画面のファイルには書かない |
 

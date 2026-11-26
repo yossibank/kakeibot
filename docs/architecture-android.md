@@ -136,7 +136,7 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 | 仕組み | 中身 |
 | --- | --- |
-| `featuremodels/shared/model/` の `ScreenParts` | DB・時計・記録の一覧の見張りを包んで、画面からモデルへ渡す。DB と見張りは `internal` で、`:app` から読めない |
+| `featuremodels/shared/model/` の `ScreenParts` | DB・時計・待ち（`ScreenWait`）・記録の一覧の見張りを包んで、画面からモデルへ渡す。DB と見張りは `internal` で、`:app` から読めない |
 | `ScreenParts` を作る所 | `AppModel` が DB を開いた時に作り、`RootView` が `MainView` に渡す。画面は、子の画面とモデルへそのまま渡す |
 | `ScreenPartsShared` | 記録の一覧の見張りを 1 本にまとめた `ScreenParts` を作る。`MainView` が持ち、消える時に止める |
 | `:store` の型 | 画面は名前を書かず、モデルの値と関数に通す |
@@ -155,7 +155,7 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
 | 下からせり上がる全画面の層 | `designsystem/components/modal/` の `SheetLayer`。閉じる動きの間は、最後の中身を出す |
 | 失敗の知らせ | `designsystem/components/notice/` の `NoticeBanner`。タブの画面は、題のすぐ下に出す |
-| 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`LoadFailedColumn` で画面の全体に出す |
+| 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`TabScreen` の `LoadFailedColumn` で画面の全体に出す |
 | 記録が無い時の表示 | `features/shared/placeholder/` の `PlaceholderEmpty`。記録するボタンを付けられる |
 | 振替の経路 | `designsystem/components/entry/` の `EntryRoute`。記録の行が、タグの札と一緒に出す |
 | 記録の行のメモ | `designsystem/components/entry/` の `EntryMemo`。左に線を引き、2 行を超えると押して開く |
@@ -175,9 +175,10 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | --- | --- |
 | `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
 | `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
-| `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `SettingsHideNotice` と、削除の知らせに分かれる |
+| `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `undoNotice` と `deletionNotice` に分かれる |
+| `shared/tab/TabScreen.kt` | タブの外枠。iOS の `tabScreen` は今日と失敗の画面だけを持ち、見張りは `MainView` が持つ |
 | `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
-| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainModel` が番号を持ち、タブに配らない |
+| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainModel` の `ObservationRound` が全部のタブを見張り、タブに配らない |
 | `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
 | `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |
 
