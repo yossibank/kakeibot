@@ -150,45 +150,58 @@ private fun BoardRow(
                 val y = if (isLifted) lift.y else target.toPx()
                 IntOffset(0, y.roundToInt())
             }.scale(if (isLifted) 1.03f else 1f),
-        contentModifier = Modifier
-            .pointerInput(row.id) {
-                detectDragGesturesAfterLongPress(
-                    onDragStart = { touch ->
-                        actions.onOpen(null)
-
-                        lift.start(
-                            id = row.id,
-                            top = model.output.rows.indexOfFirst { it.id == row.id } * slot,
-                            touch = touch,
-                        )
-                    },
-                    onDragEnd = {
-                        val hiding = lift.end()
-
-                        if (hiding != null) {
-                            model.state.cancelMoving()
-                            actions.onHide(hiding)
-                        } else {
-                            model.perform { it.finishMoving() }
-                        }
-                    },
-                    onDragCancel = {
-                        lift.cancel()
-                        model.state.cancelMoving()
-                    },
-                ) { change, amount ->
-                    change.consume()
-
-                    val position = lift.drag(
-                        amount = amount,
-                        slot = slot,
-                    )
-
-                    model.move(row.id, to = position)
-                }
-            },
+        contentModifier = Modifier.liftDrag(
+            model = model,
+            lift = lift,
+            row = row,
+            slot = slot,
+            actions = actions,
+        ),
     ) {
         RecurringRowCard(row = row)
+    }
+}
+
+private fun Modifier.liftDrag(
+    model: RecurringListModel,
+    lift: RecurringLift,
+    row: RecurringRow,
+    slot: Float,
+    actions: RecurringRowActions,
+): Modifier = pointerInput(row.id) {
+    detectDragGesturesAfterLongPress(
+        onDragStart = { touch ->
+            actions.onOpen(null)
+
+            lift.start(
+                id = row.id,
+                top = model.output.rows.indexOfFirst { it.id == row.id } * slot,
+                touch = touch,
+            )
+        },
+        onDragEnd = {
+            val hiding = lift.end()
+
+            if (hiding != null) {
+                model.state.cancelMoving()
+                actions.onHide(hiding)
+            } else {
+                model.perform { it.finishMoving() }
+            }
+        },
+        onDragCancel = {
+            lift.cancel()
+            model.state.cancelMoving()
+        },
+    ) { change, amount ->
+        change.consume()
+
+        val position = lift.drag(
+            amount = amount,
+            slot = slot,
+        )
+
+        model.move(row.id, to = position)
     }
 }
 

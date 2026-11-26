@@ -85,78 +85,19 @@ fun SettingsIntroCard(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .border(
-                            width = 1.dp,
-                            color = Palette.accent.opacity(Emphasis.Muted),
-                            shape = CircleShape,
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                        tint = Palette.accent,
-                    )
-                }
-
-                Column(modifier = Modifier.weight(1f)) {
-                    listOf(headline.first, headline.second).forEach { line ->
-                        FittedText(
-                            text = line,
-                            color = Palette.accentStrong,
-                            style = displayFont(
-                                size = FontSize.Body,
-                                weight = FontWeight.Medium,
-                            ),
-                        )
-                    }
-                }
-
-                RoundIconButton(
-                    icon = R.drawable.ic_close,
-                    onSelect = {
-                        model.perform {
-                            it.setFold(
-                                fold = fold,
-                                isClosed = true,
-                            )
-                        }
-                    },
-                )
-            }
+            IntroHeader(
+                icon = icon,
+                headline = headline,
+                fold = fold,
+                model = model,
+            )
 
             if (notes.isNotEmpty()) {
                 SettingsDivider()
 
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     notes.forEach { note ->
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                painter = painterResource(note.icon),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(18.dp)
-                                    .rotate(note.rotation),
-                                tint = Palette.accent,
-                            )
-
-                            FittedText(
-                                text = note.text,
-                                color = Palette.text,
-                                style = textFont(style = FontTextStyle.Footnote),
-                            )
-                        }
+                        NoteRow(note = note)
                     }
                 }
             }
@@ -184,6 +125,85 @@ fun SettingsHintButton(
                     )
                 }
             },
+        )
+    }
+}
+
+@Composable
+private fun IntroHeader(
+    icon: Int,
+    headline: Pair<String, String>,
+    fold: SettingsFoldInput,
+    model: SettingsFoldModel,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .border(
+                    width = 1.dp,
+                    color = Palette.accent.opacity(Emphasis.Muted),
+                    shape = CircleShape,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = Palette.accent,
+            )
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            listOf(headline.first, headline.second).forEach { line ->
+                FittedText(
+                    text = line,
+                    color = Palette.accentStrong,
+                    style = displayFont(
+                        size = FontSize.Body,
+                        weight = FontWeight.Medium,
+                    ),
+                )
+            }
+        }
+
+        RoundIconButton(
+            icon = R.drawable.ic_close,
+            onSelect = {
+                model.perform {
+                    it.setFold(
+                        fold = fold,
+                        isClosed = true,
+                    )
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun NoteRow(note: SettingsIntroNote) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(note.icon),
+            contentDescription = null,
+            modifier = Modifier
+                .size(18.dp)
+                .rotate(note.rotation),
+            tint = Palette.accent,
+        )
+
+        FittedText(
+            text = note.text,
+            color = Palette.text,
+            style = textFont(style = FontTextStyle.Footnote),
         )
     }
 }

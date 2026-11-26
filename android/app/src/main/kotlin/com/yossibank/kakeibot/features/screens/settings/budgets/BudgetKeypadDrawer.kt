@@ -85,19 +85,7 @@ private fun ColumnScope.Drawer(model: BudgetListModel) {
     )
 
     if (model.output.suggestions.isNotEmpty()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            model.output.suggestions.forEach { suggestion ->
-                SuggestionChip(
-                    suggestion = suggestion,
-                    isSelected = model.state.calculator.amount == suggestion.amount,
-                    onSelect = { model.state.choose(suggestion) },
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
+        SuggestionRow(model = model)
     }
 
     Keypad(
@@ -136,6 +124,23 @@ private fun ColumnScope.Drawer(model: BudgetListModel) {
             color = Palette.rose,
             style = textFont(style = FontTextStyle.Footnote),
         )
+    }
+}
+
+@Composable
+private fun SuggestionRow(model: BudgetListModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        model.output.suggestions.forEach { suggestion ->
+            SuggestionChip(
+                suggestion = suggestion,
+                isSelected = model.state.calculator.amount == suggestion.amount,
+                onSelect = { model.state.choose(suggestion) },
+                modifier = Modifier.weight(1f),
+            )
+        }
     }
 }
 

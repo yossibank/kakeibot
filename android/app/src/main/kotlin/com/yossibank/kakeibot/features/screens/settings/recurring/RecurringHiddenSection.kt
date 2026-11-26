@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -45,67 +46,12 @@ fun RecurringHiddenSection(
     onShow: (Identifier<Recurring>) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .heightIn(min = 32.dp)
-                        .clickable(onClick = onToggle),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_chevron_right),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(16.dp)
-                            .rotate(if (isOpen) 90f else 0f),
-                        tint = Palette.accent,
-                    )
-
-                    Text(
-                        text = "非表示の固定費（${rows.size}）",
-                        color = Palette.accent,
-                        style = textFont(
-                            style = FontTextStyle.Caption,
-                            weight = FontWeight.SemiBold,
-                        ),
-                    )
-                }
-
-                if (isOpen) {
-                    Row(
-                        modifier = Modifier
-                            .heightIn(min = 32.dp)
-                            .clickable(onClick = onDeleteAll),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_trash),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Palette.rose,
-                        )
-
-                        Text(
-                            text = "まとめて削除",
-                            color = Palette.rose,
-                            style = textFont(style = FontTextStyle.Caption),
-                        )
-                    }
-                }
-            }
-
-            if (isOpen) {
-                Text(
-                    text = "長押しで上に動かすと戻せます",
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption2),
-                )
-            }
-        }
+        HiddenHeader(
+            count = rows.size,
+            isOpen = isOpen,
+            onToggle = onToggle,
+            onDeleteAll = onDeleteAll,
+        )
 
         if (isOpen) {
             rows.forEach { row ->
@@ -116,6 +62,94 @@ fun RecurringHiddenSection(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun HiddenHeader(
+    count: Int,
+    isOpen: Boolean,
+    onToggle: () -> Unit,
+    onDeleteAll: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            ToggleButton(
+                count = count,
+                isOpen = isOpen,
+                onToggle = onToggle,
+            )
+
+            if (isOpen) {
+                DeleteAllButton(onDeleteAll = onDeleteAll)
+            }
+        }
+
+        if (isOpen) {
+            Text(
+                text = "長押しで上に動かすと戻せます",
+                color = Palette.subtext,
+                style = textFont(style = FontTextStyle.Caption2),
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowScope.ToggleButton(
+    count: Int,
+    isOpen: Boolean,
+    onToggle: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .weight(1f)
+            .heightIn(min = 32.dp)
+            .clickable(onClick = onToggle),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_chevron_right),
+            contentDescription = null,
+            modifier = Modifier
+                .size(16.dp)
+                .rotate(if (isOpen) 90f else 0f),
+            tint = Palette.accent,
+        )
+
+        Text(
+            text = "非表示の固定費（$count）",
+            color = Palette.accent,
+            style = textFont(
+                style = FontTextStyle.Caption,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun DeleteAllButton(onDeleteAll: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .heightIn(min = 32.dp)
+            .clickable(onClick = onDeleteAll),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_trash),
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = Palette.rose,
+        )
+
+        Text(
+            text = "まとめて削除",
+            color = Palette.rose,
+            style = textFont(style = FontTextStyle.Caption),
+        )
     }
 }
 
