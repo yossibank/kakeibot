@@ -75,7 +75,7 @@
 | id | TEXT | |
 | rule_id | TEXT | |
 | date | TEXT | |
-| amount | INTEGER | その時点の額を写す |
+| amount | INTEGER | その時点の額を複製して持つ |
 | created_at | TEXT | |
 
 `(rule_id, date)` は重複禁止。

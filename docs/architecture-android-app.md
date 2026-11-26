@@ -86,20 +86,20 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 知らせを消すまでの秒 | 失敗の知らせは画面の `task.Timer()` が、取り消しの知らせは `UndoNotice` が数える |
 | 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「端末の空き容量が足りません」に替える |
 | 端末の呼び名 | スマホとタブレットを呼び分けず、「端末」と書く。声の入力の案内も同じ語を使う |
-| 見張りの失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、それでも読めなければ `task` に文を出す |
+| 監視の失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、それでも読めなければ `task` に文を出す |
 | 今の時刻 | `featuremodels/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
 | 説明カードを閉じたか | `settingsparts/hint/` の `SettingsFoldInput` を、モデルの `Input` に置く。読み書きは、`SettingsFoldModel` の `loadFold`・`setFold` に通す |
 | 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` でモデルの `setToday` を呼ぶ。`AssetsModel` だけは iOS と同じく `input.today` に持つ |
-| 記録の一覧の見張り | `MainView` が 1 本を共有し、`ScreenParts` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
-| 共有した見張りの持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
-| 共有した見張りの失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の見張りは、受け取る側がいる間は読み直し続ける |
+| 記録の一覧の監視 | `MainView` が 1 本を共有し、`ScreenParts` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
+| 共有した監視の持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
+| 共有した監視の失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の監視は、受け取る側がいる間は読み直し続ける |
 | 読み込みの段階 | `Loadable` で持つ。`task.observe` の `into` に渡すと、読めない時に `Failed` を入れる |
-| 見張りの回 | `MainModel` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
-| タブの外枠 | `features/shared/tab/` の `TabScreen`。見張り・知らせの時間・失敗の画面を持つ |
+| 監視の回 | `MainModel` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
+| タブの外枠 | `features/shared/tab/` の `TabScreen`。監視・知らせの時間・失敗の画面を持つ |
 | 記録の知らせ | `MainView` が `EntryNoticeModel` を持ち、タブの上に出す。`EntrySheet` が閉じる時に、結果の変更を渡す |
 | 知らせの入れ替え | 記録の知らせが出ると、`MainModel` の `noticeRound` を進める。タブは `TabNoticeRound` で、失敗の知らせを消す |
 | タブの失敗の知らせ | `TabNoticeRound` が `LocalTabNoticeShown` を呼び、出ている記録の知らせを消す |
-| 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて見張りを始め直す |
+| 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて監視を始め直す |
 | 開いているシート | `MainModel.Sheet` のように 1 つの sealed interface にし、`Shown` で持つ |
 | 入口のタブとシート | `featuremodels/screens/main/` の `MainModel` が持つ。通知やリンクの行き先は、`open` が開く |
 | 行き先を開く前の待ち | シートが出ていれば閉じ、`MainModel.sheetCloseDelay` だけ待ってから開く。長さは iOS と同じ 600 ミリ秒で、`SheetLayer` が下がりきる |

@@ -61,7 +61,7 @@ flowchart LR
 | Android の画面とモデル | [docs/architecture-android-app.md](docs/architecture-android-app.md) |
 | Android の画面とモデルのやり取り | [docs/architecture-android-flow.md](docs/architecture-android-flow.md) |
 | 画面の組み立て・通知とウィジェット・画面のフォルダ | [docs/architecture-screens.md](docs/architecture-screens.md) |
-| 画面とモデルのやり取り・見張り・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
+| 画面とモデルのやり取り・監視・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
 | 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | データの形 | [docs/data.md](docs/data.md) |
 | 予算・固定費・ごほうび・スタンプの表 | [docs/data-budget.md](docs/data-budget.md) |

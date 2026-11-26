@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > AppModel と MainView などの画面の組み立てと、通知とウィジェットの方式と、画面のフォルダが分かる。
-> 画面とモデルのやり取りと、見張り・起動・外から開く流れは [architecture-screens-flow](architecture-screens-flow.md) にある。
+> 画面とモデルのやり取りと、監視・起動・外から開く流れは [architecture-screens-flow](architecture-screens-flow.md) にある。
 > 全体の構成は [architecture](architecture.md) にある。
 
 ## 📱 画面の組み立て
@@ -15,7 +15,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | AppModel の持ち物 | DB を開く関数・時計・通知・Pro の窓口は、`dependencies` にまとめる。今の時刻は、その時計から受け取る |
 | DB と時計の受け渡し | AppModel が DB を開いた時に `ScreenParts` を作り、RootView が渡す。画面は、子の画面とモデルの init へそのまま渡す |
 | 子の画面に渡す `ScreenParts` | モデルから開く画面には、モデルの `childParts()` が返す |
-| MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが見張りを始め、全部を読み終えるまで起動画面を出す |
+| MainView | タブは Home・Records・Review・Assets。起動したときに全部のタブが監視を始め、全部を読み終えるまで起動画面を出す |
 | MainView のタブの切り替え | 開いたことのあるタブを重ねて持ち、見えるかどうかだけを切り替える。`TabView` は切り替えのたびに中身の大きさを測り直して重いため使わない |
 | MainView のタブの選択 | `MainModel` の `state` が持ち、`MainTabLayer` とタブの帯（`MainTabBar`）だけが読む。MainView の `body` が読むと、切り替えのたびに 4 つのタブを組み直して重いため読まない |
 | MainView のシート | 新規・編集・設定・振替・お知らせなど。テンプレート（`EntryTemplate`）・口座（`Wallet`）・固定費（`Recurring`）も開く |
@@ -24,10 +24,10 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | ReviewView の途中経過 | 今の期間では、シートに `ReviewProgressView` を出し、AI を使わない。期間が変わると、`task(id:)` で一手（`ReviewGoal`）を読み直す |
 | ReviewView の締めのレポート | 締めた期間では、シートの頭に `ReviewClosingView` を出す。中身は、開いた時の記録からコードで数える |
 | ReviewView の一手 | 今の期間が変わると、`task(id:)` で直前の期間の一手を答え合わせし、次の一手を作る。開いた締めのレポートは、setting の `review_seen_reports` に残す |
-| ReviewView のレビューの札 | 記録の数が変わると、`task(id:)` で出すかを決め直す |
+| ReviewView のレビューのカード | 記録の数が変わると、`task(id:)` で出すかを決め直す |
 | AssetsModel の集計 | MainActor の外で `AssetsSummary` を 1 つずつ組み立て、途中で届いた値は後でまとめて使う。記録の一覧・今日と集計は一緒に差し替える |
 
-記録の一覧（`EntryList`）の見張りは、`AppDatabase` が 1 つだけ持つ。見張りの型は `ValueObservation` で、見張る画面と入力シートのあいだで共有する。中身が変わらない書き込みでは、値を渡さない。
+記録の一覧（`EntryList`）の監視は、`AppDatabase` が 1 つだけ持つ。監視の型は `ValueObservation` で、監視する画面と入力シートのあいだで共有する。中身が変わらない書き込みでは、値を渡さない。
 
 月の集計（`MonthOverview`）と通知の入力（`NotificationInput`）も、この一覧から作る。ほかの表は、小さな問い合わせで足す。
 
@@ -53,7 +53,7 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | iOS のウィジェットの読み出し | AppWidget が `AppDatabase.appGroupForReading()` で DB を読むだけで開く。表の形が最新でなければ読まない |
 | iOS のウィジェットの読み出しの範囲 | 記録は、今月の 4 か月前の月初か 90 日前の早いほうからと、そこからの固定費・請求月に当たるものだけを読む |
 | iOS のウィジェットの描き方 | ホームと同じ `MonthOverview` を使う。背景は、テーマ（`ThemePalette`）の色の値から作った色で描く |
-| iOS のウィジェットの更新 | AppModel が、記録・予算・固定費・テンプレートとその並べ順・テーマの変化を見張って更新する。日付が変わるときはタイムラインで切り替える |
+| iOS のウィジェットの更新 | AppModel が、記録・予算・固定費・テンプレートとその並べ順・テーマの変化を監視して更新する。日付が変わるときはタイムラインで切り替える |
 | iOS のウィジェットの更新の間隔 | 最後の変化から 1 秒待ち、続けて変わった分を 1 回にまとめる。シートを閉じる動きと重ねないため |
 | iOS のウィジェットが読めない時 | 最初のロックの解除の前や移行の前で DB を読めない時は「アプリを開くと出ます」と出し、5 分後に読み直す |
 | すぐ記録の書き込み | 押したときだけ、AppIntent が `appGroupForWriting()` で開いて書く。通知を予約し直し、すべてのウィジェットを更新する |

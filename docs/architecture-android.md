@@ -79,7 +79,7 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 | `Store/Sync/` | 同期は Android に無いので、移さない |
 | `Store/Migrations/` | iOS の最新の形から始めるので、移さない |
 | 振り返りの一手と理由 | `ReviewComment`・`ReviewGoal` の行・読み出し・書き込みは、まだ移していない |
-| Android だけのファイル | `database/` の `AppDatabaseChecks`・`AppDatabaseObservation`。トリガーと見張りを、Room の形で足す |
+| Android だけのファイル | `database/` の `AppDatabaseChecks`・`AppDatabaseObservation`。トリガーと監視を、Room の形で足す |
 | iOS だけのファイル | `AppDatabase+Interruption`。`Database/` にある |
 
 フォルダとファイルは、次のとおりに対応させる。
@@ -89,7 +89,7 @@ DB を開く入口だけは、Room がターゲットごとに違うので分け
 | `Store/<フォルダ>/<中のフォルダ>/X.swift` | `store/<フォルダ>/<中のフォルダ>/X.kt`。フォルダの名前は小文字にする |
 | Core の型をそのまま表の行にする | 表ごとの `XRecord`（`@Entity`）と、Core の型との変換を `records/rows/` に置く |
 | `AppDatabase` の拡張 | `AppDatabase` の拡張関数（suspend） |
-| 変化を見張る `ValueObservation`（`xxxUpdates()`） | `Flow` を返す拡張関数。読む表の変化を `InvalidationTracker` で受け、読み直す |
+| 変化を監視する `ValueObservation`（`xxxUpdates()`） | `Flow` を返す拡張関数。読む表の変化を `InvalidationTracker` で受け、読み直す |
 | `removeDuplicates()` | `distinctUntilChanged()` |
 | 失敗を表す enum（`XError`）を投げる | 同じ名前の enum と、それを持つ `XException`。記録の書き込みだけは `EntryWriteError` にする |
 | 書き込みの時刻（`at:`） | 既定値を置かず、呼ぶ側が必ず渡す |
@@ -136,9 +136,9 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 
 | 仕組み | 中身 |
 | --- | --- |
-| `featuremodels/shared/model/` の `ScreenParts` | DB・時計・待ち（`ScreenWait`）・記録の一覧の見張りを包んで、画面からモデルへ渡す。DB と見張りは `internal` で、`:app` から読めない |
+| `featuremodels/shared/model/` の `ScreenParts` | DB・時計・待ち（`ScreenWait`）・記録の一覧の監視を包んで、画面からモデルへ渡す。DB と監視は `internal` で、`:app` から読めない |
 | `ScreenParts` を作る所 | `AppModel` が DB を開いた時に作り、`RootView` が `MainView` に渡す。画面は、子の画面とモデルへそのまま渡す |
-| `ScreenPartsShared` | 記録の一覧の見張りを 1 本にまとめた `ScreenParts` を作る。`MainView` が持ち、消える時に止める |
+| `ScreenPartsShared` | 記録の一覧の監視を 1 本にまとめた `ScreenParts` を作る。`MainView` が持ち、消える時に止める |
 | `:store` の型 | 画面は名前を書かず、モデルの値と関数に通す |
 | `:store` の型の別名 | 画面が名前を書く型は、`:featuremodels` に別名を置く。例は、削除の取り消しに使う `Deletion` である |
 | `make verify` の `android-features-no-store` | `features/` の下の `:store` の import を、grep で止める |
@@ -176,9 +176,9 @@ Android の `SortableRecord`・`ArchivableRecord` は、行の列だけを表す
 | `tabs/home/`・`tabs/assets/` | 4 つのタブを `model/`・`view/` にそろえて分ける。iOS のホームは分けていない |
 | `settings/menu/SettingsMenuWeekStart.kt` | 週の始まりを選ぶ画面。iOS は、設定の入口の行の中で選ぶ |
 | `settingsparts/board/SettingsUndoNotice.kt` | 非表示と削除の取り消しの知らせ。iOS は `undoNotice` と `deletionNotice` に分かれる |
-| `shared/tab/TabScreen.kt` | タブの外枠。iOS の `tabScreen` は失敗の画面だけを持ち、今日と見張りは `MainView` が持つ |
+| `shared/tab/TabScreen.kt` | タブの外枠。iOS の `tabScreen` は失敗の画面だけを持ち、今日と監視は `MainView` が持つ |
 | `tabs/records/view/RecordsDayCard.kt` | 記録の 1 日分のカード。iOS は `RecordsView+Day`・`RecordsView+DayHeader` に置く |
-| `shared/observation/LocalObservationRound.kt` | 見張りの回を配る。iOS は `MainModel` の `ObservationRound` が全部のタブを見張り、タブに配らない |
+| `shared/observation/LocalObservationRound.kt` | 監視の回を配る。iOS は `MainModel` の `ObservationRound` が全部のタブを監視し、タブに配らない |
 | `tabs/review/parts/ReviewTextColor.kt` | `ReviewText` の色。文は `:featuremodels` の `ReviewText` にあり、iOS は 1 つの型に置く |
 | `RecurringPanelBody`・`SegmentSwitch`・`DeleteDialog`・`DiscardDialog` | Compose で書くために足した部品。iOS に同じ名前の型は無い |
 

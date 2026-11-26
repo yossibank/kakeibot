@@ -92,7 +92,7 @@ KakeibotApp/
 | `FeatureModels/Shared/Bill/` | これからの引き落としを月のページに分ける |
 | `FeatureModels/Shared/DateChoice/` | 休日のずらしと曜日の表示の名前 |
 | `FeatureModels/Shared/EntryList/` | 記録の一覧の検索と絞り込み、一覧の行に出す値、記録で選べるカテゴリ・タグ・アイコンと、口座の見出しの言葉 |
-| `FeatureModels/Shared/Model/` | 画面のモデルの見張り（失敗で見張り直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、時計と待ち、値を覚える `Derived`・`DerivedTable` も置く |
+| `FeatureModels/Shared/Model/` | 画面のモデルの監視（失敗で監視し直す）、読み込みと知らせの状態、文言に出す端末の名前（iPhone か iPad）。設定を失敗で戻す形、時計と待ち、値を覚える `Derived`・`DerivedTable` も置く |
 | `FeatureModels/Shared/Model/` の `ScreenOutcome` | 保存できた・消した、の結果をモデルの `state` に置く型 |
 | `FeatureModels/Shared/Model/` の `ScreenParts` | DB と時計と待ち（`ScreenWait`）を包んで、画面からモデルへ渡す型。中の DB は `FeatureModels` だけが読む |
 | `FeatureModels/Shared/Notice/` | 記録・削除の知らせのモデルと、削除の取り消し（`DeletionUndo`）。保存の失敗が空き容量不足かの見分けも置く |

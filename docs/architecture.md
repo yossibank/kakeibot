@@ -80,7 +80,7 @@ claude-config の並びの検査が見送る、今ある並びの外れを持つ
 | --- | --- | --- |
 | アプリアイコン | Icon Composer の `AppIcon.icon`（ホワイト） | |
 | アイコンの色違い | 設定で選べる色違いは、同じフォルダの `AppIcon-<色>.icon` | |
-| アイコンの見本 | `Assets.xcassets` の `AppIconYen`・`AppIconDial`。設定の見本に描く、アイコンと同じ絵の写し | |
+| アイコンの見本 | `Assets.xcassets` の `AppIconYen`・`AppIconDial`。設定の見本に描く、アイコンと同じ絵の複製 | |
 | 同梱のフォント | `Kakeibot/Fonts` の TTF と、そのライセンスの文。Info.plist の `UIAppFonts` で読む | アプリのものを `WidgetFonts` で読む |
 | Pro の商品 | ID は `com.yossibank.kakeibot.pro`（買い切り、ファミリー共有あり）。手元で試す設定は `ios/Kakeibot.storekit` | |
 | カメラ | 撮る許可の文は、ビルド設定の `INFOPLIST_KEY_NSCameraUsageDescription` に置く | |

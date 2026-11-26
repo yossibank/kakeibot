@@ -34,7 +34,7 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 | 機能・画面を足す | overview、roadmap、architecture-parts | overview、roadmap、architecture-screens の「画面とフォルダ」 |
 | iOS のターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | architecture、architecture-packages、architecture-packages-app、architecture-naming | 先に読む文書のすべて |
 | Android のモジュール・依存・フォルダを変える、ファイルを足す・名前を変える | iOS の行の文書も読む。architecture-android、architecture-android-app、architecture-android-flow | 先に読む文書のすべて |
-| 画面の組み立て・見張り・通知とウィジェットの流れを変える | architecture-screens、architecture-screens-flow | architecture-screens、architecture-screens-flow |
+| 画面の組み立て・監視・通知とウィジェットの流れを変える | architecture-screens、architecture-screens-flow | architecture-screens、architecture-screens-flow |
 | 表の形を変える | data、data-budget、data-settings、data-sync | 変えた表の文書。書き出しに響くなら export-format も |
 | 書き出しの形式を変える | export-format | export-format |
 | fixtures を足す・変える | fixtures | fixtures |

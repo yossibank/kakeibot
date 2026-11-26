@@ -10,12 +10,12 @@
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
-| `ScreenModel` | 画面のモデル。DB を見張り、読めなかった時は `NoticeHolding` の知らせと `Loadable` の `failed` に出す | `FeatureModels/Shared/Model/` |
+| `ScreenModel` | 画面のモデル。DB を監視し、読めなかった時は `NoticeHolding` の知らせと `Loadable` の `failed` に出す | `FeatureModels/Shared/Model/` |
 | `NoticeHolding` | エラーの知らせを持つ、モデルの状態。状態がそれだけの時は `NoticeState` を使う | `FeatureModels/Shared/Model/` |
 | `ScreenPerforming` | 画面がモデルの async の関数を呼ぶ口。`perform` が `Task` を始め、画面は `Task` を書かない | `FeatureModels/Shared/Model/` |
 | `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `FeatureModels/Shared/Model/` |
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardListModel` | 一覧を DB から読み、見張るモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardListModel` | 一覧を DB から読み、監視するモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardDatabaseModel` | `ScreenParts` だけで作れる一覧のモデル。`SettingsBoardSpec` の `makeModel()` の既定の実装を使える | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並び・知らせ・消した物（`removed`）・出している物（`shown`）を持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardInput` | 一覧のモデルの入力で、DB から読んだ一覧と、説明カード・非表示の一覧を閉じたかを持つ。それだけの時は `SettingsBoardSnapshotInput` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
@@ -24,7 +24,7 @@
 | `SettingsFoldModel` | 説明カードと非表示の一覧を閉じたかを、DB から読み書きするモデル。値は `input` の `SettingsFoldInput` に置き、モデルは `foldStore()` だけ書く | `FeatureModels/Shared/SettingsParts/Hint/` |
 | `SettingsEditSheet` | 1 件を編集する画面。モデルと、削除・非表示の受け取りだけで作れる | `Features/Shared/SettingsParts/Input/` |
 | `ScreenEditable` | 画面が書いてよい値の型の印。`State` の `public var` は、これに従う型かシートの `enum` だけにする | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `TabScreenModel` | タブ 4 つの見張りと、失敗の画面を出すかを持つ。今日は iOS の `MainView` と Kotlin の `rememberTabModel` から受ける | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `TabScreenModel` | タブ 4 つの監視と、失敗の画面を出すかを持つ。今日は iOS の `MainView` と Kotlin の `rememberTabModel` から受ける | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `EditFlowSource` | `EditFlow` に渡す元で、変わったか・問題の文・保存・非表示・削除を返す。Swift はモデルが従って `connect` し、Kotlin は入れ子の `Source` で書く | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
@@ -47,21 +47,21 @@
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
-| `SettingsBoardPage` | 設定の一覧の画面の全体で、`SettingsBoardSpec` を受け取り、モデルと見張りを持つ。行き先と確認は、モデルの `shown` から読む | `Features/Shared/SettingsParts/Board/` |
+| `SettingsBoardPage` | 設定の一覧の画面の全体で、`SettingsBoardSpec` を受け取り、モデルと監視を持つ。行き先と確認は、モデルの `shown` から読む | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardLayout` | 一覧の並びの形。`tiles`（タイル）、`swipeCards`（幅を測って置く、横に払える行）、`swipeRows`（横に払える行） | `Features/Shared/SettingsParts/Board/` |
 | `SettingsConfirmation` | 行を非表示・削除する前の確認の文言。`SettingsBoardSpec` が返す | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardDestination` | 新規と編集だけの行き先。`SettingsBoardMovingState` が使い、`SettingsBoardSpec` の既定の実装がある | `FeatureModels/Shared/SettingsParts/Board/` |
 | `SettingsBoardShown` | 一覧の画面が出している物。行き先・開いている行・確認（`SettingsBoardPrompt`）を持つ | `FeatureModels/Shared/SettingsParts/Board/` |
 | `Shown` | 出している物（シート・確認・メニュー・パネル）を 1 つの値で持つ。Swift は確認に `shown[.delete]` で `Binding` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ModelTask` | 保存などの実行中の印。`attempt` は実行中でも走らせ、二度押しは呼ぶ側が `isRunning` で止める | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `Loadable` | 読み込み中・読めた・失敗を 1 つの値で持ち、値と読んだ印を組にしない。見張り直す時は、失敗だけを読み込み中に戻す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `Loadable` | 読み込み中・読めた・失敗を 1 つの値で持ち、値と読んだ印を組にしない。監視し直す時は、失敗だけを読み込み中に戻す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `UndoNotice` | 取り消しの知らせの値と、消すまでの 4 秒を持つ。時間は `ScreenParts` の `ScreenWait` で数える | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ScreenWait` | モデルの待ちで、`after` が時間の後に処理を動かす。テストは手で進める `ManualWait` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `ObservationRound` | 見張りをやり直す回で、`MainModel` が 1 つ持つ。`restart` で進め、`each` が回ごとに見張りを始め直す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `ObservationRound` | 監視をやり直す回で、`MainModel` が 1 つ持つ。`restart` で進め、`each` が回ごとに監視を始め直す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `EditFlow` | 編集シートの流れの子のモデル。確認の `Shown`・`ModelTask`・保存の題・結果を持ち、モデルが `flow` で持つ | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `editSheet`・`EditSheet` | 編集シートの確認一式と結果の受け取り。Swift は `dismiss` を呼ぶ modifier、Kotlin は `onClose` と戻るを持つ | `Features/Shared/Model/`・`features/shared/model/` |
 | `undoNotice`・`SettingsUndoNotice` | `UndoNotice` を出す画面の部品。削除の文は、Swift は `deletionNotice` が作る | `Features/Shared/Notice/`・`features/shared/settingsparts/board/` |
-| `tabScreen`・`TabScreen` | タブの外枠で、失敗の画面を持つ。Kotlin は見張りと知らせの時間も持つ | `Features/Shared/Model/`・`features/shared/tab/` |
+| `tabScreen`・`TabScreen` | タブの外枠で、失敗の画面を持つ。Kotlin は監視と知らせの時間も持つ | `Features/Shared/Model/`・`features/shared/tab/` |
 | `SettingsBoardScreen` | `SettingsBoardPage` の中で使う、設定の一覧の外枠。説明カード・タイルの並び・追加ボタンを組む | `Features/Shared/SettingsParts/Board/` |
 | `PageSlideReader` | 頁めくりの入れ物。動きの値を中に持って中身に `PageSlideProxy` を渡し、画面は値を持たない | `DesignSystem/Components/Navigation/` |
 | `PageSlideProxy` | 頁めくりの口。`pageSlide` と `onPageSwipe` に渡し、ボタンからは `run(forward:)` で頁を送る | `DesignSystem/Components/Navigation/` |
