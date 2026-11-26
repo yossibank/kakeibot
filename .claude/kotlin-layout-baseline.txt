@@ -1,18 +1,3 @@
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/date/MonthCalendar.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/dial/HalfDial.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/entry/EntryMemo.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/entry/EntryRow.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/input/Keypad.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/modal/BottomDrawer.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/modal/UndoNotice.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/navigation/FloatingTabBar.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/row/SwipeRow.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/components/tag/TagCard.kt: K8: 1 つの関数は 60 行までにする
-android/app/src/main/kotlin/com/yossibank/kakeibot/designsystem/theme/ViewPalette.kt: K9: Composable の本体は、持つ val・派生の val・効果・組み立ての順に並べる。「持つ val」は「派生の val」より前に置く
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryDeck.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntryRecentRow.kt: K8: 1 つの関数は 60 行までにする
 android/app/src/main/kotlin/com/yossibank/kakeibot/features/screens/entry/parts/EntrySlip.kt: K8: 1 つの関数は 60 行までにする

@@ -56,8 +56,55 @@ fun <Item : Any> BottomDrawer(
         last = item
     }
 
+    Scrim(
+        isShown = item != null,
+        onClose = onClose,
+    )
+
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter,
+    ) {
+        AnimatedVisibility(
+            visible = item != null,
+            enter = slideInVertically { it },
+            exit = slideOutVertically { it },
+        ) {
+            val current = last ?: return@AnimatedVisibility
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(drawerShape)
+                    .background(Palette.backgroundTop)
+                    .border(
+                        width = 1.dp,
+                        color = Palette.accent.opacity(Emphasis.Soft),
+                        shape = drawerShape,
+                    ).pointerInput(Unit) {}
+                    .navigationBarsPadding()
+                    .padding(padding),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = horizontalAlignment,
+            ) {
+                DrawerHeader(
+                    title = title(current),
+                    onClose = onClose,
+                )
+
+                content(current)
+            }
+        }
+    }
+}
+
+@Composable
+private fun Scrim(
+    isShown: Boolean,
+    onClose: () -> Unit,
+) {
     AnimatedVisibility(
-        visible = item != null,
+        visible = isShown,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
@@ -72,55 +119,30 @@ fun <Item : Any> BottomDrawer(
                 ),
         )
     }
+}
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        AnimatedVisibility(
-            visible = item != null,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
-        ) {
-            val current = last ?: return@AnimatedVisibility
+@Composable
+private fun DrawerHeader(
+    title: String,
+    onClose: () -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        FittedText(
+            text = title,
+            modifier = Modifier.align(Alignment.Center),
+            color = Palette.accentStrong,
+            style = displayFont(size = FontSize.Body),
+        )
 
-            val shape = RoundedCornerShape(
-                topStart = Metrics.drawerCorner,
-                topEnd = Metrics.drawerCorner,
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape)
-                    .background(Palette.backgroundTop)
-                    .border(
-                        width = 1.dp,
-                        color = Palette.accent.opacity(Emphasis.Soft),
-                        shape = shape,
-                    ).pointerInput(Unit) {}
-                    .navigationBarsPadding()
-                    .padding(padding),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = horizontalAlignment,
-            ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    FittedText(
-                        text = title(current),
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Palette.accentStrong,
-                        style = displayFont(size = FontSize.Body),
-                    )
-
-                    CircleIconButton(
-                        icon = R.drawable.ic_close,
-                        onClick = onClose,
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                    )
-                }
-
-                content(current)
-            }
-        }
+        CircleIconButton(
+            icon = R.drawable.ic_close,
+            onClick = onClose,
+            modifier = Modifier.align(Alignment.CenterEnd),
+        )
     }
 }
+
+private val drawerShape = RoundedCornerShape(
+    topStart = Metrics.drawerCorner,
+    topEnd = Metrics.drawerCorner,
+)

@@ -3,6 +3,7 @@ package com.yossibank.kakeibot.designsystem.components.entry
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -48,8 +49,6 @@ fun EntryRow(
     memo: String? = null,
     isRecurring: Boolean = false,
 ) {
-    val showsMemo = tag != null || detail == null || route != null
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -57,75 +56,107 @@ fun EntryRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (icon != null) {
-            IconTile(
-                icon = icon,
-                size = 28.dp,
-            )
-        } else if (type == Entry.Kind.transfer) {
-            SymbolIcon(
-                painter = painterResource(R.drawable.ic_swap),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(28.dp)
-                    .padding(4.dp),
-                tint = Palette.accent,
-            )
-        } else {
-            Spacer(modifier = Modifier.size(28.dp))
-        }
+        LeadingIcon(
+            icon = icon,
+            type = type,
+        )
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = title,
-                    color = Palette.text,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = textFont(style = FontTextStyle.Subheadline),
-                )
-
-                if (isRecurring) {
-                    SymbolIcon(
-                        painter = painterResource(R.drawable.ic_repeat),
-                        contentDescription = null,
-                        modifier = Modifier.size(14.dp),
-                        tint = Palette.accent.opacity(Emphasis.Strong),
-                    )
-                }
-            }
-
-            Details(
-                tag = tag,
-                detail = detail,
-                memo = memo.takeIf { route == null },
-            )
-
-            if (route != null) {
-                EntryRoute(
-                    source = route.source,
-                    destination = route.destination,
-                )
-            }
-
-            if (memo != null && showsMemo) {
-                EntryMemo(text = memo)
-            }
-        }
+        Texts(
+            title = title,
+            detail = detail,
+            tag = tag,
+            route = route,
+            memo = memo,
+            isRecurring = isRecurring,
+        )
 
         AmountText(
             amount = amount,
             style = displayFont(size = FontSize.Body),
             type = type,
         )
+    }
+}
+
+@Composable
+private fun LeadingIcon(
+    icon: Icon?,
+    type: Entry.Kind,
+) {
+    if (icon != null) {
+        IconTile(
+            icon = icon,
+            size = 28.dp,
+        )
+    } else if (type == Entry.Kind.transfer) {
+        SymbolIcon(
+            painter = painterResource(R.drawable.ic_swap),
+            contentDescription = null,
+            modifier = Modifier
+                .size(28.dp)
+                .padding(4.dp),
+            tint = Palette.accent,
+        )
+    } else {
+        Spacer(modifier = Modifier.size(28.dp))
+    }
+}
+
+@Composable
+private fun RowScope.Texts(
+    title: String,
+    detail: String?,
+    tag: String?,
+    route: EntryRowItem.Route?,
+    memo: String?,
+    isRecurring: Boolean,
+) {
+    val showsMemo = tag != null || detail == null || route != null
+
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = title,
+                color = Palette.text,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = textFont(style = FontTextStyle.Subheadline),
+            )
+
+            if (isRecurring) {
+                SymbolIcon(
+                    painter = painterResource(R.drawable.ic_repeat),
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = Palette.accent.opacity(Emphasis.Strong),
+                )
+            }
+        }
+
+        Details(
+            tag = tag,
+            detail = detail,
+            memo = memo.takeIf { route == null },
+        )
+
+        if (route != null) {
+            EntryRoute(
+                source = route.source,
+                destination = route.destination,
+            )
+        }
+
+        if (memo != null && showsMemo) {
+            EntryMemo(text = memo)
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -68,33 +69,12 @@ fun <ID> SwipeRow(
     }
 
     Box(modifier = modifier.height(IntrinsicSize.Min)) {
-        Row(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
-                .graphicsLayer { alpha = (-offset.value / reach).coerceIn(0f, 1f) },
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Action(
-                title = "削除",
-                icon = R.drawable.ic_trash,
-                color = Palette.rose,
-                onSelect = {
-                    settle(isOpen = false)
-                    onDelete()
-                },
-            )
-
-            Action(
-                title = "非表示",
-                icon = R.drawable.ic_pause,
-                color = Palette.amber,
-                onSelect = {
-                    settle(isOpen = false)
-                    onHide()
-                },
-            )
-        }
+        SwipeActions(
+            opacity = { (-offset.value / reach).coerceIn(0f, 1f) },
+            onClose = { settle(isOpen = false) },
+            onDelete = onDelete,
+            onHide = onHide,
+        )
 
         Box(
             modifier = Modifier
@@ -119,6 +99,42 @@ fun <ID> SwipeRow(
         ) {
             content()
         }
+    }
+}
+
+@Composable
+private fun BoxScope.SwipeActions(
+    opacity: () -> Float,
+    onClose: () -> Unit,
+    onDelete: () -> Unit,
+    onHide: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .fillMaxHeight()
+            .graphicsLayer { alpha = opacity() },
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Action(
+            title = "削除",
+            icon = R.drawable.ic_trash,
+            color = Palette.rose,
+            onSelect = {
+                onClose()
+                onDelete()
+            },
+        )
+
+        Action(
+            title = "非表示",
+            icon = R.drawable.ic_pause,
+            color = Palette.amber,
+            onSelect = {
+                onClose()
+                onHide()
+            },
+        )
     }
 }
 

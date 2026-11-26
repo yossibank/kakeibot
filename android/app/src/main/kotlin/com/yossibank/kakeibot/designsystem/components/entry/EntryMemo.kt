@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,9 +34,11 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
@@ -57,24 +60,8 @@ fun EntryMemo(
     val canExpand = isExpanded || isTruncated
     val angle by animateFloatAsState(if (isExpanded) 270f else 90f)
     val toggleWidth = with(LocalDensity.current) { TOGGLE_WIDTH.toSp() }
-
-    val shown = buildAnnotatedString {
-        append(text)
-
-        if (isExpanded) {
-            appendInlineContent(ROOM)
-        }
-    }
-
-    val room = mapOf(
-        ROOM to InlineTextContent(
-            Placeholder(
-                width = toggleWidth,
-                height = toggleWidth / 20,
-                placeholderVerticalAlign = PlaceholderVerticalAlign.TextBottom,
-            ),
-        ) {},
-    )
+    val shown = shownText(text = text, isExpanded = isExpanded)
+    val room = roomContent(width = toggleWidth)
 
     HapticEffect(
         haptic = Haptic.Selection,
@@ -96,31 +83,10 @@ fun EntryMemo(
                 .padding(start = 8.dp)
                 .animateContentSize()
                 .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-                .drawWithContent {
-                    drawContent()
-
-                    if (isTruncated && !isExpanded) {
-                        val fade = FADE_WIDTH.toPx()
-
-                        drawRect(
-                            brush = Brush.horizontalGradient(
-                                0f to Color.Black,
-                                0.55f to Color.Transparent,
-                                startX = size.width - fade,
-                                endX = size.width,
-                            ),
-                            topLeft = Offset(
-                                x = size.width - fade,
-                                y = size.height - lineHeight,
-                            ),
-                            size = Size(
-                                width = fade,
-                                height = lineHeight,
-                            ),
-                            blendMode = BlendMode.DstIn,
-                        )
-                    }
-                },
+                .fade(
+                    isShown = { isTruncated && !isExpanded },
+                    lineHeight = { lineHeight },
+                ),
             color = Palette.subtext,
             maxLines = if (isExpanded) Int.MAX_VALUE else LINE_LIMIT,
             inlineContent = room,
@@ -132,34 +98,95 @@ fun EntryMemo(
             style = textFont(style = FontTextStyle.Caption),
         )
 
-        Box(modifier = Modifier.matchParentSize()) {
-            Box(
-                modifier = Modifier
-                    .width(2.dp)
-                    .fillMaxHeight()
-                    .background(
-                        color = Palette.accent.opacity(Emphasis.Medium),
-                        shape = CircleShape,
-                    ),
-            )
-        }
+        MemoLine()
 
         if (canExpand) {
-            Icon(
-                painter = painterResource(R.drawable.ic_chevron_right),
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .size(
-                        width = TOGGLE_WIDTH,
-                        height = 16.dp,
-                    ).padding(4.dp)
-                    .rotate(angle),
-                tint = Palette.accent,
-            )
+            ToggleMark(angle = angle)
         }
     }
 }
+
+@Composable
+private fun BoxScope.MemoLine() {
+    Box(modifier = Modifier.matchParentSize()) {
+        Box(
+            modifier = Modifier
+                .width(2.dp)
+                .fillMaxHeight()
+                .background(
+                    color = Palette.accent.opacity(Emphasis.Medium),
+                    shape = CircleShape,
+                ),
+        )
+    }
+}
+
+@Composable
+private fun BoxScope.ToggleMark(angle: Float) {
+    Icon(
+        painter = painterResource(R.drawable.ic_chevron_right),
+        contentDescription = null,
+        modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .size(
+                width = TOGGLE_WIDTH,
+                height = 16.dp,
+            ).padding(4.dp)
+            .rotate(angle),
+        tint = Palette.accent,
+    )
+}
+
+private fun Modifier.fade(
+    isShown: () -> Boolean,
+    lineHeight: () -> Float,
+): Modifier = drawWithContent {
+    drawContent()
+
+    if (isShown()) {
+        val fade = FADE_WIDTH.toPx()
+        val height = lineHeight()
+
+        drawRect(
+            brush = Brush.horizontalGradient(
+                0f to Color.Black,
+                0.55f to Color.Transparent,
+                startX = size.width - fade,
+                endX = size.width,
+            ),
+            topLeft = Offset(
+                x = size.width - fade,
+                y = size.height - height,
+            ),
+            size = Size(
+                width = fade,
+                height = height,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
+    }
+}
+
+private fun shownText(
+    text: String,
+    isExpanded: Boolean,
+): AnnotatedString = buildAnnotatedString {
+    append(text)
+
+    if (isExpanded) {
+        appendInlineContent(ROOM)
+    }
+}
+
+private fun roomContent(width: TextUnit): Map<String, InlineTextContent> = mapOf(
+    ROOM to InlineTextContent(
+        Placeholder(
+            width = width,
+            height = width / 20,
+            placeholderVerticalAlign = PlaceholderVerticalAlign.TextBottom,
+        ),
+    ) {},
+)
 
 private const val LINE_LIMIT = 2
 private const val ROOM = "room"

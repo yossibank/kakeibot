@@ -19,8 +19,8 @@ fun PaletteScene(
     style: ThemeStyle,
     content: @Composable () -> Unit,
 ) {
-    val palette = look.palette(isDark = isSystemInDarkTheme())
     val view = LocalView.current
+    val palette = look.palette(isDark = isSystemInDarkTheme())
 
     SideEffect {
         val window = (view.context as? Activity)?.window ?: return@SideEffect

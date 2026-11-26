@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.Weekday
+import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.designsystem.theme.FontSize
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.displayFont
@@ -50,59 +51,90 @@ fun MonthCalendar(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            MonthButton(
-                rotation = 180f,
-                onSelect = { month = month.adding(months = -1) },
-            )
+        MonthHeader(
+            month = month,
+            onMove = { months -> month = month.adding(months = months) },
+        )
 
-            Text(
-                text = "${month.year}年 ${month.month}月",
-                modifier = Modifier.weight(1f),
-                color = Palette.accentStrong,
-                textAlign = TextAlign.Center,
-                style = displayFont(size = FontSize.Body),
-            )
-
-            MonthButton(
-                rotation = 0f,
-                onSelect = { month = month.adding(months = 1) },
-            )
-        }
-
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Weekday.week(startingOn = Weekday.sunday).forEach { weekday ->
-                Text(
-                    text = weekday.shortName,
-                    modifier = Modifier.weight(1f),
-                    color = Palette.subtext,
-                    textAlign = TextAlign.Center,
-                    style = textFont(size = FontSize.Caption),
-                )
-            }
-        }
+        WeekdayHeader()
 
         month.weeks(startingOn = Weekday.sunday).forEach { week ->
-            Row(modifier = Modifier.fillMaxWidth()) {
-                week.forEach { day ->
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (day != null) {
-                            DayCell(
-                                day = day,
-                                isSelected = day == selection,
-                                isToday = day == today,
-                                onSelect = { onSelect(day) },
-                            )
-                        } else {
-                            Spacer(modifier = Modifier.height(dayCellSize))
-                        }
-                    }
+            WeekRow(
+                week = week,
+                selection = selection,
+                today = today,
+                onSelect = onSelect,
+            )
+        }
+    }
+}
+
+@Composable
+private fun MonthHeader(
+    month: YearMonth,
+    onMove: (Int) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MonthButton(
+            rotation = 180f,
+            onSelect = { onMove(-1) },
+        )
+
+        Text(
+            text = "${month.year}年 ${month.month}月",
+            modifier = Modifier.weight(1f),
+            color = Palette.accentStrong,
+            textAlign = TextAlign.Center,
+            style = displayFont(size = FontSize.Body),
+        )
+
+        MonthButton(
+            rotation = 0f,
+            onSelect = { onMove(1) },
+        )
+    }
+}
+
+@Composable
+private fun WeekdayHeader() {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Weekday.week(startingOn = Weekday.sunday).forEach { weekday ->
+            Text(
+                text = weekday.shortName,
+                modifier = Modifier.weight(1f),
+                color = Palette.subtext,
+                textAlign = TextAlign.Center,
+                style = textFont(size = FontSize.Caption),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WeekRow(
+    week: List<LocalDate?>,
+    selection: LocalDate,
+    today: LocalDate,
+    onSelect: (LocalDate) -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        week.forEach { day ->
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (day != null) {
+                    DayCell(
+                        day = day,
+                        isSelected = day == selection,
+                        isToday = day == today,
+                        onSelect = { onSelect(day) },
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(dayCellSize))
                 }
             }
         }

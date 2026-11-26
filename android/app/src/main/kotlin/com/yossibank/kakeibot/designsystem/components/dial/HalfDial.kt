@@ -9,6 +9,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.designsystem.theme.Emphasis
@@ -50,52 +51,77 @@ fun HalfDial(
             y = center.y - radius,
         )
 
-        drawArc(
+        drawHalfArc(
             color = track,
-            startAngle = 180f,
             sweepAngle = 180f,
-            useCenter = false,
-            topLeft = corner,
-            size = box,
-            style = Stroke(
-                width = stroke,
-                cap = StrokeCap.Round,
-            ),
+            corner = corner,
+            box = box,
+            stroke = stroke,
         )
 
-        drawArc(
+        drawHalfArc(
             color = color,
-            startAngle = 180f,
             sweepAngle = (180 * progress.coerceIn(0.0, 1.0)).toFloat(),
-            useCenter = false,
-            topLeft = corner,
-            size = box,
-            style = Stroke(
-                width = stroke,
-                cap = StrokeCap.Round,
-            ),
+            corner = corner,
+            box = box,
+            stroke = stroke,
         )
 
-        repeat(TICKS + 1) { index ->
-            val isMajor = index % MAJOR_EVERY == 0
-            val angle = PI * index / TICKS
-            val outer = radius - 10.dp.toPx()
-            val inner = outer - (if (isMajor) 14.dp else 7.dp).toPx()
+        drawScale(
+            center = center,
+            radius = radius,
+            tick = tick,
+            major = major,
+        )
+    }
+}
 
-            drawLine(
-                color = if (isMajor) major else tick,
-                start = Offset(
-                    x = center.x - (cos(angle) * inner).toFloat(),
-                    y = center.y - (sin(angle) * inner).toFloat(),
-                ),
-                end = Offset(
-                    x = center.x - (cos(angle) * outer).toFloat(),
-                    y = center.y - (sin(angle) * outer).toFloat(),
-                ),
-                strokeWidth = (if (isMajor) 1.5.dp else 0.75.dp).toPx(),
-                cap = StrokeCap.Round,
-            )
-        }
+private fun DrawScope.drawHalfArc(
+    color: Color,
+    sweepAngle: Float,
+    corner: Offset,
+    box: Size,
+    stroke: Float,
+) {
+    drawArc(
+        color = color,
+        startAngle = 180f,
+        sweepAngle = sweepAngle,
+        useCenter = false,
+        topLeft = corner,
+        size = box,
+        style = Stroke(
+            width = stroke,
+            cap = StrokeCap.Round,
+        ),
+    )
+}
+
+private fun DrawScope.drawScale(
+    center: Offset,
+    radius: Float,
+    tick: Color,
+    major: Color,
+) {
+    repeat(TICKS + 1) { index ->
+        val isMajor = index % MAJOR_EVERY == 0
+        val angle = PI * index / TICKS
+        val outer = radius - 10.dp.toPx()
+        val inner = outer - (if (isMajor) 14.dp else 7.dp).toPx()
+
+        drawLine(
+            color = if (isMajor) major else tick,
+            start = Offset(
+                x = center.x - (cos(angle) * inner).toFloat(),
+                y = center.y - (sin(angle) * inner).toFloat(),
+            ),
+            end = Offset(
+                x = center.x - (cos(angle) * outer).toFloat(),
+                y = center.y - (sin(angle) * outer).toFloat(),
+            ),
+            strokeWidth = (if (isMajor) 1.5.dp else 0.75.dp).toPx(),
+            cap = StrokeCap.Round,
+        )
     }
 }
 

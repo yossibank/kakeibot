@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -69,58 +70,76 @@ fun UndoNotice(
             tint = tint,
         )
 
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = title,
-                color = Palette.text,
-                style = textFont(
-                    size = FontSize.Small,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-
-            if (detail != null) {
-                Text(
-                    text = detail,
-                    color = Palette.subtext,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = textFont(size = FontSize.Caption),
-                )
-            }
-
-            if (hint != null) {
-                Text(
-                    text = hint,
-                    color = Palette.hint,
-                    style = textFont(size = FontSize.Caption),
-                )
-            }
-        }
+        NoticeTexts(
+            title = title,
+            detail = detail,
+            hint = hint,
+        )
 
         if (onUndo != null) {
+            UndoButton(onUndo = onUndo)
+        }
+    }
+}
+
+@Composable
+private fun RowScope.NoticeTexts(
+    title: String,
+    detail: String?,
+    hint: String?,
+) {
+    Column(
+        modifier = Modifier.weight(1f),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = title,
+            color = Palette.text,
+            style = textFont(
+                size = FontSize.Small,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+
+        if (detail != null) {
             Text(
-                text = "取り消す",
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = Palette.accent.opacity(Emphasis.Muted),
-                        shape = CircleShape,
-                    ).clickable(onClick = onUndo)
-                    .padding(
-                        horizontal = 12.dp,
-                        vertical = 8.dp,
-                    ),
-                color = Palette.accentStrong,
-                style = textFont(
-                    size = FontSize.Small,
-                    weight = FontWeight.SemiBold,
-                ),
+                text = detail,
+                color = Palette.subtext,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = textFont(size = FontSize.Caption),
+            )
+        }
+
+        if (hint != null) {
+            Text(
+                text = hint,
+                color = Palette.hint,
+                style = textFont(size = FontSize.Caption),
             )
         }
     }
+}
+
+@Composable
+private fun UndoButton(onUndo: () -> Unit) {
+    Text(
+        text = "取り消す",
+        modifier = Modifier
+            .clip(CircleShape)
+            .border(
+                width = 1.dp,
+                color = Palette.accent.opacity(Emphasis.Muted),
+                shape = CircleShape,
+            ).clickable(onClick = onUndo)
+            .padding(
+                horizontal = 12.dp,
+                vertical = 8.dp,
+            ),
+        color = Palette.accentStrong,
+        style = textFont(
+            size = FontSize.Small,
+            weight = FontWeight.SemiBold,
+        ),
+    )
 }

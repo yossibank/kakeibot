@@ -3,6 +3,7 @@ package com.yossibank.kakeibot.designsystem.components.tag
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -101,16 +102,9 @@ fun TagCard(
         ),
         contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = size.holeTop)
-                .size(size.hole)
-                .border(
-                    width = 0.8.dp,
-                    color = stroke,
-                    shape = CircleShape,
-                ),
+        TagHole(
+            size = size,
+            stroke = stroke,
         )
 
         FittedText(
@@ -124,6 +118,24 @@ fun TagCard(
             style = textFont(size = size.font),
         )
     }
+}
+
+@Composable
+private fun BoxScope.TagHole(
+    size: TagCardSize,
+    stroke: Color,
+) {
+    Box(
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .padding(top = size.holeTop)
+            .size(size.hole)
+            .border(
+                width = 0.8.dp,
+                color = stroke,
+                shape = CircleShape,
+            ),
+    )
 }
 
 private val TagCardStyle.foreground: Color
