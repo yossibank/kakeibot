@@ -1,6 +1,8 @@
 import GRDB
 
 enum MigrationSyncTriggers {
+    static let ownRecording = "(SELECT enabled AND NOT applying FROM sync_state)"
+
     static let events = [
         ("insert", "INSERT", "NEW"),
         ("update", "UPDATE", "NEW"),
@@ -11,8 +13,6 @@ enum MigrationSyncTriggers {
     'onboarding_completed', 'setup_card_closed', 'entry_opened', 'settings_opened', \
     'closed_hints', 'closed_hidden_lists', 'recent_searches', 'widget_entry'
     """
-
-    static let ownRecording = "(SELECT enabled AND NOT applying FROM sync_state)"
 
     static let sharedRecording = """
     (SELECT (enabled OR EXISTS (SELECT 1 FROM sync_share)) AND NOT applying FROM sync_state)

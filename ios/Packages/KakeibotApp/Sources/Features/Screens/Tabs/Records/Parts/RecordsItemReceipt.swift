@@ -36,26 +36,7 @@ struct RecordsItemReceipt: View {
 
             EntryReceiptRule(style: .double)
 
-            HStack(alignment: .firstTextBaseline) {
-                Text("合計")
-                    .textFont(.caption, weight: .semibold)
-                    .foregroundStyle(Palette.text)
-
-                Text("\(itemCount)点")
-                    .textFont(.caption2)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-
-                Spacer()
-
-                AmountText(
-                    amount,
-                    font: .size(.headline, weight: .bold),
-                    color: Palette.accentStrong
-                )
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-            }
+            totalLine
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 12 + Self.tooth / 2)
@@ -76,6 +57,29 @@ struct RecordsItemReceipt: View {
 }
 
 private extension RecordsItemReceipt {
+    var totalLine: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text("合計")
+                .textFont(.caption, weight: .semibold)
+                .foregroundStyle(Palette.text)
+
+            Text("\(itemCount)点")
+                .textFont(.caption2)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+
+            Spacer()
+
+            AmountText(
+                amount,
+                font: .size(.headline, weight: .bold),
+                color: Palette.accentStrong
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+        }
+    }
+
     func itemLine(_ item: EntryItem) -> some View {
         ViewThatFits(in: .horizontal) {
             itemLine(item, style: .caption, fitsName: true)

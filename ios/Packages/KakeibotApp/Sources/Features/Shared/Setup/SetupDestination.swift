@@ -24,66 +24,59 @@ public struct SetupDestination: View {
 
     public var body: some View {
         switch item {
-        case .budget:
-            BudgetListView(
-                model: BudgetListModel(
-                    parts: parts,
-                    today: today
-                )
-            )
-
-        case .monthStart:
-            MonthStartDayView(
-                model: MonthStartDayModel(
-                    parts: parts,
-                    today: today
-                )
-            )
-
-        case .wallets:
-            WalletListView(parts: parts)
-
-        case .categories:
-            CategoryListView(parts: parts)
-
-        case .recurrings:
-            RecurringListView(
-                board: RecurringBoard(
-                    parts: parts,
-                    today: today
-                )
-            )
-
-        case .templates:
-            TemplateListView(parts: parts)
-
-        case .reminder:
-            ReminderView(
-                model: ReminderModel(
-                    parts: parts,
-                    today: today,
-                    time: nil,
-                    permission: permission
-                )
-            )
-
-        case .launchScreen:
-            LaunchScreenView(model: LaunchScreenModel(parts: parts))
-
-        case .theme:
-            ThemeListView(parts: parts, appIcon: appIcon)
-
-        case .appIcon:
-            AppIconListView(model: appIcon, parts: parts)
-
-        case .themeStyle:
-            ThemeStyleTextView(model: ThemeStyleModel(parts: parts))
-
-        case .themeLook:
-            ThemeStyleLookView(model: ThemeStyleModel(parts: parts))
-
-        case .homeSections:
-            HomeSectionListView(model: HomeSectionListModel(parts: parts))
+        case .budget: budgetList
+        case .monthStart: monthStartDay
+        case .wallets: WalletListView(parts: parts)
+        case .categories: CategoryListView(parts: parts)
+        case .recurrings: recurringList
+        case .templates: TemplateListView(parts: parts)
+        case .reminder: reminder
+        case .launchScreen: LaunchScreenView(model: LaunchScreenModel(parts: parts))
+        case .theme: ThemeListView(parts: parts, appIcon: appIcon)
+        case .appIcon: AppIconListView(model: appIcon, parts: parts)
+        case .themeStyle: ThemeStyleTextView(model: ThemeStyleModel(parts: parts))
+        case .themeLook: ThemeStyleLookView(model: ThemeStyleModel(parts: parts))
+        case .homeSections: HomeSectionListView(model: HomeSectionListModel(parts: parts))
         }
+    }
+}
+
+private extension SetupDestination {
+    var budgetList: some View {
+        BudgetListView(
+            model: BudgetListModel(
+                parts: parts,
+                today: today
+            )
+        )
+    }
+
+    var monthStartDay: some View {
+        MonthStartDayView(
+            model: MonthStartDayModel(
+                parts: parts,
+                today: today
+            )
+        )
+    }
+
+    var recurringList: some View {
+        RecurringListView(
+            board: RecurringBoard(
+                parts: parts,
+                today: today
+            )
+        )
+    }
+
+    var reminder: some View {
+        ReminderView(
+            model: ReminderModel(
+                parts: parts,
+                today: today,
+                time: nil,
+                permission: permission
+            )
+        )
     }
 }

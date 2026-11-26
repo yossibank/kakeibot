@@ -93,7 +93,7 @@ import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.saveTitle
 import com.yossibank.kakeibot.featuremodels.screens.settings.recurring.select
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
-import com.yossibank.kakeibot.featuremodels.shared.settingsparts.input.SettingsEditOutcome
+import com.yossibank.kakeibot.featuremodels.shared.notice.Deletion
 import com.yossibank.kakeibot.features.shared.model.OnOutcome
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
@@ -109,7 +109,8 @@ fun RecurringEditSheet(
     type: Entry.Kind,
     editingId: Identifier<Recurring>?,
     onClose: () -> Unit,
-    onOutcome: (SettingsEditOutcome<Unit>) -> Unit,
+    onDelete: (Deletion) -> Unit,
+    onHide: () -> Unit,
 ) {
     val model = remember(parts, editingId) {
         RecurringEditModel(
@@ -169,10 +170,17 @@ fun RecurringEditSheet(
         }
     }
 
-    OnOutcome(
-        outcome = model.state.outcome,
-        action = onOutcome,
-    )
+    OnOutcome(model.state.outcome) { outcome ->
+        if (outcome.isHidden == true) {
+            onHide()
+        }
+
+        outcome.deletion?.let(onDelete)
+
+        if (outcome.closes) {
+            onClose()
+        }
+    }
 
     BackHandler {
         if (model.state.panel != null) {

@@ -7,56 +7,7 @@ public extension HomeModel {
         await loadTemplateOrder()
         await loadHomeLayout()
 
-        await observeAll([
-            {
-                await self.observe(
-                    self.dependencies.database.entryListUpdates(),
-                    into: \.input.list,
-                    failing: \.input.isListFailed
-                )
-            },
-            {
-                await self.observe(
-                    self.dependencies.database.templateUpdates(),
-                    into: \.input.allTemplates
-                )
-            },
-            {
-                await self.observe(
-                    self.dependencies.database.budgetUpdates(),
-                    into: \.input.budgets
-                )
-            },
-            {
-                await self.observe(
-                    self.dependencies.database.recurringUpdates(),
-                    into: \.input.recurrings
-                )
-            },
-            {
-                await self.observe(
-                    self.dependencies.database.settingUpdates(.monthStartDay),
-                    into: \.input.monthStartDay
-                )
-            },
-            {
-                await self.observe(
-                    self.dependencies.database.settingUpdates(.budgetCarryoverFrom),
-                    into: \.input.carryoverFrom
-                )
-            },
-            {
-                await self.observe(
-                    self.dependencies.database.settingUpdates(.homeSections),
-                    into: \.input.homeSections
-                )
-            },
-            {
-                await self.observe(
-                    self.dependencies.database.settingUpdates(.homeHiddenSections),
-                    into: \.input.homeHiddenSections
-                )
-            },
+        await observeAll(recordObservations + settingObservations + [
             {
                 await self.observe(
                     self.dependencies.database.stampBookUpdates(),
@@ -161,6 +112,65 @@ private extension HomeModel {
     static let saveFailedMessage = "記録できませんでした"
     static let orderSaveFailedMessage = "並べ順を保存できませんでした"
     static let layoutSaveFailedMessage = "設定を保存できませんでした"
+
+    var recordObservations: [@MainActor @Sendable () async -> Void] {
+        [
+            {
+                await self.observe(
+                    self.dependencies.database.entryListUpdates(),
+                    into: \.input.list,
+                    failing: \.input.isListFailed
+                )
+            },
+            {
+                await self.observe(
+                    self.dependencies.database.templateUpdates(),
+                    into: \.input.allTemplates
+                )
+            },
+            {
+                await self.observe(
+                    self.dependencies.database.budgetUpdates(),
+                    into: \.input.budgets
+                )
+            },
+            {
+                await self.observe(
+                    self.dependencies.database.recurringUpdates(),
+                    into: \.input.recurrings
+                )
+            }
+        ]
+    }
+
+    var settingObservations: [@MainActor @Sendable () async -> Void] {
+        [
+            {
+                await self.observe(
+                    self.dependencies.database.settingUpdates(.monthStartDay),
+                    into: \.input.monthStartDay
+                )
+            },
+            {
+                await self.observe(
+                    self.dependencies.database.settingUpdates(.budgetCarryoverFrom),
+                    into: \.input.carryoverFrom
+                )
+            },
+            {
+                await self.observe(
+                    self.dependencies.database.settingUpdates(.homeSections),
+                    into: \.input.homeSections
+                )
+            },
+            {
+                await self.observe(
+                    self.dependencies.database.settingUpdates(.homeHiddenSections),
+                    into: \.input.homeHiddenSections
+                )
+            }
+        ]
+    }
 
     func loadHomeLayout() async {
         do {

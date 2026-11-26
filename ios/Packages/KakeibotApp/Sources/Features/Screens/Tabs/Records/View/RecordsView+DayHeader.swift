@@ -3,6 +3,14 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
+private extension RecordsView {
+    enum DayTotals: AlignmentID {
+        static func defaultValue(in context: ViewDimensions) -> CGFloat {
+            context[VerticalAlignment.center]
+        }
+    }
+}
+
 extension RecordsView {
     func dayHeader(
         _ date: LocalDate,
@@ -262,11 +270,5 @@ private extension RecordsView {
 }
 
 private extension VerticalAlignment {
-    enum DayTotals: AlignmentID {
-        static func defaultValue(in context: ViewDimensions) -> CGFloat {
-            context[VerticalAlignment.center]
-        }
-    }
-
-    static let dayTotals = VerticalAlignment(DayTotals.self)
+    static let dayTotals = VerticalAlignment(RecordsView.DayTotals.self)
 }

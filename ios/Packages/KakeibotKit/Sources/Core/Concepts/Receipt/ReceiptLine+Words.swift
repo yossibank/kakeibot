@@ -9,12 +9,6 @@ extension ReceiptLine {
     static let stopWords = ["お預", "預り", "お釣", "釣銭", "現金", "お支払内訳", "残高", "ポイント"]
     static let itemWords = ["レジ袋"]
     static let addressWords = ["県", "都", "府", "丁目", "番地", "階"]
-
-    static let skipWords = [
-        "小計", "消費税", "外税", "内税", "税率", "対象", "クレジット", "点数", "TEL", "電話",
-        "領収", "レジ", "No.", "ありがとう", "登録番号", "担当", "通番", "番号", "伝票", "端末"
-    ]
-
     static let amountBlockers: Set<Character> = ["#"]
     static let maxDigits = 7
     static let minMarkedAmount = 10
@@ -22,6 +16,11 @@ extension ReceiptLine {
     static let reducedMarks: Set<Character> = ["※", "*", "軽"]
     static let numberJoints: Set<Character> = [":", "-", "/", "."]
     static let nameTrimmed = CharacterSet(charactersIn: "※*").union(.whitespaces)
+
+    static let skipWords = [
+        "小計", "消費税", "外税", "内税", "税率", "対象", "クレジット", "点数", "TEL", "電話",
+        "領収", "レジ", "No.", "ありがとう", "登録番号", "担当", "通番", "番号", "伝票", "端末"
+    ]
 
     static let halfwidth: [Character: Character] = [
         "０": "0", "１": "1", "２": "2", "３": "3", "４": "4",

@@ -27,64 +27,7 @@ extension ReviewView {
             }
 
             if hasRecurringRow || hasUpcomingRow || showsMoveRow {
-                VStack(alignment: .leading, spacing: 0) {
-                    if let recurring = model.output.recurringTotal {
-                        Button {
-                            model.state.sheet = model.output.recurringShare.map { .share($0) }
-                        } label: {
-                            HStack(spacing: 4) {
-                                Label(recurringText(recurring), systemImage: "repeat")
-
-                                DisclosureMark(.link)
-                            }
-                            .textFont(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .frame(
-                                maxWidth: .infinity,
-                                minHeight: rowMinHeight,
-                                alignment: .leading
-                            )
-                            .tapArea(Self.rowTapOutsets(top: true, bottom: isLastRow(.recurring)))
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    if let upcoming = model.output.upcomingRecurringTotal {
-                        let outsets = Self.rowTapOutsets(
-                            top: isFirstRow(.upcoming),
-                            bottom: isLastRow(.upcoming)
-                        )
-
-                        upcomingRow(
-                            upcoming,
-                            tapOutsets: outsets,
-                            minHeight: rowMinHeight
-                        )
-                    }
-
-                    if showsMoveRow {
-                        Button {
-                            select(.balance)
-                        } label: {
-                            HStack(spacing: 4) {
-                                Label(moveText, systemImage: "arrow.right")
-
-                                DisclosureMark(.link)
-                            }
-                            .textFont(.caption)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .frame(
-                                maxWidth: .infinity,
-                                minHeight: rowMinHeight,
-                                alignment: .leading
-                            )
-                            .tapArea(Self.rowTapOutsets(top: isFirstRow(.move), bottom: true))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+                detailLinks
             }
 
             if model.input.kind == .balance {
@@ -105,24 +48,7 @@ extension ReviewView {
             }
 
             if let usage = model.output.budgetUsage {
-                VStack(spacing: 8) {
-                    HStack {
-                        Text(usage.budgetText)
-                            .sharedTextScale()
-
-                        Spacer()
-
-                        Text(usage.remainingText)
-                            .sharedTextScale()
-                    }
-                    .textFont(.caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .sharesTextScale(id: [usage.budgetText, usage.remainingText])
-
-                    BudgetUsageBar(usage)
-                }
-                .padding(.top, 4)
+                detailBudget(usage)
             }
         }
         .padding(16)
@@ -132,6 +58,96 @@ extension ReviewView {
 }
 
 private extension ReviewView {
+    var detailLinks: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let recurring = model.output.recurringTotal {
+                recurringLink(recurring)
+            }
+
+            if let upcoming = model.output.upcomingRecurringTotal {
+                let outsets = Self.rowTapOutsets(
+                    top: isFirstRow(.upcoming),
+                    bottom: isLastRow(.upcoming)
+                )
+
+                upcomingRow(
+                    upcoming,
+                    tapOutsets: outsets,
+                    minHeight: rowMinHeight
+                )
+            }
+
+            if showsMoveRow {
+                moveLink
+            }
+        }
+    }
+
+    var moveLink: some View {
+        Button {
+            select(.balance)
+        } label: {
+            HStack(spacing: 4) {
+                Label(moveText, systemImage: "arrow.right")
+
+                DisclosureMark(.link)
+            }
+            .textFont(.caption)
+            .monospacedDigit()
+            .foregroundStyle(Palette.subtext)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: rowMinHeight,
+                alignment: .leading
+            )
+            .tapArea(Self.rowTapOutsets(top: isFirstRow(.move), bottom: true))
+        }
+        .buttonStyle(.plain)
+    }
+
+    func recurringLink(_ recurring: Int) -> some View {
+        Button {
+            model.state.sheet = model.output.recurringShare.map { .share($0) }
+        } label: {
+            HStack(spacing: 4) {
+                Label(recurringText(recurring), systemImage: "repeat")
+
+                DisclosureMark(.link)
+            }
+            .textFont(.caption)
+            .monospacedDigit()
+            .foregroundStyle(Palette.subtext)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: rowMinHeight,
+                alignment: .leading
+            )
+            .tapArea(Self.rowTapOutsets(top: true, bottom: isLastRow(.recurring)))
+        }
+        .buttonStyle(.plain)
+    }
+
+    func detailBudget(_ usage: BudgetUsage) -> some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text(usage.budgetText)
+                    .sharedTextScale()
+
+                Spacer()
+
+                Text(usage.remainingText)
+                    .sharedTextScale()
+            }
+            .textFont(.caption)
+            .monospacedDigit()
+            .foregroundStyle(Palette.subtext)
+            .sharesTextScale(id: [usage.budgetText, usage.remainingText])
+
+            BudgetUsageBar(usage)
+        }
+        .padding(.top, 4)
+    }
+
     func balanceBar(
         _ title: String,
         amount: Int,

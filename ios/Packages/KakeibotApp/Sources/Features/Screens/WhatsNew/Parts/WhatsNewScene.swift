@@ -48,62 +48,25 @@ private extension WhatsNewScene {
     @ViewBuilder
     var content: some View {
         switch kind {
-        case let .receipt(step):
-            WhatsNewReceiptScene(step: step)
-
-        case let .items(step):
-            WhatsNewItemsScene(step: step)
-
-        case let .carryover(step):
-            WhatsNewCarryoverScene(step: step)
-
-        case let .monthStart(step):
-            WhatsNewMonthStartScene(step: step)
-
-        case let .bill(step):
-            WhatsNewBillScene(step: step)
-
-        case let .recurring(step):
-            WhatsNewRecurringScene(step: step)
-
-        case let .loan(step):
-            WhatsNewLoanScene(step: step)
-
-        case let .icon(step):
-            WhatsNewIconScene(step: step)
-
-        case let .plan(step):
-            WhatsNewPlanScene(step: step)
-
-        case let .pager(step):
-            WhatsNewPagerScene(step: step)
-
-        case let .wallet(step):
-            WhatsNewWalletScene(step: step)
-
-        case let .outlook(step):
-            WhatsNewOutlookScene(step: step)
-
-        case let .voice(step):
-            WhatsNewVoiceScene(step: step)
-
-        case let .entry(step):
-            WhatsNewEntryScene(step: step)
-
-        case let .pad(step):
-            WhatsNewPadScene(step: step)
-
-        case let .upcoming(step):
-            WhatsNewUpcomingScene(step: step)
-
-        case let .widget(step):
-            WhatsNewWidgetScene(step: step)
-
-        case let .analysis(step):
-            WhatsNewAnalysisScene(step: step)
-
-        case let .review(step):
-            WhatsNewReviewScene(step: step)
+        case let .receipt(step): WhatsNewReceiptScene(step: step)
+        case let .items(step): WhatsNewItemsScene(step: step)
+        case let .carryover(step): WhatsNewCarryoverScene(step: step)
+        case let .monthStart(step): WhatsNewMonthStartScene(step: step)
+        case let .bill(step): WhatsNewBillScene(step: step)
+        case let .recurring(step): WhatsNewRecurringScene(step: step)
+        case let .loan(step): WhatsNewLoanScene(step: step)
+        case let .icon(step): WhatsNewIconScene(step: step)
+        case let .plan(step): WhatsNewPlanScene(step: step)
+        case let .pager(step): WhatsNewPagerScene(step: step)
+        case let .wallet(step): WhatsNewWalletScene(step: step)
+        case let .outlook(step): WhatsNewOutlookScene(step: step)
+        case let .voice(step): WhatsNewVoiceScene(step: step)
+        case let .entry(step): WhatsNewEntryScene(step: step)
+        case let .pad(step): WhatsNewPadScene(step: step)
+        case let .upcoming(step): WhatsNewUpcomingScene(step: step)
+        case let .widget(step): WhatsNewWidgetScene(step: step)
+        case let .analysis(step): WhatsNewAnalysisScene(step: step)
+        case let .review(step): WhatsNewReviewScene(step: step)
         }
     }
 }

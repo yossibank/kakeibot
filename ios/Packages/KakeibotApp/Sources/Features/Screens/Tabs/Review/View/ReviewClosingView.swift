@@ -56,86 +56,95 @@ extension ReviewClosingView {
 
 private extension ReviewClosingView {
     var resultCard: some View {
-        let perDay = ReviewYen.number(spent / totalDays)
-        let spentText = ReviewYen.number(spent)
         let limitName = content.pace?.limitName(unit: unit) ?? ""
 
         return VStack(alignment: .leading, spacing: 16) {
             ReviewReportLabel(title: "\(name)の結果")
 
             ReviewReportGaugeRow(pace: content.pace, limitName: limitName, showsMarker: false) {
-                VStack(alignment: .leading, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(verdictText)
-                            .displayFont(.title, weight: .bold)
-                            .foregroundStyle(Palette.gold)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.5)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        if let streakTitle {
-                            ReviewReportChip(systemImage: "rosette", title: streakTitle)
-                        }
-                    }
-
-                    if let pace = content.pace {
-                        let left = ReviewYen.number(abs(pace.remaining))
-
-                        Rectangle()
-                            .fill(Palette.line)
-                            .frame(height: 1)
-
-                        ReviewReportLead(
-                            caption: Self.leadCaption(pace),
-                            value: left,
-                            suffix: Self.leftSuffix(pace),
-                            color: Self.leftColor(pace)
-                        )
-                    }
-                }
+                resultVerdict
             }
 
-            Grid(horizontalSpacing: 1, verticalSpacing: 1) {
-                GridRow {
-                    ReviewReportStat(
-                        title: "使った",
-                        systemImage: "yensign.circle",
-                        value: spentText,
-                        unit: "円",
-                        note: spentNote
-                    )
-
-                    ReviewReportStat(
-                        title: "1 日あたり",
-                        systemImage: "calendar",
-                        value: perDay,
-                        unit: "円",
-                        note: "\(totalDays) 日で割った額"
-                    )
-                }
-
-                if let previousTotal = content.previousTotal {
-                    let difference = spent - previousTotal
-                    let color = difference <= 0 ? Palette.accent : Palette.increase
-                    let symbol = difference <= 0 ? "arrow.down.right" : "arrow.up.right"
-                    let value = ReviewYen.signedNumber(difference)
-
-                    GridRow {
-                        ReviewReportStat(
-                            title: "\(previousName)より",
-                            systemImage: symbol,
-                            value: value,
-                            unit: "円",
-                            note: "\(previousName) \(ReviewYen.text(previousTotal))",
-                            color: color
-                        )
-                        .gridCellColumns(2)
-                    }
-                }
-            }
-            .reviewStatGrid()
+            resultStats
         }
         .reviewHero()
+    }
+
+    var resultVerdict: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(verdictText)
+                    .displayFont(.title, weight: .bold)
+                    .foregroundStyle(Palette.gold)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.5)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if let streakTitle {
+                    ReviewReportChip(systemImage: "rosette", title: streakTitle)
+                }
+            }
+
+            if let pace = content.pace {
+                let left = ReviewYen.number(abs(pace.remaining))
+
+                Rectangle()
+                    .fill(Palette.line)
+                    .frame(height: 1)
+
+                ReviewReportLead(
+                    caption: Self.leadCaption(pace),
+                    value: left,
+                    suffix: Self.leftSuffix(pace),
+                    color: Self.leftColor(pace)
+                )
+            }
+        }
+    }
+
+    var resultStats: some View {
+        let perDay = ReviewYen.number(spent / totalDays)
+        let spentText = ReviewYen.number(spent)
+
+        return Grid(horizontalSpacing: 1, verticalSpacing: 1) {
+            GridRow {
+                ReviewReportStat(
+                    title: "使った",
+                    systemImage: "yensign.circle",
+                    value: spentText,
+                    unit: "円",
+                    note: spentNote
+                )
+
+                ReviewReportStat(
+                    title: "1 日あたり",
+                    systemImage: "calendar",
+                    value: perDay,
+                    unit: "円",
+                    note: "\(totalDays) 日で割った額"
+                )
+            }
+
+            if let previousTotal = content.previousTotal {
+                let difference = spent - previousTotal
+                let color = difference <= 0 ? Palette.accent : Palette.increase
+                let symbol = difference <= 0 ? "arrow.down.right" : "arrow.up.right"
+                let value = ReviewYen.signedNumber(difference)
+
+                GridRow {
+                    ReviewReportStat(
+                        title: "\(previousName)より",
+                        systemImage: symbol,
+                        value: value,
+                        unit: "円",
+                        note: "\(previousName) \(ReviewYen.text(previousTotal))",
+                        color: color
+                    )
+                    .gridCellColumns(2)
+                }
+            }
+        }
+        .reviewStatGrid()
     }
 
     func summaryCard(_ summary: String) -> some View {

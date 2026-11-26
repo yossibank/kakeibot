@@ -31,47 +31,7 @@ public struct TemplateEditSheet: View {
 
     public var body: some View {
         FloatingInputReader { _ in
-            content
-                .ignoresSafeArea(keyboardRegions)
-                .floatingInput(isPresented: model.state.prompt.panel == .memo) {
-                    closePanel()
-                } card: {
-                    memoCard
-                }
-                .settingsDrawerLayer(item: drawerPanel) {
-                    closePanel()
-                } drawer: { panel in
-                    SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
-                        closePanel()
-                    } content: {
-                        drawerBody(panel)
-                    }
-                }
-                .overlay(alignment: .top) {
-                    SettingsEditHeader(
-                        isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
-                        title: title,
-                        isEditing: model.isEditing,
-                        isHidden: model.input.isHidden,
-                        subtitle: model.output.typeName
-                    ) {
-                        edit.close()
-                    } onHide: {
-                        edit.toggleHidden()
-                    } onDelete: {
-                        model.state.prompt.isConfirmingDelete = true
-                    }
-                    .padding(.horizontal, SettingsSpacing.side)
-                    .padding(.top, SettingsSpacing.top)
-                }
-                .errorBanner(Bindable(model.state).errorNotice)
-                .background {
-                    Backdrop()
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            focus = nil
-                        }
-                }
+            layeredContent
                 .haptic(.selection, trigger: model.state.categoryId)
                 .haptic(.selection, trigger: model.state.walletId)
                 .settingsEditConfirmations(edit)
@@ -175,6 +135,50 @@ private extension TemplateEditSheet {
         } save: {
             saveButton
         }
+    }
+
+    var layeredContent: some View {
+        content
+            .ignoresSafeArea(keyboardRegions)
+            .floatingInput(isPresented: model.state.prompt.panel == .memo) {
+                closePanel()
+            } card: {
+                memoCard
+            }
+            .settingsDrawerLayer(item: drawerPanel) {
+                closePanel()
+            } drawer: { panel in
+                SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
+                    closePanel()
+                } content: {
+                    drawerBody(panel)
+                }
+            }
+            .overlay(alignment: .top) {
+                SettingsEditHeader(
+                    isMenuOpen: Bindable(model.state).prompt.isMenuOpen,
+                    title: title,
+                    isEditing: model.isEditing,
+                    isHidden: model.input.isHidden,
+                    subtitle: model.output.typeName
+                ) {
+                    edit.close()
+                } onHide: {
+                    edit.toggleHidden()
+                } onDelete: {
+                    model.state.prompt.isConfirmingDelete = true
+                }
+                .padding(.horizontal, SettingsSpacing.side)
+                .padding(.top, SettingsSpacing.top)
+            }
+            .errorBanner(Bindable(model.state).errorNotice)
+            .background {
+                Backdrop()
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        focus = nil
+                    }
+            }
     }
 }
 

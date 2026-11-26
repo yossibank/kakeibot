@@ -27,43 +27,7 @@ public struct ThemeListView: View {
 
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            VStack(spacing: SettingsSpacing.header) {
-                SettingsBackHeader("テーマ", hint: hint)
-
-                SettingsIntroCard(
-                    systemImage: "paintpalette",
-                    headline: ("アプリの色を", "好みに変えられます"),
-                    notes: notes,
-                    hint: hint
-                )
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: SettingsSpacing.section) {
-                        section("ライト", isLight: true)
-
-                        section("ダーク", isLight: false)
-
-                        if !model.input.customThemes.isEmpty {
-                            customSection
-                        }
-
-                        systemSection
-                    }
-                    .padding(.vertical, 8)
-                }
-                .scrollIndicators(.hidden)
-                .scrollDisabled(shownMenu != nil)
-                .deletionNotice(Bindable(model.state).deletion) { deletion in
-                    restore(deletion)
-                }
-
-                AddButton("テーマを追加", isLocked: !isPro) {
-                    create(base: nil)
-                }
-            }
-            .padding(.horizontal, SettingsSpacing.side)
-            .padding(.top, SettingsSpacing.top)
-            .padding(.bottom, 8)
+            listColumn
 
             if let shownMenu {
                 menuLayer(shownMenu)
@@ -105,17 +69,7 @@ public struct ThemeListView: View {
             new != nil
         }
         .navigationDestination(item: editing) { target in
-            ThemeEditSheet(
-                model: ThemeEditModel(
-                    parts: parts,
-                    editing: target.theme,
-                    base: target.base ?? model.output.currentPalette
-                )
-            ) { deletion in
-                model.state.deletion = deletion
-            }
-            .toolbar(.hidden, for: .navigationBar)
-            .environment(\.isSettingsEditPushed, true)
+            editSheet(target)
         }
         .onChange(of: model.state.presented?.editing) { _, editing in
             if editing == nil {
@@ -165,6 +119,46 @@ extension ThemeListView {
 }
 
 private extension ThemeListView {
+    var listColumn: some View {
+        VStack(spacing: SettingsSpacing.header) {
+            SettingsBackHeader("テーマ", hint: hint)
+
+            SettingsIntroCard(
+                systemImage: "paintpalette",
+                headline: ("アプリの色を", "好みに変えられます"),
+                notes: notes,
+                hint: hint
+            )
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: SettingsSpacing.section) {
+                    section("ライト", isLight: true)
+
+                    section("ダーク", isLight: false)
+
+                    if !model.input.customThemes.isEmpty {
+                        customSection
+                    }
+
+                    systemSection
+                }
+                .padding(.vertical, 8)
+            }
+            .scrollIndicators(.hidden)
+            .scrollDisabled(shownMenu != nil)
+            .deletionNotice(Bindable(model.state).deletion) { deletion in
+                restore(deletion)
+            }
+
+            AddButton("テーマを追加", isLocked: !isPro) {
+                create(base: nil)
+            }
+        }
+        .padding(.horizontal, SettingsSpacing.side)
+        .padding(.top, SettingsSpacing.top)
+        .padding(.bottom, 8)
+    }
+
     var systemSection: some View {
         let isCurrent = model.input.current == .system
         let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
@@ -246,6 +240,20 @@ private extension ThemeListView {
             }
         }
         .sharesTextScale(id: presets)
+    }
+
+    func editSheet(_ target: ThemeListModel.EditTarget) -> some View {
+        ThemeEditSheet(
+            model: ThemeEditModel(
+                parts: parts,
+                editing: target.theme,
+                base: target.base ?? model.output.currentPalette
+            )
+        ) { deletion in
+            model.state.deletion = deletion
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .environment(\.isSettingsEditPushed, true)
     }
 }
 

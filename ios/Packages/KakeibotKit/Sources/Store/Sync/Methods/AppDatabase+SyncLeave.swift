@@ -115,7 +115,14 @@ private extension AppDatabase {
         }
 
         _ = try deleteRecurrings(recurrings, in: db, at: now)
+        try deleteWalletRecords(walletID, icons: icons, in: db)
+    }
 
+    static func deleteWalletRecords(
+        _ walletID: String,
+        icons: [String],
+        in db: Database
+    ) throws {
         try db.execute(
             sql: """
             DELETE FROM template

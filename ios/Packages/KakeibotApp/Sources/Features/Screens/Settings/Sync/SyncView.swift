@@ -17,52 +17,55 @@ public struct SyncView: View {
     public var body: some View {
         let asking = model.state.asking
 
+        content
+            .confirmation(
+                isPresented: isAsking(asking?.leaving.map { .leave($0) }),
+                systemImage: "person.crop.circle.badge.minus",
+                title: "共有から抜けますか",
+                message: "この \(DeviceName.current) から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
+                keepTitle: "やめる",
+                confirmTitle: "抜ける"
+            ) {
+                leave(asking?.leaving)
+            }
+            .confirmation(
+                isPresented: isAsking(asking?.stopping.map { .stop($0) }),
+                systemImage: "person.2.slash",
+                title: "共有を終えますか",
+                message: "相手の端末から、この口座と記録が消えます。この \(DeviceName.current) には残ります",
+                keepTitle: "やめる",
+                confirmTitle: "共有を終える"
+            ) {
+                stopSharing(asking?.stopping)
+            }
+            .overlay {
+                cardOverlay
+            }
+            .animation(.snappy(duration: 0.25), value: model.state.choice)
+            .animation(.snappy(duration: 0.25), value: model.state.invitation)
+            .animation(.snappy(duration: 0.25), value: model.state.opened)
+            .proOffer(asking?.offer?.feature) {
+                model.state.close(asking)
+            } onUnlock: {
+                unlock()
+            }
+            .haptic(.selection, trigger: model.output.isChoosing) { _, new in
+                new
+            }
+            .haptic(.success, trigger: model.output.progress) { old, new in
+                Self.hasFinishedSyncing(from: old, to: new)
+            }
+    }
+}
+
+private extension SyncView {
+    var content: some View {
         VStack(spacing: 16) {
             SettingsBackHeader("同期と共有", hint: hint)
 
             SyncIntroCard(hint: hint)
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        VStack(spacing: 0) {
-                            HStack(spacing: 12) {
-                                Text("同期する")
-                                    .textFont(.subheadline)
-                                    .foregroundStyle(Palette.text)
-
-                                Spacer(minLength: 0)
-
-                                CapsulePicker(selection: onBinding, options: Self.onOptions)
-                            }
-                            .frame(minHeight: 58)
-                            .disabled(model.state.isWorking || model.output
-                                .isSwitching || !canChange)
-
-                            if let progress = model.output.progress {
-                                Hairline()
-
-                                status(progress)
-                                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                            }
-                        }
-                        .padding(.horizontal, 16)
-                        .card()
-
-                        SettingsCaption(model.output.footnote)
-                    }
-
-                    if !model.input.shares.isEmpty {
-                        sharingSection
-                    }
-
-                    if !model.input.joined.isEmpty {
-                        joinedSection
-                    }
-                }
-                .padding(.vertical, 8)
-            }
-            .scrollIndicators(.hidden)
+            sections
         }
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
@@ -84,71 +87,81 @@ public struct SyncView: View {
         .task {
             await model.observe()
         }
-        .confirmation(
-            isPresented: isAsking(asking?.leaving.map { .leave($0) }),
-            systemImage: "person.crop.circle.badge.minus",
-            title: "共有から抜けますか",
-            message: "この \(DeviceName.current) から口座と記録が消えます。自分の口座との振替は、支出と収入にして残します",
-            keepTitle: "やめる",
-            confirmTitle: "抜ける"
-        ) {
-            leave(asking?.leaving)
-        }
-        .confirmation(
-            isPresented: isAsking(asking?.stopping.map { .stop($0) }),
-            systemImage: "person.2.slash",
-            title: "共有を終えますか",
-            message: "相手の端末から、この口座と記録が消えます。この \(DeviceName.current) には残ります",
-            keepTitle: "やめる",
-            confirmTitle: "共有を終える"
-        ) {
-            stopSharing(asking?.stopping)
-        }
-        .overlay {
-            if let choice = model.state.choice {
-                SyncChoiceCard(
-                    choice: choice,
-                    onUseLocal: useLocalData,
-                    onUseCloud: useCloudData,
-                    onKeep: model.cancelChoice
-                )
-            } else if let invitation = model.state.invitation {
-                SyncInviteCard(
-                    item: invitation,
-                    onInvite: confirmInvitation,
-                    onCancel: model.cancelInvitation
-                )
-            } else if let opened = model.state.opened {
-                SyncSharedCard(
-                    item: opened,
-                    participants: model.output.participants,
-                    isFailed: model.output.isParticipantsFailed,
-                    onInvite: inviteMore,
-                    onStop: {
-                        model.askToStop(opened)
-                    },
-                    onClose: model.closeOpened
-                )
+    }
+
+    var sections: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(spacing: 0) {
+                        HStack(spacing: 12) {
+                            Text("同期する")
+                                .textFont(.subheadline)
+                                .foregroundStyle(Palette.text)
+
+                            Spacer(minLength: 0)
+
+                            CapsulePicker(selection: onBinding, options: Self.onOptions)
+                        }
+                        .frame(minHeight: 58)
+                        .disabled(model.state.isWorking || model.output
+                            .isSwitching || !canChange)
+
+                        if let progress = model.output.progress {
+                            Hairline()
+
+                            status(progress)
+                                .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .card()
+
+                    SettingsCaption(model.output.footnote)
+                }
+
+                if !model.input.shares.isEmpty {
+                    sharingSection
+                }
+
+                if !model.input.joined.isEmpty {
+                    joinedSection
+                }
             }
+            .padding(.vertical, 8)
         }
-        .animation(.snappy(duration: 0.25), value: model.state.choice)
-        .animation(.snappy(duration: 0.25), value: model.state.invitation)
-        .animation(.snappy(duration: 0.25), value: model.state.opened)
-        .proOffer(asking?.offer?.feature) {
-            model.state.close(asking)
-        } onUnlock: {
-            unlock()
-        }
-        .haptic(.selection, trigger: model.output.isChoosing) { _, new in
-            new
-        }
-        .haptic(.success, trigger: model.output.progress) { old, new in
-            Self.hasFinishedSyncing(from: old, to: new)
+        .scrollIndicators(.hidden)
+    }
+
+    @ViewBuilder
+    var cardOverlay: some View {
+        if let choice = model.state.choice {
+            SyncChoiceCard(
+                choice: choice,
+                onUseLocal: useLocalData,
+                onUseCloud: useCloudData,
+                onKeep: model.cancelChoice
+            )
+        } else if let invitation = model.state.invitation {
+            SyncInviteCard(
+                item: invitation,
+                onInvite: confirmInvitation,
+                onCancel: model.cancelInvitation
+            )
+        } else if let opened = model.state.opened {
+            SyncSharedCard(
+                item: opened,
+                participants: model.output.participants,
+                isFailed: model.output.isParticipantsFailed,
+                onInvite: inviteMore,
+                onStop: {
+                    model.askToStop(opened)
+                },
+                onClose: model.closeOpened
+            )
         }
     }
-}
 
-private extension SyncView {
     @ViewBuilder
     func status(_ progress: SyncProgress) -> some View {
         if progress.isProblem {

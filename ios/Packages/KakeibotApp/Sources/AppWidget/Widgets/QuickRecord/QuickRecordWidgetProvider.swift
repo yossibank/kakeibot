@@ -35,27 +35,12 @@ extension QuickRecordWidgetProvider {
             recordedId: recordedId
         )
 
-        var entries = [
-            QuickRecordWidgetEntry(
-                date: now,
-                summary: summary,
-                look: look,
-                style: style
-            )
-        ]
-
-        if let recorded = summary.recorded(at: now) {
-            let clearedSummary = summary.clearingRecorded()
-
-            let cleared = QuickRecordWidgetEntry(
-                date: recorded.until,
-                summary: clearedSummary,
-                look: look,
-                style: style
-            )
-
-            entries.append(cleared)
-        }
+        let entries = currentEntries(
+            of: summary,
+            at: now,
+            look: look,
+            style: style
+        )
 
         guard let midnight = WidgetTimeline.nextMidnight(after: now) else {
             return Timeline(entries: entries, policy: .never)
@@ -79,5 +64,38 @@ extension QuickRecordWidgetProvider {
         )
 
         return Timeline(entries: entries + [next], policy: .atEnd)
+    }
+}
+
+private extension QuickRecordWidgetProvider {
+    static func currentEntries(
+        of summary: QuickRecordWidgetSummary,
+        at now: Date,
+        look: ThemeLook,
+        style: ThemeStyle
+    ) -> [QuickRecordWidgetEntry] {
+        var entries = [
+            QuickRecordWidgetEntry(
+                date: now,
+                summary: summary,
+                look: look,
+                style: style
+            )
+        ]
+
+        if let recorded = summary.recorded(at: now) {
+            let clearedSummary = summary.clearingRecorded()
+
+            let cleared = QuickRecordWidgetEntry(
+                date: recorded.until,
+                summary: clearedSummary,
+                look: look,
+                style: style
+            )
+
+            entries.append(cleared)
+        }
+
+        return entries
     }
 }

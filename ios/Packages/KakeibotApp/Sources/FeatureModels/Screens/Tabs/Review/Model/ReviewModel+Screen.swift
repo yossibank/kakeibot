@@ -1,7 +1,7 @@
 import Core
 
 public extension ReviewModel {
-    enum Sheet: Identifiable {
+    enum Sheet {
         case share(Share)
         case analysis
         case stamp(StampBook.Tally)
@@ -38,16 +38,6 @@ public extension ReviewModel.Sheet {
     }
 }
 
-public extension ReviewModel.Sheet {
-    var id: Key {
-        switch self {
-        case let .share(share): .share(share.id)
-        case .analysis: .analysis
-        case let .stamp(tally): .stamp(tally.id)
-        }
-    }
-}
-
 public extension ReviewModel.State {
     func open(afterSheet opening: ReviewModel.Opening) {
         pending = opening
@@ -63,5 +53,15 @@ public extension ReviewModel.State {
         self.pending = nil
 
         return pending
+    }
+}
+
+extension ReviewModel.Sheet: Identifiable {
+    public var id: Key {
+        switch self {
+        case let .share(share): .share(share.id)
+        case .analysis: .analysis
+        case let .stamp(tally): .stamp(tally.id)
+        }
     }
 }

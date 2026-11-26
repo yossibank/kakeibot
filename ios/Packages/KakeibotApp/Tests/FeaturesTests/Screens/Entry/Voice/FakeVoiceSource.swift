@@ -80,8 +80,25 @@ extension EntryVoiceFlow.Dependencies {
             prepare: {},
             choose: { _ in nil },
             clock: .system,
+            sleep: { duration in
+                try await Task.sleep(for: duration)
+            },
             silence: .milliseconds(100),
             noticeDuration: .milliseconds(100)
         )
+    }
+
+    static func fake(
+        _ source: FakeVoiceSource,
+        clock: FakeVoiceClock
+    ) -> Self {
+        var dependencies = fake(source)
+        dependencies.clock = clock.screenClock
+
+        dependencies.sleep = { duration in
+            try await clock.sleep(for: duration)
+        }
+
+        return dependencies
     }
 }

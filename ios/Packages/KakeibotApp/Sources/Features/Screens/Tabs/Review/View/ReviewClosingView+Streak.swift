@@ -43,38 +43,7 @@ extension ReviewClosingView {
                 legend
             }
 
-            HStack(spacing: 0) {
-                trioItem(
-                    "calendar",
-                    value: "\(streak.days.count)",
-                    unit: "日",
-                    title: "記録した日"
-                )
-
-                Divider()
-
-                trioItem(
-                    "square.and.pencil",
-                    value: "\(streak.count)",
-                    unit: "件",
-                    title: "\(name)の記録"
-                )
-
-                Divider()
-
-                trioItem(
-                    "rosette",
-                    value: "\(content.continuing)",
-                    unit: periodsUnit,
-                    title: "続けている"
-                )
-            }
-            .padding(.top, 12)
-            .overlay(alignment: .top) {
-                Rectangle()
-                    .fill(Palette.line)
-                    .frame(height: 1)
-            }
+            streakTrio
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -83,6 +52,43 @@ extension ReviewClosingView {
 }
 
 private extension ReviewClosingView {
+    var streakTrio: some View {
+        let streak = content.streak
+
+        return HStack(spacing: 0) {
+            trioItem(
+                "calendar",
+                value: "\(streak.days.count)",
+                unit: "日",
+                title: "記録した日"
+            )
+
+            Divider()
+
+            trioItem(
+                "square.and.pencil",
+                value: "\(streak.count)",
+                unit: "件",
+                title: "\(name)の記録"
+            )
+
+            Divider()
+
+            trioItem(
+                "rosette",
+                value: "\(content.continuing)",
+                unit: periodsUnit,
+                title: "続けている"
+            )
+        }
+        .padding(.top, 12)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(Palette.line)
+                .frame(height: 1)
+        }
+    }
+
     var calendar: some View {
         let weekdays = Weekday.week(startingOn: content.weekStart)
 

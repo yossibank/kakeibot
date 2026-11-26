@@ -72,10 +72,12 @@ extension VoiceText {
 }
 
 private extension VoiceText {
+    static let particles: Set<Character> = ["で", "に", "を", "は", "が", "と", "も", "の", "へ"]
+    static let payments: Set = ["現金", "クレカ", "クレジット", "クレジットカード", "カード払い", "電子マネー", "現金払い"]
+    static let fillers: Set = ["えっと", "えーと", "えー", "あの", "あと", "それと", "から", "より"]
+
     static let separators = CharacterSet.whitespacesAndNewlines
         .union(CharacterSet(charactersIn: "、。,.!?！？「」"))
-
-    static let particles: Set<Character> = ["で", "に", "を", "は", "が", "と", "も", "の", "へ"]
 
     static let endings = [
         "の支払い",
@@ -92,9 +94,6 @@ private extension VoiceText {
         "でした",
         "です"
     ]
-
-    static let payments: Set = ["現金", "クレカ", "クレジット", "クレジットカード", "カード払い", "電子マネー", "現金払い"]
-    static let fillers: Set = ["えっと", "えーと", "えー", "あの", "あと", "それと", "から", "より"]
 
     static func fold(_ text: String) -> String {
         let katakana = text.applyingTransform(.hiraganaToKatakana, reverse: false) ?? text

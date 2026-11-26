@@ -97,91 +97,7 @@ public extension AppIconChoice {
     }
 
     var look: Look {
-        switch self {
-        case .navy:
-            Look(
-                background: ["#18253F", "#060B16"],
-                yen: Self.goldMark,
-                dial: Self.goldMark
-            )
-
-        case .black:
-            Look(
-                background: ["#1D1D20", "#050506"],
-                yen: Self.goldMark,
-                dial: Self.goldMark
-            )
-
-        case .forest:
-            Look(
-                background: ["#143C32", "#04130E"],
-                yen: Self.goldMark,
-                dial: Self.goldMark
-            )
-
-        case .teal:
-            Look(
-                background: ["#0F3B44", "#04161A"],
-                yen: Self.silverMark,
-                dial: Self.silverMark
-            )
-
-        case .wine:
-            Look(
-                background: ["#4A1626", "#16050A"],
-                yen: Self.goldMark,
-                dial: Self.goldMark
-            )
-
-        case .plum:
-            Look(
-                background: ["#36203F", "#0F0714"],
-                yen: Self.goldMark,
-                dial: Self.goldMark
-            )
-
-        case .ivory:
-            Look(
-                background: ["#F8F4EB", "#E3DAC7"],
-                yen: Self.deepGoldMark,
-                dial: Self.inkMark
-            )
-
-        case .white:
-            Look(
-                background: ["#FFFFFF", "#E6E6EA"],
-                yen: Self.deepGoldMark,
-                dial: Self.deepGoldMark
-            )
-
-        case .sky:
-            Look(
-                background: ["#E6EFF8", "#A9C2DB"],
-                yen: ["#18253F", "#0B1324"],
-                dial: ["#18253F", "#0B1324"]
-            )
-
-        case .sage:
-            Look(
-                background: ["#DFE7D8", "#A3B49A"],
-                yen: ["#143C32", "#0A241D"],
-                dial: ["#143C32", "#0A241D"]
-            )
-
-        case .rose:
-            Look(
-                background: ["#F6E0D8", "#CC9A8E"],
-                yen: ["#5A1E2E", "#3A0F1C"],
-                dial: ["#5A1E2E", "#3A0F1C"]
-            )
-
-        case .gold:
-            Look(
-                background: ["#F1DFB2", "#9A773F"],
-                yen: Self.inkMark,
-                dial: Self.inkMark
-            )
-        }
+        Look(background: backgroundColors, yen: yenColors, dial: dialColors)
     }
 }
 
@@ -190,4 +106,37 @@ private extension AppIconChoice {
     static let deepGoldMark = ["#A87A35", "#5E4116"]
     static let silverMark = ["#F7F7F5", "#9EA1A6"]
     static let inkMark = ["#1A1A1C", "#1A1A1C"]
+
+    var backgroundColors: [String] {
+        switch self {
+        case .navy: ["#18253F", "#060B16"]
+        case .black: ["#1D1D20", "#050506"]
+        case .forest: ["#143C32", "#04130E"]
+        case .teal: ["#0F3B44", "#04161A"]
+        case .wine: ["#4A1626", "#16050A"]
+        case .plum: ["#36203F", "#0F0714"]
+        case .ivory: ["#F8F4EB", "#E3DAC7"]
+        case .white: ["#FFFFFF", "#E6E6EA"]
+        case .sky: ["#E6EFF8", "#A9C2DB"]
+        case .sage: ["#DFE7D8", "#A3B49A"]
+        case .rose: ["#F6E0D8", "#CC9A8E"]
+        case .gold: ["#F1DFB2", "#9A773F"]
+        }
+    }
+
+    var yenColors: [String] {
+        switch self {
+        case .navy, .black, .forest, .wine, .plum: Self.goldMark
+        case .teal: Self.silverMark
+        case .ivory, .white: Self.deepGoldMark
+        case .sky: ["#18253F", "#0B1324"]
+        case .sage: ["#143C32", "#0A241D"]
+        case .rose: ["#5A1E2E", "#3A0F1C"]
+        case .gold: Self.inkMark
+        }
+    }
+
+    var dialColors: [String] {
+        self == .ivory ? Self.inkMark : yenColors
+    }
 }

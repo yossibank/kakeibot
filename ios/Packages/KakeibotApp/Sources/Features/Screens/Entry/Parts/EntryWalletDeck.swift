@@ -118,28 +118,7 @@ private extension EntryWalletDeck {
                 IconImage(model.output.icon(for: wallet), size: 16)
                     .foregroundStyle(isSelected ? Palette.accent : Palette.subtext)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 4) {
-                        Text(wallet.name)
-                            .textFont(.subheadline, weight: .medium)
-                            .foregroundStyle(isSelected ? Palette.accentStrong : Palette.text)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-
-                        if model.output.isShared(wallet) {
-                            SharedMark()
-                        }
-                    }
-
-                    if let balance = model.output.balanceText(of: wallet) {
-                        Text(balance)
-                            .textFont(.caption2)
-                            .monospacedDigit()
-                            .foregroundStyle(Palette.subtext)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
-                }
+                tileText(wallet, isSelected: isSelected)
 
                 Spacer(minLength: 0)
             }
@@ -161,6 +140,34 @@ private extension EntryWalletDeck {
         .buttonStyle(.plain)
         .disabled(isLocked)
         .opacity(isLocked ? 0.45 : 1)
+    }
+
+    func tileText(
+        _ wallet: Wallet,
+        isSelected: Bool
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 4) {
+                Text(wallet.name)
+                    .textFont(.subheadline, weight: .medium)
+                    .foregroundStyle(isSelected ? Palette.accentStrong : Palette.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                if model.output.isShared(wallet) {
+                    SharedMark()
+                }
+            }
+
+            if let balance = model.output.balanceText(of: wallet) {
+                Text(balance)
+                    .textFont(.caption2)
+                    .monospacedDigit()
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
     }
 }
 

@@ -39,124 +39,9 @@ public struct EntrySheet: View {
 
     public var body: some View {
         FloatingInputReader { proxy in
-            ZStack(alignment: .top) {
-                fittedContent(in: proxy.size.height)
-                    .floatingInput(isPresented: model.state.screen.isEditingMemo) {
-                        editMemo(false)
-                    } card: {
-                        EntryMemoCard(model: model, isFocused: $isMemoFocused) {
-                            editMemo(false)
-                        }
-                    }
+            let screen = layers(in: proxy.size.height)
 
-                if let category = model.state.screen.menuCategory {
-                    categoryMenuLayer(category, at: layout.menuFrame)
-                }
-
-                receiptLayer
-
-                voiceNoticeLayer(bottom: bannerBottom)
-            }
-            .coordinateSpace(.named(Self.coordinateSpace))
-            .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.size.width
-            } action: { width in
-                layout.sheetWidth = width
-            }
-            .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.safeAreaInsets.bottom
-            } action: { inset in
-                layout.bottomInset = inset
-            }
-            .haptic(
-                .impact(weight: .medium),
-                trigger: model.state.screen.menuCategory
-            ) { _, category in
-                category != nil
-            }
-            .onChange(of: voice.output.isActive) {
-                if voice.output.isActive {
-                    show(.amount)
-                }
-            }
-            .haptic(.impact(weight: .light), trigger: voice.state.startCount)
-            .haptic(.impact(weight: .light), trigger: voice.state.endCount)
-            .errorBanner(
-                model.state.errorNotice,
-                bottom: bannerBottom
-            ) {
-                model.state.errorNotice.clear()
-            }
-            .deletionNotice(
-                Bindable(model.state).results.deletion,
-                bottom: bannerBottom
-            ) { deletion in
-                model.perform {
-                    await $0.restore(deletion)
-                    await $0.reloadWallets()
-                }
-            }
-            .settingsHideNotice(
-                Bindable(model.state).results.hiddenCategory,
-                bottom: bannerBottom
-            ) { hidden in
-                model.perform {
-                    await $0.showCategory(hidden)
-                }
-            }
-            .onOutcome(model.state.results.outcome) { outcome in
-                receive(outcome)
-            }
-            .onOutcome(receipt.state.outcome) { outcome in
-                receive(outcome)
-            }
-            .entryNotice(
-                notice,
-                above: bannerBottom - 12,
-                clearsOnTap: false
-            )
-            .onChange(of: notice.state.notice) {
-                if notice.state.notice == .undone {
-                    model.perform {
-                        await $0.reloadWallets()
-                    }
-                }
-            }
-            .proOffer(receipt.state.offer, presentsInSheet: true) {
-                receipt.closeOffer()
-            } onUnlock: {
-                receipt.closeOffer()
-            }
-            .fullScreenCover(isPresented: isScanningReceipt) {
-                receiptCamera
-            }
-            .backdrop()
-            .modifier(
-                EntryDiscardGuard(
-                    isPresented: Bindable(model.state).screen.isConfirmingDiscard,
-                    model: model
-                ) {
-                    dismiss()
-                }
-            )
-            .sheet(item: Bindable(model.state).screen.sheet, onDismiss: reloadAfterSheet) { sheet in
-                sheetContent(for: sheet)
-            }
-            .task {
-                await model.start()
-            }
-            .task {
-                await model.observeHistory()
-            }
-            .task {
-                await voice.checkAvailability()
-            }
-            .modifier(EntryTodayFollower(model: model))
-            .onDisappear {
-                voice.perform {
-                    await $0.cancel()
-                }
-            }
+            presented(noticed(screen))
         }
     }
 }
@@ -300,6 +185,135 @@ private extension EntrySheet {
             .ignoresSafeArea(edges: .bottom)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    func layers(in height: CGFloat) -> some View {
+        ZStack(alignment: .top) {
+            fittedContent(in: height)
+                .floatingInput(isPresented: model.state.screen.isEditingMemo) {
+                    editMemo(false)
+                } card: {
+                    EntryMemoCard(model: model, isFocused: $isMemoFocused) {
+                        editMemo(false)
+                    }
+                }
+
+            if let category = model.state.screen.menuCategory {
+                categoryMenuLayer(category, at: layout.menuFrame)
+            }
+
+            receiptLayer
+
+            voiceNoticeLayer(bottom: bannerBottom)
+        }
+        .coordinateSpace(.named(Self.coordinateSpace))
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { width in
+            layout.sheetWidth = width
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.safeAreaInsets.bottom
+        } action: { inset in
+            layout.bottomInset = inset
+        }
+    }
+
+    func noticed(_ content: some View) -> some View {
+        content
+            .haptic(
+                .impact(weight: .medium),
+                trigger: model.state.screen.menuCategory
+            ) { _, category in
+                category != nil
+            }
+            .onChange(of: voice.output.isActive) {
+                if voice.output.isActive {
+                    show(.amount)
+                }
+            }
+            .haptic(.impact(weight: .light), trigger: voice.state.startCount)
+            .haptic(.impact(weight: .light), trigger: voice.state.endCount)
+            .errorBanner(
+                model.state.errorNotice,
+                bottom: bannerBottom
+            ) {
+                model.state.errorNotice.clear()
+            }
+            .deletionNotice(
+                Bindable(model.state).results.deletion,
+                bottom: bannerBottom
+            ) { deletion in
+                model.perform {
+                    await $0.restore(deletion)
+                    await $0.reloadWallets()
+                }
+            }
+            .settingsHideNotice(
+                Bindable(model.state).results.hiddenCategory,
+                bottom: bannerBottom
+            ) { hidden in
+                model.perform {
+                    await $0.showCategory(hidden)
+                }
+            }
+            .onOutcome(model.state.results.outcome) { outcome in
+                receive(outcome)
+            }
+            .onOutcome(receipt.state.outcome) { outcome in
+                receive(outcome)
+            }
+            .entryNotice(
+                notice,
+                above: bannerBottom - 12,
+                clearsOnTap: false
+            )
+            .onChange(of: notice.state.notice) {
+                if notice.state.notice == .undone {
+                    model.perform {
+                        await $0.reloadWallets()
+                    }
+                }
+            }
+    }
+
+    func presented(_ content: some View) -> some View {
+        content
+            .proOffer(receipt.state.offer, presentsInSheet: true) {
+                receipt.closeOffer()
+            } onUnlock: {
+                receipt.closeOffer()
+            }
+            .fullScreenCover(isPresented: isScanningReceipt) {
+                receiptCamera
+            }
+            .backdrop()
+            .modifier(
+                EntryDiscardGuard(
+                    isPresented: Bindable(model.state).screen.isConfirmingDiscard,
+                    model: model
+                ) {
+                    dismiss()
+                }
+            )
+            .sheet(item: Bindable(model.state).screen.sheet, onDismiss: reloadAfterSheet) { sheet in
+                sheetContent(for: sheet)
+            }
+            .task {
+                await model.start()
+            }
+            .task {
+                await model.observeHistory()
+            }
+            .task {
+                await voice.checkAvailability()
+            }
+            .modifier(EntryTodayFollower(model: model))
+            .onDisappear {
+                voice.perform {
+                    await $0.cancel()
+                }
+            }
     }
 
     @ViewBuilder

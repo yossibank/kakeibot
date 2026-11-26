@@ -127,7 +127,8 @@ struct EntryVoiceFlowTests {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
         let source = FakeVoiceSource()
-        let flow = EntryVoiceFlow(dependencies: .fake(source))
+        let clock = FakeVoiceClock()
+        let flow = EntryVoiceFlow(dependencies: .fake(source, clock: clock))
 
         await flow.start(for: model, today: setup.date) {}
 
@@ -137,7 +138,7 @@ struct EntryVoiceFlowTests {
         source.say("500円")
         let first = try #require(flow.state.silenceStart)
 
-        try await Task.sleep(for: .milliseconds(20))
+        clock.advance(by: .milliseconds(20))
         source.hear(0.8)
 
         #expect(flow.state.silenceStart == nil)
@@ -176,15 +177,20 @@ struct EntryVoiceFlowTests {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
         let source = FakeVoiceSource()
-        let flow = EntryVoiceFlow(dependencies: .fake(source))
+        let clock = FakeVoiceClock()
+        let flow = EntryVoiceFlow(dependencies: .fake(source, clock: clock))
 
         await flow.start(for: model, today: setup.date) {}
         source.say("500円")
+        let silence = try #require(flow.input.silenceTask)
+        await ObservationWait.until { clock.isSleeping }
 
         for _ in 0..<6 {
             source.hear(0.8)
-            try await Task.sleep(for: .milliseconds(40))
+            clock.advance(by: .milliseconds(40))
         }
+
+        await silence.value
 
         #expect(flow.state.step == .listening)
 

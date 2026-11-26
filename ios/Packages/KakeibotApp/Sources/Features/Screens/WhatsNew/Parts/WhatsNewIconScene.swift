@@ -84,10 +84,10 @@ private extension WhatsNewIconScene {
 }
 
 private extension WhatsNewIconScene {
+    static let emojis = ["🍚", "🍗", "🌮", "🍲"]
+
     static let symbols = [
         ["figure.climbing", "film.stack", "dryer"],
         ["giftcard", "play.rectangle", "figure.bowling"]
     ]
-
-    static let emojis = ["🍚", "🍗", "🌮", "🍲"]
 }

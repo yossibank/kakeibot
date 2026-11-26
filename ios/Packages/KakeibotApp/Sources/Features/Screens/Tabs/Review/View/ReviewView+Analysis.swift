@@ -33,19 +33,7 @@ extension ReviewView {
                         in: .rect(cornerRadius: ReviewReportRadius.block)
                     )
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(bannerLabel)
-                        .textFont(.caption2, weight: .bold)
-                        .tracking(2)
-                        .foregroundStyle(Palette.accent)
-
-                    Text(bannerTitle)
-                        .displayFont(style: .subheadline, weight: .bold)
-                        .foregroundStyle(Palette.text)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .contentTransition(periodTextTransition)
-                }
+                bannerText
 
                 Spacer(minLength: 8)
 
@@ -137,6 +125,22 @@ extension ReviewView {
 }
 
 private extension ReviewView {
+    var bannerText: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(bannerLabel)
+                .textFont(.caption2, weight: .bold)
+                .tracking(2)
+                .foregroundStyle(Palette.accent)
+
+            Text(bannerTitle)
+                .displayFont(style: .subheadline, weight: .bold)
+                .foregroundStyle(Palette.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .contentTransition(periodTextTransition)
+        }
+    }
+
     @ViewBuilder
     func sheetContent(_ slide: PageSlideProxy) -> some View {
         if model.output.isCurrentPeriod {

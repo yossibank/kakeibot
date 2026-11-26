@@ -38,66 +38,74 @@ struct ReviewProgressView: View {
 
 private extension ReviewProgressView {
     var closingCard: some View {
-        let day = closingDate.monthDayText
-
-        return VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 16) {
             ReviewReportLabel(title: closingTitle)
 
-            HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(alignment: .lastTextBaseline, spacing: 4) {
-                        Text(day)
-                            .displayFont(.largeTitle, weight: .bold)
-                            .foregroundStyle(Palette.accent)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
+            closingHead
 
-                        Text("に届きます")
-                            .displayFont(.body, weight: .bold)
-                            .foregroundStyle(Palette.text)
-                            .fixedSize()
-                    }
-
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 8) {
-                            daysLeftChip
-
-                            closingNote
-                        }
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            daysLeftChip
-
-                            closingNote
-                        }
-                    }
-                }
-
-                Spacer(minLength: 0)
-
-                envelope
-            }
-
-            VStack(spacing: 4) {
-                closingRow(1, "checkmark.seal", "一手の答え合わせ", "決めた一手を守れたか")
-                closingRow(2, "arrow.up.arrow.down", "いつもと比べる", "多めと少なめのカテゴリ")
-                closingRow(3, "sparkles", "よかったこと", "減らせた所と続いたこと")
-                closingRow(4, "flag", nextGoalTitle, "AI が次の目標を 1 つ決めます")
-            }
-            .background(alignment: .leading) {
-                Rectangle()
-                    .fill(Self.pathFill)
-                    .frame(width: 2)
-                    .frame(width: 40)
-                    .padding(.vertical, 24)
-            }
+            closingSteps
 
             BandLinkButton(previousTitle, action: onOpenPrevious)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .card(cornerRadius: 24)
+    }
+
+    var closingHead: some View {
+        let day = closingDate.monthDayText
+
+        return HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text(day)
+                        .displayFont(.largeTitle, weight: .bold)
+                        .foregroundStyle(Palette.accent)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+
+                    Text("に届きます")
+                        .displayFont(.body, weight: .bold)
+                        .foregroundStyle(Palette.text)
+                        .fixedSize()
+                }
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) {
+                        daysLeftChip
+
+                        closingNote
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        daysLeftChip
+
+                        closingNote
+                    }
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            envelope
+        }
+    }
+
+    var closingSteps: some View {
+        VStack(spacing: 4) {
+            closingRow(1, "checkmark.seal", "一手の答え合わせ", "決めた一手を守れたか")
+            closingRow(2, "arrow.up.arrow.down", "いつもと比べる", "多めと少なめのカテゴリ")
+            closingRow(3, "sparkles", "よかったこと", "減らせた所と続いたこと")
+            closingRow(4, "flag", nextGoalTitle, "AI が次の目標を 1 つ決めます")
+        }
+        .background(alignment: .leading) {
+            Rectangle()
+                .fill(Self.pathFill)
+                .frame(width: 2)
+                .frame(width: 40)
+                .padding(.vertical, 24)
+        }
     }
 
     var daysLeftChip: some View {
@@ -129,82 +137,93 @@ private extension ReviewProgressView {
 
     func paceCard(_ pace: ReviewPace) -> some View {
         let limitName = pace.limitName(unit: unit)
-        let leadColor = pace.lead >= 0 ? Palette.accent : Palette.increase
-        let leadSuffix = pace.lead >= 0 ? "少ない" : "多い"
-        let projectedColor = pace.projectedLeft >= 0 ? Palette.accent : Palette.increase
-        let projectedBadge = pace.projectedLeft >= 0 ? "余る見込み" : "足りない見込み"
-        let lead = ReviewYen.number(abs(pace.lead))
-        let spent = ReviewYen.number(pace.spent)
-        let elapsed = "\(ReviewPace.percent(pace.elapsedRatio))"
-        let perDay = ReviewYen.number(pace.perDay)
-        let projected = ReviewYen.number(abs(pace.projectedLeft))
 
         return VStack(alignment: .leading, spacing: 16) {
             ReviewReportLabel(title: "いまのペース")
 
             ReviewReportGaugeRow(pace: pace, limitName: limitName, showsMarker: true) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(Self.verdictText(pace))
-                        .displayFont(.title, weight: .bold)
-                        .foregroundStyle(Palette.gold)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.5)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Rectangle()
-                        .fill(Palette.line)
-                        .frame(height: 1)
-
-                    ReviewReportLead(
-                        caption: "ペースより",
-                        value: lead,
-                        suffix: leadSuffix,
-                        color: leadColor
-                    )
-                }
+                paceVerdict(pace)
             }
 
-            Grid(horizontalSpacing: 1, verticalSpacing: 1) {
-                GridRow {
-                    ReviewReportStat(
-                        title: "使った",
-                        systemImage: "yensign.circle",
-                        value: spent,
-                        unit: "円",
-                        note: "\(limitName) \(ReviewYen.text(pace.limit))"
-                    )
-
-                    ReviewReportStat(
-                        title: "今日までの目安",
-                        systemImage: "clock",
-                        value: elapsed,
-                        unit: "%",
-                        progress: pace.elapsedRatio
-                    )
-                }
-
-                GridRow {
-                    ReviewReportStat(
-                        title: "残りの 1 日に使える",
-                        systemImage: "sun.max",
-                        value: perDay,
-                        unit: "円",
-                        note: Self.perDayNote(pace)
-                    )
-
-                    ReviewReportStat(
-                        title: "このままだと\(unit)末",
-                        systemImage: "arrow.forward",
-                        value: projected,
-                        unit: "円",
-                        badge: projectedBadge,
-                        color: projectedColor
-                    )
-                }
-            }
-            .reviewStatGrid()
+            paceStats(pace)
         }
         .reviewHero()
+    }
+
+    func paceVerdict(_ pace: ReviewPace) -> some View {
+        let leadColor = pace.lead >= 0 ? Palette.accent : Palette.increase
+        let leadSuffix = pace.lead >= 0 ? "少ない" : "多い"
+        let lead = ReviewYen.number(abs(pace.lead))
+
+        return VStack(alignment: .leading, spacing: 12) {
+            Text(Self.verdictText(pace))
+                .displayFont(.title, weight: .bold)
+                .foregroundStyle(Palette.gold)
+                .lineLimit(2)
+                .minimumScaleFactor(0.5)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Rectangle()
+                .fill(Palette.line)
+                .frame(height: 1)
+
+            ReviewReportLead(
+                caption: "ペースより",
+                value: lead,
+                suffix: leadSuffix,
+                color: leadColor
+            )
+        }
+    }
+
+    func paceStats(_ pace: ReviewPace) -> some View {
+        let limitName = pace.limitName(unit: unit)
+        let projectedColor = pace.projectedLeft >= 0 ? Palette.accent : Palette.increase
+        let projectedBadge = pace.projectedLeft >= 0 ? "余る見込み" : "足りない見込み"
+        let spent = ReviewYen.number(pace.spent)
+        let elapsed = "\(ReviewPace.percent(pace.elapsedRatio))"
+        let perDay = ReviewYen.number(pace.perDay)
+        let projected = ReviewYen.number(abs(pace.projectedLeft))
+
+        return Grid(horizontalSpacing: 1, verticalSpacing: 1) {
+            GridRow {
+                ReviewReportStat(
+                    title: "使った",
+                    systemImage: "yensign.circle",
+                    value: spent,
+                    unit: "円",
+                    note: "\(limitName) \(ReviewYen.text(pace.limit))"
+                )
+
+                ReviewReportStat(
+                    title: "今日までの目安",
+                    systemImage: "clock",
+                    value: elapsed,
+                    unit: "%",
+                    progress: pace.elapsedRatio
+                )
+            }
+
+            GridRow {
+                ReviewReportStat(
+                    title: "残りの 1 日に使える",
+                    systemImage: "sun.max",
+                    value: perDay,
+                    unit: "円",
+                    note: Self.perDayNote(pace)
+                )
+
+                ReviewReportStat(
+                    title: "このままだと\(unit)末",
+                    systemImage: "arrow.forward",
+                    value: projected,
+                    unit: "円",
+                    badge: projectedBadge,
+                    color: projectedColor
+                )
+            }
+        }
+        .reviewStatGrid()
     }
 
     func closingRow(

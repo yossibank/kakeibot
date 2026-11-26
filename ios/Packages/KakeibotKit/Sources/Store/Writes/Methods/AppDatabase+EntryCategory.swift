@@ -101,28 +101,7 @@ private extension AppDatabase {
             throw EntryTagDraft.Problem.duplicateName
         }
 
-        var restorable = existing
-            .filter { $0.archivedAt != nil }
-            .sorted { ($0.createdAt, $0.id.description) < ($1.createdAt, $1.id.description) }
-
-        let drafts = zip(drafts, names).map { draft, name in
-            guard draft.id == nil else {
-                return draft
-            }
-
-            let index = restorable.firstIndex { $0.name == name }
-
-            guard let index else {
-                return draft
-            }
-
-            var restored = draft
-
-            restored.id = restorable.remove(at: index).id
-
-            return restored
-        }
-
+        let drafts = restoring(drafts, names: names, from: existing)
         let keptIds = drafts.compactMap(\.id)
         let kept = Set(keptIds)
 
@@ -152,6 +131,34 @@ private extension AppDatabase {
             try saved.update(db)
 
             return saved
+        }
+    }
+
+    static func restoring(
+        _ drafts: [EntryTagDraft],
+        names: [String],
+        from existing: [EntryTag]
+    ) -> [EntryTagDraft] {
+        var restorable = existing
+            .filter { $0.archivedAt != nil }
+            .sorted { ($0.createdAt, $0.id.description) < ($1.createdAt, $1.id.description) }
+
+        return zip(drafts, names).map { draft, name in
+            guard draft.id == nil else {
+                return draft
+            }
+
+            let index = restorable.firstIndex { $0.name == name }
+
+            guard let index else {
+                return draft
+            }
+
+            var restored = draft
+
+            restored.id = restorable.remove(at: index).id
+
+            return restored
         }
     }
 }

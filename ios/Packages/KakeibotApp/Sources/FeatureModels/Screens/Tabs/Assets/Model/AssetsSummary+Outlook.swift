@@ -37,7 +37,7 @@ extension AssetsSummary.Input {
         let inPeriod = plans.filter { $0.date <= end }
 
         let planned = inPeriod.map { plan in
-            Draft(
+            OutlookDraft(
                 source: .plan(plan.id),
                 date: plan.date,
                 title: plan.title,
@@ -47,7 +47,6 @@ extension AssetsSummary.Input {
         }
 
         let upcoming = recurringDrafts(in: period, wallets: wallets)
-
         let drafts = (planned + upcoming).sorted { $0.date < $1.date }
         var balance = start
 
@@ -74,14 +73,6 @@ extension AssetsSummary.Input {
 }
 
 private extension AssetsSummary.Input {
-    struct Draft {
-        let source: AssetsModel.OutlookItem.Source
-        let date: LocalDate
-        let title: String
-        let wallet: String?
-        let change: Int
-    }
-
     static func walletText(
         of entry: Entry,
         in list: EntryList
@@ -112,7 +103,6 @@ private extension AssetsSummary.Input {
         let isToAvailable = recurring.toWalletId.map(ids.contains) ?? false
         let outgoing = isFromAvailable ? -item.amount : 0
         let incoming = isToAvailable ? item.amount : 0
-
         let fee = isFromAvailable ? recurring.fee ?? 0 : 0
 
         switch recurring.type {
@@ -125,7 +115,7 @@ private extension AssetsSummary.Input {
     func recurringDrafts(
         in period: ClosedRange<LocalDate>,
         wallets: [Wallet]
-    ) -> [Draft] {
+    ) -> [OutlookDraft] {
         guard let list else {
             return []
         }
@@ -146,7 +136,7 @@ private extension AssetsSummary.Input {
                     return nil
                 }
 
-                return Draft(
+                return OutlookDraft(
                     source: .recurring(item.recurring.id, item.date),
                     date: item.date,
                     title: list.title(of: item.recurring) ?? "固定費",
@@ -155,4 +145,12 @@ private extension AssetsSummary.Input {
                 )
             }
     }
+}
+
+private struct OutlookDraft {
+    let source: AssetsModel.OutlookItem.Source
+    let date: LocalDate
+    let title: String
+    let wallet: String?
+    let change: Int
 }

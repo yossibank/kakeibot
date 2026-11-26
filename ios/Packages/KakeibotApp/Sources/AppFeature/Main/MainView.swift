@@ -90,6 +90,46 @@ struct MainView: View {
     }
 
     var body: some View {
+        runningTabs
+            .onChange(of: scenePhase) { _, phase in
+                model.state.changeScene(to: ForegroundReturn.Phase(phase))
+            }
+            .onChange(of: route) { _, route in
+                if isRevealed,
+                   let route {
+                    open(route)
+                }
+            }
+            .onChange(of: model.state.sheet) { _, sheet in
+                markOpened(sheet)
+            }
+            .onChange(of: today) { _, today in
+                home.state.today = today
+                records.state.today = today
+                review.state.today = today
+                assets.setToday(today)
+                model.setToday(today)
+            }
+    }
+}
+
+extension MainView {
+    struct Layout {
+        var orderMenuAnchor: CGRect?
+    }
+}
+
+private extension MainView {
+    enum NoticeSource {
+        case entry
+        case deletion
+        case undoError
+        case tab
+    }
+}
+
+private extension MainView {
+    var tabStack: some View {
         ZStack {
             homeTab
 
@@ -126,105 +166,78 @@ struct MainView: View {
         .overlay {
             notices
         }
-        .background {
-            if model.state.isWarmingEntry {
-                entryWarmup
-            }
+    }
 
-            MainLoadSignal {
-                isLoaded
-            } onLoad: {
-                onLoad()
-            }
+    @ViewBuilder
+    var signals: some View {
+        if model.state.isWarmingEntry {
+            entryWarmup
+        }
 
-            MainOutcomeSignal {
-                home.state.outcome
-            } onOutcome: { change in
-                show(change)
-            }
+        MainLoadSignal {
+            isLoaded
+        } onLoad: {
+            onLoad()
+        }
 
-            MainOutcomeSignal {
-                appReview.state.outcome
-            } onOutcome: {
-                requestReview()
-            }
+        MainOutcomeSignal {
+            home.state.outcome
+        } onOutcome: { change in
+            show(change)
         }
-        .sheet(item: Bindable(model.state).sheet) {
-            model.prepareDraft()
-        } content: { sheet in
-            sheetContent(for: sheet)
-                .presentationSizing(.tallForm)
-        }
-        .task(id: model.state.observationRound) {
-            await home.run()
-        }
-        .task(id: model.state.observationRound) {
-            await records.run()
-        }
-        .task(id: model.state.observationRound) {
-            await review.run()
-        }
-        .task(id: model.state.observationRound) {
-            await assets.run()
-        }
-        .task(id: model.state.observationRound) {
-            await setup.run()
-        }
-        .task {
-            await model.state.draft.load()
-        }
-        .task {
-            await chooseLaunchTab()
-        }
-        .task(id: isLaunchReady) {
-            guard isLaunchReady else {
-                return
-            }
 
-            if let route {
-                open(route)
-            } else {
-                openLaunchSheet()
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            model.state.changeScene(to: ForegroundReturn.Phase(phase))
-        }
-        .onChange(of: route) { _, route in
-            if isRevealed,
-               let route {
-                open(route)
-            }
-        }
-        .onChange(of: model.state.sheet) { _, sheet in
-            markOpened(sheet)
-        }
-        .onChange(of: today) { _, today in
-            home.state.today = today
-            records.state.today = today
-            review.state.today = today
-            assets.setToday(today)
-            model.setToday(today)
+        MainOutcomeSignal {
+            appReview.state.outcome
+        } onOutcome: {
+            requestReview()
         }
     }
-}
 
-extension MainView {
-    struct Layout {
-        var orderMenuAnchor: CGRect?
+    var runningTabs: some View {
+        tabStack
+            .background {
+                signals
+            }
+            .sheet(item: Bindable(model.state).sheet) {
+                model.prepareDraft()
+            } content: { sheet in
+                sheetContent(for: sheet)
+                    .presentationSizing(.tallForm)
+            }
+            .task(id: model.state.observationRound) {
+                await home.run()
+            }
+            .task(id: model.state.observationRound) {
+                await records.run()
+            }
+            .task(id: model.state.observationRound) {
+                await review.run()
+            }
+            .task(id: model.state.observationRound) {
+                await assets.run()
+            }
+            .task(id: model.state.observationRound) {
+                await setup.run()
+            }
+            .task {
+                await model.state.draft.load()
+            }
+            .task {
+                await chooseLaunchTab()
+            }
+            .task(id: isLaunchReady) {
+                guard isLaunchReady else {
+                    return
+                }
+
+                if let route {
+                    open(route)
+                } else {
+                    openLaunchSheet()
+                }
+            }
     }
-}
 
-private extension MainView {
-    enum NoticeSource {
-        case entry
-        case deletion
-        case undoError
-        case tab
-    }
-}
-
-private extension MainView {
     var tabBar: some View {
         MainTabBar(
             state: model.state,

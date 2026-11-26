@@ -10,55 +10,9 @@ struct SyncInviteCard: View {
     var body: some View {
         ModalCard(maxWidth: 360, onDismiss: onCancel) {
             VStack(spacing: 20) {
-                VStack(spacing: 12) {
-                    Image(systemName: "person.2")
-                        .sansFont(.headline, weight: .ultraLight)
-                        .foregroundStyle(Palette.accent)
-                        .frame(width: 52, height: 52)
-                        .overlay {
-                            Circle()
-                                .stroke(Palette.outline, lineWidth: 0.8)
-                        }
+                heading
 
-                    Text(item.wallet.name)
-                        .textFont(.subheadline, weight: .bold)
-                        .foregroundStyle(Palette.subtext)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-
-                    Text("この口座を\nほかの人と共有します")
-                        .displayFont(.headline, weight: .medium)
-                        .foregroundStyle(Palette.accentStrong)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text("家族やパートナーなど、iCloud を使う人を招待できます。")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                VStack(alignment: .leading, spacing: 16) {
-                    point(
-                        "tray.full",
-                        title: "共有するもの",
-                        text: "この口座と、その記録・カテゴリです。\n一緒に付けて、直せます。"
-                    )
-
-                    point(
-                        "person.crop.circle.badge.checkmark",
-                        title: "相手に要るもの",
-                        text: "かけいぼっとと、iCloud へのサインインです。\n届いたリンクを開くと参加できます。"
-                    )
-
-                    point(
-                        "hand.raised",
-                        title: "やめるとき",
-                        text: "この画面で、いつでもやめられます。\n相手の端末からは消えます。"
-                    )
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                points
 
                 Text("次の画面で、メッセージなどから招待を送ります")
                     .textFont(.caption)
@@ -76,6 +30,60 @@ struct SyncInviteCard: View {
 }
 
 private extension SyncInviteCard {
+    var heading: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "person.2")
+                .sansFont(.headline, weight: .ultraLight)
+                .foregroundStyle(Palette.accent)
+                .frame(width: 52, height: 52)
+                .overlay {
+                    Circle()
+                        .stroke(Palette.outline, lineWidth: 0.8)
+                }
+
+            Text(item.wallet.name)
+                .textFont(.subheadline, weight: .bold)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+
+            Text("この口座を\nほかの人と共有します")
+                .displayFont(.headline, weight: .medium)
+                .foregroundStyle(Palette.accentStrong)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("家族やパートナーなど、iCloud を使う人を招待できます。")
+                .textFont(.caption)
+                .foregroundStyle(Palette.subtext)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    var points: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            point(
+                "tray.full",
+                title: "共有するもの",
+                text: "この口座と、その記録・カテゴリです。\n一緒に付けて、直せます。"
+            )
+
+            point(
+                "person.crop.circle.badge.checkmark",
+                title: "相手に要るもの",
+                text: "かけいぼっとと、iCloud へのサインインです。\n届いたリンクを開くと参加できます。"
+            )
+
+            point(
+                "hand.raised",
+                title: "やめるとき",
+                text: "この画面で、いつでもやめられます。\n相手の端末からは消えます。"
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     func point(
         _ systemImage: String,
         title: String,

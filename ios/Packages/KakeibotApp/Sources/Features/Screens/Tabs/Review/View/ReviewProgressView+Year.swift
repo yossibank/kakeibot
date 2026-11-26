@@ -5,94 +5,102 @@ import SwiftUI
 
 extension ReviewProgressView {
     func yearCard(_ year: ReviewYearProgress) -> some View {
-        let spent = ReviewYen.number(year.spent)
-
-        return VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 16) {
             ReviewReportLabel(title: "\(currentName)の 12 か月")
 
-            VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("今日までに使った")
-                        .textFont(.caption)
-                        .foregroundStyle(Palette.subtext)
-
-                    HStack(alignment: .lastTextBaseline, spacing: 2) {
-                        Text(spent)
-                            .displayFont(.title, weight: .bold)
-                            .foregroundStyle(Palette.gold)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-
-                        Text("円")
-                            .displayFont(.small, weight: .bold)
-                            .foregroundStyle(Palette.accent)
-                            .fixedSize()
-                    }
-                }
-
-                if let previous = year.previousSpent {
-                    let difference = previous - year.spent
-                    let value = ReviewYen.number(abs(difference))
-                    let suffix = difference >= 0 ? "少ない" : "多い"
-                    let color = difference >= 0 ? Palette.accent : Palette.increase
-
-                    Rectangle()
-                        .fill(Palette.line)
-                        .frame(height: 1)
-
-                    ReviewReportLead(
-                        caption: "前の年の同じ日までより",
-                        value: value,
-                        suffix: suffix,
-                        color: color
-                    )
-                }
-            }
+            yearSpent(year)
 
             yearChart(year)
 
-            Grid(horizontalSpacing: 1, verticalSpacing: 1) {
-                GridRow {
-                    ReviewReportStat(
-                        title: "月の平均",
-                        systemImage: "chart.bar",
-                        value: year.average.map(ReviewYen.number) ?? "−",
-                        unit: "円",
-                        note: "締めた \(year.closedMonths.count) か月"
-                    )
-
-                    ReviewReportStat(
-                        title: "いちばん多い月",
-                        systemImage: "flame",
-                        value: year.peak.map { ReviewYen.number($0.total) } ?? "−",
-                        unit: "円",
-                        note: year.peak?.name
-                    )
-                }
-
-                if year.budgetedCount > 0 {
-                    let ratio = Double(year.withinBudgetCount) / Double(year.budgetedCount)
-
-                    GridRow {
-                        ReviewReportStat(
-                            title: "予算内の月",
-                            systemImage: "rosette",
-                            value: "\(year.withinBudgetCount)",
-                            unit: "/ \(year.budgetedCount) か月",
-                            progress: ratio
-                        )
-                        .gridCellColumns(2)
-                    }
-                }
-            }
-            .reviewStatGrid()
+            yearStats(year)
         }
         .reviewHero()
     }
 }
 
 private extension ReviewProgressView {
+    func yearSpent(_ year: ReviewYearProgress) -> some View {
+        let spent = ReviewYen.number(year.spent)
+
+        return VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("今日までに使った")
+                    .textFont(.caption)
+                    .foregroundStyle(Palette.subtext)
+
+                HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    Text(spent)
+                        .displayFont(.title, weight: .bold)
+                        .foregroundStyle(Palette.gold)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+
+                    Text("円")
+                        .displayFont(.small, weight: .bold)
+                        .foregroundStyle(Palette.accent)
+                        .fixedSize()
+                }
+            }
+
+            if let previous = year.previousSpent {
+                let difference = previous - year.spent
+                let value = ReviewYen.number(abs(difference))
+                let suffix = difference >= 0 ? "少ない" : "多い"
+                let color = difference >= 0 ? Palette.accent : Palette.increase
+
+                Rectangle()
+                    .fill(Palette.line)
+                    .frame(height: 1)
+
+                ReviewReportLead(
+                    caption: "前の年の同じ日までより",
+                    value: value,
+                    suffix: suffix,
+                    color: color
+                )
+            }
+        }
+    }
+
+    func yearStats(_ year: ReviewYearProgress) -> some View {
+        Grid(horizontalSpacing: 1, verticalSpacing: 1) {
+            GridRow {
+                ReviewReportStat(
+                    title: "月の平均",
+                    systemImage: "chart.bar",
+                    value: year.average.map(ReviewYen.number) ?? "−",
+                    unit: "円",
+                    note: "締めた \(year.closedMonths.count) か月"
+                )
+
+                ReviewReportStat(
+                    title: "いちばん多い月",
+                    systemImage: "flame",
+                    value: year.peak.map { ReviewYen.number($0.total) } ?? "−",
+                    unit: "円",
+                    note: year.peak?.name
+                )
+            }
+
+            if year.budgetedCount > 0 {
+                let ratio = Double(year.withinBudgetCount) / Double(year.budgetedCount)
+
+                GridRow {
+                    ReviewReportStat(
+                        title: "予算内の月",
+                        systemImage: "rosette",
+                        value: "\(year.withinBudgetCount)",
+                        unit: "/ \(year.budgetedCount) か月",
+                        progress: ratio
+                    )
+                    .gridCellColumns(2)
+                }
+            }
+        }
+        .reviewStatGrid()
+    }
+
     func yearChart(_ year: ReviewYearProgress) -> some View {
         let largest = max(year.largest, 1)
         let averageRatio = year.average.map { Double($0) / Double(largest) }

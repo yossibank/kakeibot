@@ -21,22 +21,7 @@ struct ReviewShareSheet: View {
                     .foregroundStyle(Palette.accent)
             }
 
-            HStack(spacing: 12) {
-                badge
-
-                Text(share.name)
-                    .textFont(.headline)
-                    .foregroundStyle(Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                Spacer()
-
-                AmountText(share.amount, font: .size(.headline), color: Palette.accentStrong)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-            }
-            .padding(.horizontal, 4)
+            summary
 
             ScrollView {
                 LazyVStack(spacing: 0) {
@@ -76,6 +61,25 @@ struct ReviewShareSheet: View {
 }
 
 private extension ReviewShareSheet {
+    var summary: some View {
+        HStack(spacing: 12) {
+            badge
+
+            Text(share.name)
+                .textFont(.headline)
+                .foregroundStyle(Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+            Spacer()
+
+            AmountText(share.amount, font: .size(.headline), color: Palette.accentStrong)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+        }
+        .padding(.horizontal, 4)
+    }
+
     @ViewBuilder
     var badge: some View {
         if share.id == ReviewModel.recurringShareId {

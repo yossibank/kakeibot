@@ -37,6 +37,8 @@ extension ThemePalette {
 }
 
 private extension ThemePalette {
+    static let luminanceWeights = [0.2126, 0.7152, 0.0722]
+
     static let readableRoles: [(Role, Double)] = [
         (.accent, 3),
         (.accentStrong, 4.5),
@@ -44,8 +46,6 @@ private extension ThemePalette {
         (.subtext, 3),
         (.hint, 3)
     ]
-
-    static let luminanceWeights = [0.2126, 0.7152, 0.0722]
 
     static func luminance(_ rgb: UInt32) -> Double {
         let channels = [rgb >> 16, rgb >> 8, rgb].map { value in

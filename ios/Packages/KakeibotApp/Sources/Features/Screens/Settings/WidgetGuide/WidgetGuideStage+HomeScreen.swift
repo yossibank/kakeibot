@@ -6,36 +6,7 @@ import SwiftUI
 extension WidgetGuideStage {
     var budget: some View {
         HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text("今月あといくら")
-                    .textFont(size: .caption)
-                    .tracking(1)
-                    .foregroundStyle(Palette.accent)
-
-                Spacer(minLength: 4)
-
-                ZStack(alignment: .bottom) {
-                    HalfDial(progress: 0.62)
-
-                    AmountText(
-                        FeatureArtSample.remaining,
-                        font: .size(.headline, weight: .bold),
-                        color: Palette.accentStrong
-                    )
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.horizontal, 20)
-                }
-
-                Spacer(minLength: 4)
-
-                Text("予算 \(Yen.text(200_000))")
-                    .textFont(size: .caption)
-                    .monospacedDigit()
-                    .foregroundStyle(Palette.subtext)
-                    .frame(maxWidth: .infinity)
-            }
-            .frame(maxWidth: .infinity)
+            budgetRest
 
             VStack(alignment: .leading, spacing: 0) {
                 HStack(alignment: .firstTextBaseline) {
@@ -97,18 +68,7 @@ extension WidgetGuideStage {
 
                 Spacer(minLength: 4)
 
-                ZStack(alignment: .bottom) {
-                    HalfDial(progress: 0.62)
-
-                    AmountText(
-                        FeatureArtSample.remaining,
-                        font: .size(.headline, weight: .bold),
-                        color: Palette.accentStrong
-                    )
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.horizontal, 20)
-                }
+                remainingDial
 
                 Spacer(minLength: 4)
 
@@ -245,6 +205,43 @@ extension WidgetGuideStage {
 }
 
 private extension WidgetGuideStage {
+    var budgetRest: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("今月あといくら")
+                .textFont(size: .caption)
+                .tracking(1)
+                .foregroundStyle(Palette.accent)
+
+            Spacer(minLength: 4)
+
+            remainingDial
+
+            Spacer(minLength: 4)
+
+            Text("予算 \(Yen.text(200_000))")
+                .textFont(size: .caption)
+                .monospacedDigit()
+                .foregroundStyle(Palette.subtext)
+                .frame(maxWidth: .infinity)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    var remainingDial: some View {
+        ZStack(alignment: .bottom) {
+            HalfDial(progress: 0.62)
+
+            AmountText(
+                FeatureArtSample.remaining,
+                font: .size(.headline, weight: .bold),
+                color: Palette.accentStrong
+            )
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .padding(.horizontal, 20)
+        }
+    }
+
     func row(
         _ title: String,
         amount: Int

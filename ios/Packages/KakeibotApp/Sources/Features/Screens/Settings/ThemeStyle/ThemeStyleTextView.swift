@@ -43,39 +43,9 @@ public struct ThemeStyleTextView: View {
                 }
             }
 
-            ThemeStyleChoices(
-                title: "見出しと金額の字体",
-                options: ThemeFont.allCases,
-                selection: model.output.style.displayFont,
-                columns: 3,
-                label: \.title,
-                isLocked: isLocked
-            ) { font in
-                fontSample(
-                    Yen.text(Self.sampleAmount),
-                    font: .display(.headline, in: font, scale: 1),
-                    scale: 0.5
-                )
-            } choose: { font in
-                choose(.display(font))
-            }
+            displayFontChoices
 
-            ThemeStyleChoices(
-                title: "本文の字体",
-                options: ThemeFont.allCases,
-                selection: model.output.style.textFont,
-                columns: 3,
-                label: \.title,
-                isLocked: isLocked
-            ) { font in
-                fontSample(
-                    Self.sampleText,
-                    font: .text(.subheadline, in: font, scale: 1),
-                    scale: 0.8
-                )
-            } choose: { font in
-                choose(.text(font))
-            }
+            textFontChoices
         }
         .proOffer(model.state.fontOffer?.feature) {
             model.closeFontOffer()
@@ -151,6 +121,44 @@ private extension ThemeStyleTextView {
         .card()
     }
 
+    var displayFontChoices: some View {
+        ThemeStyleChoices(
+            title: "見出しと金額の字体",
+            options: ThemeFont.allCases,
+            selection: model.output.style.displayFont,
+            columns: 3,
+            label: \.title,
+            isLocked: isLocked
+        ) { font in
+            fontSample(
+                Yen.text(Self.sampleAmount),
+                font: .display(.headline, in: font, scale: 1),
+                scale: 0.5
+            )
+        } choose: { font in
+            choose(.display(font))
+        }
+    }
+
+    var textFontChoices: some View {
+        ThemeStyleChoices(
+            title: "本文の字体",
+            options: ThemeFont.allCases,
+            selection: model.output.style.textFont,
+            columns: 3,
+            label: \.title,
+            isLocked: isLocked
+        ) { font in
+            fontSample(
+                Self.sampleText,
+                font: .text(.subheadline, in: font, scale: 1),
+                scale: 0.8
+            )
+        } choose: { font in
+            choose(.text(font))
+        }
+    }
+
     func fontSample(
         _ text: String,
         font: Font,
@@ -165,6 +173,12 @@ private extension ThemeStyleTextView {
 }
 
 private extension ThemeStyleTextView {
+    static let sizeSampleHeight: CGFloat = 30
+    static let restCardHeight: CGFloat = 108
+    static let sampleRest = 125_560
+    static let sampleAmount = 1280
+    static let sampleText = "食費・財布"
+
     static let intro = ThemeStyleIntroContent(
         systemImage: "textformat",
         headline: ("文字の大きさと字体を", "好みに変えられます"),
@@ -173,12 +187,6 @@ private extension ThemeStyleTextView {
             .init("arrow.uturn.backward", "戻ると、アプリ全体が変わります")
         ]
     )
-
-    static let sizeSampleHeight: CGFloat = 30
-    static let restCardHeight: CGFloat = 108
-    static let sampleRest = 125_560
-    static let sampleAmount = 1280
-    static let sampleText = "食費・財布"
 
     var suggestsLarge: Bool {
         dynamicTypeSize >= .xLarge && model.output.style.textSize != .large

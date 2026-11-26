@@ -86,46 +86,9 @@ extension EntryItemSheet {
 private extension EntryItemSheet {
     var content: some View {
         VStack(spacing: 0) {
-            HStack {
-                RingButton(systemImage: "questionmark") {
-                    withAnimation(.snappy) {
-                        items.state.isShowingHelp = true
-                    }
-                }
+            header
 
-                Spacer()
-
-                RingButton(systemImage: "checkmark", style: .prominent) {
-                    dismiss()
-                }
-            }
-            .overlay {
-                SheetTitle("品目")
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-
-            ScrollViewReader { proxy in
-                ScrollView {
-                    receipt
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 16)
-                }
-                .scrollBounceBehavior(.basedOnSize)
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.interactively)
-                .scrollPosition($layout.scrollPosition)
-                .onScrollGeometryChange(for: ScrollGeometry.self) { geometry in
-                    geometry
-                } action: { _, geometry in
-                    layout.scrollGeometry = geometry
-                }
-                .onOutcome(items.state.scroll) { index in
-                    withAnimation(.snappy) {
-                        proxy.scrollTo(index, anchor: .top)
-                    }
-                }
-            }
+            receiptScroll
 
             if items.state.isSlipOpen {
                 slip
@@ -158,6 +121,51 @@ private extension EntryItemSheet {
                 .onTapGesture {
                     focus = nil
                 }
+        }
+    }
+
+    var header: some View {
+        HStack {
+            RingButton(systemImage: "questionmark") {
+                withAnimation(.snappy) {
+                    items.state.isShowingHelp = true
+                }
+            }
+
+            Spacer()
+
+            RingButton(systemImage: "checkmark", style: .prominent) {
+                dismiss()
+            }
+        }
+        .overlay {
+            SheetTitle("品目")
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+    }
+
+    var receiptScroll: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                receipt
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
+            .scrollPosition($layout.scrollPosition)
+            .onScrollGeometryChange(for: ScrollGeometry.self) { geometry in
+                geometry
+            } action: { _, geometry in
+                layout.scrollGeometry = geometry
+            }
+            .onOutcome(items.state.scroll) { index in
+                withAnimation(.snappy) {
+                    proxy.scrollTo(index, anchor: .top)
+                }
+            }
         }
     }
 }

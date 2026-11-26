@@ -202,12 +202,8 @@ fun RecurringListView(
                         type = model.state.type,
                         editingId = (current as? Editing.Existing)?.id,
                         onClose = { model.state.editing = null },
-                        onOutcome = { outcome ->
-                            model.state.finishEditing(
-                                edited = current,
-                                outcome = outcome,
-                            )
-                        },
+                        onDelete = deletedNotice::show,
+                        onHide = { (current as? Editing.Existing)?.id?.let(hiddenNotice::show) },
                     )
                 }
             }

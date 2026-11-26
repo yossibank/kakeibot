@@ -110,27 +110,27 @@ private extension AppDatabase {
     ) throws -> [String] {
         switch key.table {
         case .wallet:
-            return [key.id]
+            [key.id]
 
         case .valuation:
-            return try walletColumns("SELECT wallet_id FROM valuation WHERE id = ?", key.id, in: db)
+            try walletColumns("SELECT wallet_id FROM valuation WHERE id = ?", key.id, in: db)
 
         case .adjustment:
-            return try walletColumns(
+            try walletColumns(
                 "SELECT wallet_id FROM adjustment WHERE id = ?",
                 key.id,
                 in: db
             )
 
         case .entry:
-            return try walletColumns(
+            try walletColumns(
                 "SELECT wallet_id, to_wallet_id FROM entry WHERE id = ?",
                 key.id,
                 in: db
             )
 
         case .entryItem:
-            return try walletColumns(
+            try walletColumns(
                 """
                 SELECT entry.wallet_id, entry.to_wallet_id FROM entry_item
                 JOIN entry ON entry.id = entry_item.entry_id
@@ -141,10 +141,10 @@ private extension AppDatabase {
             )
 
         case .category:
-            return try walletColumns("SELECT wallet_id FROM category WHERE id = ?", key.id, in: db)
+            try walletColumns("SELECT wallet_id FROM category WHERE id = ?", key.id, in: db)
 
         case .tag:
-            return try walletColumns(
+            try walletColumns(
                 """
                 SELECT category.wallet_id FROM tag
                 JOIN category ON category.id = tag.category_id
@@ -155,26 +155,10 @@ private extension AppDatabase {
             )
 
         case .icon:
-            let wallets = try String.fetchAll(
-                db,
-                sql: "SELECT id FROM wallet WHERE icon_id = ? ORDER BY id",
-                arguments: [key.id]
-            )
-
-            let categories = try String.fetchAll(
-                db,
-                sql: """
-                SELECT wallet_id FROM category
-                WHERE icon_id = ? AND wallet_id IS NOT NULL
-                ORDER BY wallet_id
-                """,
-                arguments: [key.id]
-            )
-
-            return wallets + categories
+            try iconWallets(key.id, in: db)
 
         default:
-            return []
+            []
         }
     }
 
@@ -188,6 +172,29 @@ private extension AppDatabase {
         }
 
         return row.columnNames.compactMap { row[$0] as String? }
+    }
+
+    static func iconWallets(
+        _ id: String,
+        in db: Database
+    ) throws -> [String] {
+        let wallets = try String.fetchAll(
+            db,
+            sql: "SELECT id FROM wallet WHERE icon_id = ? ORDER BY id",
+            arguments: [id]
+        )
+
+        let categories = try String.fetchAll(
+            db,
+            sql: """
+            SELECT wallet_id FROM category
+            WHERE icon_id = ? AND wallet_id IS NOT NULL
+            ORDER BY wallet_id
+            """,
+            arguments: [id]
+        )
+
+        return wallets + categories
     }
 
     static func startSharing(

@@ -69,7 +69,12 @@ struct RecordsModelTests {
             model.output.days.count == 1
         }
 
-        try await Task.sleep(for: .milliseconds(300))
+        try await setup.database.setSetting(.weekStart, to: .monday)
+
+        await ObservationWait.until {
+            model.input.weekStart == .monday
+        }
+
         second.cancel()
 
         #expect(model.state.month.description == "2026-09")

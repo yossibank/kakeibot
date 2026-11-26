@@ -25,30 +25,7 @@ public struct ThemeEditSheet: View {
         VStack(spacing: 16) {
             header
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: SettingsSpacing.form) {
-                    ThemePreview(palette: model.output.palette)
-                        .frame(width: 150)
-                        .frame(maxWidth: .infinity)
-
-                    SettingsField(
-                        "名前",
-                        text: Bindable(model.state).draft.name,
-                        focus: $focus,
-                        field: .name
-                    )
-
-                    ForEach(ThemeEditModel.Slot.allCases, id: \.self) { slot in
-                        colorRow(slot)
-                    }
-                }
-                .padding(.bottom, 8)
-                .padding(.vertical, Self.fade)
-            }
-            .scrollIndicators(.hidden)
-            .edgeFade(Self.fade)
-            .padding(.vertical, -Self.fade)
-            .scrollDismissesKeyboard(.interactively)
+            form
 
             if focus == nil {
                 PrimaryButton(model.saveTitle) {
@@ -116,6 +93,33 @@ private extension ThemeEditSheet {
             focus = nil
             model.state.prompt.isConfirmingDelete = true
         }
+    }
+
+    var form: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: SettingsSpacing.form) {
+                ThemePreview(palette: model.output.palette)
+                    .frame(width: 150)
+                    .frame(maxWidth: .infinity)
+
+                SettingsField(
+                    "名前",
+                    text: Bindable(model.state).draft.name,
+                    focus: $focus,
+                    field: .name
+                )
+
+                ForEach(ThemeEditModel.Slot.allCases, id: \.self) { slot in
+                    colorRow(slot)
+                }
+            }
+            .padding(.bottom, 8)
+            .padding(.vertical, Self.fade)
+        }
+        .scrollIndicators(.hidden)
+        .edgeFade(Self.fade)
+        .padding(.vertical, -Self.fade)
+        .scrollDismissesKeyboard(.interactively)
     }
 
     func colorRow(_ slot: ThemeEditModel.Slot) -> some View {

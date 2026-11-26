@@ -34,13 +34,6 @@ public extension AssetsModel {
 }
 
 public extension AssetsModel.OutlookItem {
-    enum Source: Hashable, Sendable {
-        case plan(Entry.ID)
-        case recurring(Recurring.ID, LocalDate)
-    }
-}
-
-public extension AssetsModel.OutlookItem {
     var id: Source {
         source
     }
