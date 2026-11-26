@@ -24,7 +24,7 @@
 | `SettingsFoldModel` | 説明カードと非表示の一覧を閉じたかを、DB から読み書きするモデル。値は `input` の `SettingsFoldInput` に置き、モデルは `foldStore()` だけ書く | `FeatureModels/Shared/SettingsParts/Hint/` |
 | `SettingsEditSheet` | 1 件を編集する画面。モデルと、削除・非表示の受け取りだけで作れる | `Features/Shared/SettingsParts/Input/` |
 | `ScreenEditable` | 画面が書いてよい値の型の印。`State` の `public var` は、これに従う型かシートの `enum` だけにする | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `TabScreenModel` | タブ 4 つのモデル。今日の受け取り・見張り・失敗の画面を出すかを持つ。今日は iOS の `MainView` と Kotlin の `rememberTabModel` が渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `TabScreenModel` | タブ 4 つの見張りと、失敗の画面を出すかを持つ。今日は iOS の `MainView` と Kotlin の `rememberTabModel` から受ける | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `EditFlowSource` | `EditFlow` に渡す元で、変わったか・問題の文・保存・非表示・削除を返す。Swift はモデルが従って `connect` し、Kotlin は入れ子の `Source` で書く | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
