@@ -44,11 +44,15 @@ public extension BudgetListModel {
         public let amount: Int
     }
 
+    enum Prompt: Hashable, Sendable {
+        case discard
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var errorNotice = ErrorNotice()
-        public var isConfirmingDiscard = false
+        public var prompt = Shown<Prompt>()
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
@@ -139,7 +143,7 @@ public extension BudgetListModel {
 
     func closeEditing() {
         if output.isChanged {
-            state.isConfirmingDiscard = true
+            state.prompt.show(.discard)
         } else {
             cancelEditing()
         }
@@ -148,8 +152,8 @@ public extension BudgetListModel {
     func cancelEditing() {
         state.editing = nil
 
-        if state.isConfirmingDiscard {
-            state.isConfirmingDiscard = false
+        if state.prompt.isShowing(.discard) {
+            state.prompt.close(.discard)
         }
     }
 

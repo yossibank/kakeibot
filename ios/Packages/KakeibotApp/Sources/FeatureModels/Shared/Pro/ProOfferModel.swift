@@ -9,23 +9,27 @@ public final class ProOfferModel {
 }
 
 public extension ProOfferModel {
+    enum Presented: Hashable, Sendable {
+        case pro
+    }
+
     @MainActor
     @Observable
     final class State {
-        public var isShowingPro = false
+        public var presented = Shown<Presented>()
     }
 }
 
 public extension ProOfferModel {
     func showPro() {
-        state.isShowingPro = true
+        state.presented.show(.pro)
     }
 
     func closePro() {
-        guard state.isShowingPro else {
+        guard state.presented.isShowing(.pro) else {
             return
         }
 
-        state.isShowingPro = false
+        state.presented.close(.pro)
     }
 }

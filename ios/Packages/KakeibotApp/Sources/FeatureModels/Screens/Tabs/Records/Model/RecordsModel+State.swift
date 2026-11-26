@@ -11,11 +11,11 @@ public extension RecordsModel {
         public var today: LocalDate
         public var selectedDate: LocalDate?
         public var isSearching = false
-        public var isConfirmingDelete = false
         public var searchText = ""
         public var filter = EntryFilter()
         public var outcome = ScreenOutcome<Deletion>()
         public var screen = Screen()
+        public var prompt = Shown<Prompt>()
 
         public private(set) var month: YearMonth
         public private(set) var pendingDeleteIDs: [Entry.ID] = []
@@ -52,7 +52,7 @@ public extension RecordsModel.State {
         }
 
         pendingDeleteIDs = ids
-        isConfirmingDelete = true
+        prompt.show(.delete)
     }
 
     func confirmDelete(delete: ([Entry.ID]) -> Void) {
@@ -63,7 +63,7 @@ public extension RecordsModel.State {
 
     func cancelDelete() {
         pendingDeleteIDs = []
-        isConfirmingDelete = false
+        prompt.close(.delete)
     }
 }
 

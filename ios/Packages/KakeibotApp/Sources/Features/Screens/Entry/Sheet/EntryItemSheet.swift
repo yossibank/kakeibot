@@ -21,10 +21,10 @@ struct EntryItemSheet: View {
         }
         .ignoresSafeArea(.keyboard)
         .overlay {
-            if items.state.isShowingHelp {
+            if items.state.presented.isShowing(.help) {
                 EntryGuideCard(guide: .items) {
                     withAnimation(.snappy) {
-                        items.state.isShowingHelp = false
+                        items.state.presented.close(.help)
                     }
                 }
             }
@@ -128,7 +128,7 @@ private extension EntryItemSheet {
         HStack {
             RingButton(systemImage: "questionmark") {
                 withAnimation(.snappy) {
-                    items.state.isShowingHelp = true
+                    items.state.presented.show(.help)
                 }
             }
 

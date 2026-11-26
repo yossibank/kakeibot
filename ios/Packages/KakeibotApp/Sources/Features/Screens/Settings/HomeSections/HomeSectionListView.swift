@@ -38,7 +38,7 @@ public struct HomeSectionListView: View {
         }
         .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
         .animation(.snappy, value: model.state.layout)
-        .transaction(value: model.input.isLoaded) { transaction in
+        .transaction(value: model.input.saved.isSettled) { transaction in
             transaction.disablesAnimations = true
         }
         .haptic(.selection, trigger: model.state.layout)

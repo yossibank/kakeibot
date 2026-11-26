@@ -34,7 +34,7 @@ public extension HomeSectionListModel {
     @MainActor
     @Observable
     final class Input {
-        public internal(set) var isLoaded = false
+        public internal(set) var saved: Loadable<HomeLayout> = .loading
 
         public let hint = SettingsFoldInput.hint(.homeSections)
     }
@@ -51,12 +51,14 @@ public extension HomeSectionListModel {
         do {
             let order = try await dependencies.database.setting(.homeSections)
             let hidden = try await dependencies.database.setting(.homeHiddenSections)
-            state.layout = HomeLayout(order: order, hidden: hidden)
+            let layout = HomeLayout(order: order, hidden: hidden)
+
+            state.layout = layout
+            input.saved = .loaded(layout)
         } catch {
             state.errorNotice.show(SettingMessage.loadFailed)
+            input.saved = .failed
         }
-
-        input.isLoaded = true
     }
 
     func move(
@@ -99,6 +101,7 @@ public extension HomeSectionListModel {
         do {
             try await dependencies.database.setSetting(.homeSections, to: state.layout.order)
             try await dependencies.database.setSetting(.homeHiddenSections, to: state.layout.hidden)
+            input.saved = .loaded(state.layout)
         } catch {
             state.errorNotice.show(SettingMessage.saveFailed, for: error)
         }

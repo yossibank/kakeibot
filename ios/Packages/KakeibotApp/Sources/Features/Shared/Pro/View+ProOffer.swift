@@ -83,7 +83,7 @@ private struct ProOfferModifier: ViewModifier {
                 onUnlock()
             }
             .proDestination(
-                isPresented: Bindable(model.state).isShowingPro,
+                isPresented: Bindable(model.state).presented[.pro],
                 inSheet: presentsInSheet
             ) {
                 ProView(

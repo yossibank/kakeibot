@@ -13,7 +13,7 @@ struct HomeSectionListModelTests {
 
         await model.load()
 
-        #expect(model.input.isLoaded)
+        #expect(model.input.saved == .loaded(.standard))
         #expect(model.state.layout == .standard)
     }
 

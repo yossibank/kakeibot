@@ -8,10 +8,10 @@ struct ProOfferModelTests {
         let model = ProOfferModel()
 
         model.showPro()
-        let shown = model.state.isShowingPro
+        let shown = model.state.presented.isShowing(.pro)
         model.closePro()
 
         #expect(shown)
-        #expect(!model.state.isShowingPro)
+        #expect(!model.state.presented.isShowing(.pro))
     }
 }

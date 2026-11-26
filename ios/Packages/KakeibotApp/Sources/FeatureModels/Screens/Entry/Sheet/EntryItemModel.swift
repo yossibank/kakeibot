@@ -20,6 +20,10 @@ public extension EntryItemModel {
         case quantity
     }
 
+    enum Presented: Hashable, Sendable {
+        case help
+    }
+
     struct Editing: Equatable, Sendable {
         public let index: Int
 
@@ -61,7 +65,7 @@ public extension EntryItemModel {
         public var draft = Draft()
         public var openIndex: Int?
         public var isSlipOpen: Bool
-        public var isShowingHelp = false
+        public var presented = Shown<Presented>()
 
         public internal(set) var scroll = ScreenOutcome<Int>()
 
