@@ -107,8 +107,8 @@ private extension EntryItemSheet {
                     }
             }
         }
-        .settingsHideNotice(
-            Bindable(items.state).removed,
+        .undoNotice(
+            items.state.removed,
             message: "品目を消しました",
             systemImage: "trash",
             bottom: Self.noticeBottom

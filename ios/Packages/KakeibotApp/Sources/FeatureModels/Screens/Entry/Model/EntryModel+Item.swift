@@ -12,7 +12,7 @@ public extension EntryModel {
 
 public extension EntryModel {
     func newItemModel(isSlipOpen: Bool = false) -> EntryItemModel {
-        EntryItemModel(isSlipOpen: isSlipOpen)
+        EntryItemModel(isSlipOpen: isSlipOpen, wait: dependencies.wait)
     }
 }
 

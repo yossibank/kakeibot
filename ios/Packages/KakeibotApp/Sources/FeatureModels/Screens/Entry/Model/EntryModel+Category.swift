@@ -130,12 +130,12 @@ public extension EntryModel {
             )
 
             await reloadCategories()
-            state.results.hiddenCategory = hidden
+            state.results.hiddenCategory.show(hidden)
 
             return hidden
         } catch {
             report(error)
-            state.results.hiddenCategory = nil
+            state.results.hiddenCategory.dismiss()
             return nil
         }
     }

@@ -1,6 +1,4 @@
 import Core
-import DesignSystem
-import SwiftUI
 
 public extension Deletion.Subject {
     var noticeMessage: String {
@@ -30,25 +28,5 @@ private extension Deletion.Kind {
         case .valuation: "評価額"
         case .adjustment: "残高の調整"
         }
-    }
-}
-
-public extension View {
-    func deletionNotice(
-        _ deletion: Binding<Deletion?>,
-        note: String? = nil,
-        bottom: CGFloat = NoticeBanner.bottomMargin,
-        onUndo: @escaping (Deletion) -> Void
-    ) -> some View {
-        let subject = deletion.wrappedValue?.subject?.noticeMessage ?? "削除しました"
-        let message = note.map { "\(subject)（\($0)）" } ?? subject
-
-        return settingsHideNotice(
-            deletion,
-            message: message,
-            systemImage: "trash",
-            bottom: bottom,
-            onUndo: onUndo
-        )
     }
 }

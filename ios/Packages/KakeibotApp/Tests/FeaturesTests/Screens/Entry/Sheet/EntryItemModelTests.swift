@@ -132,7 +132,7 @@ struct EntryItemModelTests {
 
         items.state.draft.shiftEditing(afterRemoving: 0)
         items.remove(0, from: entry)
-        let removed = try #require(items.state.removed)
+        let removed = try #require(items.state.removed.current)
         let shifted = items.state.draft.editing?.index
         items.restore(removed, in: entry)
 

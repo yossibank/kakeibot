@@ -20,7 +20,12 @@ public final class EntryModel: ScreenPerforming {
         type: Entry.Kind = .expense,
         template: EntryTemplate? = nil
     ) {
-        let state = State(type: type, date: date, today: parts.clock.today)
+        let state = State(
+            type: type,
+            date: date,
+            today: parts.clock.today,
+            wait: parts.wait
+        )
         let input = Input(editingId: id, startingTemplate: template)
 
         self.state = state
@@ -34,8 +39,8 @@ public extension EntryModel {
     func start() async {
         let isFirst = !output.isLoaded
 
-        state.results.deletion = nil
-        state.results.hiddenCategory = nil
+        state.results.deletion.dismiss()
+        state.results.hiddenCategory.dismiss()
 
         if isFirst {
             await load()
