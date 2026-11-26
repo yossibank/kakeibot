@@ -89,6 +89,28 @@ struct EntryNoticeModelTests {
     }
 
     @Test
+    func restoresItemsWhenUndoingDelete() async throws {
+        let setup = try await Setup()
+
+        let saved = try await setup.saveEntry(items: [
+            EntryItem.Draft(name: "牛乳", amount: 396),
+            EntryItem.Draft(name: "食パン", amount: 220)
+        ])
+
+        let model = try await setup.entryModel(editing: saved.id)
+
+        let change = try #require(await model.delete())
+        let deleted = try await setup.database.entryItems(of: saved.id)
+        setup.notice.show(change)
+        await setup.notice.undo()
+        let restored = try await setup.database.entryItems(of: saved.id)
+
+        #expect(deleted.isEmpty)
+        #expect(restored.map(\.name) == ["牛乳", "食パン"])
+        #expect(restored.map(\.amount) == [396, 220])
+    }
+
+    @Test
     func deletesFromListAndUndoes() async throws {
         let setup = try await Setup()
         let saved = try await setup.saveEntry()
@@ -294,7 +316,10 @@ extension EntryNoticeModelTests.Setup {
         return model
     }
 
-    func saveEntry(memo: String = "") async throws -> Entry {
+    func saveEntry(
+        memo: String = "",
+        items: [EntryItem.Draft]? = nil
+    ) async throws -> Entry {
         let options = try await database.entryOptions()
 
         let draft = EntryDraft(
@@ -303,7 +328,8 @@ extension EntryNoticeModelTests.Setup {
             date: date,
             categoryId: options.expenseCategories[0].id,
             walletId: options.wallets[0].id,
-            memo: memo
+            memo: memo,
+            items: items
         )
 
         return try await database.saveEntry(draft, at: Date())

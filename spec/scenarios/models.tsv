@@ -525,6 +525,7 @@ entry-notice.undoes-new-entry	EntryNoticeModelTests/undoesNewEntry	EntryNoticeMo
 entry-notice.restores-fee-deleted-from-stale-list	EntryNoticeModelTests/restoresFeeDeletedFromStaleList		未移植	一覧の行から記録を消す操作が無い
 entry-notice.undoes-edit	EntryNoticeModelTests/undoesEdit	EntryNoticeModelTest/undoesEdit	対応	
 entry-notice.undoes-delete	EntryNoticeModelTests/undoesDelete	EntryNoticeModelTest/undoesDelete	対応	
+entry-notice.restores-items-when-undoing-delete	EntryNoticeModelTests/restoresItemsWhenUndoingDelete	EntryNoticeModelTest/restoresItemsWhenUndoingDelete	対応	
 entry-notice.deletes-from-list-and-undoes	EntryNoticeModelTests/deletesFromListAndUndoes		未移植	一覧の行からの削除とその取り消しが無い
 entry-notice.names-deleted-entry-by-memo	EntryNoticeModelTests/namesDeletedEntryByMemo	EntryNoticeModelTest/namesDeletedEntryByMemo	対応	一覧からの削除が無く、入力の画面の削除で確かめる
 entry-notice.names-deleted-entry-without-category-as-record	EntryNoticeModelTests/namesDeletedEntryWithoutCategoryAsRecord	EntryNoticeModelTest/namesDeletedEntryWithoutCategoryAsRecord	対応	

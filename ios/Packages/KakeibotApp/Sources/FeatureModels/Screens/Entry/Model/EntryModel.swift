@@ -205,7 +205,10 @@ public extension EntryModel {
         }
 
         do {
-            let deleted = try await dependencies.database.deleteEntry(
+            let database = dependencies.database
+            let items = try await database.entryItems(of: original.id)
+
+            let deleted = try await database.deleteEntry(
                 original.id,
                 at: dependencies.clock.now
             )
@@ -216,7 +219,8 @@ public extension EntryModel {
                 kind: .deleted,
                 entry: original,
                 label: title,
-                fee: deleted.first { $0.transferId == original.id }
+                fee: deleted.first { $0.transferId == original.id },
+                items: items
             )
 
             beginClosing()
