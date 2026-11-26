@@ -27,24 +27,24 @@ VoiceOver などのアクセシビリティの対応は入れない。`accessibi
 
 ## 文書
 
-作業ごとに、先に読む文書と、終えたら直す文書が決まっている。
+作業ごとに、先に読む文書と、終えたら直す文書が決まっている。文書の場所は、README の「文書」の表にある。
 
 | 作業 | 先に読む | 終えたら直す |
 | --- | --- | --- |
-| 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md)、[architecture-parts](docs/architecture-parts.md) | overview、roadmap、architecture-screens の「画面とフォルダ」 |
+| 機能・画面を足す | overview、roadmap、architecture-parts | overview、roadmap、architecture-screens の「画面とフォルダ」 |
 | iOS のターゲット・依存・フォルダを変える、ファイルを足す・名前を変える | architecture、architecture-packages、architecture-packages-app、architecture-naming | 先に読む文書のすべて |
 | Android のモジュール・依存・フォルダを変える、ファイルを足す・名前を変える | iOS の行の文書も読む。architecture-android、architecture-android-app、architecture-android-flow | 先に読む文書のすべて |
-| 画面の組み立て・見張り・通知とウィジェットの流れを変える | [architecture-screens](docs/architecture-screens.md)、[architecture-screens-flow](docs/architecture-screens-flow.md) | architecture-screens、architecture-screens-flow |
-| 表の形を変える | [data](docs/data.md)、[data-budget](docs/data-budget.md)、[data-settings](docs/data-settings.md)、[data-sync](docs/data-sync.md) | 変えた表の文書。書き出しに響くなら export-format も |
-| 書き出しの形式を変える | [export-format](spec/export-format.md) | export-format |
-| fixtures を足す・変える | [fixtures](spec/fixtures.md) | fixtures |
-| 画面のモデルのテストを足す・消す・名前を変える | [scenarios](spec/scenarios.md) | `spec/scenarios/models.tsv`。違いを見つけたら scenarios も |
-| 画面の言葉・型の名前を足す・変える | [glossary](docs/glossary.md) | glossary |
-| 方針を決める・変える | [decisions](docs/decisions/) の、`docs-section.sh` で探した節だけ | decisions |
-| 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
-| 対応 OS を変える | [overview](docs/overview.md) | overview、README の技術のアイコンと実行環境 |
-| Swift の版・使う技術を変える | [architecture](docs/architecture.md) | architecture、README の技術のアイコンと実行環境 |
+| 画面の組み立て・見張り・通知とウィジェットの流れを変える | architecture-screens、architecture-screens-flow | architecture-screens、architecture-screens-flow |
+| 表の形を変える | data、data-budget、data-settings、data-sync | 変えた表の文書。書き出しに響くなら export-format も |
+| 書き出しの形式を変える | export-format | export-format |
+| fixtures を足す・変える | fixtures | fixtures |
+| 画面のモデルのテストを足す・消す・名前を変える | scenarios | `spec/scenarios/models.tsv`。違いを見つけたら scenarios も |
+| 画面の言葉・型の名前を足す・変える | glossary | glossary |
+| 方針を決める・変える | decisions の索引から選び、`docs-section.sh` で探した節だけ | decisions。文書を足したら、索引も |
+| 作る順番の 1 段を終える | roadmap | roadmap の状態 |
+| 対応 OS を変える | overview | overview、README の技術のアイコンと実行環境 |
+| Swift の版・使う技術を変える | architecture | architecture、README の技術のアイコンと実行環境 |
 | 未検証の項目を確かめる | 各文書の `[!WARNING]` | 結果で本文を書き換え、WARNING から消す |
-| 整形・確認の仕組みを変える | [development](docs/development.md) | development、architecture のリポジトリの表 |
+| 整形・確認の仕組みを変える | development | development、architecture のリポジトリの表 |
 
 spec の文書の役割は [.claude/rules/doc-roles.md](.claude/rules/doc-roles.md) にあり、文書を開くと読み込まれる。
