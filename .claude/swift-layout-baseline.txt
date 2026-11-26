@@ -46,8 +46,8 @@ ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/ThemeStyle/ThemeStyle
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeEditSheet.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Themes/ThemeListView.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/Wallets/WalletEditSheet.swift: L8: 1 つの関数は 60 行までにする
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage+Tile.swift: L8: 1 つの関数は 60 行までにする
-ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage+Tile.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage+HomeScreen.swift: L8: 1 つの関数は 60 行までにする
+ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideStage+HomeScreen.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/Features/Screens/Settings/WidgetGuide/WidgetGuideView.swift: L6: 1 行の宣言は、同じまとまりの複数行の宣言より前に置く
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Assets/Sheet/AssetsOutlookSheet.swift: L8: 1 つの関数は 60 行までにする
 ios/Packages/KakeibotApp/Sources/Features/Screens/Tabs/Home/HomeView+Budget.swift: L8: 1 つの関数は 60 行までにする

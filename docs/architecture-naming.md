@@ -56,6 +56,7 @@
 | `+Actions` | 画面の操作の関数。複数形で書く |
 | `+Sheets` | 画面から開くシートの種類と、その振り分け。複数形で書く |
 | `+Stored` | データベースに保存した形の値から作る `init` |
+| `+HomeScreen` | ウィジェットの案内の、ホーム画面に置く見本。置く場所の語で `+LockScreen`・`+Control` と並べる |
 
 型をまたぐ文言は、拡張にせず、名前空間の `enum` の `<頭>Text` に置く。例は `BillText`・`PeriodText`・`RecurringText`・`ReviewText` である。
 
