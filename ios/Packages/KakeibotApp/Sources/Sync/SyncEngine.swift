@@ -133,8 +133,6 @@ public extension SyncEngine {
 }
 
 extension SyncEngine {
-    static let goneCodes: Set<CKError.Code> = [.unknownItem, .zoneNotFound]
-
     static var zoneID: CKRecordZone.ID {
         CKRecordZone.ID(zoneName: SyncZone.own)
     }

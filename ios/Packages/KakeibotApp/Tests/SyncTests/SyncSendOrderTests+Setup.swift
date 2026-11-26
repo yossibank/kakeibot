@@ -139,11 +139,14 @@ extension SyncSendOrderTests.Device {
     func finish(_ batch: SyncSendOrderTests.Batch) async throws {
         let fields = batch.saves.mapValues { _ in Data([1]) }
 
-        let result = Self.route.finish(
-            sending: sending,
+        let sent = SyncRoute.Sent(
             saved: Array(batch.saves.keys),
-            deleted: batch.deletes
+            deleted: batch.deletes,
+            failedSaves: [],
+            failedDeletes: []
         )
+
+        let result = Self.route.settle(sent, sending: sending)
 
         pending.subtract(batch.sent)
 
@@ -156,7 +159,7 @@ extension SyncSendOrderTests.Device {
         }
 
         try await database.saveSyncSystemFields(fields)
-        try await database.removeSyncSystemFields(batch.deletes)
+        try await database.removeSyncSystemFields(result.deleted)
         try await database.removeSyncChanges(result.finished)
         try await enqueue()
     }

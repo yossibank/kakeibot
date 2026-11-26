@@ -55,13 +55,6 @@ extension SyncEngine {
     }
 
     func finishSending(_ sent: CKSyncEngine.Event.SentRecordZoneChanges) async {
-        let unknownDeletes = sent.failedRecordDeletes
-            .filter { Self.goneCodes.contains($0.value.code) }
-            .map(\.key)
-
-        let deletedIDs = sent.deletedRecordIDs + unknownDeletes
-        let deleted = deletedIDs.compactMap(SyncRecordID.init)
-
         let systemFields = sent.savedRecords
             .reduce(into: [SyncRecordID: Data]()) { fields, record in
                 if let id = SyncRecordID(record.recordID) {
@@ -69,36 +62,29 @@ extension SyncEngine {
                 }
             }
 
-        let savedIDs = Array(systemFields.keys)
-        let failedSaves = sent.failedRecordSaves.map(\.record.recordID)
+        let result = SyncRoute.Sent(sent, saved: Array(systemFields.keys))
+        let settled = route.settle(result, sending: sending)
+        let deletions = settled.staleDeletions.map { pendingChange(.delete($0)) }
 
-        let failedDeletes = sent.failedRecordDeletes
-            .filter { !Self.goneCodes.contains($0.value.code) }
-            .map(\.key)
+        for change in settled.finished {
+            sending.removeValue(forKey: change.key)
+        }
 
-        let failedKeys = (failedSaves + failedDeletes).compactMap(SyncKey.init)
-        let failed = Set(failedKeys)
-        let finished = finishChanges(saved: savedIDs, deleted: deleted)
-
-        let failureCodes = sent.failedRecordSaves.map(\.error.code)
-            + sent.failedRecordDeletes.values.map(\.code)
-
-        let problem = failureCodes.lazy.compactMap(SyncSendProblem.init).first
+        engine?.state.add(pendingRecordZoneChanges: deletions)
 
         try? await database.saveSyncSystemFields(systemFields)
-        try? await database.removeSyncSystemFields(deleted)
-        try? await database.removeSyncChanges(finished)
+        try? await database.removeSyncSystemFields(settled.deleted)
+        try? await database.removeSyncChanges(settled.finished)
 
-        if !isShared,
-           problem != nil || !savedIDs.isEmpty || !deleted.isEmpty {
-            try? await database.setSyncSendProblem(problem)
+        if settled.updatesProblem {
+            try? await database.setSyncSendProblem(settled.problem)
         }
 
         for failure in sent.failedRecordSaves {
             await retry(failure)
         }
 
-        await enqueuePending(excluding: failed)
+        await enqueuePending(excluding: settled.failed)
     }
 }
 
@@ -121,27 +107,6 @@ private extension SyncEngine {
         case let .save(id): .saveRecord(recordID(of: id))
         case let .delete(id): .deleteRecord(recordID(of: id))
         }
-    }
-
-    func finishChanges(
-        saved: [SyncRecordID],
-        deleted: [SyncRecordID]
-    ) -> [SyncChange] {
-        let result = route.finish(
-            sending: sending,
-            saved: saved,
-            deleted: deleted
-        )
-
-        let deletions = result.staleDeletions.map { pendingChange(.delete($0)) }
-
-        for change in result.finished {
-            sending.removeValue(forKey: change.key)
-        }
-
-        engine?.state.add(pendingRecordZoneChanges: deletions)
-
-        return result.finished
     }
 
     func retry(_ failure: CKSyncEngine.Event.SentRecordZoneChanges.FailedRecordSave) async {
