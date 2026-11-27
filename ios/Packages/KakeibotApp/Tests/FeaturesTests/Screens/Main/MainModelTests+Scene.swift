@@ -8,12 +8,12 @@ extension MainModelTests {
     func finishesWarmingEntryAfterWaiting() async throws {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
-        let before = model.state.isWarmingEntry
+        let before = model.state.entry.isWarming
 
         await model.warmUpEntry()
 
         #expect(before)
-        #expect(!model.state.isWarmingEntry)
+        #expect(!model.state.entry.isWarming)
     }
 
     @Test
@@ -52,7 +52,7 @@ extension MainModelTests {
 
         model.state.hideTabNotices()
 
-        #expect(model.state.noticeRound == 1)
+        #expect(model.state.notices.round == 1)
         #expect(model.state.round.count == 0)
     }
 

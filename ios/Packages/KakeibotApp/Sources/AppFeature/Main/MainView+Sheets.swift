@@ -10,7 +10,7 @@ extension MainView {
         case .new:
             EntrySheet(
                 model: model.state.submodels.draft,
-                startsReceipt: model.state.startsReceipt,
+                startsReceipt: model.state.entry.startsReceipt,
                 onChange: show
             )
 

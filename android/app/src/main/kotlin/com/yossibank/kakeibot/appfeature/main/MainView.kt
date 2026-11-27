@@ -113,7 +113,7 @@ private fun MainLayers(
             .background(Palette.background),
     ) {
         CompositionLocalProvider(
-            LocalTabNoticeRound provides model.state.noticeRound,
+            LocalTabNoticeRound provides model.state.notices.round,
             LocalTabNoticeShown provides notice::clear,
         ) {
             MainTabs(

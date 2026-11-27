@@ -5,8 +5,8 @@ import com.yossibank.kakeibot.core.shared.Identifier
 
 fun MainModel.saved(): List<String> {
     val tabs = listOf(
-        state.tab.name,
-        state.visitedTabs.joinToString(SEPARATOR) { it.name },
+        state.tabs.current.name,
+        state.tabs.visited.joinToString(SEPARATOR) { it.name },
     )
 
     return tabs + saved(state.presented.sheet.current)

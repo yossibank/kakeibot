@@ -24,7 +24,7 @@ class MainModel(
     sheet: Sheet? = null,
     closeDelay: Duration = sheetCloseDelay,
 ) : ScreenPerforming {
-    val state = State(tab, visitedTabs, sheet)
+    val state = State(TabSelection(tab, visitedTabs), sheet)
 
     private val dependencies = Dependencies(closeDelay)
 
@@ -51,40 +51,63 @@ class MainModel(
         ) : Sheet
     }
 
+    data class TabSelection(
+        val current: Tab = Tab.Home,
+        val visited: Set<Tab> = setOf(Tab.Home),
+    ) {
+        fun selected(tab: Tab): TabSelection = TabSelection(
+            current = tab,
+            visited = visited + tab,
+        )
+    }
+
     class Presented(
         sheet: Sheet?,
     ) : ScreenEditable {
         val sheet = Shown(sheet)
+
+        private var settingsRound = 0
+
+        internal fun openSettings(recurring: Identifier<Recurring>) {
+            settingsRound += 1
+
+            sheet.show(
+                Sheet.Settings(
+                    recurring = recurring,
+                    round = settingsRound,
+                ),
+            )
+        }
+    }
+
+    class Notices {
+        var round: Int by mutableIntStateOf(0)
+            private set
+
+        fun next() {
+            round += 1
+        }
     }
 
     class State(
-        tab: Tab,
-        visitedTabs: Set<Tab>,
+        tabs: TabSelection,
         sheet: Sheet?,
     ) {
         val presented = Presented(sheet)
+        val notices = Notices()
 
-        var tab: Tab by mutableStateOf(tab)
-            private set
-
-        var visitedTabs: Set<Tab> by mutableStateOf(visitedTabs)
-            private set
-
-        var noticeRound: Int by mutableIntStateOf(0)
+        var tabs: TabSelection by mutableStateOf(tabs)
             private set
 
         val observation = ObservationRound()
 
         private val foreground = ForegroundReturn()
 
-        private var round = 0
-
         val observationRound: Int
             get() = observation.count
 
         fun select(tab: Tab) {
-            this.tab = tab
-            visitedTabs = visitedTabs + tab
+            tabs = tabs.selected(tab)
         }
 
         fun restartObservation() {
@@ -98,18 +121,11 @@ class MainModel(
         }
 
         fun hideTabNotices() {
-            noticeRound += 1
+            notices.next()
         }
 
         internal fun openSettings(recurring: Identifier<Recurring>) {
-            round += 1
-
-            presented.sheet.show(
-                Sheet.Settings(
-                    recurring = recurring,
-                    round = round,
-                ),
-            )
+            presented.openSettings(recurring)
         }
     }
 

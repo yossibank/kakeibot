@@ -139,7 +139,7 @@ private extension MainView {
 
             assetsTab
         }
-        .environment(\.noticeRound, model.state.noticeRound)
+        .environment(\.noticeRound, model.state.notices.round)
         .overlay(alignment: .leading) {
             if hasSidebar {
                 tabBar
@@ -170,7 +170,7 @@ private extension MainView {
 
     @ViewBuilder
     var signals: some View {
-        if model.state.isWarmingEntry {
+        if model.state.entry.isWarming {
             entryWarmup
         }
 

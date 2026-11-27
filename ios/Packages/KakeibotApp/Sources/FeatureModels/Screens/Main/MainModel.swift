@@ -72,6 +72,8 @@ public extension MainModel {
     @MainActor
     struct Notices {
         public let undo: DeletionUndo
+
+        public private(set) var round = 0
     }
 
     @MainActor
@@ -84,15 +86,10 @@ public extension MainModel {
     final class State {
         public var presented = Presented()
 
-        public let notices: Notices
-
+        public internal(set) var notices: Notices
         public internal(set) var submodels: Submodels
-
-        public private(set) var tab: Tab = .home
-        public private(set) var visitedTabs: Set<Tab> = [.home]
-        public private(set) var startsReceipt = false
-        public private(set) var isWarmingEntry = true
-        public private(set) var noticeRound = 0
+        public internal(set) var tabs = TabSelection()
+        public internal(set) var entry = EntryLaunch()
 
         public let round = ObservationRound()
 
@@ -134,8 +131,7 @@ public extension MainModel {
 
 public extension MainModel.State {
     func select(_ tab: MainModel.Tab) {
-        self.tab = tab
-        visitedTabs.insert(tab)
+        tabs.select(tab)
     }
 
     func changeScene(to phase: ForegroundReturn.Phase) {
@@ -145,25 +141,25 @@ public extension MainModel.State {
     }
 
     func hideTabNotices() {
-        noticeRound += 1
+        notices.nextRound()
     }
 }
 
 extension MainModel.State {
     func finishWarmingEntry() {
-        guard isWarmingEntry else {
+        guard entry.isWarming else {
             return
         }
 
-        isWarmingEntry = false
+        entry.finishWarming()
     }
 
     func startReceipt() {
-        startsReceipt = true
+        entry.startReceipt()
     }
 
     func replaceDraft(with draft: EntryModel) {
-        startsReceipt = false
+        entry.clearReceipt()
         submodels.draft = draft
     }
 }
@@ -171,5 +167,11 @@ extension MainModel.State {
 public extension MainModel.Sheet {
     var id: Self {
         self
+    }
+}
+
+extension MainModel.Notices {
+    mutating func nextRound() {
+        round += 1
     }
 }

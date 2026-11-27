@@ -13,7 +13,7 @@ fun MainTabBar(
     modifier: Modifier = Modifier,
 ) {
     FloatingTabBar(
-        selection = model.state.tab,
+        selection = model.state.tabs.current,
         items = tabItems,
         onSelect = model.state::select,
         onAdd = onAdd,
