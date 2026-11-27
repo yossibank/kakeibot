@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > 複数の画面で使う仕組みの名前、使いどころ、置き場所が分かる。
-> 設定の一覧の画面の足し方は [architecture-parts-settings](architecture-parts-settings.md) にある。
+> 設定の一覧の足し方は [architecture-parts-settings](architecture-parts-settings.md) にある。State の組み方は [architecture-parts-state](architecture-parts-state.md) にある。
 > 全体の構成は [architecture](architecture.md)、名前の付け方は [architecture-naming](architecture-naming.md) にある。
 
 ## 🪝 プロトコル
@@ -33,21 +33,6 @@
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |
 | `Draft` | 保存前の下書き。`problems` を返し、`validate()` が最初の問題を投げる | `Core/Shared/` |
-
-## 📏 State の枠
-
-モデルの `State` は、次の名前の枠で組む。要る枠だけを置き、中身が 1 つでも包む。
-
-| 枠 | iOS | Android | 書く人 | 入れる物 |
-| --- | --- | --- | --- | --- |
-| `fields` | `Fields` の struct を `public var` | `Fields` の data class を `private set` | 画面 | 入力と選んでいる物 |
-| `presented` | `Shown` を並べた `Presented` を `public var` | `Shown` を並べた `Presented` を `val` | 画面 | シート・確認・開いている行など |
-| `notices` | `ScreenNotices` の `Notices` を `let` | `Notices` の class を `val` | モデル | 時間で消える知らせ。エラーは `error` |
-| `task` | `ModelTask` | `ModelTask` | モデル | 実行中の印 |
-| `outcome` | `ScreenOutcome` | `ScreenOutcome` | モデル | 画面への結果 |
-| `submodels` | `Submodels` の struct | `Submodels` の class | モデル | State が持つ子のモデル |
-
-今日は `input` に置き、計算できる値は `output` に出す。モデルだけが書く途中の値は、`State` の直下に閉じて置く。
 
 ## 📱 モデルから画面へ返す型
 

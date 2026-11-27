@@ -29,7 +29,7 @@
 
 ## 📏 画面がモデルに書く値
 
-画面が書く入口は、モデルの `state` の `fields` と `presented` の枠だけにする。枠の一覧は [architecture-parts の「State の枠」](architecture-parts.md#-state-の枠)にある。ほかの枠と値は画面から書けない型にし、変える時はモデルの関数を呼ぶ。
+画面が書く入口は、モデルの `state` の `fields` と `presented` の枠だけにする。枠の一覧は [architecture-parts-state の「State の枠」](architecture-parts-state.md#️-state-の枠)にある。ほかの枠と値は画面から書けない型にし、変える時はモデルの関数を呼ぶ。
 
 | 項目 | 決まり |
 | --- | --- |
