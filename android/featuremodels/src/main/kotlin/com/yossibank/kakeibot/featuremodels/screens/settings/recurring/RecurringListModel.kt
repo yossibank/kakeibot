@@ -40,8 +40,8 @@ class RecurringListModel(
     today: LocalDate,
     opening: Identifier<Recurring>? = null,
 ) : SettingsFoldModel {
-    val state = State(today, opening?.let { Editing.Existing(it) }, parts.wait)
-    val input = Input()
+    val state = State(opening?.let { Editing.Existing(it) }, parts.wait)
+    val input = Input(today)
     val output = Output(input, state)
 
     private val dependencies = Dependencies(parts.database, parts.clock, parts.entryList)
@@ -63,7 +63,6 @@ class RecurringListModel(
     }
 
     class State(
-        today: LocalDate,
         editing: Editing?,
         wait: ScreenWait,
     ) {
@@ -73,9 +72,6 @@ class RecurringListModel(
         val deleted = UndoNotice<Deletion>(wait)
         val editing = Shown(editing)
         val deleting = Shown<DeleteTarget>()
-
-        var today: LocalDate by mutableStateOf(today)
-            internal set
 
         var openId: Identifier<Recurring>? by mutableStateOf(null)
             private set
@@ -123,7 +119,12 @@ class RecurringListModel(
         }
     }
 
-    class Input {
+    class Input(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var recurrings: List<Recurring> by mutableStateOf(emptyList())
             internal set
 
@@ -149,7 +150,7 @@ class RecurringListModel(
 
         val monthTotal: Long
             get() {
-                val period = state.today
+                val period = input.today
                     .periodMonth(startingOn = input.monthStartDay)
                     .period(startingOn = input.monthStartDay)
 
@@ -199,7 +200,7 @@ class RecurringListModel(
     }
 
     fun setToday(today: LocalDate) {
-        state.today = today
+        input.today = today
     }
 
     suspend fun observe() {
@@ -341,7 +342,7 @@ class RecurringListModel(
             dependencies.database.setRecurringHidden(
                 id = id,
                 isHidden = isHidden,
-                today = state.today,
+                today = input.today,
                 at = dependencies.clock.now,
             )
         }

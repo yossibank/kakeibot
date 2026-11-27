@@ -27,7 +27,7 @@ public struct RecurringEditSheet: View {
 
     public var body: some View {
         content
-            .settingsDrawerLayer(item: model.state.panel.current) {
+            .settingsDrawerLayer(item: model.state.presented.panel.current) {
                 closePanel()
             } drawer: { panel in
                 SettingsDrawer(title(for: panel), showsDone: showsDone(for: panel)) {
@@ -38,7 +38,7 @@ public struct RecurringEditSheet: View {
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
-                    isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+                    isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
                     title: headerTitle,
                     isEditing: model.flow.output.isEditing,
                     isHidden: model.flow.output.isHidden
@@ -48,7 +48,7 @@ public struct RecurringEditSheet: View {
                 } onHide: {
                     model.flow.toggleHidden()
                 } onDelete: {
-                    model.flow.state.prompt.show(.delete)
+                    model.flow.state.presented.prompt.show(.delete)
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -105,7 +105,7 @@ extension RecurringEditSheet {
 
     func closePanel() {
         withAnimation(.snappy) {
-            model.state.panel.closeAll()
+            model.state.presented.panel.closeAll()
         }
     }
 }
@@ -213,7 +213,7 @@ private extension RecurringEditSheet {
         }
 
         withAnimation(.snappy) {
-            model.state.panel.show(panel)
+            model.state.presented.panel.show(panel)
         }
     }
 }
