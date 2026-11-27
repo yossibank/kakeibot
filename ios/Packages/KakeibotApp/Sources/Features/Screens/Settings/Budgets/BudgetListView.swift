@@ -86,7 +86,7 @@ private extension BudgetListView {
 
     @ViewBuilder
     var budgetedSection: some View {
-        if !budgeted.isEmpty {
+        if !model.output.budgeted.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     SettingsSectionTitle("カテゴリごと")
@@ -100,28 +100,28 @@ private extension BudgetListView {
                         .padding(.trailing, 8)
                 }
 
-                rowsCard(budgeted, row: categoryRow)
+                rowsCard(model.output.budgeted, row: categoryRow)
             }
         }
     }
 
     @ViewBuilder
     var unbudgetedSection: some View {
-        if !unbudgeted.isEmpty {
+        if !model.output.unbudgeted.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     SettingsSectionTitle("予算なし")
 
                     Spacer()
 
-                    Text("\(unbudgeted.count) カテゴリ")
+                    Text("\(model.output.unbudgeted.count) カテゴリ")
                         .textFont(.caption2)
                         .monospacedDigit()
                         .foregroundStyle(Palette.subtext)
                         .padding(.trailing, 8)
                 }
 
-                rowsCard(unbudgeted, row: plainRow)
+                rowsCard(model.output.unbudgeted, row: plainRow)
             }
         }
     }
@@ -337,25 +337,6 @@ private extension BudgetListView {
 }
 
 private extension BudgetListView {
-    var budgeted: [EntryCategory] {
-        model.output.categories.filter { model.output.amount(for: $0.id) != nil }
-    }
-
-    var unbudgeted: [EntryCategory] {
-        let rest = model.output.categories.filter { model.output.amount(for: $0.id) == nil }
-
-        let order = rest.enumerated().sorted { lhs, rhs in
-            let spent = (
-                model.output.spent(for: lhs.element.id),
-                model.output.spent(for: rhs.element.id)
-            )
-
-            return spent.0 == spent.1 ? lhs.offset < rhs.offset : spent.0 > spent.1
-        }
-
-        return order.map(\.element)
-    }
-
     var periodText: String {
         "\(model.input.month.month)月（\(model.output.periodText)）から使う額"
     }

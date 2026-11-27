@@ -1,5 +1,5 @@
 import Core
-import Store
+@testable import Store
 
 extension AppDatabase {
     func setCategory(

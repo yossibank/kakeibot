@@ -311,6 +311,9 @@ assets.describes-breakdown-of-total		AssetsModelTest/describesBreakdownOfTotal	A
 assets-adjustment.*	AssetsAdjustmentModelTests/*		未移植	残高を手元の額に合わせるモデルと画面が Android に無い
 assets-reward-goal-edit.*	AssetsRewardGoalEditModelTests/*		未移植	ごほうびの目標を編集するモデルと画面が Android に無い
 assets-entry-sheet.*	AssetsEntrySheetTests/*		未移植	カードごとの未払いの記録を並べるシートが Android に無い
+assets-wallet-section.splits-owned-and-owed-totals	AssetsWalletSectionTests/splitsOwnedAndOwedTotals		未確認	Android も資産と負債に分けるが、合計のテストが無い
+assets-wallet-section.shares-all-to-owned-without-balances	AssetsWalletSectionTests/sharesAllToOwnedWithoutBalances		未移植	資産と負債の割合の棒が、資産の画面に無い
+assets-wallet-section.counts-unpaid-across-cards	AssetsWalletSectionTests/countsUnpaidAcrossCards		未移植	資産の行に、カードの未払いの内訳が無い
 records.shows-adjustment-on-its-day-without-totals	RecordsModelTests/showsAdjustmentOnItsDayWithoutTotals		未移植	残高の調整を記録の画面に出す機能が、モデルにも画面にも無い
 records.hides-adjustments-while-filtering	RecordsModelTests/hidesAdjustmentsWhileFiltering		未移植	残高の調整の行も絞り込みも、記録のモデルと画面に無い
 records.deletes-adjustment-with-undo	RecordsModelTests/deletesAdjustmentWithUndo		未移植	残高の調整を消す・元に戻す操作が、記録のモデルと画面に無い
@@ -328,6 +331,7 @@ records.searches-across-months	RecordsModelTests/searchesAcrossMonths		未移植
 records.searches-item-names	RecordsModelTests/searchesItemNames		未移植	記録の検索が無く、明細の名前でも探せない
 records.lists-items-under-rows	RecordsModelTests/listsItemsUnderRows		未移植	EntryRowItem に明細（items）が無く、行の下に明細を出さない
 records.filters-by-category-and-sums-search	RecordsModelTests/filtersByCategoryAndSumsSearch		未移植	カテゴリでの絞り込みと、検索の結果の合計が無い
+records.narrows-filter-tags-to-chosen-categories	RecordsModelTests/narrowsFilterTagsToChosenCategories		未移植	絞り込みのシートが、記録の画面に無い
 records.tells-when-filter-hides-every-record	RecordsModelTests/tellsWhenFilterHidesEveryRecord		未移植	絞り込みが無く、絞り込みで隠れたことを伝える出力も無い
 records.remembers-searched-words	RecordsModelTests/remembersSearchedWords		未移植	検索の履歴（recentSearches）を覚える機能が無い
 records.restores-cleared-searches	RecordsModelTests/restoresClearedSearches		未移植	検索の履歴を消す・戻す機能が無い
@@ -428,6 +432,7 @@ budget-list.skips-average-until-two-months-are-recorded	BudgetListModelTests/ski
 budget-list.suggests-only-recurring-without-records	BudgetListModelTests/suggestsOnlyRecurringWithoutRecords	BudgetListModelTest/suggestsOnlyRecurringWithoutRecords	対応	
 budget-list.tells-when-budgets-cannot-be-read	BudgetListModelTests/tellsWhenBudgetsCannotBeRead	BudgetListModelTest/tellsWhenBudgetsCannotBeRead	対応	設定の表ではなく、共有の記録の一覧を失敗させて確かめる
 budget-list.keeps-notice-when-editing-starts	BudgetListModelTests/keepsNoticeWhenEditingStarts	BudgetListModelTest/keepsNoticeWhenEditingStarts	対応	共有の記録の一覧を失敗させて、知らせを出してから確かめる
+budget-list.splits-categories-by-budget-and-orders-rest-by-spending	BudgetListModelTests/splitsCategoriesByBudgetAndOrdersRestBySpending		未確認	Android の Output に同じ分け方があるが、テストが無い
 recurring-edit.warns-that-reminders-cannot-arrive-when-denied	RecurringEditModelTests/warnsThatRemindersCannotArriveWhenDenied	RecurringEditModelTest/warnsThatRemindersCannotArriveWhenDenied	対応	未回答は、Android 13 以上でアプリがまだ尋ねていない時。12 以下には無い
 recurring-edit.opens-one-panel-at-a-time	RecurringEditModelTests/opensOnePanelAtATime	RecurringEditModelPromptTest/opensOnePanelAtATime	対応	
 recurring-edit.does-not-warn-when-reminders-are-allowed	RecurringEditModelTests/doesNotWarnWhenRemindersAreAllowed	RecurringEditModelTest/doesNotWarnWhenRemindersAreAllowed	対応	

@@ -29,53 +29,51 @@ public struct WalletEditSheet: View {
     }
 
     public var body: some View {
-        GeometryReader { _ in
-            editorStack
-        }
-        .iconEditorDrawer(
-            model: model.state.submodels.icon,
-            focus: $focus,
-            textField: .text,
-            below: layout.iconBottom
-        )
-        .errorBanner(model.state.notices.error)
-        .deletionNotice(model.state.notices.valuationDeletion) { deletion in
-            model.perform {
-                await $0.restore(deletion)
+        editorStack
+            .iconEditorDrawer(
+                model: model.state.submodels.icon,
+                focus: $focus,
+                textField: .text,
+                below: layout.iconBottom
+            )
+            .errorBanner(model.state.notices.error)
+            .deletionNotice(model.state.notices.valuationDeletion) { deletion in
+                model.perform {
+                    await $0.restore(deletion)
+                }
             }
-        }
-        .editSheet(
-            model.flow,
-            deleting: .deletingWallet(hasEntries: model.input.hasEntries),
-            hiding: .hidingWallet(balance: model.input.balance),
-            onHide: onHide,
-            onDelete: onDelete,
-            onSaved: onSave
-        )
-        .onChange(of: model.state.kind) {
-            focus = nil
-        }
-        .sheet(isPresented: Bindable(model.state).presented.paymentStep[.editing]) {
-            closePayment()
-        } content: {
-            RecurringEditSheet(model: model.paymentModel())
-        }
-        .confirmation(
-            isPresented: Bindable(model.state).presented.paymentStep[.asking],
-            systemImage: "repeat",
-            title: model.output.paymentQuestion,
-            message: model.output.paymentQuestionNote,
-            keepTitle: "あとで",
-            confirmTitle: "決める",
-            role: .suggestion,
-            onKeep: model.finishAddedWallet
-        ) {
-            model.state.presented.paymentStep.show(.editing)
-        }
-        .task {
-            await model.load()
-        }
-        .presentationSizing(.tallForm)
+            .editSheet(
+                model.flow,
+                deleting: .deletingWallet(hasEntries: model.input.hasEntries),
+                hiding: .hidingWallet(balance: model.input.balance),
+                onHide: onHide,
+                onDelete: onDelete,
+                onSaved: onSave
+            )
+            .onChange(of: model.state.kind) {
+                focus = nil
+            }
+            .sheet(isPresented: Bindable(model.state).presented.paymentStep[.editing]) {
+                closePayment()
+            } content: {
+                RecurringEditSheet(model: model.paymentModel())
+            }
+            .confirmation(
+                isPresented: Bindable(model.state).presented.paymentStep[.asking],
+                systemImage: "repeat",
+                title: model.output.paymentQuestion,
+                message: model.output.paymentQuestionNote,
+                keepTitle: "あとで",
+                confirmTitle: "決める",
+                role: .suggestion,
+                onKeep: model.finishAddedWallet
+            ) {
+                model.state.presented.paymentStep.show(.editing)
+            }
+            .task {
+                await model.load()
+            }
+            .presentationSizing(.tallForm)
     }
 }
 

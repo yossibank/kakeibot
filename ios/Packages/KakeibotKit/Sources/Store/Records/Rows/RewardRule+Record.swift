@@ -11,7 +11,7 @@ extension RewardRule: HidableRecord {
         AppDatabase.RewardRuleWriteError.ruleNotFound
     }
 
-    public static func setHidden(
+    static func setHidden(
         _ id: ID,
         _ isHidden: Bool,
         in db: Database,
@@ -31,4 +31,9 @@ extension RewardRule: IconBackedRecord {
     public static var iconNotFound: any Error {
         AppDatabase.RewardRuleWriteError.iconNotFound
     }
+}
+
+extension RewardRule: HidableRow {
+    public static let ordering = OrderedRowWrite<RewardRule>.sortable
+    public static let hiding = HidableRowWrite<RewardRule>.hidable
 }

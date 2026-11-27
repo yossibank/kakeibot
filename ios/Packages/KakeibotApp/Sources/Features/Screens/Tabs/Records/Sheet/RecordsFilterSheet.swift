@@ -199,8 +199,8 @@ private extension RecordsFilterSheet {
     }
 
     var tabOptions: [CapsulePicker<RecordsModel.FilterTab>.Option] {
-        let expense = tabTitle("支出", count: count(of: .expense))
-        let income = tabTitle("収入", count: count(of: .income))
+        let expense = tabTitle("支出", count: model.output.chosenCategoryCount(of: .expense))
+        let income = tabTitle("収入", count: model.output.chosenCategoryCount(of: .income))
         let wallet = tabTitle("口座", count: filter.walletIds.count)
         let tag = tabTitle("タグ", count: filter.tagIds.count)
 
@@ -233,11 +233,8 @@ private extension RecordsFilterSheet {
     }
 
     var tagGroups: [TagGroup] {
-        let tags = list?.filterTags ?? []
-
-        return shownCategories.compactMap { category in
-            let items = tags
-                .filter { $0.categoryId == category.id }
+        model.output.filterTagCategories.compactMap { category in
+            let items = model.output.filterTags(in: category.id)
                 .map { TagLine.Item(id: $0.id, name: $0.name) }
 
             guard !items.isEmpty else {
@@ -250,16 +247,6 @@ private extension RecordsFilterSheet {
                 tags: items
             )
         }
-    }
-
-    var shownCategories: [EntryCategory] {
-        let categories = list?.filterCategories ?? []
-
-        guard !filter.categoryIds.isEmpty else {
-            return categories
-        }
-
-        return categories.filter { filter.categoryIds.contains($0.id) }
     }
 
     var walletItems: [Item] {
@@ -285,14 +272,6 @@ private extension RecordsFilterSheet {
         count > 0 ? "\(title) \(count)" : title
     }
 
-    func count(of kind: EntryCategory.Kind) -> Int {
-        let categories = list?.filterCategories ?? []
-
-        return categories
-            .filter { $0.kind == kind && filter.categoryIds.contains($0.id) }
-            .count
-    }
-
     func items(in tab: RecordsModel.FilterTab) -> [Item] {
         switch tab {
         case .expense: categoryItems(.expense)
@@ -303,10 +282,7 @@ private extension RecordsFilterSheet {
     }
 
     func categoryItems(_ kind: EntryCategory.Kind) -> [Item] {
-        let categories = list?.filterCategories ?? []
-
-        return categories
-            .filter { $0.kind == kind }
+        model.output.filterCategories(of: kind)
             .map { category in
                 Item(
                     id: category.id,
@@ -322,8 +298,7 @@ private extension RecordsFilterSheet {
     }
 
     func keepShownTags() {
-        let shown = Set(tagGroups.flatMap { $0.tags.map(\.id) })
-        filter.tagIds.formIntersection(shown)
+        filter.tagIds.formIntersection(model.output.shownFilterTagIds)
     }
 
     func toggle<ID: Hashable>(

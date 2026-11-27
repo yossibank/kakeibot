@@ -1,4 +1,4 @@
-import Store
+@testable import Store
 
 extension AppDatabase {
     func failWrites(to table: String) async throws {

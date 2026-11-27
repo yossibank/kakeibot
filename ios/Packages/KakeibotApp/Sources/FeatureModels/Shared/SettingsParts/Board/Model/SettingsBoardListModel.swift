@@ -44,14 +44,14 @@ public extension SettingsBoardListModel where Input == SettingsBoardSnapshotInpu
     }
 }
 
-public extension SettingsBoardListModel where Item: SortableRecord, Item.ID == Identifier<Item> {
+public extension SettingsBoardListModel where Item: OrderedRow {
     func saveOrder(_ ids: [Item.ID]) async throws {
         let ids = ids + output.hidden.map(\.id)
         try await dependencies.database.reorder(ids, at: dependencies.clock.now)
     }
 }
 
-public extension SettingsBoardListModel where Item: HidableRecord, Item.ID == Identifier<Item> {
+public extension SettingsBoardListModel where Item: HidableRow {
     func saveHidden(
         _ id: Item.ID,
         isHidden: Bool

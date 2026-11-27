@@ -204,15 +204,13 @@ extension AssetsEntrySheet.Content {
             )
         }
 
-        let count = cards.reduce(0) { $0 + $1.1.count }
-        let total = cards.reduce(0) { $0 + $1.1.total }
         let name = cards.count == 1 ? cards.first?.0.wallet.name : nil
 
         return Self(
             id: "unpaid",
-            amount: total,
+            amount: rows.unpaidTotal,
             title: "未払いの記録",
-            note: "\(name ?? "カード \(cards.count) 枚") · \(count) 件",
+            note: "\(name ?? "カード \(cards.count) 枚") · \(rows.unpaidCount) 件",
             groups: groups
         )
     }

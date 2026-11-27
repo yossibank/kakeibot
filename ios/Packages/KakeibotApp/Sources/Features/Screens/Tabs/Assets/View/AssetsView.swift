@@ -67,16 +67,6 @@ public struct AssetsView: View {
     }
 }
 
-extension AssetsView {
-    var ownedSections: [AssetsModel.WalletSection] {
-        model.output.sections.filter { !Self.isOwed($0.role) }
-    }
-
-    var owedSections: [AssetsModel.WalletSection] {
-        model.output.sections.filter { Self.isOwed($0.role) }
-    }
-}
-
 private extension AssetsView {
     var header: some View {
         TabHeader("資産") {
@@ -113,7 +103,7 @@ private extension AssetsView {
     var ownedCard: some View {
         walletGroup(
             "資産",
-            sections: ownedSections,
+            sections: model.output.ownedSections,
             addNote: "現金・銀行・投資など"
         ) {
             addWallet(.cash)
@@ -123,7 +113,7 @@ private extension AssetsView {
     var owedCard: some View {
         walletGroup(
             "負債",
-            sections: owedSections,
+            sections: model.output.owedSections,
             addNote: "カード・借入"
         ) {
             addWallet(.card)
@@ -214,13 +204,6 @@ private extension AssetsView {
         let change = model.output.changeFromLastMonth
         let sign = change > 0 ? "+" : ""
         return "先月末より \(sign)\(Yen.text(change))"
-    }
-
-    static func isOwed(_ role: Wallet.Kind.Role) -> Bool {
-        switch role {
-        case .card, .loan: true
-        case .onHand, .investment: false
-        }
     }
 
     func addWallet(_ kind: Wallet.Kind) {

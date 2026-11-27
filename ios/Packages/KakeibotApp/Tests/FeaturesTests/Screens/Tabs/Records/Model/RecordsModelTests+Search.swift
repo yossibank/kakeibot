@@ -76,6 +76,41 @@ extension RecordsModelTests {
     }
 
     @Test
+    func narrowsFilterTagsToChosenCategories() async throws {
+        let setup = try await Setup()
+        let options = try await setup.database.entryOptions()
+        let food = options.expenseCategories[0]
+        let daily = options.expenseCategories[1]
+        let foodTags = try await setup.database.saveTags(
+            [EntryTagDraft(name: "外食")],
+            for: food.id,
+            at: Date()
+        )
+        let dailyTags = try await setup.database.saveTags(
+            [EntryTagDraft(name: "洗剤")],
+            for: daily.id,
+            at: Date()
+        )
+        let foodTag = try #require(foodTags.first)
+        let dailyTag = try #require(dailyTags.first)
+        let model = RecordsModel(parts: .system(setup.database), today: setup.today)
+        await model.load()
+        let unfiltered = model.output.shownFilterTagIds
+
+        model.state.fields.filter = EntryFilter(categoryIds: [food.id])
+
+        #expect(unfiltered.isSuperset(of: [foodTag.id, dailyTag.id]))
+        #expect(model.output.filterTagCategories.map(\.id) == [food.id])
+        #expect(model.output
+            .shownFilterTagIds == Set(model.output.filterTags(in: food.id).map(\.id)))
+        #expect(model.output.shownFilterTagIds.contains(foodTag.id))
+        #expect(!model.output.shownFilterTagIds.contains(dailyTag.id))
+        #expect(model.output.chosenCategoryCount(of: .expense) == 1)
+        #expect(model.output.chosenCategoryCount(of: .income) == 0)
+        #expect(model.output.filterCategories(of: .income).allSatisfy { $0.kind == .income })
+    }
+
+    @Test
     func filtersByCategoryAndSumsSearch() async throws {
         let setup = try await Setup()
         try await setup.save(.expense, amount: 980, on: "2026-10-12", memo: "ランチ")

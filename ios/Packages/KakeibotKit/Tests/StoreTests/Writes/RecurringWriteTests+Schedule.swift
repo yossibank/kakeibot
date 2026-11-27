@@ -1,6 +1,6 @@
 import Core
 import Foundation
-import Store
+@testable import Store
 import Testing
 
 extension RecurringWriteTests {

@@ -16,3 +16,8 @@ extension ShelfIcon: IconBackedRecord {
         AppDatabase.ShelfIconWriteError.iconNotFound
     }
 }
+
+extension ShelfIcon: ArchivableRow {
+    public static let ordering = OrderedRowWrite<ShelfIcon>.sortable
+    public static let hiding = HidableRowWrite<ShelfIcon>.hidable
+}

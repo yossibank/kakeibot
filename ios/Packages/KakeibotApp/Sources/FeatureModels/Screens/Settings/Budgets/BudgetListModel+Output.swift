@@ -39,6 +39,24 @@ public extension BudgetListModel.Output {
         }
     }
 
+    var budgeted: [EntryCategory] {
+        categories.filter { amount(for: $0.id) != nil }
+    }
+
+    var unbudgeted: [EntryCategory] {
+        let rest = categories
+            .filter { amount(for: $0.id) == nil }
+            .map { (category: $0, spent: spent(for: $0.id)) }
+
+        let order = rest.enumerated().sorted { lhs, rhs in
+            lhs.element.spent == rhs.element.spent
+                ? lhs.offset < rhs.offset
+                : lhs.element.spent > rhs.element.spent
+        }
+
+        return order.map(\.element.category)
+    }
+
     var totalAmount: Int? {
         amount(for: nil)
     }

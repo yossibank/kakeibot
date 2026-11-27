@@ -2,7 +2,7 @@
 import Core
 import Foundation
 import Notifications
-import Store
+@testable import Store
 import Synchronization
 import Testing
 

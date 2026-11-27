@@ -10,3 +10,8 @@ extension EntryTemplate: ArchivableRecord {
         AppDatabase.TemplateWriteError.templateNotFound
     }
 }
+
+extension EntryTemplate: ArchivableRow {
+    public static let ordering = OrderedRowWrite<EntryTemplate>.sortable
+    public static let hiding = HidableRowWrite<EntryTemplate>.hidable
+}

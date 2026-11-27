@@ -138,6 +138,8 @@
 | 複数の画面の部品 | `Features/Shared/<役割>/` | |
 | OS の枠組みへの橋 | `AppFeature/Bridge/` の `<型>+<枠組み>` | `ProStore+StoreKit`・`SyncAccount+CloudKit` |
 
+お知らせのモデル（`WhatsNewModel`）だけは、`Features` の `WhatsNew/Model/` に置く。版の中身（`WhatsNewRelease`）が、使い方のコマの種類を持つからである。コマの種類（`WhatsNewScene.Kind`）は、画面の部品の中にある。
+
 同期は、層の間にもう 1 段を持つ。
 
 | 層 | 置き場所 |

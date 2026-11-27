@@ -18,3 +18,8 @@ extension EntryCategory: IconBackedRecord {
         AppDatabase.CategoryWriteError.iconNotFound
     }
 }
+
+extension EntryCategory: ArchivableRow {
+    public static let ordering = OrderedRowWrite<EntryCategory>.sortable
+    public static let hiding = HidableRowWrite<EntryCategory>.hidable
+}

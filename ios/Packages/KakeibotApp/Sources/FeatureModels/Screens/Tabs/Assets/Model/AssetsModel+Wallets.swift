@@ -66,6 +66,19 @@ public extension AssetsModel.Unpaid {
     }
 }
 
+public extension AssetsModel.WalletSection {
+    var isOwed: Bool {
+        switch role {
+        case .card, .loan: true
+        case .onHand, .investment: false
+        }
+    }
+
+    var total: Int {
+        rows.reduce(0) { $0 + $1.balance }
+    }
+}
+
 extension AssetsModel.WalletSection {
     static func sections(of rows: [AssetsModel.WalletRow]) -> [Self] {
         Wallet.Kind.Role.allCases.compactMap { role in
@@ -84,5 +97,40 @@ extension AssetsModel.WalletRow: Identifiable {
 extension AssetsModel.WalletSection: Identifiable {
     public var id: Wallet.Kind.Role {
         role
+    }
+}
+
+public extension [AssetsModel.WalletSection] {
+    var owned: Self {
+        filter { !$0.isOwed }
+    }
+
+    var owed: Self {
+        filter(\.isOwed)
+    }
+
+    var total: Int {
+        reduce(0) { $0 + $1.total }
+    }
+
+    var rowCount: Int {
+        reduce(0) { $0 + $1.rows.count }
+    }
+
+    var ownedShare: Double {
+        let owned = Swift.max(owned.total, 0)
+        let owed = Swift.max(-owed.total, 0)
+        let total = owned + owed
+        return total == 0 ? 1 : Double(owned) / Double(total)
+    }
+}
+
+public extension [AssetsModel.WalletRow] {
+    var unpaidCount: Int {
+        compactMap(\.unpaid).reduce(0) { $0 + $1.count }
+    }
+
+    var unpaidTotal: Int {
+        compactMap(\.unpaid).reduce(0) { $0 + $1.total }
     }
 }

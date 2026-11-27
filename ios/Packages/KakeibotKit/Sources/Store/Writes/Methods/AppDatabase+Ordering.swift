@@ -2,22 +2,22 @@ import Core
 import Foundation
 
 public extension AppDatabase {
-    func reorder<Record: SortableRecord>(
-        _ ids: [Identifier<Record>],
+    func reorder<Row: OrderedRow>(
+        _ ids: [Identifier<Row>],
         at now: Date
-    ) async throws where Record.ID == Identifier<Record> {
+    ) async throws {
         try await writer.write { db in
-            try Record.reorder(ids, in: db, at: now)
+            try Row.ordering.reorder(ids, db, now)
         }
     }
 
-    func setHidden<Record: HidableRecord>(
-        _ id: Identifier<Record>,
+    func setHidden<Row: HidableRow>(
+        _ id: Identifier<Row>,
         isHidden: Bool,
         at now: Date
-    ) async throws where Record.ID == Identifier<Record> {
+    ) async throws {
         try await writer.write { db in
-            try Record.setHidden(id, isHidden, in: db, at: now)
+            try Row.hiding.setHidden(id, isHidden, db, now)
         }
     }
 }
