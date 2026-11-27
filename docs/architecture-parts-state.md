@@ -62,7 +62,7 @@ ID の型（`…ID`・`Identifier<…>`）も裸の値として扱う。その O
 | 値の種類 | 例 | 行き先 |
 | --- | --- | --- |
 | 画面で選ぶ物 | 口座・カテゴリ・タグ・並べ替え中の並び | `fields`（`fields.walletId`・`fields.movingOrder`） |
-| 表示中の行 | 横に払って開いた行 | `presented`（`presented.row`） |
+| 表示中の行 | 横に払って開いた行 | `presented`（iOS は `presented.openId`、Android は `presented.row`） |
 | モデルだけが決める物 | 共有を操作中の口座 | 意味の名前の値の型（`WalletWork`） |
 
 設定の一覧の `fields` は、iOS では `SettingsBoardFields` に適合させる。
