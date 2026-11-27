@@ -251,7 +251,7 @@ private fun RecurringEditContent(
         if (model.output.isLoanRepayment &&
             (model.output.plannedTotal != null || model.output.autoPlan != null)
         ) {
-            RecurringLoanPlan(
+            RecurringLoanPlanCard(
                 model = model,
                 onMatch = model.state::useAutoCount,
             )

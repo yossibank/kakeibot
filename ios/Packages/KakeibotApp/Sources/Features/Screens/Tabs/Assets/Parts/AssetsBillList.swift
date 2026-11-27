@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct AssetsBillSchedule: View {
+struct AssetsBillList: View {
     let bills: [CardBill]
     let showsAmounts: Bool
 
@@ -33,7 +33,7 @@ struct AssetsBillSchedule: View {
     }
 }
 
-private extension AssetsBillSchedule {
+private extension AssetsBillList {
     func mark(of bill: CardBill) -> some View {
         VStack(spacing: 0) {
             connector(isShown: bill != bills.first)
@@ -95,7 +95,7 @@ private extension AssetsBillSchedule {
     }
 }
 
-private extension AssetsBillSchedule {
+private extension AssetsBillList {
     static let widestDate = "00/00払い"
 
     static func status(of bill: CardBill) -> String {

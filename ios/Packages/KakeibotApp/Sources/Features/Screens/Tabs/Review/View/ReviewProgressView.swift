@@ -39,7 +39,7 @@ struct ReviewProgressView: View {
 private extension ReviewProgressView {
     var closingCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ReviewReportLabel(title: closingTitle)
+            ReviewReportTitle(title: closingTitle)
 
             closingHead
 
@@ -139,7 +139,7 @@ private extension ReviewProgressView {
         let limitName = pace.limitName(unit: unit)
 
         return VStack(alignment: .leading, spacing: 16) {
-            ReviewReportLabel(title: "いまのペース")
+            ReviewReportTitle(title: "いまのペース")
 
             ReviewReportGaugeRow(pace: pace, limitName: limitName, showsMarker: true) {
                 paceVerdict(pace)
@@ -187,7 +187,7 @@ private extension ReviewProgressView {
 
         return Grid(horizontalSpacing: 1, verticalSpacing: 1) {
             GridRow {
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "使った",
                     systemImage: "yensign.circle",
                     value: spent,
@@ -195,7 +195,7 @@ private extension ReviewProgressView {
                     note: "\(limitName) \(ReviewYen.text(pace.limit))"
                 )
 
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "今日までの目安",
                     systemImage: "clock",
                     value: elapsed,
@@ -205,7 +205,7 @@ private extension ReviewProgressView {
             }
 
             GridRow {
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "残りの 1 日に使える",
                     systemImage: "sun.max",
                     value: perDay,
@@ -213,7 +213,7 @@ private extension ReviewProgressView {
                     note: Self.perDayNote(pace)
                 )
 
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "このままだと\(unit)末",
                     systemImage: "arrow.forward",
                     value: projected,

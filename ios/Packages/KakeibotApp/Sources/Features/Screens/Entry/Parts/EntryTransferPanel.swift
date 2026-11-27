@@ -7,7 +7,7 @@ struct EntryTransferPanel: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let model: EntryModel
-    let onPick: (EntryWalletDeck.Role) -> Void
+    let onPick: (EntryWalletPanel.Role) -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -75,7 +75,7 @@ private extension EntryTransferPanel {
         .animation(.snappy, value: model.output.amount)
     }
 
-    func card(_ role: EntryWalletDeck.Role) -> some View {
+    func card(_ role: EntryWalletPanel.Role) -> some View {
         let wallet = roleWallet(role)
         let shape = RoundedRectangle(cornerRadius: corner.radius(20))
 
@@ -142,7 +142,7 @@ private extension EntryTransferPanel {
     }
 
     func cardInfo(
-        _ role: EntryWalletDeck.Role,
+        _ role: EntryWalletPanel.Role,
         wallet: Wallet?
     ) -> some View {
         let nameColor = wallet == nil ? Palette.hint : Palette.text
@@ -159,7 +159,7 @@ private extension EntryTransferPanel {
     }
 
     func cardBalances(
-        _ role: EntryWalletDeck.Role,
+        _ role: EntryWalletPanel.Role,
         wallet: Wallet?
     ) -> some View {
         let isOver = role == .source && model.output.isOverSourceBalance
@@ -194,7 +194,7 @@ private extension EntryTransferPanel {
     }
 
     @ViewBuilder
-    func roleTag(_ role: EntryWalletDeck.Role) -> some View {
+    func roleTag(_ role: EntryWalletPanel.Role) -> some View {
         let tag = Text(title(role))
             .textFont(.caption2, weight: .bold)
             .fixedSize()
@@ -232,12 +232,12 @@ private extension EntryTransferPanel {
 private extension EntryTransferPanel {
     static let iconSize: CGFloat = 44
 
-    func roleWallet(_ role: EntryWalletDeck.Role) -> Wallet? {
+    func roleWallet(_ role: EntryWalletPanel.Role) -> Wallet? {
         let id = role == .source ? model.state.payment.walletId : model.state.payment.toWalletId
         return model.output.wallet(id)
     }
 
-    func title(_ role: EntryWalletDeck.Role) -> String {
+    func title(_ role: EntryWalletPanel.Role) -> String {
         switch role {
         case .source: model.output.walletTitle
         case .destination: EntryModel.destinationTitle

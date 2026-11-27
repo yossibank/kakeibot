@@ -6,7 +6,7 @@ import SwiftUI
 extension ReviewProgressView {
     func yearCard(_ year: ReviewYearProgress) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            ReviewReportLabel(title: "\(currentName)の 12 か月")
+            ReviewReportTitle(title: "\(currentName)の 12 か月")
 
             yearSpent(year)
 
@@ -66,7 +66,7 @@ private extension ReviewProgressView {
     func yearStats(_ year: ReviewYearProgress) -> some View {
         Grid(horizontalSpacing: 1, verticalSpacing: 1) {
             GridRow {
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "月の平均",
                     systemImage: "chart.bar",
                     value: year.average.map(ReviewYen.number) ?? "−",
@@ -74,7 +74,7 @@ private extension ReviewProgressView {
                     note: "締めた \(year.closedMonths.count) か月"
                 )
 
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "いちばん多い月",
                     systemImage: "flame",
                     value: year.peak.map { ReviewYen.number($0.total) } ?? "−",
@@ -87,7 +87,7 @@ private extension ReviewProgressView {
                 let ratio = Double(year.withinBudgetCount) / Double(year.budgetedCount)
 
                 GridRow {
-                    ReviewReportStat(
+                    ReviewReportStatTile(
                         title: "予算内の月",
                         systemImage: "rosette",
                         value: "\(year.withinBudgetCount)",

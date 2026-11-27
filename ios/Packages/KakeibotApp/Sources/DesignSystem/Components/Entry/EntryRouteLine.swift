@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct EntryRoute: View {
+public struct EntryRouteLine: View {
     let source: String
     let destination: String
 
@@ -39,6 +39,6 @@ public struct EntryRoute: View {
 }
 
 #Preview {
-    EntryRoute(source: "みずほ銀行", destination: "財布")
+    EntryRouteLine(source: "みずほ銀行", destination: "財布")
         .padding()
 }

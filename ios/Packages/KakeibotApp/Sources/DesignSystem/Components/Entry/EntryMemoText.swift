@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct EntryMemo: View {
+struct EntryMemoText: View {
     @State private var isExpanded = false
     @State private var fullHeight: CGFloat = 0
     @State private var shownHeight: CGFloat = 0
@@ -52,7 +52,7 @@ struct EntryMemo: View {
     }
 }
 
-private extension EntryMemo {
+private extension EntryMemoText {
     var measure: some View {
         ZStack(alignment: .topLeading) {
             Text(text)
@@ -108,7 +108,7 @@ private extension EntryMemo {
     }
 }
 
-private extension EntryMemo {
+private extension EntryMemoText {
     static let lineLimit = 2
     static let fadeWidth: CGFloat = 72
     static let toggleWidth: CGFloat = 20
@@ -141,9 +141,9 @@ private extension EntryMemo {
 
 #Preview {
     VStack(alignment: .leading, spacing: 16) {
-        EntryMemo("ランチ")
+        EntryMemoText("ランチ")
 
-        EntryMemo(
+        EntryMemoText(
             "同僚と駅前の新しいイタリアンでランチ。パスタとサラダのセットに、"
                 + "食後のコーヒーとデザートも付けた。次は夜に来てみたい"
         )

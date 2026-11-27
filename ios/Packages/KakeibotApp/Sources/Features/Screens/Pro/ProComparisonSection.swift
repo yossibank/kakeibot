@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct ProComparison: View {
+struct ProComparisonSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             SettingsSectionTitle("無料と Pro")
@@ -40,7 +40,7 @@ struct ProComparison: View {
     }
 }
 
-private extension ProComparison {
+private extension ProComparisonSection {
     struct Row: Identifiable {
         let title: String
         let free: Mark
@@ -54,7 +54,7 @@ private extension ProComparison {
     }
 }
 
-private extension ProComparison {
+private extension ProComparisonSection {
     func header(_ title: String) -> some View {
         Text(title)
             .textFont(.caption, weight: .bold)
@@ -93,7 +93,7 @@ private extension ProComparison {
     }
 }
 
-private extension ProComparison {
+private extension ProComparisonSection {
     static let columnWidth: CGFloat = 76
 
     static let rows = [
@@ -107,7 +107,7 @@ private extension ProComparison {
     ]
 }
 
-extension ProComparison.Row {
+extension ProComparisonSection.Row {
     var id: String {
         title
     }

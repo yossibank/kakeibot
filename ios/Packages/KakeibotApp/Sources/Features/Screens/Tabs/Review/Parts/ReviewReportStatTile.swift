@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct ReviewReportStat: View {
+struct ReviewReportStatTile: View {
     let title: String
     let systemImage: String
     let value: String
@@ -58,7 +58,7 @@ struct ReviewReportStat: View {
     }
 }
 
-private extension ReviewReportStat {
+private extension ReviewReportStatTile {
     var titleText: some View {
         Text(title)
             .textFont(.caption2)
@@ -107,6 +107,6 @@ private extension ReviewReportStat {
     }
 }
 
-private extension ReviewReportStat {
+private extension ReviewReportStatTile {
     static let valueHeight: CGFloat = 30
 }

@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct ProHero: View {
+struct ProHeroCard: View {
     @Environment(\.themeStyle.corner) var corner
 
     let price: String?
@@ -37,7 +37,7 @@ struct ProHero: View {
     }
 }
 
-private extension ProHero {
+private extension ProHeroCard {
     var emblem: some View {
         Image(systemName: "sparkles")
             .font(.system(size: 26, weight: .light))
@@ -94,7 +94,7 @@ private extension ProHero {
     }
 }
 
-private extension ProHero {
+private extension ProHeroCard {
     static let ink = Color(red: 0.12, green: 0.1, blue: 0.08)
 
     static let promiseTitles = [

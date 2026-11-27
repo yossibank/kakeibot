@@ -10,7 +10,7 @@ extension AssetsView {
 
         if row.wallet.kind == .card,
            !bills.isEmpty {
-            AssetsBillSchedule(
+            AssetsBillList(
                 bills: bills,
                 showsAmounts: Self.showsBillAmounts(bills, balance: row.balance)
             )

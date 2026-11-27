@@ -3,7 +3,7 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
-struct EntryWalletDeck: View {
+struct EntryWalletPanel: View {
     @Environment(\.themeStyle.corner) var corner
 
     @State private var layout = Layout()
@@ -66,11 +66,11 @@ struct EntryWalletDeck: View {
     }
 }
 
-extension EntryWalletDeck {
+extension EntryWalletPanel {
     typealias Role = EntryModel.WalletRole
 }
 
-private extension EntryWalletDeck {
+private extension EntryWalletPanel {
     struct Layout {
         var scrollPosition = ScrollPosition()
     }
@@ -81,13 +81,13 @@ private extension EntryWalletDeck {
     }
 }
 
-extension EntryWalletDeck {
+extension EntryWalletPanel {
     var shown: EntryModel.WalletDeck {
         model.state.screen.wallets
     }
 }
 
-private extension EntryWalletDeck {
+private extension EntryWalletPanel {
     var editBadge: some View {
         Image(systemName: "pencil")
             .sansFont(.micro, weight: .heavy)
@@ -171,7 +171,7 @@ private extension EntryWalletDeck {
     }
 }
 
-private extension EntryWalletDeck {
+private extension EntryWalletPanel {
     static let badgeSize: CGFloat = 20
 
     static let columns = [

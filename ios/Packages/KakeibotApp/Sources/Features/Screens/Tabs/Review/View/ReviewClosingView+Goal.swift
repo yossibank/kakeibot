@@ -22,7 +22,7 @@ extension ReviewClosingView {
 private extension ReviewClosingView {
     var restCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ReviewReportLabel(title: "\(goals.nextName)の一手")
+            ReviewReportTitle(title: "\(goals.nextName)の一手")
 
             Text("一手はお休みです")
                 .displayFont(.headline, weight: .bold)
@@ -69,7 +69,7 @@ private extension ReviewClosingView {
 
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                ReviewReportLabel(title: "\(goals.nextName)の一手")
+                ReviewReportTitle(title: "\(goals.nextName)の一手")
 
                 Text("\(start.monthDayText) から")
                     .textFont(.caption2, weight: .bold)

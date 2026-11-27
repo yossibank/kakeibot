@@ -29,7 +29,7 @@ extension WalletBoard: SettingsBoardSpec {
     }
 
     var grid: SettingsBoardGrid {
-        SettingsBoardGrid(columns: 1, itemHeight: WalletRowCard<WalletRowIcon>.height, spacing: 12)
+        SettingsBoardGrid(columns: 1, itemHeight: WalletRowCard<WalletRowBadge>.height, spacing: 12)
     }
 
     var space: String {
@@ -59,7 +59,7 @@ extension WalletBoard: SettingsBoardSpec {
             )),
             isShared: model.output.isShared(item)
         ) {
-            WalletRowIcon(icon: model.output.icon(for: item))
+            WalletRowBadge(icon: model.output.icon(for: item))
         }
     }
 

@@ -106,7 +106,7 @@ private extension TemplateEditSheet {
                 open(panel)
             }
 
-            SettingsDetails {
+            SettingsDetailsSection {
                 SettingsRowList(items: detailItems) { panel in
                     open(panel)
                 }

@@ -1,7 +1,7 @@
 import Core
 import SwiftUI
 
-public struct TemplateCardName: View {
+public struct TemplateCardTitle: View {
     @Environment(\.themeStyle) private var themeStyle
 
     let name: String

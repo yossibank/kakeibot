@@ -2,7 +2,7 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
-struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
+struct SettingsHiddenSection<Item: Identifiable, Face: View>: View {
     let fold: SettingsFold
     let title: String
     let items: [Item]
@@ -42,7 +42,7 @@ struct SettingsHiddenTiles<Item: Identifiable, Face: View>: View {
     }
 }
 
-extension SettingsHiddenTiles {
+extension SettingsHiddenSection {
     init<Model: SettingsBoardModel>(
         fold: SettingsFold,
         title: String,
@@ -75,7 +75,7 @@ extension SettingsHiddenTiles {
     }
 }
 
-private extension SettingsHiddenTiles {
+private extension SettingsHiddenSection {
     func tile(_ item: Item) -> some View {
         let lifted = drag.hiddenOffset(of: item.id)
         let isLifted = lifted != nil
@@ -108,7 +108,7 @@ private extension SettingsHiddenTiles {
     }
 }
 
-private extension SettingsHiddenTiles {
+private extension SettingsHiddenSection {
     var columns: [GridItem] {
         Array(
             repeating: GridItem(.flexible(), spacing: grid.spacing),

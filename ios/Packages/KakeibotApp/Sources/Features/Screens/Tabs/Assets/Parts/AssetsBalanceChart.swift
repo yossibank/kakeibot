@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct AssetsBalanceTrend: View {
+struct AssetsBalanceChart: View {
     static let netWorthColor = Palette.subtext
 
     let totals: [Int]
@@ -49,7 +49,7 @@ struct AssetsBalanceTrend: View {
     }
 }
 
-private extension AssetsBalanceTrend {
+private extension AssetsBalanceChart {
     func points(
         of values: [Int],
         in size: CGSize

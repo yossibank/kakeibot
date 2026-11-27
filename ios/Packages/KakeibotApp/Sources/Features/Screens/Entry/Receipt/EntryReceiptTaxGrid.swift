@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct EntryReceiptTaxBreakdown: View {
+struct EntryReceiptTaxGrid: View {
     let taxes: [EntryItemTotal.Tax]
     let taxIncluded: Bool
 
@@ -16,7 +16,7 @@ struct EntryReceiptTaxBreakdown: View {
     }
 }
 
-private extension EntryReceiptTaxBreakdown {
+private extension EntryReceiptTaxGrid {
     func grid(isCompact: Bool) -> some View {
         Grid(alignment: .leading, horizontalSpacing: 6, verticalSpacing: 6) {
             if let first = taxes.first {
@@ -60,7 +60,7 @@ private extension EntryReceiptTaxBreakdown {
     }
 }
 
-private extension EntryReceiptTaxBreakdown {
+private extension EntryReceiptTaxGrid {
     func taxTitle(isCompact: Bool) -> String {
         switch (taxIncluded, isCompact) {
         case (true, false): "うち消費税"

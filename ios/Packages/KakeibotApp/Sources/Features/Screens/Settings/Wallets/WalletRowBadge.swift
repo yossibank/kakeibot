@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct WalletRowIcon: View {
+struct WalletRowBadge: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let icon: Icon?

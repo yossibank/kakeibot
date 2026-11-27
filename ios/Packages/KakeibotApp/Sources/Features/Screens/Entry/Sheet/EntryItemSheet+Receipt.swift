@@ -21,7 +21,7 @@ extension EntryItemSheet {
             }
 
             if !model.output.itemTotals.taxes.isEmpty {
-                EntryReceiptTaxBreakdown(
+                EntryReceiptTaxGrid(
                     taxes: model.output.itemTotals.taxes,
                     taxIncluded: model.state.items.taxIncluded
                 )

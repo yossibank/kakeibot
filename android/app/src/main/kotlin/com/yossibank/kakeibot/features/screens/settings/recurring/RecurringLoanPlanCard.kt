@@ -33,7 +33,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import kotlin.math.abs
 
 @Composable
-fun RecurringLoanPlan(
+fun RecurringLoanPlanCard(
     model: RecurringEditModel,
     onMatch: () -> Unit,
 ) {

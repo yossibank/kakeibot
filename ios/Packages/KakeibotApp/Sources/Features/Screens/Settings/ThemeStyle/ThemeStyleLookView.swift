@@ -19,7 +19,7 @@ public struct ThemeStyleLookView: View {
         ) {
             preview
         } content: {
-            ThemeStyleChoices(
+            ThemeStyleChoiceSection(
                 title: "角の丸み",
                 options: ThemeCorner.allCases,
                 selection: model.output.style.corner,
@@ -33,7 +33,7 @@ public struct ThemeStyleLookView: View {
                 }
             }
 
-            ThemeStyleChoices(
+            ThemeStyleChoiceSection(
                 title: "行の間隔",
                 options: ThemeRowSpacing.allCases,
                 selection: model.output.style.rowSpacing,
@@ -128,7 +128,7 @@ private extension ThemeStyleLookView {
     }
 
     var stampShapeChoices: some View {
-        ThemeStyleChoices(
+        ThemeStyleChoiceSection(
             title: "スタンプの形",
             options: ThemeStampShape.allCases,
             selection: model.output.style.stampShape,
@@ -145,7 +145,7 @@ private extension ThemeStyleLookView {
     }
 
     var tabTitleChoices: some View {
-        ThemeStyleChoices(
+        ThemeStyleChoiceSection(
             title: "タブの名前",
             options: [true, false],
             selection: model.output.style.showsTabTitles,
@@ -162,7 +162,7 @@ private extension ThemeStyleLookView {
     }
 
     var backdropChoices: some View {
-        ThemeStyleChoices(
+        ThemeStyleChoiceSection(
             title: "背景",
             options: ThemeBackdrop.allCases,
             selection: model.output.style.backdrop,

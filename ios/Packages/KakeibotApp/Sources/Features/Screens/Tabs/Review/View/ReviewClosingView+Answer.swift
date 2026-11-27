@@ -6,7 +6,7 @@ import SwiftUI
 extension ReviewClosingView {
     func answerCard(_ item: ReviewGoalItem) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            ReviewReportLabel(title: "\(name)の一手")
+            ReviewReportTitle(title: "\(name)の一手")
 
             answerHeader(item)
 

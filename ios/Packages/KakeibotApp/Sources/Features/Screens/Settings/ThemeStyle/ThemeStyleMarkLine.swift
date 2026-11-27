@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct ThemeStyleMarks: View {
+struct ThemeStyleMarkLine: View {
     @Environment(\.themeStyle.corner) private var corner
 
     var body: some View {
@@ -27,7 +27,7 @@ struct ThemeStyleMarks: View {
     }
 }
 
-private extension ThemeStyleMarks {
+private extension ThemeStyleMarkLine {
     var cornerMark: some View {
         ThemeStyleCornerMark(corner: corner, color: Palette.subtext, size: Self.size)
     }
@@ -49,6 +49,6 @@ private extension ThemeStyleMarks {
     }
 }
 
-private extension ThemeStyleMarks {
+private extension ThemeStyleMarkLine {
     static let size: CGFloat = 18
 }

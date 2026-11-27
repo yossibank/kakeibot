@@ -26,7 +26,7 @@ public struct ThemeStyleTextView: View {
                 largeSuggestion
             }
 
-            ThemeStyleChoices(
+            ThemeStyleChoiceSection(
                 title: "文字の大きさ",
                 options: ThemeTextSize.allCases,
                 selection: model.output.style.textSize,
@@ -122,7 +122,7 @@ private extension ThemeStyleTextView {
     }
 
     var displayFontChoices: some View {
-        ThemeStyleChoices(
+        ThemeStyleChoiceSection(
             title: "見出しと金額の字体",
             options: ThemeFont.allCases,
             selection: model.output.style.displayFont,
@@ -141,7 +141,7 @@ private extension ThemeStyleTextView {
     }
 
     var textFontChoices: some View {
-        ThemeStyleChoices(
+        ThemeStyleChoiceSection(
             title: "本文の字体",
             options: ThemeFont.allCases,
             selection: model.output.style.textFont,

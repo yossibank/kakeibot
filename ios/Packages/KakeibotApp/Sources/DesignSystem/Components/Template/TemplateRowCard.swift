@@ -30,7 +30,7 @@ public struct TemplateRowCard: View {
             IconTile(icon, size: TemplateBadge.Size.regular.diameter)
 
             VStack(alignment: .leading, spacing: 4) {
-                TemplateCardName(name: name, size: .regular)
+                TemplateCardTitle(name: name, size: .regular)
                     .lineLimit(fit.nameLines)
                     .minimumScaleFactor(fit.nameScale)
 

@@ -3,7 +3,7 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
-struct RecurringLoanPlan: View {
+struct RecurringLoanPlanCard: View {
     let model: RecurringEditModel
     let onMatch: () -> Void
 
@@ -37,7 +37,7 @@ struct RecurringLoanPlan: View {
     }
 }
 
-private extension RecurringLoanPlan {
+private extension RecurringLoanPlanCard {
     @ViewBuilder
     var note: some View {
         if let noteText {
@@ -95,7 +95,7 @@ private extension RecurringLoanPlan {
     }
 }
 
-private extension RecurringLoanPlan {
+private extension RecurringLoanPlanCard {
     var totalTitle: String {
         model.flow.output.isEditing ? "これから返す額" : "返す総額"
     }

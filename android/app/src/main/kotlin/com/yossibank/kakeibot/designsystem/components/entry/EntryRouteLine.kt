@@ -19,7 +19,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
 @Composable
-fun EntryRoute(
+fun EntryRouteLine(
     source: String,
     destination: String,
     modifier: Modifier = Modifier,

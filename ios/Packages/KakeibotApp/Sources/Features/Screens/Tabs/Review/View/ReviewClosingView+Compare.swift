@@ -47,7 +47,7 @@ extension ReviewClosingView {
         let scale = compareScale
 
         return VStack(alignment: .leading, spacing: 12) {
-            ReviewReportLabel(title: "いつもと比べる")
+            ReviewReportTitle(title: "いつもと比べる")
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(content.averagePeriods) \(periodsUnit)の平均と")
@@ -76,7 +76,7 @@ extension ReviewClosingView {
 
     var goodCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ReviewReportLabel(title: "よかったこと")
+            ReviewReportTitle(title: "よかったこと")
 
             VStack(spacing: 0) {
                 ForEach(goodItems) { item in

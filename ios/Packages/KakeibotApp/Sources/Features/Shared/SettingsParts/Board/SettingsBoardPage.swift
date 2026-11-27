@@ -144,7 +144,7 @@ private extension SettingsBoardPage {
     }
 
     var hiddenSection: some View {
-        SettingsHiddenTiles(
+        SettingsHiddenSection(
             fold: SettingsFold(\.hiddenList, in: model),
             title: spec.hiddenTitle,
             grid: grid,

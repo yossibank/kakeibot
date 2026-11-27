@@ -135,7 +135,7 @@ private extension RecurringEditSheet {
                 open(panel)
             }
 
-            SettingsDetails {
+            SettingsDetailsSection {
                 SettingsRowList(items: detailItems) { panel in
                     open(panel)
                 }
@@ -143,7 +143,7 @@ private extension RecurringEditSheet {
 
             if model.output.isLoanRepayment,
                model.output.plannedTotal != nil || model.output.autoPlan != nil {
-                RecurringLoanPlan(model: model) {
+                RecurringLoanPlanCard(model: model) {
                     withAnimation(.snappy) {
                         model.state.useAutoCount()
                     }

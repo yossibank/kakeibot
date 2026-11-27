@@ -3,7 +3,7 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
-extension EntryWalletDeck {
+extension EntryWalletPanel {
     var billSection: some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
         let ring = shown.isBillOpen ? Palette.accent : Palette.line
@@ -39,7 +39,7 @@ extension EntryWalletDeck {
     }
 }
 
-private extension EntryWalletDeck {
+private extension EntryWalletPanel {
     var billHeader: some View {
         Button {
             withAnimation(.snappy) {
@@ -119,7 +119,7 @@ private extension EntryWalletDeck {
     }
 }
 
-private extension EntryWalletDeck {
+private extension EntryWalletPanel {
     var shiftTitle: String? {
         let choices = model.output.billChoices
 

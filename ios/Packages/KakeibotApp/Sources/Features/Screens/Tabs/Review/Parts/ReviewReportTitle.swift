@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct ReviewReportLabel: View {
+struct ReviewReportTitle: View {
     let title: String
 
     var body: some View {
@@ -20,7 +20,7 @@ struct ReviewReportLabel: View {
     }
 }
 
-private extension ReviewReportLabel {
+private extension ReviewReportTitle {
     static var line: LinearGradient {
         LinearGradient(
             colors: [Palette.accent.opacity(.muted), .clear],

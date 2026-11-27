@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct ThemeStyleChoices<Option: Hashable & Sendable, Sample: View>: View {
+struct ThemeStyleChoiceSection<Option: Hashable & Sendable, Sample: View>: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let title: String
@@ -30,7 +30,7 @@ struct ThemeStyleChoices<Option: Hashable & Sendable, Sample: View>: View {
     }
 }
 
-private extension ThemeStyleChoices {
+private extension ThemeStyleChoiceSection {
     func tile(_ option: Option) -> some View {
         let isSelected = option == selection
         let ring = isSelected ? Palette.accent : Palette.line
@@ -69,7 +69,7 @@ private extension ThemeStyleChoices {
     }
 }
 
-private extension ThemeStyleChoices {
+private extension ThemeStyleChoiceSection {
     var gridColumns: [GridItem] {
         let count = min(options.count, columns)
 

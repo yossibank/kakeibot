@@ -36,7 +36,7 @@ extension WalletEditSheet {
             }
 
             if !rowItems.isEmpty {
-                SettingsDetails {
+                SettingsDetailsSection {
                     SettingsRowList(items: rowItems) { panel in
                         open(panel)
                     }
@@ -94,7 +94,7 @@ extension WalletEditSheet {
                 focus = nil
                 model.state.submodels.icon.present()
             } label: {
-                WalletRowIcon(
+                WalletRowBadge(
                     icon: model.state.submodels.icon.preview,
                     strokeWidth: iconStrokeWidth
                 )

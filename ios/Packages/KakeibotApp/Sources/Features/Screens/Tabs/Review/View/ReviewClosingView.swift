@@ -59,7 +59,7 @@ private extension ReviewClosingView {
         let limitName = content.pace?.limitName(unit: unit) ?? ""
 
         return VStack(alignment: .leading, spacing: 16) {
-            ReviewReportLabel(title: "\(name)の結果")
+            ReviewReportTitle(title: "\(name)の結果")
 
             ReviewReportGaugeRow(pace: content.pace, limitName: limitName, showsMarker: false) {
                 resultVerdict
@@ -108,7 +108,7 @@ private extension ReviewClosingView {
 
         return Grid(horizontalSpacing: 1, verticalSpacing: 1) {
             GridRow {
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "使った",
                     systemImage: "yensign.circle",
                     value: spentText,
@@ -116,7 +116,7 @@ private extension ReviewClosingView {
                     note: spentNote
                 )
 
-                ReviewReportStat(
+                ReviewReportStatTile(
                     title: "1 日あたり",
                     systemImage: "calendar",
                     value: perDay,
@@ -132,7 +132,7 @@ private extension ReviewClosingView {
                 let value = ReviewYen.signedNumber(difference)
 
                 GridRow {
-                    ReviewReportStat(
+                    ReviewReportStatTile(
                         title: "\(previousName)より",
                         systemImage: symbol,
                         value: value,
@@ -151,7 +151,7 @@ private extension ReviewClosingView {
         let sparkle = Text(Image(systemName: "sparkles"))
 
         return VStack(alignment: .leading, spacing: 12) {
-            ReviewReportLabel(title: "AI のひとこと")
+            ReviewReportTitle(title: "AI のひとこと")
 
             Text(summary)
                 .displayFont(.headline, weight: .bold)

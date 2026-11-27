@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct SettingsDetails<Content: View>: View {
+struct SettingsDetailsSection<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {

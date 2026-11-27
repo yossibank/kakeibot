@@ -25,13 +25,13 @@ public struct ProView: View {
 
             ScrollView {
                 VStack(spacing: 20) {
-                    ProHero(price: model.input.price)
+                    ProHeroCard(price: model.input.price)
 
                     ForEach(ProFeature.all) { feature in
                         ProFeatureCard(feature: feature)
                     }
 
-                    ProComparison()
+                    ProComparisonSection()
                 }
                 .padding(.vertical, 8)
             }

@@ -17,7 +17,7 @@ extension ReviewClosingView {
 
         return VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                ReviewReportLabel(title: "記録のつづき")
+                ReviewReportTitle(title: "記録のつづき")
 
                 HStack(spacing: 4) {
                     Image(systemName: "flame.fill")

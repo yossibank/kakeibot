@@ -75,7 +75,7 @@ extension EntrySheet {
 
     func choose(
         _ wallet: Wallet,
-        as role: EntryWalletDeck.Role
+        as role: EntryWalletPanel.Role
     ) {
         model.choose(wallet.id, as: role)
         showTransferDeck()
@@ -116,7 +116,7 @@ private extension EntrySheet {
             amountDeck
 
         case let .wallet(role):
-            EntryWalletDeck(model: model, role: role) { wallet in
+            EntryWalletPanel(model: model, role: role) { wallet in
                 choose(wallet, as: role)
             } onEdit: { wallet in
                 open(.editWallet(wallet.id))

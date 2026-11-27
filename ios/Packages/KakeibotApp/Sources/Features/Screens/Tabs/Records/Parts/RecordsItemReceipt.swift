@@ -27,7 +27,7 @@ struct RecordsItemReceipt: View {
             EntryReceiptRule(style: .dashed)
 
             if !totals.taxes.isEmpty {
-                EntryReceiptTaxBreakdown(taxes: totals.taxes, taxIncluded: taxIncluded)
+                EntryReceiptTaxGrid(taxes: totals.taxes, taxIncluded: taxIncluded)
             }
 
             if adjustment != 0 {

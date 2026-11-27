@@ -50,7 +50,7 @@ import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
 @Composable
-fun EntryMemo(
+fun EntryMemoText(
     text: String,
     modifier: Modifier = Modifier,
 ) {
