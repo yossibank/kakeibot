@@ -4,8 +4,6 @@ import GRDB
 @testable import Store
 import Testing
 
-/// Core の型は、プロパティの名前を snake_case にした名前で列に書かれる。
-/// プロパティの名前を変えると、表と同期が黙って壊れるので、ここで止める。
 struct RecordColumnTests {
     private static let hint = Comment(
         rawValue: "Core の型のプロパティの名前を変えたら、CodingKeys の rawValue に元のプロパティの名前（camelCase）を書く"
@@ -80,8 +78,6 @@ private extension RecordColumnTests {
     static let day = LocalDate("2026-02-27")!
     static let month = YearMonth("2026-01")!
 
-    /// 任意の値も含めて、すべてのプロパティに値を入れる。
-    /// nil のプロパティは列に書かれないことがあり、名前の違いを見逃すため。
     static let rows: [SampleRow] = [
         SampleRow(
             Icon(
