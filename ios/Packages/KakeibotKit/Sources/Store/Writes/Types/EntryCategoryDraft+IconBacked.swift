@@ -3,7 +3,7 @@ import Foundation
 import GRDB
 
 extension EntryCategoryDraft: IconBackedDraft {
-    public func newRecord(
+    func newRecord(
         iconId: Icon.ID,
         sortOrder: Int,
         at now: Date
@@ -11,7 +11,7 @@ extension EntryCategoryDraft: IconBackedDraft {
         try newCategory(iconId: iconId, sortOrder: sortOrder, at: now)
     }
 
-    public func sortOrder(in db: Database) throws -> Int {
+    func sortOrder(in db: Database) throws -> Int {
         let sameKind = EntryCategory
             .filter(Column("kind") == kind.rawValue)
             .filter(Column("wallet_id") == nil)

@@ -7,7 +7,7 @@ extension RewardRule: StoreRecord {
 }
 
 extension RewardRule: HidableRecord {
-    public static var notFound: any Error {
+    static var notFound: any Error {
         AppDatabase.RewardRuleWriteError.ruleNotFound
     }
 
@@ -28,7 +28,7 @@ extension RewardRule: HidableRecord {
 }
 
 extension RewardRule: IconBackedRecord {
-    public static var iconNotFound: any Error {
+    static var iconNotFound: any Error {
         AppDatabase.RewardRuleWriteError.iconNotFound
     }
 }

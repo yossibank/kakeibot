@@ -2,7 +2,7 @@ import Core
 import Foundation
 
 extension RewardRuleDraft: IconBackedDraft {
-    public func newRecord(
+    func newRecord(
         iconId: Icon.ID,
         sortOrder: Int,
         at now: Date

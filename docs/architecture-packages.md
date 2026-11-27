@@ -21,9 +21,19 @@ Android も同じ分け方で、画面のモデルを `:featuremodels` に置く
 
 `Store` の外には、GRDB の型を見せない。
 
-- `AppDatabase` の `writer` は Store の中だけが使う。ほかのパッケージのテストは `@testable import Store` で読む。
-- 並べ替えと非表示は、`OrderedRow`・`HidableRow`・`ArchivableRow` で頼む。行の決まりの `HidableRecord`・`ArchivableRecord` は、Store の中だけで使う。
-- アイコン付きの保存の `IconBackedDraft` は、まだ GRDB の行の決まりを見せている。
+- `AppDatabase` の `writer` と、DB を受け取る `init` は Store の中だけが使う。ほかのパッケージのテストは `@testable import Store` で読む。
+- 並べ替えと非表示は、`OrderedRow`・`HidableRow`・`ArchivableRow` で頼む。
+- アイコン付きの保存は、下書きの型ごとの `AppDatabase.save(_:editing:at:)` で頼む。
+- 行と下書きの決まり（`SortableRecord`・`IconBackedDraft` など）は、Store の中だけで使う。
+- `StoreRecord` と、列の値の `DatabaseValueConvertible` の適合は public に残る。GRDB への適合は外からも見えるので、満たす関数も public になる。
+
+Core の行の型（`Entry`・`Wallet` など）は、GRDB を知らない。Store が `<型>+Record` で `StoreRecord` に適合させ、表の 1 行として読み書きする。列の名前は、プロパティの名前を snake_case にしたものである。
+
+そのため、Core のプロパティの名前を変えると、表と合わなくなる。StoreTests の `RecordColumnTests` が、見本の行の列と表の列を比べて止める。
+
+名前を変える時は、列の名前を保つ。`CodingKeys` の rawValue に、元のプロパティの名前（camelCase）を書く。
+
+同期は表の列をそのまま送るので、表と合えば同期も合う。
 
 `Features` と `AppFeature` には `MemberImportVisibility` を付ける。import していないモジュールの関数は呼べない。`import Store` が `AppModel` の 4 ファイルだけなのは、`make verify` が確かめる。
 

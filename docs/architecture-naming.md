@@ -82,7 +82,7 @@
 
 | 語 | 指すもの |
 | --- | --- |
-| `<型>+Record`・`StoreRecord` | 表の行。`Store/Records/` に置く |
+| `<型>+Record`・`StoreRecord` | Core の型を写した表の行。`Store/Records/` に置く |
 | `Records`・`QuickRecord`・`WidgetRecord` | 記録（`Entry`）。画面とウィジェットの名前に使う |
 | `SyncRecord` | 同期で送り受けする行 |
 | `EntryCategory` | Core の型と、`Store/Writes/Methods/` の拡張の名前 |

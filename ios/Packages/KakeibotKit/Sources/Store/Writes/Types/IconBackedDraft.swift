@@ -2,7 +2,7 @@ import Core
 import Foundation
 import GRDB
 
-public protocol IconBackedDraft: Sendable {
+protocol IconBackedDraft: Sendable {
     associatedtype Record: IconBackedRecord
 
     func newIcon(at now: Date) throws -> Icon
@@ -27,7 +27,7 @@ public protocol IconBackedDraft: Sendable {
     func locked(by record: Record, in db: Database) throws -> Self
 }
 
-public extension IconBackedDraft {
+extension IconBackedDraft {
     func sortOrder(in db: Database) throws -> Int {
         try Record.nextSortOrder(in: db)
     }

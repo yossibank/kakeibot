@@ -99,7 +99,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 
 ## 🧪 テスト
 
-テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。
+テストの形は、共通の形に `SyncTests` と `AppWidgetTests` を足したものである。Core のテストは、fixtures を全部通す。Store の `RecordColumnTests` は、Core の型の列の名前が表と合うかを確かめる。
 
 テストの補助は、使う範囲で置き場所を分ける。
 
