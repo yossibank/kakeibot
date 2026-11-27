@@ -178,6 +178,19 @@ extension EntryModelTests {
     }
 
     @Test
+    func narrowsSuggestionsByTypedText() {
+        let recent = ["業務スーパー", "ランチ", "ｽｰﾊﾟｰ", "スーパー玉出", "スーパー"]
+
+        let empty = EntryModel.suggestions(from: recent, for: " ", limit: 2)
+        let typed = EntryModel.suggestions(from: recent, for: "すー", limit: 6)
+        let exact = EntryModel.suggestions(from: recent, for: "スーパー", limit: 6)
+
+        #expect(empty == ["業務スーパー", "ランチ"])
+        #expect(typed == ["ｽｰﾊﾟｰ", "スーパー玉出", "スーパー", "業務スーパー"])
+        #expect(exact == ["ｽｰﾊﾟｰ", "スーパー玉出", "業務スーパー"])
+    }
+
+    @Test
     func showsQuantityOnlyWhenMany() {
         let pair = EntryItem.Draft(name: "牛乳", quantity: 2, amount: 396)
         let uneven = EntryItem.Draft(name: "卵", quantity: 3, amount: 200)

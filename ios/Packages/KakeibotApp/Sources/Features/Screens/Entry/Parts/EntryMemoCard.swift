@@ -36,14 +36,14 @@ struct EntryMemoCard: View {
             .tint(Palette.accent)
             .focused(isFocused)
 
-            if !model.input.recentMemos.isEmpty {
+            if !model.output.memoSuggestions.isEmpty {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
-                        ForEach(model.input.recentMemos, id: \.self) { memo in
+                        ForEach(model.output.memoSuggestions, id: \.self) { memo in
                             suggestionButton(memo)
                         }
                     }
-                    .sharesTextScale(id: model.input.recentMemos)
+                    .sharesTextScale(id: model.output.memoSuggestions)
                 }
                 .scrollIndicators(.hidden)
             }
@@ -60,6 +60,7 @@ private extension EntryMemoCard {
     func suggestionButton(_ memo: String) -> some View {
         ChipButton {
             model.state.fields.memo = memo
+            onDone()
         } content: {
             Text(memo)
                 .sharedTextScale()

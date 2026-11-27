@@ -18,8 +18,9 @@ extension EntryModel {
 }
 
 extension EntryModel {
-    static let recentMemoLimit = 6
+    static let recentMemoLimit = 50
     static let recentItemNameLimit = 50
+    static let memoSuggestionLimit = 6
 
     static func message(for error: any Error) -> String {
         switch error {
@@ -31,5 +32,48 @@ extension EntryModel {
         case _ where AppDatabase.isStorageFull(error): ErrorNotice.storageFullMessage
         default: "保存できませんでした"
         }
+    }
+
+    static func suggestions(
+        from recent: [String],
+        for text: String,
+        limit: Int
+    ) -> [String] {
+        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !text.isEmpty else {
+            return Array(recent.prefix(limit))
+        }
+
+        let key = suggestionKey(text)
+
+        let matches: [(name: String, isPrefix: Bool)] = recent.compactMap { name in
+            let nameKey = suggestionKey(name)
+
+            guard
+                name != text,
+                let range = nameKey.range(of: key, options: suggestionOptions)
+            else {
+                return nil
+            }
+
+            return (name, range.lowerBound == nameKey.startIndex)
+        }
+
+        let ordered = matches.filter(\.isPrefix) + matches.filter { !$0.isPrefix }
+
+        return Array(ordered.prefix(limit).map(\.name))
+    }
+}
+
+private extension EntryModel {
+    static let suggestionOptions: String.CompareOptions = [
+        .caseInsensitive,
+        .diacriticInsensitive,
+        .widthInsensitive
+    ]
+
+    static func suggestionKey(_ text: String) -> String {
+        text.applyingTransform(.hiraganaToKatakana, reverse: false) ?? text
     }
 }
