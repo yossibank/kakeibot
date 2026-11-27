@@ -39,22 +39,28 @@ class TemplateEditModel(
 
     private val dependencies = Dependencies(parts.database, parts.clock)
 
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+    }
+
+    class Submodels(
+        amount: Int,
+    ) {
+        var calculator: AmountCalculator by mutableStateOf(AmountCalculator(amount = amount))
+            internal set
+    }
+
     class State(
         draft: EntryTemplateDraft,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
+        val submodels = Submodels(amount = draft.amount ?: 0)
 
         var form: EntryTemplateDraft by mutableStateOf(draft)
-            private set
-
-        var calculator: AmountCalculator by mutableStateOf(
-            AmountCalculator(
-                amount =
-                    draft.amount ?: 0,
-            ),
-        )
             private set
 
         fun update(change: EntryTemplateDraft.() -> EntryTemplateDraft) {
@@ -74,7 +80,7 @@ class TemplateEditModel(
         }
 
         fun press(key: AmountCalculator.Key) {
-            calculator = calculator.press(key)
+            submodels.calculator = submodels.calculator.press(key)
         }
     }
 
@@ -109,7 +115,7 @@ class TemplateEditModel(
             get() = listOfNotNull(category?.name, tag?.name, wallet?.name).joinToString("・")
 
         val amount: Int?
-            get() = state.calculator.amount.takeIf { it > 0 }
+            get() = state.submodels.calculator.amount.takeIf { it > 0 }
 
         val walletTitle: String
             get() = if (state.form.type == Entry.Kind.income) "入金先" else "支払い元"

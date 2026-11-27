@@ -13,6 +13,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.Shown
@@ -62,16 +63,28 @@ class RecurringListModel(
         ) : DeleteTarget
     }
 
+    class Presented(
+        editing: Editing?,
+    ) : ScreenEditable {
+        val editing = Shown(editing)
+        val deleting = Shown<DeleteTarget>()
+    }
+
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+        val hidden = UndoNotice<Identifier<Recurring>>(wait)
+        val deleted = UndoNotice<Deletion>(wait)
+    }
+
     class State(
         editing: Editing?,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
-        val hidden = UndoNotice<Identifier<Recurring>>(wait)
-        val deleted = UndoNotice<Deletion>(wait)
-        val editing = Shown(editing)
-        val deleting = Shown<DeleteTarget>()
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
+        val presented = Presented(editing)
 
         var openId: Identifier<Recurring>? by mutableStateOf(null)
             private set
@@ -262,7 +275,7 @@ class RecurringListModel(
         )
 
         if (isHidden) {
-            state.hidden.show(id)
+            state.notices.hidden.show(id)
         }
 
         return isHidden
@@ -279,7 +292,7 @@ class RecurringListModel(
 
         val deletion = state.task.attempt(failure = DELETE_FAILED) { remove(id) }
 
-        deletion?.let(state.deleted::show) ?: state.deleted.dismiss()
+        deletion?.let(state.notices.deleted::show) ?: state.notices.deleted.dismiss()
 
         return deletion
     }
@@ -292,22 +305,22 @@ class RecurringListModel(
         }
 
         if (deletions.any { it == null }) {
-            state.errorNotice.show(BULK_DELETE_FAILED)
+            state.notices.error.show(BULK_DELETE_FAILED)
         }
 
         val deletion = deletions.filterNotNull().takeIf { it.isNotEmpty() }?.let(Deletion::merging)
 
-        deletion?.let(state.deleted::show)
+        deletion?.let(state.notices.deleted::show)
 
         return deletion
     }
 
     fun receive(deletion: Deletion) {
-        state.deleted.show(deletion)
+        state.notices.deleted.show(deletion)
     }
 
     fun receiveHidden(id: Identifier<Recurring>) {
-        state.hidden.show(id)
+        state.notices.hidden.show(id)
     }
 
     suspend fun restore(deletion: Deletion) {

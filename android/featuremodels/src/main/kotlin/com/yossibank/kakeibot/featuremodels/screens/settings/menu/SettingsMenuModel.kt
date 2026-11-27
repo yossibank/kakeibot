@@ -43,12 +43,18 @@ class SettingsMenuModel(
         Recurrings("設定"),
     }
 
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+    }
+
     class State(
         screen: Screen,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
 
         var screen: Screen by mutableStateOf(screen)
             private set

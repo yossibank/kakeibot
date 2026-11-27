@@ -111,8 +111,8 @@ internal val EntryModel.Output.snapshot: EntryModel.Snapshot
             templateId = null,
             categoryByType = emptyMap(),
         ),
-        calculator = state.calculator,
-        feeCalculator = state.feeCalculator,
+        calculator = state.submodels.calculator,
+        feeCalculator = state.submodels.feeCalculator,
     )
 
 internal val EntryModel.Output.allCategories: List<EntryCategory>

@@ -91,6 +91,14 @@ class EntryModel(
         val error = ErrorNotice(wait)
     }
 
+    class Submodels {
+        var calculator: AmountCalculator by mutableStateOf(AmountCalculator())
+            internal set
+
+        var feeCalculator: AmountCalculator by mutableStateOf(AmountCalculator())
+            internal set
+    }
+
     data class FieldFocus(
         val field: Field = Field.Category,
         val isForward: Boolean = true,
@@ -117,14 +125,9 @@ class EntryModel(
         val task = ModelTask(notices.error)
         val outcome = ScreenOutcome<Outcome>()
         val presented = Presented()
+        val submodels = Submodels()
 
         var form: EntryForm by mutableStateOf(EntryForm(date = date))
-            private set
-
-        var calculator: AmountCalculator by mutableStateOf(AmountCalculator())
-            private set
-
-        var feeCalculator: AmountCalculator by mutableStateOf(AmountCalculator())
             private set
 
         var focus: FieldFocus by mutableStateOf(FieldFocus())
@@ -148,24 +151,24 @@ class EntryModel(
 
         fun press(key: AmountCalculator.Key) {
             if (focus.field == Field.Fee) {
-                feeCalculator = feeCalculator.press(key)
+                submodels.feeCalculator = submodels.feeCalculator.press(key)
             } else {
-                calculator = calculator.press(key)
+                submodels.calculator = submodels.calculator.press(key)
             }
         }
 
         fun setAmount(amount: Int) {
-            calculator = AmountCalculator(amount = amount)
+            submodels.calculator = AmountCalculator(amount = amount)
         }
 
         fun setFee(amount: Int) {
-            feeCalculator = AmountCalculator(amount = amount)
+            submodels.feeCalculator = AmountCalculator(amount = amount)
         }
 
         fun clear() {
             form = form.cleared()
-            calculator = AmountCalculator()
-            feeCalculator = AmountCalculator()
+            submodels.calculator = AmountCalculator()
+            submodels.feeCalculator = AmountCalculator()
             voiceFilled = null
         }
 
@@ -175,7 +178,7 @@ class EntryModel(
             voiceFilled: VoiceFilled?,
         ) {
             this.form = form
-            this.calculator = calculator
+            submodels.calculator = calculator
             this.voiceFilled = voiceFilled
         }
 
@@ -185,8 +188,8 @@ class EntryModel(
             fee: Int,
         ) {
             this.form = form
-            calculator = AmountCalculator(amount = amount)
-            feeCalculator = AmountCalculator(amount = fee)
+            submodels.calculator = AmountCalculator(amount = amount)
+            submodels.feeCalculator = AmountCalculator(amount = fee)
         }
 
         internal fun startAgain(today: LocalDate) {
@@ -198,7 +201,7 @@ class EntryModel(
                 templateId = null,
             )
 
-            feeCalculator = AmountCalculator()
+            submodels.feeCalculator = AmountCalculator()
             voiceFilled = null
             focus(Field.Amount)
         }

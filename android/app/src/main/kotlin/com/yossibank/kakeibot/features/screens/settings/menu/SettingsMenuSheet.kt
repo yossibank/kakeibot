@@ -116,10 +116,10 @@ private fun SettingsMenuFrame(
             }
         },
     ) {
-        if (model.state.errorNotice.message.isNotEmpty()) {
+        if (model.state.notices.error.message.isNotEmpty()) {
             NoticeBanner(
-                message = model.state.errorNotice.message,
-                onClose = model.state.errorNotice::clear,
+                message = model.state.notices.error.message,
+                onClose = model.state.notices.error::clear,
             )
         }
 

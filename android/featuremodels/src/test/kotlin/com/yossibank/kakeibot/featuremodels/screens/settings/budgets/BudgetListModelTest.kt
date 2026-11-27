@@ -64,9 +64,9 @@ class BudgetListModelTest {
         ModelWait.until { model.output.totalAmount != null }
 
         model.startEditing(Target.Total)
-        val current = model.state.calculator.amount
+        val current = model.state.submodels.calculator.amount
         val cleared = assertNotNull(model.clear())
-        val shown = model.state.cleared.current
+        val shown = model.state.notices.cleared.current
         ModelWait.until { model.output.totalAmount == null }
 
         model.restore(cleared)
@@ -207,7 +207,7 @@ class BudgetListModelTest {
         val start = model.input.overview?.carryoverFrom
 
         val previous = assertNotNull(model.resetCarryover())
-        val shown = model.state.resetFrom.current
+        val shown = model.state.notices.resetFrom.current
         ModelWait.until { model.output.carryover == 0L }
         val resetStart = setup.database.setting(SettingKey.budgetCarryoverFrom)
 
@@ -232,7 +232,7 @@ class BudgetListModelTest {
 
         assertNull(off)
         assertNull(zero)
-        assertNull(model.state.resetFrom.current)
+        assertNull(model.state.notices.resetFrom.current)
         assertEquals(0L, model.output.carryover)
         assertEquals(model.output.month, setup.database.setting(SettingKey.budgetCarryoverFrom))
     }
@@ -259,7 +259,7 @@ class BudgetListModelTest {
         assertEquals(listOf("先月", "3 か月の平均", "固定費"), total.map { it.title })
         assertEquals(listOf(48200, 44500, 82800), total.map { it.amount })
         assertEquals(listOf(48200, 44500), category.map { it.amount })
-        assertEquals(44500, model.state.calculator.amount)
+        assertEquals(44500, model.state.submodels.calculator.amount)
     }
 
     @Test
@@ -309,9 +309,9 @@ class BudgetListModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
 
-        assertEquals("予算を読めませんでした", model.state.errorNotice.message)
+        assertEquals("予算を読めませんでした", model.state.notices.error.message)
         assertNull(model.input.overview)
     }
 
@@ -323,10 +323,10 @@ class BudgetListModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
         model.startEditing(Target.Total)
 
-        assertEquals("予算を読めませんでした", model.state.errorNotice.message)
+        assertEquals("予算を読めませんでした", model.state.notices.error.message)
     }
 
     private fun BudgetListModel.press(vararg digits: Int) {

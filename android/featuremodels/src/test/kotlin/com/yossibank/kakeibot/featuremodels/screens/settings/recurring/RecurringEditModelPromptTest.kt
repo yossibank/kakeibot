@@ -15,12 +15,12 @@ class RecurringEditModelPromptTest {
 
         model.open(RecurringPanel.Amount)
         model.open(RecurringPanel.Holiday)
-        val opened = model.state.panel.current
+        val opened = model.state.presented.panel.current
 
-        model.state.panel.closeAll()
+        model.state.presented.panel.closeAll()
 
         assertEquals(RecurringPanel.Holiday, opened)
-        assertNull(model.state.panel.current)
+        assertNull(model.state.presented.panel.current)
     }
 
     @Test
@@ -53,17 +53,17 @@ class RecurringEditModelPromptTest {
     @Test
     fun keepsPanelOpenBehindPrompt() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.editModel()
-        val closed = model.state.panel.current
+        val closed = model.state.presented.panel.current
 
         model.open(RecurringPanel.Amount)
         model.flow.state.presented.prompt.show(EditFlow.Prompt.delete)
-        val opened = model.state.panel.current
+        val opened = model.state.presented.panel.current
 
-        model.state.panel.closeAll()
+        model.state.presented.panel.closeAll()
 
         assertNull(closed)
         assertEquals(RecurringPanel.Amount, opened)
-        assertNull(model.state.panel.current)
+        assertNull(model.state.presented.panel.current)
         assertEquals(EditFlow.Prompt.delete, model.flow.state.presented.prompt.current)
     }
 
@@ -80,7 +80,7 @@ class RecurringEditModelPromptTest {
         model.flow.close()
 
         assertNull(afterBack)
-        assertNull(model.state.panel.current)
+        assertNull(model.state.presented.panel.current)
         assertEquals(EditFlow.Prompt.discard, model.flow.state.presented.prompt.current)
         assertEquals(0, model.flow.state.outcome.count)
     }

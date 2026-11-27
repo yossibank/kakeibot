@@ -205,8 +205,8 @@ private fun BudgetNotices(
     model: BudgetListModel,
     modifier: Modifier = Modifier,
 ) {
-    val cleared = model.state.cleared
-    val resetFrom = model.state.resetFrom
+    val cleared = model.state.notices.cleared
+    val resetFrom = model.state.notices.resetFrom
 
     Column(
         modifier = modifier
@@ -235,13 +235,13 @@ private fun BudgetNotices(
             )
         }
 
-        if (model.state.errorNotice.message.isNotEmpty() && model.state.editing == null) {
+        if (model.state.notices.error.message.isNotEmpty() && model.state.editing == null) {
             Text(
-                text = model.state.errorNotice.message,
+                text = model.state.notices.error.message,
                 modifier = Modifier
                     .fillMaxWidth()
                     .card()
-                    .clickable(onClick = model.state.errorNotice::clear)
+                    .clickable(onClick = model.state.notices.error::clear)
                     .padding(12.dp),
                 color = Palette.rose,
                 style = textFont(style = FontTextStyle.Caption),

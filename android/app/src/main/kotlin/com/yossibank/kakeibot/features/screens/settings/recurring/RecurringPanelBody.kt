@@ -96,7 +96,7 @@ private fun AmountKeypad(model: RecurringEditModel) {
         KeypadValue(amount = model.output.amount)
 
         Keypad(
-            calculator = model.state.calculator,
+            calculator = model.state.submodels.calculator,
             onKey = model.state::press,
         )
     }
@@ -210,7 +210,7 @@ private fun FeeKeypad(model: RecurringEditModel) {
         )
 
         Keypad(
-            calculator = model.state.feeCalculator,
+            calculator = model.state.submodels.feeCalculator,
             onKey = model.state::pressFee,
         )
     }
