@@ -6,7 +6,7 @@ struct SettingsMenuLinkTests {
     @Test
     func fillsDeviceAndVersionsIntoContactForm() throws {
         let url = try #require(SettingsMenuLink.contact(
-            model: "iPhone17,3",
+            model: "iPhone 16",
             system: "26.1",
             app: "1.0.0"
         ))
@@ -19,14 +19,14 @@ struct SettingsMenuLinkTests {
 
         #expect(url.absoluteString.hasPrefix(SettingsMenuLink.contactForm))
         #expect(value("usp") == "pp_url")
-        #expect(value("entry.1282978121") == "iPhone17,3")
+        #expect(value("entry.1282978121") == "iPhone 16")
         #expect(value("entry.885969465") == "26.1")
         #expect(value("entry.1211808836") == "1.0.0")
     }
 
     @Test
     func readsThisDevice() {
-        let model = SettingsMenuLink.modelIdentifier
+        let model = SettingsMenuLink.modelName
         let system = SettingsMenuLink.systemVersion
 
         #expect(!model.isEmpty)
