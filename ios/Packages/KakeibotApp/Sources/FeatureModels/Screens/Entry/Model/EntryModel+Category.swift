@@ -111,7 +111,7 @@ public extension EntryModel {
             await reloadCategories()
             await reloadTemplates()
         } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.notices.error.show(Self.restoreFailedMessage, for: error)
         }
     }
 
@@ -151,7 +151,7 @@ public extension EntryModel {
             await reloadCategories(selecting: hidden.wasSelected ? hidden.id : nil)
             state.outcome.send(.categoryMoved)
         } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.notices.error.show(Self.restoreFailedMessage, for: error)
         }
     }
 }

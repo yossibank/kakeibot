@@ -24,7 +24,7 @@ public struct RootView: View {
                 .overlay {
                     Color.clear
                         .padding(.leading, MainView.noticeLeading(hasSidebar: hasSidebar))
-                        .errorBanner(model.state.notice, bottom: noticeBottom)
+                        .errorBanner(model.state.notices.error, bottom: noticeBottom)
                 }
 
             if model.state.reveal.curtain.isShown {

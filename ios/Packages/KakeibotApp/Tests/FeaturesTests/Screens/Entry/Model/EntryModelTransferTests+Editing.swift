@@ -218,7 +218,7 @@ extension EntryModelTransferTests {
         await model.load()
         let change = await model.save()
 
-        #expect(model.state.errorNotice.message == "記録が見つかりませんでした")
+        #expect(model.state.notices.error.message == "記録が見つかりませんでした")
         #expect(model.output.isEditing)
         #expect(model.state.payment.walletId == nil)
         #expect(model.state.category.id == nil)
@@ -239,7 +239,7 @@ extension EntryModelTransferTests {
         let change = await model.delete()
 
         #expect(change == nil)
-        #expect(model.state.errorNotice.message == "記録が見つかりませんでした")
+        #expect(model.state.notices.error.message == "記録が見つかりませんでした")
     }
 
     @Test

@@ -306,17 +306,6 @@ extension ReviewModel.Output {
     }
 }
 
-extension ReviewModel.Share.Key {
-    func contains(_ entry: Entry) -> Bool {
-        switch self {
-        case let .category(id): entry.categoryId == id
-        case let .wallet(id): entry.walletId == id
-        case .recurring: entry.recurringId != nil
-        case .move, .factor, .month: false
-        }
-    }
-}
-
 private extension ReviewModel.Output {
     func summary(in range: ClosedRange<LocalDate>) -> ReviewSummary {
         summaries.value(for: range) {
@@ -332,6 +321,17 @@ private extension ReviewModel.Output {
         case .expense: summary.expense.total
         case .income: summary.income.total
         case .balance: summary.balance
+        }
+    }
+}
+
+extension ReviewModel.Share.Key {
+    func contains(_ entry: Entry) -> Bool {
+        switch self {
+        case let .category(id): entry.categoryId == id
+        case let .wallet(id): entry.walletId == id
+        case .recurring: entry.recurringId != nil
+        case .move, .factor, .month: false
         }
     }
 }

@@ -22,10 +22,10 @@ struct OnboardingModelTests {
         let locked = model.canTurn(forward: true)
         model.choose(.full)
         model.next()
-        await model.state.monthStart.choose(payday)
+        await model.state.submodels.monthStart.choose(payday)
         model.next()
         await model.refreshPage()
-        let budgetMonth = model.state.budget.input.month
+        let budgetMonth = model.state.submodels.budget.input.month
         model.back()
         let back = model.state.page
         model.next()

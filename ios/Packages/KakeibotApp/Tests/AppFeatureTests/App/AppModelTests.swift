@@ -111,7 +111,7 @@ struct AppModelTests {
 
         await model.open()
 
-        #expect(model.state.notice.message == "固定費を自動で記録できませんでした")
+        #expect(model.state.notices.error.message == "固定費を自動で記録できませんでした")
     }
 
     @Test
@@ -159,7 +159,7 @@ struct AppModelTests {
 
         await model.refreshDay()
 
-        #expect(model.state.notice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test

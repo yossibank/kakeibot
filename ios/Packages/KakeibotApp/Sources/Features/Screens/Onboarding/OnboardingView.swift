@@ -52,7 +52,7 @@ public struct OnboardingView: View {
             await model.load()
         }
         .task {
-            await model.state.setup.run()
+            await model.state.submodels.setup.run()
         }
         .task(id: model.state.page) {
             await model.refreshPage()
@@ -86,9 +86,9 @@ private extension OnboardingView {
         .padding(.bottom, 8)
         .frame(maxWidth: Self.contentWidth, maxHeight: .infinity, alignment: .top)
         .frame(maxWidth: .infinity)
-        .errorBanner(model.state.errorNotice)
+        .errorBanner(model.state.notices.error)
         .backdrop()
-        .budgetKeypad(model.state.budget)
+        .budgetKeypad(model.state.submodels.budget)
         .haptic(.selection, trigger: model.state.page)
     }
 

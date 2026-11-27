@@ -74,7 +74,7 @@ extension EntryModel {
             try await dependencies.database.countReceiptSave()
             input.receiptSavedCount += 1
         } catch {
-            state.errorNotice.show(Self.receiptCountFailedMessage)
+            state.notices.error.show(Self.receiptCountFailedMessage)
         }
     }
 }
@@ -117,7 +117,7 @@ private extension EntryModel {
                     )
                 }
             } catch {
-                state.errorNotice.show(Self.itemNameFailedMessage)
+                state.notices.error.show(Self.itemNameFailedMessage)
                 return
             }
         }

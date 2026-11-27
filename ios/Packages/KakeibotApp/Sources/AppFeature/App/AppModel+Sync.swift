@@ -62,7 +62,7 @@ extension AppModel {
         for metadata in shares {
             do {
                 try await SyncEngine.acceptShare(metadata)
-                state.notice.inform(Self.joinedMessage(for: metadata))
+                state.notices.error.inform(Self.joinedMessage(for: metadata))
             } catch is CancellationError {
                 continue
             } catch {
@@ -73,7 +73,7 @@ extension AppModel {
                     "\(Self.shareFailedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
                 )
 
-                state.notice.show(Self.shareFailedMessage)
+                state.notices.error.show(Self.shareFailedMessage)
             }
         }
 

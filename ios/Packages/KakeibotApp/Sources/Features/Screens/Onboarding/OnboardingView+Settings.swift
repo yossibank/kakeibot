@@ -13,15 +13,16 @@ extension OnboardingView {
                 )
 
                 PeriodCard(
-                    periodText: model.state.monthStart.output.periodText,
-                    month: model.state.monthStart.output.month
+                    periodText: model.state.submodels.monthStart.output.periodText,
+                    month: model.state.submodels.monthStart.output.month
                 )
 
-                MonthStartDayGrid(selection: model.state.monthStart.input.startDay) { day in
-                    model.state.monthStart.perform {
-                        await $0.choose(day)
+                MonthStartDayGrid(selection: model.state.submodels.monthStart.input
+                    .startDay) { day in
+                        model.state.submodels.monthStart.perform {
+                            await $0.choose(day)
+                        }
                     }
-                }
 
                 HStack(spacing: 12) {
                     Text("週の始まり")
@@ -53,11 +54,11 @@ extension OnboardingView {
 
             Button {
                 withAnimation(.snappy) {
-                    model.state.budget.startEditing(.total)
+                    model.state.submodels.budget.startEditing(.total)
                 }
             } label: {
                 VStack(spacing: 8) {
-                    Text("\(model.state.budget.input.month.month)月の予算")
+                    Text("\(model.state.submodels.budget.input.month.month)月の予算")
                         .textFont(.caption2)
                         .tracking(3)
                         .foregroundStyle(Palette.accent)
@@ -109,7 +110,7 @@ private extension OnboardingView {
             SectionTitle(title)
                 .padding(.leading, 8)
 
-            SetupList(items, model: model.state.setup) { item in
+            SetupList(items, model: model.state.submodels.setup) { item in
                 model.state.open(item)
             }
             .padding(.horizontal, 16)
@@ -138,11 +139,11 @@ private extension OnboardingView {
 
 private extension OnboardingView {
     var budgetText: String {
-        model.state.budget.output.totalAmount.map { Yen.text($0) } ?? "なし"
+        model.state.submodels.budget.output.totalAmount.map { Yen.text($0) } ?? "なし"
     }
 
     var budgetColor: Color {
-        model.state.budget.output.totalAmount == nil ? Palette.hint : Palette.accentStrong
+        model.state.submodels.budget.output.totalAmount == nil ? Palette.hint : Palette.accentStrong
     }
 
     var weekStartBinding: Binding<Weekday> {

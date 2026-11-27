@@ -65,6 +65,11 @@ public extension AssetsRewardGoalEditModel {
     }
 
     @MainActor
+    struct Submodels {
+        public internal(set) var calculator: AmountCalculator
+    }
+
+    @MainActor
     @Observable
     final class State: NoticesHolding {
         public var fields: Fields
@@ -72,7 +77,7 @@ public extension AssetsRewardGoalEditModel {
 
         public let notices: Notices
 
-        public private(set) var calculator: AmountCalculator
+        public internal(set) var submodels: Submodels
 
         init(
             name: String,
@@ -83,7 +88,7 @@ public extension AssetsRewardGoalEditModel {
             self.notices = Notices(wait: wait)
             self.presented = Presented(panel: Shown(panel))
             self.fields = Fields(name: name)
-            self.calculator = AmountCalculator(amount: amount)
+            self.submodels = Submodels(calculator: AmountCalculator(amount: amount))
         }
     }
 
@@ -163,25 +168,25 @@ private extension AssetsRewardGoalEditModel {
 
 public extension AssetsRewardGoalEditModel.Output {
     var draft: RewardGoalDraft {
-        RewardGoalDraft(name: state.fields.name, targetAmount: state.calculator.amount)
+        RewardGoalDraft(name: state.fields.name, targetAmount: state.submodels.calculator.amount)
     }
 
     var remaining: Int {
-        max(state.calculator.amount - input.balance, 0)
+        max(state.submodels.calculator.amount - input.balance, 0)
     }
 
     var progress: Double {
-        guard state.calculator.amount > 0 else {
+        guard state.submodels.calculator.amount > 0 else {
             return 0
         }
 
-        return Double(input.balance) / Double(state.calculator.amount)
+        return Double(input.balance) / Double(state.submodels.calculator.amount)
     }
 }
 
 public extension AssetsRewardGoalEditModel.State {
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        submodels.calculator.press(key)
     }
 }
 
