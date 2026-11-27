@@ -3,6 +3,8 @@
 SIMULATOR ?= $(shell scripts/find-simulator.sh)
 XCBEAUTIFY = $(shell command -v xcbeautify)
 BEAUTIFY = $(if $(XCBEAUTIFY),| perl -pe 's/\xe2\x80\x8b//g' | xcbeautify)
+XCODE_VERSION = 27
+XCODE_CHECK = @reason=$$(scripts/xcode-version.sh $(XCODE_VERSION)) || { echo "NG $$reason"; exit 1; }
 XCODEBUILD = xcodebuild -workspace ios/Kakeibot.xcworkspace -scheme Kakeibot
 ANY_SIMULATOR = -destination 'generic/platform=iOS Simulator'
 ON_SIMULATOR = -destination 'id=$(SIMULATOR)'
@@ -36,19 +38,23 @@ licenses:
 	rm -f ios/Kakeibot/Settings.bundle/com.mono0926.LicensePlist.latest_result.txt
 
 build:
+	$(XCODE_CHECK)
 	set -o pipefail; $(XCODEBUILD) $(ANY_SIMULATOR) build $(BEAUTIFY)
 
 test-build:
 	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
+	$(XCODE_CHECK)
 	set -o pipefail; $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) build-for-testing $(BEAUTIFY)
 
 test:
 	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
+	$(XCODE_CHECK)
 	@mkdir -p .build
 	set -o pipefail; $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never test 2>&1 $(BEAUTIFY) | tee .build/test.log
 
 test-model:
 	@test -n "$(SIMULATOR)" || { echo "NG iPhone のシミュレーターが無い。SIMULATOR に UDID を渡す"; exit 1; }
+	$(XCODE_CHECK)
 	@rm -rf .build/model-test.xcresult .build/model-test
 	@mkdir -p .build/model-test
 	-set -o pipefail; TEST_RUNNER_KAKEIBOT_MODEL_TESTS=1 $(XCODEBUILD) -testPlan Kakeibot $(ON_SIMULATOR) -collect-test-diagnostics never -resultBundlePath .build/model-test.xcresult -only-testing:FeaturesTests/ReviewCommentWriterAccuracyTests -only-testing:FeaturesTests/ReviewNoteWriterAccuracyTests -only-testing:FeaturesTests/EntryVoiceInterpreterAccuracyTests test >| .build/model-test.log 2>&1
@@ -70,6 +76,7 @@ scenarios:
 	@scripts/scenarios-check.py --summary
 
 verify: verify-docs
+	@scripts/verify.sh --reset
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	@ktlint --version | grep -qx 'ktlint version $(KTLINT_VERSION)' || { echo "NG ktlint は $(KTLINT_VERSION) を使う"; exit 1; }
@@ -87,9 +94,10 @@ verify: verify-docs
 	scripts/verify.sh app-feature-no-store sh -c '! grep -rlE "^(@testable )?import Store$$" ios/Packages/KakeibotApp/Sources/AppFeature | grep -vxE "ios/Packages/KakeibotApp/Sources/AppFeature/App/AppModel(\+(Pro|State|Sync))?\.swift"'
 	scripts/verify.sh android-features-no-store sh -c '! grep -rnE "^import com\.yossibank\.kakeibot\.store" android/app/src/main/kotlin/com/yossibank/kakeibot/features'
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/KakeibotKit
-	scripts/verify.sh app-build scripts/no-warnings.sh $(XCODEBUILD) $(ANY_SIMULATOR) build
+	scripts/verify.sh --xcode $(XCODE_VERSION) app-build scripts/no-warnings.sh $(XCODEBUILD) $(ANY_SIMULATOR) build
 	scripts/verify.sh android-test $(GRADLE) :core:test :store:jvmTest :featuremodels:testDebugUnitTest
 	scripts/verify.sh android-build $(GRADLE) :app:assembleDebug
+	@scripts/verify.sh --summary
 
 verify-docs:
 	scripts/verify.sh docs-check-test scripts/docs-check-test.py
