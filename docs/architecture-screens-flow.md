@@ -27,6 +27,20 @@
 | テスト | `perform` が返す `Task` の `value` を待つ |
 | `.task` | 画面が出た時と値が変わった時の読み込みは、`.task` と `task(id:)` に書く |
 
+## 📏 画面がモデルに書く値
+
+画面が書く入口は、モデルの `state` の `fields` と、表示中のもの（`Shown`）だけにする。ほかの値は画面から書けない型にし、変える時はモデルの関数を呼ぶ。
+
+| 項目 | 決まり |
+| --- | --- |
+| `fields` | 入力・選んでいる物・開いている行を、`ScreenEditable` の struct の `Fields` に入れる |
+| 表示中のもの | シート・確認・パネルを `Shown<値>` に持つ。名前は `presented`・`prompt` で、重なって出る物だけ別の名前にする |
+| 渡し方 | `.sheet(item:)` には `Shown` の `item` を、確認には `shown[.x]` を渡す。入力は `Bindable(model.state).fields.x` で渡す |
+| ほかの値 | `public internal(set)` か `public private(set)` にする。今日のようにモデルが決める値は、画面が `setToday` などを呼ぶ |
+| 部品の値 | `ErrorNotice`・`UndoNotice`・アイコンの編集は `let` で持つ。設定の一覧の `SettingsBoardShown` は `public var` で持つ |
+| 条件のある閉じ方 | 種類で閉じ方が違う時は、`Shown<値>` の制約付きの extension に `get`・`set` を書く。記録の `sheet`、資産の `goal` が当たる |
+| 守らせ方 | `Features` と `AppFeature` は別のモジュールである。`internal(set)` の値への書き込みは、ビルドで止まる |
+
 ## 🖥️ モデルから画面へ結果を返す
 
 保存できた・消した、の結果は、モデルの `state` の `outcome` に置く。画面は、関数の戻り値を見ない。
