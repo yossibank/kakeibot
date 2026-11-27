@@ -19,6 +19,7 @@
 | 空の値や取りうる値 | 意味は `description` に書く |
 | 請求期間の fixtures | `recurring/card-bill-period.json` の期間は、続く回と隙間なく重ならない。締め日と引き落とし日が 28〜31 日の組でも同じで、テストが fixtures を使わずに月を並べて確かめる |
 | 書き出しの見本 | `export/export-v1.json` は、読み込んで書き出すと同じ JSON になる。DB に入れて読み出しても同じになる |
+| 書き出しのキー | `export/export-v1.json` は、すべての表とすべての項目のキーを持つ。書き出しのキーの正解になる |
 | 表計算の見本 | `export/export-v1.csv` は、JSON の見本の記録を表計算用に書き出した結果である。形は [export-format.md](export-format.md) にある |
 | 設定の行の見本 | `export/export-v1-setting.json` は、`settings` の行の判定である |
 | `voice/voice-reading.json` | `today`・`categories`・`wallets` は全ケースで使う。`modelCategory`・`modelWallet` は精度を測る時だけ使う |
