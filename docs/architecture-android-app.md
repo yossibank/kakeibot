@@ -81,15 +81,15 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 画面からの読み方 | `model.state.x`・`model.input.x`・`model.output.x` の形で読む。モデルに転送のプロパティを足さない |
 | 入力の下書き | 1 つの `data class` にまとめ、`State` の `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
 | 下書きの決まり | 口座・カテゴリ・日付を変えた時の消し込みは、下書きの型の関数に置く |
-| 保存と読み込みの失敗 | `featuremodels/shared/model/` の `ModelTask` に通す。実行中は `State` の `task` に、失敗の文は `task` に渡した `errorNotice` に持つ |
+| 保存と読み込みの失敗 | `State` の `task`（`featuremodels/shared/model/` の `ModelTask`）に通す。失敗の文は、タブが `notices.error`、ほかが `errorNotice` に持つ |
 | 失敗の知らせの消え方 | 押すか、出してから 6 秒たつと消える。入力を変えても、後で成功しても消さない |
 | 知らせを消すまでの秒 | 失敗の知らせは `ErrorNotice` が、取り消しの知らせは `UndoNotice` が数える。画面は時間を数えない |
 | 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「端末の空き容量が足りません」に替える |
 | 端末の呼び名 | スマホとタブレットを呼び分けず、「端末」と書く。声の入力の案内も同じ語を使う |
-| 監視の失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、読めなければ `errorNotice` に出す |
+| 監視の失敗 | `ModelTask` の `observe` に通す。`ScreenObservation` が 1・2・4 秒あけて読み直し、読めなければ `task` の知らせに出す |
 | 今の時刻 | `featuremodels/shared/model/` の `ScreenClock` を使う。`dependencies.clock` から読み、モデルで `Instant.now()` を書かない |
 | 説明カードを閉じたか | `settingsparts/hint/` の `SettingsFoldInput` を、モデルの `Input` に置く。読み書きは、`SettingsFoldModel` の `loadFold`・`setFold` に通す |
-| 今日の日付 | モデルの `state.today` に持ち、画面が `SideEffect` でモデルの `setToday` を呼ぶ。`AssetsModel` だけは iOS と同じく `input.today` に持つ |
+| 今日の日付 | タブのモデルは `input.today`、入力のモデルは `state.today` に持つ。画面が `SideEffect` でモデルの `setToday` を呼ぶ |
 | 記録の一覧の監視 | `MainView` が 1 本を共有し、`ScreenParts` で配る。モデルは `Flow<EntryList>` を `Dependencies` に持つ |
 | 共有した監視の持ち主 | `featuremodels/shared/model/` の `SharedObservation` がコルーチンを持つ。`MainView` が消えると、`stop` で止める |
 | 共有した監視の失敗 | `ScreenObservation.share` が、失敗を受け取る側のモデルへ渡す。元の監視は、受け取る側がいる間は読み直し続ける |

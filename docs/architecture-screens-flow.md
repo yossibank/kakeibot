@@ -29,16 +29,18 @@
 
 ## 📏 画面がモデルに書く値
 
-画面が書く入口は、モデルの `state` の `fields` と、表示中のもの（`Shown`）だけにする。ほかの値は画面から書けない型にし、変える時はモデルの関数を呼ぶ。
+画面が書く入口は、モデルの `state` の `fields` と `presented` の枠だけにする。枠の一覧は [architecture-parts の「State の枠」](architecture-parts.md#-state-の枠)にある。ほかの枠と値は画面から書けない型にし、変える時はモデルの関数を呼ぶ。
 
 | 項目 | 決まり |
 | --- | --- |
-| `fields` | 入力・選んでいる物・開いている行を、`ScreenEditable` の struct の `Fields` に入れる |
-| 表示中のもの | シートは `presented`、確認は `prompt`、パネルは `panel` の `Shown<値>` に持つ。重なって出る物だけ別の名前にする |
-| 渡し方 | `.sheet(item:)` には `Shown` の `item` を、確認には `shown[.x]` を渡す。入力は `Bindable(model.state).fields.x` で渡す |
-| ほかの値 | `public internal(set)` か `public private(set)` にする。今日のようにモデルが決める値は、画面が `setToday` などを呼ぶ |
-| 部品の値 | `ErrorNotice`・`UndoNotice`・アイコンの編集は `let` で持つ。設定の一覧の `SettingsBoardShown` は `public var` で持つ |
+| `fields` | 入力と選んでいる物を、`ScreenEditable` の `Fields` に入れる。モデルが読む物に限る |
+| `presented` | 表示中のものを、`Presented` に `Shown<値>` を名前で並べて持つ。例は `presented.sheet`・`presented.row` |
+| `notices` | 時間で消える知らせは、モデルが `notices` に出し、時間もモデルが `ScreenWait` で数える。画面は `.task` で時間を数えない |
+| 渡し方 | シートには `presented.x.item` を、確認には `presented.x[.y]` を渡す。入力は `Bindable(model.state).fields.x` で渡す |
+| ほかの値 | `public internal(set)` か `public private(set)` にする。今日は `input` に置き、画面が `setToday` を呼ぶ |
+| 画面が見た変化 | ホームの `customize` のように、モデルの関数で渡す。光らせる項目は、モデルが `presented.glow` に出す |
 | 条件のある閉じ方 | 種類で閉じ方が違う時は、`Shown<値>` の制約付きの extension に `get`・`set` を書く。記録の `sheet`、資産の `goal` が当たる |
+| Kotlin | どの枠も `private set` か `val` にし、画面が書く値は State の関数か `Shown` の関数を通す |
 | 守らせ方 | `Features` と `AppFeature` は別のモジュールである。`internal(set)` の値への書き込みは、ビルドで止まる |
 
 ## 🖥️ モデルから画面へ結果を返す

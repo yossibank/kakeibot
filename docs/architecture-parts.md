@@ -13,6 +13,8 @@
 | --- | --- | --- |
 | `ScreenModel` | 画面のモデル。DB を監視し、読めなかった時は `NoticeHolding` の知らせと `Loadable` の `failed` に出す | `FeatureModels/Shared/Model/` |
 | `NoticeHolding` | エラーの知らせを持つ、モデルの状態。状態がそれだけの時は `NoticeState` を使う | `FeatureModels/Shared/Model/` |
+| `NoticesHolding` | 知らせを `notices` の枠に持つ状態。`errorNotice` は `notices.error` を返す | `FeatureModels/Shared/Model/` |
+| `ScreenNotices` | `notices` の枠の型。エラーの知らせを `error` で持つ | `FeatureModels/Shared/Model/` |
 | `ScreenPerforming` | 画面がモデルの async の関数を呼ぶ口。`perform` が `Task` を始め、画面は `Task` を書かない | `FeatureModels/Shared/Model/` |
 | `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `FeatureModels/Shared/Model/` |
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
@@ -24,13 +26,28 @@
 | `SettingsBoardSpec` | 一覧の画面ごとの設定（題・文言・並びの形・タイル・編集画面・確認）。画面ごとに 1 つ書く | `Features/Shared/SettingsParts/Board/` |
 | `SettingsFoldModel` | 説明カードと非表示の一覧を閉じたかを、DB から読み書きするモデル。値は `input` の `SettingsFoldInput` に置き、モデルは `foldStore()` だけ書く | `FeatureModels/Shared/SettingsParts/Hint/` |
 | `SettingsEditSheet` | 1 件を編集する画面。モデルと、削除・非表示の受け取りだけで作れる | `Features/Shared/SettingsParts/Input/` |
-| `ScreenEditable` | 画面が書いてよい値の型の印。Swift の `State` の `public var` は、`fields` と表示中の `Shown` だけにする（[決まり](architecture-screens-flow.md#-画面がモデルに書く値)） | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `ScreenEditable` | 画面が書いてよい値の型の印。Swift の `public var` は `fields` と `presented` だけにする（[決まり](architecture-screens-flow.md#-画面がモデルに書く値)） | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `TabScreenModel` | タブ 4 つの監視と、失敗の画面を出すかを持つ。今日は iOS の `MainView` と Kotlin の `rememberTabModel` から受ける | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `EditFlowSource` | `EditFlow` に渡す元で、変わったか・問題の文・保存・非表示・削除を返す。モデルの入れ子の `Source` が state・input・依存を持ち、流れは作る時に受けて強く持つ | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |
 | `Draft` | 保存前の下書き。`problems` を返し、`validate()` が最初の問題を投げる | `Core/Shared/` |
+
+## 📏 State の枠
+
+モデルの `State` は、次の名前の枠で組む。要る枠だけを置き、中身が 1 つでも包む。
+
+| 枠 | iOS | Android | 書く人 | 入れる物 |
+| --- | --- | --- | --- | --- |
+| `fields` | `Fields` の struct を `public var` | `Fields` の data class を `private set` | 画面 | 入力と選んでいる物 |
+| `presented` | `Shown` を並べた `Presented` を `public var` | `Shown` を並べた `Presented` を `val` | 画面 | シート・確認・開いている行など |
+| `notices` | `ScreenNotices` の `Notices` を `let` | `Notices` の class を `val` | モデル | 時間で消える知らせ。エラーは `error` |
+| `task` | `ModelTask` | `ModelTask` | モデル | 実行中の印 |
+| `outcome` | `ScreenOutcome` | `ScreenOutcome` | モデル | 画面への結果 |
+| `submodels` | `Submodels` の struct | `Submodels` の class | モデル | State が持つ子のモデル |
+
+今日は `input` に置き、計算できる値は `output` に出す。モデルだけが書く途中の値は、`State` の直下に閉じて置く。
 
 ## 📱 モデルから画面へ返す型
 
