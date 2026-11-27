@@ -25,7 +25,7 @@ public extension RecurringEditModel.Output {
     }
 
     var repaymentStart: LocalDate {
-        let startDate = state.schedule.startDate
+        let startDate = state.fields.schedule.startDate
         let next = input.generatedUntil.map { $0.adding(days: 1) } ?? startDate
         return max(startDate, next)
     }
@@ -35,7 +35,7 @@ public extension RecurringEditModel.Output {
             usesAutoCount,
             let plan = autoPlan
         else {
-            return state.schedule.endDate
+            return state.fields.schedule.endDate
         }
 
         return autoEndDate(of: plan)
@@ -87,7 +87,7 @@ extension RecurringEditModel.Output {
         endDate: LocalDate?,
         finalAmount: Int?
     ) -> Recurring {
-        let schedule = state.schedule
+        let schedule = state.fields.schedule
 
         return Recurring(
             type: state.type,

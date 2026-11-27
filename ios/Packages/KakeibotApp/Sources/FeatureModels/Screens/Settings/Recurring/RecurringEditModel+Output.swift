@@ -28,7 +28,7 @@ public extension RecurringEditModel.Output {
     }
 
     var draft: RecurringDraft {
-        let schedule = state.schedule
+        let schedule = state.fields.schedule
         let closing = canUseClosingDay ? schedule.closingDay : nil
         let transferFee = state.type == .transfer ? fee : 0
 
@@ -77,7 +77,7 @@ public extension RecurringEditModel.Output {
     }
 
     var isCardBill: Bool {
-        canUseClosingDay && state.schedule.closingDay != nil
+        canUseClosingDay && state.fields.schedule.closingDay != nil
     }
 
     var isLoanRepayment: Bool {
@@ -85,7 +85,7 @@ public extension RecurringEditModel.Output {
     }
 
     var isNotificationDenied: Bool {
-        state.schedule.remindDaysBefore != nil && input.authorization == .denied
+        state.fields.schedule.remindDaysBefore != nil && input.authorization == .denied
     }
 
     var categories: [EntryCategory] {

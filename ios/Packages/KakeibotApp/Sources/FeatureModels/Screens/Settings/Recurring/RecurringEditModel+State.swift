@@ -18,7 +18,7 @@ public extension RecurringEditModel {
         private(set) var isHolidayShiftChosen = false
     }
 
-    struct Repayment: ScreenEditable {
+    struct Repayment: Equatable, Sendable {
         public internal(set) var countCalculator = AmountCalculator()
 
         public private(set) var isCountAuto = true
@@ -40,6 +40,7 @@ public extension RecurringEditModel {
     struct Fields: ScreenEditable {
         public var memo = ""
         public var billShift = 0
+        public var schedule: Schedule
     }
 
     struct Calculators {
@@ -51,9 +52,9 @@ public extension RecurringEditModel {
     @Observable
     final class State: NoticeHolding {
         public var panel = Shown<Panel>()
-        public var fields = Fields()
-        public var schedule: Schedule
-        public var repayment = Repayment()
+        public var fields: Fields
+
+        public internal(set) var repayment = Repayment()
 
         public private(set) var walletId: Wallet.ID?
         public private(set) var calculators = Calculators()
@@ -73,24 +74,24 @@ public extension RecurringEditModel {
             self.errorNotice = ErrorNotice(wait: wait)
             self.type = type
 
-            self.schedule = Schedule(
-                month: today.month,
-                day: today.day,
-                startDate: today,
-                isOpen: isScheduleOpen
+            self.fields = Fields(
+                schedule: Schedule(
+                    month: today.month,
+                    day: today.day,
+                    startDate: today,
+                    isOpen: isScheduleOpen
+                )
             )
         }
     }
 }
 
-public extension RecurringEditModel.Repayment {
+extension RecurringEditModel.Repayment {
     mutating func useAutoCount() {
         isCountAuto = true
         manualFinal = nil
     }
-}
 
-extension RecurringEditModel.Repayment {
     mutating func useManualCount(final amount: Int?) {
         isCountAuto = false
         manualFinal = amount
@@ -127,6 +128,10 @@ extension RecurringEditModel.Schedule {
 }
 
 public extension RecurringEditModel.State {
+    func useAutoCount() {
+        repayment.useAutoCount()
+    }
+
     func setWallet(_ id: Wallet.ID?) {
         guard id != walletId else {
             return
@@ -161,15 +166,15 @@ extension RecurringEditModel.State {
         walletId = draft.walletId
         toWalletId = draft.toWalletId
         fields.memo = draft.memo
-        schedule.frequency = draft.frequency
-        schedule.month = draft.month
-        schedule.day = draft.day
-        schedule.load(draft.holidayShift)
-        schedule.closingDay = draft.closingDay
+        fields.schedule.frequency = draft.frequency
+        fields.schedule.month = draft.month
+        fields.schedule.day = draft.day
+        fields.schedule.load(draft.holidayShift)
+        fields.schedule.closingDay = draft.closingDay
         calculators.fee = AmountCalculator(amount: draft.fee)
         fields.billShift = draft.billShift
-        schedule.startDate = draft.startDate
-        schedule.endDate = draft.endDate
-        schedule.remindDaysBefore = draft.remindDaysBefore
+        fields.schedule.startDate = draft.startDate
+        fields.schedule.endDate = draft.endDate
+        fields.schedule.remindDaysBefore = draft.remindDaysBefore
     }
 }

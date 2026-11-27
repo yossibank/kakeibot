@@ -16,7 +16,7 @@ struct RecurringEditModelTests {
 
         await model.refreshAuthorization(client.permission)
         let withoutReminder = model.output.isNotificationDenied
-        model.state.schedule.remindDaysBefore = 1
+        model.state.fields.schedule.remindDaysBefore = 1
 
         #expect(withoutReminder == false)
         #expect(model.output.isNotificationDenied)
@@ -43,7 +43,7 @@ struct RecurringEditModelTests {
         let client = ReminderModelTests.FakePermission(authorization: .allowed)
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
-        model.state.schedule.remindDaysBefore = 1
+        model.state.fields.schedule.remindDaysBefore = 1
 
         await model.refreshAuthorization(client.permission)
 
@@ -75,7 +75,7 @@ struct RecurringEditModelTests {
 
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
-        #expect(model.state.schedule.isOpen)
+        #expect(model.state.fields.schedule.isOpen)
     }
 
     @Test
@@ -88,7 +88,7 @@ struct RecurringEditModelTests {
             editing: Recurring.ID()
         )
 
-        #expect(!model.state.schedule.isOpen)
+        #expect(!model.state.fields.schedule.isOpen)
     }
 
     @Test
@@ -97,7 +97,7 @@ struct RecurringEditModelTests {
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
-        model.state.schedule.isOpen = false
+        model.state.fields.schedule.isOpen = false
 
         #expect(model.flow.output.isChanged == false)
     }
@@ -114,8 +114,8 @@ struct RecurringEditModelTests {
         model.state.press(.doubleZero)
         model.state.press(.digit(0))
         model.state.fields.memo = "家賃"
-        model.state.schedule.day = 27
-        model.state.schedule.startDate = start
+        model.state.fields.schedule.day = 27
+        model.state.fields.schedule.startDate = start
         let saved = await model.save() != nil
         let snapshot = try setup.database.snapshot()
 
@@ -145,7 +145,7 @@ struct RecurringEditModelTests {
         await model.load()
         model.state.press(.digit(5))
         model.state.fields.memo = "保険"
-        model.state.schedule.remindDaysBefore = 1
+        model.state.fields.schedule.remindDaysBefore = 1
 
         let saved = await model.save(permission: client.permission) != nil
         let asked = await client.requested
@@ -164,14 +164,14 @@ struct RecurringEditModelTests {
 
         await model.load()
         model.select(.income)
-        let salary = model.state.schedule.holidayShift
+        let salary = model.state.fields.schedule.holidayShift
 
         model.select(.transfer)
-        let transfer = model.state.schedule.holidayShift
+        let transfer = model.state.fields.schedule.holidayShift
 
-        model.state.schedule.choose(.none)
+        model.state.fields.schedule.choose(.none)
         model.select(.income)
-        let chosen = model.state.schedule.holidayShift
+        let chosen = model.state.fields.schedule.holidayShift
 
         #expect(salary == .previous)
         #expect(transfer == .next)
@@ -204,8 +204,8 @@ struct RecurringEditModelTests {
         #expect(model.state.toWalletId == card.id)
         #expect(model.output.selectedWallet?.kind == .bank)
         #expect(model.output.isCardBill)
-        #expect(model.state.schedule.closingDay == 31)
-        #expect(model.state.schedule.day == 27)
+        #expect(model.state.fields.schedule.closingDay == 31)
+        #expect(model.state.fields.schedule.day == 27)
         #expect(model.state.fields.memo == "カード")
         #expect(model.flow.output.canSave)
     }
@@ -235,7 +235,7 @@ struct RecurringEditModelTests {
         #expect(model.state.type == .transfer)
         #expect(model.state.toWalletId == loan.id)
         #expect(!model.output.isCardBill)
-        #expect(model.state.schedule.closingDay == nil)
+        #expect(model.state.fields.schedule.closingDay == nil)
         #expect(model.state.fields.memo == "奨学金の返済")
         #expect(!model.flow.output.canSave)
     }
@@ -283,7 +283,7 @@ struct RecurringEditModelTests {
         #expect(model.output.draft.finalAmount == 0)
         #expect(model.output.balanceGap == -16587)
 
-        model.state.repayment.useAutoCount()
+        model.state.useAutoCount()
 
         #expect(model.output.repaymentCount == 240)
         #expect(model.output.balanceGap == nil)
@@ -301,8 +301,8 @@ struct RecurringEditModelTests {
         model.state.press(.digit(0))
         model.state.press(.doubleZero)
         model.state.press(.digit(0))
-        model.state.schedule.day = 26
-        model.state.schedule.startDate = start
+        model.state.fields.schedule.day = 26
+        model.state.fields.schedule.startDate = start
         let saved = await model.save() != nil
         let entry = try #require(setup.database.snapshot().entries.first)
 
@@ -364,8 +364,8 @@ private extension RecurringEditModelTests {
         )
 
         await model.load()
-        model.state.schedule.startDate = start
-        model.state.schedule.choose(.none)
+        model.state.fields.schedule.startDate = start
+        model.state.fields.schedule.choose(.none)
 
         for key in [AmountCalculator.Key.digit(1), .digit(6), .digit(2), .digit(3), .digit(5)] {
             model.state.press(key)

@@ -117,7 +117,7 @@ private extension RecurringQuickCard {
         VStack(spacing: 12) {
             scheduleHeader
 
-            if model.state.schedule.isOpen {
+            if model.state.fields.schedule.isOpen {
                 scheduleChooser
                     .transition(.opacity)
             }
@@ -127,7 +127,7 @@ private extension RecurringQuickCard {
     var scheduleHeader: some View {
         Button {
             withAnimation(.snappy) {
-                model.state.schedule.isOpen.toggle()
+                model.state.fields.schedule.isOpen.toggle()
             }
         } label: {
             HStack(alignment: .firstTextBaseline) {
@@ -138,9 +138,9 @@ private extension RecurringQuickCard {
 
                 HStack(spacing: 4) {
                     Text(RecurringText.schedule(
-                        model.state.schedule.frequency,
-                        month: model.state.schedule.month,
-                        day: model.state.schedule.day
+                        model.state.fields.schedule.frequency,
+                        month: model.state.fields.schedule.month,
+                        day: model.state.fields.schedule.day
                     ))
                     .textFont(.footnote)
                     .monospacedDigit()
@@ -149,7 +149,7 @@ private extension RecurringQuickCard {
 
                     Image(systemName: "chevron.down")
                         .sansFont(.small)
-                        .rotationEffect(.degrees(model.state.schedule.isOpen ? 180 : 0))
+                        .rotationEffect(.degrees(model.state.fields.schedule.isOpen ? 180 : 0))
                 }
                 .foregroundStyle(Palette.accentStrong)
                 .padding(.trailing, 8)
@@ -163,18 +163,18 @@ private extension RecurringQuickCard {
     var scheduleChooser: some View {
         VStack(spacing: 12) {
             CapsulePicker(
-                selection: Bindable(model.state).schedule.frequency,
+                selection: Bindable(model.state).fields.schedule.frequency,
                 options: Self.frequencyOptions
             )
 
-            if model.state.schedule.frequency == .yearly {
+            if model.state.fields.schedule.frequency == .yearly {
                 LazyVGrid(columns: Self.monthColumns, spacing: 8) {
                     ForEach(1...12, id: \.self) { month in
                         SettingsChoice(
                             "\(month) 月",
-                            isSelected: model.state.schedule.month == month
+                            isSelected: model.state.fields.schedule.month == month
                         ) {
-                            model.state.schedule.month = month
+                            model.state.fields.schedule.month = month
                         }
                     }
                 }
@@ -182,10 +182,10 @@ private extension RecurringQuickCard {
             }
 
             MonthStartDayGrid(selection: scheduleDay) { day in
-                model.state.schedule.day = day.day
+                model.state.fields.schedule.day = day.day
             }
         }
-        .animation(.snappy, value: model.state.schedule.frequency)
+        .animation(.snappy, value: model.state.fields.schedule.frequency)
     }
 }
 
@@ -204,6 +204,6 @@ private extension RecurringQuickCard {
     )
 
     var scheduleDay: MonthStartDay {
-        MonthStartDay(model.state.schedule.day) ?? .first
+        MonthStartDay(model.state.fields.schedule.day) ?? .first
     }
 }

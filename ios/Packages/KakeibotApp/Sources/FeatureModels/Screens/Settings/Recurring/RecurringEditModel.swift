@@ -164,7 +164,7 @@ extension RecurringEditModel.Source {
 
 private extension RecurringEditModel.Source {
     func requestPermissionIfReminding(_ permission: NotificationPermission) async {
-        guard state.schedule.remindDaysBefore != nil else {
+        guard state.fields.schedule.remindDaysBefore != nil else {
             return
         }
 

@@ -5,9 +5,11 @@ public protocol SettingsBoardState: NoticeHolding, Observable {
     associatedtype ID: Hashable & Sendable
     associatedtype Destination: Hashable & Sendable
 
-    var movingOrder: [ID]? { get set }
+    var movingOrder: [ID]? { get }
     var removed: SettingsBoardRemoved<ID> { get }
     var shown: SettingsBoardShown<ID, Destination> { get set }
+
+    func setMovingOrder(_ order: [ID]?)
 }
 
 public extension SettingsBoardState {

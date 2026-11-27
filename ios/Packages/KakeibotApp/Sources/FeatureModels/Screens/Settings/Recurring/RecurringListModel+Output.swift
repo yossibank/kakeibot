@@ -45,10 +45,10 @@ public extension RecurringListModel.Output {
         let period = input.today.periodMonth(startingOn: startDay).period(startingOn: startDay)
 
         guard let list = input.list else {
-            return visible.total(of: state.type, in: period)
+            return visible.total(of: state.fields.type, in: period)
         }
 
-        return visible.total(of: state.type, in: period, entries: list.entries)
+        return visible.total(of: state.fields.type, in: period, entries: list.entries)
     }
 
     var items: [Recurring] {
@@ -56,7 +56,7 @@ public extension RecurringListModel.Output {
             return []
         }
 
-        return snapshot.filter { $0.type == state.type }
+        return snapshot.filter { $0.type == state.fields.type }
     }
 
     func row(for recurring: Recurring) -> RecurringListModel.Row? {

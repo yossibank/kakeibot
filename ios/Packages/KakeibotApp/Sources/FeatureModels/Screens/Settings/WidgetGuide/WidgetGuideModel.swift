@@ -14,10 +14,14 @@ public final class WidgetGuideModel {
 }
 
 public extension WidgetGuideModel {
+    struct Fields: ScreenEditable {
+        public var place: WidgetGuidePlace
+    }
+
     @MainActor
     @Observable
     final class State {
-        public var place: WidgetGuidePlace
+        public var fields: Fields
 
         public private(set) var sample: WidgetGuideSample
         public private(set) var shownSample: WidgetGuideSample?
@@ -26,7 +30,7 @@ public extension WidgetGuideModel {
             place: WidgetGuidePlace,
             sample: WidgetGuideSample
         ) {
-            self.place = place
+            self.fields = Fields(place: place)
             self.sample = sample
         }
     }

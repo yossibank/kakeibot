@@ -55,13 +55,13 @@ public struct WalletEditSheet: View {
         .onChange(of: model.state.kind) {
             focus = nil
         }
-        .sheet(isPresented: Bindable(model.state).payment.shown[.editing]) {
+        .sheet(isPresented: Bindable(model.state).paymentStep[.editing]) {
             closePayment()
         } content: {
             RecurringEditSheet(model: model.paymentModel())
         }
         .confirmation(
-            isPresented: Bindable(model.state).payment.shown[.asking],
+            isPresented: Bindable(model.state).paymentStep[.asking],
             systemImage: "repeat",
             title: model.output.paymentQuestion,
             message: model.output.paymentQuestionNote,
@@ -70,7 +70,7 @@ public struct WalletEditSheet: View {
             role: .suggestion,
             onKeep: model.finishAddedWallet
         ) {
-            model.state.payment.shown.show(.editing)
+            model.state.paymentStep.show(.editing)
         }
         .task {
             await model.load()

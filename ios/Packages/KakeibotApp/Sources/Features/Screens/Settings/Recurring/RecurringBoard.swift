@@ -24,7 +24,7 @@ extension RecurringBoard {
 private extension RecurringBoard {
     func totalCard(in model: RecurringListModel) -> some View {
         VStack(spacing: 4) {
-            Text("今月の\(model.state.type.name)")
+            Text("今月の\(model.state.fields.type.name)")
                 .textFont(.caption2)
                 .tracking(2)
                 .foregroundStyle(Palette.accent)
@@ -104,7 +104,7 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func header(in model: RecurringListModel) -> some View {
-        CapsulePicker(selection: Bindable(model.state).type, options: Self.typeOptions)
+        CapsulePicker(selection: Bindable(model.state).fields.type, options: Self.typeOptions)
     }
 
     @ViewBuilder
@@ -162,7 +162,7 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func emptyNote(in model: RecurringListModel) -> (systemImage: String, text: String) {
-        switch model.state.type {
+        switch model.state.fields.type {
         case .expense: ("repeat", "家賃やサブスクなどを足すと、ここに並びます")
         case .income: ("repeat", "給料や年金などを足すと、ここに並びます")
         case .transfer: ("repeat", "カードの引き落としや積立などを足すと、ここに並びます")
@@ -170,7 +170,7 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func addTitle(in model: RecurringListModel) -> String {
-        "\(model.state.type.name)の固定費を追加"
+        "\(model.state.fields.type.name)の固定費を追加"
     }
 
     func scaleID(in model: RecurringListModel) -> [String?]? {
@@ -178,7 +178,7 @@ extension RecurringBoard: SettingsBoardSpec {
     }
 
     func newDestination(in model: RecurringListModel) -> Destination {
-        .new(model.state.type)
+        .new(model.state.fields.type)
     }
 
     func destination(editing item: Recurring) -> Destination {

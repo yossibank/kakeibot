@@ -29,12 +29,17 @@ public extension TemplateListModel {
         case edit(Entry.Kind, EntryTemplate.ID)
     }
 
+    struct Fields: ScreenEditable {
+        public var type: Entry.Kind = .expense
+    }
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
-        public var type: Entry.Kind = .expense
-        public var movingOrder: [EntryTemplate.ID]?
+        public var fields = Fields()
         public var shown = SettingsBoardShown<EntryTemplate.ID, Destination>()
+
+        public private(set) var movingOrder: [EntryTemplate.ID]?
 
         public let errorNotice: ErrorNotice
         public let removed: SettingsBoardRemoved<EntryTemplate.ID>
@@ -99,7 +104,7 @@ public extension TemplateListModel {
 public extension TemplateListModel.Output {
     var items: [EntryTemplate] {
         let templates = input.snapshot ?? []
-        return templates.filter { $0.type == state.type }
+        return templates.filter { $0.type == state.fields.type }
     }
 
     func icon(for template: EntryTemplate) -> Icon? {
@@ -108,6 +113,12 @@ public extension TemplateListModel.Output {
 
     func detail(for template: EntryTemplate) -> String {
         input.list?.detail(for: template) ?? ""
+    }
+}
+
+public extension TemplateListModel.State {
+    func setMovingOrder(_ order: [EntryTemplate.ID]?) {
+        movingOrder = order
     }
 }
 

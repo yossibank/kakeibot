@@ -32,12 +32,17 @@ public extension CategoryListModel {
         case edit(EntryCategory.Kind, EntryCategory.ID)
     }
 
+    struct Fields: ScreenEditable {
+        public var kind: EntryCategory.Kind
+    }
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
-        public var kind: EntryCategory.Kind
-        public var movingOrder: [EntryCategory.ID]?
+        public var fields: Fields
         public var shown = SettingsBoardShown<EntryCategory.ID, Destination>()
+
+        public private(set) var movingOrder: [EntryCategory.ID]?
 
         public let errorNotice: ErrorNotice
         public let removed: SettingsBoardRemoved<EntryCategory.ID>
@@ -47,7 +52,7 @@ public extension CategoryListModel {
             wait: ScreenWait
         ) {
             self.errorNotice = ErrorNotice(wait: wait)
-            self.kind = kind
+            self.fields = Fields(kind: kind)
             self.removed = SettingsBoardRemoved(wait: wait)
         }
     }
@@ -71,11 +76,17 @@ public extension CategoryListModel {
 public extension CategoryListModel.Output {
     var items: [EntryCategory] {
         let categories = input.snapshot?.categories ?? []
-        return categories.filter { $0.kind == state.kind }
+        return categories.filter { $0.kind == state.fields.kind }
     }
 
     func icon(for category: EntryCategory) -> Icon? {
         input.snapshot?.icons[category.iconId]
+    }
+}
+
+public extension CategoryListModel.State {
+    func setMovingOrder(_ order: [EntryCategory.ID]?) {
+        movingOrder = order
     }
 }
 

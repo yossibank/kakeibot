@@ -132,7 +132,7 @@ public extension WalletEditModel {
             parts: dependencies,
             today: dependencies.clock.today,
             editing: input.payment?.id,
-            paying: state.payment.addedWallet?.id ?? input.editingId
+            paying: state.addedWallet?.id ?? input.editingId
         )
     }
 
@@ -142,7 +142,7 @@ public extension WalletEditModel {
     }
 
     func finishAddedWallet() {
-        guard let wallet = state.payment.addedWallet else {
+        guard let wallet = state.addedWallet else {
             return
         }
 

@@ -32,12 +32,17 @@ public extension RecurringListModel {
         case edit(Entry.Kind, Recurring.ID)
     }
 
+    struct Fields: ScreenEditable {
+        public var type: Entry.Kind = .expense
+    }
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
-        public var type: Entry.Kind = .expense
-        public var movingOrder: [Recurring.ID]?
+        public var fields = Fields()
         public var shown = SettingsBoardShown<Recurring.ID, Destination>()
+
+        public private(set) var movingOrder: [Recurring.ID]?
 
         public let errorNotice: ErrorNotice
         public let removed: SettingsBoardRemoved<Recurring.ID>
@@ -88,6 +93,12 @@ public extension RecurringListModel {
                 )
             }
         ])
+    }
+}
+
+public extension RecurringListModel.State {
+    func setMovingOrder(_ order: [Recurring.ID]?) {
+        movingOrder = order
     }
 }
 

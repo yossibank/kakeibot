@@ -35,7 +35,7 @@ public struct WidgetGuideView: View {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
                     VStack(spacing: 16) {
                         CapsulePicker(
-                            selection: Bindable(model.state).place,
+                            selection: Bindable(model.state).fields.place,
                             options: Self.options,
                             size: .wide
                         )
@@ -207,7 +207,7 @@ private extension WidgetGuideView {
     }
 
     var place: WidgetGuidePlace {
-        model.state.place
+        model.state.fields.place
     }
 
     var widget: WidgetGuideWidget {

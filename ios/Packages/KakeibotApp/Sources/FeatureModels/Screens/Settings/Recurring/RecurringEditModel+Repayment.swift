@@ -25,7 +25,7 @@ public extension RecurringEditModel {
     }
 
     func setEnd(_ date: LocalDate?) {
-        state.schedule.endDate = date
+        state.fields.schedule.endDate = date
         state.repayment.useManualCount(final: output.manualFinalAmount(through: date))
     }
 }
@@ -39,7 +39,7 @@ extension RecurringEditModel {
 
         guard
             let plan = output.autoPlan,
-            let end = state.schedule.endDate
+            let end = state.fields.schedule.endDate
         else {
             state.repayment.setCountAuto(false)
             return
