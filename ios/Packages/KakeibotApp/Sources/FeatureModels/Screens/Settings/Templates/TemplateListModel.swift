@@ -41,7 +41,7 @@ public extension TemplateListModel {
     @MainActor
     @Observable
     final class State: SettingsBoardState {
-        public var fields = Fields()
+        public var fields = TemplateListModel.Fields()
         public var presented = Presented()
 
         public let notices: Notices
