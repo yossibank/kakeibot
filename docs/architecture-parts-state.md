@@ -1,7 +1,7 @@
 # モデルの State の組み方
 
 > [!NOTE]
-> 画面のモデルの `State` に、何をどの名前で置くかが分かる。
+> 画面のモデルの `State` に、何をどの名前で置くかが分かる。`Input` に置ける物も分かる。
 > 部品は [architecture-parts](architecture-parts.md) にある。
 > 画面が書く値は [architecture-screens-flow](architecture-screens-flow.md#-画面がモデルに書く値) にある。
 
@@ -42,14 +42,15 @@
 
 iOS だけ。実行中の印と、どれを実行中かを別の値で持たない。
 
-- 鍵は、モデルの入れ子の `Work` の enum にする
+- 鍵は、モデルの入れ子の `Work` の enum にし、`ModelTask<Work>()` で持つ
 - `task.attempt(鍵)` で走らせ、画面は `task.isRunning(鍵)` で見る
+- 鍵の型が決まるため、`isRunning(.switching)` と書け、違う型の鍵は通らない
 - Android の `ModelTask` は、当たる画面が無いため鍵を持たない
 
 | モデル | 鍵 | 中身 |
 | --- | --- | --- |
 | ProPurchase | `Work` | 購入（`purchase`）か復元（`restore`） |
-| Sync | `Work` | 同期の切り替え（`switching`）か、口座の共有（`sharing(id)`）。共有の二度押しは `isRunning(where: \Work.isSharing)` で止める |
+| Sync | `Work` | 同期の切り替え（`switching`）か、口座の共有（`sharing(id)`）。共有の二度押しは `isRunning(where: \.isSharing)` で止める |
 
 ## 📏 直下に置ける物
 
@@ -106,6 +107,31 @@ ID の型（`…ID`・`Identifier<…>`）も裸の値として扱う。その O
 
 Android の入力の下書きの `data class`（`EntryForm` など）は、`fields.form` に持つ。下書きの外の印（固定費の休日の扱いを人が選んだか）も、`fields` に並べる。
 
+## 🗄️ Input に置ける物
+
+`Input` には、外から来る値だけを置く。書くのはモデルだけにする。
+
+| 置ける物 | 例 |
+| --- | --- |
+| 監視で読んだ DB の値と設定 | `list`・`monthStartDay`・`stampBook` |
+| 今日と、確かめた時刻 | `today`・`checkTime` |
+| 端末やサービスの様子 | 通知の許可（`authorization`）・同期の状態（`isFetching`）・声が使えるか |
+| 画面から渡された部品 | 通知の許可を聞く `permission` |
+| 作る時に決まる値 | `editingId`・`silenceDuration` |
+
+次の物は `Input` に置かない。モデルが自分の仕事のために書く値で、外から来る値ではないからである。
+
+| 置かない物 | 例 | 行き先 |
+| --- | --- | --- |
+| 実行中の印 | 聞き始めている間（声の入力） | `task`（どれを実行中かは鍵） |
+| 走らせ直すための印 | 作り直している間に来た頼み（資産） | 振る舞いを持つ値の型（`RefreshGate`） |
+| 一度だけ頼むための印 | 書いてもらった振り返りの文（振り返り） | 振る舞いを持つ値の型（`CommentRequests`） |
+| 動いている `Task`・`Job` と、認識の部品 | 黙るのを待つ `Task`・声の認識 | モデルの `Runtime`。iOS は `let runtime`、Android は `private val runtime` で持つ |
+
+`make verify` の state-check が、`Input` の直下を見る。`Task`・`Job` と、実行中の印に見える `Bool` を止める。
+
+印に見えるのは、`needs…`・`isRefreshing` などの名前の物である。iOS で `@ObservationIgnored` を付けた物も含む。
+
 ## 🪝 タブとメインの値の型
 
 | モデル | 値の型 | 中身 |
@@ -120,6 +146,8 @@ Android の入力の下書きの `data class`（`EntryForm` など）は、`fiel
 | RecurringEdit | `Repayment`（Android は `RecurringRepayment`） | 返済の回数と、回数を自動で決めるか、手で決めた最後の額。`useAutoCount` など（Android は `usingAutoCount` などの値を返す関数） |
 | EntryVoice | `Rounds` | 聞き始めと聞き終わりの回。`start`・`end` |
 | EntryVoice | `Silence` | 黙り始めた時刻。`start(at:)`・`clear`。iOS だけ |
+| Assets | `RefreshGate` | 残高のまとめを作り直している間と、その間に来た頼み。`request`・`next`。iOS だけ |
+| Review | `CommentRequests` | 理由（`reasonRequests`）と振り返り（`noteRequests`）の文を頼んだ鍵。`begin`・`cancel`。iOS だけ |
 | App | `Reveal` | 起動の幕と、輪を回し終えたか、ホームを読み終えたか。iOS だけ |
 | WalletEdit | `BalanceSign` | 初めの残高の正負。種類を変えた時は、`follow` で新しい種類の向きに合わせる（iOS だけ） |
 | Sync | `SwitchRequest` | 同期のスイッチを押してから、切り替え終わるまでの向き。`ask`・`clear`。iOS だけ |

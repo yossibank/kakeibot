@@ -182,7 +182,7 @@ struct EntryVoiceFlowTests {
 
         await flow.start(for: model, today: setup.date) {}
         source.say("500円")
-        let silence = try #require(flow.input.silenceTask)
+        let silence = try #require(flow.runtime.silenceTask)
         await ObservationWait.until { clock.isSleeping }
 
         for _ in 0..<6 {

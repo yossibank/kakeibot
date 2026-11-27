@@ -153,7 +153,7 @@ struct ProPurchaseModelTests {
         #expect(!isUnlocked)
         #expect(model.state.notices.error.message == "購入を復元できませんでした。時間をおいて試してください")
         #expect(model.state.notices.error.tone == .error)
-        #expect(!model.state.task.isRunning(ProPurchaseModel.Work.restore))
+        #expect(!model.state.task.isRunning(.restore))
     }
 
     @Test

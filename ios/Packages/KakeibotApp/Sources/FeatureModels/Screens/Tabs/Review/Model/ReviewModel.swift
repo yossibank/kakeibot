@@ -51,9 +51,6 @@ public extension ReviewModel {
         var noSpendDays: Set<LocalDate> = []
         var recurrings: [Recurring] = []
 
-        @ObservationIgnored var reasonRequests: Set<String> = []
-        @ObservationIgnored var noteRequests: Set<String> = []
-
         init(
             today: LocalDate,
             checkTime: Date

@@ -28,6 +28,9 @@ public extension ReviewModel {
 
         public private(set) var cursor = PeriodCursor()
 
+        public internal(set) var reasonRequests = CommentRequests()
+        public internal(set) var noteRequests = CommentRequests()
+
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
         }

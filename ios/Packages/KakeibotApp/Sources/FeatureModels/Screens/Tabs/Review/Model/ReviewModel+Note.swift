@@ -20,13 +20,11 @@ public extension ReviewModel {
         guard
             input.list.isLoaded,
             !output.isCurrentPeriod,
-            !input.noteRequests.contains(request),
-            output.entryCount(in: output.period.range) >= ReviewComment.minimumEntries
+            output.entryCount(in: output.period.range) >= ReviewComment.minimumEntries,
+            state.noteRequests.begin(request)
         else {
             return
         }
-
-        input.noteRequests.insert(request)
 
         let saved = try? await dependencies.database.reviewComment(for: key)
 
@@ -44,7 +42,7 @@ public extension ReviewModel {
             categories: names
         )
         else {
-            input.noteRequests.remove(request)
+            state.noteRequests.cancel(request)
             return
         }
 

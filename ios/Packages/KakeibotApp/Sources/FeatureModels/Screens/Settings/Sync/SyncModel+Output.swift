@@ -64,7 +64,7 @@ public extension SyncModel.Output {
     }
 
     var progress: SyncProgress? {
-        if state.task.isRunning(SyncModel.Work.switching) {
+        if state.task.isRunning(.switching) {
             return .switching
         }
 

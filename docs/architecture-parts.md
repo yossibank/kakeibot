@@ -57,7 +57,7 @@
 | `SettingsBoardShown` | 一覧の画面が出している物。行き先・開いている行・確認（`SettingsBoardPrompt`）を持つ | `FeatureModels/Shared/SettingsParts/Board/` |
 | `Shown` | 出している物（シート・確認・メニュー・パネル）を 1 つの値で持つ。Swift は確認に `shown[.delete]` で `Binding` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ModelTask` | 保存などの実行中の印。`attempt` は実行中でも走らせ、二度押しは呼ぶ側が `isRunning` で止める | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `ModelTask` の鍵 | どれを実行中かの印（iOS だけ）。`attempt(鍵)` で走らせ、`isRunning(鍵)`・`isRunning(where:)` で見る | `FeatureModels/Shared/Model/` |
+| `ModelTask` の鍵 | どれを実行中かの印（iOS だけ）。`ModelTask<Work>()` で持ち、`attempt(鍵)`・`isRunning(鍵)` で使う | `FeatureModels/Shared/Model/` |
 | `Loadable` | 読み込み中・読めた・失敗を 1 つの値で持ち、値と読んだ印を組にしない。監視し直す時は、失敗だけを読み込み中に戻す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `UndoNotice` | 取り消しの知らせの値と、消すまでの時間（既定は 4 秒）を持ち、`ScreenWait` で数える。`show` に秒を渡せ、`EntryNoticeModel` が知らせごとの秒に使う | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ErrorNotice` | エラーの知らせの文・色・出した数と、消すまでの 6 秒を持ち、`show`・`inform`・`clear` で変える。時間は `ScreenWait` で数え、Kotlin は `ModelTask` の失敗もここに出す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |

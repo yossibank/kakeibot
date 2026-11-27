@@ -10,6 +10,7 @@ public final class EntryVoiceFlow: ScreenPerforming {
     public let output: Output
 
     let dependencies: Dependencies
+    let runtime = Runtime()
 
     init(dependencies: Dependencies) {
         let state = State(wait: dependencies.wait)
@@ -65,66 +66,22 @@ public extension EntryVoiceFlow {
         today: LocalDate,
         onApplied: @escaping @MainActor () -> Void
     ) async {
-        guard state.presented.step == nil, !input.isStarting else {
+        guard state.presented.step == nil, !state.task.isRunning else {
             return
         }
 
-        input.isStarting = true
-
-        defer {
-            input.isStarting = false
+        await state.task.attempt {
+            await begin(for: model, today: today, onApplied: onApplied)
         }
-
-        clearNotice()
-
-        guard await dependencies.requestPermission() else {
-            state.setDenied(dependencies.isDenied())
-            return
-        }
-
-        guard let source = dependencies.makeSource() else {
-            return
-        }
-
-        input.source = source
-        input.session = Session(model: model, today: today, onApplied: onApplied)
-        input.transcript = EntryVoiceTranscript()
-        input.preview = nil
-        state.startListening()
-
-        do {
-            try await source.start(hints: model.output.voiceHints) { [weak self] event in
-                self?.receive(event)
-            }
-        } catch {
-            await source.cancel()
-
-            guard input.source === source else {
-                return
-            }
-
-            reset()
-            state.countEnd()
-            model.state.errorNotice.show(Self.failedMessage)
-
-            return
-        }
-
-        guard input.source === source, state.presented.step == .listening else {
-            await source.cancel()
-            return
-        }
-
-        dependencies.prepare()
     }
 
     func finish() async {
-        guard state.presented.step == .listening, let source = input.source,
-              let session = input.session else {
+        guard state.presented.step == .listening, let source = runtime.source,
+              let session = runtime.session else {
             return
         }
 
-        input.silenceTask?.cancel()
+        runtime.silenceTask?.cancel()
         input.levels = Self.quietLevels
         state.finish()
         await source.finish()
@@ -133,12 +90,12 @@ public extension EntryVoiceFlow {
     }
 
     func cancel() async {
-        guard let source = input.source else {
+        guard let source = runtime.source else {
             state.reset()
             return
         }
 
-        input.silenceTask?.cancel()
+        runtime.silenceTask?.cancel()
         state.countEnd()
         await source.cancel()
         reset()
@@ -156,6 +113,54 @@ public extension EntryVoiceFlow {
 
     func clearNotice() {
         state.notices.result.dismiss()
+    }
+
+    private func begin(
+        for model: EntryModel,
+        today: LocalDate,
+        onApplied: @escaping @MainActor () -> Void
+    ) async {
+        clearNotice()
+
+        guard await dependencies.requestPermission() else {
+            state.setDenied(dependencies.isDenied())
+            return
+        }
+
+        guard let source = dependencies.makeSource() else {
+            return
+        }
+
+        runtime.source = source
+        runtime.session = Session(model: model, today: today, onApplied: onApplied)
+        input.transcript = EntryVoiceTranscript()
+        input.preview = nil
+        state.startListening()
+
+        do {
+            try await source.start(hints: model.output.voiceHints) { [weak self] event in
+                self?.receive(event)
+            }
+        } catch {
+            await source.cancel()
+
+            guard runtime.source === source else {
+                return
+            }
+
+            reset()
+            state.countEnd()
+            model.state.errorNotice.show(Self.failedMessage)
+
+            return
+        }
+
+        guard runtime.source === source, state.presented.step == .listening else {
+            await source.cancel()
+            return
+        }
+
+        dependencies.prepare()
     }
 }
 
@@ -191,7 +196,7 @@ private extension EntryVoiceFlow {
         case let .transcript(transcript):
             input.transcript = transcript
 
-            if let session = input.session {
+            if let session = runtime.session {
                 input.preview = session.model.output.voiceReading(
                     from: transcript.text,
                     today: session.today,
@@ -199,7 +204,7 @@ private extension EntryVoiceFlow {
                 )
             }
 
-            if !transcript.isEmpty, input.lastVoice == nil {
+            if !transcript.isEmpty, runtime.lastVoice == nil {
                 waitForSilence()
             }
 
@@ -211,21 +216,21 @@ private extension EntryVoiceFlow {
 
     func follow(_ level: Double) {
         guard level < Self.voiceLevel else {
-            input.lastVoice = dependencies.clock.now
-            input.silenceTask?.cancel()
-            input.silenceTask = nil
+            runtime.lastVoice = dependencies.clock.now
+            runtime.silenceTask?.cancel()
+            runtime.silenceTask = nil
             state.clearSilence()
 
             return
         }
 
-        if input.lastVoice != nil {
+        if runtime.lastVoice != nil {
             waitForSilence()
         }
     }
 
     func waitForSilence() {
-        guard input.silenceTask == nil else {
+        guard runtime.silenceTask == nil else {
             return
         }
 
@@ -234,7 +239,7 @@ private extension EntryVoiceFlow {
 
         state.startSilence(at: dependencies.clock.now)
 
-        input.silenceTask = Task { [weak self] in
+        runtime.silenceTask = Task { [weak self] in
             try? await sleep(silence)
 
             guard !Task.isCancelled else {
@@ -290,12 +295,12 @@ private extension EntryVoiceFlow {
     }
 
     func reset() {
-        input.silenceTask?.cancel()
-        input.silenceTask = nil
-        input.lastVoice = nil
+        runtime.silenceTask?.cancel()
+        runtime.silenceTask = nil
+        runtime.lastVoice = nil
         input.levels = Self.quietLevels
-        input.source = nil
-        input.session = nil
+        runtime.source = nil
+        runtime.session = nil
         state.reset()
         input.preview = nil
     }

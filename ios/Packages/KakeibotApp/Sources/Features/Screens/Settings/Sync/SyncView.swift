@@ -208,7 +208,7 @@ private extension SyncView {
     }
 
     var isSwitchLocked: Bool {
-        let isRunning = model.state.task.isRunning(SyncModel.Work.switching)
+        let isRunning = model.state.task.isRunning(.switching)
         return isRunning || model.output.isSwitching || !canChange
     }
 

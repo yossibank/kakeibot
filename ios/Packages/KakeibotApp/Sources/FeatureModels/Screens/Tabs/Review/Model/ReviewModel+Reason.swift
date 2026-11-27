@@ -17,14 +17,12 @@ public extension ReviewModel {
 
         guard
             !output.isCurrentPeriod,
-            !input.reasonRequests.contains(key),
             let goal = input.goals.first(where: { $0.period == next.commentKey }),
-            let item = output.goalItem(goal, in: next)
+            let item = output.goalItem(goal, in: next),
+            state.reasonRequests.begin(key)
         else {
             return
         }
-
-        input.reasonRequests.insert(key)
 
         let basis = output.reasonBasis(for: item)
         let saved = try? await dependencies.database.reviewComment(for: key)
@@ -42,7 +40,7 @@ public extension ReviewModel {
         )
 
         guard let body else {
-            input.reasonRequests.remove(key)
+            state.reasonRequests.cancel(key)
             return
         }
 

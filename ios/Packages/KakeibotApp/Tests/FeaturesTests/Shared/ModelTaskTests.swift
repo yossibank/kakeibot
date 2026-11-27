@@ -57,56 +57,61 @@ struct ModelTaskTests {
 
     @Test
     func marksOnlyTheRunningKey() async {
-        let task = ModelTask()
+        let task = ModelTask<Work>()
         var first = false
         var second = true
         var any = false
 
-        await task.attempt(1) {
-            first = task.isRunning(1)
-            second = task.isRunning(2)
+        await task.attempt(.first) {
+            first = task.isRunning(.first)
+            second = task.isRunning(.second)
             any = task.isRunning
         }
 
         #expect(first)
         #expect(!second)
         #expect(any)
-        #expect(!task.isRunning(1))
+        #expect(!task.isRunning(.first))
         #expect(!task.isRunning)
     }
 
     @Test
     func keepsKeyRunningUntilOuterAttemptEnds() async {
-        let task = ModelTask()
+        let task = ModelTask<Work>()
         var afterInner = false
         var otherWhileRunning = true
 
-        await task.attempt(1) {
-            await task.attempt(1) {}
-            afterInner = task.isRunning(1)
-            otherWhileRunning = task.isRunning { (key: Int) in key != 1 }
+        await task.attempt(.first) {
+            await task.attempt(.first) {}
+            afterInner = task.isRunning(.first)
+            otherWhileRunning = task.isRunning(where: { $0 != .first })
         }
 
         #expect(afterInner)
         #expect(!otherWhileRunning)
-        #expect(!task.isRunning(1))
+        #expect(!task.isRunning(.first))
     }
 
     @Test
     func stopsRunningKeyAfterFailure() async {
-        let task = ModelTask()
+        let task = ModelTask<Work>()
 
         await #expect(throws: Failure.self) {
-            try await task.attempt(1) {
+            try await task.attempt(.first) {
                 throw Failure()
             }
         }
 
-        #expect(!task.isRunning(1))
+        #expect(!task.isRunning(.first))
         #expect(!task.isRunning)
     }
 }
 
 extension ModelTaskTests {
     struct Failure: Error {}
+
+    enum Work: Hashable, Sendable {
+        case first
+        case second
+    }
 }

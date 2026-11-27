@@ -7,7 +7,7 @@ FOLDERS = [
     (os.path.join("ios", "Packages", "KakeibotApp", "Sources", "FeatureModels"), ".swift"),
     (os.path.join("android", "featuremodels", "src", "main"), ".kt"),
 ]
-STATE = re.compile(r"^\s*(?:(?:public|internal|private|fileprivate|final)\s+)*class\s+State\b")
+PART = re.compile(r"^\s*(?:(?:public|internal|private|fileprivate|final)\s+)*class\s+(?P<part>State|Input)\b")
 DECLARATION = re.compile(
     r"^\s*(?P<modifiers>(?:@\w+(?:\([^)]*\))?\s+"
     r"|(?:public|internal|private|fileprivate|override|lateinit|nonisolated|weak|unowned)(?:\(set\))?\s+)*)"
@@ -25,6 +25,12 @@ LITERAL = re.compile(r'^(?:true|false|-?\d[\d_]*(?:\.\d+)?[LlFf]?|"")$')
 PRIMITIVE_STATE = re.compile(r"^mutable(?:Int|Long|Float|Double)StateOf\(")
 STATE_OF = re.compile(r"^mutableStateOf\((.*)\)$")
 NOTICE_TYPE = re.compile(r"\b(?:ErrorNotice|UndoNotice)\b")
+INPUT_MARK = re.compile(r"needs[A-Z]\w*|is(?:Refreshing|Starting|Stopping|Running|Working|Saving|Sending|Requesting|Pending)")
+INPUT_HANDLE = re.compile(r"(?:^|[^\w.])(?:Task<|Job\b)")
+INPUT_HANDLE_VALUE = re.compile(r"^(?:Task\s*[{(]|(?:\w+\.)*launch\b)")
+ATTRIBUTES_ONLY = re.compile(r"(?:@\w+(?:\([^)]*\))?\s*)+")
+FLAG = {"Bool", "Boolean"}
+FLAG_VALUE = {"true", "false"}
 SWIFT_OPEN = {"fields", "presented"}
 SWIFT_SETTERS = ("private(set)", "internal(set)", "fileprivate(set)")
 PRIVATE = ("private", "fileprivate")
@@ -92,13 +98,34 @@ def bare_initial(rest):
     return bool(LITERAL.match(value) or PRIMITIVE_STATE.match(value))
 
 
+def is_flag(declared, rest):
+    if declared:
+        return declared.rstrip("?") in FLAG
+    return initial(rest) in FLAG_VALUE
+
+
+def input_error(name, declared, rest, attributes):
+    """Input の直下の値のうち、外から来る値でない物を見分けて文を返す。当たらない時は None を返す。"""
+    if INPUT_HANDLE.search(declared) or INPUT_HANDLE_VALUE.match(initial(rest) or ""):
+        return "動いている Task と Job は Input に置かない（モデルの Runtime へ）"
+
+    if is_flag(declared, rest) and (INPUT_MARK.fullmatch(name) or "@ObservationIgnored" in attributes):
+        return "実行中の印と、走らせ直すための印は Input に置かない（task の鍵か、State の値の型へ）"
+
+    return None
+
+
 def check(path, relative, swift, errors):
     with open(path, encoding="utf-8") as file:
         lines = file.read().split("\n")
 
     for start, line in enumerate(lines):
-        if not STATE.match(code(line)):
+        found = PART.match(code(line))
+
+        if not found:
             continue
+
+        part = found.group("part")
 
         rows = list(depths(lines, start))
         for position, (index, braces, parens) in enumerate(rows):
@@ -132,6 +159,15 @@ def check(path, relative, swift, errors):
 
             def report(message):
                 errors.append(f"{relative}:{index + 1}: error: {message}: {name}")
+
+            if part == "Input":
+                above = code(lines[index - 1]).strip()
+                attributes = modifiers + (above.split() if ATTRIBUTES_ONLY.fullmatch(above) else [])
+
+                if message := input_error(name, declared, rest, attributes):
+                    report(message)
+
+                continue
 
             if name == "errorNotice" or NOTICE_TYPE.search(declared) or NOTICE_TYPE.match(initial(rest) or ""):
                 report("知らせは State の直下に置かず、notices に置く")
