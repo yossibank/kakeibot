@@ -63,9 +63,9 @@ struct RecurringEditModelTests {
         await model.load()
 
         #expect(model.state.type == .transfer)
-        #expect(model.state.categoryId == nil)
-        #expect(model.state.toWalletId != nil)
-        #expect(model.state.toWalletId != model.state.walletId)
+        #expect(model.state.fields.categoryId == nil)
+        #expect(model.state.fields.toWalletId != nil)
+        #expect(model.state.fields.toWalletId != model.state.fields.walletId)
         #expect(model.flow.output.isChanged == false)
     }
 
@@ -201,7 +201,7 @@ struct RecurringEditModelTests {
         await model.load()
 
         #expect(model.state.type == .transfer)
-        #expect(model.state.toWalletId == card.id)
+        #expect(model.state.fields.toWalletId == card.id)
         #expect(model.output.selectedWallet?.kind == .bank)
         #expect(model.output.isCardBill)
         #expect(model.state.fields.schedule.closingDay == 31)
@@ -233,7 +233,7 @@ struct RecurringEditModelTests {
         await model.load()
 
         #expect(model.state.type == .transfer)
-        #expect(model.state.toWalletId == loan.id)
+        #expect(model.state.fields.toWalletId == loan.id)
         #expect(!model.output.isCardBill)
         #expect(model.state.fields.schedule.closingDay == nil)
         #expect(model.state.fields.memo == "奨学金の返済")
@@ -322,7 +322,7 @@ struct RecurringEditModelTests {
         await model.load()
         model.select(.transfer)
         model.state.press(.digit(5))
-        model.state.toWalletId = model.state.walletId
+        model.state.fields.toWalletId = model.state.fields.walletId
         let saved = await model.save() != nil
 
         #expect(!saved)

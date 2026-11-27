@@ -35,9 +35,9 @@ public extension RecurringEditModel.Output {
         return RecurringDraft(
             type: state.type,
             amount: amount,
-            categoryId: state.categoryId,
-            walletId: state.walletId,
-            toWalletId: state.toWalletId,
+            categoryId: state.fields.categoryId,
+            walletId: state.fields.walletId,
+            toWalletId: state.fields.toWalletId,
             memo: state.fields.memo,
             frequency: schedule.frequency,
             month: schedule.month,
@@ -54,7 +54,7 @@ public extension RecurringEditModel.Output {
     }
 
     var billRecurring: Recurring? {
-        state.type == .transfer ? nil : input.cardBills.cardBill(paidBy: state.walletId)
+        state.type == .transfer ? nil : input.cardBills.cardBill(paidBy: state.fields.walletId)
     }
 
     var billDates: [LocalDate] {
@@ -97,15 +97,15 @@ public extension RecurringEditModel.Output {
     }
 
     var selectedCategory: EntryCategory? {
-        categories.first { $0.id == state.categoryId }
+        categories.first { $0.id == state.fields.categoryId }
     }
 
     var selectedWallet: Wallet? {
-        wallets.first { $0.id == state.walletId }
+        wallets.first { $0.id == state.fields.walletId }
     }
 
     var selectedDestination: Wallet? {
-        wallets.first { $0.id == state.toWalletId }
+        wallets.first { $0.id == state.fields.toWalletId }
     }
 
     func icon(for category: EntryCategory) -> Icon? {

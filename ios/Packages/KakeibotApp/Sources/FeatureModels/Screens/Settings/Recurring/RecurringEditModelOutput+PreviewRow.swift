@@ -21,7 +21,7 @@ public extension RecurringEditModel.Output {
         let destination = type == .transfer ? selectedDestination?.name : nil
         let place = [selectedWallet?.name, destination].compactMap(\.self).joined(separator: " → ")
         let rowPlace = place.isEmpty ? nil : place
-        let wallet = state.walletId ?? Wallet.ID()
+        let wallet = state.fields.walletId ?? Wallet.ID()
         let rowAmount = isCardBill ? nil : amount
 
         let title = name.isEmpty
@@ -35,7 +35,7 @@ public extension RecurringEditModel.Output {
         let recurring = Recurring(
             type: type,
             amount: amount,
-            categoryId: state.categoryId,
+            categoryId: state.fields.categoryId,
             walletId: wallet,
             frequency: schedule.frequency,
             month: schedule.month,

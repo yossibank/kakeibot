@@ -11,13 +11,13 @@ public extension RecurringEditModel {
             try await loadRecurring()
             presetPayment()
 
-            if state.categoryId == nil {
-                state.categoryId = output.categories.first?.id
+            if state.fields.categoryId == nil {
+                state.fields.categoryId = output.categories.first?.id
             }
 
             suggestHolidayShift()
 
-            if state.walletId == nil {
+            if state.fields.walletId == nil {
                 state.setWallet(output.wallets.first?.id)
             }
 
@@ -50,8 +50,8 @@ extension RecurringEditModel {
         let other = wallets.first { $0.id != target }
 
         state.type = .transfer
-        state.categoryId = nil
-        state.toWalletId = target
+        state.fields.categoryId = nil
+        state.fields.toWalletId = target
         state.setWallet((bank ?? other)?.id)
         state.fields.schedule.day = Self.billPaymentDay
 
@@ -69,12 +69,12 @@ extension RecurringEditModel {
     func presetDestination() {
         guard
             state.type == .transfer,
-            state.toWalletId == nil
+            state.fields.toWalletId == nil
         else {
             return
         }
 
-        state.toWalletId = output.wallets.first { $0.id != state.walletId }?.id
+        state.fields.toWalletId = output.wallets.first { $0.id != state.fields.walletId }?.id
     }
 
     func suggestHolidayShift() {

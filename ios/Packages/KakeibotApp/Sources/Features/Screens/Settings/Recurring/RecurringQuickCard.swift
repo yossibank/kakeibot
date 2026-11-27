@@ -53,7 +53,7 @@ private extension RecurringQuickCard {
     var categoryGrid: some View {
         SettingsPagedGrid(
             items: model.output.categories,
-            selected: model.state.categoryId,
+            selected: model.state.fields.categoryId,
             columns: 5,
             rows: 2,
             spacing: 4
@@ -61,7 +61,7 @@ private extension RecurringQuickCard {
             SettingsCategoryTile(
                 category: category,
                 icon: model.output.icon(for: category),
-                isSelected: model.state.categoryId == category.id
+                isSelected: model.state.fields.categoryId == category.id
             ) {
                 model.select(category: category.id)
             }
@@ -72,7 +72,7 @@ private extension RecurringQuickCard {
         VStack(alignment: .leading, spacing: 12) {
             SettingsPagedGrid(
                 items: model.output.wallets,
-                selected: model.state.walletId,
+                selected: model.state.fields.walletId,
                 columns: 2,
                 rows: 3,
                 spacing: 8
@@ -80,7 +80,7 @@ private extension RecurringQuickCard {
                 SettingsWalletTile(
                     wallet: wallet,
                     icon: model.output.icon(for: wallet),
-                    isSelected: model.state.walletId == wallet.id
+                    isSelected: model.state.fields.walletId == wallet.id
                 ) {
                     model.state.setWallet(wallet.id)
                 }
@@ -98,7 +98,7 @@ private extension RecurringQuickCard {
     var destinationGrid: some View {
         SettingsPagedGrid(
             items: model.output.wallets,
-            selected: model.state.toWalletId,
+            selected: model.state.fields.toWalletId,
             columns: 2,
             rows: 3,
             spacing: 8
@@ -106,7 +106,7 @@ private extension RecurringQuickCard {
             SettingsWalletTile(
                 wallet: wallet,
                 icon: model.output.icon(for: wallet),
-                isSelected: model.state.toWalletId == wallet.id
+                isSelected: model.state.fields.toWalletId == wallet.id
             ) {
                 model.state.selectDestination(wallet.id)
             }
