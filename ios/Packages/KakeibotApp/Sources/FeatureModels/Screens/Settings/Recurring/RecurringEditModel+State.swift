@@ -41,6 +41,9 @@ public extension RecurringEditModel {
         public var memo = ""
         public var billShift = 0
         public var schedule: Schedule
+        public var walletId: Wallet.ID?
+        public var categoryId: EntryCategory.ID?
+        public var toWalletId: Wallet.ID?
     }
 
     struct Presented: ScreenEditable {
@@ -69,12 +72,7 @@ public extension RecurringEditModel {
 
         public internal(set) var repayment = Repayment()
         public internal(set) var submodels = Submodels()
-
-        public private(set) var walletId: Wallet.ID?
-
         public internal(set) var type: Entry.Kind
-        public internal(set) var categoryId: EntryCategory.ID?
-        public internal(set) var toWalletId: Wallet.ID?
 
         public let notices: Notices
 
@@ -146,16 +144,16 @@ public extension RecurringEditModel.State {
     }
 
     func setWallet(_ id: Wallet.ID?) {
-        guard id != walletId else {
+        guard id != fields.walletId else {
             return
         }
 
-        walletId = id
+        fields.walletId = id
         fields.billShift = 0
     }
 
     func selectDestination(_ id: Wallet.ID) {
-        toWalletId = id
+        fields.toWalletId = id
     }
 
     func press(_ key: AmountCalculator.Key) {
@@ -175,9 +173,9 @@ extension RecurringEditModel.State {
     func apply(_ draft: RecurringDraft) {
         type = draft.type
         submodels.amount = AmountCalculator(amount: draft.amount)
-        categoryId = draft.categoryId
-        walletId = draft.walletId
-        toWalletId = draft.toWalletId
+        fields.categoryId = draft.categoryId
+        fields.walletId = draft.walletId
+        fields.toWalletId = draft.toWalletId
         fields.memo = draft.memo
         fields.schedule.frequency = draft.frequency
         fields.schedule.month = draft.month

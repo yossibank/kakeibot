@@ -105,13 +105,13 @@ public extension RecurringEditModel {
         }
 
         state.type = type
-        state.categoryId = output.categories.first?.id
+        state.fields.categoryId = output.categories.first?.id
         presetDestination()
         suggestHolidayShift()
     }
 
     func select(category id: EntryCategory.ID) {
-        state.categoryId = id
+        state.fields.categoryId = id
         suggestHolidayShift()
     }
 

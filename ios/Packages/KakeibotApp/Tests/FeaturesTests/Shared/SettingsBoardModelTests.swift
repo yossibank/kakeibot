@@ -25,11 +25,11 @@ struct SettingsBoardModelTests {
         let board = FakeBoard(visible: ["a", "b", "c"])
 
         board.move("b", to: 1)
-        let samePlace = board.state.movingOrder
+        let samePlace = board.state.fields.movingOrder
         board.move("x", to: 0)
 
         #expect(samePlace == nil)
-        #expect(board.state.movingOrder == nil)
+        #expect(board.state.fields.movingOrder == nil)
     }
 
     @Test
@@ -148,7 +148,7 @@ struct SettingsBoardModelTests {
         #expect(result.note(for: result.deletion) == nil)
         #expect(board.removed == ["x", "y"])
         #expect(board.reloadCount == 1)
-        #expect(board.state.movingOrder == nil)
+        #expect(board.state.fields.movingOrder == nil)
         #expect(board.state.notices.error.message == nil)
     }
 

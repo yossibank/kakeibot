@@ -278,7 +278,7 @@ private fun RecurringContent(
         RecurringBoard(
             model = model,
             lift = lift,
-            openId = model.state.openId,
+            openId = model.state.presented.row.current,
             actions = actions,
         )
 

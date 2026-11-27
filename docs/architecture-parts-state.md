@@ -55,6 +55,18 @@
 
 `errorNotice` の共通の読み口は残し、`notices.error` を返す。
 
+### 選んでいる物は fields に置く
+
+ID の型（`…ID`・`Identifier<…>`）も裸の値として扱う。その Optional・配列・Set も含む。
+
+| 値の種類 | 例 | 行き先 |
+| --- | --- | --- |
+| 画面で選ぶ物 | 口座・カテゴリ・タグ・並べ替え中の並び | `fields`（`fields.walletId`・`fields.movingOrder`） |
+| 表示中の行 | 横に払って開いた行 | `presented`（iOS は `presented.openId`、Android は `presented.row`） |
+| モデルだけが決める物 | 共有を操作中の口座 | 意味の名前の値の型（`WalletWork`） |
+
+設定の一覧の `fields` は、iOS では `SettingsBoardFields` に適合させる。
+
 ## 🪝 タブとメインの値の型
 
 | モデル | 値の型 | 中身 |
@@ -71,5 +83,6 @@
 | App | `Reveal` | 起動の幕と、輪を回し終えたか、ホームを読み終えたか。iOS だけ |
 | WalletEdit | `BalanceSign` | 初めの残高の正負。種類を変えた時は、`follow` で新しい種類の向きに合わせる（iOS だけ） |
 | Sync | `SwitchRequest` | 同期のスイッチを押してから、切り替え終わるまでの向き。`ask`・`clear`。iOS だけ |
+| Sync | `WalletWork` | 共有を操作中の口座。`begin`・`end`・`isWorking(on:)`。iOS だけ |
 
 Main の知らせを隠す回は、`notices.round` に置く。

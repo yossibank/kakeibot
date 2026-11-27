@@ -30,8 +30,8 @@ public struct TemplateEditSheet: View {
     public var body: some View {
         FloatingInputReader { _ in
             layeredContent
-                .haptic(.selection, trigger: model.state.categoryId)
-                .haptic(.selection, trigger: model.state.walletId)
+                .haptic(.selection, trigger: model.state.fields.categoryId)
+                .haptic(.selection, trigger: model.state.fields.walletId)
                 .editSheet(
                     model.flow,
                     deleting: "このテンプレートを削除しますか",

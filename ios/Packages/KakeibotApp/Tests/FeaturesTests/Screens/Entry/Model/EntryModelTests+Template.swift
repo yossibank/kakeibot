@@ -173,7 +173,7 @@ extension EntryModelTests {
 
         #expect(editor.output.amount == 450)
         #expect(editor.state.fields.memo == "カフェ")
-        #expect(editor.state.categoryId == model.state.category.id)
+        #expect(editor.state.fields.categoryId == model.state.category.id)
         #expect(editor.state.fields.name.isEmpty)
     }
 }

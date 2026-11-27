@@ -6,7 +6,7 @@ public extension RecurringEditModel.Output {
     var loanOwed: Int? {
         guard
             isLoanRepayment,
-            let id = state.toWalletId,
+            let id = state.fields.toWalletId,
             let balance = input.loanBalances[id],
             balance < 0
         else {
@@ -93,8 +93,8 @@ extension RecurringEditModel.Output {
             type: state.type,
             amount: amount,
             categoryId: nil,
-            walletId: state.walletId ?? Wallet.ID(),
-            toWalletId: state.toWalletId,
+            walletId: state.fields.walletId ?? Wallet.ID(),
+            toWalletId: state.fields.toWalletId,
             frequency: schedule.frequency,
             month: schedule.frequency == .yearly ? schedule.month : nil,
             day: schedule.day,

@@ -35,16 +35,16 @@ public extension TemplateEditModel.Output {
             name: state.fields.name,
             type: state.type,
             amount: amount,
-            categoryId: state.categoryId,
-            tagId: state.tagId,
-            walletId: state.walletId,
+            categoryId: state.fields.categoryId,
+            tagId: state.fields.tagId,
+            walletId: state.fields.walletId,
             memo: state.fields.memo,
             billShift: billRecurring == nil ? 0 : state.fields.billShift
         )
     }
 
     var billRecurring: Recurring? {
-        input.cardBills.cardBill(paidBy: state.walletId)
+        input.cardBills.cardBill(paidBy: state.fields.walletId)
     }
 
     var categories: [EntryCategory] {
@@ -56,19 +56,19 @@ public extension TemplateEditModel.Output {
     }
 
     var selectedCategory: EntryCategory? {
-        categories.first { $0.id == state.categoryId }
+        categories.first { $0.id == state.fields.categoryId }
     }
 
     var selectedWallet: Wallet? {
-        wallets.first { $0.id == state.walletId }
+        wallets.first { $0.id == state.fields.walletId }
     }
 
     var tags: [EntryTag] {
-        input.options?.tags(of: state.categoryId, keeping: state.tagId) ?? []
+        input.options?.tags(of: state.fields.categoryId, keeping: state.fields.tagId) ?? []
     }
 
     var selectedTag: EntryTag? {
-        tags.first { $0.id == state.tagId }
+        tags.first { $0.id == state.fields.tagId }
     }
 
     func icon(for category: EntryCategory) -> Icon? {

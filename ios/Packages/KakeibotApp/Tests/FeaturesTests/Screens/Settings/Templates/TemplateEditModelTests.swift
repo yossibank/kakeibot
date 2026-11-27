@@ -74,7 +74,7 @@ struct TemplateEditModelTests {
         #expect(refusal == "名前を入れてください")
         #expect(saved?.amount == 980)
         #expect(templates.map(\.name) == ["ランチ"])
-        #expect(templates.first?.categoryId == model.state.categoryId)
+        #expect(templates.first?.categoryId == model.state.fields.categoryId)
     }
 
     @Test

@@ -34,7 +34,7 @@ extension SyncModelTests {
         #expect(await cloud.shareCalls == ["create", "show"])
         #expect(shared.isShared)
         #expect(model.output.invitation == nil)
-        #expect(model.state.workingWallet == nil)
+        #expect(model.state.walletWork.wallet == nil)
         #expect(model.state.notices.error.message == nil)
     }
 
@@ -111,7 +111,7 @@ extension SyncModelTests {
 
         #expect(await cloud.shareCalls == ["delete"])
         #expect(after.isShared == false)
-        #expect(model.state.workingWallet == nil)
+        #expect(model.state.walletWork.wallet == nil)
     }
 
     @Test
@@ -154,7 +154,7 @@ extension SyncModelTests {
         let after = try await firstShare(in: setup.database)
 
         #expect(after.isShared == false)
-        #expect(model.state.workingWallet == nil)
+        #expect(model.state.walletWork.wallet == nil)
         #expect(model.state.notices.error.message == "共有を開けませんでした。時間をおいて試してください")
     }
 
@@ -242,7 +242,7 @@ extension SyncModelTests {
 
         #expect(await cloud.shareCalls.isEmpty)
         #expect(after.isShared == false)
-        #expect(model.state.workingWallet == nil)
+        #expect(model.state.walletWork.wallet == nil)
     }
 
     @Test

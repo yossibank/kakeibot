@@ -90,7 +90,7 @@ struct SettingsBoardScreen<
         .errorBanner(errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
-        .settingsBoardHaptics(drag, movingOrder: model.state.movingOrder)
+        .settingsBoardHaptics(drag, movingOrder: model.state.fields.movingOrder)
     }
 }
 

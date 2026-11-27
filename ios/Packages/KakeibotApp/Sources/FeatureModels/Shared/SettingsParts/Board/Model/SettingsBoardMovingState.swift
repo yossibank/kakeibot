@@ -4,9 +4,8 @@ import Observation
 @MainActor
 @Observable
 public final class SettingsBoardMovingState<ID: Hashable & Sendable>: SettingsBoardState {
+    public var fields = Fields()
     public var presented = SettingsBoardShown<ID, SettingsBoardDestination<ID>>()
-
-    public private(set) var movingOrder: [ID]?
 
     public let notices: SettingsBoardNotices<ID>
 
@@ -16,7 +15,7 @@ public final class SettingsBoardMovingState<ID: Hashable & Sendable>: SettingsBo
 }
 
 public extension SettingsBoardMovingState {
-    func setMovingOrder(_ order: [ID]?) {
-        movingOrder = order
+    struct Fields: SettingsBoardFields {
+        public var movingOrder: [ID]?
     }
 }

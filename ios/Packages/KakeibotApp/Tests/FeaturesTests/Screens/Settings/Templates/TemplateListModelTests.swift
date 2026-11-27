@@ -62,6 +62,6 @@ struct TemplateListModelTests {
         #expect(moving == ["定期", "ランチ"])
         #expect(stored.map(\.name) == ["定期", "ランチ", "給料"])
         #expect(income == ["給料"])
-        #expect(model.state.movingOrder == nil)
+        #expect(model.state.fields.movingOrder == nil)
     }
 }

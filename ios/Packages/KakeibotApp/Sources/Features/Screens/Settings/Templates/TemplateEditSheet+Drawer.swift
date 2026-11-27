@@ -30,7 +30,7 @@ private extension TemplateEditSheet {
     var tagChooser: some View {
         TagLine(
             tagItems,
-            selection: model.state.tagId,
+            selection: model.state.fields.tagId,
             onSelect: { id in
                 model.state.toggleTag(id)
             },

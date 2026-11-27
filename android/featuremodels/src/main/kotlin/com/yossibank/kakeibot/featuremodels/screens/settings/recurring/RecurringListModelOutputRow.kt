@@ -23,7 +23,7 @@ val RecurringListModel.Output.hiddenRows: List<RecurringRow>
 
 private val RecurringListModel.Output.shown: List<Recurring>
     get() {
-        val order = state.movingOrder ?: return visible
+        val order = state.fields.movingOrder ?: return visible
         val byId = visible.associateBy { it.id }
         return order.mapNotNull { byId[it] }
     }

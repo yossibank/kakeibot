@@ -23,7 +23,7 @@ public extension SettingsBoardOutput {
     var shown: [Item] {
         let visible = visible
 
-        guard let movingOrder = state.movingOrder else {
+        guard let movingOrder = state.fields.movingOrder else {
             return visible
         }
 

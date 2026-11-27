@@ -108,7 +108,7 @@ private extension SyncView {
             } label: {
                 shareLabel(
                     isShared: item.isShared,
-                    isWorking: model.state.workingWallet == item.wallet.id
+                    isWorking: model.state.walletWork.isWorking(on: item.wallet.id)
                 )
             }
             .buttonStyle(.plain)
@@ -176,7 +176,7 @@ private extension SyncView {
                     systemImage: nil,
                     color: Palette.rose,
                     isFilled: false,
-                    isWorking: model.state.workingWallet == item.wallet.id
+                    isWorking: model.state.walletWork.isWorking(on: item.wallet.id)
                 )
             }
             .buttonStyle(.plain)

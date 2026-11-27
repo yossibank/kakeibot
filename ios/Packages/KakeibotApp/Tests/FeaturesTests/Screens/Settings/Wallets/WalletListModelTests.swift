@@ -21,7 +21,7 @@ struct WalletListModelTests {
         let options = try await database.entryOptions()
 
         #expect(moving == ["銀行", "財布"])
-        #expect(model.state.movingOrder == nil)
+        #expect(model.state.fields.movingOrder == nil)
         #expect(options.wallets.map(\.name) == ["銀行", "財布"])
     }
 
@@ -119,7 +119,7 @@ struct WalletListModelTests {
 
         #expect(shown == ["財布"])
         #expect(hidden == ["銀行"])
-        #expect(model.state.movingOrder == nil)
+        #expect(model.state.fields.movingOrder == nil)
         #expect(model.output.shown.map(\.name) == ["財布"])
         #expect(model.state.notices.error.message == "最後の 1 つの口座は非表示にできません")
     }

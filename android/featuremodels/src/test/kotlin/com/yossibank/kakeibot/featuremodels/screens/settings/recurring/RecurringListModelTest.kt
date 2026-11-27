@@ -95,7 +95,7 @@ class RecurringListModelTest {
         ModelWait.until { model.output.visible.first().id == second }
 
         assertEquals(listOf("サブスク", "家賃"), moving)
-        assertNull(model.state.movingOrder)
+        assertNull(model.state.fields.movingOrder)
         assertEquals(listOf("サブスク", "家賃"), setup.database.recurrings().map { it.memo })
     }
 
@@ -212,7 +212,7 @@ class RecurringListModelTest {
         assertEquals("表示に戻せませんでした", showing)
         assertEquals("削除できませんでした", deleting)
         assertEquals("並びを保存できませんでした", moving)
-        assertNull(model.state.movingOrder)
+        assertNull(model.state.fields.movingOrder)
     }
 
     @Test
@@ -222,11 +222,11 @@ class RecurringListModelTest {
         val model = setup.observedModel(count = 2)
 
         model.move(id = model.output.rows[1].id, to = 1)
-        val samePlace = model.state.movingOrder
+        val samePlace = model.state.fields.movingOrder
         model.move(id = Identifier(), to = 0)
 
         assertNull(samePlace)
-        assertNull(model.state.movingOrder)
+        assertNull(model.state.fields.movingOrder)
     }
 
     @Test
@@ -238,11 +238,11 @@ class RecurringListModelTest {
         val ids = model.output.visible.map { it.id }
 
         model.move(id = ids[2], to = -5)
-        val toStart = model.state.movingOrder
+        val toStart = model.state.fields.movingOrder
         model.move(id = ids[2], to = 99)
 
         assertEquals(listOf(ids[2], ids[0], ids[1]), toStart)
-        assertEquals(ids, model.state.movingOrder)
+        assertEquals(ids, model.state.fields.movingOrder)
     }
 
     @Test
@@ -275,7 +275,7 @@ class RecurringListModelTest {
 
         assertEquals(Editing.Existing(editing), model.state.presented.editing.current)
         assertEquals(editing, (model.state.presented.editing.current as? Editing.Existing)?.id)
-        assertEquals(open, model.state.openId)
+        assertEquals(open, model.state.presented.row.current)
         assertNull(model.state.presented.deleting.current)
     }
 
