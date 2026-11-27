@@ -31,7 +31,7 @@ struct StampListModelTests {
         await model.finishMoving()
         let shelf = try await database.shelfIconList()
 
-        #expect(model.state.movingOrder == nil)
+        #expect(model.state.fields.movingOrder == nil)
         #expect(shelf.shelfIcons[2].id == first.id)
     }
 

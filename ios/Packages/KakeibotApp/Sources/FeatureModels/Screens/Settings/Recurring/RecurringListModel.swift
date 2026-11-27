@@ -32,8 +32,9 @@ public extension RecurringListModel {
         case edit(Entry.Kind, Recurring.ID)
     }
 
-    struct Fields: ScreenEditable {
+    struct Fields: SettingsBoardFields {
         public var type: Entry.Kind = .expense
+        public var movingOrder: [Recurring.ID]?
     }
 
     typealias Presented = SettingsBoardShown<Recurring.ID, Destination>
@@ -45,8 +46,6 @@ public extension RecurringListModel {
     final class State: SettingsBoardState {
         public var fields = Fields()
         public var presented = Presented()
-
-        public private(set) var movingOrder: [Recurring.ID]?
 
         public let notices: Notices
 
@@ -95,12 +94,6 @@ public extension RecurringListModel {
                 )
             }
         ])
-    }
-}
-
-public extension RecurringListModel.State {
-    func setMovingOrder(_ order: [Recurring.ID]?) {
-        movingOrder = order
     }
 }
 

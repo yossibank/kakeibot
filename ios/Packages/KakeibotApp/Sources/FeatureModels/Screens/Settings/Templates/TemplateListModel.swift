@@ -29,8 +29,9 @@ public extension TemplateListModel {
         case edit(Entry.Kind, EntryTemplate.ID)
     }
 
-    struct Fields: ScreenEditable {
+    struct Fields: SettingsBoardFields {
         public var type: Entry.Kind = .expense
+        public var movingOrder: [EntryTemplate.ID]?
     }
 
     typealias Presented = SettingsBoardShown<EntryTemplate.ID, Destination>
@@ -42,8 +43,6 @@ public extension TemplateListModel {
     final class State: SettingsBoardState {
         public var fields = Fields()
         public var presented = Presented()
-
-        public private(set) var movingOrder: [EntryTemplate.ID]?
 
         public let notices: Notices
 
@@ -115,12 +114,6 @@ public extension TemplateListModel.Output {
 
     func detail(for template: EntryTemplate) -> String {
         input.list?.detail(for: template) ?? ""
-    }
-}
-
-public extension TemplateListModel.State {
-    func setMovingOrder(_ order: [EntryTemplate.ID]?) {
-        movingOrder = order
     }
 }
 

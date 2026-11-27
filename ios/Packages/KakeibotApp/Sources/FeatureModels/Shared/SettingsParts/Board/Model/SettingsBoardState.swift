@@ -5,14 +5,17 @@ public protocol SettingsBoardState: NoticesHolding, Observable
     where Notices == SettingsBoardNotices<ID> {
     associatedtype ID: Hashable & Sendable
     associatedtype Destination: Hashable & Sendable
+    associatedtype Fields: SettingsBoardFields where Fields.ID == ID
 
-    var movingOrder: [ID]? { get }
+    var fields: Fields { get set }
     var presented: SettingsBoardShown<ID, Destination> { get set }
-
-    func setMovingOrder(_ order: [ID]?)
 }
 
 public extension SettingsBoardState {
+    func setMovingOrder(_ order: [ID]?) {
+        fields.movingOrder = order
+    }
+
     func open(_ destination: Destination) {
         if presented.destination != destination {
             presented.destination = destination

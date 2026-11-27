@@ -32,8 +32,9 @@ public extension CategoryListModel {
         case edit(EntryCategory.Kind, EntryCategory.ID)
     }
 
-    struct Fields: ScreenEditable {
+    struct Fields: SettingsBoardFields {
         public var kind: EntryCategory.Kind
+        public var movingOrder: [EntryCategory.ID]?
     }
 
     typealias Presented = SettingsBoardShown<EntryCategory.ID, Destination>
@@ -45,8 +46,6 @@ public extension CategoryListModel {
     final class State: SettingsBoardState {
         public var fields: Fields
         public var presented = Presented()
-
-        public private(set) var movingOrder: [EntryCategory.ID]?
 
         public let notices: Notices
 
@@ -83,12 +82,6 @@ public extension CategoryListModel.Output {
 
     func icon(for category: EntryCategory) -> Icon? {
         input.snapshot?.icons[category.iconId]
-    }
-}
-
-public extension CategoryListModel.State {
-    func setMovingOrder(_ order: [EntryCategory.ID]?) {
-        movingOrder = order
     }
 }
 

@@ -47,7 +47,7 @@ public extension SettingsBoardModel {
         _ id: Item.ID,
         to index: Int
     ) {
-        var order = state.movingOrder ?? output.shown.map(\.id)
+        var order = state.fields.movingOrder ?? output.shown.map(\.id)
 
         guard let from = order.firstIndex(of: id) else {
             return
@@ -69,7 +69,7 @@ public extension SettingsBoardModel {
     }
 
     func finishMoving() async {
-        guard let movingOrder = state.movingOrder else {
+        guard let movingOrder = state.fields.movingOrder else {
             return
         }
 

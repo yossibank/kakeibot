@@ -43,7 +43,7 @@ struct CategoryListModelTests {
 
         #expect(Array(moving.prefix(3)) == ["日用品", "交通", "食費"])
         #expect(saved == moving)
-        #expect(model.state.movingOrder == nil)
+        #expect(model.state.fields.movingOrder == nil)
     }
 
     @Test
@@ -58,7 +58,7 @@ struct CategoryListModelTests {
 
         #expect(model.output.hidden.map(\.name) == ["食費"])
         #expect(model.output.shown.first?.name == "日用品")
-        #expect(model.state.movingOrder == nil)
+        #expect(model.state.fields.movingOrder == nil)
     }
 
     @Test

@@ -51,7 +51,7 @@ extension RecurringListModelTests {
         #expect(showing == "表示に戻せませんでした")
         #expect(deleting == "削除できませんでした")
         #expect(moving == "並びを保存できませんでした")
-        #expect(model.state.movingOrder == nil)
+        #expect(model.state.fields.movingOrder == nil)
     }
 }
 
