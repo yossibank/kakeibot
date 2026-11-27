@@ -234,12 +234,7 @@ private extension EntrySheet {
             }
             .haptic(.impact(weight: .light), trigger: voice.state.startCount)
             .haptic(.impact(weight: .light), trigger: voice.state.endCount)
-            .errorBanner(
-                model.state.errorNotice,
-                bottom: bannerBottom
-            ) {
-                model.state.errorNotice.clear()
-            }
+            .errorBanner(model.state.errorNotice, bottom: bannerBottom)
             .deletionNotice(
                 model.state.results.deletion,
                 bottom: bannerBottom

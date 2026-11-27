@@ -11,11 +11,13 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import com.yossibank.kakeibot.featuremodels.shared.notice.EntryChange
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -42,7 +44,7 @@ class EntryModel(
     editing: Identifier<Entry>? = null,
     date: LocalDate = today,
 ) : ScreenPerforming {
-    val state = State(today, date)
+    val state = State(today, date, parts.wait)
     val input = Input(editing)
     val output = Output(input, state)
 
@@ -81,8 +83,10 @@ class EntryModel(
     class State(
         today: LocalDate,
         date: LocalDate,
+        wait: ScreenWait,
     ) {
-        val task = ModelTask()
+        val errorNotice = ErrorNotice(wait)
+        val task = ModelTask(errorNotice)
         val outcome = ScreenOutcome<Outcome>()
         val presented = Shown<Presented>()
 
@@ -356,7 +360,7 @@ class EntryModel(
         val problem = draft.problems.firstOrNull()
 
         if (problem != null) {
-            state.task.show(output.message(of = problem))
+            state.errorNotice.show(output.message(of = problem))
             return null
         }
 

@@ -21,7 +21,13 @@ public final class RecurringEditModel: ScreenPerforming {
         editing id: Recurring.ID? = nil,
         paying wallet: Wallet.ID? = nil
     ) {
-        let state = State(type: type, today: today, isScheduleOpen: id == nil)
+        let state = State(
+            type: type,
+            today: today,
+            isScheduleOpen: id == nil,
+            wait: parts.wait
+        )
+
         let input = Input(today: today, editingId: id, paidWallet: wallet)
 
         let output = Output(input: input, state: state)

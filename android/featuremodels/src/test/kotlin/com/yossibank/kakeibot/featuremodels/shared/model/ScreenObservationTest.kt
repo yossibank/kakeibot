@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.shared.model
 
+import com.yossibank.kakeibot.featuremodels.support.ManualWait
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 class ScreenObservationTest {
     @Test
     fun resubscribesAfterFailure() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
         val counter = Counter()
         val received = mutableListOf<Int>()
 
@@ -33,13 +34,13 @@ class ScreenObservationTest {
         assertFalse(isFailed)
         assertEquals(3, counter.attempts)
         assertEquals(listOf(1), received)
-        assertEquals("", task.message)
+        assertEquals("", task.notice.message)
         assertEquals(3000L, currentTime)
     }
 
     @Test
     fun stopsAtLimitWithNotice() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
         val counter = Counter()
 
         val isFailed = task.observe(
@@ -49,13 +50,13 @@ class ScreenObservationTest {
 
         assertTrue(isFailed)
         assertEquals(4, counter.attempts)
-        assertEquals("失敗", task.message)
+        assertEquals("失敗", task.notice.message)
         assertEquals(7000L, currentTime)
     }
 
     @Test
     fun succeedsOnLastRetry() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
         val counter = Counter()
 
         val isFailed = task.observe(
@@ -65,12 +66,12 @@ class ScreenObservationTest {
 
         assertFalse(isFailed)
         assertEquals(4, counter.attempts)
-        assertEquals("", task.message)
+        assertEquals("", task.notice.message)
     }
 
     @Test
     fun marksFailureUntilObservedAgain() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
         val counter = Counter()
         val holder = Holder()
 
@@ -90,25 +91,25 @@ class ScreenObservationTest {
 
         assertTrue(failed)
         assertEquals(Loadable.Loaded(1), holder.value)
-        assertEquals("読めませんでした", task.message)
+        assertEquals("読めませんでした", task.notice.message)
     }
 
     @Test
     fun countsEachNoticeAndKeepsItAfterSuccess() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
 
         task.attempt(failure = "失敗") { throw IOException("failing for tests") }
-        val first = task.count
+        val first = task.notice.count
         task.attempt(failure = "失敗") { 1 }
-        val kept = task.message
-        task.show("失敗")
-        val second = task.count
-        task.clear()
+        val kept = task.notice.message
+        task.notice.show("失敗")
+        val second = task.notice.count
+        task.notice.clear()
 
         assertEquals(1, first)
         assertEquals("失敗", kept)
         assertEquals(2, second)
-        assertEquals("", task.message)
+        assertEquals("", task.notice.message)
     }
 
     @Test
@@ -128,7 +129,7 @@ class ScreenObservationTest {
 
     @Test
     fun stopsWhenCancelled() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
         val counter = Counter()
 
         val job = launch {
@@ -144,20 +145,20 @@ class ScreenObservationTest {
         job.join()
 
         assertEquals(1, counter.attempts)
-        assertEquals("", task.message)
+        assertEquals("", task.notice.message)
     }
 
     @Test
     fun keepsEarlierMessageWhileObserving() = runTest {
-        val task = ModelTask()
-        task.show("保存できませんでした")
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
+        task.notice.show("保存できませんでした")
 
         task.observe(
             values = values(Counter(), failures = 0),
             failure = "失敗",
         ) {}
 
-        assertEquals("保存できませんでした", task.message)
+        assertEquals("保存できませんでした", task.notice.message)
     }
 
     @Test
@@ -181,8 +182,8 @@ class ScreenObservationTest {
     @Test
     fun sharesFailureWithEachSubscriber() = runTest {
         val counter = Counter()
-        val first = ModelTask()
-        val second = ModelTask()
+        val first = ModelTask(ErrorNotice(ManualWait().wait))
+        val second = ModelTask(ErrorNotice(ManualWait().wait))
 
         val shared = ScreenObservation.share(
             values = values(counter, failures = 100),
@@ -195,8 +196,8 @@ class ScreenObservationTest {
         other.join()
 
         assertTrue(isFailed)
-        assertEquals("失敗", first.message)
-        assertEquals("失敗", second.message)
+        assertEquals("失敗", first.notice.message)
+        assertEquals("失敗", second.notice.message)
         assertTrue(counter.attempts > 1)
     }
 

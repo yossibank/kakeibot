@@ -12,7 +12,7 @@ import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.theme.FontTextStyle
 import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 
 @Composable
 fun NoticeBanner(
@@ -32,15 +32,15 @@ fun NoticeBanner(
     )
 }
 
-fun LazyListScope.noticeBanner(task: ModelTask) {
-    if (task.message.isEmpty()) {
+fun LazyListScope.noticeBanner(notice: ErrorNotice) {
+    if (notice.message.isEmpty()) {
         return
     }
 
     item(key = "notice") {
         NoticeBanner(
-            message = task.message,
-            onClose = task::clear,
+            message = notice.message,
+            onClose = notice::clear,
         )
     }
 }

@@ -115,7 +115,7 @@ KakeibotApp/
 | `Features/Shared/DateChoice/` | 月の始まりの日を選ぶ部品 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |
 | `Features/Shared/Model/` | モデルが `state` に置いた結果の変化を、画面が受ける modifier と、タブの外枠（`tabScreen`） |
-| `Features/Shared/Notice/` | 記録・削除の知らせの帯と、取り消しの知らせ（`undoNotice`）。ファイルの頭は、元の型ごとに分かれる |
+| `Features/Shared/Notice/` | 記録・削除の知らせの帯と、取り消しの知らせ（`undoNotice`）とエラーの知らせ（`errorBanner`）。ファイルの頭は、元の型ごとに分かれる |
 | `Features/Shared/Notification/` | 通知の許可が無い時の帯と、許可の窓口を画面に渡す値 |
 | `Features/Shared/Period/` | 期間のカード、期間を送る行と今に戻るボタン |
 | `Features/Shared/Placeholder/` | タブで記録が無い時と読み込めない時の表示。設定の一覧が空なら `SettingsParts/Hint/` の `SettingsEmptyNote` を使う |

@@ -7,7 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class SettingsMenuResetModel: ScreenPerforming {
-    public let state = State()
+    public let state: State
     public let input: Input
     public let output: Output
 
@@ -16,6 +16,7 @@ public final class SettingsMenuResetModel: ScreenPerforming {
     public init(parts: ScreenParts) {
         let input = Input()
 
+        self.state = State(wait: parts.wait)
         self.input = input
         self.output = Output(input: input)
         self.dependencies = parts
@@ -30,10 +31,14 @@ public extension SettingsMenuResetModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var prompt = Shown<Prompt>()
 
+        public let errorNotice: ErrorNotice
         public let task = ModelTask()
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

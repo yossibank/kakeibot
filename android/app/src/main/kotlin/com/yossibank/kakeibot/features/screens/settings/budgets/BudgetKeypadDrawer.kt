@@ -94,10 +94,10 @@ private fun ColumnScope.Drawer(model: BudgetListModel) {
         keyHeight = Metrics.keyHeight,
     )
 
-    if (model.state.task.message.isNotEmpty()) {
+    if (model.state.errorNotice.message.isNotEmpty()) {
         Text(
-            text = model.state.task.message,
-            modifier = Modifier.clickable(onClick = model.state.task::clear),
+            text = model.state.errorNotice.message,
+            modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
             color = Palette.rose,
             style = textFont(style = FontTextStyle.Caption),
         )

@@ -309,9 +309,9 @@ class BudgetListModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
 
-        assertEquals("予算を読めませんでした", model.state.task.message)
+        assertEquals("予算を読めませんでした", model.state.errorNotice.message)
         assertNull(model.input.overview)
     }
 
@@ -323,10 +323,10 @@ class BudgetListModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
         model.startEditing(Target.Total)
 
-        assertEquals("予算を読めませんでした", model.state.task.message)
+        assertEquals("予算を読めませんでした", model.state.errorNotice.message)
     }
 
     private fun BudgetListModel.press(vararg digits: Int) {

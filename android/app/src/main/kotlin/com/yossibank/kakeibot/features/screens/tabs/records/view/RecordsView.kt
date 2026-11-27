@@ -71,7 +71,7 @@ fun RecordsView(
             )
         }
 
-        noticeBanner(task = model.state.task)
+        noticeBanner(notice = model.state.errorNotice)
 
         item(key = "month") {
             PeriodStepper(

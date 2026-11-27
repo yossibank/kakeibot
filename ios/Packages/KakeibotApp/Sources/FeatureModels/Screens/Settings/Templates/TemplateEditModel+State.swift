@@ -18,7 +18,6 @@ public extension TemplateEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var panel = Shown<Panel>()
         public var tagCategory = Shown<EntryCategory>()
         public var fields = Fields()
@@ -29,7 +28,13 @@ public extension TemplateEditModel {
         public private(set) var type: Entry.Kind
         public private(set) var calculator = AmountCalculator()
 
-        init(type: Entry.Kind) {
+        public let errorNotice: ErrorNotice
+
+        init(
+            type: Entry.Kind,
+            wait: ScreenWait
+        ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.type = type
         }
     }

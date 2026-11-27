@@ -77,7 +77,6 @@ fun RecurringListView(
         model.observe()
     }
 
-    model.state.task.Timer()
     BackHandler(onBack = onBack)
 
     val actions = RecurringRowActions(
@@ -195,13 +194,13 @@ private fun RecurringNotices(
             )
         }
 
-        if (model.state.task.message.isNotEmpty()) {
+        if (model.state.errorNotice.message.isNotEmpty()) {
             Text(
-                text = model.state.task.message,
+                text = model.state.errorNotice.message,
                 modifier = Modifier
                     .fillMaxWidth()
                     .card()
-                    .clickable(onClick = model.state.task::clear)
+                    .clickable(onClick = model.state.errorNotice::clear)
                     .padding(12.dp),
                 color = Palette.rose,
                 style = textFont(style = FontTextStyle.Caption),

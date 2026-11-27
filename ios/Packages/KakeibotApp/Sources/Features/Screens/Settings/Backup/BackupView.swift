@@ -22,7 +22,7 @@ public struct BackupView: View {
         .padding(.top, SettingsSpacing.top)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner(Bindable(model.state).errorNotice)
+        .errorBanner(model.state.errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .task {

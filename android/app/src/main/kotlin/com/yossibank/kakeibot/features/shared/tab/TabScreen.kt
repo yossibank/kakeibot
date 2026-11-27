@@ -38,8 +38,7 @@ fun TabScreen(
         model.observe()
     }
 
-    model.task.Timer()
-    TabNoticeRound(model.task)
+    TabNoticeRound(model.errorNotice)
 
     LoadFailedColumn(
         isFailed = model.isLoadFailed,

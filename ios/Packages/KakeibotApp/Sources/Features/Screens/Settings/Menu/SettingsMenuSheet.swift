@@ -58,8 +58,8 @@ public struct SettingsMenuSheet: View {
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
         }
-        .errorBanner(Bindable(weekStart.state).errorNotice)
-        .errorBanner(Bindable(recordReset.state).errorNotice)
+        .errorBanner(weekStart.state.errorNotice)
+        .errorBanner(recordReset.state.errorNotice)
         .confirmation(
             isPresented: Bindable(recordReset.state).prompt[.deleteAll],
             systemImage: "trash",

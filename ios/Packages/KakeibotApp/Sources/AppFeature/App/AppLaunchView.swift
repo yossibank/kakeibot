@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+import FeatureModels
 import SwiftUI
 
 struct AppLaunchView: View {
@@ -175,5 +176,5 @@ extension RingSweep {
 }
 
 #Preview {
-    AppLaunchView(state: AppModel.State(), palette: .night, isReady: true)
+    AppLaunchView(state: AppModel.State(wait: .system), palette: .night, isReady: true)
 }

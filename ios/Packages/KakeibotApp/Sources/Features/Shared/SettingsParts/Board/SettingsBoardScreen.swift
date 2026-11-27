@@ -20,7 +20,7 @@ struct SettingsBoardScreen<
     let hideMessage: String
     let liftScale: CGFloat
     let controller: SettingsBoardController<Model>
-    let errorNotice: Binding<ErrorNotice>
+    let errorNotice: ErrorNotice
     let onAdd: () -> Void
     let header: Header
     let board: Board
@@ -39,7 +39,7 @@ struct SettingsBoardScreen<
         hideMessage: String = "非表示にしました",
         liftScale: CGFloat,
         controller: SettingsBoardController<Model>,
-        errorNotice: Binding<ErrorNotice>,
+        errorNotice: ErrorNotice,
         onAdd: @escaping () -> Void,
         @ViewBuilder header: () -> Header,
         @ViewBuilder board: () -> Board,

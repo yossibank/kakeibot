@@ -78,7 +78,6 @@ public extension EntryModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var results: Results
         public var fields = Fields()
         public var presented = Shown<Presented>()
@@ -92,6 +91,7 @@ public extension EntryModel {
         public internal(set) var items = Items()
         public internal(set) var filled = Filled()
 
+        public let errorNotice: ErrorNotice
         public let task = ModelTask()
 
         init(
@@ -100,6 +100,7 @@ public extension EntryModel {
             today: LocalDate,
             wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.results = Results(wait: wait)
             self.type = type
             self.payment = Payment(date: date)

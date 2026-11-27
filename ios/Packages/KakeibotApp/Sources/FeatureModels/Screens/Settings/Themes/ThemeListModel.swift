@@ -29,7 +29,7 @@ public extension ThemeListModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
+        public let errorNotice: ErrorNotice
 
         public internal(set) var suggestedIcon: AppIconChoice?
         public internal(set) var presented: Presented?
@@ -38,6 +38,7 @@ public extension ThemeListModel {
         public let deletion: UndoNotice<Deletion>
 
         init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.deletion = UndoNotice(wait: wait)
         }
     }

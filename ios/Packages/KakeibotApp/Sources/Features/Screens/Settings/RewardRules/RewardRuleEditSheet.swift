@@ -48,7 +48,7 @@ public struct RewardRuleEditSheet: View {
                         focus = nil
                     }
             }
-            .errorBanner(Bindable(model.state).errorNotice)
+            .errorBanner(model.state.errorNotice)
             .editSheet(
                 model.flow,
                 deleting: deletion,

@@ -35,17 +35,18 @@ public extension CategoryListModel {
     @MainActor
     @Observable
     final class State: SettingsBoardState {
-        public var errorNotice = ErrorNotice()
         public var kind: EntryCategory.Kind
         public var movingOrder: [EntryCategory.ID]?
         public var shown = SettingsBoardShown<EntryCategory.ID, Destination>()
 
+        public let errorNotice: ErrorNotice
         public let removed: SettingsBoardRemoved<EntryCategory.ID>
 
         init(
             kind: EntryCategory.Kind,
             wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.kind = kind
             self.removed = SettingsBoardRemoved(wait: wait)
         }

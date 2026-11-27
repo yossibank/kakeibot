@@ -13,10 +13,12 @@ import com.yossibank.kakeibot.core.concepts.wallet.role
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.TabScreenModel
 import com.yossibank.kakeibot.store.queries.types.EntryList
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +28,7 @@ class AssetsModel(
     today: LocalDate,
     round: ObservationRound,
 ) : TabScreenModel {
-    val state = State()
+    val state = State(parts.wait)
     val input = Input(today)
     val output = Output(input)
 
@@ -40,8 +42,11 @@ class AssetsModel(
         val balance: Long,
     )
 
-    class State {
-        val task = ModelTask()
+    class State(
+        wait: ScreenWait,
+    ) {
+        val errorNotice = ErrorNotice(wait)
+        val task = ModelTask(errorNotice)
     }
 
     class Input(
@@ -122,8 +127,8 @@ class AssetsModel(
         val round: ObservationRound,
     )
 
-    override val task: ModelTask
-        get() = state.task
+    override val errorNotice: ErrorNotice
+        get() = state.errorNotice
 
     override val isLoadFailed: Boolean
         get() = input.list.isFailed

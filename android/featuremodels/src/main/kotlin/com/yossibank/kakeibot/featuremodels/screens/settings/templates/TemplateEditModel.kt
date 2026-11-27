@@ -16,10 +16,12 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.queries.methods.entryOptions
 import com.yossibank.kakeibot.store.queries.methods.recurrings
@@ -30,7 +32,7 @@ class TemplateEditModel(
     parts: ScreenParts,
     draft: EntryTemplateDraft,
 ) : ScreenPerforming {
-    val state = State(draft)
+    val state = State(draft, parts.wait)
     val input = Input()
     val output = Output(input, state)
     val flow = EditFlow(task = state.task, source = Source())
@@ -39,8 +41,10 @@ class TemplateEditModel(
 
     class State(
         draft: EntryTemplateDraft,
+        wait: ScreenWait,
     ) {
-        val task = ModelTask()
+        val errorNotice = ErrorNotice(wait)
+        val task = ModelTask(errorNotice)
 
         var form: EntryTemplateDraft by mutableStateOf(draft)
             private set

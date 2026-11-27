@@ -61,8 +61,6 @@ fun SettingsMenuSheet(
         model.observe()
     }
 
-    model.state.task.Timer()
-
     fun back() {
         when (screen) {
             Screen.Menu -> onClose()
@@ -118,10 +116,10 @@ private fun SettingsMenuFrame(
             }
         },
     ) {
-        if (model.state.task.message.isNotEmpty()) {
+        if (model.state.errorNotice.message.isNotEmpty()) {
             NoticeBanner(
-                message = model.state.task.message,
-                onClose = model.state.task::clear,
+                message = model.state.errorNotice.message,
+                onClose = model.state.errorNotice::clear,
             )
         }
 

@@ -16,7 +16,7 @@ public final class SettingsMenuValueModel<Value: Equatable & Sendable>: ScreenPe
         parts: ScreenParts,
         key: SettingKey<Value>
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(value: key.defaultValue)
 
         self.state = state
@@ -30,9 +30,13 @@ public extension SettingsMenuValueModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
+        public let errorNotice: ErrorNotice
 
         public internal(set) var chosen: Value?
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

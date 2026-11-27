@@ -176,7 +176,7 @@ class EditFlow<Saved : Any>(
         val problem = source.problem
 
         if (problem != null) {
-            state.task.show(problem)
+            state.task.notice.show(problem)
             return null
         }
 

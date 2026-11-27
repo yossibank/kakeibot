@@ -213,7 +213,7 @@ class EntryModelTransferTest {
         model.state.update { copy(toWalletId = walletId) }
 
         assertFalse(model.save())
-        assertEquals("振替元と振替先を別にしてください", model.state.task.message)
+        assertEquals("振替元と振替先を別にしてください", model.state.errorNotice.message)
     }
 
     @Test

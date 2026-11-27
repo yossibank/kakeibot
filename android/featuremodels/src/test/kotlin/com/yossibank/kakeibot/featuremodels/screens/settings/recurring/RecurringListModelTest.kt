@@ -185,9 +185,9 @@ class RecurringListModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
 
-        assertEquals("固定費を読めませんでした", model.state.task.message)
+        assertEquals("固定費を読めませんでした", model.state.errorNotice.message)
     }
 
     @Test
@@ -199,14 +199,14 @@ class RecurringListModelTest {
         setup.database.failWrites(to = "recurring")
 
         model.hide(rent.id)
-        val hiding = model.state.task.message
+        val hiding = model.state.errorNotice.message
         model.show(rent.id)
-        val showing = model.state.task.message
+        val showing = model.state.errorNotice.message
         model.delete(rent.id)
-        val deleting = model.state.task.message
+        val deleting = model.state.errorNotice.message
         model.move(id = second, to = 0)
         model.finishMoving()
-        val moving = model.state.task.message
+        val moving = model.state.errorNotice.message
 
         assertEquals("非表示にできませんでした", hiding)
         assertEquals("表示に戻せませんでした", showing)
@@ -293,7 +293,7 @@ class RecurringListModelTest {
         assertNotNull(shown)
         assertNull(deletion)
         assertNull(model.state.deleted.current)
-        assertEquals("削除できませんでした", model.state.task.message)
+        assertEquals("削除できませんでした", model.state.errorNotice.message)
     }
 
     @Test
@@ -331,7 +331,7 @@ class RecurringListModelTest {
         val deletion = model.deleteHidden()
 
         assertNotNull(deletion)
-        assertEquals("削除できないものがありました", model.state.task.message)
+        assertEquals("削除できないものがありました", model.state.errorNotice.message)
         assertEquals(
             listOf("家賃"),
             setup.database.recurrings(includingHidden = true).map { it.memo },

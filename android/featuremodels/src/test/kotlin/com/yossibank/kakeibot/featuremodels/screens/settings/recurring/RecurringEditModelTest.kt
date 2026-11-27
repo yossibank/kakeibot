@@ -183,7 +183,7 @@ class RecurringEditModelTest {
         val saved = model.flow.save()
 
         assertNull(saved)
-        assertEquals("振替元と振替先を別にしてください", model.state.task.message)
+        assertEquals("振替元と振替先を別にしてください", model.state.errorNotice.message)
         assertEquals("振替元と振替先を別にしてください", model.flow.output.saveTitle)
     }
 
@@ -195,7 +195,7 @@ class RecurringEditModelTest {
         val saved = model.flow.save()
 
         assertNull(saved)
-        assertEquals("金額を入れてください", model.state.task.message)
+        assertEquals("金額を入れてください", model.state.errorNotice.message)
         assertFalse(model.flow.output.canSave)
     }
 
@@ -242,7 +242,7 @@ class RecurringEditModelTest {
 
         model.load()
 
-        assertEquals("固定費を読めませんでした", model.state.task.message)
+        assertEquals("固定費を読めませんでした", model.state.errorNotice.message)
     }
 
     @Test

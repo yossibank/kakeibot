@@ -7,7 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class BackupModel {
-    public let state = State()
+    public let state: State
     public let input: Input
     public let output: Output
 
@@ -19,8 +19,10 @@ public final class BackupModel {
         appVersion: String = Bundle.main.shortVersion,
         permission: NotificationPermission = .allowed
     ) {
+        let state = State(wait: parts.wait)
         let input = Input()
 
+        self.state = state
         self.input = input
         self.output = Output(state: state)
 
@@ -38,7 +40,6 @@ public extension BackupModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var presented = Shown<Presented>()
 
         public internal(set) var file: BackupFile?
@@ -46,7 +47,12 @@ public extension BackupModel {
         public internal(set) var doneMessage: String?
         public internal(set) var pressed: Row?
 
+        public let errorNotice: ErrorNotice
         public let task = ModelTask()
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

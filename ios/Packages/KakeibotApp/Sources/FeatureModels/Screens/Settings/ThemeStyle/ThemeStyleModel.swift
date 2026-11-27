@@ -13,7 +13,7 @@ public final class ThemeStyleModel: SettingSaving {
     let dependencies: Dependencies
 
     public init(parts: ScreenParts) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input()
 
         self.state = state
@@ -32,11 +32,15 @@ public extension ThemeStyleModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
+        public let errorNotice: ErrorNotice
 
         public internal(set) var fontOffer: FontOffer?
 
         public private(set) var preview: ThemeStyle?
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

@@ -20,7 +20,7 @@ public final class AssetsAdjustmentModel: ScreenPerforming {
         balance: Int,
         today: LocalDate
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(wallet: wallet, balance: balance, today: today)
         let output = Output(input: input, state: state)
         let source = Source(state: state, input: input, output: output, parts: parts)
@@ -37,9 +37,13 @@ public extension AssetsAdjustmentModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
+        public let errorNotice: ErrorNotice
 
         public private(set) var calculator = AmountCalculator()
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

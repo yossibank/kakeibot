@@ -32,14 +32,15 @@ public extension TemplateListModel {
     @MainActor
     @Observable
     final class State: SettingsBoardState {
-        public var errorNotice = ErrorNotice()
         public var type: Entry.Kind = .expense
         public var movingOrder: [EntryTemplate.ID]?
         public var shown = SettingsBoardShown<EntryTemplate.ID, Destination>()
 
+        public let errorNotice: ErrorNotice
         public let removed: SettingsBoardRemoved<EntryTemplate.ID>
 
         init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.removed = SettingsBoardRemoved(wait: wait)
         }
     }

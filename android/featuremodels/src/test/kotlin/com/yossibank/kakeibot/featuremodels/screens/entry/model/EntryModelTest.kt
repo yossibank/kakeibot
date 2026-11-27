@@ -171,7 +171,7 @@ class EntryModelTest {
         val saved = model.save()
 
         assertFalse(saved)
-        assertEquals("金額を入れてください", model.state.task.message)
+        assertEquals("金額を入れてください", model.state.errorNotice.message)
     }
 
     @Test
@@ -181,7 +181,7 @@ class EntryModelTest {
         model.state.update { copy(categoryId = null) }
 
         assertFalse(model.save())
-        assertEquals("カテゴリを選んでください", model.state.task.message)
+        assertEquals("カテゴリを選んでください", model.state.errorNotice.message)
     }
 
     @Test
@@ -214,7 +214,7 @@ class EntryModelTest {
         val saved = model.save()
 
         assertFalse(saved)
-        assertEquals("記録が見つかりませんでした", model.state.task.message)
+        assertEquals("記録が見つかりませんでした", model.state.errorNotice.message)
     }
 
     @Test

@@ -20,7 +20,7 @@ public final class ThemeEditModel: ScreenPerforming {
         base palette: ThemePalette
     ) {
         let draft = theme.map(ThemeDraft.init) ?? ThemeDraft(name: "", palette: palette)
-        let state = State(draft: draft)
+        let state = State(draft: draft, wait: parts.wait)
         let input = Input(editingId: theme?.id, baseline: draft)
 
         self.state = state
@@ -35,11 +35,15 @@ public extension ThemeEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
+        public let errorNotice: ErrorNotice
 
         public internal(set) var draft: ThemeDraft
 
-        init(draft: ThemeDraft) {
+        init(
+            draft: ThemeDraft,
+            wait: ScreenWait
+        ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.draft = draft
         }
     }

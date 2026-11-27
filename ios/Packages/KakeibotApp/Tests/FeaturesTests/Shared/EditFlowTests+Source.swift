@@ -110,6 +110,6 @@ extension EditFlowTests {
 
     @MainActor
     final class FakeState: NoticeHolding {
-        var errorNotice = ErrorNotice()
+        let errorNotice = ErrorNotice(wait: ManualWait().wait)
     }
 }

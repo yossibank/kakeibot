@@ -50,7 +50,6 @@ public extension RecurringEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var panel = Shown<Panel>()
         public var fields = Fields()
         public var schedule: Schedule
@@ -63,11 +62,15 @@ public extension RecurringEditModel {
         public internal(set) var categoryId: EntryCategory.ID?
         public internal(set) var toWalletId: Wallet.ID?
 
+        public let errorNotice: ErrorNotice
+
         init(
             type: Entry.Kind,
             today: LocalDate,
-            isScheduleOpen: Bool
+            isScheduleOpen: Bool,
+            wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.type = type
 
             self.schedule = Schedule(

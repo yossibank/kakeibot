@@ -66,7 +66,7 @@ public struct StampEditSheet: View {
             focus = nil
         }
         .backdrop()
-        .errorBanner(Bindable(model.state).errorNotice)
+        .errorBanner(model.state.errorNotice)
         .editSheet(
             model.flow,
             deleting: "このスタンプを削除しますか",

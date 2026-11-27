@@ -109,7 +109,7 @@ extension ScreenModelTests {
     final class Model: ScreenModel {
         static let loadFailedMessage = "読めませんでした"
 
-        let state = NoticeState()
+        let state = NoticeState(wait: ManualWait().wait)
 
         var value: Loadable<Int> = .loading
     }

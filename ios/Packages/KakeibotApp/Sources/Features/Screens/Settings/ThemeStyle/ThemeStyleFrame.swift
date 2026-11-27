@@ -46,9 +46,7 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .errorBanner(model.state.errorNotice) {
-            model.state.errorNotice.clear()
-        }
+        .errorBanner(model.state.errorNotice)
         .backdrop()
         .toolbar(.hidden, for: .navigationBar)
         .haptic(.selection, trigger: model.output.style, condition: Self.isSwitchKept)

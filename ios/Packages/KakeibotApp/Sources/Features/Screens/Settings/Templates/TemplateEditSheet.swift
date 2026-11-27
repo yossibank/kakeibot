@@ -155,7 +155,7 @@ private extension TemplateEditSheet {
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
             }
-            .errorBanner(Bindable(model.state).errorNotice)
+            .errorBanner(model.state.errorNotice)
             .background {
                 Backdrop()
                     .ignoresSafeArea()

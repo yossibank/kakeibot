@@ -38,7 +38,7 @@ public struct WalletEditSheet: View {
             textField: .text,
             below: layout.iconBottom
         )
-        .errorBanner(Bindable(model.state).errorNotice)
+        .errorBanner(model.state.errorNotice)
         .deletionNotice(model.state.valuationDeletion) { deletion in
             model.perform {
                 await $0.restore(deletion)

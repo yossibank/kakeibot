@@ -16,7 +16,7 @@ public final class HomeModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State(today: today)
+        let state = State(today: today, wait: parts.wait)
         let input = Input()
 
         self.state = state

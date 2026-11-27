@@ -1,5 +1,6 @@
 package com.yossibank.kakeibot.featuremodels.shared.model
 
+import com.yossibank.kakeibot.featuremodels.support.ManualWait
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -10,7 +11,7 @@ import kotlin.test.assertTrue
 class ModelTaskTest {
     @Test
     fun returnsValueAndMarksRunning() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
         var whileRunning = false
 
         val value = task.attempt(failure = ModelTask.saveFailed) {
@@ -25,7 +26,7 @@ class ModelTaskTest {
 
     @Test
     fun runsActionWhileRunning() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
         var inner: Int? = null
         var count = 0
 
@@ -44,7 +45,7 @@ class ModelTaskTest {
 
     @Test
     fun stopsRunningAfterFailure() = runTest {
-        val task = ModelTask()
+        val task = ModelTask(ErrorNotice(ManualWait().wait))
 
         val failed = task.attempt<Int>(failure = ModelTask.saveFailed) {
             throw IllegalStateException("failure")
@@ -54,6 +55,6 @@ class ModelTaskTest {
         assertNull(failed)
         assertFalse(task.isRunning)
         assertEquals(1, value)
-        assertEquals(ModelTask.saveFailed, task.message)
+        assertEquals(ModelTask.saveFailed, task.notice.message)
     }
 }

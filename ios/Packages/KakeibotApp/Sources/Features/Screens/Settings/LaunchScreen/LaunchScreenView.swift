@@ -47,7 +47,7 @@ public struct LaunchScreenView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
+        .settingsScreen(errorNotice: model.state.errorNotice)
         .haptic(.selection, trigger: model.input.screen)
         .task {
             await model.load()

@@ -1,5 +1,6 @@
 import CloudKit
 import DesignSystem
+import FeatureModels
 import Foundation
 import OSLog
 import Store

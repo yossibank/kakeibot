@@ -17,7 +17,7 @@ public final class StampEditModel: ScreenPerforming {
         parts: ScreenParts,
         editing id: ShelfIcon.ID? = nil
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(editingId: id, baseline: state.icon.draft)
 
         self.state = state
@@ -31,9 +31,12 @@ public extension StampEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
-
+        public let errorNotice: ErrorNotice
         public let icon = SettingsIconEditorModel(glyph: .star)
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

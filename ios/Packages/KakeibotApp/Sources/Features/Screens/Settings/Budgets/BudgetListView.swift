@@ -12,7 +12,7 @@ public struct BudgetListView: View {
 
     public var body: some View {
         content
-            .errorBanner(Bindable(model.state).errorNotice)
+            .errorBanner(model.state.errorNotice)
             .budgetKeypad(model)
             .toolbar(.hidden, for: .navigationBar)
             .haptic(.selection, trigger: model.input.budgets)

@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.concepts.recurring.total
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
@@ -66,7 +67,8 @@ class RecurringListModel(
         editing: Editing?,
         wait: ScreenWait,
     ) {
-        val task = ModelTask()
+        val errorNotice = ErrorNotice(wait)
+        val task = ModelTask(errorNotice)
         val hidden = UndoNotice<Identifier<Recurring>>(wait)
         val deleted = UndoNotice<Deletion>(wait)
         val editing = Shown(editing)
@@ -289,7 +291,7 @@ class RecurringListModel(
         }
 
         if (deletions.any { it == null }) {
-            state.task.show(BULK_DELETE_FAILED)
+            state.errorNotice.show(BULK_DELETE_FAILED)
         }
 
         val deletion = deletions.filterNotNull().takeIf { it.isNotEmpty() }?.let(Deletion::merging)

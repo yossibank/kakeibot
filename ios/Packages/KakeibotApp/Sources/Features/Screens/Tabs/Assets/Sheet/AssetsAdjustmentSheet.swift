@@ -14,7 +14,7 @@ struct AssetsAdjustmentSheet: View {
         FittedSheet {
             content
         }
-        .errorBanner(Bindable(model.state).errorNotice)
+        .errorBanner(model.state.errorNotice)
         .editSheet(model.flow)
     }
 }

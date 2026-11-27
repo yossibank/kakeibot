@@ -20,11 +20,11 @@ public extension DeletionUndo {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
-
+        public let errorNotice: ErrorNotice
         public let deletion: UndoNotice<Deletion>
 
         init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.deletion = UndoNotice(wait: wait)
         }
     }

@@ -35,14 +35,15 @@ public extension RecurringListModel {
     @MainActor
     @Observable
     final class State: SettingsBoardState {
-        public var errorNotice = ErrorNotice()
         public var type: Entry.Kind = .expense
         public var movingOrder: [Recurring.ID]?
         public var shown = SettingsBoardShown<Recurring.ID, Destination>()
 
+        public let errorNotice: ErrorNotice
         public let removed: SettingsBoardRemoved<Recurring.ID>
 
         init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.removed = SettingsBoardRemoved(wait: wait)
         }
     }

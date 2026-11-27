@@ -1,6 +1,7 @@
 package com.yossibank.kakeibot.featuremodels.shared.model
 
 import com.yossibank.kakeibot.featuremodels.shared.notice.Deletion
+import com.yossibank.kakeibot.featuremodels.support.ManualWait
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -14,7 +15,7 @@ import kotlin.test.assertTrue
 class EditFlowTest {
     @Test
     fun closesWithoutAskingWhenUnchanged() {
-        val flow = EditFlow(task = ModelTask(), source = FakeSource())
+        val flow = EditFlow(task = manualTask(), source = FakeSource())
 
         flow.close()
         val outcome = flow.state.outcome.value
@@ -27,7 +28,7 @@ class EditFlowTest {
     @Test
     fun asksBeforeDiscardingChanges() {
         val source = FakeSource(isChanged = true)
-        val flow = EditFlow(task = ModelTask(), source = source)
+        val flow = EditFlow(task = manualTask(), source = source)
 
         flow.close()
         val asked = flow.state.prompt.current
@@ -43,7 +44,7 @@ class EditFlowTest {
     @Test
     fun putsOpenPartAwayBeforeClosingOnBack() {
         val source = FakeSource(isResting = true)
-        val flow = EditFlow(task = ModelTask(), source = source)
+        val flow = EditFlow(task = manualTask(), source = source)
 
         flow.back()
         val first = flow.state.outcome.count
@@ -56,7 +57,7 @@ class EditFlowTest {
     @Test
     fun namesProblemInsteadOfSaving() = runTest {
         val source = FakeSource(problem = "名前を入れてください")
-        val flow = EditFlow(task = ModelTask(), source = source)
+        val flow = EditFlow(task = manualTask(), source = source)
 
         val saved = flow.save()
 
@@ -64,14 +65,14 @@ class EditFlowTest {
         assertEquals(0, source.storeCount)
         assertFalse(flow.output.canSave)
         assertEquals("名前を入れてください", flow.output.saveTitle)
-        assertEquals("名前を入れてください", flow.state.task.message)
+        assertEquals("名前を入れてください", flow.state.task.notice.message)
         assertEquals(0, flow.state.outcome.count)
     }
 
     @Test
     fun namesSaveByWhetherEditing() {
-        val adding = EditFlow(task = ModelTask(), source = FakeSource())
-        val editing = EditFlow(task = ModelTask(), source = FakeSource(isEditing = true))
+        val adding = EditFlow(task = manualTask(), source = FakeSource())
+        val editing = EditFlow(task = manualTask(), source = FakeSource(isEditing = true))
 
         assertEquals("追加する", adding.output.saveTitle)
         assertEquals("変更を保存", editing.output.saveTitle)
@@ -80,7 +81,7 @@ class EditFlowTest {
 
     @Test
     fun ignoresSecondSaveWhileSaving() = runTest {
-        val task = ModelTask()
+        val task = manualTask()
         val release = CompletableDeferred<Unit>()
         val source = FakeSource(task = task, release = release)
         val flow = EditFlow(task = task, source = source)
@@ -99,13 +100,13 @@ class EditFlowTest {
     @Test
     fun asksBeforeHidingChanges() = runTest {
         val changed = EditFlow(
-            task = ModelTask(),
+            task = manualTask(),
             source = FakeSource(
                 isEditing = true,
                 isChanged = true,
             ),
         )
-        val unchanged = EditFlow(task = ModelTask(), source = FakeSource(isEditing = true))
+        val unchanged = EditFlow(task = manualTask(), source = FakeSource(isEditing = true))
 
         changed.toggleHidden()
         unchanged.toggleHidden()
@@ -123,7 +124,7 @@ class EditFlowTest {
             isChanged = true,
             asksBeforeHiding = true,
         )
-        val flow = EditFlow(task = ModelTask(), source = source)
+        val flow = EditFlow(task = manualTask(), source = source)
 
         flow.toggleHidden()
         val asked = flow.state.prompt.current
@@ -137,7 +138,7 @@ class EditFlowTest {
 
     @Test
     fun keepsSheetOpenWhenNothingToDelete() = runTest {
-        val flow = EditFlow(task = ModelTask(), source = FakeSource())
+        val flow = EditFlow(task = manualTask(), source = FakeSource())
 
         val deletion = flow.delete()
 
@@ -152,7 +153,7 @@ private class FakeSource(
     override val problem: String? = null,
     override val asksBeforeHiding: Boolean = false,
     private val isResting: Boolean = false,
-    private val task: ModelTask = ModelTask(),
+    private val task: ModelTask = manualTask(),
     private val release: CompletableDeferred<Unit>? = null,
 ) : EditFlowSource<String> {
     var storeCount = 0
@@ -179,3 +180,5 @@ private class FakeSource(
 
     override suspend fun remove(): Deletion? = null
 }
+
+private fun manualTask(): ModelTask = ModelTask(ErrorNotice(ManualWait().wait))
