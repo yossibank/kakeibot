@@ -11,10 +11,8 @@ public extension ReviewModel {
         public let balance: Int
         public let payoff: LoanPayoff?
     }
-}
 
-extension ReviewModel {
-    struct MoveKey: Hashable {
+    struct MoveKey: Hashable, Sendable {
         let walletId: Wallet.ID
     }
 }
@@ -55,7 +53,7 @@ public extension ReviewModel.Output {
 
     func share(of move: ReviewModel.Move) -> ReviewModel.Share {
         ReviewModel.Share(
-            id: AnyHashable(ReviewModel.MoveKey(walletId: move.wallet.id)),
+            id: .move(ReviewModel.MoveKey(walletId: move.wallet.id)),
             name: move.wallet.name,
             icon: move.icon,
             amount: move.amount,

@@ -1,7 +1,7 @@
 import Core
 
 public extension ReviewModel {
-    struct MonthKey: Hashable {
+    struct MonthKey: Hashable, Sendable {
         let range: ClosedRange<LocalDate>
     }
 }
@@ -52,7 +52,7 @@ public extension ReviewModel.Output {
 
     func monthShare(of month: ReviewYearProgress.Month) -> ReviewModel.Share {
         ReviewModel.Share(
-            id: AnyHashable(ReviewModel.MonthKey(range: month.range)),
+            id: .month(ReviewModel.MonthKey(range: month.range)),
             name: month.name,
             icon: nil,
             amount: month.total,

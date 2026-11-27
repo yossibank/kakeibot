@@ -82,11 +82,12 @@ private extension ReviewShareSheet {
 
     @ViewBuilder
     var badge: some View {
-        if share.id == ReviewModel.recurringShareId {
+        switch share.id {
+        case .recurring:
             IconBadge(systemImage: "repeat", size: 40)
-        } else if share.id.base is ReviewModel.MonthKey {
+        case .month:
             IconBadge(systemImage: "calendar", size: 40)
-        } else {
+        case .category, .wallet, .move, .factor:
             IconBadge(share.icon, size: 40)
         }
     }

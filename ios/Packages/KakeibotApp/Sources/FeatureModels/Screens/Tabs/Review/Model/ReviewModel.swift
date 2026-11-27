@@ -97,8 +97,8 @@ public extension ReviewModel {
         }
     }
 
-    struct Share: Equatable, Identifiable, @unchecked Sendable {
-        public let id: AnyHashable
+    struct Share: Equatable, Identifiable, Sendable {
+        public let id: Key
         public let name: String
         public let icon: Icon?
         public let amount: Int
@@ -108,7 +108,6 @@ public extension ReviewModel {
 }
 
 public extension ReviewModel {
-    static let recurringShareId = AnyHashable("recurring")
     static let loadFailedMessage = "記録を読めませんでした"
 
     func run() async {
@@ -197,6 +196,17 @@ private extension ReviewModel {
     static let saveFailedMessage = "保存できませんでした"
 }
 
+public extension ReviewModel.Share {
+    enum Key: Hashable, Sendable {
+        case category(EntryCategory.ID)
+        case wallet(Wallet.ID)
+        case recurring
+        case move(ReviewModel.MoveKey)
+        case factor(ReviewModel.FactorKey)
+        case month(ReviewModel.MonthKey)
+    }
+}
+
 public extension ReviewModel.Output {
     var period: ReviewPeriod {
         let current = ReviewPeriod(
@@ -263,16 +273,15 @@ public extension ReviewModel.Output {
     }
 
     func rows(for share: ReviewModel.Share) -> [EntryRowItem] {
-        if let key = share.id.base as? ReviewModel.MoveKey {
+        switch share.id {
+        case let .move(key):
             return moveRows(to: key.walletId)
-        }
-
-        if let key = share.id.base as? ReviewModel.FactorKey {
+        case let .factor(key):
             return factorRows(of: key)
-        }
-
-        if let key = share.id.base as? ReviewModel.MonthKey {
+        case let .month(key):
             return monthRows(of: key)
+        case .category, .wallet, .recurring:
+            break
         }
 
         guard
@@ -284,19 +293,9 @@ public extension ReviewModel.Output {
 
         return entries
             .filter { entry in
-                let category = entry.categoryId.map(AnyHashable.init)
-                let wallet = AnyHashable(entry.walletId)
-
-                let isRecurring = share.id == ReviewModel.recurringShareId
-                    && entry.recurringId != nil
-
-                return entry.type == type
+                entry.type == type
                     && period.range.contains(entry.date)
-                    && (
-                        category == share.id
-                            || wallet == share.id
-                            || isRecurring
-                    )
+                    && share.id.contains(entry)
             }
             .sorted { $0.date > $1.date }
             .map { entry in
@@ -320,6 +319,17 @@ public extension ReviewModel.Output {
 extension ReviewModel.Output {
     var entries: [Entry] {
         input.list.value?.entries ?? []
+    }
+}
+
+extension ReviewModel.Share.Key {
+    func contains(_ entry: Entry) -> Bool {
+        switch self {
+        case let .category(id): entry.categoryId == id
+        case let .wallet(id): entry.walletId == id
+        case .recurring: entry.recurringId != nil
+        case .move, .factor, .month: false
+        }
     }
 }
 
