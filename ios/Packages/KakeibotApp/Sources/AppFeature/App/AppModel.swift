@@ -18,6 +18,7 @@ final class AppModel: ScreenPerforming {
     let state: State
     let input: Input
     let dependencies: Dependencies
+    let runtime = Runtime()
 
     init(
         openDatabase: @escaping @Sendable () throws -> AppDatabase,
@@ -292,9 +293,9 @@ private extension AppModel {
     }
 
     func reloadWidgets() {
-        state.widgetReload?.cancel()
+        runtime.widgetReload?.cancel()
 
-        state.widgetReload = Task {
+        runtime.widgetReload = Task {
             try? await Task.sleep(for: Self.widgetReloadDelay)
 
             guard !Task.isCancelled else {

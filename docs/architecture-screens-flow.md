@@ -75,6 +75,7 @@ DB の監視（`ValueObservation`）が止まった時は、次の決まりで�
 | RootView | DB が使えるかどうかと今日が変わるたびに、AppModel の監視を始め直す |
 | 前面に戻った時 | MainModel が `changeScene` で `ObservationRound` を進め、各画面の監視を始め直す。AppModel は `changeScene` で、止まった監視だけを始め直す |
 | タブの監視 | MainView が `ObservationRound` の `each` で、タブ 4 つとはじめの案内をまとめて監視する。失敗の画面の「もう一度読み込む」も回を進める |
+| 止まった監視の印 | AppModel の `state` の `ObservationStop` が覚える。iOS だけ |
 | 裏に回った印 | モデルの `ForegroundReturn` が覚え、inactive を挟んで戻っても検出する。Android は `ON_STOP` を裏とする |
 | 止まった画面 | ホーム・記録・振り返り・資産は、「読めませんでした」と「もう一度読み込む」を出す |
 

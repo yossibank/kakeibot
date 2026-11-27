@@ -78,6 +78,8 @@ iOS だけ。実行中の印と、どれを実行中かを別の値で持たな�
 
 `make verify` の state-check が、直下の知らせ・裸の値・書ける `var` を見る。中身は [architecture](architecture.md#確かめるスクリプト) にある。型の無い値で裸と見るのは、文字どおりの値（`false`・`0`・`""`）と `mutableIntStateOf` などである。
 
+画面のモデルに加えて、アプリ全体の `AppModel` の `State` も見る。
+
 ### 部品の型は枠の中だけに置く
 
 次の部品の型は、`State` の直下に置かず、枠の中に置く。同じ役目の値を 2 通りで書かないためである。
@@ -149,6 +151,7 @@ Android の入力の下書きの `data class`（`EntryForm` など）は、`fiel
 | Assets | `RefreshGate` | 残高のまとめを作り直している間と、その間に来た頼み。`request`・`next`。iOS だけ |
 | Review | `CommentRequests` | 理由（`reasonRequests`）と振り返り（`noteRequests`）の文を頼んだ鍵。`begin`・`cancel`。iOS だけ |
 | App | `Reveal` | 起動の幕と、輪を回し終えたか、ホームを読み終えたか。iOS だけ |
+| App | `ObservationStop` | 監視が止まったかを持ち、`stop`・`resume` で変える。iOS だけ |
 | WalletEdit | `BalanceSign` | 初めの残高の正負。種類を変えた時は、`follow` で新しい種類の向きに合わせる（iOS だけ） |
 | Sync | `SwitchRequest` | 同期のスイッチを押してから、切り替え終わるまでの向き。`ask`・`clear`。iOS だけ |
 | SettingsMenuValue | `Choice` | 保存中の選んだ値。`begin`・`end`・`clear`・`value(over:)`。iOS だけ |

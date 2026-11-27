@@ -5,7 +5,9 @@ import sys
 
 FOLDERS = [
     (os.path.join("ios", "Packages", "KakeibotApp", "Sources", "FeatureModels"), ".swift"),
+    (os.path.join("ios", "Packages", "KakeibotApp", "Sources", "AppFeature"), ".swift"),
     (os.path.join("android", "featuremodels", "src", "main"), ".kt"),
+    (os.path.join("android", "app", "src", "main", "kotlin", "com", "yossibank", "kakeibot", "appfeature"), ".kt"),
 ]
 PART = re.compile(r"^\s*(?:(?:public|internal|private|fileprivate|final)\s+)*class\s+(?P<part>State|Input)\b")
 DECLARATION = re.compile(

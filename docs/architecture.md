@@ -32,7 +32,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | `scripts/scenarios-check-test.py` | `scenarios-check.py` を、仮のテストと一覧に通して確かめる | `make verify-docs` |
 | `scripts/json-format.sh` | `spec/fixtures/` と `store/` の JSON の整形。`make format` と pre-commit で直す | `make verify-docs` |
 | `scripts/spacing-check.py` | 余白・間隔・角の丸みの数値が 4 の倍数か。2 以下と、式の中の値は見ない | `make verify` |
-| `scripts/state-check.py` | 画面のモデルの `State` と `Input` の直下が [architecture-parts-state](architecture-parts-state.md) に沿うか。`State` は知らせ・裸の値・書ける `var`、`Input` は `Task`・`Job` と実行中の印を見る | `make verify` |
+| `scripts/state-check.py` | モデルと `AppModel` の `State`・`Input` が [architecture-parts-state](architecture-parts-state.md) に沿うか。`State` は知らせ・裸の値・書ける `var`、`Input` は `Task`・`Job`・実行中の印を見る | `make verify` |
 | `scripts/state-check-test.py` | `state-check.py` を、仮の State と Input に通して確かめる | `make verify` |
 | `scripts/no-warnings.sh` | アプリのビルドを包み、外のパッケージを除いた `warning:` で失敗にする。差分ビルドなので、組み直したファイルの警告だけを見る | `make verify` |
 | `scripts/xcode-version.sh` | 手元の Xcode が Makefile の `XCODE_VERSION` 以上か。足りない時、`make verify` は app-build を飛ばし、`make build` などは止まる | `make verify`・`make build`・`make test-build`・`make test`・`make test-model` |

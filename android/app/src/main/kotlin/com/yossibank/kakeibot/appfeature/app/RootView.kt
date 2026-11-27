@@ -49,8 +49,8 @@ fun RootView(
     }
 
     PaletteScene(
-        look = model.look,
-        style = model.style,
+        look = model.input.look,
+        style = model.input.style,
     ) {
         Box(
             modifier = Modifier
@@ -58,12 +58,12 @@ fun RootView(
                 .background(Palette.background),
             contentAlignment = Alignment.Center,
         ) {
-            when (val launch = model.launch) {
+            when (val launch = model.state.launch) {
                 AppModel.Launch.Opening -> CircularProgressIndicator(color = Palette.accent)
 
                 is AppModel.Launch.Ready -> MainView(
                     parts = launch.parts,
-                    today = model.today,
+                    today = model.input.today,
                     link = link,
                     onOpenLink = onOpenLink,
                 )

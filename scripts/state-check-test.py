@@ -7,6 +7,10 @@ import tempfile
 CHECK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state-check.py")
 SWIFT = os.path.join("ios", "Packages", "KakeibotApp", "Sources", "FeatureModels", "Model.swift")
 KOTLIN = os.path.join("android", "featuremodels", "src", "main", "Model.kt")
+APP_SWIFT = os.path.join("ios", "Packages", "KakeibotApp", "Sources", "AppFeature", "AppModel.swift")
+APP_KOTLIN = os.path.join(
+    "android", "app", "src", "main", "kotlin", "com", "yossibank", "kakeibot", "appfeature", "AppModel.kt"
+)
 SWIFT_SOURCE = """
 public final class EntryModel {
     @MainActor
@@ -142,10 +146,13 @@ def write(root, relative, text):
         file.write(text)
 
 
-def run(swift_member="", kotlin_member="", swift_input="", kotlin_input=""):
+def run(swift_member="", kotlin_member="", swift_input="", kotlin_input="", app=False):
     with tempfile.TemporaryDirectory() as root:
-        write(root, SWIFT, SWIFT_SOURCE.replace("//MEMBER", swift_member).replace("//INPUT", swift_input))
-        write(root, KOTLIN, KOTLIN_SOURCE.replace("//MEMBER", kotlin_member).replace("//INPUT", kotlin_input))
+        for swift, kotlin, chosen in ((SWIFT, KOTLIN, not app), (APP_SWIFT, APP_KOTLIN, app)):
+            swift_text = SWIFT_SOURCE.replace("//MEMBER", swift_member if chosen else "")
+            kotlin_text = KOTLIN_SOURCE.replace("//MEMBER", kotlin_member if chosen else "")
+            write(root, swift, swift_text.replace("//INPUT", swift_input if chosen else ""))
+            write(root, kotlin, kotlin_text.replace("//INPUT", kotlin_input if chosen else ""))
         command = [sys.executable, "-I", CHECK, "--root", root]
         return subprocess.run(command, capture_output=True, text=True, check=False)
 
@@ -161,6 +168,14 @@ def main():
     cases += [(name, {"kotlin_member": member}, expected) for name, member, expected in KOTLIN_CASES]
     cases += [(name, {"swift_input": member}, expected) for name, member, expected in SWIFT_INPUT_CASES]
     cases += [(name, {"kotlin_input": member}, expected) for name, member, expected in KOTLIN_INPUT_CASES]
+    cases += [
+        (f"アプリの {name}", {"swift_member": member, "app": True}, expected)
+        for name, member, expected in SWIFT_CASES[:1]
+    ]
+    cases += [
+        (f"アプリの {name}", {"kotlin_member": member, "app": True}, expected)
+        for name, member, expected in KOTLIN_CASES[:1]
+    ]
 
     for name, members, expected in cases:
         result = run(**members)

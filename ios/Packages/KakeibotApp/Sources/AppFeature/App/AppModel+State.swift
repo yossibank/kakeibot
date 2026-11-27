@@ -43,12 +43,8 @@ extension AppModel {
 
         let observation = ObservationRound()
 
-        @ObservationIgnored var syncEngine: SyncEngine?
-        @ObservationIgnored var sharedSyncEngine: SyncEngine?
-        @ObservationIgnored var widgetReload: Task<Void, Never>?
-
         @ObservationIgnored private var foreground = ForegroundReturn()
-        @ObservationIgnored private var hasStoppedObservation = false
+        @ObservationIgnored private var stop = ObservationStop()
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
@@ -67,6 +63,13 @@ extension AppModel {
         init(today: LocalDate) {
             self.today = today
         }
+    }
+
+    @MainActor
+    final class Runtime {
+        var syncEngine: SyncEngine?
+        var sharedSyncEngine: SyncEngine?
+        var widgetReload: Task<Void, Never>?
     }
 }
 
@@ -112,15 +115,14 @@ extension AppModel.State {
     }
 
     func markObservationStopped() {
-        hasStoppedObservation = true
+        stop.stop()
     }
 
     func restartStoppedObservation() {
-        guard hasStoppedObservation else {
+        guard stop.resume() else {
             return
         }
 
-        hasStoppedObservation = false
         observation.restart()
     }
 }

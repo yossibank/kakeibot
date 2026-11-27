@@ -29,6 +29,7 @@
 | 取り消しの知らせ | モデルが、`state` の `UndoNotice` に出す。予算と固定費の一覧・`EntryNoticeModel`・`EntryItemModel` が当たる |
 | 子の画面の結果 | 親のモデルの `receive`・`receiveHidden` に渡す |
 | 入力の結果 | `EntryModel.Outcome` の `Closed` と `Continued` が、`EntryChange` を持つ |
+| アプリの入口 | `RootView` は `AppModel` の `state.launch` と `input` の今日・テーマを読む。`open`・`retryOpen`・`refreshDay` を呼ぶ |
 | 残す `rememberCoroutineScope` | `designsystem` の動きだけが持つ。画面のファイルには書かない |
 
 ## 🧪 モデルのテスト

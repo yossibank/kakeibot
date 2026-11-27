@@ -13,6 +13,9 @@ AppModel と MainView は、共通の形に加えて、次のものを持つ。
 | --- | --- |
 | AppModel | 最初の設定が済んでいなければ Onboarding を出す。今日は RootView が MainView と Onboarding に渡す |
 | AppModel の持ち物 | DB を開く関数・時計・通知・Pro の窓口は、`dependencies` にまとめる。今の時刻は、その時計から受け取る |
+| AppModel の形 | 画面のモデルと同じ `state`・`input`・`dependencies` に、`runtime` を足す。Android も同じ名前で持つ |
+| AppModel の `state` と `input` | `state` は起動の段・幕・`notices`・監視の回を持つ。`input` は今日・テーマ・同期の状態・Pro を持つ |
+| AppModel の `runtime` | 同期のエンジンと、ウィジェットを更新する `Task` を持つ。Android は DB を開く `Job` と通知の `Job` を持つ |
 | DB と時計の受け渡し | AppModel が DB を開いた時に `ScreenParts` を作り、RootView が渡す。画面は、子の画面とモデルの init へそのまま渡す |
 | 子の画面に渡す `ScreenParts` | モデルから開く画面には、モデルの `childParts()` が返す |
 | MainView | タブは Home・Records・Review・Assets。起動した時に全部のタブが監視を始め、全部を読み終えるまで起動画面を出す |

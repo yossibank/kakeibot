@@ -73,7 +73,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `Output` | `input` と `state` から出す値を持つ。`derivedStateOf` はここに置き、DB と `dependencies` を使わない |
 | `Dependencies` | DB・時計・`Flow`・`Context`・`CoroutineScope` のような外の口を持つ。`private class` にし、モデルの関数だけが使う |
 | 画面だけが使う値 | `state` と `output` の両方から出す値は、`:app` にモデルの拡張で書く。`RecurringEditModel.detailRows` が当たる |
-| 動いている間の持ち物 | 認識の部品や `Job` は、`private val` の入れ物に置く。`EntryVoiceFlow` の `Runtime` が当たり、`mutableStateOf` を使わない |
+| 動いている間の持ち物 | 認識の部品や `Job` は、`private val` の `Runtime` に置く。`EntryVoiceFlow` と `AppModel` が当たり、`mutableStateOf` を使わない |
+| `AppModel` の形 | 画面のモデルと同じ `state`・`input`・`runtime`・`dependencies` を持つ。`:app` の中なので、値は `private set` にして関数から書く |
 | 連動する値 | `private set` にして、`State` の関数で一緒に書き換える |
 | 操作の置き場所 | 状態だけを変える操作は `State` の関数に置く。DB や `output` が要る操作は、モデルの関数に置く |
 | 分けたファイル | `Output` の計算は、`EntryModelOutputText.kt` のように拡張プロパティのファイルへ出す |
