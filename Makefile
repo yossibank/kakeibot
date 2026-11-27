@@ -78,6 +78,7 @@ scenarios:
 verify: verify-docs
 	@scripts/verify.sh --reset
 	scripts/verify.sh spacing-check python3 -I scripts/spacing-check.py
+	scripts/verify.sh state-check-test python3 -I scripts/state-check-test.py
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	@ktlint --version | grep -qx 'ktlint version $(KTLINT_VERSION)' || { echo "NG ktlint は $(KTLINT_VERSION) を使う"; exit 1; }
 	scripts/verify.sh ktlint sh -c "$(KTLINT)"
@@ -97,6 +98,7 @@ verify: verify-docs
 	scripts/verify.sh --xcode $(XCODE_VERSION) app-build scripts/no-warnings.sh $(XCODEBUILD) $(ANY_SIMULATOR) build
 	scripts/verify.sh android-test $(GRADLE) :core:test :store:jvmTest :featuremodels:testDebugUnitTest
 	scripts/verify.sh android-build $(GRADLE) :app:assembleDebug
+	scripts/verify.sh state-check python3 -I scripts/state-check.py
 	@scripts/verify.sh --summary
 
 verify-docs:
