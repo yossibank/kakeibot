@@ -67,7 +67,7 @@ struct SnapshotTests {
                 to: "home-bills"
             )
 
-            model.state.billPage = 1
+            model.state.fields.billPage = 1
 
             try Self.write(
                 view.billCard.padding(16),
@@ -76,7 +76,7 @@ struct SnapshotTests {
                 to: "home-bills-next"
             )
 
-            model.state.billPage = 0
+            model.state.fields.billPage = 0
             try Self.write(sheet, variant: variant, title: "ホーム › 固定費", to: "home-recurring")
         }
 
