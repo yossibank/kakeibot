@@ -38,7 +38,7 @@ struct RecordsModelTests {
 
         model.state.move(months: -1)
 
-        #expect(model.state.month.description == "2026-09")
+        #expect(model.state.cursor.month.description == "2026-09")
         #expect(model.output.days.map(\.date.description) == ["2026-09-30"])
         #expect(model.output.expenseTotal == 500)
     }
@@ -77,7 +77,7 @@ struct RecordsModelTests {
 
         second.cancel()
 
-        #expect(model.state.month.description == "2026-09")
+        #expect(model.state.cursor.month.description == "2026-09")
     }
 
     @Test

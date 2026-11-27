@@ -45,7 +45,7 @@ struct ReviewModelTests {
         await model.saveSelection()
         await model.loadSelection()
 
-        #expect(model.state.errorNotice.message == "保存できませんでした")
+        #expect(model.state.notices.error.message == "保存できませんでした")
     }
 
     @Test

@@ -16,8 +16,8 @@ public final class HomeModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State(today: today, wait: parts.wait)
-        let input = Input()
+        let state = State(wait: parts.wait)
+        let input = Input(today: today)
 
         self.state = state
         self.input = input
@@ -42,8 +42,8 @@ extension HomeModel: TabScreenModel {
     }
 
     public func setToday(_ today: LocalDate) {
-        if state.today != today {
-            state.today = today
+        if input.today != today {
+            input.today = today
         }
     }
 }

@@ -112,7 +112,7 @@ extension ReviewModelTests {
         #expect(isCurrentAtFirst)
         #expect(!isCurrentAfterMove)
         #expect(model.output.isCurrentPeriod)
-        #expect(model.state.isMovingForward)
+        #expect(model.state.cursor.isMovingForward)
         #expect(model.output.period.range.lowerBound.description == "2026-10-01")
     }
 

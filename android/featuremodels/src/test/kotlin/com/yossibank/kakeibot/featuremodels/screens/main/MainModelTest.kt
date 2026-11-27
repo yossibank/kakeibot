@@ -46,14 +46,14 @@ class MainModelTest {
         var tabAfterRoute: MainModel.Tab? = null
 
         val route = model.perform { it.open(PlannedNotification.Route.Home) }
-        val probe = model.perform { tabAfterRoute = it.state.tab }
+        val probe = model.perform { tabAfterRoute = it.state.tabs.current }
 
         route.join()
         probe.join()
 
         assertEquals(MainModel.Tab.Home, tabAfterRoute)
-        assertNull(model.state.sheet.current)
-        assertEquals(setOf(MainModel.Tab.Home, MainModel.Tab.Records), model.state.visitedTabs)
+        assertNull(model.state.presented.sheet.current)
+        assertEquals(setOf(MainModel.Tab.Home, MainModel.Tab.Records), model.state.tabs.visited)
         assertEquals(0, currentTime)
     }
 
@@ -64,7 +64,7 @@ class MainModelTest {
 
         model.open(PlannedNotification.Route.Entry(date = date))
 
-        val sheet = model.state.sheet.current as? MainModel.Sheet.Entry
+        val sheet = model.state.presented.sheet.current as? MainModel.Sheet.Entry
 
         val entry = EntryModel(
             parts = setup.parts,
@@ -73,7 +73,7 @@ class MainModelTest {
             date = sheet?.date ?: setup.today,
         )
 
-        assertEquals(MainModel.Tab.Home, model.state.tab)
+        assertEquals(MainModel.Tab.Home, model.state.tabs.current)
         assertEquals(MainModel.Sheet.Entry(editing = null, date = date), sheet)
         assertEquals(date, entry.state.form.date)
         assertEquals(setup.today, entry.state.today)
@@ -86,12 +86,15 @@ class MainModelTest {
         model.state.select(MainModel.Tab.Review)
 
         model.open(PlannedNotification.Route.Recurring(id = id))
-        val first = model.state.sheet.current
+        val first = model.state.presented.sheet.current
         model.open(PlannedNotification.Route.Recurring(id = id))
 
-        assertEquals(MainModel.Tab.Review, model.state.tab)
+        assertEquals(MainModel.Tab.Review, model.state.tabs.current)
         assertEquals(MainModel.Sheet.Settings(recurring = id, round = 1), first)
-        assertEquals(MainModel.Sheet.Settings(recurring = id, round = 2), model.state.sheet.current)
+        assertEquals(
+            MainModel.Sheet.Settings(recurring = id, round = 2),
+            model.state.presented.sheet.current,
+        )
     }
 
     @Test
@@ -176,7 +179,7 @@ class MainModelTest {
 
         model.state.hideTabNotices()
 
-        assertEquals(1, model.state.noticeRound)
+        assertEquals(1, model.state.notices.round)
         assertEquals(0, model.state.observationRound)
     }
 
@@ -194,13 +197,13 @@ class MainModelTest {
 
         restored.state.select(MainModel.Tab.Assets)
 
-        assertEquals(MainModel.Tab.Assets, restored.state.tab)
+        assertEquals(MainModel.Tab.Assets, restored.state.tabs.current)
         assertEquals(
             MainModel.Tab.entries.toSet() - MainModel.Tab.Records,
-            restored.state.visitedTabs,
+            restored.state.tabs.visited,
         )
-        assertEquals(MainModel.Sheet.Entry(editing = id), restored.state.sheet.current)
-        assertEquals(entry, MainModel.restore(dated.saved()).state.sheet.current)
+        assertEquals(MainModel.Sheet.Entry(editing = id), restored.state.presented.sheet.current)
+        assertEquals(entry, MainModel.restore(dated.saved()).state.presented.sheet.current)
     }
 }
 
@@ -210,6 +213,6 @@ private data class Seen(
 )
 
 private fun seen(model: MainModel): Seen = Seen(
-    sheet = model.state.sheet.current,
-    tab = model.state.tab,
+    sheet = model.state.presented.sheet.current,
+    tab = model.state.tabs.current,
 )

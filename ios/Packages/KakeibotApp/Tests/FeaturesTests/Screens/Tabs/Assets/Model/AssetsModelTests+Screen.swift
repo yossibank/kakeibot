@@ -13,18 +13,18 @@ extension AssetsModelTests {
 
         model.state.present(.reward)
         model.state.toggleGuide()
-        model.state.rewardChild.show(.rules)
+        model.state.presented.rewardChild.show(.rules)
 
-        let guideBefore = model.state.reward.isGuideOpen
+        let guideBefore = model.state.presented.reward.isGuideOpen
         let rulesBefore = model.state.isEditingRules
 
-        model.state.presented.closeAll()
+        model.state.presented.sheet.closeAll()
         model.state.present(.reward)
 
         #expect(guideBefore)
         #expect(rulesBefore)
-        #expect(model.state.presented.current == .reward)
-        #expect(model.state.reward.isGuideOpen == false)
+        #expect(model.state.presented.sheet.current == .reward)
+        #expect(model.state.presented.reward.isGuideOpen == false)
         #expect(model.state.isEditingRules == false)
     }
 
@@ -38,12 +38,12 @@ extension AssetsModelTests {
         let target = model.state.goalTarget
         let rulesWhileEditing = model.state.isEditingRules
 
-        model.state.rewardChild.close(.rules)
+        model.state.presented.rewardChild.close(.rules)
 
         let targetAfterOtherClose = model.state.goalTarget
 
-        model.state.rewardChild.goal = nil
-        model.state.rewardChild.show(.rules)
+        model.state.presented.rewardChild.goal = nil
+        model.state.presented.rewardChild.show(.rules)
 
         #expect(target != nil)
         #expect(target?.goal == nil)

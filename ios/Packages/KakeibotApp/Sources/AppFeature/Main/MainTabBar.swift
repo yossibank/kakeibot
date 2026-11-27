@@ -31,7 +31,7 @@ struct MainTabBar: View {
 private extension MainTabBar {
     var selection: Binding<MainModel.Tab> {
         Binding {
-            state.tab
+            state.tabs.current
         } set: { tab in
             state.select(tab)
         }

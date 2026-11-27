@@ -28,6 +28,6 @@ public extension RecordsModel.Output {
     }
 
     func canReward(on date: LocalDate) -> Bool {
-        date <= state.today
+        date <= input.today
     }
 }

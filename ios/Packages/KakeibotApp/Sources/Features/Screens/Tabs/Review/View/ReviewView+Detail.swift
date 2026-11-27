@@ -107,7 +107,7 @@ private extension ReviewView {
 
     func recurringLink(_ recurring: Int) -> some View {
         Button {
-            model.state.presented.item = model.output.recurringShare.map { .share($0) }
+            model.state.presented.sheet.item = model.output.recurringShare.map { .share($0) }
         } label: {
             HStack(spacing: 4) {
                 Label(recurringText(recurring), systemImage: "repeat")

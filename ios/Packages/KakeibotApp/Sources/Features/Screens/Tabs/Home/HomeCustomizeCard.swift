@@ -4,7 +4,7 @@ import FeatureModels
 import SwiftUI
 
 struct HomeCustomizeCard: View {
-    @Binding var changed: SetupItem?
+    @Binding var glowing: SetupItem?
 
     @State private var layout = Layout()
 
@@ -14,6 +14,8 @@ struct HomeCustomizeCard: View {
     let appIcon: AppIconListModel
     let isSheetOpen: Bool
     let onOpen: (SetupItem) -> Void
+    let onChange: (SetupItem) -> Void
+    let onSheetClose: () -> Void
     let onClose: () -> Void
 
     var body: some View {
@@ -31,7 +33,7 @@ struct HomeCustomizeCard: View {
                         .buttonStyle(.plain)
                         .onChange(of: value(for: item)) {
                             if isSheetOpen {
-                                changed = item
+                                onChange(item)
                             }
                         }
                     }
@@ -52,16 +54,12 @@ struct HomeCustomizeCard: View {
         .padding(.bottom, 16)
         .card()
         .onChange(of: isSheetOpen) { _, isOpen in
-            guard
-                !isOpen,
-                let changed
-            else {
-                return
+            if !isOpen {
+                onSheetClose()
             }
-
-            self.changed = nil
-
-            glow(changed)
+        }
+        .onChange(of: glowing) { _, item in
+            take(item)
         }
         .task(id: layout.glow) {
             guard !layout.glow.isEmpty else {
@@ -138,6 +136,15 @@ private extension HomeCustomizeCard {
 
     func glowOpacity(_ item: SetupItem) -> Double {
         layout.glow[item] ?? 0
+    }
+
+    func take(_ item: SetupItem?) {
+        guard let item else {
+            return
+        }
+
+        glowing = nil
+        glow(item)
     }
 
     func glow(_ item: SetupItem) {

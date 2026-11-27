@@ -45,7 +45,7 @@ internal fun RecordsDayCard(
     ) {
         DayHeader(
             day = day,
-            today = model.state.today,
+            today = model.input.today,
         )
 
         if (day.entries.isEmpty()) {

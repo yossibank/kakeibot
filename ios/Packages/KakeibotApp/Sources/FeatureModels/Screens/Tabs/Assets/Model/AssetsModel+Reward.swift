@@ -31,12 +31,12 @@ public extension AssetsModel {
             )
 
             if isPurchased {
-                state.bought.show(id)
+                state.notices.bought.show(id)
             }
 
             return true
         } catch {
-            state.errorNotice.show(Self.goalFailedMessage, for: error)
+            state.notices.error.show(Self.goalFailedMessage, for: error)
             return false
         }
     }

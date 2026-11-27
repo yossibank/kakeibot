@@ -16,7 +16,7 @@ extension RecordsModelTests {
         #expect(model.state.markMenuDate == setup.today)
         #expect(model.state.sheet == nil)
 
-        model.state.presented.sheet = nil
+        model.state.presented.panel.sheet = nil
 
         #expect(model.state.markMenuDate == setup.today)
 
@@ -29,9 +29,9 @@ extension RecordsModelTests {
 
         #expect(model.state.sheet == .stamp(setup.today))
 
-        model.state.presented.sheet = nil
+        model.state.presented.panel.sheet = nil
 
-        #expect(model.state.presented.current == nil)
+        #expect(model.state.presented.panel.current == nil)
     }
 
     @Test
@@ -41,22 +41,22 @@ extension RecordsModelTests {
 
         model.state.present(.filter)
         model.state.fields.filterTab = .tag
-        model.state.presented.sheet = nil
+        model.state.presented.panel.sheet = nil
         model.state.present(.filter)
 
         #expect(model.state.fields.filterTab == .expense)
 
         model.state.present(.reward(setup.today))
-        model.state.fields.isAddingMark = true
-        model.state.presented.sheet = nil
+        model.state.presented.adding.show(.mark)
+        model.state.presented.panel.sheet = nil
         model.state.present(.stamp(setup.today))
 
-        #expect(model.state.fields.isAddingMark == false)
+        #expect(model.state.presented.adding.current == nil)
 
-        model.state.fields.isAddingMark = true
+        model.state.presented.adding.show(.mark)
         model.state.finishAddingMark()
 
-        #expect(model.state.fields.isAddingMark == false)
+        #expect(model.state.presented.adding.current == nil)
     }
 
     @Test
@@ -64,20 +64,20 @@ extension RecordsModelTests {
         let setup = try await Setup()
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let id = Entry.ID()
-        let before = model.state.screen.selection
+        let before = model.state.fields.selection
 
         model.state.select([])
-        let started = model.state.screen.selection
+        let started = model.state.fields.selection
 
         model.state.select([id])
-        let selected = model.state.screen.selection
+        let selected = model.state.fields.selection
 
         model.state.finishSelecting()
 
         #expect(before == nil)
         #expect(started == [])
         #expect(selected == [id])
-        #expect(model.state.screen.selection == nil)
+        #expect(model.state.fields.selection == nil)
     }
 
     @Test
@@ -91,18 +91,18 @@ extension RecordsModelTests {
         model.state.toggleItems(of: second)
         model.state.toggleItems(of: first)
 
-        #expect(model.state.screen.openItemIds == [second])
+        #expect(model.state.presented.openItemIds == [second])
     }
 
     @Test
     func remembersDirectionOfLastMove() async throws {
         let setup = try await Setup()
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
-        let before = model.state.screen.isMovingForward
+        let before = model.state.cursor.isMovingForward
 
         model.state.head(forward: false)
 
         #expect(before)
-        #expect(model.state.screen.isMovingForward == false)
+        #expect(model.state.cursor.isMovingForward == false)
     }
 }

@@ -78,6 +78,7 @@ flowchart LR
 | 画面とモデルのやり取り・監視・外からの入口 | [docs/architecture-screens-flow.md](docs/architecture-screens-flow.md) |
 | 複数の画面で使う部品 | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | 設定の一覧の画面の足し方 | [docs/architecture-parts-settings.md](docs/architecture-parts-settings.md) |
+| モデルの State の組み方 | [docs/architecture-parts-state.md](docs/architecture-parts-state.md) |
 | データの形 | [docs/data.md](docs/data.md) |
 | 予算・固定費・ごほうび・スタンプの表 | [docs/data-budget.md](docs/data-budget.md) |
 | 設定とテーマの表 | [docs/data-settings.md](docs/data-settings.md) |

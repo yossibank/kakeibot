@@ -8,8 +8,8 @@ struct MainTabLayer<Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
-        if state.visitedTabs.contains(value) {
-            let isShown = state.tab == value
+        if state.tabs.visited.contains(value) {
+            let isShown = state.tabs.current == value
 
             content
                 .opacity(isShown ? 1 : 0)

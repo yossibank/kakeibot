@@ -80,7 +80,7 @@ extension RecordsModelTests {
 
         #expect(model.input.layout == .list)
         #expect(saved == .calendar)
-        #expect(model.state.errorNotice.message == "保存できませんでした")
+        #expect(model.state.notices.error.message == "保存できませんでした")
     }
 
     @Test
@@ -97,7 +97,7 @@ extension RecordsModelTests {
 
         model.open(date)
 
-        #expect(model.state.month.description == "2026-08")
+        #expect(model.state.cursor.month.description == "2026-08")
         #expect(model.output.shownDate == date)
         #expect(model.input.layout == .calendar)
         #expect(!model.state.fields.isSearching)
@@ -117,7 +117,7 @@ extension RecordsModelTests {
 
         model.openCurrentMonth()
 
-        #expect(model.state.month.description == "2026-10")
+        #expect(model.state.cursor.month.description == "2026-10")
         #expect(model.output.shownDate == setup.today)
         #expect(!model.state.fields.isSearching)
         #expect(model.state.fields.searchText.isEmpty)
@@ -133,7 +133,7 @@ extension RecordsModelTests {
 
         #expect(isCurrentAtFirst)
         #expect(!model.output.isCurrentMonth)
-        #expect(model.state.month < model.output.currentMonth)
+        #expect(model.state.cursor.month < model.output.currentMonth)
     }
 
     @Test
@@ -188,7 +188,7 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(!model.state.prompt.isShowing(.delete))
+        #expect(!model.state.presented.prompt.isShowing(.delete))
         #expect(deleted == [firstNine])
 
         deleted = []
@@ -197,13 +197,13 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(model.state.prompt.isShowing(.delete))
+        #expect(model.state.presented.prompt.isShowing(.delete))
         #expect(model.output.pendingDeleteCount == 10)
         #expect(deleted.isEmpty)
 
         model.state.cancelDelete()
 
-        #expect(!model.state.prompt.isShowing(.delete))
+        #expect(!model.state.presented.prompt.isShowing(.delete))
         #expect(deleted.isEmpty)
 
         model.state.requestDelete(ids) {
@@ -214,7 +214,7 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(!model.state.prompt.isShowing(.delete))
+        #expect(!model.state.presented.prompt.isShowing(.delete))
         #expect(deleted == [ids])
     }
 }

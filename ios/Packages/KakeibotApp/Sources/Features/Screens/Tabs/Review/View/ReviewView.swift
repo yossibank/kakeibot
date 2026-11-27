@@ -41,7 +41,7 @@ public struct ReviewView: View {
 
 extension ReviewView {
     var periodTextTransition: ContentTransition {
-        .numericText(countsDown: !model.state.isMovingForward)
+        .numericText(countsDown: !model.state.cursor.isMovingForward)
     }
 
     var periodTitle: String {
@@ -49,7 +49,7 @@ extension ReviewView {
         let month = range.upperBound.yearMonth
 
         switch model.input.scale {
-        case .week: return PeriodText.range(range, today: model.state.today)
+        case .week: return PeriodText.range(range, today: model.input.today)
         case .month: return month.title
         case .year: return "\(String(month.year))年"
         }
@@ -169,10 +169,10 @@ private extension ReviewView {
         .task(id: model.input.list.value?.entries.count) {
             await model.refreshStoreReviewCard()
         }
-        .sheet(item: Bindable(model.state).presented.item, onDismiss: openPending) { sheet in
+        .sheet(item: Bindable(model.state).presented.sheet.item, onDismiss: openPending) { sheet in
             sheetView(sheet, slide: slide)
         }
-        .errorBanner(model.state.errorNotice)
+        .errorBanner(model.state.notices.error)
         .backdrop()
     }
 

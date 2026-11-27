@@ -35,11 +35,12 @@ extension RecordsView {
 
         if EntrySearch(model.state.fields.searchText).isEmpty {
             RecordsSearchHistory(
-                clearedWords: Bindable(model.state).fields.clearedSearches,
+                clearedWords: model.state.notices.clearedSearches.current,
                 words: model.input.recentSearches,
                 onSelect: selectRecent,
                 onClear: clearRecent,
-                onRestore: restoreRecent
+                onRestore: restoreRecent,
+                onLeave: model.state.notices.clearedSearches.dismiss
             )
         } else if let summary = model.output.searchSummary {
             searchSummary(summary)
@@ -92,9 +93,9 @@ private extension RecordsView {
         }
     }
 
-    func restoreRecent(_ words: [String]) {
+    func restoreRecent() {
         model.perform {
-            await $0.restoreRecentSearches(words)
+            await $0.restoreRecentSearches()
         }
     }
 

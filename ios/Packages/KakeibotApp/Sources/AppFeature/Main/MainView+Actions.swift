@@ -6,7 +6,7 @@ import SwiftUI
 
 extension MainView {
     var isLoaded: Bool {
-        let isHomeLoaded = Self.isSettled(home.input.list, home.state.errorNotice)
+        let isHomeLoaded = Self.isSettled(home.input.list, home.state.notices.error)
         let isSetupLoaded = setup.output.isLoaded || setup.state.errorNotice.message != nil
         let isLaunchChosen = model.input.launchScreen != nil
         return isHomeLoaded && isSetupLoaded && isLaunchChosen && areTabsLoaded
@@ -36,15 +36,15 @@ extension MainView {
     }
 
     func openEntry(_ id: Entry.ID) {
-        model.state.presented.show(.edit(id))
+        model.state.presented.sheet.show(.edit(id))
     }
 
     func openRecurring(_ id: Recurring.ID) {
-        model.state.presented.show(.recurring(id))
+        model.state.presented.sheet.show(.recurring(id))
     }
 
     func openRecurrings() {
-        model.state.presented.show(.periodRecurrings)
+        model.state.presented.sheet.show(.periodRecurrings)
     }
 
     func showDay(_ date: LocalDate) {
@@ -87,7 +87,7 @@ extension MainView {
     }
 
     func openNews() {
-        model.state.presented.show(.whatsNew(seenVersion: setup.output.seenNewsVersion))
+        model.state.presented.sheet.show(.whatsNew(seenVersion: setup.output.seenNewsVersion))
 
         setup.perform {
             await $0.markNewsSeen()
@@ -104,11 +104,11 @@ extension MainView {
 
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
-            model.state.presented.show(.template(template))
+            model.state.presented.sheet.show(.template(template))
             return
         }
 
-        model.state.presented.closeAll()
+        model.state.presented.sheet.closeAll()
 
         home.perform {
             await $0.record(template)
@@ -149,10 +149,10 @@ private extension MainView {
     }
 
     var areTabsLoaded: Bool {
-        let isRecordsLoaded = Self.isSettled(records.input.list, records.state.errorNotice)
-        let isReviewLoaded = Self.isSettled(review.input.list, review.state.errorNotice)
+        let isRecordsLoaded = Self.isSettled(records.input.list, records.state.notices.error)
+        let isReviewLoaded = Self.isSettled(review.input.list, review.state.notices.error)
         let isAssetsShown = assets.output.list != nil || assets.input.list.isFailed
-        let isAssetsLoaded = isAssetsShown || assets.state.errorNotice.message != nil
+        let isAssetsLoaded = isAssetsShown || assets.state.notices.error.message != nil
         return isRecordsLoaded && isReviewLoaded && isAssetsLoaded
     }
 

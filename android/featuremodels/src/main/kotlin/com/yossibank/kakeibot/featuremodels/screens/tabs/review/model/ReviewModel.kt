@@ -47,8 +47,8 @@ class ReviewModel(
     round: ObservationRound,
 ) : ScreenPerforming,
     TabScreenModel {
-    val state = State(today, parts.wait)
-    val input = Input()
+    val state = State(parts.wait)
+    val input = Input(today)
     val output = Output(input, state)
 
     private val dependencies = Dependencies(parts.database, parts.entryList, round)
@@ -71,32 +71,49 @@ class ReviewModel(
     )
 
     class State(
-        today: LocalDate,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
 
-        var today: LocalDate by mutableStateOf(today)
-            internal set
-
-        var offset: Int by mutableStateOf(0)
+        var cursor: PeriodCursor by mutableStateOf(PeriodCursor())
             private set
 
         fun move(count: Int) {
-            if (offset + count > 0) {
-                return
-            }
-
-            offset += count
+            cursor = cursor.moved(count)
         }
 
         internal fun restart() {
-            offset = 0
+            cursor = cursor.restarted()
         }
     }
 
-    class Input {
+    data class PeriodCursor(
+        val offset: Int = 0,
+    ) {
+        val canMoveForward: Boolean
+            get() = offset < 0
+
+        fun moved(count: Int): PeriodCursor {
+            val next = offset + count
+            return if (next > 0) this else copy(offset = next)
+        }
+
+        fun restarted(): PeriodCursor = copy(offset = 0)
+    }
+
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+    }
+
+    class Input(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var scale: ReviewPeriod.Scale by mutableStateOf(ReviewPeriod.Scale.month)
             internal set
 
@@ -120,13 +137,13 @@ class ReviewModel(
         val period: ReviewPeriod
             get() = ReviewPeriod(
                 scale = input.scale,
-                containing = state.today,
+                containing = input.today,
                 monthStartDay = input.monthStartDay,
                 weekStart = input.weekStart,
-            ).adding(count = state.offset)
+            ).adding(count = state.cursor.offset)
 
         val canMoveForward: Boolean
-            get() = state.offset < 0
+            get() = state.cursor.canMoveForward
 
         val title: String
             get() {
@@ -136,7 +153,7 @@ class ReviewModel(
                     ReviewPeriod.Scale.week -> {
                         PeriodText.range(
                             period = range,
-                            today = state.today,
+                            today = input.today,
                         )
                     }
 
@@ -166,7 +183,7 @@ class ReviewModel(
             get() {
                 val previous = ReviewSummary(
                     entries = input.list.value?.entries ?: emptyList(),
-                    range = period.comparisonRange(today = state.today),
+                    range = period.comparisonRange(today = input.today),
                 )
 
                 return total(of = previous)
@@ -174,7 +191,7 @@ class ReviewModel(
 
         val hasPreviousEntries: Boolean
             get() {
-                val range = period.comparisonRange(today = state.today)
+                val range = period.comparisonRange(today = input.today)
                 return input.list.value?.entries.orEmpty().any { it.date in range }
             }
 
@@ -186,7 +203,7 @@ class ReviewModel(
 
                 val previous = ReviewText.previousName(
                     scale = input.scale,
-                    isPartial = state.today in period.range,
+                    isPartial = input.today in period.range,
                 )
 
                 val amount = AmountText.text(abs(change).clamped)
@@ -275,13 +292,13 @@ class ReviewModel(
     )
 
     override val errorNotice: ErrorNotice
-        get() = state.errorNotice
+        get() = state.notices.error
 
     override val isLoadFailed: Boolean
         get() = input.list.isFailed
 
     override fun setToday(today: LocalDate) {
-        state.today = today
+        input.today = today
     }
 
     override suspend fun observe() {

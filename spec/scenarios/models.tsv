@@ -237,11 +237,16 @@ main.restarts-observation-on-retry	MainModelTests/restartsObservationOnRetry	Mai
 main.advances-notice-round-to-hide-tab-notices	MainModelTests/advancesNoticeRoundToHideTabNotices	MainModelTest/advancesNoticeRoundToHideTabNotices	対応	
 main.keeps-deletion-for-undo	MainModelTests/keepsDeletionForUndo		未移植	入口が削除の取り消し（DeletionUndo）を持たず、入口で受ける削除も無い
 main.keeps-tabs-and-sheet-when-restored		MainModelTest/keepsTabsAndSheetWhenRestored	Androidのみ	保存した値から作り直した時にタブとシートを引き継ぐ。iOS は保存から作り直さない
+tab-selection.starts-on-home	TabSelectionTests/startsOnHome	TabSelectionTest/startsOnHome	対応	
+tab-selection.remembers-visited-tabs	TabSelectionTests/remembersVisitedTabs	TabSelectionTest/remembersVisitedTabs	対応	
+entry-launch.starts-and-clears-receipt	EntryLaunchTests/startsAndClearsReceipt		未移植	メインからレシートで入力を始める所が無い
+entry-launch.finishes-warming	EntryLaunchTests/finishesWarming		未移植	メインに、入力の画面を先に温める所が無い
 app-review.*	AppReviewModelTests/*		未移植	レビューのお願いを待って出すモデルが Android に無い
 app-review-request.*	AppReviewRequestTests/*		未移植	レビューのお願いを出すかを決める型が Android に無い
 foreground-return.detects-foreground-after-inactive	ForegroundReturnTests/detectsForegroundAfterInactive	ForegroundReturnTest/detectsForegroundAfterInactive	対応	
 home.opens-picked-day-after-closing-stamp-sheet	HomeModelTests/opensPickedDayAfterClosingStampSheet		未移植	スタンプが、ホームのモデルと画面に無い
 home.starts-shelf-over-after-closing	HomeModelTests/startsShelfOverAfterClosing		未移植	ひな形の棚が、ホームのモデルと画面に無い
+home.glows-customized-item-after-closing-sheet	HomeModelTests/glowsCustomizedItemAfterClosingSheet		未移植	カスタマイズのカードが、ホームのモデルと画面に無い
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
@@ -261,6 +266,7 @@ home.shows-no-notice-while-list-arrives		HomeModelTest/showsNoNoticeWhileListArr
 home.marks-list-failure-until-retried		HomeModelTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 home.orders-same-day-by-newest-save		HomeModelTest/ordersSameDayByNewestSave	Androidのみ	同じ日の中を保存の新しい順に並べることは、iOS のホームにテストが無い
 home.labels-today-and-yesterday-rows		HomeModelTest/labelsTodayAndYesterdayRows	Androidのみ	先の日付の行が日付で出ることは iOS に無く、今日と昨日の札だけ重なる
+pending-day.takes-picked-day-once	PendingDayTests/takesPickedDayOnce		未移植	スタンプの日を開く仕組みが、ホームのモデルと画面に無い
 assets.pages-card-bills-by-month	AssetsModelTests/pagesCardBillsByMonth		未移植	資産のモデルと画面に、カードの請求の月ごとのページが無い
 assets.counts-unpaid-entries-once-with-two-card-bills	AssetsModelTests/countsUnpaidEntriesOnceWithTwoCardBills		未移植	資産の行に、カードの未払いの内訳が無い
 assets.adds-upcoming-recurrings-and-plans-until-period-end	AssetsModelTests/addsUpcomingRecurringsAndPlansUntilPeriodEnd		未移植	資産のモデルと画面に、期間の終わりまでの見通しが無い
@@ -347,6 +353,9 @@ records.shows-notice-when-list-fails		RecordsModelTest/showsNoticeWhenListFails	
 records.shows-notice-when-settings-fail		RecordsModelTest/showsNoticeWhenSettingsFail	Androidのみ	設定の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 records.marks-list-failure-until-retried		RecordsModelTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 records.marks-no-list-failure-when-settings-fail		RecordsModelTest/marksNoListFailureWhenSettingsFail	Androidのみ	設定の監視の失敗では旗を立てない。iOS にこの筋書きのテストは無い
+month-cursor.moves-by-months-and-keeps-direction	MonthCursorTests/movesByMonthsAndKeepsDirection		未移植	Android の MonthCursor に、月の数で動かす関数と動く向きが無い
+month-cursor.shows-given-month	MonthCursorTests/showsGivenMonth	MonthCursorTest/movesToMonthAndBackToCurrent	対応	Android は今月を nil で持つ
+month-cursor.starts-at-current-month		MonthCursorTest/startsAtCurrentMonth	Androidのみ	iOS は作る時に月を受け取り、今月の印を持たない
 review-comment-writer-accuracy.*	ReviewCommentWriterAccuracyTests/*		iOSのみ	Apple の FoundationModels で文を書く精度の確かめで、Android に相手が無い
 review.totals-upcoming-recurrings-of-current-period	ReviewModelTests/totalsUpcomingRecurringsOfCurrentPeriod		未移植	これからの定期の合計（upcomingRecurringTotal）が無い
 review.ranks-categories-by-amount	ReviewModelTests/ranksCategoriesByAmount	ReviewModelTest/ranksCategoriesByAmount	対応	予算の使い方・口座ごとの割合・割合ごとの記録の行は、Android に無く確かめない
@@ -380,6 +389,9 @@ review.scales-balance-bars-to-larger-expense		ReviewModelTest/scalesBalanceBarsT
 review.keeps-selection-only-after-saving		ReviewModelTest/keepsSelectionOnlyAfterSaving	Androidのみ	選んだだけでは保存せず、saveSelection で保存する。iOS にテストは無い
 review.reads-saved-selection-when-observing		ReviewModelTest/readsSavedSelectionWhenObserving	Androidのみ	observe の初めに保存済みの選択を読む。iOS にテストは無い
 review.leaves-out-categories-missing-from-list		ReviewModelTest/leavesOutCategoriesMissingFromList	Androidのみ	一覧に無いカテゴリを内訳から落とす。iOS にテストは無い
+period-cursor.moves-back-and-stops-at-current	PeriodCursorTests/movesBackAndStopsAtCurrent	PeriodCursorTest/movesBackAndForward PeriodCursorTest/staysWhenMovingPastCurrent	対応	Android は動く向きを持たない
+period-cursor.returns-to-current-moving-forward	PeriodCursorTests/returnsToCurrentMovingForward		未移植	Android の PeriodCursor に、今の期間へ戻す関数が無い
+period-cursor.restarts-with-given-direction	PeriodCursorTests/restartsWithGivenDirection	PeriodCursorTest/restartsAtCurrent	対応	Android は動く向きを持たない
 review-notice.shows-notice-when-list-fails		ReviewModelNoticeTest/showsNoticeWhenListFails	Androidのみ	記録の読み込みの失敗で知らせを出す。iOS にこの筋書きのテストは無い
 review-notice.marks-list-failure-until-retried		ReviewModelNoticeTest/marksListFailureUntilRetried	Androidのみ	iOS は Loadable を共通の observe で確かめ、やり直しは MainView が持つ
 review-notice.shows-notice-when-selection-cannot-be-read		ReviewModelNoticeTest/showsNoticeWhenSelectionCannotBeRead	Androidのみ	選択を読めない時の知らせ。iOS も出すがテストは無い

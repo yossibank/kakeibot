@@ -23,7 +23,7 @@ extension RecordsView {
 
                 Spacer()
 
-                Text(PeriodText.range(summary.range, today: model.state.today))
+                Text(PeriodText.range(summary.range, today: model.input.today))
                     .textFont(.caption)
                     .monospacedDigit()
                     .foregroundStyle(Palette.subtext)

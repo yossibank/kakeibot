@@ -6,29 +6,40 @@ public extension HomeModel {
     struct Fields: ScreenEditable {
         public var templateType: Entry.Kind = .expense
         public var billPage = 0
-        public var openRowId: Entry.ID?
-        public var shelf = Shelf()
-        public var customized: SetupItem?
+        public var shelfQuery = ""
+    }
+
+    struct Presented: ScreenEditable {
+        public var stamp = Shown<StampBook.Tally>()
+        public var shelf = Shown<ShelfPage>()
+        public var row = Shown<Entry.ID>()
+        public var glow = Shown<SetupItem>()
+
+        public internal(set) var customized: SetupItem?
+    }
+
+    @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
-        public var presented = Shown<StampBook.Tally>()
+        public var presented = Presented()
 
-        public internal(set) var today: LocalDate
+        public let notices: Notices
+
         public internal(set) var outcome = ScreenOutcome<EntryChange>()
-        public internal(set) var pendingDay: LocalDate?
+        public internal(set) var pendingDay = PendingDay()
 
-        public let errorNotice: ErrorNotice
-
-        init(
-            today: LocalDate,
-            wait: ScreenWait
-        ) {
-            self.today = today
-            self.errorNotice = ErrorNotice(wait: wait)
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
         }
     }
 }

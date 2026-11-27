@@ -45,8 +45,14 @@ class AssetsModel(
     class State(
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
+    }
+
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
     }
 
     class Input(
@@ -128,7 +134,7 @@ class AssetsModel(
     )
 
     override val errorNotice: ErrorNotice
-        get() = state.errorNotice
+        get() = state.notices.error
 
     override val isLoadFailed: Boolean
         get() = input.list.isFailed

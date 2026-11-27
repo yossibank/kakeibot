@@ -17,7 +17,11 @@ public extension RecordsModel {
         case delete
     }
 
-    enum Presented: Equatable, Identifiable, Sendable {
+    enum Adding: Hashable, Sendable {
+        case mark
+    }
+
+    enum Panel: Equatable, Identifiable, Sendable {
         case markMenu(LocalDate)
         case stamp(LocalDate)
         case reward(LocalDate)
@@ -25,15 +29,9 @@ public extension RecordsModel {
         case filter
         case adjustment(AdjustmentRow)
     }
-
-    struct Screen {
-        public internal(set) var selection: Set<Entry.ID>?
-        public internal(set) var openItemIds: Set<Entry.ID> = []
-        public internal(set) var isMovingForward = true
-    }
 }
 
-public extension RecordsModel.Presented {
+public extension RecordsModel.Panel {
     enum Key: Hashable, Sendable {
         case markMenu(LocalDate)
         case stamp(LocalDate)
@@ -44,7 +42,7 @@ public extension RecordsModel.Presented {
     }
 }
 
-public extension RecordsModel.Presented {
+public extension RecordsModel.Panel {
     var id: Key {
         switch self {
         case let .markMenu(date): .markMenu(date)
@@ -72,67 +70,67 @@ public extension RecordsModel.BatchTarget {
 
 public extension RecordsModel.State {
     var markMenuDate: LocalDate? {
-        guard case let .markMenu(date) = presented.current else {
+        guard case let .markMenu(date) = presented.panel.current else {
             return nil
         }
 
         return date
     }
 
-    var sheet: RecordsModel.Presented? {
-        presented.sheet
+    var sheet: RecordsModel.Panel? {
+        presented.panel.sheet
     }
 
-    func present(_ presented: RecordsModel.Presented) {
-        fields.isAddingMark = false
+    func present(_ panel: RecordsModel.Panel) {
+        presented.adding.closeAll()
 
-        if presented == .filter {
+        if panel == .filter {
             fields.filterTab = .expense
         }
 
-        self.presented.show(presented)
+        presented.panel.show(panel)
     }
 
     func finishAddingMark() {
-        if fields.isAddingMark {
-            fields.isAddingMark = false
+        if presented.adding.isShowing(.mark) {
+            presented.adding.close(.mark)
         }
     }
 
     func closeMarkMenu() {
         if markMenuDate != nil {
-            presented.closeAll()
+            presented.panel.closeAll()
         }
     }
 
     func select(_ ids: Set<Entry.ID>) {
-        if screen.selection != ids {
-            screen.selection = ids
+        if fields.selection != ids {
+            fields.selection = ids
         }
     }
 
     func finishSelecting() {
-        if screen.selection != nil {
-            screen.selection = nil
+        if fields.selection != nil {
+            fields.selection = nil
         }
     }
 
     func toggleItems(of id: Entry.ID) {
-        if screen.openItemIds.contains(id) {
-            screen.openItemIds.remove(id)
+        if presented.openItemIds.contains(id) {
+            presented.openItemIds.remove(id)
         } else {
-            screen.openItemIds.insert(id)
+            presented.openItemIds.insert(id)
         }
     }
 
     func head(forward isForward: Bool) {
-        if screen.isMovingForward != isForward {
-            screen.isMovingForward = isForward
+        if cursor.isMovingForward != isForward {
+            cursor.head(forward: isForward)
         }
     }
 }
 
-public extension Shown<RecordsModel.Presented> {
+public extension Shown<RecordsModel.Panel> {
     var sheet: Value? {
         get {
             current?.isSheet == true ? current : nil

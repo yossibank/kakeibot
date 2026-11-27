@@ -19,13 +19,13 @@ extension ReviewModelTests {
         let share = try #require(model.output.categoryShares.first)
         let id = try #require(model.output.rows(for: share).first?.id)
 
-        model.state.presented.show(.share(share))
+        model.state.presented.sheet.show(.share(share))
 
         let empty = model.state.takePending()
 
         model.choose(id, in: share)
 
-        let sheetAfterChoice = model.state.presented.current?.id
+        let sheetAfterChoice = model.state.presented.sheet.current?.id
         let first = model.state.takePending()
         let second = model.state.takePending()
 
@@ -48,16 +48,16 @@ extension ReviewModelTests {
         let share = try #require(model.output.categoryShares.first)
         let id = try #require(model.output.rows(for: share).first?.id)
 
-        model.state.presented.show(.analysis)
-        model.state.analysisShare.item = share
+        model.state.presented.sheet.show(.analysis)
+        model.state.presented.analysisShare.item = share
 
-        let sheetBefore = model.state.presented.current?.id
+        let sheetBefore = model.state.presented.sheet.current?.id
 
         model.choose(id, in: share)
 
         #expect(sheetBefore == .analysis)
-        #expect(model.state.presented.current?.id == nil)
-        #expect(model.state.analysisShare.current?.id == nil)
+        #expect(model.state.presented.sheet.current?.id == nil)
+        #expect(model.state.presented.analysisShare.current?.id == nil)
         #expect(model.state.takePending() == .entry(id))
     }
 
@@ -77,14 +77,14 @@ extension ReviewModelTests {
 
         let tally = try #require(model.output.stampTallies.first)
 
-        model.state.presented.show(.stamp(tally))
+        model.state.presented.sheet.show(.stamp(tally))
 
-        let sheetBefore = model.state.presented.current?.id
+        let sheetBefore = model.state.presented.sheet.current?.id
 
         model.state.open(afterSheet: .day(date))
 
         #expect(sheetBefore == .stamp(tally.id))
-        #expect(model.state.presented.current?.id == nil)
+        #expect(model.state.presented.sheet.current?.id == nil)
         #expect(model.state.takePending() == .day(date))
     }
 }

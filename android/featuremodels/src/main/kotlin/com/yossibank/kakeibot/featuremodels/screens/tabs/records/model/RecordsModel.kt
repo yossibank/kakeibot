@@ -20,6 +20,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
@@ -43,43 +44,62 @@ class RecordsModel(
     round: ObservationRound,
 ) : ScreenPerforming,
     TabScreenModel {
-    val state = State(today, parts.wait)
-    val input = Input()
+    val state = State(parts.wait)
+    val input = Input(today)
     val output = Output(input, state)
 
     private val dependencies = Dependencies(parts.database, parts.entryList, round)
 
+    data class Fields(
+        val selected: LocalDate? = null,
+    ) : ScreenEditable
+
     class State(
-        today: LocalDate,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
 
-        var today: LocalDate by mutableStateOf(today)
-            internal set
-
-        var month: YearMonth? by mutableStateOf(null)
+        var fields: Fields by mutableStateOf(Fields())
             private set
 
-        var selected: LocalDate? by mutableStateOf(null)
+        var cursor: MonthCursor by mutableStateOf(MonthCursor())
             private set
 
         fun move(to: YearMonth) {
-            month = to
-            selected = null
+            cursor = cursor.moved(to)
+            fields = fields.copy(selected = null)
         }
 
         fun select(date: LocalDate) {
-            selected = date
+            fields = fields.copy(selected = date)
         }
 
         internal fun openCurrentMonth() {
-            month = null
+            cursor = cursor.current()
         }
     }
 
-    class Input {
+    data class MonthCursor(
+        val month: YearMonth? = null,
+    ) {
+        fun moved(to: YearMonth): MonthCursor = copy(month = to)
+
+        fun current(): MonthCursor = copy(month = null)
+    }
+
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+    }
+
+    class Input(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var list: Loadable<EntryList> by mutableStateOf(Loadable.Loading)
             internal set
 
@@ -106,17 +126,17 @@ class RecordsModel(
         val selectedDate: LocalDate
             get() {
                 val period = period
-                val date = state.selected
+                val date = state.fields.selected
 
                 return when {
                     date != null && date in period -> date
-                    state.today in period -> state.today
+                    input.today in period -> input.today
                     else -> period.start
                 }
             }
 
         val shownMonth: YearMonth
-            get() = state.month ?: state.today.periodMonth(startingOn = input.monthStartDay)
+            get() = state.cursor.month ?: input.today.periodMonth(startingOn = input.monthStartDay)
 
         val period: ClosedRange<LocalDate>
             get() = shownMonth.period(startingOn = input.monthStartDay)
@@ -168,13 +188,13 @@ class RecordsModel(
     )
 
     override val errorNotice: ErrorNotice
-        get() = state.errorNotice
+        get() = state.notices.error
 
     override val isLoadFailed: Boolean
         get() = input.list.isFailed
 
     override fun setToday(today: LocalDate) {
-        state.today = today
+        input.today = today
     }
 
     override suspend fun observe() {

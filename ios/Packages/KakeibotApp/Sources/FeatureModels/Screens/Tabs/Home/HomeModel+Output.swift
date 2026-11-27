@@ -37,7 +37,7 @@ public extension HomeModel.Output {
         templatesCache.value {
             let shown = input.allTemplates.filter { $0.type == state.fields.templateType }
             let list = input.list.value
-            return list?.ordered(shown, by: input.templateOrder, today: state.today) ?? shown
+            return list?.ordered(shown, by: input.templateOrder, today: input.today) ?? shown
         }
     }
 
@@ -83,7 +83,7 @@ private extension HomeModel.Output {
         figuresCache.value {
             let bills = input.list.value?.upcomingCardBills(
                 recurrings: input.recurrings,
-                after: state.today,
+                after: input.today,
                 count: BillPage.limit
             )
 
@@ -93,7 +93,7 @@ private extension HomeModel.Output {
                 recurrings: input.recurrings,
                 monthStartDay: input.monthStartDay,
                 carryoverFrom: input.carryoverFrom,
-                today: state.today
+                today: input.today
             )
 
             return HomeFigures(overview: overview, billPages: BillPage.pages(of: bills ?? []))
@@ -102,8 +102,8 @@ private extension HomeModel.Output {
 
     func dayLabel(for date: LocalDate) -> String {
         switch date {
-        case state.today: "今日"
-        case state.today.adding(days: -1): "昨日"
+        case input.today: "今日"
+        case input.today.adding(days: -1): "昨日"
         default: date.monthDayText
         }
     }

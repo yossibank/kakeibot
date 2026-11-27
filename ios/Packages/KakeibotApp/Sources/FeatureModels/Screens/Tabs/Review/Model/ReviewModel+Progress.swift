@@ -27,7 +27,7 @@ extension ReviewModel {
 public extension ReviewModel.Output {
     var elapsedRange: ClosedRange<LocalDate> {
         let range = period.range
-        let end = range.contains(state.today) ? state.today : range.upperBound
+        let end = range.contains(input.today) ? input.today : range.upperBound
         return range.lowerBound...end
     }
 
@@ -40,7 +40,7 @@ public extension ReviewModel.Output {
                 basis: .budget,
                 spent: spent,
                 range: period.range,
-                today: state.today
+                today: input.today
             )
         }
 
@@ -57,7 +57,7 @@ public extension ReviewModel.Output {
             basis: .average(periods: totals.count),
             spent: spent,
             range: period.range,
-            today: state.today
+            today: input.today
         )
     }
 
@@ -81,7 +81,7 @@ public extension ReviewModel.Output {
         let progress = goal.progress(
             of: entries,
             in: period.range,
-            today: state.today
+            today: input.today
         )
 
         return ReviewGoalItem(

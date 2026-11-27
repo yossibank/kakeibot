@@ -87,7 +87,7 @@ class RecordsModelTest {
         setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.monday)
         ModelWait.until { model.input.weekStart == Weekday.monday }
 
-        assertEquals("2026-09", model.state.month.toString())
+        assertEquals("2026-09", model.state.cursor.month.toString())
     }
 
     @Test
@@ -175,14 +175,14 @@ class RecordsModelTest {
         assertEquals(setup.today, initial)
         assertEquals(chosen, selected)
         assertEquals("2026-09-01", moved.toString())
-        assertNull(model.state.selected)
+        assertNull(model.state.fields.selected)
     }
 
     @Test
     fun followsTodayWhenDateChanges() = modelTest(today = "2026-10-31") { setup ->
         val model = setup.recordsModel()
 
-        model.state.today = date("2026-11-01")
+        model.input.today = date("2026-11-01")
 
         assertEquals("2026-11", model.output.shownMonth.toString())
         assertEquals(date("2026-11-01"), model.output.selectedDate)
@@ -250,7 +250,7 @@ class RecordsModelTest {
 
         assertEquals(RecordsLayout.list, model.input.layout)
         assertEquals(RecordsLayout.calendar, setup.database.setting(SettingKey.recordsLayout))
-        assertEquals("保存できませんでした", model.state.errorNotice.message)
+        assertEquals("保存できませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -262,11 +262,11 @@ class RecordsModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
         setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.sunday)
         ModelWait.until { model.input.weekStart == Weekday.sunday }
 
-        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
+        assertEquals("記録を読めませんでした", model.state.notices.error.message)
         assertFalse(model.input.list.isLoaded)
         assertNull(model.input.list.value)
     }
@@ -283,7 +283,7 @@ class RecordsModelTest {
 
         setup.scope.launch { model.observe() }
         ModelWait.until { model.input.list.isFailed }
-        val message = model.state.errorNotice.message
+        val message = model.state.notices.error.message
         val list = model.input.list.value
         model.retry()
         ModelWait.until { model.input.list.isLoaded }
@@ -299,7 +299,7 @@ class RecordsModelTest {
         val model = setup.recordsModel()
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
 
         assertFalse(model.input.list.isFailed)
     }
@@ -310,10 +310,10 @@ class RecordsModelTest {
         val model = setup.recordsModel()
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
         ModelWait.until { model.input.list.isLoaded }
 
-        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
+        assertEquals("記録を読めませんでした", model.state.notices.error.message)
         assertEquals(MonthStartDay.first, model.input.monthStartDay)
     }
 

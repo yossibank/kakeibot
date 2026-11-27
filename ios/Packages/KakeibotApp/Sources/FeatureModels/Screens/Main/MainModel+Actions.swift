@@ -19,14 +19,14 @@ public extension MainModel {
 
     func openLaunchSheet(preferring sheet: Sheet?) {
         if let sheet {
-            state.presented.show(sheet)
+            state.presented.sheet.show(sheet)
         } else if input.launchScreen == .entry {
-            state.presented.show(.new)
+            state.presented.sheet.show(.new)
         }
     }
 
     func open(_ route: PlannedNotification.Route) async {
-        if state.presented.current != nil {
+        if state.presented.sheet.current != nil {
             await closeSheet()
         }
 
@@ -36,25 +36,25 @@ public extension MainModel {
 
         case let .entry(date):
             state.select(.home)
-            state.draft.state.setDate(date)
-            state.presented.show(.new)
+            state.submodels.draft.state.setDate(date)
+            state.presented.sheet.show(.new)
 
         case let .recurring(id):
-            state.presented.show(.recurring(id))
+            state.presented.sheet.show(.recurring(id))
 
         case let .template(id):
             state.select(.home)
-            state.presented.item = await templateSheet(id)
+            state.presented.sheet.item = await templateSheet(id)
 
         case .newTemplate:
             state.select(.home)
-            state.presented.show(.newTemplate)
+            state.presented.sheet.show(.newTemplate)
 
         case .receipt:
             state.select(.home)
-            state.draft.state.setDate(state.today)
+            state.submodels.draft.state.setDate(input.today)
             state.startReceipt()
-            state.presented.show(.new)
+            state.presented.sheet.show(.new)
         }
     }
 
@@ -69,27 +69,27 @@ public extension MainModel {
         }
 
         if let sheet {
-            state.presented.show(sheet)
+            state.presented.sheet.show(sheet)
         }
     }
 
     func receive(_ deletion: Deletion) {
-        state.undo.state.deletion.show(deletion)
+        state.notices.undo.state.deletion.show(deletion)
     }
 
     func addEntry(on date: LocalDate) {
-        state.draft.state.setDate(date)
-        state.presented.show(.new)
+        state.submodels.draft.state.setDate(date)
+        state.presented.sheet.show(.new)
     }
 
     func addTransfer() {
-        state.draft.select(.transfer)
-        state.presented.show(.transfer)
+        state.submodels.draft.select(.transfer)
+        state.presented.sheet.show(.transfer)
     }
 
     @discardableResult
     func prepareDraft() -> Task<Void, Never> {
-        let draft = EntryModel(parts: dependencies.parts, date: state.today)
+        let draft = EntryModel(parts: dependencies.parts, date: input.today)
 
         state.replaceDraft(with: draft)
 
@@ -100,8 +100,8 @@ public extension MainModel {
 
     @discardableResult
     func setToday(_ today: LocalDate) -> Task<Void, Never> {
-        state.draft.state.today = today
-        state.setToday(today)
+        state.submodels.draft.state.today = today
+        input.today = today
         return prepareDraft()
     }
 }
@@ -117,7 +117,7 @@ private extension MainModel {
     }
 
     func closeSheet() async {
-        state.presented.closeAll()
+        state.presented.sheet.closeAll()
         try? await Task.sleep(for: dependencies.closeDelay)
     }
 

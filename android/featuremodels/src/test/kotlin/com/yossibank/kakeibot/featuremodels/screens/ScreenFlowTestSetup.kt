@@ -64,9 +64,9 @@ class ScreenFlowTabs(
         get() = lists.map { list -> list?.entries.orEmpty().map { it.amount }.sorted() }
 
     fun setToday(today: LocalDate) {
-        home.state.today = today
-        records.state.today = today
-        review.state.today = today
+        home.input.today = today
+        records.input.today = today
+        review.input.today = today
         assets.setToday(today)
     }
 

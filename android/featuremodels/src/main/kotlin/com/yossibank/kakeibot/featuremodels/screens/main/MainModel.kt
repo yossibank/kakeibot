@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import kotlinx.coroutines.delay
@@ -23,7 +24,7 @@ class MainModel(
     sheet: Sheet? = null,
     closeDelay: Duration = sheetCloseDelay,
 ) : ScreenPerforming {
-    val state = State(tab, visitedTabs, sheet)
+    val state = State(TabSelection(tab, visitedTabs), sheet)
 
     private val dependencies = Dependencies(closeDelay)
 
@@ -50,34 +51,63 @@ class MainModel(
         ) : Sheet
     }
 
-    class State(
-        tab: Tab,
-        visitedTabs: Set<Tab>,
-        sheet: Sheet?,
+    data class TabSelection(
+        val current: Tab = Tab.Home,
+        val visited: Set<Tab> = setOf(Tab.Home),
     ) {
+        fun selected(tab: Tab): TabSelection = TabSelection(
+            current = tab,
+            visited = visited + tab,
+        )
+    }
+
+    class Presented(
+        sheet: Sheet?,
+    ) : ScreenEditable {
         val sheet = Shown(sheet)
 
-        var tab: Tab by mutableStateOf(tab)
+        private var settingsRound = 0
+
+        internal fun openSettings(recurring: Identifier<Recurring>) {
+            settingsRound += 1
+
+            sheet.show(
+                Sheet.Settings(
+                    recurring = recurring,
+                    round = settingsRound,
+                ),
+            )
+        }
+    }
+
+    class Notices {
+        var round: Int by mutableIntStateOf(0)
             private set
 
-        var visitedTabs: Set<Tab> by mutableStateOf(visitedTabs)
-            private set
+        fun next() {
+            round += 1
+        }
+    }
 
-        var noticeRound: Int by mutableIntStateOf(0)
+    class State(
+        tabs: TabSelection,
+        sheet: Sheet?,
+    ) {
+        val presented = Presented(sheet)
+        val notices = Notices()
+
+        var tabs: TabSelection by mutableStateOf(tabs)
             private set
 
         val observation = ObservationRound()
 
         private val foreground = ForegroundReturn()
 
-        private var round = 0
-
         val observationRound: Int
             get() = observation.count
 
         fun select(tab: Tab) {
-            this.tab = tab
-            visitedTabs = visitedTabs + tab
+            tabs = tabs.selected(tab)
         }
 
         fun restartObservation() {
@@ -91,18 +121,11 @@ class MainModel(
         }
 
         fun hideTabNotices() {
-            noticeRound += 1
+            notices.next()
         }
 
         internal fun openSettings(recurring: Identifier<Recurring>) {
-            round += 1
-
-            sheet.show(
-                Sheet.Settings(
-                    recurring = recurring,
-                    round = round,
-                ),
-            )
+            presented.openSettings(recurring)
         }
     }
 
@@ -111,7 +134,7 @@ class MainModel(
     )
 
     suspend fun open(route: PlannedNotification.Route) {
-        if (state.sheet.current != null) {
+        if (state.presented.sheet.current != null) {
             closeSheet()
         }
 
@@ -122,7 +145,7 @@ class MainModel(
 
             is PlannedNotification.Route.Entry -> {
                 state.select(Tab.Home)
-                state.sheet.show(Sheet.Entry(editing = null, date = route.date))
+                state.presented.sheet.show(Sheet.Entry(editing = null, date = route.date))
             }
 
             else -> {
@@ -132,11 +155,11 @@ class MainModel(
     }
 
     fun openEntry(editing: Identifier<Record>?) {
-        state.sheet.show(Sheet.Entry(editing = editing))
+        state.presented.sheet.show(Sheet.Entry(editing = editing))
     }
 
     private suspend fun closeSheet() {
-        state.sheet.closeAll()
+        state.presented.sheet.closeAll()
         delay(dependencies.closeDelay)
     }
 

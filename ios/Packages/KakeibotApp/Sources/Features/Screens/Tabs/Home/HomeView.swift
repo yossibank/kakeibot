@@ -96,8 +96,11 @@ public struct HomeView: View {
             .animation(.snappy, value: setup.output.showsCard)
             .animation(.snappy, value: model.output.homeLayout)
         }
-        .errorBanner(model.state.errorNotice)
-        .sheet(item: Bindable(model.state).presented.item, onDismiss: openPendingDay) { tally in
+        .errorBanner(model.state.notices.error)
+        .sheet(
+            item: Bindable(model.state).presented.stamp.item,
+            onDismiss: openPendingDay
+        ) { tally in
             StampDaysSheet(
                 tally: tally,
                 periodTitle: periodTitle,
@@ -161,12 +164,12 @@ private extension HomeView {
                     systemImage: "square.and.pencil",
                     text: "まだ記録がありません",
                     onRecord: {
-                        onAddEntry(model.state.today)
+                        onAddEntry(model.input.today)
                     }
                 )
             } else {
                 ForEach(model.output.recentRows) { row in
-                    SwipeRow(id: row.id, openId: Bindable(model.state).fields.openRowId) {
+                    SwipeRow(id: row.id, openId: Bindable(model.state).presented.row.item) {
                         onOpenEntry(row.id)
                     } onAction: {
                         onDeleteEntry(row.id)
@@ -198,7 +201,7 @@ private extension HomeView {
             tallies: model.output.stampTallies,
             emptyText: "今月はまだスタンプを押していません",
             onOpen: { tally in
-                model.state.presented.show(tally)
+                model.state.presented.stamp.show(tally)
             }
         )
     }
@@ -216,11 +219,13 @@ private extension HomeView {
         switch section {
         case .customize:
             HomeCustomizeCard(
-                changed: Bindable(model.state).fields.customized,
+                glowing: Bindable(model.state).presented.glow.item,
                 model: setup,
                 appIcon: appIcon,
                 isSheetOpen: isSheetOpen,
                 onOpen: onOpenSetup,
+                onChange: model.state.customize,
+                onSheetClose: model.state.finishCustomizing,
                 onClose: {
                     model.perform {
                         await $0.hide(.customize)

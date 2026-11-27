@@ -59,8 +59,8 @@ public struct AssetsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .errorBanner(model.state.errorNotice)
-        .sheet(item: Bindable(model.state).presented.item, onDismiss: openPending) { sheet in
+        .errorBanner(model.state.notices.error)
+        .sheet(item: Bindable(model.state).presented.sheet.item, onDismiss: openPending) { sheet in
             sheetContent(sheet)
         }
         .backdrop()

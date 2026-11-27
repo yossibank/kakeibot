@@ -11,6 +11,15 @@ public extension ScreenWait {
         try await Task.sleep(for: duration)
     }
 
+    /// 頼まれた長さに関わらず、決めた長さだけ待つ。部品が持つ既定の長さを、画面ごとに変えるために使う。
+    func lasting(_ duration: Duration) -> ScreenWait {
+        let sleep = sleep
+
+        return ScreenWait { _ in
+            try await sleep(duration)
+        }
+    }
+
     @MainActor
     @discardableResult
     func after(

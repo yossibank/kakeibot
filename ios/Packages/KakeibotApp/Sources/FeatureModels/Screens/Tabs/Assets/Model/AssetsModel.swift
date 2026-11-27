@@ -32,22 +32,35 @@ public extension AssetsModel {
         public var billPage = 0
     }
 
-    @MainActor
-    @Observable
-    final class State: NoticeHolding {
-        public var fields = Fields()
-        public var presented = Shown<Sheet>()
+    struct Presented: ScreenEditable {
+        public var sheet = Shown<Sheet>()
         public var rewardChild = Shown<RewardChild>()
 
         public internal(set) var reward = RewardSheet()
         public internal(set) var pending: Opening?
+    }
 
-        public let errorNotice: ErrorNotice
+    @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
         public let bought: UndoNotice<RewardGoal.ID>
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.error = ErrorNotice(wait: wait)
             self.bought = UndoNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    @Observable
+    final class State: NoticesHolding {
+        public var fields = Fields()
+        public var presented = Presented()
+
+        public let notices: Notices
+
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -129,7 +142,7 @@ public extension AssetsModel {
             input.latest.list = list
             input.latest.recurrings = try await dependencies.database.recurrings()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
 
         await refresh()

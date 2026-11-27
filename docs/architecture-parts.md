@@ -2,7 +2,7 @@
 
 > [!NOTE]
 > 複数の画面で使う仕組みの名前、使いどころ、置き場所が分かる。
-> 設定の一覧の画面の足し方は [architecture-parts-settings](architecture-parts-settings.md) にある。
+> 設定の一覧の足し方は [architecture-parts-settings](architecture-parts-settings.md) にある。State の組み方は [architecture-parts-state](architecture-parts-state.md) にある。
 > 全体の構成は [architecture](architecture.md)、名前の付け方は [architecture-naming](architecture-naming.md) にある。
 
 ## 🪝 プロトコル
@@ -13,6 +13,8 @@
 | --- | --- | --- |
 | `ScreenModel` | 画面のモデル。DB を監視し、読めなかった時は `NoticeHolding` の知らせと `Loadable` の `failed` に出す | `FeatureModels/Shared/Model/` |
 | `NoticeHolding` | エラーの知らせを持つ、モデルの状態。状態がそれだけの時は `NoticeState` を使う | `FeatureModels/Shared/Model/` |
+| `NoticesHolding` | 知らせを `notices` の枠に持つ状態。`errorNotice` は `notices.error` を返す | `FeatureModels/Shared/Model/` |
+| `ScreenNotices` | `notices` の枠の型。エラーの知らせを `error` で持つ | `FeatureModels/Shared/Model/` |
 | `ScreenPerforming` | 画面がモデルの async の関数を呼ぶ口。`perform` が `Task` を始め、画面は `Task` を書かない | `FeatureModels/Shared/Model/` |
 | `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `FeatureModels/Shared/Model/` |
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
@@ -24,7 +26,7 @@
 | `SettingsBoardSpec` | 一覧の画面ごとの設定（題・文言・並びの形・タイル・編集画面・確認）。画面ごとに 1 つ書く | `Features/Shared/SettingsParts/Board/` |
 | `SettingsFoldModel` | 説明カードと非表示の一覧を閉じたかを、DB から読み書きするモデル。値は `input` の `SettingsFoldInput` に置き、モデルは `foldStore()` だけ書く | `FeatureModels/Shared/SettingsParts/Hint/` |
 | `SettingsEditSheet` | 1 件を編集する画面。モデルと、削除・非表示の受け取りだけで作れる | `Features/Shared/SettingsParts/Input/` |
-| `ScreenEditable` | 画面が書いてよい値の型の印。Swift の `State` の `public var` は、`fields` と表示中の `Shown` だけにする（[決まり](architecture-screens-flow.md#-画面がモデルに書く値)） | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `ScreenEditable` | 画面が書いてよい値の型の印。Swift の `public var` は `fields` と `presented` だけにする（[決まり](architecture-screens-flow.md#-画面がモデルに書く値)） | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `TabScreenModel` | タブ 4 つの監視と、失敗の画面を出すかを持つ。今日は iOS の `MainView` と Kotlin の `rememberTabModel` から受ける | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `EditFlowSource` | `EditFlow` に渡す元で、変わったか・問題の文・保存・非表示・削除を返す。モデルの入れ子の `Source` が state・input・依存を持ち、流れは作る時に受けて強く持つ | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
@@ -56,9 +58,9 @@
 | `Shown` | 出している物（シート・確認・メニュー・パネル）を 1 つの値で持つ。Swift は確認に `shown[.delete]` で `Binding` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ModelTask` | 保存などの実行中の印。`attempt` は実行中でも走らせ、二度押しは呼ぶ側が `isRunning` で止める | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `Loadable` | 読み込み中・読めた・失敗を 1 つの値で持ち、値と読んだ印を組にしない。監視し直す時は、失敗だけを読み込み中に戻す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `UndoNotice` | 取り消しの知らせの値と、消すまでの 4 秒を持つ。時間は `ScreenParts` の `ScreenWait` で数える | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `UndoNotice` | 取り消しの知らせの値と、消すまでの時間（既定は 4 秒）を持つ。時間は `ScreenParts` の `ScreenWait` で数える | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ErrorNotice` | エラーの知らせの文・色・出した数と、消すまでの 6 秒を持ち、`show`・`inform`・`clear` で変える。時間は `ScreenWait` で数え、Kotlin は `ModelTask` の失敗もここに出す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `ScreenWait` | モデルの待ちで、`after` が時間の後に処理を動かす。テストは手で進める `ManualWait` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `ScreenWait` | モデルの待ちで、`after` が時間の後に処理を動かし、`lasting` が部品の既定の長さを画面ごとに変える。テストは手で進める `ManualWait` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ObservationRound` | 監視をやり直す回で、`MainModel` が 1 つ持つ。`restart` で進め、`each` が回ごとに監視を始め直す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `EditFlow` | 編集シートの流れの子のモデル。確認の `Shown`・`ModelTask`・保存の題・結果を持ち、モデルが `flow` で持つ | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `editSheet`・`EditSheet` | 編集シートの確認一式と結果の受け取り。Swift は `dismiss` を呼ぶ modifier、Kotlin は `onClose` と戻るを持つ | `Features/Shared/Model/`・`features/shared/model/` |

@@ -17,7 +17,7 @@ public extension ReviewModel {
 
         let now = dependencies.clock.now
 
-        state.checkTime = now
+        input.checkTime = now
 
         let current = output.currentPeriod
         let closed = current.previous
@@ -25,17 +25,7 @@ public extension ReviewModel {
         do {
             try await checkGoals(of: closed, now: now)
             try await makeGoal(after: closed, for: current, now: now)
-
-            let seen = try await dependencies.database.setting(.reviewSeenReports)
-            let hasEntries = output.entries.contains { closed.range.contains($0.date) }
-
-            guard current == output.currentPeriod else {
-                return
-            }
-
-            state.newReportKey = hasEntries && !seen.contains(closed.commentKey)
-                ? closed.commentKey
-                : nil
+            input.seenReports = try await dependencies.database.setting(.reviewSeenReports)
         } catch {
             return
         }
@@ -46,11 +36,11 @@ public extension ReviewModel {
     func markReportSeen() async {
         let key = output.period.commentKey
 
-        guard state.newReportKey == key else {
+        guard output.newReportKey == key else {
             return
         }
 
-        state.newReportKey = nil
+        input.seenReports?.insert(key)
 
         do {
             let seen = try await dependencies.database.setting(.reviewSeenReports)
@@ -112,7 +102,7 @@ public extension ReviewModel.Output {
     internal var currentPeriod: ReviewPeriod {
         ReviewPeriod(
             scale: input.scale,
-            containing: state.today,
+            containing: input.today,
             monthStartDay: input.monthStartDay,
             weekStart: input.weekStart
         )
@@ -123,13 +113,28 @@ public extension ReviewModel.Output {
     }
 
     var hasNewReport: Bool {
-        isCurrentPeriod && state.newReportKey != nil
+        isCurrentPeriod && newReportKey != nil
+    }
+
+    var newReportKey: String? {
+        let closed = currentPeriod.previous
+        let key = closed.commentKey
+
+        guard
+            let seen = input.seenReports,
+            !seen.contains(key),
+            entries.contains(where: { closed.range.contains($0.date) })
+        else {
+            return nil
+        }
+
+        return key
     }
 
     var closingGoals: ReviewClosing.Goals {
         let next = period.adding(1)
         let answer = input.goals.first { $0.period == period.commentKey }
-        let checked = answer.map { answered($0, now: state.checkTime) }
+        let checked = answer.map { answered($0, now: input.checkTime) }
         let nextGoal = input.goals.first { $0.period == next.commentKey }
         let nextItem = nextGoal.flatMap { goalItem($0, in: next) }
         let count = entryCount(in: period.range)

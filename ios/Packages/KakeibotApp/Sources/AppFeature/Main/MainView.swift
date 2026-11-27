@@ -100,7 +100,7 @@ struct MainView: View {
                     open(route)
                 }
             }
-            .onChange(of: model.state.presented.current) { _, sheet in
+            .onChange(of: model.state.presented.sheet.current) { _, sheet in
                 markOpened(sheet)
             }
             .onChange(of: today) { _, today in
@@ -139,7 +139,7 @@ private extension MainView {
 
             assetsTab
         }
-        .environment(\.noticeRound, model.state.noticeRound)
+        .environment(\.noticeRound, model.state.notices.round)
         .overlay(alignment: .leading) {
             if hasSidebar {
                 tabBar
@@ -170,7 +170,7 @@ private extension MainView {
 
     @ViewBuilder
     var signals: some View {
-        if model.state.isWarmingEntry {
+        if model.state.entry.isWarming {
             entryWarmup
         }
 
@@ -198,7 +198,7 @@ private extension MainView {
             .background {
                 signals
             }
-            .sheet(item: Bindable(model.state).presented.item) {
+            .sheet(item: Bindable(model.state).presented.sheet.item) {
                 model.prepareDraft()
             } content: { sheet in
                 sheetContent(for: sheet)
@@ -208,7 +208,7 @@ private extension MainView {
                 await observe()
             }
             .task {
-                await model.state.draft.load()
+                await model.state.submodels.draft.load()
             }
             .task {
                 await chooseLaunchTab()
@@ -232,7 +232,7 @@ private extension MainView {
             hasSidebar: hasSidebar,
             isAddHinted: !setup.input.isEntryOpened
         ) {
-            model.state.presented.show(.new)
+            model.state.presented.sheet.show(.new)
         }
     }
 
@@ -240,7 +240,7 @@ private extension MainView {
         let noticeAbove = Self.noticeAbove(hasSidebar: hasSidebar)
         let noticeBottom = Self.noticeBottom(hasSidebar: hasSidebar)
 
-        let undo = model.state.undo
+        let undo = model.state.notices.undo
 
         return Color.clear
             .padding(.leading, Self.noticeLeading(hasSidebar: hasSidebar))
@@ -270,7 +270,7 @@ private extension MainView {
     }
 
     var entryWarmup: some View {
-        EntrySheet(model: model.state.draft)
+        EntrySheet(model: model.state.submodels.draft)
             .opacity(0)
             .allowsHitTesting(false)
             .task {
@@ -290,10 +290,10 @@ private extension MainView {
 
     var tabErrorCounts: [Int] {
         [
-            home.state.errorNotice.count,
-            records.state.errorNotice.count,
-            review.state.errorNotice.count,
-            assets.state.errorNotice.count
+            home.state.notices.error.count,
+            records.state.notices.error.count,
+            review.state.notices.error.count,
+            assets.state.notices.error.count
         ]
     }
 
@@ -303,11 +303,11 @@ private extension MainView {
         }
 
         if source != .deletion {
-            model.state.undo.state.deletion.dismiss()
+            model.state.notices.undo.state.deletion.dismiss()
         }
 
         if source != .undoError {
-            model.state.undo.state.errorNotice.clear()
+            model.state.notices.undo.state.errorNotice.clear()
         }
 
         if source != .tab {

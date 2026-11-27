@@ -5,14 +5,14 @@ import SwiftUI
 
 extension RecordsView {
     @ViewBuilder
-    func sheetContent(_ sheet: RecordsModel.Presented) -> some View {
+    func sheetContent(_ sheet: RecordsModel.Panel) -> some View {
         switch sheet {
         case .markMenu:
             EmptyView()
 
         case let .stamp(date):
             RecordsStampSheet(
-                isAdding: Bindable(model.state).fields.isAddingMark,
+                isAdding: Bindable(model.state).presented.adding[.mark],
                 date: date,
                 choices: model.output.stampChoices,
                 current: model.output.stampIcon(on: date),

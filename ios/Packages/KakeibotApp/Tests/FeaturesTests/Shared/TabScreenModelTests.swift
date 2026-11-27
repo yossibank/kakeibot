@@ -19,9 +19,9 @@ struct TabScreenModelTests {
         review.setToday(next)
         assets.setToday(next)
 
-        #expect(home.state.today == next)
-        #expect(records.state.today == next)
-        #expect(review.state.today == next)
+        #expect(home.input.today == next)
+        #expect(records.input.today == next)
+        #expect(review.input.today == next)
         #expect(assets.input.latest.today == next)
     }
 

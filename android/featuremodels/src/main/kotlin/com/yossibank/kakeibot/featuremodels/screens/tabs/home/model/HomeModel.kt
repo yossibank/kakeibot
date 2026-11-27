@@ -31,31 +31,37 @@ class HomeModel(
     today: LocalDate,
     round: ObservationRound,
 ) : TabScreenModel {
-    val state = State(today, parts.wait)
-    val input = Input()
-    val output = Output(input, state)
+    val state = State(parts.wait)
+    val input = Input(today)
+    val output = Output(input)
 
     private val dependencies = Dependencies(parts.database, parts.entryList, round)
 
     class State(
-        today: LocalDate,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
-
-        var today: LocalDate by mutableStateOf(today)
-            internal set
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
     }
 
-    class Input {
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+    }
+
+    class Input(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var overview: Loadable<MonthOverview> by mutableStateOf(Loadable.Loading)
             internal set
     }
 
     class Output(
         private val input: Input,
-        private val state: State,
     ) {
         val month: YearMonth?
             get() = input.overview.value?.month
@@ -99,8 +105,8 @@ class HomeModel(
         }
 
         private fun dayLabel(date: LocalDate): String = when (date) {
-            state.today -> "今日"
-            state.today.adding(days = -1) -> "昨日"
+            input.today -> "今日"
+            input.today.adding(days = -1) -> "昨日"
             else -> date.monthDayText
         }
 
@@ -119,13 +125,13 @@ class HomeModel(
     )
 
     override val errorNotice: ErrorNotice
-        get() = state.errorNotice
+        get() = state.notices.error
 
     override val isLoadFailed: Boolean
         get() = false
 
     override fun setToday(today: LocalDate) {
-        state.today = today
+        input.today = today
     }
 
     override suspend fun observe() {
@@ -138,7 +144,7 @@ class HomeModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun observeOverview() {
-        val overviews = snapshotFlow { state.today }.flatMapLatest { day ->
+        val overviews = snapshotFlow { input.today }.flatMapLatest { day ->
             dependencies.database.monthOverviewUpdates(
                 on = day,
                 list = dependencies.entryList,

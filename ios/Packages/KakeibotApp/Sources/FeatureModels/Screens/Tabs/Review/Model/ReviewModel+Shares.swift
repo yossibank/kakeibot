@@ -100,7 +100,7 @@ public extension ReviewModel.Output {
     var upcomingRecurringTotal: Int? {
         guard
             entryType != nil,
-            period.range.contains(state.today)
+            period.range.contains(input.today)
         else {
             return nil
         }
@@ -114,7 +114,7 @@ public extension ReviewModel.Output {
                 of: input.recurrings,
                 in: range,
                 entries: entries,
-                today: state.today
+                today: input.today
             )
 
             return all
@@ -193,7 +193,7 @@ private extension ReviewModel.Output {
             budget: budget,
             carryover: carried,
             spent: spent,
-            today: state.today,
+            today: input.today,
             periodEnd: period.range.upperBound
         )
     }

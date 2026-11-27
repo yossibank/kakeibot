@@ -15,11 +15,11 @@ fun MainTabLayer(
     value: MainModel.Tab,
     content: @Composable () -> Unit,
 ) {
-    if (value !in model.state.visitedTabs) {
+    if (value !in model.state.tabs.visited) {
         return
     }
 
-    val isShown = model.state.tab == value
+    val isShown = model.state.tabs.current == value
 
     Box(
         modifier = Modifier

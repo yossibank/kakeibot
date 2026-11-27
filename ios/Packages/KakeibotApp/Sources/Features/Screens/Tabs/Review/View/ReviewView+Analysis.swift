@@ -21,7 +21,7 @@ extension ReviewView {
                 model.move(by: -1)
             }
 
-            model.state.presented.show(.analysis)
+            model.state.presented.sheet.show(.analysis)
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: bannerSymbol)
@@ -70,7 +70,7 @@ extension ReviewView {
     func analysisSheet(_ slide: PageSlideProxy) -> some View {
         VStack(spacing: 12) {
             SheetHeader {
-                model.state.presented.closeAll()
+                model.state.presented.sheet.closeAll()
             } title: {
                 Text("ふりかえり")
                     .displayFont(.body)
@@ -116,7 +116,7 @@ extension ReviewView {
         .task(id: model.output.noteTrigger) {
             await model.refreshNotes()
         }
-        .sheet(item: Bindable(model.state).analysisShare.item) { share in
+        .sheet(item: Bindable(model.state).presented.analysisShare.item) { share in
             shareSheet(share)
         }
         .backdrop()
@@ -154,10 +154,13 @@ private extension ReviewView {
                 previousName: model.output.period.previous.displayName,
                 unit: model.input.scale.unitName,
                 onOpenGoal: { item in
-                    model.state.analysisShare.item = model.output.goalShare(of: item)
+                    model.state.presented.analysisShare.item = model.output.goalShare(of: item)
                 },
                 onOpenWhy: { row, why in
-                    model.state.analysisShare.item = model.output.whyShare(of: row, why: why)
+                    model.state.presented.analysisShare.item = model.output.whyShare(
+                        of: row,
+                        why: why
+                    )
                 }
             )
             .task(id: model.output.period) {
@@ -170,7 +173,7 @@ private extension ReviewView {
         let period = model.output.period
         let closingDate = period.range.upperBound.adding(days: 1)
         let previousTitle = "\(period.previous.displayName)のふりかえりを見る"
-        let daysLeft = model.state.today.days(until: closingDate)
+        let daysLeft = model.input.today.days(until: closingDate)
 
         return ReviewProgressView(
             pace: model.output.pace,
@@ -187,7 +190,7 @@ private extension ReviewView {
                 move(by: -1, with: slide)
             },
             onOpenMonth: { month in
-                model.state.analysisShare.item = model.output.monthShare(of: month)
+                model.state.presented.analysisShare.item = model.output.monthShare(of: month)
             }
         )
     }
@@ -233,7 +236,7 @@ private extension ReviewView {
     }
 
     var currentName: String {
-        let isCurrent = model.output.period.range.contains(model.state.today)
+        let isCurrent = model.output.period.range.contains(model.input.today)
 
         return switch model.input.scale {
         case .week: isCurrent ? "今週" : "この週"

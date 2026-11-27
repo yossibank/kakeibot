@@ -6,6 +6,7 @@ public extension RecordsModel {
     @MainActor
     @Observable
     final class Input {
+        public internal(set) var today: LocalDate
         public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var monthStartDay: MonthStartDay = .first
         public internal(set) var weekStart: Weekday = .sunday
@@ -16,5 +17,9 @@ public extension RecordsModel {
         public internal(set) var recurrings: [Recurring] = []
         public internal(set) var recentSearches: [String] = []
         public internal(set) var layout: RecordsLayout = .calendar
+
+        init(today: LocalDate) {
+            self.today = today
+        }
     }
 }

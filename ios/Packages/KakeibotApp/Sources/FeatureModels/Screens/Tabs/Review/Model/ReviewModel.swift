@@ -17,8 +17,8 @@ public final class ReviewModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State(today: today, checkTime: parts.clock.now, wait: parts.wait)
-        let input = Input()
+        let state = State(wait: parts.wait)
+        let input = Input(today: today, checkTime: parts.clock.now)
 
         self.state = state
         self.input = input
@@ -30,36 +30,9 @@ public final class ReviewModel: ScreenModel {
 public extension ReviewModel {
     @MainActor
     @Observable
-    final class State: NoticeHolding {
-        public var presented = Shown<Sheet>()
-        public var analysisShare = Shown<Share>()
-
+    final class Input {
         public internal(set) var today: LocalDate
         public internal(set) var checkTime: Date
-        public internal(set) var pending: Opening?
-
-        public private(set) var offset = 0
-        public private(set) var isMovingForward = true
-
-        public internal(set) var showsStoreReviewCard = false
-        public internal(set) var newReportKey: String?
-
-        public let errorNotice: ErrorNotice
-
-        init(
-            today: LocalDate,
-            checkTime: Date,
-            wait: ScreenWait
-        ) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.today = today
-            self.checkTime = checkTime
-        }
-    }
-
-    @MainActor
-    @Observable
-    final class Input {
         public internal(set) var scale: ReviewPeriod.Scale = .month
         public internal(set) var kind: ReviewKind = .expense
         public internal(set) var monthStartDay: MonthStartDay = .first
@@ -69,6 +42,9 @@ public extension ReviewModel {
         public internal(set) var stampBook: StampBook?
         public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var goals: [ReviewGoal] = []
+        public internal(set) var isStoreReviewClosed = true
+        public internal(set) var historyCount = 0
+        public internal(set) var seenReports: Set<String>?
 
         var reasons: [String: String] = [:]
         var notes: [String: String] = [:]
@@ -77,6 +53,14 @@ public extension ReviewModel {
 
         @ObservationIgnored var reasonRequests: Set<String> = []
         @ObservationIgnored var noteRequests: Set<String> = []
+
+        init(
+            today: LocalDate,
+            checkTime: Date
+        ) {
+            self.today = today
+            self.checkTime = checkTime
+        }
     }
 
     @MainActor
@@ -157,7 +141,7 @@ public extension ReviewModel {
             input.scale = try await dependencies.database.setting(.reviewScale)
             input.kind = try await dependencies.database.setting(.reviewKind)
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -179,7 +163,7 @@ public extension ReviewModel {
             try await dependencies.database.setSetting(.reviewScale, to: input.scale)
             try await dependencies.database.setSetting(.reviewKind, to: input.kind)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -211,20 +195,20 @@ public extension ReviewModel.Output {
     var period: ReviewPeriod {
         let current = ReviewPeriod(
             scale: input.scale,
-            containing: state.today,
+            containing: input.today,
             monthStartDay: input.monthStartDay,
             weekStart: input.weekStart
         )
 
-        return current.adding(state.offset)
+        return current.adding(state.cursor.offset)
     }
 
     var canMoveForward: Bool {
-        state.offset < 0
+        state.cursor.offset < 0
     }
 
     var isCurrentPeriod: Bool {
-        state.offset == 0
+        state.cursor.isCurrent
     }
 
     var summary: ReviewSummary {
@@ -232,15 +216,15 @@ public extension ReviewModel.Output {
     }
 
     var previousSummary: ReviewSummary {
-        summary(in: period.comparisonRange(today: state.today))
+        summary(in: period.comparisonRange(today: input.today))
     }
 
     var isComparingPartially: Bool {
-        period.range.contains(state.today)
+        period.range.contains(input.today)
     }
 
     var hasPreviousEntries: Bool {
-        let range = period.comparisonRange(today: state.today)
+        let range = period.comparisonRange(today: input.today)
         return entries.contains { range.contains($0.date) }
     }
 
@@ -312,7 +296,7 @@ public extension ReviewModel.Output {
     }
 
     func canMove(by count: Int) -> Bool {
-        state.offset + count <= 0
+        state.cursor.canMove(by: count)
     }
 }
 
@@ -352,39 +336,14 @@ private extension ReviewModel.Output {
     }
 }
 
-extension ReviewModel.State {
-    func restart(movingForward isMovingForward: Bool) {
-        self.isMovingForward = isMovingForward
-        offset = 0
-    }
-
-    func move(by count: Int) {
-        guard offset + count <= 0 else {
-            return
-        }
-
-        isMovingForward = count > 0
-        offset += count
-    }
-
-    func moveToCurrent() {
-        guard offset < 0 else {
-            return
-        }
-
-        isMovingForward = true
-        offset = 0
-    }
-}
-
 extension ReviewModel: TabScreenModel {
     public var isLoadFailed: Bool {
         input.list.isFailed
     }
 
     public func setToday(_ today: LocalDate) {
-        if state.today != today {
-            state.today = today
+        if input.today != today {
+            input.today = today
         }
     }
 }

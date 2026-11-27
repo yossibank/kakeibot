@@ -1,31 +1,45 @@
 import Core
 
 public extension HomeModel {
-    struct Shelf: Equatable, Sendable {
-        public var query = ""
-        public var isEditing = false
+    enum ShelfPage: Hashable, Sendable {
+        case editing
     }
 }
 
 public extension HomeModel.State {
     func pickStampDay(_ date: LocalDate) {
-        pendingDay = date
-        presented.closeAll()
+        pendingDay.pick(date)
+        presented.stamp.closeAll()
     }
 
     func takePendingDay() -> LocalDate? {
-        guard let pendingDay else {
+        guard pendingDay.date != nil else {
             return nil
         }
 
-        self.pendingDay = nil
-
-        return pendingDay
+        return pendingDay.take()
     }
 
     func closeShelf() {
-        if fields.shelf != HomeModel.Shelf() {
-            fields.shelf = HomeModel.Shelf()
+        if !fields.shelfQuery.isEmpty {
+            fields.shelfQuery = ""
         }
+
+        if presented.shelf.current != nil {
+            presented.shelf.closeAll()
+        }
+    }
+
+    func customize(_ item: SetupItem) {
+        presented.customized = item
+    }
+
+    func finishCustomizing() {
+        guard let customized = presented.customized else {
+            return
+        }
+
+        presented.customized = nil
+        presented.glow.show(customized)
     }
 }

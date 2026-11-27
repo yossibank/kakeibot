@@ -5,7 +5,7 @@ import Observation
 @Observable
 public final class MainModel: ScreenPerforming {
     public let state: State
-    public let input = Input()
+    public let input: Input
 
     let dependencies: Dependencies
 
@@ -30,7 +30,8 @@ public final class MainModel: ScreenPerforming {
         let draft = EntryModel(parts: parts, date: today)
         let undo = DeletionUndo(parts: parts)
 
-        self.state = State(today: today, draft: draft, undo: undo)
+        self.state = State(draft: draft, undo: undo)
+        self.input = Input(today: today)
 
         self.dependencies = Dependencies(
             parts: parts,
@@ -64,39 +65,54 @@ public extension MainModel {
         case whatsNew(seenVersion: String?)
     }
 
+    struct Presented: ScreenEditable {
+        public var sheet = Shown<Sheet>()
+    }
+
+    @MainActor
+    struct Notices {
+        public let undo: DeletionUndo
+
+        public private(set) var round = 0
+    }
+
+    @MainActor
+    struct Submodels {
+        public internal(set) var draft: EntryModel
+    }
+
     @MainActor
     @Observable
     final class State {
-        public var presented = Shown<Sheet>()
+        public var presented = Presented()
 
-        public private(set) var tab: Tab = .home
-        public private(set) var visitedTabs: Set<Tab> = [.home]
-        public private(set) var startsReceipt = false
-        public private(set) var today: LocalDate
-        public private(set) var draft: EntryModel
-        public private(set) var isWarmingEntry = true
-        public private(set) var noticeRound = 0
+        public internal(set) var notices: Notices
+        public internal(set) var submodels: Submodels
+        public internal(set) var tabs = TabSelection()
+        public internal(set) var entry = EntryLaunch()
 
-        public let undo: DeletionUndo
         public let round = ObservationRound()
 
         @ObservationIgnored private var foreground = ForegroundReturn()
 
         init(
-            today: LocalDate,
             draft: EntryModel,
             undo: DeletionUndo
         ) {
-            self.today = today
-            self.draft = draft
-            self.undo = undo
+            self.notices = Notices(undo: undo)
+            self.submodels = Submodels(draft: draft)
         }
     }
 
     @MainActor
     @Observable
     final class Input {
+        public internal(set) var today: LocalDate
         public internal(set) var launchScreen: LaunchScreen?
+
+        init(today: LocalDate) {
+            self.today = today
+        }
     }
 }
 
@@ -115,8 +131,7 @@ public extension MainModel {
 
 public extension MainModel.State {
     func select(_ tab: MainModel.Tab) {
-        self.tab = tab
-        visitedTabs.insert(tab)
+        tabs.select(tab)
     }
 
     func changeScene(to phase: ForegroundReturn.Phase) {
@@ -126,35 +141,37 @@ public extension MainModel.State {
     }
 
     func hideTabNotices() {
-        noticeRound += 1
+        notices.nextRound()
     }
 }
 
 extension MainModel.State {
     func finishWarmingEntry() {
-        guard isWarmingEntry else {
+        guard entry.isWarming else {
             return
         }
 
-        isWarmingEntry = false
+        entry.finishWarming()
     }
 
     func startReceipt() {
-        startsReceipt = true
-    }
-
-    func setToday(_ today: LocalDate) {
-        self.today = today
+        entry.startReceipt()
     }
 
     func replaceDraft(with draft: EntryModel) {
-        startsReceipt = false
-        self.draft = draft
+        entry.clearReceipt()
+        submodels.draft = draft
     }
 }
 
 public extension MainModel.Sheet {
     var id: Self {
         self
+    }
+}
+
+extension MainModel.Notices {
+    mutating func nextRound() {
+        round += 1
     }
 }

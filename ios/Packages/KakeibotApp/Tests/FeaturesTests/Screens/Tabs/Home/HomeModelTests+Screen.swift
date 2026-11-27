@@ -21,14 +21,14 @@ extension HomeModelTests {
 
         let empty = model.state.takePendingDay()
 
-        model.state.presented.show(tally)
+        model.state.presented.stamp.show(tally)
         model.state.pickStampDay(date)
 
         let first = model.state.takePendingDay()
         let second = model.state.takePendingDay()
 
         #expect(empty == nil)
-        #expect(model.state.presented.current == nil)
+        #expect(model.state.presented.stamp.current == nil)
         #expect(first == date)
         #expect(second == nil)
     }
@@ -38,13 +38,33 @@ extension HomeModelTests {
         let setup = try await Setup()
         let model = HomeModel(parts: .system(setup.database), today: setup.today)
 
-        model.state.fields.shelf.query = "カフェ"
-        model.state.fields.shelf.isEditing = true
+        model.state.fields.shelfQuery = "カフェ"
+        model.state.presented.shelf.show(.editing)
         model.state.fields.templateType = .income
         model.state.closeShelf()
 
-        #expect(model.state.fields.shelf.query.isEmpty)
-        #expect(model.state.fields.shelf.isEditing == false)
+        #expect(model.state.fields.shelfQuery.isEmpty)
+        #expect(model.state.presented.shelf.current == nil)
         #expect(model.state.fields.templateType == .income)
+    }
+
+    @Test
+    func glowsCustomizedItemAfterClosingSheet() async throws {
+        let setup = try await Setup()
+        let model = HomeModel(parts: .system(setup.database), today: setup.today)
+
+        model.state.finishCustomizing()
+        let untouched = model.state.presented.glow.current
+
+        model.state.customize(.theme)
+        model.state.customize(.launchScreen)
+        let pending = model.state.presented.glow.current
+
+        model.state.finishCustomizing()
+
+        #expect(untouched == nil)
+        #expect(pending == nil)
+        #expect(model.state.presented.glow.current == .launchScreen)
+        #expect(model.state.presented.customized == nil)
     }
 }

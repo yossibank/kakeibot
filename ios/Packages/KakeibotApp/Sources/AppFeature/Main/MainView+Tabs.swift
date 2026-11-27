@@ -11,7 +11,7 @@ extension MainView {
                 model: home,
                 setup: setup,
                 appIcon: appIcon,
-                isSheetOpen: model.state.presented.current != nil,
+                isSheetOpen: model.state.presented.sheet.current != nil,
                 onOpenEntry: openEntry,
                 onShowRecords: {
                     records.openCurrentMonth()
@@ -21,12 +21,12 @@ extension MainView {
                 onAddEntry: model.addEntry(on:),
                 onRetry: retry,
                 onOpenSettings: {
-                    model.state.presented.show(.settings)
+                    model.state.presented.sheet.show(.settings)
                 },
                 onOpenNews: openNews,
                 onUseTemplate: useTemplate,
                 onShowAllTemplates: {
-                    model.state.presented.show(.templates)
+                    model.state.presented.sheet.show(.templates)
                 },
                 onOpenOrderMenu: { frame in
                     withAnimation(.snappy(duration: 0.25)) {
@@ -34,7 +34,7 @@ extension MainView {
                     }
                 },
                 onAddTemplate: {
-                    model.state.presented.show(.newTemplate)
+                    model.state.presented.sheet.show(.newTemplate)
                 },
                 onDeleteEntry: { id in
                     notice.perform {
@@ -44,7 +44,7 @@ extension MainView {
                 onOpenRecurrings: openRecurrings,
                 onOpenRecurring: openRecurring,
                 onOpenSetup: { item in
-                    model.state.presented.show(.setup(item))
+                    model.state.presented.sheet.show(.setup(item))
                 },
                 onOpenDay: showDay
             )
@@ -98,12 +98,12 @@ extension MainView {
                 model: assets,
                 onTransfer: model.addTransfer,
                 onOpenWallet: { id in
-                    model.state.presented.show(.wallet(id))
+                    model.state.presented.sheet.show(.wallet(id))
                 },
                 onOpenRecurring: openRecurring,
                 onOpenEntry: openEntry,
                 onMarkReward: {
-                    model.state.presented.show(.reward)
+                    model.state.presented.sheet.show(.reward)
                 }
             )
             .tabScreen(assets, round: model.state.round)

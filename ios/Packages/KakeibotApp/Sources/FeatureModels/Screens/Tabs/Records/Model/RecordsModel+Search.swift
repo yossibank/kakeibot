@@ -23,15 +23,20 @@ public extension RecordsModel {
     }
 
     func clearRecentSearches() async {
+        state.notices.clearedSearches.show(input.recentSearches)
         input.recentSearches = []
         await saveRecentSearches()
     }
 
-    func restoreRecentSearches(_ words: [String]) async {
+    func restoreRecentSearches() async {
+        guard let words = state.notices.clearedSearches.take() else {
+            return
+        }
+
         do {
             try await dependencies.database.setSetting(.recentSearches, to: words)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 }
@@ -41,7 +46,7 @@ private extension RecordsModel {
         do {
             try await dependencies.database.setSetting(.recentSearches, to: input.recentSearches)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 }
