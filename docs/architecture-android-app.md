@@ -97,7 +97,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 監視の回 | `MainModel` が `ObservationRound` を 1 つ持つ。`LocalObservationRound` でタブに配る |
 | タブの外枠 | `features/shared/tab/` の `TabScreen`。監視・知らせの時間・失敗の画面を持つ |
 | 記録の知らせ | `MainView` が `EntryNoticeModel` を持ち、タブの上に出す。`EntrySheet` が閉じる時に、結果の変更を渡す |
-| 知らせの入れ替え | 記録の知らせが出ると、`MainModel` の `noticeRound` を進める。タブは `TabNoticeRound` で、失敗の知らせを消す |
+| 知らせの入れ替え | 記録の知らせが出ると、`MainModel` の `notices.round` を `notices.next()` で進める。タブは `TabNoticeRound` で、失敗の知らせを消す |
 | タブの失敗の知らせ | `TabNoticeRound` が `LocalTabNoticeShown` を呼び、出ている記録の知らせを消す |
 | 失敗の後のやり直し | モデルの `retry` が回を進める。同じ回を持つタブは、すべて監視を始め直す |
 | 開いているシート | `MainModel.Sheet` のように 1 つの sealed interface にし、`Shown` で持つ |
