@@ -35,44 +35,19 @@ internal object ExportJson {
     ) {
         when (element) {
             is JsonObject -> {
-                val fields = element.entries.sortedBy { it.key }
-
-                appendContainer(
+                appendObject(
                     out = out,
-                    open = '{',
-                    close = '}',
-                    items = fields,
+                    element = element,
                     depth = depth,
-                ) { field ->
-                    appendString(
-                        out = out,
-                        text = field.key,
-                    )
-
-                    out.append(" : ")
-
-                    append(
-                        out = out,
-                        element = field.value,
-                        depth = depth + 1,
-                    )
-                }
+                )
             }
 
             is JsonArray -> {
-                appendContainer(
+                appendArray(
                     out = out,
-                    open = '[',
-                    close = ']',
-                    items = element,
+                    element = element,
                     depth = depth,
-                ) { item ->
-                    append(
-                        out = out,
-                        element = item,
-                        depth = depth + 1,
-                    )
-                }
+                )
             }
 
             is JsonNull -> {
@@ -89,6 +64,55 @@ internal object ExportJson {
                     out.append(element.content)
                 }
             }
+        }
+    }
+
+    private fun appendObject(
+        out: StringBuilder,
+        element: JsonObject,
+        depth: Int,
+    ) {
+        val fields = element.entries.sortedBy { it.key }
+
+        appendContainer(
+            out = out,
+            open = '{',
+            close = '}',
+            items = fields,
+            depth = depth,
+        ) { field ->
+            appendString(
+                out = out,
+                text = field.key,
+            )
+
+            out.append(" : ")
+
+            append(
+                out = out,
+                element = field.value,
+                depth = depth + 1,
+            )
+        }
+    }
+
+    private fun appendArray(
+        out: StringBuilder,
+        element: JsonArray,
+        depth: Int,
+    ) {
+        appendContainer(
+            out = out,
+            open = '[',
+            close = ']',
+            items = element,
+            depth = depth,
+        ) { item ->
+            append(
+                out = out,
+                element = item,
+                depth = depth + 1,
+            )
         }
     }
 

@@ -27,12 +27,8 @@ class EntryVoiceFlow internal constructor(
     noticeMillis: Long,
 ) : ScreenPerforming {
     val state = State()
+    val input = Input(isAvailable, silenceMillis)
     val output = Output(state)
-
-    val input = Input(
-        isAvailable = isAvailable,
-        silenceMillis = silenceMillis,
-    )
 
     private val runtime = Runtime()
 

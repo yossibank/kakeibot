@@ -3,6 +3,7 @@ package com.yossibank.kakeibot.features.screens.tabs.records.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -119,22 +120,27 @@ private fun DayHeader(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (day.expenseTotal > 0) {
-            AmountText(
-                amount = day.expenseTotal.toInt(),
-                style = displayFont(style = FontTextStyle.Footnote),
-                modifier = Modifier.alignByBaseline(),
-                type = Entry.Kind.expense,
-            )
-        }
+        DayTotals(day = day)
+    }
+}
 
-        if (day.incomeTotal > 0) {
-            AmountText(
-                amount = day.incomeTotal.toInt(),
-                style = displayFont(style = FontTextStyle.Footnote),
-                modifier = Modifier.alignByBaseline(),
-                type = Entry.Kind.income,
-            )
-        }
+@Composable
+private fun RowScope.DayTotals(day: EntryDay) {
+    if (day.expenseTotal > 0) {
+        AmountText(
+            amount = day.expenseTotal.toInt(),
+            style = displayFont(style = FontTextStyle.Footnote),
+            modifier = Modifier.alignByBaseline(),
+            type = Entry.Kind.expense,
+        )
+    }
+
+    if (day.incomeTotal > 0) {
+        AmountText(
+            amount = day.incomeTotal.toInt(),
+            style = displayFont(style = FontTextStyle.Footnote),
+            modifier = Modifier.alignByBaseline(),
+            type = Entry.Kind.income,
+        )
     }
 }

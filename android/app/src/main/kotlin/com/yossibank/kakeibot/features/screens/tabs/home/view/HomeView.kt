@@ -153,61 +153,79 @@ private fun BudgetCard(
             isFailed = model.input.overview.isFailed,
         )
 
-        Row(
-            modifier = Modifier
-                .clickable(onClick = onOpenBudget)
-                .padding(
-                    horizontal = 12.dp,
-                    vertical = 4.dp,
-                ),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = usage?.budgetText ?: "予算を決めると、あといくら使えるかが出ます",
-                color = if (usage == null) Palette.accent else Palette.subtext,
-                style = textFont(style = FontTextStyle.Subheadline),
-            )
-
-            Icon(
-                painter = painterResource(R.drawable.ic_chevron_right),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = if (usage == null) Palette.accent else Palette.subtext,
-            )
-        }
+        BudgetLink(
+            usage = usage,
+            onOpenBudget = onOpenBudget,
+        )
 
         Hairline()
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Stat(
-                title = "今日の支出",
-                amount = overview?.todayExpense ?: 0,
-                type = Entry.Kind.expense,
-                isFailed = model.input.overview.isFailed,
-                modifier = Modifier.weight(1f),
-            )
+        DialStats(model = model)
+    }
+}
 
-            VerticalRule()
+@Composable
+private fun BudgetLink(
+    usage: BudgetUsage?,
+    onOpenBudget: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clickable(onClick = onOpenBudget)
+            .padding(
+                horizontal = 12.dp,
+                vertical = 4.dp,
+            ),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = usage?.budgetText ?: "予算を決めると、あといくら使えるかが出ます",
+            color = if (usage == null) Palette.accent else Palette.subtext,
+            style = textFont(style = FontTextStyle.Subheadline),
+        )
 
-            Stat(
-                title = model.output.middleTitle,
-                amount = model.output.middleAmount,
-                type = Entry.Kind.expense,
-                isFailed = model.input.overview.isFailed,
-                modifier = Modifier.weight(1f),
-            )
+        Icon(
+            painter = painterResource(R.drawable.ic_chevron_right),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = if (usage == null) Palette.accent else Palette.subtext,
+        )
+    }
+}
 
-            VerticalRule()
+@Composable
+private fun DialStats(model: HomeModel) {
+    val overview = model.input.overview.value
 
-            Stat(
-                title = "今月の収入",
-                amount = overview?.monthIncome ?: 0,
-                type = Entry.Kind.income,
-                isFailed = model.input.overview.isFailed,
-                modifier = Modifier.weight(1f),
-            )
-        }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Stat(
+            title = "今日の支出",
+            amount = overview?.todayExpense ?: 0,
+            type = Entry.Kind.expense,
+            isFailed = model.input.overview.isFailed,
+            modifier = Modifier.weight(1f),
+        )
+
+        VerticalRule()
+
+        Stat(
+            title = model.output.middleTitle,
+            amount = model.output.middleAmount,
+            type = Entry.Kind.expense,
+            isFailed = model.input.overview.isFailed,
+            modifier = Modifier.weight(1f),
+        )
+
+        VerticalRule()
+
+        Stat(
+            title = "今月の収入",
+            amount = overview?.monthIncome ?: 0,
+            type = Entry.Kind.income,
+            isFailed = model.input.overview.isFailed,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 

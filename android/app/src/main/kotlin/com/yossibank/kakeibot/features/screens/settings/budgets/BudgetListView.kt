@@ -113,65 +113,90 @@ fun BudgetListView(
             BudgetKeypadDrawer(model = model)
         },
     ) {
-        SettingsIntroCard(
-            icon = R.drawable.ic_glyph_budget,
-            headline = "月に使う額を" to "カテゴリ別に決めます",
-            fold = model.input.hint,
-            model = model,
-            notes = listOf(
-                SettingsIntroNote(R.drawable.ic_calendar, "変えた額はこの月から使います"),
-                SettingsIntroNote(R.drawable.ic_repeat, "前の月の額はそのまま残ります"),
-            ),
-        )
+        BudgetIntro(model = model)
 
-        Column(
+        BudgetContent(
+            model = model,
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 96.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            BudgetTotalCard(
+                .verticalScroll(rememberScrollState()),
+        )
+    }
+}
+
+@Composable
+private fun BudgetIntro(model: BudgetListModel) {
+    SettingsIntroCard(
+        icon = R.drawable.ic_glyph_budget,
+        headline = "月に使う額を" to "カテゴリ別に決めます",
+        fold = model.input.hint,
+        model = model,
+        notes = listOf(
+            SettingsIntroNote(R.drawable.ic_calendar, "変えた額はこの月から使います"),
+            SettingsIntroNote(R.drawable.ic_repeat, "前の月の額はそのまま残ります"),
+        ),
+    )
+}
+
+@Composable
+private fun BudgetContent(
+    model: BudgetListModel,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(bottom = 96.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        BudgetTotalCard(
+            model = model,
+            onEdit = { model.startEditing(BudgetListModel.Target.Total) },
+            onReset = { model.perform { it.resetCarryover() } },
+        )
+
+        SettingsSwitch(
+            title = "残りを繰り越す",
+            detail = "使いすぎた分は、次の月の予算から引きます",
+            icon = R.drawable.ic_repeat,
+            isOn = model.output.isCarryoverOn,
+            onChange = { isOn -> model.perform { it.setCarryover(isOn) } },
+        )
+
+        if (model.output.budgeted.isNotEmpty()) {
+            BudgetedSection(model = model)
+        }
+
+        if (model.output.unbudgeted.isNotEmpty()) {
+            UnbudgetedSection(model = model)
+        }
+    }
+}
+
+@Composable
+private fun BudgetedSection(model: BudgetListModel) {
+    Section(
+        title = "カテゴリごと",
+        note = model.output.categoriesNote,
+    ) {
+        RowsCard(categories = model.output.budgeted) { category ->
+            BudgetCategoryRow(
                 model = model,
-                onEdit = { model.startEditing(BudgetListModel.Target.Total) },
-                onReset = { model.perform { it.resetCarryover() } },
+                category = category,
             )
+        }
+    }
+}
 
-            SettingsSwitch(
-                title = "残りを繰り越す",
-                detail = "使いすぎた分は、次の月の予算から引きます",
-                icon = R.drawable.ic_repeat,
-                isOn = model.output.isCarryoverOn,
-                onChange = { isOn -> model.perform { it.setCarryover(isOn) } },
+@Composable
+private fun UnbudgetedSection(model: BudgetListModel) {
+    Section(
+        title = "予算なし",
+        note = model.output.unbudgetedNote,
+    ) {
+        RowsCard(categories = model.output.unbudgeted) { category ->
+            BudgetPlainRow(
+                model = model,
+                category = category,
             )
-
-            if (model.output.budgeted.isNotEmpty()) {
-                Section(
-                    title = "カテゴリごと",
-                    note = model.output.categoriesNote,
-                ) {
-                    RowsCard(categories = model.output.budgeted) { category ->
-                        BudgetCategoryRow(
-                            model = model,
-                            category = category,
-                        )
-                    }
-                }
-            }
-
-            if (model.output.unbudgeted.isNotEmpty()) {
-                Section(
-                    title = "予算なし",
-                    note = model.output.unbudgetedNote,
-                ) {
-                    RowsCard(categories = model.output.unbudgeted) { category ->
-                        BudgetPlainRow(
-                            model = model,
-                            category = category,
-                        )
-                    }
-                }
-            }
         }
     }
 }

@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -127,20 +128,7 @@ private fun <Value> Tabs(
         trigger = highlightedIndex,
     )
 
-    Box(
-        modifier = modifier
-            .glass(tint = Palette.backgroundBottom)
-            .background(
-                brush = TabBarStyle.sheen,
-                shape = CircleShape,
-            )
-            .border(
-                width = 1.dp,
-                brush = TabBarStyle.rim,
-                shape = CircleShape,
-            )
-            .padding(8.dp),
-    ) {
+    Box(modifier = modifier.tabsSurface()) {
         Indicator(
             itemWidth = itemWidth,
             barWidth = barWidth,
@@ -154,41 +142,11 @@ private fun <Value> Tabs(
                 .fillMaxWidth()
                 .onSizeChanged { barWidth = it.width }
                 .pointerInput(Unit) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown()
-                        var x = down.position.x
-
-                        dragX = x
-
-                        while (true) {
-                            val event = awaitPointerEvent()
-                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
-
-                            x = change.position.x
-
-                            if (!change.pressed) {
-                                break
-                            }
-
-                            dragX = x
-                            change.consume()
-                        }
-
-                        val count = currentItems.size
-                        val width = if (count == 0) 0f else size.width.toFloat() / count
-
-                        val selected = index(
-                            x = x,
-                            itemWidth = width,
-                            count = currentItems.size,
-                        )
-
-                        dragX = null
-
-                        if (selected != null) {
-                            currentOnSelect(currentItems[selected].value)
-                        }
-                    }
+                    selectByDrag(
+                        count = { currentItems.size },
+                        onDrag = { dragX = it },
+                        onSelect = { currentOnSelect(currentItems[it].value) },
+                    )
                 },
         ) {
             items.forEachIndexed { index, item ->
@@ -210,6 +168,7 @@ private fun Indicator(
     selectedIndex: Int?,
     isShown: Boolean,
 ) {
+    val density = LocalDensity.current
     val isDragging = dragX != null
     val fill = Palette.accent.opacity(if (isDragging) Emphasis.Soft else Emphasis.Subtle)
 
@@ -232,8 +191,6 @@ private fun Indicator(
         targetValue = if (isDragging) 1.08f else 1f,
         label = "indicatorScale",
     )
-
-    val density = LocalDensity.current
 
     Box(
         modifier = Modifier
@@ -340,29 +297,89 @@ private fun AddButton(onAdd: () -> Unit) {
             },
         contentAlignment = Alignment.Center,
     ) {
-        DialTicks(
-            count = 12,
-            length = 4.dp,
-            color = Palette.accent.opacity(Emphasis.Strong),
-            lineWidth = 1.dp,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-        )
-
-        Icon(
-            painter = painterResource(R.drawable.ic_plus),
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
-            tint = Palette.accentStrong,
-        )
+        AddMark()
     }
+}
+
+@Composable
+private fun AddMark() {
+    DialTicks(
+        count = 12,
+        length = 4.dp,
+        color = Palette.accent.opacity(Emphasis.Strong),
+        lineWidth = 1.dp,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+    )
+
+    Icon(
+        painter = painterResource(R.drawable.ic_plus),
+        contentDescription = null,
+        modifier = Modifier.size(24.dp),
+        tint = Palette.accentStrong,
+    )
 }
 
 private fun Modifier.glass(tint: Color): Modifier = background(
     color = tint.copy(alpha = 0.92f),
     shape = CircleShape,
 )
+
+@Composable
+private fun Modifier.tabsSurface(): Modifier = glass(tint = Palette.backgroundBottom)
+    .background(
+        brush = TabBarStyle.sheen,
+        shape = CircleShape,
+    )
+    .border(
+        width = 1.dp,
+        brush = TabBarStyle.rim,
+        shape = CircleShape,
+    )
+    .padding(8.dp)
+
+private suspend fun PointerInputScope.selectByDrag(
+    count: () -> Int,
+    onDrag: (Float?) -> Unit,
+    onSelect: (Int) -> Unit,
+) {
+    awaitEachGesture {
+        val down = awaitFirstDown()
+        var x = down.position.x
+
+        onDrag(x)
+
+        while (true) {
+            val event = awaitPointerEvent()
+            val change = event.changes.firstOrNull { it.id == down.id } ?: break
+
+            x = change.position.x
+
+            if (!change.pressed) {
+                break
+            }
+
+            onDrag(x)
+            change.consume()
+        }
+
+        val itemCount = count()
+        val width = if (itemCount == 0) 0f else size.width.toFloat() / itemCount
+
+        val selected = index(
+            x = x,
+            itemWidth = width,
+            count = itemCount,
+        )
+
+        onDrag(null)
+
+        if (selected != null) {
+            onSelect(selected)
+        }
+    }
+}
 
 private fun index(
     x: Float,

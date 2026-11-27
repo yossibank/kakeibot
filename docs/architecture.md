@@ -45,15 +45,6 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 - `docs/`・`spec/` の `.md` が、README の文書の表か[決定の索引](decisions/README.md)からリンクされているか
 - claude-config のそろえる語の表の、使わない語（コードとリンク先は除く）
 
-### 基準線
-
-claude-config の並びの検査が見送る、今ある並びの外れを持つ。`make verify` で確かめ、直したら行を消す。
-
-| パス | 見送る検査 |
-| --- | --- |
-| `.claude/swift-layout-baseline.txt` | swift-layout-check の Swift の並び |
-| `.claude/kotlin-layout-baseline.txt` | kotlin-layout-check の Kotlin の並び |
-
 ### spec と store
 
 | パス | 中身 |

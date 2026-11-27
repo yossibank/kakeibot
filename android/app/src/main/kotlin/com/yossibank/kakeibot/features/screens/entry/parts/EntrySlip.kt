@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.Entry
+import com.yossibank.kakeibot.core.concepts.voice.VoiceReading
 import com.yossibank.kakeibot.designsystem.components.icon.IconTile
 import com.yossibank.kakeibot.designsystem.components.surface.Hairline
 import com.yossibank.kakeibot.designsystem.components.surface.card
@@ -77,58 +78,14 @@ fun EntrySlip(
 
     Column(modifier = modifier.card()) {
         if (model.state.form.type != Entry.Kind.transfer) {
-            SlipRow(
-                title = "カテゴリ",
-                value = preview?.categoryId
-                    ?.let { id -> model.output.categories.firstOrNull { it.id == id }?.name }
-                    ?: model.output.categoryText,
-                isActive = model.state.field == EntryModel.Field.Category,
-                onSelect = { model.state.focus(EntryModel.Field.Category) },
-            ) {
-                IconTile(
-                    icon = model.output.category?.let { model.output.icon(of = it.iconId) },
-                    size = 30.dp,
-                )
-            }
-
-            Hairline()
-
-            SlipRow(
-                title = model.output.walletTitle,
-                value = model.output.wallet?.name ?: "選ぶ",
-                isFromVoice = model.output.isWalletFromVoice,
-                isActive = model.state.field == EntryModel.Field.Wallet,
-                onSelect = { model.state.focus(EntryModel.Field.Wallet) },
-            ) {
-                IconTile(
-                    icon = model.output.wallet?.let { model.output.icon(of = it.iconId) },
-                    size = 30.dp,
-                )
-            }
+            CategoryFields(
+                model = model,
+                preview = preview,
+            )
         }
 
         if (model.state.form.type == Entry.Kind.transfer) {
-            val field = model.state.field.field(of = Entry.Kind.transfer)
-
-            SlipRow(
-                title = "振替",
-                value = model.output.routeText,
-                isActive = field == EntryModel.Field.Transfer,
-                onSelect = { model.state.focus(EntryModel.Field.Transfer) },
-            ) {
-                SymbolTile(icon = R.drawable.ic_swap)
-            }
-
-            Hairline()
-
-            SlipRow(
-                title = "手数料",
-                value = if (model.output.fee > 0) AmountText.text(model.output.fee) else "なし",
-                isActive = model.state.field == EntryModel.Field.Fee,
-                onSelect = { model.state.focus(EntryModel.Field.Fee) },
-            ) {
-                SymbolTile(icon = R.drawable.ic_bank)
-            }
+            TransferFields(model = model)
         }
 
         Hairline()
@@ -157,6 +114,66 @@ fun EntrySlip(
             onOpenItems = onOpenItems,
             onVoice = onVoice,
         )
+    }
+}
+
+@Composable
+private fun CategoryFields(
+    model: EntryModel,
+    preview: VoiceReading?,
+) {
+    SlipRow(
+        title = "カテゴリ",
+        value = preview?.categoryId
+            ?.let { id -> model.output.categories.firstOrNull { it.id == id }?.name }
+            ?: model.output.categoryText,
+        isActive = model.state.field == EntryModel.Field.Category,
+        onSelect = { model.state.focus(EntryModel.Field.Category) },
+    ) {
+        IconTile(
+            icon = model.output.category?.let { model.output.icon(of = it.iconId) },
+            size = 30.dp,
+        )
+    }
+
+    Hairline()
+
+    SlipRow(
+        title = model.output.walletTitle,
+        value = model.output.wallet?.name ?: "選ぶ",
+        isFromVoice = model.output.isWalletFromVoice,
+        isActive = model.state.field == EntryModel.Field.Wallet,
+        onSelect = { model.state.focus(EntryModel.Field.Wallet) },
+    ) {
+        IconTile(
+            icon = model.output.wallet?.let { model.output.icon(of = it.iconId) },
+            size = 30.dp,
+        )
+    }
+}
+
+@Composable
+private fun TransferFields(model: EntryModel) {
+    val field = model.state.field.field(of = Entry.Kind.transfer)
+
+    SlipRow(
+        title = "振替",
+        value = model.output.routeText,
+        isActive = field == EntryModel.Field.Transfer,
+        onSelect = { model.state.focus(EntryModel.Field.Transfer) },
+    ) {
+        SymbolTile(icon = R.drawable.ic_swap)
+    }
+
+    Hairline()
+
+    SlipRow(
+        title = "手数料",
+        value = if (model.output.fee > 0) AmountText.text(model.output.fee) else "なし",
+        isActive = model.state.field == EntryModel.Field.Fee,
+        onSelect = { model.state.focus(EntryModel.Field.Fee) },
+    ) {
+        SymbolTile(icon = R.drawable.ic_bank)
     }
 }
 
@@ -220,24 +237,7 @@ private fun AmountRow(
             .height(80.dp)
             .clickable { model.state.focus(EntryModel.Field.Amount) },
     ) {
-        Box(
-            modifier = Modifier
-                .size(30.dp)
-                .background(
-                    color = Palette.accent,
-                    shape = CircleShape,
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "¥",
-                color = Palette.backgroundTop,
-                style = textFont(
-                    size = FontSize.Body,
-                    weight = FontWeight.Bold,
-                ),
-            )
-        }
+        YenMark()
 
         Text(
             text = "金額",
@@ -248,24 +248,10 @@ private fun AmountRow(
             ),
         )
 
-        val isFee = model.state.field == EntryModel.Field.Fee
-        val expression = if (isFee) null else model.output.expressionText
-
-        if (listening != null) {
-            EntryVoiceWave(
-                levels = listening.levels,
-                reach = 2,
-                height = 20.dp,
-                modifier = Modifier.weight(1f),
-            )
-        } else {
-            FittedText(
-                text = expression ?: "",
-                modifier = Modifier.weight(1f),
-                color = Palette.hint,
-                style = textFont(size = FontSize.Caption),
-            )
-        }
+        AmountStatus(
+            model = model,
+            listening = listening,
+        )
 
         val amount = listening?.preview?.amount ?: model.output.amount
 
@@ -276,6 +262,53 @@ private fun AmountRow(
                 weight = FontWeight.Bold,
             ),
             color = if (amount > 0) Palette.accentStrong else Palette.hint,
+        )
+    }
+}
+
+@Composable
+private fun YenMark() {
+    Box(
+        modifier = Modifier
+            .size(30.dp)
+            .background(
+                color = Palette.accent,
+                shape = CircleShape,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "¥",
+            color = Palette.backgroundTop,
+            style = textFont(
+                size = FontSize.Body,
+                weight = FontWeight.Bold,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun RowScope.AmountStatus(
+    model: EntryModel,
+    listening: EntryVoiceFlow.Phase.Listening?,
+) {
+    val isFee = model.state.field == EntryModel.Field.Fee
+    val expression = if (isFee) null else model.output.expressionText
+
+    if (listening != null) {
+        EntryVoiceWave(
+            levels = listening.levels,
+            reach = 2,
+            height = 20.dp,
+            modifier = Modifier.weight(1f),
+        )
+    } else {
+        FittedText(
+            text = expression ?: "",
+            modifier = Modifier.weight(1f),
+            color = Palette.hint,
+            style = textFont(size = FontSize.Caption),
         )
     }
 }

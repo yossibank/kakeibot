@@ -78,20 +78,7 @@ fun RecurringQuickCard(
             SettingsDivider()
 
             Section(title = "カテゴリ") {
-                Chips {
-                    model.output.categories.forEach { category ->
-                        ChoiceChip(
-                            title = category.name,
-                            isSelected = category.id == model.state.form.categoryId,
-                            onSelect = { model.select(category = category.id) },
-                        ) {
-                            IconTile(
-                                icon = model.output.icon(of = category.iconId),
-                                size = 24.dp,
-                            )
-                        }
-                    }
-                }
+                CategoryGrid(model = model)
             }
         }
 
@@ -113,11 +100,7 @@ fun RecurringQuickCard(
             SettingsDivider()
 
             Section(title = EntryText.destinationTitle) {
-                WalletChips(
-                    model = model,
-                    selection = model.state.form.toWalletId,
-                    onSelect = { id -> model.state.update { copy(toWalletId = id) } },
-                )
+                DestinationGrid(model = model)
             }
         }
 
@@ -219,6 +202,24 @@ private fun AmountButton(
 }
 
 @Composable
+private fun CategoryGrid(model: RecurringEditModel) {
+    Chips {
+        model.output.categories.forEach { category ->
+            ChoiceChip(
+                title = category.name,
+                isSelected = category.id == model.state.form.categoryId,
+                onSelect = { model.select(category = category.id) },
+            ) {
+                IconTile(
+                    icon = model.output.icon(of = category.iconId),
+                    size = 24.dp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun WalletChips(
     model: RecurringEditModel,
     selection: Identifier<Wallet>?,
@@ -238,6 +239,15 @@ private fun WalletChips(
             }
         }
     }
+}
+
+@Composable
+private fun DestinationGrid(model: RecurringEditModel) {
+    WalletChips(
+        model = model,
+        selection = model.state.form.toWalletId,
+        onSelect = { id -> model.state.update { copy(toWalletId = id) } },
+    )
 }
 
 @Composable
@@ -265,78 +275,88 @@ private fun BillShiftChips(model: RecurringEditModel) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Schedule(model: RecurringEditModel) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 44.dp)
-                .clickable(onClick = model.state::toggleSchedule),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "繰り返し",
-                modifier = Modifier.weight(1f),
-                color = Palette.accent,
-                style = textFont(
-                    style = FontTextStyle.Caption,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
-
-            Text(
-                text = RecurringText.schedule(
-                    frequency = model.state.form.frequency,
-                    month = model.state.form.month,
-                    day = model.state.form.day,
-                ),
-                color = Palette.accentStrong,
-                style = textFont(style = FontTextStyle.Footnote),
-            )
-
-            Icon(
-                painter = painterResource(R.drawable.ic_chevron_right),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .size(16.dp)
-                    .rotate(if (model.state.isScheduleOpen) 270f else 90f),
-                tint = Palette.accentStrong,
-            )
-        }
+        ScheduleHeader(model = model)
 
         if (model.state.isScheduleOpen) {
-            SegmentSwitch(
-                selection = model.state.form.frequency,
-                options = frequencies,
-                onSelect = { frequency -> model.state.update { copy(frequency = frequency) } },
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            if (model.state.form.frequency == Recurring.Frequency.yearly) {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    (1..12).forEach { month ->
-                        ChoiceChip(
-                            title = "$month 月",
-                            isSelected = model.state.form.month == month,
-                            onSelect = { model.state.update { copy(month = month) } },
-                            modifier = Modifier.widthIn(min = 64.dp),
-                        )
-                    }
-                }
-            }
-
-            DayGrid(
-                selection = model.state.form.day,
-                onSelect = { day -> model.state.update { copy(day = day) } },
-            )
+            ScheduleChooser(model = model)
         }
     }
+}
+
+@Composable
+private fun ScheduleHeader(model: RecurringEditModel) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 44.dp)
+            .clickable(onClick = model.state::toggleSchedule),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = "繰り返し",
+            modifier = Modifier.weight(1f),
+            color = Palette.accent,
+            style = textFont(
+                style = FontTextStyle.Caption,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+
+        Text(
+            text = RecurringText.schedule(
+                frequency = model.state.form.frequency,
+                month = model.state.form.month,
+                day = model.state.form.day,
+            ),
+            color = Palette.accentStrong,
+            style = textFont(style = FontTextStyle.Footnote),
+        )
+
+        Icon(
+            painter = painterResource(R.drawable.ic_chevron_right),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 4.dp)
+                .size(16.dp)
+                .rotate(if (model.state.isScheduleOpen) 270f else 90f),
+            tint = Palette.accentStrong,
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ScheduleChooser(model: RecurringEditModel) {
+    SegmentSwitch(
+        selection = model.state.form.frequency,
+        options = frequencies,
+        onSelect = { frequency -> model.state.update { copy(frequency = frequency) } },
+        modifier = Modifier.fillMaxWidth(),
+    )
+
+    if (model.state.form.frequency == Recurring.Frequency.yearly) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            (1..12).forEach { month ->
+                ChoiceChip(
+                    title = "$month 月",
+                    isSelected = model.state.form.month == month,
+                    onSelect = { model.state.update { copy(month = month) } },
+                    modifier = Modifier.widthIn(min = 64.dp),
+                )
+            }
+        }
+    }
+
+    DayGrid(
+        selection = model.state.form.day,
+        onSelect = { day -> model.state.update { copy(day = day) } },
+    )
 }
 
 private val frequencies = listOf(

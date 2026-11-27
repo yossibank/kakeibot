@@ -53,19 +53,10 @@ internal suspend fun AppDatabase.insertEntry(
 ): Entry? {
     val date = on.date
 
-    val exists = entryDao()
-        .ofRecurring(
-            recurringId = of.id.databaseValue,
-            earliest = on.scheduled.adding(days = -40).databaseValue,
-            latest = on.scheduled.adding(days = 40).databaseValue,
-        )
-        .map { it.decoded(EntryRecord::entry) }
-        .any {
-            of.isRecorded(
-                by = it,
-                scheduled = on.scheduled,
-            )
-        }
+    val exists = recordedBill(
+        of = of,
+        on = on,
+    ) != null
 
     val amount = billAmount(
         of = of,
@@ -114,6 +105,23 @@ internal suspend fun AppDatabase.insertEntry(
 
     return entry
 }
+
+internal suspend fun AppDatabase.recordedBill(
+    of: Recurring,
+    on: Recurring.Occurrence,
+): Entry? = entryDao()
+    .ofRecurring(
+        recurringId = of.id.databaseValue,
+        earliest = on.scheduled.adding(days = -40).databaseValue,
+        latest = on.scheduled.adding(days = 40).databaseValue,
+    )
+    .map { it.decoded(EntryRecord::entry) }
+    .firstOrNull {
+        of.isRecorded(
+            by = it,
+            scheduled = on.scheduled,
+        )
+    }
 
 internal suspend fun AppDatabase.billAmount(
     of: Recurring,

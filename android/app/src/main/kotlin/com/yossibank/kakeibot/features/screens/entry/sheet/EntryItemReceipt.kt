@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.yossibank.kakeibot.R
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
+import com.yossibank.kakeibot.core.concepts.entry.EntryItemTotal
 import com.yossibank.kakeibot.designsystem.components.input.Keypad
 import com.yossibank.kakeibot.designsystem.components.input.PlaceholderTextField
 import com.yossibank.kakeibot.designsystem.components.input.SegmentSwitch
@@ -102,93 +103,21 @@ fun EntryItemReceipt(
             ),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            val date = model.state.form.date
-
-            Text(
-                text = "${date.year}/${PeriodText.weekdayDate(date)}",
-                color = Palette.subtext,
-                style = textFont(size = FontSize.Caption),
-            )
-
-            StoreField(model = model)
-        }
+        ReceiptHeader(model = model)
 
         Hairline(color = Palette.paperEdge)
 
-        if (model.state.form.items.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    text = "品目はまだありません",
-                    color = Palette.subtext,
-                    style = textFont(size = FontSize.Small),
-                )
-
-                Text(
-                    text = "下の「品目を追加」から追加できます。",
-                    color = Palette.hint,
-                    style = textFont(size = FontSize.Caption),
-                )
-            }
-        } else {
-            Column {
-                model.state.form.items.forEachIndexed { index, item ->
-                    key(index, item) {
-                        ItemRow(
-                            item = item,
-                            isEditing = editor.isOpen && editor.editingIndex == index,
-                            showsRate = model.state.form.items.map { it.taxRate }.toSet().size > 1,
-                            onSelect = { editor.edit(index, item) },
-                            onRemove = { editor.remove(model, index) },
-                        )
-                    }
-                }
-            }
-        }
-
-        Hairline(color = Palette.paperEdge)
-
-        SummaryLine(
-            title = "小計",
-            amount = totals.subtotal,
+        ReceiptItems(
+            model = model,
+            editor = editor,
         )
 
-        if (totals.taxes.isNotEmpty()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "税の計算",
-                    modifier = Modifier.weight(1f),
-                    color = Palette.subtext,
-                    style = textFont(size = FontSize.Caption),
-                )
+        Hairline(color = Palette.paperEdge)
 
-                SegmentSwitch(
-                    selection = model.state.form.taxIncluded,
-                    options = listOf(false to "外税", true to "内税"),
-                    onSelect = model::setTaxIncluded,
-                )
-            }
-
-            totals.taxes.forEach { tax ->
-                val title = if (model.state.form.taxIncluded) "内消費税" else "消費税"
-
-                SummaryLine(
-                    title = "${tax.rate.rawValue}%対象 ${AmountText.text(tax.base.toInt())}",
-                    amount = null,
-                    detail = "$title ${AmountText.text(tax.amount.toInt())}",
-                )
-            }
-        }
+        ReceiptSummary(
+            model = model,
+            totals = totals,
+        )
 
         if (model.output.hasItemAdjustment) {
             AdjustmentLine(model = model)
@@ -196,42 +125,156 @@ fun EntryItemReceipt(
 
         Hairline(color = Palette.paperEdge)
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        ReceiptTotal(model = model)
+
+        ReceiptCount(model = model)
+    }
+}
+
+@Composable
+private fun ReceiptHeader(model: EntryModel) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        val date = model.state.form.date
+
+        Text(
+            text = "${date.year}/${PeriodText.weekdayDate(date)}",
+            color = Palette.subtext,
+            style = textFont(size = FontSize.Caption),
+        )
+
+        StoreField(model = model)
+    }
+}
+
+@Composable
+private fun ReceiptItems(
+    model: EntryModel,
+    editor: EntryItemEditor,
+) {
+    if (model.state.form.items.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
             Text(
-                text = "合計",
-                modifier = Modifier.weight(1f),
-                color = Palette.text,
-                style = textFont(
-                    size = FontSize.Small,
-                    weight = FontWeight.SemiBold,
-                ),
+                text = "品目はまだありません",
+                color = Palette.subtext,
+                style = textFont(size = FontSize.Small),
             )
 
-            FittedText(
-                text = AmountText.text(model.output.amount),
-                color = Palette.accentStrong,
-                style = displayFont(
-                    size = FontSize.Display,
-                    weight = FontWeight.Bold,
-                ),
+            Text(
+                text = "下の「品目を追加」から追加できます。",
+                color = Palette.hint,
+                style = textFont(size = FontSize.Caption),
             )
         }
-
-        if (model.state.form.items.isNotEmpty()) {
-            Row {
-                Text(
-                    text = "お買上点数",
-                    modifier = Modifier.weight(1f),
-                    color = Palette.subtext,
-                    style = textFont(size = FontSize.Caption),
-                )
-
-                Text(
-                    text = "${model.output.itemCount}点",
-                    color = Palette.subtext,
-                    style = textFont(size = FontSize.Caption),
-                )
+    } else {
+        Column {
+            model.state.form.items.forEachIndexed { index, item ->
+                key(index, item) {
+                    ItemRow(
+                        item = item,
+                        isEditing = editor.isOpen && editor.editingIndex == index,
+                        showsRate = model.state.form.items.map { it.taxRate }.toSet().size > 1,
+                        onSelect = { editor.edit(index, item) },
+                        onRemove = { editor.remove(model, index) },
+                    )
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun ReceiptSummary(
+    model: EntryModel,
+    totals: EntryItemTotal,
+) {
+    SummaryLine(
+        title = "小計",
+        amount = totals.subtotal,
+    )
+
+    if (totals.taxes.isNotEmpty()) {
+        TaxModeLine(model = model)
+
+        totals.taxes.forEach { tax ->
+            val title = if (model.state.form.taxIncluded) "内消費税" else "消費税"
+
+            SummaryLine(
+                title = "${tax.rate.rawValue}%対象 ${AmountText.text(tax.base.toInt())}",
+                amount = null,
+                detail = "$title ${AmountText.text(tax.amount.toInt())}",
+            )
+        }
+    }
+}
+
+@Composable
+private fun TaxModeLine(model: EntryModel) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = "税の計算",
+            modifier = Modifier.weight(1f),
+            color = Palette.subtext,
+            style = textFont(size = FontSize.Caption),
+        )
+
+        SegmentSwitch(
+            selection = model.state.form.taxIncluded,
+            options = listOf(false to "外税", true to "内税"),
+            onSelect = model::setTaxIncluded,
+        )
+    }
+}
+
+@Composable
+private fun ReceiptTotal(model: EntryModel) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = "合計",
+            modifier = Modifier.weight(1f),
+            color = Palette.text,
+            style = textFont(
+                size = FontSize.Small,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+
+        FittedText(
+            text = AmountText.text(model.output.amount),
+            color = Palette.accentStrong,
+            style = displayFont(
+                size = FontSize.Display,
+                weight = FontWeight.Bold,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun ReceiptCount(model: EntryModel) {
+    if (model.state.form.items.isNotEmpty()) {
+        Row {
+            Text(
+                text = "お買上点数",
+                modifier = Modifier.weight(1f),
+                color = Palette.subtext,
+                style = textFont(size = FontSize.Caption),
+            )
+
+            Text(
+                text = "${model.output.itemCount}点",
+                color = Palette.subtext,
+                style = textFont(size = FontSize.Caption),
+            )
         }
     }
 }

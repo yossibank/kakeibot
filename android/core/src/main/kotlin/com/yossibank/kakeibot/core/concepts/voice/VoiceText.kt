@@ -63,6 +63,8 @@ internal class VoiceText(
     internal companion object {
         private val separators: Set<Char> = "、。,.!?！？「」".toSet()
         private val particles: Set<Char> = "でにをはがともへの".toSet()
+        private val fillers = setOf("えっと", "えーと", "えー", "あの", "あと", "それと", "から", "より")
+        private val digitComma = Regex("([0-9])[,，](?=[0-9]{3})")
 
         private val endings = listOf(
             "の支払い",
@@ -89,9 +91,6 @@ internal class VoiceText(
             "電子マネー",
             "現金払い",
         )
-
-        private val fillers = setOf("えっと", "えーと", "えー", "あの", "あと", "それと", "から", "より")
-        private val digitComma = Regex("([0-9])[,，](?=[0-9]{3})")
 
         fun fold(text: String): String {
             val katakana = buildString(text.length) {

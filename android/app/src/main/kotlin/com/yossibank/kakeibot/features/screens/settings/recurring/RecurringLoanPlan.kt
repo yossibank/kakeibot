@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.designsystem.components.surface.card
 import com.yossibank.kakeibot.designsystem.components.text.AmountText
 import com.yossibank.kakeibot.designsystem.theme.FontSize
@@ -47,39 +48,11 @@ fun RecurringLoanPlan(
         val end = model.output.scheduledEndDate
 
         if (total != null && end != null) {
-            Row(verticalAlignment = Alignment.Bottom) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    Caption(text = if (model.flow.output.isEditing) "これから返す額" else "返す総額")
-
-                    AmountText(
-                        amount = total.clamped,
-                        style = displayFont(
-                            size = FontSize.Title,
-                            weight = FontWeight.Bold,
-                        ),
-                        color = Palette.accentStrong,
-                    )
-                }
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                    horizontalAlignment = Alignment.End,
-                ) {
-                    Caption(text = "終わり")
-
-                    Text(
-                        text = "${end.year}年${end.month}月",
-                        color = Palette.text,
-                        style = textFont(
-                            style = FontTextStyle.Subheadline,
-                            weight = FontWeight.SemiBold,
-                        ),
-                    )
-                }
-            }
+            Summary(
+                title = if (model.flow.output.isEditing) "これから返す額" else "返す総額",
+                total = total,
+                end = end,
+            )
         }
 
         model.output.finalAmount?.let { finalAmount ->
@@ -101,29 +74,83 @@ fun RecurringLoanPlan(
         }
 
         noteText(model)?.let { note ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = note,
-                    modifier = Modifier.weight(1f),
-                    color = if (model.output.balanceGap == null) Palette.subtext else Palette.amber,
-                    style = textFont(style = FontTextStyle.Caption),
-                )
+            Note(
+                model = model,
+                note = note,
+                onMatch = onMatch,
+            )
+        }
+    }
+}
 
-                if (!model.output.usesAutoCount && model.output.autoPlan != null) {
-                    Text(
-                        text = "合わせる",
-                        modifier = Modifier.clickable(onClick = onMatch),
-                        color = Palette.accent,
-                        style = textFont(
-                            size = FontSize.Caption,
-                            weight = FontWeight.Bold,
-                        ),
-                    )
-                }
-            }
+@Composable
+private fun Summary(
+    title: String,
+    total: Long,
+    end: LocalDate,
+) {
+    Row(verticalAlignment = Alignment.Bottom) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Caption(text = title)
+
+            AmountText(
+                amount = total.clamped,
+                style = displayFont(
+                    size = FontSize.Title,
+                    weight = FontWeight.Bold,
+                ),
+                color = Palette.accentStrong,
+            )
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalAlignment = Alignment.End,
+        ) {
+            Caption(text = "終わり")
+
+            Text(
+                text = "${end.year}年${end.month}月",
+                color = Palette.text,
+                style = textFont(
+                    style = FontTextStyle.Subheadline,
+                    weight = FontWeight.SemiBold,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun Note(
+    model: RecurringEditModel,
+    note: String,
+    onMatch: () -> Unit,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = note,
+            modifier = Modifier.weight(1f),
+            color = if (model.output.balanceGap == null) Palette.subtext else Palette.amber,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+
+        if (!model.output.usesAutoCount && model.output.autoPlan != null) {
+            Text(
+                text = "合わせる",
+                modifier = Modifier.clickable(onClick = onMatch),
+                color = Palette.accent,
+                style = textFont(
+                    size = FontSize.Caption,
+                    weight = FontWeight.Bold,
+                ),
+            )
         }
     }
 }

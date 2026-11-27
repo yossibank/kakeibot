@@ -142,44 +142,19 @@ private suspend fun AppDatabase.storeTags(
         throw EntryTagDraft.ProblemException(EntryTagDraft.Problem.duplicateName)
     }
 
-    val restorable = existing
-        .filter { it.archivedAt != null }
-        .sortedWith(
-            compareBy(
-                { it.createdAt },
-                { it.id.toString() },
-            ),
-        )
-        .toMutableList()
-
-    val restored = drafts.zip(names).map { (draft, name) ->
-        if (draft.id != null) {
-            return@map draft
-        }
-
-        val index = restorable.indexOfFirst { it.name == name }
-
-        if (index < 0) {
-            return@map draft
-        }
-
-        draft.copy(id = restorable.removeAt(index).id)
-    }
+    val restored = restoring(
+        drafts = drafts,
+        names = names,
+        existing = existing,
+    )
 
     val kept = restored.mapNotNull { it.id }.toSet()
 
-    for (tag in existing) {
-        if (tag.id in kept || tag.archivedAt != null) {
-            continue
-        }
-
-        val archived = tag.copy(
-            archivedAt = at,
-            updatedAt = at,
-        )
-
-        tagDao().update(archived.record())
-    }
+    archiveTags(
+        existing = existing,
+        kept = kept,
+        at = at,
+    )
 
     return restored.mapIndexed { order, draft ->
         val id = draft.id
@@ -209,5 +184,54 @@ private suspend fun AppDatabase.storeTags(
         tagDao().update(saved.record())
 
         saved
+    }
+}
+
+private suspend fun AppDatabase.archiveTags(
+    existing: List<EntryTag>,
+    kept: Set<Identifier<EntryTag>>,
+    at: Instant,
+) {
+    for (tag in existing) {
+        if (tag.id in kept || tag.archivedAt != null) {
+            continue
+        }
+
+        val archived = tag.copy(
+            archivedAt = at,
+            updatedAt = at,
+        )
+
+        tagDao().update(archived.record())
+    }
+}
+
+private fun restoring(
+    drafts: List<EntryTagDraft>,
+    names: List<String>,
+    existing: List<EntryTag>,
+): List<EntryTagDraft> {
+    val restorable = existing
+        .filter { it.archivedAt != null }
+        .sortedWith(
+            compareBy(
+                { it.createdAt },
+                { it.id.toString() },
+            ),
+        )
+        .toMutableList()
+
+    return drafts.zip(names).map { (draft, name) ->
+        if (draft.id != null) {
+            return@map draft
+        }
+
+        val index = restorable.indexOfFirst { it.name == name }
+
+        if (index < 0) {
+            return@map draft
+        }
+
+        draft.copy(id = restorable.removeAt(index).id)
     }
 }

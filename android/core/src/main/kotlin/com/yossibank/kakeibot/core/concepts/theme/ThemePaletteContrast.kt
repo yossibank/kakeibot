@@ -48,6 +48,8 @@ private fun luminance(rgb: Int): Double {
     }
 }
 
+private val luminanceWeights = listOf(0.2126, 0.7152, 0.0722)
+
 private val surfaceRoles = listOf(
     ThemePalette.Role.backgroundTop,
     ThemePalette.Role.backgroundBottom,
@@ -63,5 +65,3 @@ private val readableRoles = listOf(
     ThemePalette.Role.subtext to 3.0,
     ThemePalette.Role.hint to 3.0,
 )
-
-private val luminanceWeights = listOf(0.2126, 0.7152, 0.0722)

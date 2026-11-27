@@ -73,7 +73,6 @@ import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivid
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TemplateEditSheet(
     parts: ScreenParts,
@@ -108,147 +107,13 @@ fun TemplateEditSheet(
         onBack = model.flow::close,
         followsKeyboard = true,
     ) {
-        Column(
+        TemplateEditContent(
+            model = model,
+            onDone = focus::clearFocus,
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                TemplateCard(
-                    icon = model.output.category?.let { model.output.icon(of = it.iconId) },
-                    detail = model.output.detail,
-                    size = TemplateCardSize.Large,
-                    name = {
-                        PlaceholderTextField(
-                            value = model.state.form.name,
-                            onChange = { name -> model.state.update { copy(name = name) } },
-                            placeholder = "名前を入れる",
-                            style = displayFont(
-                                size = FontSize.Headline,
-                                weight = FontWeight.Medium,
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Palette.accentStrong,
-                            onDone = focus::clearFocus,
-                        )
-                    },
-                    amount = {
-                        TemplateCardAmount(
-                            amount = model.output.amount,
-                            size = TemplateCardSize.Large,
-                        )
-                    },
-                )
-
-                PreviewNote(text = "ホームでは、このカードで並びます")
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .card(),
-            ) {
-                PlaceholderTextField(
-                    value = model.state.form.memo,
-                    onChange = { memo -> model.state.update { copy(memo = memo) } },
-                    placeholder = "メモを書く",
-                    style = textFont(style = FontTextStyle.Body),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    onDone = focus::clearFocus,
-                )
-            }
-
-            SettingsCaption(text = "金額を空にすると、使うときに入れられます。")
-
-            SettingsCaption(text = "カテゴリ")
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                model.output.categories.forEach { category ->
-                    ChoiceChip(
-                        title = category.name,
-                        isSelected = category.id == model.state.form.categoryId,
-                        onSelect = { model.state.select(category) },
-                    ) {
-                        IconTile(
-                            icon = model.output.icon(of = category.iconId),
-                            size = 24.dp,
-                        )
-                    }
-                }
-            }
-
-            val tags = model.output.tags
-
-            if (tags.isNotEmpty()) {
-                SettingsCaption(text = "タグ")
-
-                TagLine(
-                    tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                    selection = model.state.form.tagId,
-                    onSelect = model.state::toggleTag,
-                )
-            }
-
-            SettingsCaption(text = model.output.walletTitle)
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                model.output.wallets.forEach { wallet ->
-                    ChoiceChip(
-                        title = wallet.name,
-                        isSelected = wallet.id == model.state.form.walletId,
-                        onSelect = { model.state.select(wallet) },
-                    ) {
-                        IconTile(
-                            icon = model.output.icon(of = wallet.iconId),
-                            size = 24.dp,
-                        )
-                    }
-                }
-            }
-
-            if (model.output.billRecurring != null) {
-                SettingsCaption(text = "請求")
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Recurring.billShiftTitles.forEachIndexed { index, title ->
-                        ChoiceChip(
-                            title = title,
-                            isSelected = model.state.form.billShift == index,
-                            onSelect = { model.state.update { copy(billShift = index) } },
-                        )
-                    }
-                }
-
-                SettingsCaption(
-                    text = billNotes[model.state.form.billShift.coerceIn(billNotes.indices)],
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                CapsulePreview(model = model)
-
-                PreviewNote(text = "入力シートでは、この形で並びます")
-            }
-        }
+        )
 
         Keypad(
             calculator = model.state.calculator,
@@ -259,23 +124,225 @@ fun TemplateEditSheet(
             keyHeight = 42.dp,
         )
 
-        FittedText(
-            text = model.state.task.message,
-            modifier = Modifier.clickable(onClick = model.state.task::clear),
-            color = Palette.rose,
-            style = textFont(size = FontSize.Caption),
-        )
-
-        PrimaryButton(
-            title = model.flow.output.saveTitle,
-            onClick = {
-                focus.clearFocus()
-                model.flow.perform { it.save() }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            isEnabled = model.flow.output.canSave,
+        SaveButton(
+            model = model,
+            onDone = focus::clearFocus,
         )
     }
+}
+
+@Composable
+private fun TemplateEditContent(
+    model: TemplateEditModel,
+    onDone: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Preview(
+            model = model,
+            onDone = onDone,
+        )
+
+        MemoCard(
+            model = model,
+            onDone = onDone,
+        )
+
+        SettingsCaption(text = "金額を空にすると、使うときに入れられます。")
+
+        SettingsCaption(text = "カテゴリ")
+
+        CategoryGrid(model = model)
+
+        val tags = model.output.tags
+
+        if (tags.isNotEmpty()) {
+            SettingsCaption(text = "タグ")
+
+            TagLine(
+                tags = tags.map { TagLineItem(id = it.id, name = it.name) },
+                selection = model.state.form.tagId,
+                onSelect = model.state::toggleTag,
+            )
+        }
+
+        SettingsCaption(text = model.output.walletTitle)
+
+        WalletGrid(model = model)
+
+        if (model.output.billRecurring != null) {
+            BillShiftChooser(model = model)
+        }
+
+        CapsuleSection(model = model)
+    }
+}
+
+@Composable
+private fun Preview(
+    model: TemplateEditModel,
+    onDone: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        TemplateCard(
+            icon = model.output.category?.let { model.output.icon(of = it.iconId) },
+            detail = model.output.detail,
+            size = TemplateCardSize.Large,
+            name = {
+                PlaceholderTextField(
+                    value = model.state.form.name,
+                    onChange = { name -> model.state.update { copy(name = name) } },
+                    placeholder = "名前を入れる",
+                    style = displayFont(
+                        size = FontSize.Headline,
+                        weight = FontWeight.Medium,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Palette.accentStrong,
+                    onDone = onDone,
+                )
+            },
+            amount = {
+                TemplateCardAmount(
+                    amount = model.output.amount,
+                    size = TemplateCardSize.Large,
+                )
+            },
+        )
+
+        PreviewNote(text = "ホームでは、このカードで並びます")
+    }
+}
+
+@Composable
+private fun MemoCard(
+    model: TemplateEditModel,
+    onDone: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .card(),
+    ) {
+        PlaceholderTextField(
+            value = model.state.form.memo,
+            onChange = { memo -> model.state.update { copy(memo = memo) } },
+            placeholder = "メモを書く",
+            style = textFont(style = FontTextStyle.Body),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            onDone = onDone,
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun CategoryGrid(model: TemplateEditModel) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        model.output.categories.forEach { category ->
+            ChoiceChip(
+                title = category.name,
+                isSelected = category.id == model.state.form.categoryId,
+                onSelect = { model.state.select(category) },
+            ) {
+                IconTile(
+                    icon = model.output.icon(of = category.iconId),
+                    size = 24.dp,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun WalletGrid(model: TemplateEditModel) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        model.output.wallets.forEach { wallet ->
+            ChoiceChip(
+                title = wallet.name,
+                isSelected = wallet.id == model.state.form.walletId,
+                onSelect = { model.state.select(wallet) },
+            ) {
+                IconTile(
+                    icon = model.output.icon(of = wallet.iconId),
+                    size = 24.dp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BillShiftChooser(model: TemplateEditModel) {
+    SettingsCaption(text = "請求")
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Recurring.billShiftTitles.forEachIndexed { index, title ->
+            ChoiceChip(
+                title = title,
+                isSelected = model.state.form.billShift == index,
+                onSelect = { model.state.update { copy(billShift = index) } },
+            )
+        }
+    }
+
+    SettingsCaption(
+        text = billNotes[model.state.form.billShift.coerceIn(billNotes.indices)],
+    )
+}
+
+@Composable
+private fun CapsuleSection(model: TemplateEditModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        CapsulePreview(model = model)
+
+        PreviewNote(text = "入力シートでは、この形で並びます")
+    }
+}
+
+@Composable
+private fun SaveButton(
+    model: TemplateEditModel,
+    onDone: () -> Unit,
+) {
+    FittedText(
+        text = model.state.task.message,
+        modifier = Modifier.clickable(onClick = model.state.task::clear),
+        color = Palette.rose,
+        style = textFont(size = FontSize.Caption),
+    )
+
+    PrimaryButton(
+        title = model.flow.output.saveTitle,
+        onClick = {
+            onDone()
+            model.flow.perform { it.save() }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        isEnabled = model.flow.output.canSave,
+    )
 }
 
 @Composable

@@ -150,112 +150,161 @@ fun RecurringEditSheet(
         onClose = onClose,
     )
 
+    RecurringEditFrame(
+        model = model,
+        onOpen = ::open,
+        onOpenSettings = notification::openSettings,
+    )
+}
+
+@Composable
+private fun RecurringEditFrame(
+    model: RecurringEditModel,
+    onOpen: (RecurringPanel) -> Unit,
+    onOpenSettings: () -> Unit,
+) {
     SettingsFrame(
         title = if (model.flow.output.isEditing) "固定費を編集" else "固定費を追加",
         isRoot = false,
         onBack = model.flow::close,
         followsKeyboard = true,
-        trailing = {
-            if (model.flow.output.isEditing) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HideButton(
-                        isHidden = model.flow.output.isHidden,
-                        onSelect = { model.flow.perform { it.toggleHidden() } },
-                    )
-
-                    RoundIconButton(
-                        icon = R.drawable.ic_trash,
-                        onSelect = { model.flow.state.prompt.show(EditFlow.Prompt.delete) },
-                    )
-                }
-            }
-        },
-        overlay = {
-            BottomDrawer(
-                item = model.state.panel.current,
-                title = { it.title },
-                onClose = model.state.panel::closeAll,
-            ) { current ->
-                RecurringPanelBody(
-                    panel = current,
-                    model = model,
-                    onClose = model.state.panel::closeAll,
-                )
-            }
-        },
+        trailing = { EditActions(model = model) },
+        overlay = { RecurringDrawer(model = model) },
     ) {
-        Column(
+        RecurringEditContent(
+            model = model,
+            onOpen = onOpen,
+            onOpenSettings = onOpenSettings,
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            if (!model.flow.output.isEditing) {
-                SegmentSwitch(
-                    selection = model.state.form.type,
-                    options = typeOptions,
-                    onSelect = model::select,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+        )
 
-            Column(verticalArrangement = Arrangement.spacedBy(previewSpacing)) {
-                RecurringRowCard(row = model.output.previewRow)
+        SaveButton(model = model)
+    }
+}
 
-                SettingsCaption(text = "一覧では、このカードで並びます")
-            }
-
-            PlaceholderTextField(
-                value = model.state.form.memo,
-                onChange = { memo -> model.state.update { copy(memo = memo) } },
-                placeholder = RecurringText.namePrompt(model.state.form.type),
-                style = textFont(style = FontTextStyle.Body),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .card()
-                    .padding(16.dp),
+@Composable
+private fun EditActions(model: RecurringEditModel) {
+    if (model.flow.output.isEditing) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HideButton(
+                isHidden = model.flow.output.isHidden,
+                onSelect = { model.flow.perform { it.toggleHidden() } },
             )
 
-            RecurringQuickCard(
-                model = model,
-                onOpen = ::open,
-            )
-
-            RecurringDetailRows(
-                rows = model.detailRows,
-                onOpen = ::open,
-            )
-
-            if (model.output.isLoanRepayment &&
-                (model.output.plannedTotal != null || model.output.autoPlan != null)
-            ) {
-                RecurringLoanPlan(
-                    model = model,
-                    onMatch = model.state::useAutoCount,
-                )
-            }
-
-            if (model.output.isNotificationDenied) {
-                DeniedBanner(onOpen = notification::openSettings)
-            }
-        }
-
-        if (model.state.task.message.isNotEmpty()) {
-            Text(
-                text = model.state.task.message,
-                modifier = Modifier.clickable(onClick = model.state.task::clear),
-                color = Palette.rose,
-                style = textFont(style = FontTextStyle.Caption),
+            RoundIconButton(
+                icon = R.drawable.ic_trash,
+                onSelect = { model.flow.state.prompt.show(EditFlow.Prompt.delete) },
             )
         }
+    }
+}
 
-        PrimaryButton(
-            title = model.flow.output.saveTitle,
-            onClick = { model.flow.perform { it.save() } },
-            modifier = Modifier.fillMaxWidth(),
-            isEnabled = model.flow.output.canSave,
+@Composable
+private fun RecurringDrawer(model: RecurringEditModel) {
+    BottomDrawer(
+        item = model.state.panel.current,
+        title = { it.title },
+        onClose = model.state.panel::closeAll,
+    ) { current ->
+        RecurringPanelBody(
+            panel = current,
+            model = model,
+            onClose = model.state.panel::closeAll,
         )
     }
+}
+
+@Composable
+private fun RecurringEditContent(
+    model: RecurringEditModel,
+    onOpen: (RecurringPanel) -> Unit,
+    onOpenSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        if (!model.flow.output.isEditing) {
+            SegmentSwitch(
+                selection = model.state.form.type,
+                options = typeOptions,
+                onSelect = model::select,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        PreviewCard(model = model)
+
+        NameField(model = model)
+
+        RecurringQuickCard(
+            model = model,
+            onOpen = onOpen,
+        )
+
+        RecurringDetailRows(
+            rows = model.detailRows,
+            onOpen = onOpen,
+        )
+
+        if (model.output.isLoanRepayment &&
+            (model.output.plannedTotal != null || model.output.autoPlan != null)
+        ) {
+            RecurringLoanPlan(
+                model = model,
+                onMatch = model.state::useAutoCount,
+            )
+        }
+
+        if (model.output.isNotificationDenied) {
+            DeniedBanner(onOpen = onOpenSettings)
+        }
+    }
+}
+
+@Composable
+private fun PreviewCard(model: RecurringEditModel) {
+    Column(verticalArrangement = Arrangement.spacedBy(previewSpacing)) {
+        RecurringRowCard(row = model.output.previewRow)
+
+        SettingsCaption(text = "一覧では、このカードで並びます")
+    }
+}
+
+@Composable
+private fun NameField(model: RecurringEditModel) {
+    PlaceholderTextField(
+        value = model.state.form.memo,
+        onChange = { memo -> model.state.update { copy(memo = memo) } },
+        placeholder = RecurringText.namePrompt(model.state.form.type),
+        style = textFont(style = FontTextStyle.Body),
+        modifier = Modifier
+            .fillMaxWidth()
+            .card()
+            .padding(16.dp),
+    )
+}
+
+@Composable
+private fun SaveButton(model: RecurringEditModel) {
+    if (model.state.task.message.isNotEmpty()) {
+        Text(
+            text = model.state.task.message,
+            modifier = Modifier.clickable(onClick = model.state.task::clear),
+            color = Palette.rose,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+    }
+
+    PrimaryButton(
+        title = model.flow.output.saveTitle,
+        onClick = { model.flow.perform { it.save() } },
+        modifier = Modifier.fillMaxWidth(),
+        isEnabled = model.flow.output.canSave,
+    )
 }
 
 private val previewSpacing = 6.dp

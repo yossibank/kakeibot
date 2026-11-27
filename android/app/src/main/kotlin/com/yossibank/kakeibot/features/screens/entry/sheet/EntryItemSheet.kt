@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -97,34 +98,7 @@ fun EntryItemSheet(
                 .navigationBarsPadding()
                 .imePadding(),
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 20.dp,
-                        vertical = 12.dp,
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = "品目",
-                    color = Palette.text,
-                    style = textFont(
-                        size = FontSize.Body,
-                        weight = FontWeight.SemiBold,
-                    ),
-                )
-
-                CircleIconButton(
-                    icon = R.drawable.ic_check,
-                    onClick = onClose,
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    size = 36.dp,
-                    iconSize = 20.dp,
-                    fill = SolidColor(Palette.accent),
-                    tint = Palette.backgroundTop,
-                )
-            }
+            SheetHeader(onClose = onClose)
 
             Column(
                 modifier = Modifier
@@ -151,21 +125,64 @@ fun EntryItemSheet(
             }
         }
 
-        if (editor.removed.current != null) {
-            UndoNotice(
-                title = "品目を消しました",
-                icon = R.drawable.ic_trash,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(
-                        start = 20.dp,
-                        end = 20.dp,
-                        bottom = 76.dp,
-                    ),
-                onUndo = { editor.restore(model) },
-            )
-        }
+        ItemUndoNotice(
+            model = model,
+            editor = editor,
+        )
+    }
+}
+
+@Composable
+private fun SheetHeader(onClose: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = 20.dp,
+                vertical = 12.dp,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "品目",
+            color = Palette.text,
+            style = textFont(
+                size = FontSize.Body,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+
+        CircleIconButton(
+            icon = R.drawable.ic_check,
+            onClick = onClose,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            size = 36.dp,
+            iconSize = 20.dp,
+            fill = SolidColor(Palette.accent),
+            tint = Palette.backgroundTop,
+        )
+    }
+}
+
+@Composable
+private fun BoxScope.ItemUndoNotice(
+    model: EntryModel,
+    editor: EntryItemEditor,
+) {
+    if (editor.removed.current != null) {
+        UndoNotice(
+            title = "品目を消しました",
+            icon = R.drawable.ic_trash,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(
+                    start = 20.dp,
+                    end = 20.dp,
+                    bottom = 76.dp,
+                ),
+            onUndo = { editor.restore(model) },
+        )
     }
 }
 

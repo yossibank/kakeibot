@@ -55,201 +55,198 @@ enum class ThemePreset(
     ;
 
     val palette: ThemePalette
-        get() =
-            when (this) {
-                white -> {
-                    ThemePalette(
-                        backgroundTop = 0xFFFFFF,
-                        backgroundBottom = 0xF8F8FA,
-                        panel = 0xF5F5F8,
-                        cardTop = 0xFFFFFF,
-                        cardBottom = 0xFBFBFD,
-                        line = 0xDEDEE4,
-                        accent = 0x8A6420,
-                        accentDeep = 0xB89657,
-                        accentStrong = 0x4A340C,
-                        text = 0x1E1E22,
-                        subtext = 0x63636B,
-                        hint = 0x707078,
-                    )
-                }
-
-                ivory -> {
-                    ThemePalette(
-                        backgroundTop = 0xF8F4EB,
-                        backgroundBottom = 0xF2ECE0,
-                        panel = 0xF1EBDF,
-                        cardTop = 0xFFFFFF,
-                        cardBottom = 0xFBF9F4,
-                        line = 0xDCD2BF,
-                        accent = 0x8A6420,
-                        accentDeep = 0xB89657,
-                        accentStrong = 0x4A340C,
-                        text = 0x2A2418,
-                        subtext = 0x6B6152,
-                        hint = 0x736959,
-                    )
-                }
-
-                sky -> {
-                    ThemePalette(
-                        backgroundTop = 0xEEF4FA,
-                        backgroundBottom = 0xE7EEF6,
-                        panel = 0xE5EDF6,
-                        cardTop = 0xFFFFFF,
-                        cardBottom = 0xF9FBFD,
-                        line = 0xC9D6E5,
-                        accent = 0x2F5A8C,
-                        accentDeep = 0x8AA8CC,
-                        accentStrong = 0x14315A,
-                        text = 0x17233A,
-                        subtext = 0x54627A,
-                        hint = 0x5E6B84,
-                    )
-                }
-
-                sage -> {
-                    ThemePalette(
-                        backgroundTop = 0xEEF3EA,
-                        backgroundBottom = 0xE7EEE2,
-                        panel = 0xE6EDE1,
-                        cardTop = 0xFFFFFF,
-                        cardBottom = 0xFAFBF9,
-                        line = 0xCAD8C2,
-                        accent = 0x2F6A55,
-                        accentDeep = 0x8FB3A2,
-                        accentStrong = 0x143C32,
-                        text = 0x1A2A22,
-                        subtext = 0x56685E,
-                        hint = 0x5C6E63,
-                    )
-                }
-
-                rose -> {
-                    ThemePalette(
-                        backgroundTop = 0xF8EEEC,
-                        backgroundBottom = 0xF4E7E4,
-                        panel = 0xF3E5E2,
-                        cardTop = 0xFFFFFF,
-                        cardBottom = 0xFCF8F7,
-                        line = 0xE3CDC8,
-                        accent = 0x9C3D52,
-                        accentDeep = 0xC98A97,
-                        accentStrong = 0x5A1A2A,
-                        text = 0x2E1C1E,
-                        subtext = 0x6E5559,
-                        hint = 0x7C6266,
-                    )
-                }
-
-                gold -> {
-                    ThemePalette(
-                        backgroundTop = 0xF4E8C8,
-                        backgroundBottom = 0xEDDDB3,
-                        panel = 0xEEDFB6,
-                        cardTop = 0xFFF8E6,
-                        cardBottom = 0xFAF1D8,
-                        line = 0xD8C189,
-                        accent = 0x6E4E1C,
-                        accentDeep = 0xA88545,
-                        accentStrong = 0x3A2808,
-                        text = 0x1A1A1C,
-                        subtext = 0x5E5240,
-                        hint = 0x6A5D47,
-                    )
-                }
-
-                black -> {
-                    ThemePalette(
-                        backgroundTop = 0x1D1D20,
-                        backgroundBottom = 0x050506,
-                        panel = 0x111114,
-                        cardTop = 0x18181B,
-                        cardBottom = 0x08080A,
-                        line = 0x2C2C31,
-                        accent = 0xCDAA6B,
-                        accentDeep = 0x8F6C38,
-                        accentStrong = 0xF4E6C1,
-                        text = 0xEDE6D6,
-                        subtext = 0x9A9CA3,
-                        hint = 0x878A92,
-                    )
-                }
-
-                navy -> {
-                    ThemePalette.night
-                }
-
-                forest -> {
-                    ThemePalette(
-                        backgroundTop = 0x143C32,
-                        backgroundBottom = 0x04130E,
-                        panel = 0x0B241D,
-                        cardTop = 0x12322A,
-                        cardBottom = 0x06150F,
-                        line = 0x24493E,
-                        accent = 0xCDAA6B,
-                        accentDeep = 0x8F6C38,
-                        accentStrong = 0xF4E6C1,
-                        text = 0xEDE6D6,
-                        subtext = 0x8FB0A3,
-                        hint = 0x8AA498,
-                    )
-                }
-
-                teal -> {
-                    ThemePalette(
-                        backgroundTop = 0x0F3B44,
-                        backgroundBottom = 0x04161A,
-                        panel = 0x0A262C,
-                        cardTop = 0x0E333B,
-                        cardBottom = 0x05181C,
-                        line = 0x1E4A53,
-                        accent = 0xC9CCD2,
-                        accentDeep = 0x7D8188,
-                        accentStrong = 0xF2F2F0,
-                        text = 0xECEFEE,
-                        subtext = 0x8FAEB3,
-                        hint = 0x85A3A7,
-                    )
-                }
-
-                wine -> {
-                    ThemePalette(
-                        backgroundTop = 0x3A1220,
-                        backgroundBottom = 0x12050A,
-                        panel = 0x220A13,
-                        cardTop = 0x2E0F1A,
-                        cardBottom = 0x14060B,
-                        line = 0x4A2230,
-                        accent = 0xCDAA6B,
-                        accentDeep = 0x8F6C38,
-                        accentStrong = 0xF4E6C1,
-                        text = 0xEDE6D6,
-                        subtext = 0xB39AA2,
-                        hint = 0xA0858E,
-                    )
-                }
-
-                plum -> {
-                    ThemePalette(
-                        backgroundTop = 0x2C1A36,
-                        backgroundBottom = 0x0D0712,
-                        panel = 0x1B1022,
-                        cardTop = 0x26162E,
-                        cardBottom = 0x0F0915,
-                        line = 0x3E2A4A,
-                        accent = 0xCDAA6B,
-                        accentDeep = 0x8F6C38,
-                        accentStrong = 0xF4E6C1,
-                        text = 0xEDE6D6,
-                        subtext = 0xA99AB5,
-                        hint = 0x958AA3,
-                    )
-                }
-            }
+        get() = when (this) {
+            white -> ThemePalette.white
+            ivory -> ThemePalette.ivory
+            sky -> ThemePalette.sky
+            sage -> ThemePalette.sage
+            rose -> ThemePalette.rose
+            gold -> ThemePalette.gold
+            black -> ThemePalette.black
+            navy -> ThemePalette.night
+            forest -> ThemePalette.forest
+            teal -> ThemePalette.teal
+            wine -> ThemePalette.wine
+            plum -> ThemePalette.plum
+        }
 
     companion object {
         fun of(rawValue: String): ThemePreset? = entries.firstOrNull { it.rawValue == rawValue }
     }
 }
+
+private val ThemePalette.Companion.white: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0xFFFFFF,
+        backgroundBottom = 0xF8F8FA,
+        panel = 0xF5F5F8,
+        cardTop = 0xFFFFFF,
+        cardBottom = 0xFBFBFD,
+        line = 0xDEDEE4,
+        accent = 0x8A6420,
+        accentDeep = 0xB89657,
+        accentStrong = 0x4A340C,
+        text = 0x1E1E22,
+        subtext = 0x63636B,
+        hint = 0x707078,
+    )
+
+private val ThemePalette.Companion.ivory: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0xF8F4EB,
+        backgroundBottom = 0xF2ECE0,
+        panel = 0xF1EBDF,
+        cardTop = 0xFFFFFF,
+        cardBottom = 0xFBF9F4,
+        line = 0xDCD2BF,
+        accent = 0x8A6420,
+        accentDeep = 0xB89657,
+        accentStrong = 0x4A340C,
+        text = 0x2A2418,
+        subtext = 0x6B6152,
+        hint = 0x736959,
+    )
+
+private val ThemePalette.Companion.sky: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0xEEF4FA,
+        backgroundBottom = 0xE7EEF6,
+        panel = 0xE5EDF6,
+        cardTop = 0xFFFFFF,
+        cardBottom = 0xF9FBFD,
+        line = 0xC9D6E5,
+        accent = 0x2F5A8C,
+        accentDeep = 0x8AA8CC,
+        accentStrong = 0x14315A,
+        text = 0x17233A,
+        subtext = 0x54627A,
+        hint = 0x5E6B84,
+    )
+
+private val ThemePalette.Companion.sage: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0xEEF3EA,
+        backgroundBottom = 0xE7EEE2,
+        panel = 0xE6EDE1,
+        cardTop = 0xFFFFFF,
+        cardBottom = 0xFAFBF9,
+        line = 0xCAD8C2,
+        accent = 0x2F6A55,
+        accentDeep = 0x8FB3A2,
+        accentStrong = 0x143C32,
+        text = 0x1A2A22,
+        subtext = 0x56685E,
+        hint = 0x5C6E63,
+    )
+
+private val ThemePalette.Companion.rose: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0xF8EEEC,
+        backgroundBottom = 0xF4E7E4,
+        panel = 0xF3E5E2,
+        cardTop = 0xFFFFFF,
+        cardBottom = 0xFCF8F7,
+        line = 0xE3CDC8,
+        accent = 0x9C3D52,
+        accentDeep = 0xC98A97,
+        accentStrong = 0x5A1A2A,
+        text = 0x2E1C1E,
+        subtext = 0x6E5559,
+        hint = 0x7C6266,
+    )
+
+private val ThemePalette.Companion.gold: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0xF4E8C8,
+        backgroundBottom = 0xEDDDB3,
+        panel = 0xEEDFB6,
+        cardTop = 0xFFF8E6,
+        cardBottom = 0xFAF1D8,
+        line = 0xD8C189,
+        accent = 0x6E4E1C,
+        accentDeep = 0xA88545,
+        accentStrong = 0x3A2808,
+        text = 0x1A1A1C,
+        subtext = 0x5E5240,
+        hint = 0x6A5D47,
+    )
+
+private val ThemePalette.Companion.black: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0x1D1D20,
+        backgroundBottom = 0x050506,
+        panel = 0x111114,
+        cardTop = 0x18181B,
+        cardBottom = 0x08080A,
+        line = 0x2C2C31,
+        accent = 0xCDAA6B,
+        accentDeep = 0x8F6C38,
+        accentStrong = 0xF4E6C1,
+        text = 0xEDE6D6,
+        subtext = 0x9A9CA3,
+        hint = 0x878A92,
+    )
+
+private val ThemePalette.Companion.forest: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0x143C32,
+        backgroundBottom = 0x04130E,
+        panel = 0x0B241D,
+        cardTop = 0x12322A,
+        cardBottom = 0x06150F,
+        line = 0x24493E,
+        accent = 0xCDAA6B,
+        accentDeep = 0x8F6C38,
+        accentStrong = 0xF4E6C1,
+        text = 0xEDE6D6,
+        subtext = 0x8FB0A3,
+        hint = 0x8AA498,
+    )
+
+private val ThemePalette.Companion.teal: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0x0F3B44,
+        backgroundBottom = 0x04161A,
+        panel = 0x0A262C,
+        cardTop = 0x0E333B,
+        cardBottom = 0x05181C,
+        line = 0x1E4A53,
+        accent = 0xC9CCD2,
+        accentDeep = 0x7D8188,
+        accentStrong = 0xF2F2F0,
+        text = 0xECEFEE,
+        subtext = 0x8FAEB3,
+        hint = 0x85A3A7,
+    )
+
+private val ThemePalette.Companion.wine: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0x3A1220,
+        backgroundBottom = 0x12050A,
+        panel = 0x220A13,
+        cardTop = 0x2E0F1A,
+        cardBottom = 0x14060B,
+        line = 0x4A2230,
+        accent = 0xCDAA6B,
+        accentDeep = 0x8F6C38,
+        accentStrong = 0xF4E6C1,
+        text = 0xEDE6D6,
+        subtext = 0xB39AA2,
+        hint = 0xA0858E,
+    )
+
+private val ThemePalette.Companion.plum: ThemePalette
+    get() = ThemePalette(
+        backgroundTop = 0x2C1A36,
+        backgroundBottom = 0x0D0712,
+        panel = 0x1B1022,
+        cardTop = 0x26162E,
+        cardBottom = 0x0F0915,
+        line = 0x3E2A4A,
+        accent = 0xCDAA6B,
+        accentDeep = 0x8F6C38,
+        accentStrong = 0xF4E6C1,
+        text = 0xEDE6D6,
+        subtext = 0xA99AB5,
+        hint = 0x958AA3,
+    )

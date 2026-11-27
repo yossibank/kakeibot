@@ -216,26 +216,10 @@ private fun ItemLine(
                 .padding(start = if (isNegative) 12.dp else 0.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp),
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                FittedText(
-                    text = item.trimmedName,
-                    color = if (isNegative) Palette.rose else Palette.text,
-                    style = textFont(size = FontSize.Small),
-                )
-
-                val rate = item.taxRate
-
-                if (showsRate && rate != null) {
-                    Text(
-                        text = "${rate.rawValue}%",
-                        color = Palette.subtext,
-                        style = textFont(size = FontSize.Micro),
-                    )
-                }
-            }
+            ItemName(
+                item = item,
+                showsRate = showsRate,
+            )
 
             item.quantityText()?.let { text ->
                 Text(
@@ -251,5 +235,32 @@ private fun ItemLine(
             color = if (isNegative) Palette.rose else Palette.text,
             style = textFont(size = FontSize.Small),
         )
+    }
+}
+
+@Composable
+private fun ItemName(
+    item: EntryItem.Draft,
+    showsRate: Boolean,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FittedText(
+            text = item.trimmedName,
+            color = if (item.amount < 0) Palette.rose else Palette.text,
+            style = textFont(size = FontSize.Small),
+        )
+
+        val rate = item.taxRate
+
+        if (showsRate && rate != null) {
+            Text(
+                text = "${rate.rawValue}%",
+                color = Palette.subtext,
+                style = textFont(size = FontSize.Micro),
+            )
+        }
     }
 }

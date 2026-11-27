@@ -75,9 +75,9 @@ private fun KeyButton(
     onKey: (AmountCalculator.Key) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(16.dp))
     val feedback = LocalHapticFeedback.current
     val hasHaptics = LocalThemeStyle.current.haptics
+    val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(16.dp))
     val tint = Palette.accent.opacity(Emphasis.Subtle)
     val rim = Palette.accent.opacity(Emphasis.Muted)
 
@@ -148,29 +148,10 @@ private fun KeyLabel(
             tint = Palette.text,
         )
 
-        is AmountCalculator.Key.Tax -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "税込",
-                color = if (isActive) Palette.accent else Palette.subtext,
-                style = textFont(size = FontSize.Micro),
-            )
-
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = key.rate.rawValue.toString(),
-                    modifier = Modifier.alignByBaseline(),
-                    color = if (isActive) Palette.accentStrong else Palette.text,
-                    style = displayFont(size = FontSize.Headline),
-                )
-
-                Text(
-                    text = "%",
-                    modifier = Modifier.alignByBaseline(),
-                    color = if (isActive) Palette.accentStrong else Palette.text,
-                    style = displayFont(size = FontSize.Caption),
-                )
-            }
-        }
+        is AmountCalculator.Key.Tax -> TaxLabel(
+            key = key,
+            isActive = isActive,
+        )
 
         is AmountCalculator.Key.Operation -> Text(
             text = key.operation.symbol,
@@ -186,6 +167,36 @@ private fun KeyLabel(
                 weight = FontWeight.SemiBold,
             ),
         )
+    }
+}
+
+@Composable
+private fun TaxLabel(
+    key: AmountCalculator.Key.Tax,
+    isActive: Boolean,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = "税込",
+            color = if (isActive) Palette.accent else Palette.subtext,
+            style = textFont(size = FontSize.Micro),
+        )
+
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = key.rate.rawValue.toString(),
+                modifier = Modifier.alignByBaseline(),
+                color = if (isActive) Palette.accentStrong else Palette.text,
+                style = displayFont(size = FontSize.Headline),
+            )
+
+            Text(
+                text = "%",
+                modifier = Modifier.alignByBaseline(),
+                color = if (isActive) Palette.accentStrong else Palette.text,
+                style = displayFont(size = FontSize.Caption),
+            )
+        }
     }
 }
 

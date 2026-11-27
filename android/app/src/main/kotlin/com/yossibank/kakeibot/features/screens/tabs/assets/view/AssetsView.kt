@@ -157,42 +157,47 @@ private fun WalletCard(
         rows.forEach { row ->
             Hairline()
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconTile(
-                    icon = row.icon,
-                    size = 32.dp,
-                )
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    FittedText(
-                        text = row.name,
-                        color = Palette.text,
-                        style = textFont(style = FontTextStyle.Subheadline),
-                    )
-
-                    Text(
-                        text = row.kind.title,
-                        color = Palette.subtext,
-                        style = textFont(style = FontTextStyle.Caption),
-                    )
-                }
-
-                AmountText(
-                    amount = row.balance.clamped,
-                    style = displayFont(size = FontSize.Body),
-                    color = if (row.balance < 0) Palette.rose else Palette.text,
-                )
-            }
+            WalletRow(row = row)
         }
+    }
+}
+
+@Composable
+private fun WalletRow(row: AssetsModel.Row) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconTile(
+            icon = row.icon,
+            size = 32.dp,
+        )
+
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            FittedText(
+                text = row.name,
+                color = Palette.text,
+                style = textFont(style = FontTextStyle.Subheadline),
+            )
+
+            Text(
+                text = row.kind.title,
+                color = Palette.subtext,
+                style = textFont(style = FontTextStyle.Caption),
+            )
+        }
+
+        AmountText(
+            amount = row.balance.clamped,
+            style = displayFont(size = FontSize.Body),
+            color = if (row.balance < 0) Palette.rose else Palette.text,
+        )
     }
 }
 

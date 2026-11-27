@@ -213,59 +213,17 @@ private fun BreakdownCard(model: ReviewModel) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = if (isBalance) "収入と支出" else "カテゴリごと",
-                modifier = Modifier.weight(1f),
-                color = Palette.accent,
-                style = textFont(
-                    style = FontTextStyle.Caption,
-                    weight = FontWeight.SemiBold,
-                ),
-            )
+        BreakdownHeader(
+            model = model,
+            isBalance = isBalance,
+        )
 
-            SegmentSwitch(
-                selection = model.input.kind,
-                options = kinds,
-                onSelect = { kind ->
-                    model.setKind(kind)
-                    model.perform { it.saveSelection() }
-                },
-            )
-        }
-
-        Box(contentAlignment = Alignment.Center) {
-            if (!isBalance) {
-                ReviewDonut(rows = rows)
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = if (isBalance) {
-                        ReviewText.balanceTitle(
-                            total,
-                        )
-                    } else {
-                        title(of = model.input.kind)
-                    },
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption),
-                )
-
-                AmountText(
-                    amount = total.clamped,
-                    style = displayFont(
-                        size = FontSize.Headline,
-                        weight = FontWeight.Bold,
-                    ),
-                    sign = if (isBalance) AmountText.Sign.Plus else AmountText.Sign.Auto,
-                    color = if (isBalance) ReviewText.balanceColor(total) else Palette.accentStrong,
-                )
-            }
-        }
+        BreakdownTotal(
+            model = model,
+            rows = rows,
+            isBalance = isBalance,
+            total = total,
+        )
 
         ReviewComparison(model = model)
 
@@ -286,6 +244,74 @@ private fun BreakdownCard(model: ReviewModel) {
 
                 CategoryRow(row = row)
             }
+        }
+    }
+}
+
+@Composable
+private fun BreakdownHeader(
+    model: ReviewModel,
+    isBalance: Boolean,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = if (isBalance) "収入と支出" else "カテゴリごと",
+            modifier = Modifier.weight(1f),
+            color = Palette.accent,
+            style = textFont(
+                style = FontTextStyle.Caption,
+                weight = FontWeight.SemiBold,
+            ),
+        )
+
+        SegmentSwitch(
+            selection = model.input.kind,
+            options = kinds,
+            onSelect = { kind ->
+                model.setKind(kind)
+                model.perform { it.saveSelection() }
+            },
+        )
+    }
+}
+
+@Composable
+private fun BreakdownTotal(
+    model: ReviewModel,
+    rows: List<ReviewModel.Row>,
+    isBalance: Boolean,
+    total: Long,
+) {
+    Box(contentAlignment = Alignment.Center) {
+        if (!isBalance) {
+            ReviewDonut(rows = rows)
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = if (isBalance) {
+                    ReviewText.balanceTitle(
+                        total,
+                    )
+                } else {
+                    title(of = model.input.kind)
+                },
+                color = Palette.subtext,
+                style = textFont(style = FontTextStyle.Caption),
+            )
+
+            AmountText(
+                amount = total.clamped,
+                style = displayFont(
+                    size = FontSize.Headline,
+                    weight = FontWeight.Bold,
+                ),
+                sign = if (isBalance) AmountText.Sign.Plus else AmountText.Sign.Auto,
+                color = if (isBalance) ReviewText.balanceColor(total) else Palette.accentStrong,
+            )
         }
     }
 }
@@ -333,10 +359,10 @@ private fun title(of: ReviewKind): String = when (of) {
     ReviewKind.balance -> "収支"
 }
 
+private val kinds = ReviewKind.entries.map { it to title(of = it) }
+
 private val scales = listOf(
     ReviewPeriod.Scale.week to "週",
     ReviewPeriod.Scale.month to "月",
     ReviewPeriod.Scale.year to "年",
 )
-
-private val kinds = ReviewKind.entries.map { it to title(of = it) }

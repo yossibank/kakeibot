@@ -57,30 +57,7 @@ fun RecurringRowCard(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                FittedText(
-                    text = row.title,
-                    modifier = Modifier.weight(1f),
-                    color = Palette.text,
-                    style = textFont(style = FontTextStyle.Subheadline),
-                )
-
-                val amount = row.amount
-
-                if (amount != null) {
-                    AmountText(
-                        amount = amount,
-                        style = textFont(style = FontTextStyle.Body),
-                        type = row.type,
-                    )
-                } else {
-                    Text(
-                        text = "利用分",
-                        color = Palette.subtext,
-                        style = textFont(style = FontTextStyle.Subheadline),
-                    )
-                }
-            }
+            TitleLine(row = row)
 
             FittedText(
                 text = row.schedule,
@@ -88,40 +65,79 @@ fun RecurringRowCard(
                 style = textFont(style = FontTextStyle.Caption),
             )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                FittedText(
-                    text = row.place ?: "",
-                    modifier = Modifier.weight(1f),
-                    color = Palette.subtext,
-                    style = textFont(style = FontTextStyle.Caption),
+            PlaceLine(
+                row = row,
+                isPaused = isPaused,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TitleLine(row: RecurringRow) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        FittedText(
+            text = row.title,
+            modifier = Modifier.weight(1f),
+            color = Palette.text,
+            style = textFont(style = FontTextStyle.Subheadline),
+        )
+
+        val amount = row.amount
+
+        if (amount != null) {
+            AmountText(
+                amount = amount,
+                style = textFont(style = FontTextStyle.Body),
+                type = row.type,
+            )
+        } else {
+            Text(
+                text = "利用分",
+                color = Palette.subtext,
+                style = textFont(style = FontTextStyle.Subheadline),
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlaceLine(
+    row: RecurringRow,
+    isPaused: Boolean,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        FittedText(
+            text = row.place ?: "",
+            modifier = Modifier.weight(1f),
+            color = Palette.subtext,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+
+        if (isPaused) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_pause),
+                    contentDescription = null,
+                    modifier = Modifier.size(12.dp),
+                    tint = Palette.amber,
                 )
 
-                if (isPaused) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_pause),
-                            contentDescription = null,
-                            modifier = Modifier.size(12.dp),
-                            tint = Palette.amber,
-                        )
-
-                        Text(
-                            text = "止めています",
-                            color = Palette.amber,
-                            style = textFont(style = FontTextStyle.Caption2),
-                        )
-                    }
-                } else {
-                    FittedText(
-                        text = nextText(row),
-                        color = Palette.subtext,
-                        style = textFont(style = FontTextStyle.Caption2),
-                    )
-                }
+                Text(
+                    text = "止めています",
+                    color = Palette.amber,
+                    style = textFont(style = FontTextStyle.Caption2),
+                )
             }
+        } else {
+            FittedText(
+                text = nextText(row),
+                color = Palette.subtext,
+                style = textFont(style = FontTextStyle.Caption2),
+            )
         }
     }
 }

@@ -90,22 +90,7 @@ internal fun BudgetTotalCard(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = "月全体",
-                color = Palette.accent,
-                style = textFont(style = FontTextStyle.Caption),
-            )
-
-            FittedText(
-                text = model.output.startText,
-                color = Palette.subtext,
-                style = textFont(style = FontTextStyle.Caption),
-            )
-        }
+        TotalHeader(model = model)
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -122,36 +107,10 @@ internal fun BudgetTotalCard(
 
         AnimatedVisibility(visible = model.output.isCarryoverOn && usage != null) {
             if (usage != null) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    FittedText(
-                        text = usage.carryoverText,
-                        color = Palette.subtext,
-                        style = textFont(style = FontTextStyle.Caption),
-                    )
-
-                    if (usage.carryover != 0L) {
-                        Text(
-                            text = "0 に戻す",
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .clickable(onClick = onReset)
-                                .card()
-                                .padding(
-                                    horizontal = 10.dp,
-                                    vertical = 4.dp,
-                                ),
-                            color = Palette.accentStrong,
-                            style = textFont(
-                                size = FontSize.Caption,
-                                weight = FontWeight.SemiBold,
-                            ),
-                        )
-                    }
-                }
+                CarryoverLine(
+                    usage = usage,
+                    onReset = onReset,
+                )
             }
         }
 
@@ -167,28 +126,90 @@ internal fun BudgetTotalCard(
         }
 
         if (model.output.recurringExpense > 0) {
-            Row(
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    top = 4.dp,
-                    end = 16.dp,
-                ),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_repeat),
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    tint = Palette.accent,
-                )
-
-                FittedText(
-                    text = model.output.recurringText,
-                    color = Palette.accent,
-                    style = textFont(style = FontTextStyle.Caption2),
-                )
-            }
+            RecurringLine(model = model)
         }
+    }
+}
+
+@Composable
+private fun TotalHeader(model: BudgetListModel) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "月全体",
+            color = Palette.accent,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+
+        FittedText(
+            text = model.output.startText,
+            color = Palette.subtext,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+    }
+}
+
+@Composable
+private fun CarryoverLine(
+    usage: BudgetUsage,
+    onReset: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        FittedText(
+            text = usage.carryoverText,
+            color = Palette.subtext,
+            style = textFont(style = FontTextStyle.Caption),
+        )
+
+        if (usage.carryover != 0L) {
+            Text(
+                text = "0 に戻す",
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable(onClick = onReset)
+                    .card()
+                    .padding(
+                        horizontal = 10.dp,
+                        vertical = 4.dp,
+                    ),
+                color = Palette.accentStrong,
+                style = textFont(
+                    size = FontSize.Caption,
+                    weight = FontWeight.SemiBold,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecurringLine(model: BudgetListModel) {
+    Row(
+        modifier = Modifier.padding(
+            start = 16.dp,
+            top = 4.dp,
+            end = 16.dp,
+        ),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_repeat),
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = Palette.accent,
+        )
+
+        FittedText(
+            text = model.output.recurringText,
+            color = Palette.accent,
+            style = textFont(style = FontTextStyle.Caption2),
+        )
     }
 }

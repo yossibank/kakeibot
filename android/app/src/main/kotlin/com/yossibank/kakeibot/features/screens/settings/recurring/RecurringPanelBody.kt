@@ -47,169 +47,207 @@ fun RecurringPanelBody(
     onClose: () -> Unit,
 ) {
     when (panel) {
-        RecurringPanel.Amount -> {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                KeypadValue(amount = model.output.amount)
+        RecurringPanel.Amount -> AmountKeypad(model = model)
 
-                Keypad(
-                    calculator = model.state.calculator,
-                    onKey = model.state::press,
-                )
-            }
-        }
+        RecurringPanel.Start -> MonthCalendar(
+            selection = model.state.form.startDate,
+            today = model.state.today,
+            onSelect = { date ->
+                model.state.update { copy(startDate = date) }
+                onClose()
+            },
+        )
 
-        RecurringPanel.Start -> {
-            MonthCalendar(
-                selection = model.state.form.startDate,
-                today = model.state.today,
-                onSelect = { date ->
-                    model.state.update { copy(startDate = date) }
+        RecurringPanel.End -> EndChooser(
+            model = model,
+            onClose = onClose,
+        )
+
+        RecurringPanel.Holiday -> HolidayChooser(
+            model = model,
+            onClose = onClose,
+        )
+
+        RecurringPanel.Closing -> ClosingChooser(
+            model = model,
+            onClose = onClose,
+        )
+
+        RecurringPanel.Fee -> FeeKeypad(model = model)
+
+        RecurringPanel.Count -> CountKeypad(
+            model = model,
+            onClose = onClose,
+        )
+
+        RecurringPanel.Remind -> RemindChoices(
+            model = model,
+            onClose = onClose,
+        )
+    }
+}
+
+@Composable
+private fun AmountKeypad(model: RecurringEditModel) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        KeypadValue(amount = model.output.amount)
+
+        Keypad(
+            calculator = model.state.calculator,
+            onKey = model.state::press,
+        )
+    }
+}
+
+@Composable
+private fun EndChooser(
+    model: RecurringEditModel,
+    onClose: () -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ChoiceChip(
+                title = "終わりなし",
+                isSelected = model.output.scheduledEndDate == null,
+                onSelect = {
+                    model.setEnd(null)
+                    onClose()
+                },
+            )
+
+            ChoiceChip(
+                title = "今日で終える",
+                isSelected = model.output.scheduledEndDate == model.state.today,
+                onSelect = {
+                    model.setEnd(model.state.today)
                     onClose()
                 },
             )
         }
 
-        RecurringPanel.End -> {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ChoiceChip(
-                        title = "終わりなし",
-                        isSelected = model.output.scheduledEndDate == null,
-                        onSelect = {
-                            model.setEnd(null)
-                            onClose()
-                        },
-                    )
+        MonthCalendar(
+            selection = model.output.scheduledEndDate ?: model.state.form.startDate,
+            today = model.state.today,
+            onSelect = {
+                model.setEnd(it)
+                onClose()
+            },
+        )
+    }
+}
 
-                    ChoiceChip(
-                        title = "今日で終える",
-                        isSelected = model.output.scheduledEndDate == model.state.today,
-                        onSelect = {
-                            model.setEnd(model.state.today)
-                            onClose()
-                        },
-                    )
-                }
+@Composable
+private fun HolidayChooser(
+    model: RecurringEditModel,
+    onClose: () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Note(text = "土日・祝日・年末年始（12/31〜1/3）に当たったときに、日をずらします")
 
-                MonthCalendar(
-                    selection = model.output.scheduledEndDate ?: model.state.form.startDate,
-                    today = model.state.today,
-                    onSelect = {
-                        model.setEnd(it)
-                        onClose()
-                    },
-                )
-            }
-        }
-
-        RecurringPanel.Holiday -> {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Note(text = "土日・祝日・年末年始（12/31〜1/3）に当たったときに、日をずらします")
-
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HolidayShift.entries.forEach { shift ->
-                        ChoiceChip(
-                            title = shift.title,
-                            isSelected = model.state.form.holidayShift == shift,
-                            onSelect = {
-                                model.state.choose(shift)
-                                onClose()
-                            },
-                        )
-                    }
-                }
-            }
-        }
-
-        RecurringPanel.Closing -> {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Note(text = "締め日までのカードの利用分を、引き落とし日に振り替えます")
-
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            HolidayShift.entries.forEach { shift ->
                 ChoiceChip(
-                    title = RecurringText.closingDay(null),
-                    isSelected = model.state.form.closingDay == null,
+                    title = shift.title,
+                    isSelected = model.state.form.holidayShift == shift,
                     onSelect = {
-                        model.state.update { copy(closingDay = null) }
-                        onClose()
-                    },
-                )
-
-                DayGrid(
-                    selection = model.state.form.closingDay,
-                    onSelect = { day ->
-                        model.state.update { copy(closingDay = day) }
+                        model.state.choose(shift)
                         onClose()
                     },
                 )
             }
         }
+    }
+}
 
-        RecurringPanel.Fee -> {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                KeypadValue(amount = model.output.fee)
+@Composable
+private fun ClosingChooser(
+    model: RecurringEditModel,
+    onClose: () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Note(text = "締め日までのカードの利用分を、引き落とし日に振り替えます")
 
-                FeeChoiceRow(
-                    choices = FeeChoiceRow.defaultChoices,
-                    selection = model.output.fee,
-                    onSelect = model.state::setFee,
-                )
+        ChoiceChip(
+            title = RecurringText.closingDay(null),
+            isSelected = model.state.form.closingDay == null,
+            onSelect = {
+                model.state.update { copy(closingDay = null) }
+                onClose()
+            },
+        )
 
-                Keypad(
-                    calculator = model.state.feeCalculator,
-                    onKey = model.state::pressFee,
-                )
-            }
-        }
+        DayGrid(
+            selection = model.state.form.closingDay,
+            onSelect = { day ->
+                model.state.update { copy(closingDay = day) }
+                onClose()
+            },
+        )
+    }
+}
 
-        RecurringPanel.Count -> {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CountChoices(
-                    model = model,
-                    onClose = onClose,
-                )
+@Composable
+private fun FeeKeypad(model: RecurringEditModel) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        KeypadValue(amount = model.output.fee)
 
-                Text(
-                    text = "${model.output.countCalculator.amount} 回",
-                    color = Palette.accentStrong,
-                    style = displayFont(
-                        size = FontSize.LargeTitle,
-                        weight = FontWeight.Bold,
-                    ),
-                )
+        FeeChoiceRow(
+            choices = FeeChoiceRow.defaultChoices,
+            selection = model.output.fee,
+            onSelect = model.state::setFee,
+        )
 
-                Note(
-                    text = model.output.scheduledEndDate?.let { "終わり ${RecurringText.date(it)}" }
-                        ?: "回数を入れると、終わりの日が決まります",
-                )
+        Keypad(
+            calculator = model.state.feeCalculator,
+            onKey = model.state::pressFee,
+        )
+    }
+}
 
-                Keypad(
-                    calculator = model.output.countCalculator,
-                    onKey = model::pressCount,
-                )
-            }
-        }
+@Composable
+private fun CountKeypad(
+    model: RecurringEditModel,
+    onClose: () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CountChoices(
+            model = model,
+            onClose = onClose,
+        )
 
-        RecurringPanel.Remind -> {
-            RemindChoices(
-                model = model,
-                onClose = onClose,
-            )
-        }
+        Text(
+            text = "${model.output.countCalculator.amount} 回",
+            color = Palette.accentStrong,
+            style = displayFont(
+                size = FontSize.LargeTitle,
+                weight = FontWeight.Bold,
+            ),
+        )
+
+        Note(
+            text = model.output.scheduledEndDate?.let { "終わり ${RecurringText.date(it)}" }
+                ?: "回数を入れると、終わりの日が決まります",
+        )
+
+        Keypad(
+            calculator = model.output.countCalculator,
+            onKey = model::pressCount,
+        )
     }
 }
 
