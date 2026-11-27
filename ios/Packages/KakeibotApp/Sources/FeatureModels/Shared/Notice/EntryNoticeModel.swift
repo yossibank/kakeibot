@@ -12,7 +12,7 @@ public final class EntryNoticeModel: ScreenPerforming {
     let dependencies: ScreenParts
 
     public init(parts: ScreenParts) {
-        let state = State()
+        let state = State(wait: parts.wait)
 
         self.state = state
         self.output = Output(state: state)
@@ -31,7 +31,11 @@ public extension EntryNoticeModel {
     @MainActor
     @Observable
     final class State {
-        public private(set) var notice: Notice?
+        let shown: UndoNotice<Notice>
+
+        init(wait: ScreenWait) {
+            self.shown = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor
@@ -225,13 +229,23 @@ public extension EntryNoticeModel.Output {
     }
 }
 
+public extension EntryNoticeModel.State {
+    var notice: EntryNoticeModel.Notice? {
+        shown.current
+    }
+
+    var id: Int? {
+        shown.id
+    }
+}
+
 extension EntryNoticeModel.State {
     func show(_ notice: EntryNoticeModel.Notice) {
-        self.notice = notice
+        shown.show(notice, duration: .seconds(notice.seconds))
     }
 
     func clear() {
-        notice = nil
+        shown.dismiss()
     }
 }
 

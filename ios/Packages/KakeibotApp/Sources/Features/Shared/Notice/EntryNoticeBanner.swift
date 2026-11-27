@@ -32,9 +32,6 @@ private struct EntryNoticeBanner: ViewModifier {
             .haptic(.success, trigger: model.output.change) { _, new in
                 new != nil
             }
-            .task(id: model.state.notice) {
-                await clearLater()
-            }
     }
 }
 
@@ -86,20 +83,6 @@ private extension EntryNoticeBanner {
 
     var tapMask: GestureMask {
         clearsOnTap ? .all : .subviews
-    }
-
-    func clearLater() async {
-        guard let notice = model.state.notice else {
-            return
-        }
-
-        let duration = Duration.seconds(notice.seconds)
-
-        guard await (try? Task.sleep(for: duration)) != nil else {
-            return
-        }
-
-        model.clear()
     }
 }
 

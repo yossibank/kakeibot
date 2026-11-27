@@ -21,7 +21,10 @@ public extension UndoNotice {
         .seconds(4)
     }
 
-    func show(_ item: Item) {
+    func show(
+        _ item: Item,
+        duration: Duration = UndoNotice.duration
+    ) {
         count += 1
 
         let id = count
@@ -30,7 +33,7 @@ public extension UndoNotice {
         self.id = id
         timer?.cancel()
 
-        timer = wait.after(Self.duration) { [weak self] in
+        timer = wait.after(duration) { [weak self] in
             guard let self, self.id == id else {
                 return
             }

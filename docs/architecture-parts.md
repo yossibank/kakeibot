@@ -58,7 +58,7 @@
 | `Shown` | 出している物（シート・確認・メニュー・パネル）を 1 つの値で持つ。Swift は確認に `shown[.delete]` で `Binding` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ModelTask` | 保存などの実行中の印。`attempt` は実行中でも走らせ、二度押しは呼ぶ側が `isRunning` で止める | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `Loadable` | 読み込み中・読めた・失敗を 1 つの値で持ち、値と読んだ印を組にしない。監視し直す時は、失敗だけを読み込み中に戻す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `UndoNotice` | 取り消しの知らせの値と、消すまでの時間（既定は 4 秒）を持ち、`ScreenParts` の `ScreenWait` で数える。Kotlin は `show` に秒を渡せ、`EntryNoticeModel` が知らせごとの秒に使う | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `UndoNotice` | 取り消しの知らせの値と、消すまでの時間（既定は 4 秒）を持ち、`ScreenWait` で数える。`show` に秒を渡せ、`EntryNoticeModel` が知らせごとの秒に使う | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ErrorNotice` | エラーの知らせの文・色・出した数と、消すまでの 6 秒を持ち、`show`・`inform`・`clear` で変える。時間は `ScreenWait` で数え、Kotlin は `ModelTask` の失敗もここに出す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ScreenWait` | モデルの待ちで、`after` が時間の後に処理を動かし、`lasting` が部品の既定の長さを画面ごとに変える。テストは手で進める `ManualWait` を渡す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `ObservationRound` | 監視をやり直す回で、`MainModel` が 1 つ持つ。`restart` で進め、`each` が回ごとに監視を始め直す | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
