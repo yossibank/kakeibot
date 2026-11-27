@@ -35,9 +35,9 @@ class EntryModelTemplateTest {
 
         model.apply(stock)
 
-        assertNull(model.state.form.tagId)
-        assertEquals(stock.categoryId, model.state.form.categoryId)
-        assertEquals(stock.id, model.state.form.templateId)
+        assertNull(model.state.fields.form.tagId)
+        assertEquals(stock.categoryId, model.state.fields.form.categoryId)
+        assertEquals(stock.id, model.state.fields.form.templateId)
     }
 
     @Test

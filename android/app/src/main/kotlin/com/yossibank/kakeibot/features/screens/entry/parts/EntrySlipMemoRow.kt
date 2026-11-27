@@ -73,7 +73,7 @@ fun EntrySlipMemoRow(
         )
 
         PlaceholderTextField(
-            value = model.state.form.memo,
+            value = model.state.fields.form.memo,
             onChange = { memo -> model.state.update { copy(memo = memo) } },
             placeholder = "店名や買ったものをメモ",
             style = textFont(size = FontSize.Body),
@@ -82,7 +82,7 @@ fun EntrySlipMemoRow(
                 .voiceUnderline(model.output.isMemoFromVoice),
         )
 
-        if (model.output.showsItems && model.state.form.items.isNotEmpty()) {
+        if (model.output.showsItems && model.state.fields.form.items.isNotEmpty()) {
             ItemButton(
                 model = model,
                 onOpen = onOpenItems,
@@ -137,7 +137,7 @@ private fun ItemButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "品目 ${model.state.form.items.size}件",
+            text = "品目 ${model.state.fields.form.items.size}件",
             color = Palette.accentStrong,
             style = style,
         )

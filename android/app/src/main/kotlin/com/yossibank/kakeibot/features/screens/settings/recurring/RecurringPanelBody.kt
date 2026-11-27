@@ -50,7 +50,7 @@ fun RecurringPanelBody(
         RecurringPanel.Amount -> AmountKeypad(model = model)
 
         RecurringPanel.Start -> MonthCalendar(
-            selection = model.state.form.startDate,
+            selection = model.state.fields.form.startDate,
             today = model.input.today,
             onSelect = { date ->
                 model.state.update { copy(startDate = date) }
@@ -129,7 +129,7 @@ private fun EndChooser(
         }
 
         MonthCalendar(
-            selection = model.output.scheduledEndDate ?: model.state.form.startDate,
+            selection = model.output.scheduledEndDate ?: model.state.fields.form.startDate,
             today = model.input.today,
             onSelect = {
                 model.setEnd(it)
@@ -154,7 +154,7 @@ private fun HolidayChooser(
             HolidayShift.entries.forEach { shift ->
                 ChoiceChip(
                     title = shift.title,
-                    isSelected = model.state.form.holidayShift == shift,
+                    isSelected = model.state.fields.form.holidayShift == shift,
                     onSelect = {
                         model.state.choose(shift)
                         onClose()
@@ -178,7 +178,7 @@ private fun ClosingChooser(
 
         ChoiceChip(
             title = RecurringText.closingDay(null),
-            isSelected = model.state.form.closingDay == null,
+            isSelected = model.state.fields.form.closingDay == null,
             onSelect = {
                 model.state.update { copy(closingDay = null) }
                 onClose()
@@ -186,7 +186,7 @@ private fun ClosingChooser(
         )
 
         DayGrid(
-            selection = model.state.form.closingDay,
+            selection = model.state.fields.form.closingDay,
             onSelect = { day ->
                 model.state.update { copy(closingDay = day) }
                 onClose()
@@ -307,7 +307,7 @@ private fun RemindChoices(
         RecurringEditModel.remindChoices.forEach { days ->
             ChoiceChip(
                 title = RecurringText.remind(days),
-                isSelected = model.state.form.remindDaysBefore == days,
+                isSelected = model.state.fields.form.remindDaysBefore == days,
                 onSelect = {
                     model.state.update { copy(remindDaysBefore = days) }
                     onClose()

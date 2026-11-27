@@ -5,7 +5,7 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.shared.Identifier
 
 fun RecurringEditModel.select(type: Entry.Kind) {
-    if (type == state.form.type) {
+    if (type == state.fields.form.type) {
         return
     }
 
@@ -22,25 +22,25 @@ fun RecurringEditModel.select(category: Identifier<EntryCategory>) {
 
 internal fun RecurringEditModel.chooseCountMode() {
     if (!output.isEditing) {
-        state.updateLoan { copy(isCountAuto = true) }
+        state.setCountAuto(true)
         return
     }
 
     val plan = output.autoPlan
-    val end = state.form.endDate
+    val end = state.fields.form.endDate
 
     if (plan == null || end == null) {
-        state.updateLoan { copy(isCountAuto = false) }
+        state.setCountAuto(false)
         return
     }
 
-    val isAuto = output.autoEndDate(plan) == end && plan.finalAmount == state.loan.manualFinal
+    val isAuto = output.autoEndDate(plan) == end && plan.finalAmount == state.repayment.manualFinal
 
-    state.updateLoan { copy(isCountAuto = isAuto) }
+    state.setCountAuto(isAuto)
 }
 
 internal fun RecurringEditModel.presetDestination() {
-    val form = state.form
+    val form = state.fields.form
 
     if (form.type != Entry.Kind.transfer || form.toWalletId != null) {
         return
@@ -52,7 +52,7 @@ internal fun RecurringEditModel.presetDestination() {
 }
 
 internal fun RecurringEditModel.suggestHolidayShift() {
-    if (output.isEditing || state.isHolidayShiftChosen) {
+    if (output.isEditing || state.fields.isHolidayShiftChosen) {
         return
     }
 

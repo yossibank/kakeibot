@@ -60,7 +60,7 @@ fun EntryRecentRow(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = if (model.state.form.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
+            text = if (model.state.fields.form.type == Entry.Kind.transfer) "最近の振替" else "よく使う",
             modifier = Modifier.padding(horizontal = 4.dp),
             color = Palette.subtext,
             style = textFont(
@@ -73,7 +73,7 @@ fun EntryRecentRow(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (model.state.form.type == Entry.Kind.transfer) {
+            if (model.state.fields.form.type == Entry.Kind.transfer) {
                 model.output.recentTransfers.forEach { transfer ->
                     TransferCard(
                         model = model,

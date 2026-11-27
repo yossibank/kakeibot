@@ -60,13 +60,13 @@ class EntryModelSharedWalletTest {
 
         model.state.toggleTag(own[0].id)
         model.select(wallet = shared)
-        val moved = model.state.form.tagId
+        val moved = model.state.fields.form.tagId
         model.select(wallet = options.wallets[0])
         model.state.toggleTag(own[1].id)
         model.select(wallet = shared)
 
         assertEquals(lunch.id, moved)
-        assertNull(model.state.form.tagId)
+        assertNull(model.state.fields.form.tagId)
     }
 
     @Test
@@ -85,7 +85,7 @@ class EntryModelSharedWalletTest {
 
         model.select(wallet = shared)
 
-        assertEquals(copies[0].id, model.state.form.categoryId)
+        assertEquals(copies[0].id, model.state.fields.form.categoryId)
     }
 
     @Test
@@ -99,7 +99,7 @@ class EntryModelSharedWalletTest {
 
         model.select(wallet = card)
 
-        assertEquals(daily.id, model.state.form.categoryId)
+        assertEquals(daily.id, model.state.fields.form.categoryId)
     }
 
     @Test
@@ -117,8 +117,8 @@ class EntryModelSharedWalletTest {
             )
             val model = setup.loadedModel()
 
-            assertEquals(shared.id, model.state.form.walletId)
-            assertEquals(copies[0].id, model.state.form.categoryId)
+            assertEquals(shared.id, model.state.fields.form.walletId)
+            assertEquals(copies[0].id, model.state.fields.form.categoryId)
         }
 
     @Test
@@ -141,8 +141,8 @@ class EntryModelSharedWalletTest {
 
         model.apply(template)
 
-        assertEquals(shared.id, model.state.form.walletId)
-        assertEquals(copies[1].id, model.state.form.categoryId)
-        assertEquals(template.id, model.state.form.templateId)
+        assertEquals(shared.id, model.state.fields.form.walletId)
+        assertEquals(copies[1].id, model.state.fields.form.categoryId)
+        assertEquals(template.id, model.state.fields.form.templateId)
     }
 }

@@ -58,8 +58,8 @@ class EntryVoiceFlowTest {
 
         assertEquals(980, previewAmount)
         assertEquals(980, model.output.amount)
-        assertEquals(setup.today.adding(days = -1), model.state.form.date)
-        assertEquals(wallet.id, model.state.form.walletId)
+        assertEquals(setup.today.adding(days = -1), model.state.fields.form.date)
+        assertEquals(wallet.id, model.state.fields.form.walletId)
         assertEquals("コンビニ", model.state.store)
         assertTrue(model.output.isDateFromVoice)
         assertTrue(model.output.isWalletFromVoice)
@@ -73,8 +73,8 @@ class EntryVoiceFlowTest {
         flow.undoLast(model)
 
         assertEquals(0, model.output.amount)
-        assertEquals(setup.today, model.state.form.date)
-        assertEquals("", model.state.form.memo)
+        assertEquals(setup.today, model.state.fields.form.date)
+        assertEquals("", model.state.fields.form.memo)
         assertFalse(model.output.isDateFromVoice)
         assertNull(flow.state.notices.result.current)
     }
@@ -90,7 +90,7 @@ class EntryVoiceFlowTest {
         flow.finish()
 
         assertEquals(0, model.output.amount)
-        assertEquals(setup.today.adding(days = -1), model.state.form.date)
+        assertEquals(setup.today.adding(days = -1), model.state.fields.form.date)
         assertEquals(EntryModel.Field.Amount, model.state.focus.field)
         assertEquals(Outcome.MissingAmount, flow.state.notices.result.current?.outcome)
         assertEquals("「昨日のコンビニ」", flow.state.notices.result.current?.message)

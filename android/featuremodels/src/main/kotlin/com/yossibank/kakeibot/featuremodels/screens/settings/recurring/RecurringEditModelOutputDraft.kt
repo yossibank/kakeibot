@@ -11,7 +11,7 @@ import java.time.Instant
 
 val RecurringEditModel.Output.draft: RecurringDraft
     get() {
-        val form = state.form
+        val form = state.fields.form
 
         return RecurringDraft(
             type = form.type,
@@ -36,7 +36,7 @@ val RecurringEditModel.Output.draft: RecurringDraft
 
 val RecurringEditModel.Output.suggestedHolidayShift: HolidayShift
     get() {
-        if (state.form.type == Entry.Kind.transfer) {
+        if (state.fields.form.type == Entry.Kind.transfer) {
             return HolidayShift.next
         }
 
@@ -53,7 +53,7 @@ fun RecurringEditModel.Output.recurring(
     endDate: LocalDate?,
     finalAmount: Int?,
 ): Recurring {
-    val form = state.form
+    val form = state.fields.form
 
     return Recurring(
         type = form.type,

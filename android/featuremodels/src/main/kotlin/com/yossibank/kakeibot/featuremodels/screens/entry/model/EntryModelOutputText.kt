@@ -7,11 +7,11 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.symbol
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryText
 
 val EntryModel.Output.walletTitle: String
-    get() = EntryText.walletTitle(state.form.type)
+    get() = EntryText.walletTitle(state.fields.form.type)
 
 val EntryModel.Output.dateValue: String
     get() = EntryText.dateValue(
-        date = state.form.date,
+        date = state.fields.form.date,
         today = input.today,
     )
 
@@ -31,7 +31,7 @@ val EntryModel.Output.saveTitle: String
             return "金額を入れてください"
         }
 
-        if (state.form.type == Entry.Kind.transfer && state.form.toWalletId == null) {
+        if (state.fields.form.type == Entry.Kind.transfer && state.fields.form.toWalletId == null) {
             return "${EntryText.destinationTitle}を選んでください"
         }
 
@@ -74,13 +74,13 @@ val EntryModel.Output.routeText: String
 val EntryModel.Output.categoryText: String
     get() {
         val name = category?.name ?: return "選ぶ"
-        val tag = tags.firstOrNull { it.id == state.form.tagId }?.name ?: return name
+        val tag = tags.firstOrNull { it.id == state.fields.form.tagId }?.name ?: return name
         return "$name・$tag"
     }
 
 private val EntryModel.Output.saveAction: String
     get() = when {
         isEditing -> "変更を保存"
-        state.form.type == Entry.Kind.transfer -> "振り替える"
+        state.fields.form.type == Entry.Kind.transfer -> "振り替える"
         else -> "記録する"
     }

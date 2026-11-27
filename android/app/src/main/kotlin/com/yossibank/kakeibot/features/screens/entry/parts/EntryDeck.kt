@@ -72,7 +72,7 @@ fun EntryDeck(
     onSaveTemplate: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    key(model.state.form.type) {
+    key(model.state.fields.form.type) {
         AnimatedContent(
             targetState = model.state.focus.field,
             modifier = modifier,
@@ -162,13 +162,13 @@ private fun DeckContent(
 
         EntryModel.Field.Wallet -> WalletList(
             model = model,
-            selection = model.state.form.walletId,
+            selection = model.state.fields.form.walletId,
             onSelect = { model.select(wallet = it) },
         )
 
         EntryModel.Field.ToWallet -> WalletList(
             model = model,
-            selection = model.state.form.toWalletId,
+            selection = model.state.fields.form.toWalletId,
             onSelect = model.state::selectDestination,
         )
 
@@ -293,7 +293,7 @@ private fun CategoryArea(
         if (tags.isNotEmpty()) {
             TagLine(
                 tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                selection = model.state.form.tagId,
+                selection = model.state.fields.form.tagId,
                 onSelect = model.state::toggleTag,
             )
         }
@@ -349,7 +349,7 @@ private fun SaveTemplateChip(onSelect: () -> Unit) {
 @Composable
 private fun DateCalendar(model: EntryModel) {
     MonthCalendar(
-        selection = model.state.form.date,
+        selection = model.state.fields.form.date,
         today = model.input.today,
         onSelect = model.state::select,
     )

@@ -2,6 +2,7 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
 import com.yossibank.kakeibot.core.concepts.category.EntryCategory
 import com.yossibank.kakeibot.core.concepts.category.EntryTag
+import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryDraft
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
@@ -14,17 +15,23 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 
+internal data class EntrySnapshot(
+    val form: EntryForm,
+    val calculator: AmountCalculator,
+    val feeCalculator: AmountCalculator,
+)
+
 val EntryModel.Output.templates: List<EntryTemplate>
-    get() = input.allTemplates.filter { it.type == state.form.type }
+    get() = input.allTemplates.filter { it.type == state.fields.form.type }
 
 val EntryModel.Output.tags: List<EntryTag>
     get() = allTags.filter { tag ->
-        tag.categoryId == state.form.categoryId &&
-            (tag.archivedAt == null || tag.id == state.form.tagId)
+        tag.categoryId == state.fields.form.categoryId &&
+            (tag.archivedAt == null || tag.id == state.fields.form.tagId)
     }
 
 val EntryModel.Output.categories: List<EntryCategory>
-    get() = categories(of = state.form.type, walletId = state.form.walletId)
+    get() = categories(of = state.fields.form.type, walletId = state.fields.form.walletId)
 
 val EntryModel.Output.isChanged: Boolean
     get() = input.baseline?.let { it != snapshot } ?: false
@@ -37,7 +44,7 @@ val EntryModel.Output.wallets: List<Wallet>
             return wallets
         }
 
-        val kept = listOfNotNull(state.form.walletId, state.form.toWalletId)
+        val kept = listOfNotNull(state.fields.form.walletId, state.fields.form.toWalletId)
             .filter { id -> wallets.none { it.id == id } }
             .mapNotNull { input.history?.wallets?.get(it) }
 
@@ -45,13 +52,13 @@ val EntryModel.Output.wallets: List<Wallet>
     }
 
 val EntryModel.Output.category: EntryCategory?
-    get() = categories.firstOrNull { it.id == state.form.categoryId }
+    get() = categories.firstOrNull { it.id == state.fields.form.categoryId }
 
 val EntryModel.Output.wallet: Wallet?
-    get() = wallets.firstOrNull { it.id == state.form.walletId }
+    get() = wallets.firstOrNull { it.id == state.fields.form.walletId }
 
 val EntryModel.Output.toWallet: Wallet?
-    get() = wallets.firstOrNull { it.id == state.form.toWalletId }
+    get() = wallets.firstOrNull { it.id == state.fields.form.toWalletId }
 
 fun EntryModel.Output.icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
 
@@ -62,7 +69,7 @@ fun EntryModel.Output.wallet(of: Identifier<Wallet>?): Wallet? = wallets.firstOr
 
 internal val EntryModel.Output.usualWalletId: Identifier<Wallet>?
     get() {
-        val type = state.form.type
+        val type = state.fields.form.type
 
         val recent = input.history?.entries.orEmpty()
             .filter { it.type == type && type != Entry.Kind.transfer && it.transferId == null }
@@ -76,7 +83,7 @@ internal val EntryModel.Output.allTags: List<EntryTag>
     get() = (input.options?.tags ?: emptyList()) + (input.options?.sharedTags ?: emptyList())
 
 internal val EntryModel.Output.draft: EntryDraft?
-    get() = state.form.draft(
+    get() = state.fields.form.draft(
         amount = amount,
         fee = fee,
         templates = input.allTemplates,
@@ -86,9 +93,9 @@ internal val EntryModel.Output.draft: EntryDraft?
 
 internal val EntryModel.Output.billRecurring: Recurring?
     get() {
-        val walletId = state.form.walletId
+        val walletId = state.fields.form.walletId
 
-        if (state.form.type == Entry.Kind.transfer || walletId == null) {
+        if (state.fields.form.type == Entry.Kind.transfer || walletId == null) {
             return null
         }
 
@@ -98,16 +105,16 @@ internal val EntryModel.Output.billRecurring: Recurring?
 internal val EntryModel.Output.hasBillChoices: Boolean
     get() {
         val dates = billRecurring?.billDates(
-            used = state.form.date,
+            used = state.fields.form.date,
             count = Recurring.billChoiceCount,
         )
 
         return !dates.isNullOrEmpty()
     }
 
-internal val EntryModel.Output.snapshot: EntryModel.Snapshot
-    get() = EntryModel.Snapshot(
-        form = state.form.copy(
+internal val EntryModel.Output.snapshot: EntrySnapshot
+    get() = EntrySnapshot(
+        form = state.fields.form.copy(
             templateId = null,
             categoryByType = emptyMap(),
         ),
@@ -130,7 +137,7 @@ internal fun EntryModel.Output.categories(
         return offered
     }
 
-    val kept = setOfNotNull(state.form.categoryId, state.form.categoryByType[of])
+    val kept = setOfNotNull(state.fields.form.categoryId, state.fields.form.categoryByType[of])
         .mapNotNull { input.history?.categories?.get(it) }
         .filter { category ->
             category.kind.rawValue == of.rawValue && offered.none { it.id == category.id }

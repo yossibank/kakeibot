@@ -55,7 +55,7 @@ import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButto
 
 @Composable
 fun BudgetKeypadDrawer(model: BudgetListModel) {
-    if (model.state.editing != null) {
+    if (model.state.presented.editing != null) {
         EditSheet(
             flow = model.flow,
             onClose = model.state::cancelEditing,
@@ -63,7 +63,7 @@ fun BudgetKeypadDrawer(model: BudgetListModel) {
     }
 
     BottomDrawer(
-        item = model.state.editing,
+        item = model.state.presented.editing,
         title = { it.title },
         onClose = model.flow::close,
         padding = drawerPadding,

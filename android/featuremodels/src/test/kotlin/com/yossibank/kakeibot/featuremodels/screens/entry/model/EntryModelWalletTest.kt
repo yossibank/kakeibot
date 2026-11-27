@@ -15,7 +15,7 @@ class EntryModelWalletTest {
         val options = setup.options()
         val model = setup.loadedModel()
 
-        assertEquals(options.wallets[0].id, model.state.form.walletId)
+        assertEquals(options.wallets[0].id, model.state.fields.form.walletId)
     }
 
     @Test
@@ -27,11 +27,11 @@ class EntryModelWalletTest {
         setup.save(Entry.Kind.expense, amount = 500, on = setup.today, walletId = wallets[1].id)
         val model = setup.loadedModel()
 
-        val first = model.state.form.walletId
+        val first = model.state.fields.form.walletId
         model.state.select(categories[1])
 
         assertEquals(wallets[1].id, first)
-        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
     }
 
     @Test
@@ -41,11 +41,11 @@ class EntryModelWalletTest {
         val model = setup.loadedModel()
 
         model.select(type = Entry.Kind.income)
-        val income = model.state.form.walletId
+        val income = model.state.fields.form.walletId
         model.select(type = Entry.Kind.expense)
 
         assertEquals(wallets[0].id, income)
-        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
         assertFalse(model.output.isChanged)
     }
 
@@ -57,8 +57,8 @@ class EntryModelWalletTest {
 
         model.select(type = Entry.Kind.transfer)
 
-        assertEquals(wallets[1].id, model.state.form.walletId)
-        assertEquals(wallets[0].id, model.state.form.toWalletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
+        assertEquals(wallets[0].id, model.state.fields.form.toWalletId)
     }
 
     @Test
@@ -70,7 +70,7 @@ class EntryModelWalletTest {
 
         model.select(type = Entry.Kind.income)
 
-        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
         assertTrue(model.output.isChanged)
     }
 
@@ -93,7 +93,7 @@ class EntryModelWalletTest {
         model.state.select(categories[2])
         model.select(type = Entry.Kind.income)
 
-        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
     }
 
     @Test
@@ -106,11 +106,11 @@ class EntryModelWalletTest {
 
         model.startNext()
         model.select(type = Entry.Kind.income)
-        val income = model.state.form.walletId
+        val income = model.state.fields.form.walletId
         model.select(type = Entry.Kind.expense)
 
         assertEquals(wallets[0].id, income)
-        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
     }
 
     @Test
@@ -125,7 +125,7 @@ class EntryModelWalletTest {
         )
         val model = setup.loadedModel()
 
-        assertEquals(wallets[1].id, model.state.form.walletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
     }
 
     @Test
@@ -135,7 +135,7 @@ class EntryModelWalletTest {
         setup.saveTransfer(amount = 300, from = wallets[1].id, to = wallets[0].id, fee = 110)
         val model = setup.loadedModel()
 
-        assertEquals(wallets[0].id, model.state.form.walletId)
+        assertEquals(wallets[0].id, model.state.fields.form.walletId)
     }
 
     @Test
@@ -145,7 +145,7 @@ class EntryModelWalletTest {
         setup.database.setHidden(WalletTable, id = wallets[1].id, isHidden = true, at = setup.now)
         val model = setup.loadedModel()
 
-        assertEquals(wallets[0].id, model.state.form.walletId)
+        assertEquals(wallets[0].id, model.state.fields.form.walletId)
     }
 
     @Test
@@ -160,11 +160,11 @@ class EntryModelWalletTest {
         setup.save(Entry.Kind.expense, amount = 500, on = setup.today, walletId = wallets[1].id)
         val model = setup.loadedModel(editing = entry.id)
 
-        val loaded = model.state.form.walletId
+        val loaded = model.state.fields.form.walletId
         model.select(type = Entry.Kind.income)
         model.select(type = Entry.Kind.expense)
 
         assertEquals(wallets[0].id, loaded)
-        assertEquals(wallets[0].id, model.state.form.walletId)
+        assertEquals(wallets[0].id, model.state.fields.form.walletId)
     }
 }

@@ -77,14 +77,14 @@ fun EntrySlip(
     val preview = listening?.preview
 
     Column(modifier = modifier.card()) {
-        if (model.state.form.type != Entry.Kind.transfer) {
+        if (model.state.fields.form.type != Entry.Kind.transfer) {
             CategoryFields(
                 model = model,
                 preview = preview,
             )
         }
 
-        if (model.state.form.type == Entry.Kind.transfer) {
+        if (model.state.fields.form.type == Entry.Kind.transfer) {
             TransferFields(model = model)
         }
 
@@ -97,7 +97,7 @@ fun EntrySlip(
             isActive = model.state.focus.field == EntryModel.Field.Date,
             onSelect = { model.state.focus(EntryModel.Field.Date) },
         ) {
-            DayTile(day = model.state.form.date.day)
+            DayTile(day = model.state.fields.form.date.day)
         }
 
         Hairline()

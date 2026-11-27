@@ -6,15 +6,15 @@ import com.yossibank.kakeibot.core.shared.Identifier
 
 val RecurringEditModel.Output.previewRow: RecurringRow
     get() {
-        val isTransfer = state.form.type == Entry.Kind.transfer
+        val isTransfer = state.fields.form.type == Entry.Kind.transfer
 
         val schedule = RecurringText.schedule(
-            frequency = state.form.frequency,
-            month = state.form.month,
-            day = state.form.day,
+            frequency = state.fields.form.frequency,
+            month = state.fields.form.month,
+            day = state.fields.form.day,
         )
 
-        val name = state.form.memo.trim()
+        val name = state.fields.form.memo.trim()
         val destination = if (isTransfer) selectedDestination?.name else null
         val place = listOfNotNull(selectedWallet?.name, destination).joinToString(" → ")
 
@@ -30,7 +30,7 @@ val RecurringEditModel.Output.previewRow: RecurringRow
         ).nextDate(onOrAfter = input.today)
 
         val closing = if (canUseClosingDay) {
-            state.form.closingDay?.let(RecurringText::closingNote)
+            state.fields.form.closingDay?.let(RecurringText::closingNote)
         } else {
             null
         }
@@ -39,15 +39,15 @@ val RecurringEditModel.Output.previewRow: RecurringRow
             id = input.editingId ?: Identifier(),
             title = name.ifEmpty {
                 selectedCategory?.name
-                    ?: RecurringListModel.title(state.form.type)
+                    ?: RecurringListModel.title(state.fields.form.type)
             },
             schedule = RecurringText.detail(
                 schedule = schedule,
-                holiday = RecurringText.holidayNote(state.form.holidayShift),
+                holiday = RecurringText.holidayNote(state.fields.form.holidayShift),
             ),
             place = place.ifEmpty { null },
             amount = if (isCardBill) null else amount,
-            type = state.form.type,
+            type = state.fields.form.type,
             icon = icon,
             next = next,
             closing = closing,

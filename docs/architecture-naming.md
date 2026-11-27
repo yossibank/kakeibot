@@ -113,7 +113,6 @@
 | `Preview` | 設定の値を当てた見本 | `ThemePreview`・`HomeSectionPreview` |
 | `Choice` | 選ぶ値 | `AppIconChoice`・`SyncChoice` |
 | `Option` | 画面ごとの選択肢 1 件の部品 | `LaunchScreenOption` |
-| `Editor` | 入力中の 1 件を持ち、人の操作で変える補助の型。画面のモデルではない | `EntryItemEditor`（Android） |
 | `Banner` | 画面の端に重ねて出す帯と、それを出すモディファイア | `NoticeBanner` |
 | `Notice` | 知らせの値とモデル | `ErrorNotice` |
 | `Note` | 部品に添える短い注記 | `SettingsEmptyNote` |

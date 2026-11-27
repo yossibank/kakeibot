@@ -64,8 +64,8 @@ class EntryModelTest {
         val options = setup.options()
         val model = setup.loadedModel()
 
-        assertEquals(options.expenseCategories.first().id, model.state.form.categoryId)
-        assertEquals(options.wallets.first().id, model.state.form.walletId)
+        assertEquals(options.expenseCategories.first().id, model.state.fields.form.categoryId)
+        assertEquals(options.wallets.first().id, model.state.fields.form.walletId)
         assertEquals(EntryModel.Field.Category, model.state.focus.field)
         assertTrue(model.output.isBlank)
         assertTrue(model.output.showsRecent)
@@ -78,7 +78,7 @@ class EntryModelTest {
 
         model.select(type = Entry.Kind.income)
 
-        assertEquals(options.incomeCategories.first().id, model.state.form.categoryId)
+        assertEquals(options.incomeCategories.first().id, model.state.fields.form.categoryId)
         assertEquals("入金先", model.output.walletTitle)
     }
 
@@ -110,7 +110,7 @@ class EntryModelTest {
         model.state.select(transit)
 
         model.select(type = Entry.Kind.transfer)
-        val transferCategory = model.state.form.categoryId
+        val transferCategory = model.state.fields.form.categoryId
         model.select(type = Entry.Kind.income)
         val incomeFirst = model.output.category?.name
         model.select(type = Entry.Kind.expense)
@@ -130,8 +130,8 @@ class EntryModelTest {
         model.select(type = Entry.Kind.income)
         model.select(type = Entry.Kind.expense)
 
-        assertEquals(food.id, model.state.form.categoryId)
-        assertNull(model.state.form.tagId)
+        assertEquals(food.id, model.state.fields.form.categoryId)
+        assertNull(model.state.fields.form.tagId)
     }
 
     @Test
@@ -190,7 +190,7 @@ class EntryModelTest {
         val model = setup.loadedModel(editing = entry.id)
 
         val loadedAmount = model.output.amount
-        val loadedMemo = model.state.form.memo
+        val loadedMemo = model.state.fields.form.memo
         model.state.press(AmountCalculator.Key.Delete)
         val saved = model.save()
         val stored = setup.database.entry(entry.id)
@@ -250,9 +250,9 @@ class EntryModelTest {
         model.startNext()
 
         assertEquals(0, model.output.amount)
-        assertEquals("", model.state.form.memo)
-        assertEquals(daily.id, model.state.form.categoryId)
-        assertEquals(bank.id, model.state.form.walletId)
+        assertEquals("", model.state.fields.form.memo)
+        assertEquals(daily.id, model.state.fields.form.categoryId)
+        assertEquals(bank.id, model.state.fields.form.walletId)
         assertEquals(1, model.input.history?.entries?.size)
         assertEquals(listOf("ランチ"), model.input.recentMemos)
         assertFalse(model.output.isChanged)
@@ -271,7 +271,7 @@ class EntryModelTest {
         model.state.select(daily)
 
         assertEquals("${food.name}・ランチ", text)
-        assertNull(model.state.form.tagId)
+        assertNull(model.state.fields.form.tagId)
         assertEquals(daily.name, model.output.categoryText)
     }
 
@@ -339,7 +339,7 @@ class EntryModelTest {
         model.apply(template)
 
         assertEquals(7, model.output.amount)
-        assertEquals("おやつ", model.state.form.memo)
+        assertEquals("おやつ", model.state.fields.form.memo)
         assertEquals(EntryModel.Field.Amount, model.state.focus.field)
     }
 
@@ -354,8 +354,8 @@ class EntryModelTest {
         assertEquals("", draft.name)
         assertEquals(5, draft.amount)
         assertEquals("ランチ", draft.memo)
-        assertEquals(model.state.form.categoryId, draft.categoryId)
-        assertEquals(model.state.form.walletId, draft.walletId)
+        assertEquals(model.state.fields.form.categoryId, draft.categoryId)
+        assertEquals(model.state.fields.form.walletId, draft.walletId)
     }
 
     @Test
@@ -371,7 +371,7 @@ class EntryModelTest {
 
         assertEquals(listOf(500, 300), amounts)
         assertEquals(300, model.output.amount)
-        assertEquals("おやつ", model.state.form.memo)
+        assertEquals("おやつ", model.state.fields.form.memo)
         assertTrue(model.output.hasRecent)
     }
 

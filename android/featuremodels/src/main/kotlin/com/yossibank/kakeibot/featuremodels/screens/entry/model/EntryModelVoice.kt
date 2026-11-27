@@ -23,7 +23,7 @@ fun EntryModel.apply(reading: VoiceReading): VoiceUndo {
     val calculator = state.submodels.calculator
 
     val undo = VoiceUndo(
-        form = state.form,
+        form = state.fields.form,
         calculator = calculator,
     )
 
@@ -33,7 +33,7 @@ fun EntryModel.apply(reading: VoiceReading): VoiceUndo {
     reading.walletId?.let { setWallet(it) }
 
     val categoryId = reading.categoryId?.takeIf { id -> output.categories.any { it.id == id } }
-    var next = state.form
+    var next = state.fields.form
 
     categoryId?.let { next = next.withCategory(it) }
     reading.date?.let { next = next.withDate(it) }
@@ -63,7 +63,7 @@ fun EntryModel.apply(reading: VoiceReading): VoiceUndo {
 }
 
 fun EntryModel.State.undo(undo: VoiceUndo) {
-    val restored = form.copy(
+    val restored = fields.form.copy(
         date = undo.form.date,
         categoryId = undo.form.categoryId,
         tagId = undo.form.tagId,

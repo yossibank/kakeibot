@@ -15,15 +15,15 @@ fun RecurringEditModel.open(panel: RecurringPanel) {
 }
 
 fun RecurringEditModel.prepareCount() {
-    state.updateLoan { copy(count = AmountCalculator(amount = output.repaymentCount ?: 0)) }
+    state.setCount(AmountCalculator(amount = output.repaymentCount ?: 0))
 }
 
 fun RecurringEditModel.pressCount(key: AmountCalculator.Key) {
-    val pressed = state.loan.count.press(key)
+    val pressed = state.repayment.count.press(key)
     val isOver = pressed.amount > Recurring.maxCount
     val count = if (isOver) AmountCalculator(amount = Recurring.maxCount) else pressed
 
-    state.updateLoan { copy(count = count) }
+    state.setCount(count)
 
     val end = output.recurring(
         endDate = null,
@@ -38,13 +38,6 @@ fun RecurringEditModel.pressCount(key: AmountCalculator.Key) {
 
 fun RecurringEditModel.setEnd(date: LocalDate?) {
     state.update { copy(endDate = date) }
-
     val manualFinal = output.manualFinalAmount(through = date)
-
-    state.updateLoan {
-        copy(
-            isCountAuto = false,
-            manualFinal = manualFinal,
-        )
-    }
+    state.useManualCount(final = manualFinal)
 }

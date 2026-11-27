@@ -87,7 +87,7 @@ internal fun CategoryGrid(
             ChoiceCell(
                 icon = model.output.icon(of = category.iconId),
                 name = category.name,
-                isSelected = category.id == model.state.form.categoryId,
+                isSelected = category.id == model.state.fields.form.categoryId,
                 onSelect = { model.state.select(category) },
             )
         }

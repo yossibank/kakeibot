@@ -6,7 +6,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 const val RECENT_ITEM_NAME_LIMIT = 50
 
 val EntryModel.State.store: String
-    get() = form.store
+    get() = fields.form.store
 
 fun EntryModel.State.setStore(store: String) {
     update { withStore(store) }
@@ -22,7 +22,7 @@ fun EntryModel.updateItem(
     index: Int,
     item: EntryItem.Draft,
 ) {
-    if (index !in state.form.items.indices) {
+    if (index !in state.fields.form.items.indices) {
         return
     }
 
@@ -32,7 +32,7 @@ fun EntryModel.updateItem(
 }
 
 fun EntryModel.removeItem(index: Int): RemovedItem? {
-    val item = state.form.items.getOrNull(index) ?: return null
+    val item = state.fields.form.items.getOrNull(index) ?: return null
 
     changeItems {
         state.update { copy(items = items.toMutableList().also { it.removeAt(index) }) }

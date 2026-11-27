@@ -55,8 +55,8 @@ class TemplateEditModelTest {
 
         model.load()
 
-        assertEquals(options.incomeCategories.first().id, model.state.form.categoryId)
-        assertEquals(options.wallets.first().id, model.state.form.walletId)
+        assertEquals(options.incomeCategories.first().id, model.state.fields.form.categoryId)
+        assertEquals(options.wallets.first().id, model.state.fields.form.walletId)
         assertEquals(options.incomeCategories, model.output.categories)
     }
 
@@ -93,7 +93,7 @@ class TemplateEditModelTest {
         assertEquals("名前を入れてください", refusal)
         assertEquals(980, saved?.amount)
         assertEquals(listOf("ランチ"), templates.map { it.name })
-        assertEquals(model.state.form.categoryId, templates.first().categoryId)
+        assertEquals(model.state.fields.form.categoryId, templates.first().categoryId)
     }
 
     @Test
@@ -139,7 +139,7 @@ class TemplateEditModelTest {
 
         assertEquals(listOf("ランチ", "おやつ"), shown)
         assertEquals("${food.name}・ランチ・財布", detail)
-        assertNull(model.state.form.tagId)
+        assertNull(model.state.fields.form.tagId)
         assertTrue(model.output.tags.isEmpty())
     }
 
@@ -175,7 +175,7 @@ class TemplateEditModelTest {
 
         assertNotNull(bill)
         assertEquals(1, shift)
-        assertEquals(0, model.state.form.billShift)
+        assertEquals(0, model.state.fields.form.billShift)
         assertNull(model.output.billRecurring)
         assertEquals(0, model.output.draft.billShift)
     }

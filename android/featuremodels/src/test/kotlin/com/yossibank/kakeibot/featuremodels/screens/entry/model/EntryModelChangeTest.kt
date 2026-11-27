@@ -111,13 +111,13 @@ class EntryModelChangeTest {
     fun ignoresAppliedTemplateIdAndRememberedCategories() =
         modelTest(today = "2026-10-12") { setup ->
             val model = setup.loadedModel()
-            val first = model.state.form.categoryId
+            val first = model.state.fields.form.categoryId
 
             model.select(type = Entry.Kind.income)
             model.select(type = Entry.Kind.expense)
 
-            assertTrue(model.state.form.categoryByType.isNotEmpty())
-            assertTrue(model.state.form.categoryId == first)
+            assertTrue(model.state.fields.form.categoryByType.isNotEmpty())
+            assertTrue(model.state.fields.form.categoryId == first)
             assertFalse(model.output.isChanged)
         }
 }
