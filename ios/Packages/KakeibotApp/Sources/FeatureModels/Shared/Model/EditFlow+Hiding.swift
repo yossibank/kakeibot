@@ -1,7 +1,7 @@
 public extension EditFlow {
     func toggleHidden() {
         if output.asksBeforeHiding {
-            state.prompt.show(.hide)
+            state.presented.prompt.show(.hide)
         } else {
             continueHiding()
         }
@@ -9,7 +9,7 @@ public extension EditFlow {
 
     func continueHiding() {
         if output.isChanged {
-            state.prompt.show(.hideChanges)
+            state.presented.prompt.show(.hideChanges)
         } else {
             setHidden(!output.isHidden)
         }

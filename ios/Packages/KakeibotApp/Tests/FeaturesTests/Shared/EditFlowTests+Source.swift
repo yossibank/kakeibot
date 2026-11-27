@@ -36,9 +36,9 @@ extension EditFlowTests {
         changed.toggleHidden()
         await unchanged.setHidden(true).value
 
-        #expect(changed.state.prompt.current == .hideChanges)
+        #expect(changed.state.presented.prompt.current == .hideChanges)
         #expect(changed.state.outcome.value == nil)
-        #expect(unchanged.state.prompt.current == nil)
+        #expect(unchanged.state.presented.prompt.current == nil)
         #expect(unchanged.state.outcome.value?.isHidden == true)
     }
 
@@ -52,12 +52,12 @@ extension EditFlowTests {
         let flow = EditFlow(source: source)
 
         flow.toggleHidden()
-        let asked = flow.state.prompt.current
+        let asked = flow.state.presented.prompt.current
 
         flow.continueHiding()
 
         #expect(asked == .hide)
-        #expect(flow.state.prompt.current == .hideChanges)
+        #expect(flow.state.presented.prompt.current == .hideChanges)
         #expect(flow.state.outcome.value == nil)
     }
 

@@ -44,10 +44,14 @@ public extension EditFlow {
         }
     }
 
+    struct Presented: ScreenEditable {
+        public var prompt = Shown<Prompt>()
+    }
+
     @MainActor
     @Observable
     final class State {
-        public var prompt = Shown<Prompt>()
+        public var presented = Presented()
 
         public internal(set) var outcome = ScreenOutcome<Outcome>()
 
@@ -69,14 +73,14 @@ public extension EditFlow {
         _ = source.rest()
 
         if output.isChanged {
-            state.prompt.show(.discard)
+            state.presented.prompt.show(.discard)
         } else {
             state.outcome.send(Outcome())
         }
     }
 
     func discard() {
-        state.prompt.close(.discard)
+        state.presented.prompt.close(.discard)
         state.outcome.send(Outcome())
     }
 

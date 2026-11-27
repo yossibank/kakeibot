@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 public final class SettingsBoardMovingState<ID: Hashable & Sendable>: SettingsBoardState {
-    public var shown = SettingsBoardShown<ID, SettingsBoardDestination<ID>>()
+    public var presented = SettingsBoardShown<ID, SettingsBoardDestination<ID>>()
 
     public private(set) var movingOrder: [ID]?
 

@@ -18,13 +18,15 @@ struct SettingsBoardPage<Spec: SettingsBoardSpec>: View {
     }
 
     var body: some View {
-        let prompt = model.state.shown.prompt
+        let prompt = model.state.presented.prompt
         let hiding = prompt?.hidingId
         let deleting = prompt?.deletingId
 
         screen
             .settingsSharesTextScale(spec.scaleID(in: model))
-            .navigationDestination(item: Bindable(model.state).shown.destination) { destination in
+            .navigationDestination(
+                item: Bindable(model.state).presented.destination
+            ) { destination in
                 editor(for: destination)
             }
             .settingsConfirmation(
@@ -174,7 +176,7 @@ private extension SettingsBoardPage {
     }
 
     func swipeFace(_ item: Spec.Model.Item) -> some View {
-        SwipeRow(id: item.id, openId: Bindable(model.state).shown.openId, role: .hide) {
+        SwipeRow(id: item.id, openId: Bindable(model.state).presented.openId, role: .hide) {
             model.state.open(spec.destination(editing: item))
         } onAction: {
             requestHide(item)

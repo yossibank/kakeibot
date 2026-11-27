@@ -150,18 +150,18 @@ struct EditFlowTests {
     func keepsPanelOpenBehindPrompt() throws {
         let database = try AppDatabase.inMemory()
         let model = RewardRuleEditModel(parts: .system(database))
-        let closed = model.state.panel.current
+        let closed = model.state.presented.panel.current
 
-        model.state.panel.show(.amount)
-        model.flow.state.prompt.show(.delete)
-        let opened = model.state.panel.current
+        model.state.presented.panel.show(.amount)
+        model.flow.state.presented.prompt.show(.delete)
+        let opened = model.state.presented.panel.current
 
-        model.state.panel.closeAll()
+        model.state.presented.panel.closeAll()
 
         #expect(closed == nil)
         #expect(opened == .amount)
-        #expect(model.state.panel.current == nil)
-        #expect(model.flow.state.prompt.isShowing(.delete))
+        #expect(model.state.presented.panel.current == nil)
+        #expect(model.flow.state.presented.prompt.isShowing(.delete))
     }
 
     @Test
@@ -174,7 +174,7 @@ struct EditFlowTests {
 
         #expect(outcome.closes)
         #expect(outcome.saved == nil)
-        #expect(model.flow.state.prompt.current == nil)
+        #expect(model.flow.state.presented.prompt.current == nil)
     }
 
     @Test
@@ -184,7 +184,7 @@ struct EditFlowTests {
         model.state.fields.name = "自炊した日"
 
         model.flow.close()
-        let asked = model.flow.state.prompt.isShowing(.discard)
+        let asked = model.flow.state.presented.prompt.isShowing(.discard)
         let pending = model.flow.state.outcome.value
         model.flow.discard()
 

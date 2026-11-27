@@ -15,7 +15,7 @@ private struct EditSheetOutcome<Saved: Sendable>: ViewModifier {
         content
             .confirmsDiscard(
                 when: flow.output.isChanged,
-                isPresented: Bindable(flow.state).prompt[.discard]
+                isPresented: Bindable(flow.state).presented.prompt[.discard]
             ) {
                 flow.discard()
             }
@@ -74,7 +74,7 @@ extension View {
         confirmsUnsavedHide(
             isHidden: flow.output.isHidden,
             canSave: flow.output.canSave,
-            isPresented: Bindable(flow.state).prompt[.hideChanges]
+            isPresented: Bindable(flow.state).presented.prompt[.hideChanges]
         ) {
             flow.saveTogglingHidden()
         } onDiscard: {
@@ -82,13 +82,13 @@ extension View {
         }
         .settingsConfirmation(
             hideConfirmation,
-            isPresented: Bindable(flow.state).prompt[.hide]
+            isPresented: Bindable(flow.state).presented.prompt[.hide]
         ) {
             flow.continueHiding()
         }
         .settingsConfirmation(
             confirmation,
-            isPresented: Bindable(flow.state).prompt[.delete]
+            isPresented: Bindable(flow.state).presented.prompt[.delete]
         ) {
             if confirmation?.confirmsHide == true {
                 flow.toggleHidden()
