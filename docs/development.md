@@ -28,7 +28,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 | 道具を入れ、hook を入れる | `make setup` |
 | Xcode でワークスペースを開く | `make open` |
 | ブランチのワークツリーを Xcode で開く | `make open BRANCH=feat/...` |
-| 変更の確認（見るものは表の下にある。出力は成否と失敗の箇所だけ） | `make verify` |
+| 変更の確認（見るものは表の下にある。出力は成否と失敗の箇所と飛ばした段だけ） | `make verify` |
 | 文書の一致と書き方とそろえる語、JSON の整形、テストと筋書きの一覧の一致を確かめる（文書だけの変更） | `make verify-docs` |
 | 筋書きの一覧の、区分ごとの件数と違いの一覧 | `make scenarios` |
 | iOS のビルド（シミュレーター） | `make build` |
@@ -49,6 +49,12 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 - 依存
 - iOS の警告
 - 両 OS のテストとビルド
+
+手元の Xcode が Makefile の `XCODE_VERSION` より古い時は、次のようになる。
+
+- `make verify` は app-build を流さず、`SKIP app-build（Xcode 27 が要る。手元は 26.3）` と出す。
+- `make verify` は失敗にならず、最後の行に飛ばした段の名前が出る。
+- Xcode でビルドする、ほかの `make` は `NG` を出して止まる。
 
 `make snapshot` は claude-config の `ui-snapshot` を使う。セットは `.claude/snapshots/` の下の名前で、出力は `.build/snapshots/<セット>/` に出る。
 

@@ -56,7 +56,7 @@ flowchart LR
 | --- | --- | --- |
 | 対応 OS | iOS 18 以上 | Android 8 以上（minSdk 26） |
 | 言語 | Swift 6 | Kotlin 2.4 |
-| 開発の道具 | Xcode、Homebrew | Android Studio、JDK 17 |
+| 開発の道具 | Xcode 27、Homebrew | Android Studio、JDK 17 |
 
 [道具とコマンド](docs/development.md)
 
