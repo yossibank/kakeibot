@@ -31,7 +31,7 @@ public extension SyncModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var presented = Shown<Presented>()
+        public var presented = Presented()
 
         public internal(set) var workingWallet: Wallet.ID?
 
@@ -39,7 +39,7 @@ public extension SyncModel {
         public let task = ModelTask()
         public let shareTask = ModelTask()
 
-        var requestedOn: Bool?
+        var request = SwitchRequest()
 
         init(wait: ScreenWait) {
             self.errorNotice = ErrorNotice(wait: wait)
@@ -121,13 +121,13 @@ public extension SyncModel {
             return false
         }
 
-        state.requestedOn = isOn
+        state.request.ask(isOn)
 
         return true
     }
 
     func setOn(_ isOn: Bool) async {
-        state.requestedOn = isOn
+        state.request.ask(isOn)
 
         if isOn {
             await turnOn()
@@ -138,7 +138,7 @@ public extension SyncModel {
         }
 
         if !output.isChoosing {
-            state.requestedOn = nil
+            state.request.clear()
         }
     }
 
@@ -153,7 +153,7 @@ public extension SyncModel {
             try await dependencies.database.turnOnSyncReplacingLocal()
         }
 
-        state.requestedOn = nil
+        state.request.clear()
     }
 
     func useLocalData() async {
@@ -168,12 +168,12 @@ public extension SyncModel {
             try await dependencies.database.turnOnSync()
         }
 
-        state.requestedOn = nil
+        state.request.clear()
     }
 
     func cancelChoice() {
         state.closeChoice()
-        state.requestedOn = nil
+        state.request.clear()
     }
 }
 
@@ -230,7 +230,7 @@ private extension SyncModel {
 
                 let choice = SyncChoice(local: localSummary, cloud: cloudSummary)
 
-                state.presented.show(.choice(choice))
+                state.presented.dialog.show(.choice(choice))
             }
         }
     }
