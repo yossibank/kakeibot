@@ -12,10 +12,10 @@ extension AppModel {
             return
         }
 
-        await state.syncEngine?.stop()
-        await state.sharedSyncEngine?.stop()
-        state.syncEngine = nil
-        state.sharedSyncEngine = nil
+        await runtime.syncEngine?.stop()
+        await runtime.sharedSyncEngine?.stop()
+        runtime.syncEngine = nil
+        runtime.sharedSyncEngine = nil
 
         guard input.syncActivity.isActive else {
             return
@@ -24,8 +24,8 @@ extension AppModel {
         let engine = SyncEngine(database: database, scope: .private)
         let sharedEngine = SyncEngine(database: database, scope: .shared)
 
-        state.syncEngine = engine
-        state.sharedSyncEngine = sharedEngine
+        runtime.syncEngine = engine
+        runtime.sharedSyncEngine = sharedEngine
         await engine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
         await sharedEngine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
 
@@ -77,9 +77,9 @@ extension AppModel {
             }
         }
 
-        let engine = state.sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
+        let engine = runtime.sharedSyncEngine ?? SyncEngine(database: database, scope: .shared)
 
-        state.sharedSyncEngine = engine
+        runtime.sharedSyncEngine = engine
         await engine.start(isSyncEnabled: input.syncActivity.isSyncEnabled)
         await engine.fetchChanges()
     }

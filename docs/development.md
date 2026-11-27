@@ -47,7 +47,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 - 書き方と設計と並び
 - コメント
 - 余白
-- 画面のモデルの `State` の直下
+- 画面のモデルと `AppModel` の `State` の直下
 - 依存
 - iOS の警告
 - 両 OS のテストとビルド

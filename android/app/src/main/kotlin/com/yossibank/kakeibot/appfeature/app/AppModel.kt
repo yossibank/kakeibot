@@ -24,27 +24,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Instant
 import java.time.ZoneId
 
 class AppModel(
-    private val currentDay: () -> LocalDate = ::deviceDay,
-    private val scheduler: NotificationScheduler? = null,
+    currentDay: () -> LocalDate = ::deviceDay,
+    scheduler: NotificationScheduler? = null,
+    clock: ScreenClock = ScreenClock.system,
 ) : ViewModel() {
-    var launch: Launch by mutableStateOf(Launch.Opening)
-        private set
+    val state = State()
+    val input = Input(today = currentDay())
 
-    var today: LocalDate by mutableStateOf(currentDay())
-        private set
+    private val runtime = Runtime()
 
-    var look: ThemeLook by mutableStateOf(ThemeLook.followsDevice)
-        private set
-
-    var style: ThemeStyle by mutableStateOf(ThemeStyle.standard)
-        private set
-
-    private var opening: Job? = null
-    private var notifications: Job? = null
+    private val dependencies = Dependencies(
+        currentDay = currentDay,
+        scheduler = scheduler,
+        clock = clock,
+    )
 
     sealed interface Launch {
         data object Opening : Launch
@@ -57,16 +53,61 @@ class AppModel(
         data object Failed : Launch
     }
 
+    class State {
+        var launch: Launch by mutableStateOf(Launch.Opening)
+            private set
+
+        fun move(to: Launch) {
+            launch = to
+        }
+    }
+
+    class Input(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            private set
+
+        var look: ThemeLook by mutableStateOf(ThemeLook.followsDevice)
+            private set
+
+        var style: ThemeStyle by mutableStateOf(ThemeStyle.standard)
+            private set
+
+        fun receive(today: LocalDate) {
+            this.today = today
+        }
+
+        fun receive(look: ThemeLook) {
+            this.look = look
+        }
+
+        fun receive(style: ThemeStyle) {
+            this.style = style
+        }
+    }
+
+    private class Runtime {
+        var opening: Job? = null
+        var notifications: Job? = null
+    }
+
+    private class Dependencies(
+        val currentDay: () -> LocalDate,
+        val scheduler: NotificationScheduler?,
+        val clock: ScreenClock,
+    )
+
     override fun onCleared() {
-        (launch as? Launch.Ready)?.database?.close()
+        (state.launch as? Launch.Ready)?.database?.close()
     }
 
     fun open(openDatabase: suspend () -> AppDatabase) {
-        if (opening != null || launch != Launch.Opening) {
+        if (runtime.opening != null || state.launch != Launch.Opening) {
             return
         }
 
-        opening = viewModelScope.launch {
+        runtime.opening = viewModelScope.launch {
             var database: AppDatabase? = null
 
             try {
@@ -74,14 +115,16 @@ class AppModel(
 
                 database = opened
                 generateRecurring(opened)
-                look = opened.themeLook()
-                style = opened.style()
+                input.receive(look = opened.themeLook())
+                input.receive(style = opened.style())
 
-                launch = Launch.Ready(
-                    database = opened,
-                    parts = ScreenParts(
+                state.move(
+                    to = Launch.Ready(
                         database = opened,
-                        clock = ScreenClock.system,
+                        parts = ScreenParts(
+                            database = opened,
+                            clock = dependencies.clock,
+                        ),
                     ),
                 )
 
@@ -90,30 +133,30 @@ class AppModel(
             } catch (error: CancellationException) {
                 throw error
             } catch (_: Exception) {
-                launch = Launch.Failed
+                state.move(to = Launch.Failed)
             } finally {
-                if (launch !is Launch.Ready) {
+                if (state.launch !is Launch.Ready) {
                     database?.close()
                 }
 
-                opening = null
+                runtime.opening = null
             }
         }
     }
 
     fun retryOpen(openDatabase: suspend () -> AppDatabase) {
-        if (launch != Launch.Failed) {
+        if (state.launch != Launch.Failed) {
             return
         }
 
-        launch = Launch.Opening
+        state.move(to = Launch.Opening)
         open(openDatabase)
     }
 
     fun refreshDay() {
-        today = currentDay()
+        input.receive(today = dependencies.currentDay())
 
-        val database = (launch as? Launch.Ready)?.database ?: return
+        val database = (state.launch as? Launch.Ready)?.database ?: return
 
         viewModelScope.launch {
             generateRecurring(database)
@@ -124,25 +167,28 @@ class AppModel(
 
     private fun observeTheme(database: AppDatabase) {
         viewModelScope.launch {
-            database.themeLookUpdates().collect { look = it }
+            database.themeLookUpdates().collect { input.receive(look = it) }
         }
 
         viewModelScope.launch {
-            database.styleUpdates().collect { style = it }
+            database.styleUpdates().collect { input.receive(style = it) }
         }
     }
 
     private fun observeNotifications(database: AppDatabase) {
-        val scheduler = scheduler ?: return
-        val day = today
+        val scheduler = dependencies.scheduler ?: return
+        val day = input.today
 
-        notifications?.cancel()
+        runtime.notifications?.cancel()
 
-        notifications = viewModelScope.launch {
+        runtime.notifications = viewModelScope.launch {
             ModelTask.quiet {
-                database.notificationInputUpdates(from = day).collect { input ->
+                database.notificationInputUpdates(from = day).collect { notificationInput ->
                     withContext(Dispatchers.IO) {
-                        scheduler.apply(input.plan(today = day), now = Instant.now())
+                        scheduler.apply(
+                            notificationInput.plan(today = day),
+                            now = dependencies.clock.now,
+                        )
                     }
                 }
             }
@@ -152,15 +198,15 @@ class AppModel(
     private suspend fun generateRecurring(database: AppDatabase) {
         ModelTask.quiet {
             database.generateRecurringEntries(
-                through = today,
-                at = Instant.now(),
+                through = input.today,
+                at = dependencies.clock.now,
             )
         }
     }
 
     companion object {
         fun deviceDay(): LocalDate = LocalDate.of(
-            instant = Instant.now(),
+            instant = ScreenClock.system.now,
             timeZone = ZoneId.systemDefault(),
         )
     }
