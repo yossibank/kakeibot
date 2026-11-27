@@ -136,7 +136,7 @@ private extension SyncModel {
         failure: String,
         _ operation: () async throws -> Void
     ) async {
-        state.workingWallet = id
+        state.walletWork.begin(id)
         state.notices.error.clear()
 
         do {
@@ -154,8 +154,6 @@ private extension SyncModel {
             state.notices.error.show(failure, for: error)
         }
 
-        if state.workingWallet == id {
-            state.workingWallet = nil
-        }
+        state.walletWork.end(id)
     }
 }

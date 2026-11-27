@@ -42,7 +42,7 @@ public extension SyncModel {
     final class State: NoticesHolding {
         public var presented = Presented()
 
-        public internal(set) var workingWallet: Wallet.ID?
+        public internal(set) var walletWork = WalletWork()
 
         public let notices: Notices
         public let task = ModelTask()
