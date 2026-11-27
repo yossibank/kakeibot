@@ -112,7 +112,7 @@ public extension ReviewModel.Output {
     internal var currentPeriod: ReviewPeriod {
         ReviewPeriod(
             scale: input.scale,
-            containing: state.today,
+            containing: input.today,
             monthStartDay: input.monthStartDay,
             weekStart: input.weekStart
         )

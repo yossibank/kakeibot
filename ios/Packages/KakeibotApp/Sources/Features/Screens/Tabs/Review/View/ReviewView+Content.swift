@@ -34,7 +34,7 @@ extension ReviewView {
                     tallies: tallies,
                     emptyText: "この期間に押したスタンプはありません",
                     onOpen: { tally in
-                        model.state.presented.show(.stamp(tally))
+                        model.state.presented.sheet.show(.stamp(tally))
                     }
                 )
                 .layoutColumn(.trailing)
@@ -113,7 +113,7 @@ private extension ReviewView {
                     amount: model.output.total
                 ),
                 onOpen: { share in
-                    model.state.presented.show(.share(share))
+                    model.state.presented.sheet.show(.share(share))
                 }
             )
             .layoutColumn(.trailing)
@@ -124,7 +124,7 @@ private extension ReviewView {
                 shares: walletShares,
                 total: nil,
                 onOpen: { share in
-                    model.state.presented.show(.share(share))
+                    model.state.presented.sheet.show(.share(share))
                 }
             )
         }
@@ -206,7 +206,7 @@ private extension ReviewView {
 
     var recordDate: LocalDate {
         let range = model.output.period.range
-        return range.contains(model.state.today) ? model.state.today : range.lowerBound
+        return range.contains(model.input.today) ? model.input.today : range.lowerBound
     }
 
     func tileTitle(of kind: ReviewKind) -> String {

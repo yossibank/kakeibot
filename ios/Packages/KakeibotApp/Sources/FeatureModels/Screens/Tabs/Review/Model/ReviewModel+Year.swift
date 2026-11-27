@@ -20,10 +20,10 @@ public extension ReviewModel.Output {
         }
 
         let range = period.range
-        let comparison = period.comparisonRange(today: state.today)
+        let comparison = period.comparisonRange(today: input.today)
         let hasPrevious = entries.contains { comparison.contains($0.date) }
 
-        let spent = ReviewSummary(entries: entries, in: range.lowerBound...state.today).expense
+        let spent = ReviewSummary(entries: entries, in: range.lowerBound...input.today).expense
             .total
 
         let previousSpent = ReviewSummary(entries: entries, in: comparison).expense.total
@@ -83,9 +83,9 @@ private extension ReviewModel.Output {
         let total = ReviewSummary(entries: entries, in: month.range).expense.total
         let limit = budgetLimit(of: month)
 
-        let state: ReviewYearProgress.State = if month.range.upperBound < state.today {
+        let state: ReviewYearProgress.State = if month.range.upperBound < input.today {
             .closed
-        } else if month.range.contains(state.today) {
+        } else if month.range.contains(input.today) {
             .current
         } else {
             .upcoming

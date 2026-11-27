@@ -101,7 +101,7 @@ private extension ReviewModel.Output {
                     return nil
                 }
 
-                let balance = list.balance(of: wallet, through: state.today)
+                let balance = list.balance(of: wallet, through: input.today)
 
                 return ReviewModel.Move(
                     wallet: wallet,
@@ -145,7 +145,7 @@ private extension ReviewModel.Output {
         return LoanPayoff(
             balance: balance,
             repayments: repayments,
-            after: state.today
+            after: input.today
         )
     }
 }

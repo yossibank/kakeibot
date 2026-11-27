@@ -31,9 +31,9 @@ class ReviewModelNoticeTest {
         val model = setup.reviewModel(entryList = failingEntryList)
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
 
-        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
+        assertEquals("記録を読めませんでした", model.state.notices.error.message)
         assertEquals(ReviewKind.income, model.input.kind)
         assertNull(model.input.list.value)
         assertEquals(0L, model.output.total)
@@ -46,7 +46,7 @@ class ReviewModelNoticeTest {
 
         setup.scope.launch { model.observe() }
         ModelWait.until { model.input.list.isFailed }
-        val message = model.state.errorNotice.message
+        val message = model.state.notices.error.message
         val list = model.input.list.value
         model.retry()
         ModelWait.until { model.input.list.isLoaded }
@@ -63,7 +63,7 @@ class ReviewModelNoticeTest {
 
         model.loadSelection()
 
-        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
+        assertEquals("記録を読めませんでした", model.state.notices.error.message)
         assertEquals(ReviewPeriod.Scale.month, model.input.scale)
         assertEquals(ReviewKind.expense, model.input.kind)
     }
@@ -77,7 +77,7 @@ class ReviewModelNoticeTest {
         model.setKind(ReviewKind.balance)
         model.saveSelection()
 
-        assertEquals("保存できませんでした", model.state.errorNotice.message)
+        assertEquals("保存できませんでした", model.state.notices.error.message)
         assertEquals(ReviewPeriod.Scale.year, model.input.scale)
         assertEquals(ReviewKind.balance, model.input.kind)
         assertEquals(ReviewPeriod.Scale.month, setup.database.setting(SettingKey.reviewScale))
@@ -88,12 +88,12 @@ class ReviewModelNoticeTest {
     fun keepsListNoticeAfterSaving() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.reviewModel(entryList = failingEntryList)
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
 
         model.setKind(ReviewKind.income)
         model.saveSelection()
 
-        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
+        assertEquals("記録を読めませんでした", model.state.notices.error.message)
         assertEquals(ReviewKind.income, setup.database.setting(SettingKey.reviewKind))
     }
 
@@ -105,7 +105,7 @@ class ReviewModelNoticeTest {
         model.saveSelection()
         model.loadSelection()
 
-        assertEquals("保存できませんでした", model.state.errorNotice.message)
+        assertEquals("保存できませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -114,9 +114,9 @@ class ReviewModelNoticeTest {
         val model = setup.reviewModel()
         model.loadSelection()
 
-        model.state.errorNotice.clear()
+        model.state.notices.error.clear()
 
-        assertEquals("", model.state.errorNotice.message)
+        assertEquals("", model.state.notices.error.message)
     }
 
     private fun ModelTestSetup.reviewModel(
