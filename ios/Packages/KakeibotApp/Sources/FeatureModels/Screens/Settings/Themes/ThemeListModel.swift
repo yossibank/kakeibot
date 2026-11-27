@@ -29,10 +29,11 @@ public extension ThemeListModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
+        public var presented = Presented()
+
         public let errorNotice: ErrorNotice
 
         public internal(set) var suggestedIcon: AppIconChoice?
-        public internal(set) var presented: Presented?
         public internal(set) var pressing: ThemeChoice?
 
         public let deletion: UndoNotice<Deletion>
