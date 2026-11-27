@@ -28,10 +28,14 @@ public extension SettingsMenuResetModel {
         case deleteAll
     }
 
+    struct Presented: ScreenEditable {
+        public var prompt = Shown<Prompt>()
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var prompt = Shown<Prompt>()
+        public var presented = Presented()
 
         public let errorNotice: ErrorNotice
         public let task = ModelTask()
@@ -72,17 +76,17 @@ public extension SettingsMenuResetModel {
             }
         } catch {
             state.errorNotice.show(Self.loadFailedMessage, for: error)
-            state.prompt.close(.deleteAll)
+            state.presented.prompt.close(.deleteAll)
             return false
         }
 
         guard input.count > 0 else {
             state.errorNotice.inform(Self.emptyMessage)
-            state.prompt.close(.deleteAll)
+            state.presented.prompt.close(.deleteAll)
             return false
         }
 
-        state.prompt.show(.deleteAll)
+        state.presented.prompt.show(.deleteAll)
 
         return true
     }
