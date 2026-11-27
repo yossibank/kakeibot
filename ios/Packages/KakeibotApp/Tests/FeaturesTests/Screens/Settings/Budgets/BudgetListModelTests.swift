@@ -342,6 +342,41 @@ struct BudgetListModelTests {
 
         #expect(model.state.notices.error.message == "予算を読めませんでした")
     }
+
+    @Test
+    func splitsCategoriesByBudgetAndOrdersRestBySpending() async throws {
+        let setup = try await HomeModelTests.Setup()
+        let options = try await setup.database.entryOptions()
+        let categories = options.expenseCategories
+        try #require(categories.count >= 4)
+        try await setup.database.setBudget(
+            10000,
+            for: categories[0].id,
+            from: setup.today.yearMonth
+        )
+
+        for (category, amount) in [(categories[2], 3000), (categories[3], 5000)] {
+            let draft = EntryDraft(
+                type: .expense,
+                amount: amount,
+                date: setup.today,
+                categoryId: category.id,
+                walletId: options.wallets[0].id
+            )
+
+            try await setup.database.saveEntry(
+                draft,
+                at: Date(timeIntervalSince1970: 1_791_000_000)
+            )
+        }
+
+        let model = BudgetListModel(parts: .system(setup.database), today: setup.today)
+        await model.load()
+        let ids = categories.map(\.id)
+
+        #expect(model.output.budgeted.map(\.id) == [ids[0]])
+        #expect(model.output.unbudgeted.map(\.id) == [ids[3], ids[2], ids[1]] + ids.dropFirst(4))
+    }
 }
 
 private extension BudgetListModelTests {

@@ -92,20 +92,20 @@ private extension AssetsView {
                 }
             }
 
-            if !owedSections.isEmpty {
+            if !model.output.owedSections.isEmpty {
                 VStack(spacing: 4) {
                     SplitBar(
-                        ownedShare,
+                        model.output.sections.ownedShare,
                         leading: Palette.accent,
                         trailing: Palette.accent.opacity(.muted)
                     )
 
                     HStack {
-                        Text("資産 \(Yen.text(ownedTotal))")
+                        Text("資産 \(Yen.text(model.output.ownedSections.total))")
 
                         Spacer(minLength: 8)
 
-                        Text("負債 \(Yen.text(-owedTotal))")
+                        Text("負債 \(Yen.text(-model.output.owedSections.total))")
                     }
                     .textFont(size: .micro)
                     .monospacedDigit()
@@ -141,21 +141,6 @@ private extension AssetsView {
 }
 
 private extension AssetsView {
-    var ownedTotal: Int {
-        ownedSections.flatMap(\.rows).reduce(0) { $0 + $1.balance }
-    }
-
-    var owedTotal: Int {
-        owedSections.flatMap(\.rows).reduce(0) { $0 + $1.balance }
-    }
-
-    var ownedShare: Double {
-        let owned = max(ownedTotal, 0)
-        let owed = max(-owedTotal, 0)
-        let total = owned + owed
-        return total == 0 ? 1 : Double(owned) / Double(total)
-    }
-
     var netWorths: [Int]? {
         model.output.showsNetWorth ? model.output.monthTotals.map(\.netWorth) : nil
     }

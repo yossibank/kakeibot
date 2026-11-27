@@ -10,13 +10,10 @@ extension AssetsView {
         addNote: String,
         onAdd: @escaping () -> Void
     ) -> some View {
-        let rows = sections.flatMap(\.rows)
-        let total = rows.reduce(0) { $0 + $1.balance }
+        VStack(alignment: .leading, spacing: 0) {
+            CardHeader(title, note: sections.isEmpty ? nil : "\(sections.rowCount) 口座")
 
-        return VStack(alignment: .leading, spacing: 0) {
-            CardHeader(title, note: rows.isEmpty ? nil : "\(rows.count) 口座")
-
-            if rows.isEmpty {
+            if sections.isEmpty {
                 Text("口座を追加すると、ここに並びます")
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)
@@ -24,7 +21,7 @@ extension AssetsView {
                     .padding(.bottom, 8)
             } else {
                 AmountText(
-                    total,
+                    sections.total,
                     font: .size(.title, weight: .bold),
                     color: Palette.accentStrong
                 )
@@ -48,9 +45,7 @@ extension AssetsView {
 
 private extension AssetsView {
     func walletSection(_ section: AssetsModel.WalletSection) -> some View {
-        let total = section.rows.reduce(0) { $0 + $1.balance }
-
-        return VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline) {
                 Text(Self.title(of: section.role))
                     .textFont(.caption, weight: .semibold)
@@ -60,7 +55,7 @@ private extension AssetsView {
 
                 if section.rows.count > 1 {
                     AmountText(
-                        total,
+                        section.total,
                         font: .style(.footnote, weight: .semibold),
                         color: Palette.subtext
                     )
@@ -280,7 +275,7 @@ private extension AssetsView {
 
     @ViewBuilder
     func unpaidLink(of rows: [AssetsModel.WalletRow]) -> some View {
-        let count = rows.compactMap(\.unpaid).reduce(0) { $0 + $1.count }
+        let count = rows.unpaidCount
 
         if count > 0 {
             Button {

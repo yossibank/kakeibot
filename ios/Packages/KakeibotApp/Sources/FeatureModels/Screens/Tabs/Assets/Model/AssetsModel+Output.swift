@@ -50,6 +50,14 @@ public extension AssetsModel.Output {
         input.summary.sections
     }
 
+    var ownedSections: [AssetsModel.WalletSection] {
+        sections.owned
+    }
+
+    var owedSections: [AssetsModel.WalletSection] {
+        sections.owed
+    }
+
     var upcomingBills: [AssetsModel.UpcomingBill] {
         input.summary.upcomingBills
     }
