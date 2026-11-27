@@ -10,7 +10,7 @@ import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 
 val BudgetListModel.Output.suggestions: List<BudgetListModel.Suggestion>
     get() {
-        val target = state.editing ?: return emptyList()
+        val target = state.presented.editing ?: return emptyList()
         val month = month ?: return emptyList()
         val categoryId = target.categoryId
         val recurring = if (categoryId == null) recurringExpense else 0L

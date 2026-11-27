@@ -53,7 +53,7 @@ class BudgetListModelTest {
         assertEquals(120_000, model.output.totalAmount)
         assertEquals(30000, model.output.amount(food.id))
         assertEquals(30000, model.output.categoriesTotal)
-        assertNull(model.state.editing)
+        assertNull(model.state.presented.editing)
         assertTrue(budgets.all { it.fromMonth == model.output.month })
     }
 
@@ -118,7 +118,7 @@ class BudgetListModelTest {
         assertTrue(usage.isNearLimit)
         assertEquals(9000L, model.output.spent(null))
         assertNull(model.output.totalAmount)
-        assertNull(model.state.editing)
+        assertNull(model.state.presented.editing)
     }
 
     @Test
@@ -157,7 +157,7 @@ class BudgetListModelTest {
         model.press(1)
         model.flow.close()
         val isAsking = model.flow.state.presented.prompt.isShowing(EditFlow.Prompt.discard)
-        val kept = model.state.editing
+        val kept = model.state.presented.editing
 
         model.flow.discard()
 

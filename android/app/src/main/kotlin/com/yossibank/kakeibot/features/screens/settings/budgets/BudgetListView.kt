@@ -235,7 +235,9 @@ private fun BudgetNotices(
             )
         }
 
-        if (model.state.notices.error.message.isNotEmpty() && model.state.editing == null) {
+        if (model.state.notices.error.message.isNotEmpty() &&
+            model.state.presented.editing == null
+        ) {
             Text(
                 text = model.state.notices.error.message,
                 modifier = Modifier

@@ -16,6 +16,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
 import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
@@ -90,26 +91,29 @@ class BudgetListModel(
             internal set
     }
 
+    class Presented : ScreenEditable {
+        var editing: Target? by mutableStateOf(null)
+            internal set
+    }
+
     class State(
         wait: ScreenWait,
     ) {
         val notices = Notices(wait)
         val task = ModelTask(notices.error)
         val submodels = Submodels()
-
-        var editing: Target? by mutableStateOf(null)
-            private set
+        val presented = Presented()
 
         fun startEditing(
             target: Target,
             amount: Int,
         ) {
             submodels.calculator = AmountCalculator(amount = amount)
-            editing = target
+            presented.editing = target
         }
 
         fun cancelEditing() {
-            editing = null
+            presented.editing = null
         }
 
         fun choose(suggestion: Suggestion) {
@@ -179,13 +183,13 @@ class BudgetListModel(
             get() = categories.sumOf { amount(it.id) ?: 0 }
 
         val editingAmount: Int?
-            get() = state.editing?.let { amount(it.categoryId) }
+            get() = state.presented.editing?.let { amount(it.categoryId) }
 
         val canSave: Boolean
             get() = state.submodels.calculator.amount > 0
 
         val isChanged: Boolean
-            get() = state.editing != null &&
+            get() = state.presented.editing != null &&
                 state.submodels.calculator.amount != (editingAmount ?: 0)
 
         fun amount(categoryId: Identifier<EntryCategory>?): Int? {
@@ -283,7 +287,7 @@ class BudgetListModel(
     }
 
     suspend fun clear(): Cleared? {
-        val target = state.editing ?: return null
+        val target = state.presented.editing ?: return null
         val amount = output.editingAmount ?: return null
         val month = output.month ?: return null
 
@@ -336,7 +340,7 @@ class BudgetListModel(
     }
 
     private suspend fun setBudget(amount: Int?): Boolean {
-        val target = state.editing ?: return false
+        val target = state.presented.editing ?: return false
         val month = output.month ?: return false
 
         val saved = state.task.attempt(failure = SAVE_FAILED) {
