@@ -48,7 +48,8 @@ public extension OnboardingModel {
 
     struct Fields: ScreenEditable {
         public var path: [SetupItem] = []
-        public var route: Route?
+
+        public internal(set) var route: Route?
     }
 
     @MainActor
