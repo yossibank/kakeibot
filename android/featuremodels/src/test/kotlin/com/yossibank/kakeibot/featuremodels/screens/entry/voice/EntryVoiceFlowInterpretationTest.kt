@@ -39,7 +39,7 @@ class EntryVoiceFlowInterpretationTest {
         flow.finish()
 
         assertEquals(990, model.output.amount)
-        assertEquals("ランチ990円", flow.state.notice?.text)
+        assertEquals("ランチ990円", flow.state.notices.result.current?.text)
     }
 
     @Test
@@ -54,6 +54,6 @@ class EntryVoiceFlowInterpretationTest {
         flow.finish()
 
         assertEquals(980, model.output.amount)
-        assertEquals(Outcome.Applied, flow.state.notice?.outcome)
+        assertEquals(Outcome.Applied, flow.state.notices.result.current?.outcome)
     }
 }

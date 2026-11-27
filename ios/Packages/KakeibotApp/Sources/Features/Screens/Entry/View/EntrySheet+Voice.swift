@@ -28,7 +28,7 @@ extension EntrySheet {
         VStack {
             Spacer(minLength: 0)
 
-            if let notice = voice.state.notice {
+            if let notice = voice.state.notices.result.current {
                 EntryVoiceNotice(notice: notice) {
                     withAnimation(.snappy) {
                         voice.undoLast(in: model)
@@ -43,7 +43,7 @@ extension EntrySheet {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .animation(.snappy, value: voice.state.notice)
+        .animation(.snappy, value: voice.state.notices.result.current)
     }
 
     func startVoice() {

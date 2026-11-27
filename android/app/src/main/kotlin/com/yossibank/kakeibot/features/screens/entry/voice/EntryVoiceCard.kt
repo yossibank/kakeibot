@@ -129,7 +129,7 @@ private fun ColumnScope.Listening(
         )
 
         EntryVoiceFinishButton(
-            silenceStart = listening.silenceStart,
+            silenceStart = listening.silence.startedAt,
             duration = flow.input.silenceMillis,
             passed = flow::silencePassed,
             onSelect = flow::finish,

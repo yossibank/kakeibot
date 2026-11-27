@@ -12,7 +12,7 @@ public final class EntryVoiceFlow: ScreenPerforming {
     let dependencies: Dependencies
 
     init(dependencies: Dependencies) {
-        let state = State()
+        let state = State(wait: dependencies.wait)
         let input = Input(silenceDuration: dependencies.silence / .seconds(1))
 
         self.state = state
@@ -43,9 +43,9 @@ public extension EntryVoiceFlow {
         var prepare: @MainActor () -> Void
         var choose: @MainActor (EntryVoiceQuestion) async -> VoiceReading.Choice?
         var clock: ScreenClock
+        var wait: ScreenWait
         var sleep: @Sendable (Duration) async throws -> Void
         var silence: Duration
-        var noticeDuration: Duration
     }
 }
 
@@ -149,16 +149,13 @@ public extension EntryVoiceFlow {
     }
 
     func undoLast(in model: EntryModel) {
-        if let undo = state.undo {
+        if let undo = state.notices.result.take()?.undo {
             model.undo(undo)
         }
-
-        clearNotice()
     }
 
     func clearNotice() {
-        input.noticeTask?.cancel()
-        state.clearNotice()
+        state.notices.result.dismiss()
     }
 }
 
@@ -256,7 +253,7 @@ private extension EntryVoiceFlow {
         let text = Self.spokenText(of: transcript, in: session)
 
         guard !text.isEmpty else {
-            show(Notice(outcome: .unheard, count: 0, text: ""))
+            state.notices.result.show(Notice(outcome: .unheard, count: 0, text: "", undo: nil))
             return
         }
 
@@ -271,41 +268,25 @@ private extension EntryVoiceFlow {
         let reading = model.output.voiceReading(from: text, today: session.today, choice: choice)
 
         guard !reading.isEmpty else {
-            show(Notice(outcome: .unheard, count: 0, text: text))
+            state.notices.result.show(Notice(outcome: .unheard, count: 0, text: text, undo: nil))
             return
         }
 
         let undo = model.apply(reading)
 
         guard reading.amount != nil else {
-            show(Notice(outcome: .missingAmount, count: reading.count, text: text))
+            state.notices.result.show(
+                Notice(outcome: .missingAmount, count: reading.count, text: text, undo: nil)
+            )
+
             return
         }
 
-        show(Notice(outcome: .applied, count: reading.count, text: text), undo: undo)
+        state.notices.result.show(
+            Notice(outcome: .applied, count: reading.count, text: text, undo: undo)
+        )
+
         session.onApplied()
-    }
-
-    func show(
-        _ notice: Notice,
-        undo: EntryModel.VoiceUndo? = nil
-    ) {
-        input.noticeTask?.cancel()
-        state.show(notice, undo: undo)
-
-        let duration = dependencies.noticeDuration
-        let sleep = dependencies.sleep
-        let id = notice.id
-
-        input.noticeTask = Task { [weak self] in
-            try? await sleep(duration)
-
-            guard !Task.isCancelled, self?.state.notice?.id == id else {
-                return
-            }
-
-            self?.state.clearNotice()
-        }
     }
 
     func reset() {
@@ -321,7 +302,10 @@ private extension EntryVoiceFlow {
 }
 
 extension EntryVoiceFlow.Dependencies {
-    static func live(clock: ScreenClock) -> EntryVoiceFlow.Dependencies {
+    static func live(
+        clock: ScreenClock,
+        wait: ScreenWait
+    ) -> EntryVoiceFlow.Dependencies {
         EntryVoiceFlow.Dependencies(
             isAvailable: EntryVoiceReader.isAvailable,
             isDenied: EntryVoiceReader.isDenied,
@@ -330,11 +314,11 @@ extension EntryVoiceFlow.Dependencies {
             prepare: EntryVoiceReader.prepare,
             choose: EntryVoiceReader.choose,
             clock: clock,
+            wait: wait,
             sleep: { duration in
                 try await Task.sleep(for: duration)
             },
-            silence: .seconds(1),
-            noticeDuration: .seconds(4)
+            silence: .seconds(1)
         )
     }
 }

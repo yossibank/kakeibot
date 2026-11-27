@@ -54,7 +54,7 @@ extension EntryVoiceFlowTests {
         await flow.finish()
 
         #expect(model.output.amount == 990)
-        #expect(flow.state.notice?.text == "ランチ990円")
+        #expect(flow.state.notices.result.current?.text == "ランチ990円")
     }
 
     @Test
@@ -169,7 +169,7 @@ extension EntryVoiceFlowTests {
         await flow.finish()
 
         #expect(model.output.amount == 980)
-        #expect(flow.state.notice?.outcome == .applied)
+        #expect(flow.state.notices.result.current?.outcome == .applied)
     }
 
     @Test
