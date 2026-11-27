@@ -51,5 +51,7 @@
 | Home | `PendingDay` | スタンプのシートで選んだ日。`pick`・`take` |
 | Main | `TabSelection` | 今のタブと訪れたタブ。`select` |
 | Main | `EntryLaunch` | 入力をレシートで始めるかと、先に温めている間か。iOS だけ |
+| WalletEdit | `BalanceSign` | 初めの残高の正負。前の種類の向きのままなら、`follow` で新しい種類に合わせる（iOS だけ） |
+| Sync | `SwitchRequest` | 同期のスイッチを押してから、切り替え終わるまでの向き。`ask`・`clear`（iOS だけ） |
 
 Main の知らせを隠す回は、`notices.round` に置く。
