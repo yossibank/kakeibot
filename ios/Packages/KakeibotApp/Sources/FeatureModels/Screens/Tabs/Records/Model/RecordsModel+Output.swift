@@ -32,7 +32,7 @@ public extension RecordsModel.Output {
     }
 
     var currentMonth: YearMonth {
-        state.today.periodMonth(startingOn: input.monthStartDay)
+        input.today.periodMonth(startingOn: input.monthStartDay)
     }
 
     var isCurrentMonth: Bool {
@@ -69,7 +69,7 @@ public extension RecordsModel.Output {
             return selectedDate
         }
 
-        return period.contains(state.today) ? state.today : period.lowerBound
+        return period.contains(input.today) ? input.today : period.lowerBound
     }
 
     var pendingDeleteCount: Int {

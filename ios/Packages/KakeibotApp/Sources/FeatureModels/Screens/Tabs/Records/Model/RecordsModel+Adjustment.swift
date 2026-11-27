@@ -21,7 +21,7 @@ public extension RecordsModel {
 
             return deletion
         } catch {
-            state.errorNotice.show(Self.deleteAdjustmentFailedMessage, for: error)
+            state.notices.error.show(Self.deleteAdjustmentFailedMessage, for: error)
             return nil
         }
     }

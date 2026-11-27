@@ -60,7 +60,7 @@ private extension RecordsView {
 
 extension RecordsView {
     var selection: Set<Entry.ID>? {
-        model.state.screen.selection
+        model.state.fields.selection
     }
 
     var isCalendarWide: Bool {
@@ -214,7 +214,7 @@ private extension RecordsView {
                 moveMonth(direction, with: slide)
             }
             .scrollDismissesKeyboard(.interactively)
-            .errorBanner(model.state.errorNotice)
+            .errorBanner(model.state.notices.error)
             .safeAreaInset(edge: .bottom) {
                 if let selection {
                     selectionBar(selection)
@@ -222,7 +222,7 @@ private extension RecordsView {
                 }
             }
             .confirmation(
-                isPresented: Bindable(model.state).prompt[.delete],
+                isPresented: Bindable(model.state).presented.prompt[.delete],
                 systemImage: "trash",
                 title: "\(model.output.pendingDeleteCount) 件の記録を削除しますか",
                 message: deleteUndoMessage,
@@ -248,7 +248,7 @@ private extension RecordsView {
             }
             .haptic(.selection, trigger: model.state.month)
             .haptic(.selection, trigger: model.state.fields.selectedDate)
-            .sheet(item: Bindable(model.state).presented.sheet) { sheet in
+            .sheet(item: Bindable(model.state).presented.panel.sheet) { sheet in
                 sheetContent(sheet)
             }
             .overlay {
@@ -293,7 +293,7 @@ private extension RecordsView {
     }
 
     var monthTextTransition: ContentTransition {
-        .numericText(countsDown: !model.state.screen.isMovingForward)
+        .numericText(countsDown: !model.state.isMovingForward)
     }
 
     var canSwipeMonth: Bool {
@@ -305,7 +305,7 @@ private extension RecordsView {
             return nil
         }
 
-        let date = model.output.isCurrentMonth ? model.state.today : model.output.period.lowerBound
+        let date = model.output.isCurrentMonth ? model.input.today : model.output.period.lowerBound
 
         return {
             onAddEntry(date)

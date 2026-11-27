@@ -2,12 +2,12 @@ import DesignSystem
 import SwiftUI
 
 struct RecordsSearchHistory: View {
-    @Binding var clearedWords: [String]?
-
+    let clearedWords: [String]?
     let words: [String]
     let onSelect: (String) -> Void
     let onClear: () -> Void
-    let onRestore: ([String]) -> Void
+    let onRestore: () -> Void
+    let onLeave: () -> Void
 
     var body: some View {
         Group {
@@ -17,24 +17,9 @@ struct RecordsSearchHistory: View {
                 list
             }
         }
-        .task(id: clearedWords) {
-            guard clearedWords != nil else {
-                return
-            }
-
-            try? await Task.sleep(for: .seconds(Self.undoSeconds))
-
-            guard !Task.isCancelled else {
-                return
-            }
-
-            withAnimation(.snappy) {
-                clearedWords = nil
-            }
-        }
         .onDisappear {
             if clearedWords != nil {
-                clearedWords = nil
+                onLeave()
             }
         }
     }
@@ -48,19 +33,20 @@ private extension RecordsSearchHistory {
                 .foregroundStyle(Palette.subtext)
                 .multilineTextAlignment(.center)
 
-            if let clearedWords {
-                undoLine(clearedWords)
+            if clearedWords != nil {
+                undoLine
                     .transition(.opacity)
             }
         }
         .padding(.vertical, 40)
+        .animation(.snappy, value: clearedWords)
     }
 
     var list: some View {
         VStack(alignment: .leading, spacing: 0) {
             CardHeader("最近探した言葉") {
                 Button {
-                    clear()
+                    onClear()
                 } label: {
                     Text("履歴を消す")
                         .textFont(.caption)
@@ -101,14 +87,14 @@ private extension RecordsSearchHistory {
         .sharesTextScale(id: words)
     }
 
-    func undoLine(_ cleared: [String]) -> some View {
+    var undoLine: some View {
         HStack(spacing: 8) {
             Text("履歴を消しました")
                 .textFont(.caption)
                 .foregroundStyle(Palette.subtext)
 
             Button {
-                restore(cleared)
+                onRestore()
             } label: {
                 Text("取り消す")
                     .textFont(.caption, weight: .bold)
@@ -122,33 +108,14 @@ private extension RecordsSearchHistory {
     }
 }
 
-private extension RecordsSearchHistory {
-    static let undoSeconds = 5
-
-    func clear() {
-        withAnimation(.snappy) {
-            clearedWords = words
-        }
-
-        onClear()
-    }
-
-    func restore(_ cleared: [String]) {
-        withAnimation(.snappy) {
-            clearedWords = nil
-        }
-
-        onRestore(cleared)
-    }
-}
-
 #Preview {
     RecordsSearchHistory(
-        clearedWords: .constant(nil),
+        clearedWords: nil,
         words: ["ランチ", "本", "¥500"],
         onSelect: { _ in },
         onClear: {},
-        onRestore: { _ in }
+        onRestore: {},
+        onLeave: {}
     )
     .padding()
     .background(Palette.background)

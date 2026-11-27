@@ -10,7 +10,7 @@ public extension RecordsModel {
         do {
             try await dependencies.database.stamp(icon.id, on: date, at: dependencies.clock.now)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -18,7 +18,7 @@ public extension RecordsModel {
         do {
             try await dependencies.database.removeStamp(on: date)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -34,7 +34,7 @@ public extension RecordsModel {
                 try await dependencies.database.markNoSpendDay(date, at: dependencies.clock.now)
             }
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 }

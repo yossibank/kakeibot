@@ -17,6 +17,6 @@ public extension RecordsModel.Output {
     }
 
     func canMarkNoSpend(on date: LocalDate) -> Bool {
-        date <= state.today && (day(on: date)?.expenseTotal ?? 0) == 0
+        date <= input.today && (day(on: date)?.expenseTotal ?? 0) == 0
     }
 }

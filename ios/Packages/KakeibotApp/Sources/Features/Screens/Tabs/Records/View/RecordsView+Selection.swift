@@ -149,7 +149,7 @@ private extension RecordsView {
 
         return Button {
             if let block {
-                model.state.errorNotice.inform(block)
+                model.state.notices.error.inform(block)
             } else {
                 action()
             }

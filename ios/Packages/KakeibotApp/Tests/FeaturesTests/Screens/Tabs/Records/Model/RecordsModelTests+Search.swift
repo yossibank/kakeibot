@@ -159,10 +159,13 @@ extension RecordsModelTests {
         await model.rememberSearch("本")
         let words = model.input.recentSearches
         await model.clearRecentSearches()
+        let cleared = model.state.notices.clearedSearches.current
 
-        await model.restoreRecentSearches(words)
+        await model.restoreRecentSearches()
         let saved = try await setup.database.setting(.recentSearches)
 
+        #expect(cleared == words)
+        #expect(model.state.notices.clearedSearches.current == nil)
         #expect(saved == ["本", "ランチ"])
     }
 

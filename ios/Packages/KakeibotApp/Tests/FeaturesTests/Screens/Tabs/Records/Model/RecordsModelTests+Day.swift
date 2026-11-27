@@ -80,7 +80,7 @@ extension RecordsModelTests {
 
         #expect(model.input.layout == .list)
         #expect(saved == .calendar)
-        #expect(model.state.errorNotice.message == "保存できませんでした")
+        #expect(model.state.notices.error.message == "保存できませんでした")
     }
 
     @Test
@@ -188,7 +188,7 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(!model.state.prompt.isShowing(.delete))
+        #expect(!model.state.presented.prompt.isShowing(.delete))
         #expect(deleted == [firstNine])
 
         deleted = []
@@ -197,13 +197,13 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(model.state.prompt.isShowing(.delete))
+        #expect(model.state.presented.prompt.isShowing(.delete))
         #expect(model.output.pendingDeleteCount == 10)
         #expect(deleted.isEmpty)
 
         model.state.cancelDelete()
 
-        #expect(!model.state.prompt.isShowing(.delete))
+        #expect(!model.state.presented.prompt.isShowing(.delete))
         #expect(deleted.isEmpty)
 
         model.state.requestDelete(ids) {
@@ -214,7 +214,7 @@ extension RecordsModelTests {
             deleted.append($0)
         }
 
-        #expect(!model.state.prompt.isShowing(.delete))
+        #expect(!model.state.presented.prompt.isShowing(.delete))
         #expect(deleted == [ids])
     }
 }

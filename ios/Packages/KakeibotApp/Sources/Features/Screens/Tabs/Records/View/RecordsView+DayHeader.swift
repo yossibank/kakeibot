@@ -115,7 +115,7 @@ private extension RecordsView {
 
     func dayTitle(_ date: LocalDate) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Text(PeriodText.day(date, today: model.state.today))
+            Text(PeriodText.day(date, today: model.input.today))
                 .displayFont(.headline)
                 .foregroundStyle(Palette.accentStrong)
                 .fixedSize()
@@ -125,7 +125,7 @@ private extension RecordsView {
                 .foregroundStyle(Self.weekdayColor(for: date))
                 .fixedSize()
 
-            if date == model.state.today {
+            if date == model.input.today {
                 Text("今日")
                     .textFont(.caption2, weight: .semibold)
                     .foregroundStyle(Palette.accent)

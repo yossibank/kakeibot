@@ -95,7 +95,7 @@ internal fun RecordsCalendarCard(model: RecordsModel) {
                                 date = date,
                                 day = model.output.day(on = date),
                                 isSelected = date == selected,
-                                isToday = date == model.state.today,
+                                isToday = date == model.input.today,
                                 onSelect = { model.state.select(date) },
                             )
                         }

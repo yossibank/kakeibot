@@ -20,7 +20,7 @@ public extension RecordsModel.Output {
     }
 
     var upcomingDates: [LocalDate] {
-        let start = max(period.lowerBound, state.today.adding(days: 1))
+        let start = max(period.lowerBound, input.today.adding(days: 1))
 
         guard
             filterTitle == nil,
@@ -37,13 +37,13 @@ public extension RecordsModel.Output {
     }
 
     func listCaptions(in days: [RecordsModel.ListDay]) -> [LocalDate: String] {
-        guard let firstFuture = days.first(where: { $0.date > state.today }) else {
+        guard let firstFuture = days.first(where: { $0.date > input.today }) else {
             return [:]
         }
 
         var captions = [firstFuture.date: Self.futureCaption]
 
-        if let firstPast = days.first(where: { $0.date <= state.today }) {
+        if let firstPast = days.first(where: { $0.date <= input.today }) {
             captions[firstPast.date] = Self.pastCaption
         }
 
@@ -62,7 +62,7 @@ public extension RecordsModel.Output {
     }
 
     func upcomingRecurrings(on date: LocalDate) -> [Recurring] {
-        guard date > state.today else {
+        guard date > input.today else {
             return []
         }
 

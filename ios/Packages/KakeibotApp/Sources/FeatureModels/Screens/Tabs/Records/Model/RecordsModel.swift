@@ -17,8 +17,8 @@ public final class RecordsModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State(today: today, wait: parts.wait)
-        let input = Input()
+        let state = State(month: today.yearMonth, wait: parts.wait)
+        let input = Input(today: today)
 
         self.state = state
         self.input = input
@@ -41,7 +41,7 @@ public extension RecordsModel {
         do {
             input.layout = try await dependencies.database.setting(.recordsLayout)
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -53,7 +53,7 @@ public extension RecordsModel {
         do {
             try await dependencies.database.setSetting(.recordsLayout, to: input.layout)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -62,7 +62,7 @@ public extension RecordsModel {
             input.list = try await .loaded(dependencies.database.entryList())
             input.recurrings = try await dependencies.database.recurrings()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -130,6 +130,7 @@ extension RecordsModel {
 
     static let saveFailedMessage = "保存できませんでした"
     static let confirmDeleteThreshold = 10
+    static let clearedSearchesDuration: Duration = .seconds(5)
 }
 
 private extension RecordsModel {
@@ -143,7 +144,7 @@ private extension RecordsModel {
             }
 
             input.monthStartDay = startDay
-            state.setMonth(state.today.periodMonth(startingOn: startDay))
+            state.setMonth(input.today.periodMonth(startingOn: startDay))
         }
     }
 }
@@ -154,8 +155,8 @@ extension RecordsModel: TabScreenModel {
     }
 
     public func setToday(_ today: LocalDate) {
-        if state.today != today {
-            state.today = today
+        if input.today != today {
+            input.today = today
         }
     }
 }

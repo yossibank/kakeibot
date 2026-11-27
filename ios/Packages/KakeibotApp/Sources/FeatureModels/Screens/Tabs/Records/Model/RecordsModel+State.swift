@@ -9,34 +9,51 @@ public extension RecordsModel {
         public var isSearching = false
         public var searchText = ""
         public var filter = EntryFilter()
-        public var isAddingMark = false
         public var filterTab: FilterTab = .expense
-        public var clearedSearches: [String]?
+        public var selection: Set<Entry.ID>?
+    }
+
+    struct Presented: ScreenEditable {
+        public var panel = Shown<Panel>()
+        public var prompt = Shown<Prompt>()
+        public var adding = Shown<Adding>()
+
+        public internal(set) var openItemIds: Set<Entry.ID> = []
+    }
+
+    @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+        public let clearedSearches: UndoNotice<[String]>
+
+        init(wait: ScreenWait) {
+            let undoWait = wait.lasting(RecordsModel.clearedSearchesDuration)
+
+            self.error = ErrorNotice(wait: wait)
+            self.clearedSearches = UndoNotice(wait: undoWait)
+        }
     }
 
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
-        public var presented = Shown<Presented>()
-        public var prompt = Shown<Prompt>()
+        public var presented = Presented()
 
-        public internal(set) var today: LocalDate
+        public let notices: Notices
+
         public internal(set) var outcome = ScreenOutcome<Deletion>()
-        public internal(set) var screen = Screen()
+        public internal(set) var isMovingForward = true
 
         public private(set) var month: YearMonth
         public private(set) var pendingDeleteIDs: [Entry.ID] = []
 
-        public let errorNotice: ErrorNotice
-
         init(
-            today: LocalDate,
+            month: YearMonth,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.today = today
-            self.month = today.yearMonth
+            self.notices = Notices(wait: wait)
+            self.month = month
         }
     }
 }
@@ -66,7 +83,7 @@ public extension RecordsModel.State {
         }
 
         pendingDeleteIDs = ids
-        prompt.show(.delete)
+        presented.prompt.show(.delete)
     }
 
     func confirmDelete(delete: ([Entry.ID]) -> Void) {
@@ -77,7 +94,7 @@ public extension RecordsModel.State {
 
     func cancelDelete() {
         pendingDeleteIDs = []
-        prompt.close(.delete)
+        presented.prompt.close(.delete)
     }
 }
 
