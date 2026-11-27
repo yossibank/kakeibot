@@ -9,9 +9,10 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.loadedModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.store
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.wallets
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceResult.Outcome
+import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
 import com.yossibank.kakeibot.featuremodels.support.FakeVoiceClock
 import com.yossibank.kakeibot.featuremodels.support.FakeVoiceSource
-import com.yossibank.kakeibot.featuremodels.support.VOICE_NOTICE_MILLIS
+import com.yossibank.kakeibot.featuremodels.support.ManualWait
 import com.yossibank.kakeibot.featuremodels.support.VOICE_SILENCE_MILLIS
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import com.yossibank.kakeibot.featuremodels.support.voiceFlow
@@ -29,6 +30,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EntryVoiceFlowTest {
@@ -62,9 +64,9 @@ class EntryVoiceFlowTest {
         assertTrue(model.output.isDateFromVoice)
         assertTrue(model.output.isWalletFromVoice)
         assertTrue(model.output.isMemoFromVoice)
-        assertEquals(Outcome.Applied, flow.state.notice?.outcome)
-        assertEquals(4, flow.state.notice?.count)
-        assertEquals("声から 4 つ入れました", flow.state.notice?.title)
+        assertEquals(Outcome.Applied, flow.state.notices.result.current?.outcome)
+        assertEquals(4, flow.state.notices.result.current?.count)
+        assertEquals("声から 4 つ入れました", flow.state.notices.result.current?.title)
         assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
         assertTrue(source.isFinished)
 
@@ -74,7 +76,7 @@ class EntryVoiceFlowTest {
         assertEquals(setup.today, model.state.form.date)
         assertEquals("", model.state.form.memo)
         assertFalse(model.output.isDateFromVoice)
-        assertNull(flow.state.notice)
+        assertNull(flow.state.notices.result.current)
     }
 
     @Test
@@ -90,10 +92,10 @@ class EntryVoiceFlowTest {
         assertEquals(0, model.output.amount)
         assertEquals(setup.today.adding(days = -1), model.state.form.date)
         assertEquals(EntryModel.Field.Amount, model.state.focus.field)
-        assertEquals(Outcome.MissingAmount, flow.state.notice?.outcome)
-        assertEquals("「昨日のコンビニ」", flow.state.notice?.message)
-        assertEquals(false, flow.state.notice?.canUndo)
-        assertNull(flow.state.undo)
+        assertEquals(Outcome.MissingAmount, flow.state.notices.result.current?.outcome)
+        assertEquals("「昨日のコンビニ」", flow.state.notices.result.current?.message)
+        assertEquals(false, flow.state.notices.result.current?.canUndo)
+        assertNull(flow.state.notices.result.current?.undo)
     }
 
     @Test
@@ -104,9 +106,9 @@ class EntryVoiceFlowTest {
         flow.start(model, today = setup.today)
         flow.finish()
 
-        assertEquals(Outcome.Unheard, flow.state.notice?.outcome)
-        assertEquals("聞き取れませんでした", flow.state.notice?.title)
-        assertNull(flow.state.notice?.message)
+        assertEquals(Outcome.Unheard, flow.state.notices.result.current?.outcome)
+        assertEquals("聞き取れませんでした", flow.state.notices.result.current?.title)
+        assertNull(flow.state.notices.result.current?.message)
         assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
     }
 
@@ -225,19 +227,18 @@ class EntryVoiceFlowTest {
     fun clearsNoticeAfterAWhile() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
         val source = FakeVoiceSource()
-        val clock = FakeVoiceClock()
-        val flow = voiceFlow(source, clock)
+        val wait = ManualWait()
+        val flow = voiceFlow(source, wait = wait)
 
         flow.start(model, today = setup.today)
         source.say("500円")
         flow.finish()
-        runCurrent()
-        val shown = flow.state.notice != null
-        clock.advance(millis = VOICE_NOTICE_MILLIS)
-        runCurrent()
+        wait.advance(by = UndoNotice.duration - 1.milliseconds)
+        val shown = flow.state.notices.result.current != null
+        wait.advance(by = 1.milliseconds)
 
         assertTrue(shown)
-        assertNull(flow.state.notice)
+        assertNull(flow.state.notices.result.current)
     }
 
     @Test
@@ -253,7 +254,7 @@ class EntryVoiceFlowTest {
 
         assertEquals(0, model.output.amount)
         assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
-        assertNull(flow.state.notice)
+        assertNull(flow.state.notices.result.current)
         assertTrue(source.isCancelled)
         assertEquals(listOf(1, 1), listOf(startCount, flow.state.rounds.ends))
     }

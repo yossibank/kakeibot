@@ -33,9 +33,9 @@ struct EntryVoiceFlowTests {
         #expect(model.output.isDateFromVoice)
         #expect(model.output.isWalletFromVoice)
         #expect(model.output.isMemoFromVoice)
-        #expect(flow.state.notice?.outcome == .applied)
-        #expect(flow.state.notice?.count == 4)
-        #expect(flow.state.notice?.title == "声から 4 つ入れました")
+        #expect(flow.state.notices.result.current?.outcome == .applied)
+        #expect(flow.state.notices.result.current?.count == 4)
+        #expect(flow.state.notices.result.current?.title == "声から 4 つ入れました")
         #expect(applied == 1)
         #expect(flow.state.step == nil)
         #expect(source.isFinished)
@@ -46,7 +46,7 @@ struct EntryVoiceFlowTests {
         #expect(model.state.payment.date == setup.date)
         #expect(model.state.fields.memo.isEmpty)
         #expect(!model.output.isDateFromVoice)
-        #expect(flow.state.notice == nil)
+        #expect(flow.state.notices.result.current == nil)
     }
 
     @Test
@@ -66,9 +66,9 @@ struct EntryVoiceFlowTests {
 
         #expect(model.output.amount == 0)
         #expect(model.state.payment.date == setup.date.adding(days: -1))
-        #expect(flow.state.notice?.outcome == .missingAmount)
-        #expect(flow.state.notice?.message == "「昨日のコンビニ」")
-        #expect(flow.state.notice?.canUndo == false)
+        #expect(flow.state.notices.result.current?.outcome == .missingAmount)
+        #expect(flow.state.notices.result.current?.message == "「昨日のコンビニ」")
+        #expect(flow.state.notices.result.current?.canUndo == false)
         #expect(applied == 0)
     }
 
@@ -81,9 +81,9 @@ struct EntryVoiceFlowTests {
         await flow.start(for: model, today: setup.date) {}
         await flow.finish()
 
-        #expect(flow.state.notice?.outcome == .unheard)
-        #expect(flow.state.notice?.title == "聞き取れませんでした")
-        #expect(flow.state.notice?.message == nil)
+        #expect(flow.state.notices.result.current?.outcome == .unheard)
+        #expect(flow.state.notices.result.current?.title == "聞き取れませんでした")
+        #expect(flow.state.notices.result.current?.message == nil)
     }
 
     @Test
@@ -202,16 +202,21 @@ struct EntryVoiceFlowTests {
         let setup = try await EntryModelTests.Setup()
         let model = try await loadedModel(setup)
         let source = FakeVoiceSource()
-        let flow = EntryVoiceFlow(dependencies: .fake(source))
+        let wait = ManualWait()
+        let flow = EntryVoiceFlow(dependencies: .fake(source, wait: wait))
+        let duration = UndoNotice<EntryVoiceFlow.Notice>.duration
 
         await flow.start(for: model, today: setup.date) {}
         source.say("500円")
         await flow.finish()
-        let shown = flow.state.notice != nil
-        await ObservationWait.until { flow.state.notice == nil }
+        await ObservationWait.until { wait.isSleeping }
+        wait.advance(by: duration - .milliseconds(1))
+        let shown = flow.state.notices.result.current != nil
+        wait.advance(by: .milliseconds(1))
+        await ObservationWait.until { flow.state.notices.result.current == nil }
 
         #expect(shown)
-        #expect(flow.state.notice == nil)
+        #expect(flow.state.notices.result.current == nil)
     }
 
     @Test
@@ -230,7 +235,7 @@ struct EntryVoiceFlowTests {
 
         #expect(model.output.amount == 0)
         #expect(flow.state.step == nil)
-        #expect(flow.state.notice == nil)
+        #expect(flow.state.notices.result.current == nil)
         #expect(source.isCancelled)
         #expect(counts == [1, 1])
     }

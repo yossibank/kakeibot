@@ -256,7 +256,7 @@ public extension EntryModel {
     }
 
     func newVoiceFlow() -> EntryVoiceFlow {
-        EntryVoiceFlow(dependencies: .live(clock: dependencies.clock))
+        EntryVoiceFlow(dependencies: .live(clock: dependencies.clock, wait: dependencies.wait))
     }
 
     func newReceiptFlow() -> EntryReceiptFlow {

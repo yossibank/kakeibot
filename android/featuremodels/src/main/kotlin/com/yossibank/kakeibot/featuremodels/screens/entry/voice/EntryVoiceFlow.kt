@@ -7,12 +7,12 @@ import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.voice.VoiceReading
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.VoiceUndo
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.undo
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.voiceHints
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.voiceReading
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import kotlinx.coroutines.Job
@@ -22,11 +22,11 @@ class EntryVoiceFlow internal constructor(
     isAvailable: Boolean,
     clock: ScreenClock,
     makeSource: () -> EntryVoiceSource?,
+    wait: ScreenWait,
     sleep: suspend (Long) -> Unit,
     silenceMillis: Long,
-    noticeMillis: Long,
 ) : ScreenPerforming {
-    val state = State()
+    val state = State(wait)
     val input = Input(isAvailable, silenceMillis)
     val output = Output(state)
 
@@ -36,19 +36,19 @@ class EntryVoiceFlow internal constructor(
         clock = clock,
         makeSource = makeSource,
         sleep = sleep,
-        noticeMillis = noticeMillis,
     )
 
     constructor(
         context: Context,
         clock: ScreenClock,
+        wait: ScreenWait,
     ) : this(
         isAvailable = EntryVoiceSpeech.isAvailable(context),
         clock = clock,
         makeSource = { EntryVoiceRecognizer.make(context) },
+        wait = wait,
         sleep = { millis -> delay(millis) },
         silenceMillis = SILENCE_MILLIS,
-        noticeMillis = UndoNotice.duration.inWholeMilliseconds,
     )
 
     sealed interface Phase {
@@ -86,17 +86,21 @@ class EntryVoiceFlow internal constructor(
         fun ended(): Rounds = copy(ends = ends + 1)
     }
 
-    class State {
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val result = UndoNotice<EntryVoiceResult>(wait)
+    }
+
+    class State(
+        wait: ScreenWait,
+    ) {
+        val notices = Notices(wait)
+
         var phase: Phase by mutableStateOf(Phase.Idle)
             private set
 
-        var notice: EntryVoiceResult? by mutableStateOf(null)
-            private set
-
         var rounds: Rounds by mutableStateOf(Rounds())
-            private set
-
-        var undo: VoiceUndo? = null
             private set
 
         fun start() {
@@ -115,19 +119,6 @@ class EntryVoiceFlow internal constructor(
 
         fun move(to: Phase) {
             phase = to
-        }
-
-        fun show(notice: EntryVoiceResult) {
-            this.notice = notice
-        }
-
-        fun remember(undo: VoiceUndo) {
-            this.undo = undo
-        }
-
-        fun clearNotice() {
-            notice = null
-            undo = null
         }
     }
 
@@ -150,13 +141,11 @@ class EntryVoiceFlow internal constructor(
         val clock: ScreenClock,
         val makeSource: () -> EntryVoiceSource?,
         val sleep: suspend (Long) -> Unit,
-        val noticeMillis: Long,
     )
 
     private class Runtime {
         var source: EntryVoiceSource? = null
         var session: Session? = null
-        var noticeJob: Job? = null
         var silenceJob: Job? = null
     }
 
@@ -219,13 +208,11 @@ class EntryVoiceFlow internal constructor(
     }
 
     fun undoLast(model: EntryModel) {
-        state.undo?.let(model.state::undo)
-        clearNotice()
+        state.notices.result.take()?.undo?.let(model.state::undo)
     }
 
     fun clearNotice() {
-        runtime.noticeJob?.cancel()
-        state.clearNotice()
+        state.notices.result.dismiss()
     }
 
     fun close() {
@@ -290,13 +277,12 @@ class EntryVoiceFlow internal constructor(
             return
         }
 
-        val read = session.model.read(
+        val result = session.model.read(
             candidates = candidates,
             today = session.today,
         )
 
-        show(read.result)
-        read.undo?.let(state::remember)
+        state.notices.result.show(result)
     }
 
     private fun fail(error: Int) {
@@ -311,26 +297,13 @@ class EntryVoiceFlow internal constructor(
             return
         }
 
-        show(
+        state.notices.result.show(
             EntryVoiceResult(
                 outcome = outcome,
                 count = 0,
                 text = "",
             ),
         )
-    }
-
-    private fun show(notice: EntryVoiceResult) {
-        runtime.noticeJob?.cancel()
-        state.show(notice)
-
-        runtime.noticeJob = perform {
-            dependencies.sleep(dependencies.noticeMillis)
-
-            if (state.notice?.id == notice.id) {
-                state.clearNotice()
-            }
-        }
     }
 
     private fun follow(level: Float) {

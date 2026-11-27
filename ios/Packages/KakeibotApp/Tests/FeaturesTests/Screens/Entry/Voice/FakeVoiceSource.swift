@@ -80,12 +80,21 @@ extension EntryVoiceFlow.Dependencies {
             prepare: {},
             choose: { _ in nil },
             clock: .system,
+            wait: .system,
             sleep: { duration in
                 try await Task.sleep(for: duration)
             },
-            silence: .milliseconds(100),
-            noticeDuration: .milliseconds(100)
+            silence: .milliseconds(100)
         )
+    }
+
+    static func fake(
+        _ source: FakeVoiceSource,
+        wait: ManualWait
+    ) -> Self {
+        var dependencies = fake(source)
+        dependencies.wait = wait.wait
+        return dependencies
     }
 
     static func fake(

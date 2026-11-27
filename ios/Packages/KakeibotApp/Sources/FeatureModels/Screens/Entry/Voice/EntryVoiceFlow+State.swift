@@ -9,17 +9,30 @@ public extension EntryVoiceFlow {
         let outcome: Outcome
         let count: Int
         let text: String
+        let undo: EntryModel.VoiceUndo?
+    }
+
+    @MainActor
+    struct Notices {
+        public let result: UndoNotice<Notice>
+
+        init(wait: ScreenWait) {
+            self.result = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor
     @Observable
     final class State {
+        public let notices: Notices
+
         public private(set) var step: Step?
         public private(set) var silence = Silence()
         public private(set) var rounds = Rounds()
-        public private(set) var notice: Notice?
 
-        private(set) var undo: EntryModel.VoiceUndo?
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
+        }
     }
 
     @MainActor
@@ -36,7 +49,6 @@ public extension EntryVoiceFlow {
         @ObservationIgnored var session: Session?
         @ObservationIgnored var lastVoice: Date?
         @ObservationIgnored var silenceTask: Task<Void, Never>?
-        @ObservationIgnored var noticeTask: Task<Void, Never>?
         @ObservationIgnored var isStarting = false
 
         init(silenceDuration: TimeInterval) {
@@ -66,19 +78,6 @@ public extension EntryVoiceFlow {
 }
 
 extension EntryVoiceFlow.State {
-    func show(
-        _ notice: EntryVoiceFlow.Notice,
-        undo: EntryModel.VoiceUndo?
-    ) {
-        self.notice = notice
-        self.undo = undo
-    }
-
-    func clearNotice() {
-        notice = nil
-        undo = nil
-    }
-
     func setDenied(_ isDenied: Bool) {
         step = isDenied ? .denied : nil
     }

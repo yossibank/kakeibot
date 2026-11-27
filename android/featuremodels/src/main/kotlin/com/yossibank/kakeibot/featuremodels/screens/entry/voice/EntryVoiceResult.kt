@@ -1,11 +1,13 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.voice
 
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.VoiceUndo
 import java.util.UUID
 
 data class EntryVoiceResult(
     val outcome: Outcome,
     val count: Int,
     val text: String,
+    val undo: VoiceUndo? = null,
     val id: UUID = UUID.randomUUID(),
 ) {
     enum class Outcome {

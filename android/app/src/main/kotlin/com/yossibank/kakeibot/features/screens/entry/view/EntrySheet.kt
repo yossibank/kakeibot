@@ -105,6 +105,7 @@ private fun rememberEntryVoice(
         EntryVoiceFlow(
             context = context,
             clock = parts.clock,
+            wait = parts.wait,
         )
     }
 }
@@ -185,7 +186,7 @@ private fun BoxScope.EntryNoticeLayer(
     voice: EntryVoiceFlow,
     model: EntryModel,
 ) {
-    val voiceNotice = voice.state.notice
+    val voiceNotice = voice.state.notices.result.current
 
     val modifier = Modifier
         .align(Alignment.BottomCenter)
