@@ -6,6 +6,8 @@ public enum Yen {
         case plus
     }
 
+    public static let compactUnit = "万円"
+
     private static let locale = Locale(identifier: "ja_JP")
     private static let compactFloor = 1_000_000
 
@@ -29,7 +31,7 @@ public enum Yen {
 
         let number = (abs(amount) / 10000).formatted(.number.locale(locale))
 
-        return "\(mark(of: amount, type: type, sign: sign))\(number)万円"
+        return "\(mark(of: amount, type: type, sign: sign))\(number)\(compactUnit)"
     }
 
     private static func mark(
