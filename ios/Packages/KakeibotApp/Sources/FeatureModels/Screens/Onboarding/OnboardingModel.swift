@@ -46,12 +46,16 @@ public extension OnboardingModel {
         case full
     }
 
+    struct Fields: ScreenEditable {
+        public var path: [SetupItem] = []
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var outcome = ScreenOutcome<Void>()
-        public var path: [SetupItem] = []
+        public var fields = Fields()
 
+        public internal(set) var outcome = ScreenOutcome<Void>()
         public internal(set) var page: Page = .welcome
         public internal(set) var route: Route?
 
@@ -206,7 +210,7 @@ public extension OnboardingModel.Output {
 
 public extension OnboardingModel.State {
     func open(_ item: SetupItem) {
-        path.append(item)
+        fields.path.append(item)
     }
 }
 

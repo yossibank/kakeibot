@@ -31,7 +31,7 @@ public struct OnboardingView: View {
     }
 
     public var body: some View {
-        NavigationStack(path: Bindable(model.state).path) {
+        NavigationStack(path: Bindable(model.state).fields.path) {
             PageSlideReader { slide in
                 content(slide)
             }

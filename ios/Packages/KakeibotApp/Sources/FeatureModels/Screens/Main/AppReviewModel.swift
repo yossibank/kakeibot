@@ -34,7 +34,7 @@ public extension AppReviewModel {
     @MainActor
     @Observable
     final class State {
-        public var outcome = ScreenOutcome<Void>()
+        public internal(set) var outcome = ScreenOutcome<Void>()
     }
 }
 
