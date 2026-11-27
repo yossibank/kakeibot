@@ -16,10 +16,9 @@ struct EntryItemSheet: View {
     @Environment(\.themeStyle.corner) var corner
 
     var body: some View {
-        GeometryReader { _ in
+        FloatingInputReader { _ in
             content
         }
-        .ignoresSafeArea(.keyboard)
         .overlay {
             if items.state.presented.overlay.isShowing(.help) {
                 EntryGuideCard(guide: .items) {

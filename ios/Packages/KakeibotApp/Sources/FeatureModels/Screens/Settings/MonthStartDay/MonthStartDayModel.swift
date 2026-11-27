@@ -7,7 +7,7 @@ import Store
 @MainActor
 @Observable
 public final class MonthStartDayModel: SettingSaving {
-    public let state: NoticesOnlyState
+    public let state: ErrorNoticeState
     public let input: Input
     public let output: Output
 
@@ -19,7 +19,7 @@ public final class MonthStartDayModel: SettingSaving {
     ) {
         let input = Input(today: today)
 
-        self.state = NoticesOnlyState(wait: parts.wait)
+        self.state = ErrorNoticeState(wait: parts.wait)
         self.input = input
         self.output = Output(input: input)
         self.dependencies = Dependencies(database: parts.database)

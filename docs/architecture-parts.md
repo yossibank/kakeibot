@@ -12,7 +12,7 @@
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
 | `ScreenModel` | 画面のモデル。DB を監視し、読めなかった時は `errorNotice` と `Loadable` の `failed` に出す | `FeatureModels/Shared/Model/` |
-| `NoticesHolding` | 知らせを `notices` の枠に持つ状態で、`errorNotice` は `notices.error` を返す。`notices` だけの時は `NoticesOnlyState` を使う | `FeatureModels/Shared/Model/` |
+| `NoticesHolding` | 知らせを `notices` の枠に持つ状態で、`errorNotice` は `notices.error` を返す。知らせがエラーだけの時は `ErrorNoticeState` を使う | `FeatureModels/Shared/Model/` |
 | `ScreenNotices` | `notices` の枠の型。エラーの知らせを `error` で持つ | `FeatureModels/Shared/Model/` |
 | `ScreenPerforming` | 画面がモデルの async の関数を呼ぶ口。`perform` が `Task` を始め、画面は `Task` を書かない | `FeatureModels/Shared/Model/` |
 | `SettingSaving` | 設定の値を保存するモデル。失敗したら値を戻す | `FeatureModels/Shared/Model/` |
