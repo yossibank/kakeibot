@@ -13,7 +13,7 @@ struct RecordsFilterSheet: View {
         VStack(spacing: 20) {
             header
 
-            CapsulePicker(selection: Bindable(model.state).screen.filterTab, options: tabOptions)
+            CapsulePicker(selection: Bindable(model.state).fields.filterTab, options: tabOptions)
 
             if isEmpty {
                 Text(emptyText)
@@ -178,15 +178,15 @@ private extension RecordsFilterSheet {
 
     var filter: EntryFilter {
         get {
-            model.state.filter
+            model.state.fields.filter
         }
         nonmutating set {
-            model.state.filter = newValue
+            model.state.fields.filter = newValue
         }
     }
 
     var tab: RecordsModel.FilterTab {
-        model.state.screen.filterTab
+        model.state.fields.filterTab
     }
 
     var list: EntryList? {

@@ -9,7 +9,7 @@ extension MainModelTests {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
         model.state.select(.records)
-        model.state.sheet = .settings
+        model.state.presented.show(.settings)
         var whileWaiting: Seen?
 
         let route = model.perform {
@@ -32,7 +32,7 @@ extension MainModelTests {
         let model = Self.model(setup)
         let id = Recurring.ID()
         model.state.select(.records)
-        model.state.sheet = .settings
+        model.state.presented.show(.settings)
         var afterSecond: Seen?
 
         let first = model.perform {
@@ -54,7 +54,7 @@ extension MainModelTests {
     func closesSheetBeforeMovingToTab() async throws {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
-        model.state.sheet = .whatsNew(seenVersion: nil)
+        model.state.presented.show(.whatsNew(seenVersion: nil))
         var whileWaiting: Seen?
 
         let move = model.perform {
@@ -100,7 +100,7 @@ extension MainModelTests {
 
         model.addEntry(on: date)
 
-        #expect(model.state.sheet == .new)
+        #expect(model.state.presented.current == .new)
         #expect(model.state.draft.state.payment.date == date)
         #expect(model.state.draft.state.type == .expense)
     }
@@ -112,7 +112,7 @@ extension MainModelTests {
 
         model.addTransfer()
 
-        #expect(model.state.sheet == .transfer)
+        #expect(model.state.presented.current == .transfer)
         #expect(model.state.draft.state.type == .transfer)
     }
 
@@ -122,7 +122,7 @@ extension MainModelTests {
         let model = Self.model(setup)
         let first = model.state.draft
         model.addTransfer()
-        model.state.sheet = nil
+        model.state.presented.closeAll()
 
         await model.prepareDraft().value
 

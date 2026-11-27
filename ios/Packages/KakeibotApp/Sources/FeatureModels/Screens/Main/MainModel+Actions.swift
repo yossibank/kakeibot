@@ -19,14 +19,14 @@ public extension MainModel {
 
     func openLaunchSheet(preferring sheet: Sheet?) {
         if let sheet {
-            state.sheet = sheet
+            state.presented.show(sheet)
         } else if input.launchScreen == .entry {
-            state.sheet = .new
+            state.presented.show(.new)
         }
     }
 
     func open(_ route: PlannedNotification.Route) async {
-        if state.sheet != nil {
+        if state.presented.current != nil {
             await closeSheet()
         }
 
@@ -37,24 +37,24 @@ public extension MainModel {
         case let .entry(date):
             state.select(.home)
             state.draft.state.setDate(date)
-            state.sheet = .new
+            state.presented.show(.new)
 
         case let .recurring(id):
-            state.sheet = .recurring(id)
+            state.presented.show(.recurring(id))
 
         case let .template(id):
             state.select(.home)
-            state.sheet = await templateSheet(id)
+            state.presented.item = await templateSheet(id)
 
         case .newTemplate:
             state.select(.home)
-            state.sheet = .newTemplate
+            state.presented.show(.newTemplate)
 
         case .receipt:
             state.select(.home)
             state.draft.state.setDate(state.today)
             state.startReceipt()
-            state.sheet = .new
+            state.presented.show(.new)
         }
     }
 
@@ -69,7 +69,7 @@ public extension MainModel {
         }
 
         if let sheet {
-            state.sheet = sheet
+            state.presented.show(sheet)
         }
     }
 
@@ -79,12 +79,12 @@ public extension MainModel {
 
     func addEntry(on date: LocalDate) {
         state.draft.state.setDate(date)
-        state.sheet = .new
+        state.presented.show(.new)
     }
 
     func addTransfer() {
         state.draft.select(.transfer)
-        state.sheet = .transfer
+        state.presented.show(.transfer)
     }
 
     @discardableResult
@@ -117,7 +117,7 @@ private extension MainModel {
     }
 
     func closeSheet() async {
-        state.sheet = nil
+        state.presented.closeAll()
         try? await Task.sleep(for: dependencies.closeDelay)
     }
 

@@ -100,7 +100,7 @@ struct MainView: View {
                     open(route)
                 }
             }
-            .onChange(of: model.state.sheet) { _, sheet in
+            .onChange(of: model.state.presented.current) { _, sheet in
                 markOpened(sheet)
             }
             .onChange(of: today) { _, today in
@@ -198,7 +198,7 @@ private extension MainView {
             .background {
                 signals
             }
-            .sheet(item: Bindable(model.state).sheet) {
+            .sheet(item: Bindable(model.state).presented.item) {
                 model.prepareDraft()
             } content: { sheet in
                 sheetContent(for: sheet)
@@ -232,7 +232,7 @@ private extension MainView {
             hasSidebar: hasSidebar,
             isAddHinted: !setup.input.isEntryOpened
         ) {
-            model.state.sheet = .new
+            model.state.presented.show(.new)
         }
     }
 

@@ -21,14 +21,14 @@ extension HomeModelTests {
 
         let empty = model.state.takePendingDay()
 
-        model.state.openStamp = tally
+        model.state.presented.show(tally)
         model.state.pickStampDay(date)
 
         let first = model.state.takePendingDay()
         let second = model.state.takePendingDay()
 
         #expect(empty == nil)
-        #expect(model.state.openStamp == nil)
+        #expect(model.state.presented.current == nil)
         #expect(first == date)
         #expect(second == nil)
     }
@@ -38,13 +38,13 @@ extension HomeModelTests {
         let setup = try await Setup()
         let model = HomeModel(parts: .system(setup.database), today: setup.today)
 
-        model.state.shelf.query = "カフェ"
-        model.state.shelf.isEditing = true
-        model.state.templateType = .income
+        model.state.fields.shelf.query = "カフェ"
+        model.state.fields.shelf.isEditing = true
+        model.state.fields.templateType = .income
         model.state.closeShelf()
 
-        #expect(model.state.shelf.query.isEmpty)
-        #expect(model.state.shelf.isEditing == false)
-        #expect(model.state.templateType == .income)
+        #expect(model.state.fields.shelf.query.isEmpty)
+        #expect(model.state.fields.shelf.isEditing == false)
+        #expect(model.state.fields.templateType == .income)
     }
 }

@@ -66,7 +66,7 @@ private extension MainView {
         TemplateEditSheet(
             model: TemplateEditModel(
                 parts: parts,
-                type: home.state.templateType
+                type: home.state.fields.templateType
             )
         )
     }
@@ -75,7 +75,7 @@ private extension MainView {
         HomeRecurringSheet(
             model: home,
             onOpenRecurring: { id in
-                model.state.sheet = .recurring(id)
+                model.state.presented.show(.recurring(id))
             }
         )
     }

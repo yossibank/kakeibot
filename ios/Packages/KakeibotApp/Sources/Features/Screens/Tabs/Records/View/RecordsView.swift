@@ -153,7 +153,7 @@ private extension RecordsView {
     func scrollContent(_ slide: PageSlideProxy) -> some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                if model.state.isSearching {
+                if model.state.fields.isSearching {
                     searchBar
 
                     filterLine
@@ -243,12 +243,12 @@ private extension RecordsView {
             .onChange(of: model.state.month) {
                 finishSelecting()
             }
-            .onChange(of: model.state.isSearching) {
+            .onChange(of: model.state.fields.isSearching) {
                 finishSelecting()
             }
             .haptic(.selection, trigger: model.state.month)
-            .haptic(.selection, trigger: model.state.selectedDate)
-            .sheet(item: Bindable(model.state).sheet) { sheet in
+            .haptic(.selection, trigger: model.state.fields.selectedDate)
+            .sheet(item: Bindable(model.state).presented.sheet) { sheet in
                 sheetContent(sheet)
             }
             .overlay {
@@ -297,11 +297,11 @@ private extension RecordsView {
     }
 
     var canSwipeMonth: Bool {
-        !model.state.isSearching && selection == nil
+        !model.state.fields.isSearching && selection == nil
     }
 
     var recordAction: (() -> Void)? {
-        guard model.state.filter.isEmpty else {
+        guard model.state.fields.filter.isEmpty else {
             return nil
         }
 
@@ -332,7 +332,7 @@ private extension RecordsView {
 
     func openSearch() {
         withAnimation(.snappy) {
-            model.state.isSearching = true
+            model.state.fields.isSearching = true
         }
 
         isSearchFocused = true

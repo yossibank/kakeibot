@@ -78,12 +78,12 @@ extension RecordsModelTests {
         let expenseId = try #require(expenseDay.entries.first?.id)
         let category = try #require(expenseDay.entries.first?.categoryId)
 
-        model.state.filter = EntryFilter(categoryIds: [category])
+        model.state.fields.filter = EntryFilter(categoryIds: [category])
         let filtered = model.output.selectingAllShown(in: [])
 
-        model.state.filter = EntryFilter()
-        model.state.isSearching = true
-        model.state.searchText = "ランチ"
+        model.state.fields.filter = EntryFilter()
+        model.state.fields.isSearching = true
+        model.state.fields.searchText = "ランチ"
         let searched = model.output.selectingAllShown(in: [])
 
         #expect(filtered == [expenseId])

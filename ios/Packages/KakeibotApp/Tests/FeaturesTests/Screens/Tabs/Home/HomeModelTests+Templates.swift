@@ -138,7 +138,7 @@ extension HomeModelTests {
         }
 
         let expense = home.output.templates.map(\.name)
-        home.state.templateType = .income
+        home.state.fields.templateType = .income
         let income = home.output.templates.map(\.name)
         task.cancel()
 

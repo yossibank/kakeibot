@@ -169,7 +169,7 @@ private extension ReviewView {
         .task(id: model.input.list.value?.entries.count) {
             await model.refreshStoreReviewCard()
         }
-        .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in
+        .sheet(item: Bindable(model.state).presented.item, onDismiss: openPending) { sheet in
             sheetView(sheet, slide: slide)
         }
         .errorBanner(model.state.errorNotice)

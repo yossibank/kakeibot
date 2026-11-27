@@ -45,6 +45,6 @@ private extension RecordsModel.Output {
     static let walletFallback = "口座"
 
     var showsAdjustments: Bool {
-        state.filter.isEmpty && !state.isSearching
+        state.fields.filter.isEmpty && !state.fields.isSearching
     }
 }

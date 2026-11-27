@@ -168,7 +168,7 @@ struct RecordsModelTests {
 
         #expect(model.output.listRecurrings(on: day).count == 1)
 
-        model.state.isSearching = true
+        model.state.fields.isSearching = true
 
         #expect(model.output.listRecurrings(on: day).isEmpty)
     }
@@ -226,7 +226,7 @@ struct RecordsModelTests {
         let chosen = try #require(LocalDate("2026-10-03"))
 
         let initial = model.output.shownDate
-        model.state.selectedDate = chosen
+        model.state.fields.selectedDate = chosen
         let selected = model.output.shownDate
         model.state.move(months: -1)
         let moved = model.output.shownDate

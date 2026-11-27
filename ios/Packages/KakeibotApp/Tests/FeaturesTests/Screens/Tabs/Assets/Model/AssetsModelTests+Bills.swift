@@ -65,7 +65,7 @@ extension AssetsModelTests {
         #expect(unpaid.later.map(\.amount) == [800])
         #expect(unpaid.total == 42800)
 
-        model.state.billPage = 1
+        model.state.fields.billPage = 1
 
         #expect(model.output.upcomingBillTotal == 17000)
         #expect(model.output.shownBillPage?.isOpen == true)

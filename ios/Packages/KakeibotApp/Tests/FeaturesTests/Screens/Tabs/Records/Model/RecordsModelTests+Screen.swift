@@ -16,7 +16,7 @@ extension RecordsModelTests {
         #expect(model.state.markMenuDate == setup.today)
         #expect(model.state.sheet == nil)
 
-        model.state.sheet = nil
+        model.state.presented.sheet = nil
 
         #expect(model.state.markMenuDate == setup.today)
 
@@ -29,9 +29,9 @@ extension RecordsModelTests {
 
         #expect(model.state.sheet == .stamp(setup.today))
 
-        model.state.sheet = nil
+        model.state.presented.sheet = nil
 
-        #expect(model.state.screen.presented == nil)
+        #expect(model.state.presented.current == nil)
     }
 
     @Test
@@ -40,23 +40,23 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         model.state.present(.filter)
-        model.state.screen.filterTab = .tag
-        model.state.sheet = nil
+        model.state.fields.filterTab = .tag
+        model.state.presented.sheet = nil
         model.state.present(.filter)
 
-        #expect(model.state.screen.filterTab == .expense)
+        #expect(model.state.fields.filterTab == .expense)
 
         model.state.present(.reward(setup.today))
-        model.state.screen.isAddingMark = true
-        model.state.sheet = nil
+        model.state.fields.isAddingMark = true
+        model.state.presented.sheet = nil
         model.state.present(.stamp(setup.today))
 
-        #expect(model.state.screen.isAddingMark == false)
+        #expect(model.state.fields.isAddingMark == false)
 
-        model.state.screen.isAddingMark = true
+        model.state.fields.isAddingMark = true
         model.state.finishAddingMark()
 
-        #expect(model.state.screen.isAddingMark == false)
+        #expect(model.state.fields.isAddingMark == false)
     }
 
     @Test

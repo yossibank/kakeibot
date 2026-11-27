@@ -1,4 +1,4 @@
-public struct Shown<Value: Hashable & Sendable>: ScreenEditable {
+public struct Shown<Value: Equatable & Sendable>: ScreenEditable {
     public private(set) var current: Value?
 
     public init(_ current: Value? = nil) {

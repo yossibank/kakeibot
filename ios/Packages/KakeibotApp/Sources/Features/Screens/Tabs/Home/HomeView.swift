@@ -97,7 +97,7 @@ public struct HomeView: View {
             .animation(.snappy, value: model.output.homeLayout)
         }
         .errorBanner(model.state.errorNotice)
-        .sheet(item: Bindable(model.state).openStamp, onDismiss: openPendingDay) { tally in
+        .sheet(item: Bindable(model.state).presented.item, onDismiss: openPendingDay) { tally in
             StampDaysSheet(
                 tally: tally,
                 periodTitle: periodTitle,
@@ -166,7 +166,7 @@ private extension HomeView {
                 )
             } else {
                 ForEach(model.output.recentRows) { row in
-                    SwipeRow(id: row.id, openId: Bindable(model.state).openRowId) {
+                    SwipeRow(id: row.id, openId: Bindable(model.state).fields.openRowId) {
                         onOpenEntry(row.id)
                     } onAction: {
                         onDeleteEntry(row.id)
@@ -198,7 +198,7 @@ private extension HomeView {
             tallies: model.output.stampTallies,
             emptyText: "今月はまだスタンプを押していません",
             onOpen: { tally in
-                model.state.openStamp = tally
+                model.state.presented.show(tally)
             }
         )
     }
@@ -216,7 +216,7 @@ private extension HomeView {
         switch section {
         case .customize:
             HomeCustomizeCard(
-                changed: Bindable(model.state).customized,
+                changed: Bindable(model.state).fields.customized,
                 model: setup,
                 appIcon: appIcon,
                 isSheetOpen: isSheetOpen,

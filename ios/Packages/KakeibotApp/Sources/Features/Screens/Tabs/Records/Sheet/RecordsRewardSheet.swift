@@ -30,7 +30,7 @@ public struct RecordsRewardSheet: View {
                         message: "決まりを作ると、ここで達成を付けられます",
                         actionTitle: "決まりを追加"
                     ) {
-                        model.state.screen.isAddingMark = true
+                        model.state.fields.isAddingMark = true
                     }
                 } else {
                     VStack(spacing: 8) {
@@ -44,7 +44,7 @@ public struct RecordsRewardSheet: View {
                 }
             }
         }
-        .sheet(isPresented: Bindable(model.state).screen.isAddingMark) {
+        .sheet(isPresented: Bindable(model.state).fields.isAddingMark) {
             RewardRuleEditSheet(model: model.rewardRuleEditModel())
         }
         .onAppear {
@@ -63,7 +63,7 @@ private extension RecordsRewardSheet {
                 SheetHeaderSlot()
             } else {
                 RingButton(systemImage: "plus") {
-                    model.state.screen.isAddingMark = true
+                    model.state.fields.isAddingMark = true
                 }
             }
         }

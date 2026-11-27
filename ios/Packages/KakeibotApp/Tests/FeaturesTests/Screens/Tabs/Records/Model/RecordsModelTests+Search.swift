@@ -15,16 +15,16 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
-        model.state.searchText = "ランチ"
+        model.state.fields.searchText = "ランチ"
         let lunch = model.output.searchDays.map(\.date.description)
 
-        model.state.searchText = "食費"
+        model.state.fields.searchText = "食費"
         let food = model.output.searchDays.map(\.date.description)
 
-        model.state.searchText = "¥500"
+        model.state.fields.searchText = "¥500"
         let amount = model.output.searchDays.map(\.date.description)
 
-        model.state.searchText = " "
+        model.state.fields.searchText = " "
         let blank = model.output.searchDays
 
         #expect(lunch == ["2026-10-12"])
@@ -45,10 +45,10 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
-        model.state.searchText = "牛乳"
+        model.state.fields.searchText = "牛乳"
         let milk = model.output.searchDays.map(\.date.description)
 
-        model.state.searchText = "パン"
+        model.state.fields.searchText = "パン"
         let bread = model.output.searchDays.map(\.date.description)
 
         #expect(milk == ["2026-10-12"])
@@ -86,14 +86,14 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
-        model.state.searchText = "ランチ"
+        model.state.fields.searchText = "ランチ"
         let summary = model.output.searchSummary
 
-        model.state.filter = EntryFilter(categoryIds: [food.id])
+        model.state.fields.filter = EntryFilter(categoryIds: [food.id])
         let filtered = model.output.days.map(\.date.description)
         let title = model.output.filterTitle
 
-        model.state.filter = EntryFilter()
+        model.state.fields.filter = EntryFilter()
 
         #expect(summary?.count == 2)
         #expect(summary?.expenseTotal == 1480)
@@ -113,12 +113,12 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
 
-        model.state.filter = EntryFilter(categoryIds: [salary.id])
-        model.state.searchText = "ランチ"
+        model.state.fields.filter = EntryFilter(categoryIds: [salary.id])
+        model.state.fields.searchText = "ランチ"
         let isMonthHidden = model.output.isMonthHiddenByFilter
         let isSearchHidden = model.output.isSearchHiddenByFilter
 
-        model.state.searchText = "コーヒー"
+        model.state.fields.searchText = "コーヒー"
         let isMissingWordHidden = model.output.isSearchHiddenByFilter
 
         model.state.move(months: -1)
@@ -131,7 +131,7 @@ extension RecordsModelTests {
         #expect(isSearchHidden)
         #expect(!isMissingWordHidden)
         #expect(!isEmptyMonthHidden)
-        #expect(model.state.filter.isEmpty)
+        #expect(model.state.fields.filter.isEmpty)
         #expect(!model.output.isMonthHiddenByFilter)
         #expect(model.output.days.map(\.date.description) == ["2026-10-12"])
     }
@@ -175,13 +175,13 @@ extension RecordsModelTests {
         let salary = try #require(options.incomeCategories.first)
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         await model.load()
-        model.state.searchText = "ランチ"
+        model.state.fields.searchText = "ランチ"
         let unfiltered = model.output.searchHiddenCount
 
-        model.state.filter = EntryFilter(categoryIds: [salary.id])
+        model.state.fields.filter = EntryFilter(categoryIds: [salary.id])
         let hidden = model.output.searchHiddenCount
 
-        model.state.searchText = "コーヒー"
+        model.state.fields.searchText = "コーヒー"
         let missing = model.output.searchHiddenCount
 
         #expect(unfiltered == 0)
@@ -202,16 +202,16 @@ extension RecordsModelTests {
         await model.load()
         let month = model.output.shownEntryCount
 
-        model.state.filter = EntryFilter(categoryIds: [food.id])
+        model.state.fields.filter = EntryFilter(categoryIds: [food.id])
         let filteredMonth = model.output.shownEntryCount
 
-        model.state.isSearching = true
+        model.state.fields.isSearching = true
         let blankSearch = model.output.shownEntryCount
 
-        model.state.searchText = "ランチ"
+        model.state.fields.searchText = "ランチ"
         let searched = model.output.shownEntryCount
 
-        model.state.filter = EntryFilter(categoryIds: [salary.id])
+        model.state.fields.filter = EntryFilter(categoryIds: [salary.id])
         let hiddenSearch = model.output.shownEntryCount
 
         #expect(month == 2)

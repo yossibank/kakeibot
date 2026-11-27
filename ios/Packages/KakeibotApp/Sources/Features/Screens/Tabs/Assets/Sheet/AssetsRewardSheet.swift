@@ -37,11 +37,11 @@ struct AssetsRewardSheet: View {
             .padding(.top, 20)
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(isPresented: Bindable(model.state).isEditingRules) {
+            .navigationDestination(isPresented: Bindable(model.state).rewardChild[.rules]) {
                 RewardRuleListView(parts: model.childParts())
             }
         }
-        .sheet(item: Bindable(model.state).goalTarget) { target in
+        .sheet(item: Bindable(model.state).rewardChild.goal) { target in
             AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: target.goal))
         }
         .undoNotice(
@@ -168,13 +168,13 @@ private extension AssetsRewardSheet {
                 Spacer()
 
                 ToolButton(systemImage: "pencil") {
-                    model.state.isEditingRules = true
+                    model.state.rewardChild.show(.rules)
                 }
             }
 
             if model.output.rewardRules.isEmpty {
                 AddButton("決まりを追加") {
-                    model.state.isEditingRules = true
+                    model.state.rewardChild.show(.rules)
                 }
             } else {
                 VStack(spacing: 12) {

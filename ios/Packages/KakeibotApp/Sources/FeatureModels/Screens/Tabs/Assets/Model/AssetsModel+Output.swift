@@ -79,7 +79,7 @@ public extension AssetsModel.Output {
     }
 
     var shownBillPage: BillPage? {
-        BillPage.page(state.billPage, in: billPages)
+        BillPage.page(state.fields.billPage, in: billPages)
     }
 
     var shownUpcomingBills: [AssetsModel.UpcomingBill] {

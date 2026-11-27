@@ -29,13 +29,13 @@ public struct HomeTemplateShelfSheet: View {
                 header
 
                 CapsulePicker(
-                    selection: Bindable(model.state).templateType,
+                    selection: Bindable(model.state).fields.templateType,
                     options: Self.typeOptions
                 )
 
                 SearchField(
                     "名前で探す",
-                    text: Bindable(model.state).shelf.query,
+                    text: Bindable(model.state).fields.shelf.query,
                     focus: $isSearching
                 )
 
@@ -65,7 +65,7 @@ public struct HomeTemplateShelfSheet: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(isPresented: Bindable(model.state).shelf.isEditing) {
+            .navigationDestination(isPresented: Bindable(model.state).fields.shelf.isEditing) {
                 TemplateListView(parts: parts)
             }
         }
@@ -82,7 +82,7 @@ private extension HomeTemplateShelfSheet {
         } trailing: {
             RingButton(systemImage: "slider.horizontal.3", label: "編集") {
                 isSearching = false
-                model.state.shelf.isEditing = true
+                model.state.fields.shelf.isEditing = true
             }
         }
     }
@@ -115,7 +115,7 @@ private extension HomeTemplateShelfSheet {
     ]
 
     var query: String {
-        model.state.shelf.query
+        model.state.fields.shelf.query
     }
 
     var sections: [HomeModel.TemplateSection] {

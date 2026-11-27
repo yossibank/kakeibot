@@ -19,7 +19,7 @@ extension HomeView {
                         pages: model.output.billPages,
                         current: model.output.billPage
                     ) { index in
-                        model.state.billPage = index
+                        model.state.fields.billPage = index
                     }
                     .padding(.bottom, 4)
                 }
@@ -28,7 +28,7 @@ extension HomeView {
                     current: Binding {
                         model.output.billPage
                     } set: { page in
-                        model.state.billPage = page
+                        model.state.fields.billPage = page
                     },
                     pages: model.output.billPages,
                     id: \.month,
