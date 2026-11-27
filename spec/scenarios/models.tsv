@@ -210,6 +210,8 @@ entry-item.turns-discount-negative-and-halves-unit	EntryItemModelTests/turnsDisc
 entry-item.refuses-draft-without-name-or-price	EntryItemModelTests/refusesDraftWithoutNameOrPrice	EntryItemModelTest/refusesDraftWithoutNameOrPrice	対応	
 entry-item.updates-edited-item	EntryItemModelTests/updatesEditedItem	EntryItemModelTest/updatesEditedItem	対応	
 entry-item.follows-edited-row-when-rows-are-removed-and-restored	EntryItemModelTests/followsEditedRowWhenRowsAreRemovedAndRestored	EntryItemModelTest/followsEditedRowWhenRowsAreRemovedAndRestored	対応	
+entry-item.clears-removed-item-notice-after-duration		EntryItemModelTest/clearsRemovedItemNoticeAfterDuration	Androidのみ	品目の取り消しの知らせが時間で消える、というテストが iOS に無い
+entry-item.restores-removed-item-before-duration-ends		EntryItemModelTest/restoresRemovedItemBeforeDurationEnds	Androidのみ	時間の内に取り消すと品目が戻る、というテストが iOS に無い
 entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScrollOnlyToExistingRows		未移植	品目のシートに、編集する行へ送る動きが無い
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
@@ -572,6 +574,8 @@ entry-notice.deletes-selected-entries-and-undoes	EntryNoticeModelTests/deletesSe
 entry-notice.keeps-batch-notice-longer-and-ignores-screen-taps	EntryNoticeModelTests/keepsBatchNoticeLongerAndIgnoresScreenTaps		未移植	まとめての変更の知らせ（EntryBatch）が無い
 entry-notice.restores-no-spend-mark-when-undoing-new-entry	EntryNoticeModelTests/restoresNoSpendMarkWhenUndoingNewEntry	EntryNoticeModelTest/restoresNoSpendMarkWhenUndoingNewEntry	対応	
 entry-notice.does-not-make-no-spend-mark-when-undoing-entry-on-unmarked-day	EntryNoticeModelTests/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay	EntryNoticeModelTest/doesNotMakeNoSpendMarkWhenUndoingEntryOnUnmarkedDay	対応	
+entry-notice.clears-change-notice-after-duration		EntryNoticeModelTest/clearsChangeNoticeAfterDuration	Androidのみ	iOS は画面の EntryNoticeBanner が時間を数え、モデルのテストが無い
+entry-notice.undoes-before-duration-ends-and-clears-undone-sooner		EntryNoticeModelTest/undoesBeforeDurationEndsAndClearsUndoneSooner	Androidのみ	iOS は画面の EntryNoticeBanner が時間を数え、モデルのテストが無い
 entry-row-item.shows-tag-name-of-entry	EntryRowItemTests/showsTagNameOfEntry	EntryRowItemTest/showsTagNameOfEntry	対応	
 entry-row-item.shows-bill-date-of-moved-usage	EntryRowItemTests/showsBillDateOfMovedUsage	EntryRowItemTest/showsBillDateOfMovedUsage	対応	
 entry-row-item.keeps-month-when-bill-is-unknown	EntryRowItemTests/keepsMonthWhenBillIsUnknown	EntryRowItemTest/keepsMonthWhenBillIsUnknown	対応	

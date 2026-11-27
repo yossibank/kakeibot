@@ -27,9 +27,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | `Keypad` の演算の記号 | `amount/AmountCalculatorOperationSymbol.kt` |
 | `FeeChoiceRow.defaultChoices` | `amount/FeeChoiceRow.kt` の `object FeeChoiceRow`。Composable は `designsystem/components/row/` に残す |
 | `Weekday+Name` | `datechoice/WeekdayName.kt` |
-| 無い | `notice/UndoNoticeState.kt`。入力のシートの品目の取り消しだけが使う |
 | Features の `Deletion+Notice` の文 | `notice/DeletionNotice.kt`。削除の知らせの文を出す |
-| FeatureModels の `EntryNoticeModel`・`EntryChange` | `notice/` の同じ名前のファイル。知らせを消す時を数える `Timer` も、`State` に置く |
+| FeatureModels の `EntryNoticeModel`・`EntryChange` | `notice/` の同じ名前のファイル。知らせは `State` の `UndoNotice` に持ち、知らせごとの秒で消す |
 
 ## 📱 アプリのモジュール
 

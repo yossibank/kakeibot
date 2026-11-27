@@ -69,14 +69,16 @@ import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import kotlinx.coroutines.delay
 
 @Composable
 fun EntryItemSheet(
+    parts: ScreenParts,
     model: EntryModel,
     onClose: () -> Unit,
 ) {
-    val editor = remember(model) { EntryItemEditor() }
+    val editor = remember(model) { EntryItemEditor(wait = parts.wait) }
 
     BackHandler {
         if (editor.isOpen) {
@@ -85,8 +87,6 @@ fun EntryItemSheet(
             onClose()
         }
     }
-
-    editor.removed.Timer()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(

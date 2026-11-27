@@ -1,18 +1,21 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
+import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
+import com.yossibank.kakeibot.featuremodels.support.ManualWait
 import com.yossibank.kakeibot.featuremodels.support.modelTest
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 class EntryItemModelTest {
     @Test
     fun startsNextDraftWithLastTaxRate() = modelTest(today = "2026-10-12") { setup ->
         val entry = setup.loadedModel()
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(setup.wait.wait)
         items.isOpen = true
         entry.addItem(item("牛乳", amount = 200, taxRate = AmountCalculator.TaxRate.reduced))
         items.name = "パン"
@@ -28,7 +31,7 @@ class EntryItemModelTest {
     @Test
     fun fillsDraftFromEditedItem() = modelTest(today = "2026-10-12") { setup ->
         val entry = setup.loadedModel()
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(setup.wait.wait)
         val reduced = AmountCalculator.TaxRate.reduced
         entry.addItem(item("卵", amount = 600, quantity = 3, taxRate = reduced))
 
@@ -45,7 +48,7 @@ class EntryItemModelTest {
     @Test
     fun keepsReadAmountUntilPriceChanges() = modelTest(today = "2026-10-12") { setup ->
         val entry = setup.loadedModel()
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(setup.wait.wait)
         entry.addItem(item("割引セット", amount = 100, quantity = 3))
 
         items.edit(index = 0, item = entry.state.form.items[0])
@@ -62,7 +65,7 @@ class EntryItemModelTest {
     @Test
     fun addsItemFromDraft() = modelTest(today = "2026-10-12") { setup ->
         val entry = setup.loadedModel()
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(setup.wait.wait)
         items.name = " パン "
         items.taxRate = AmountCalculator.TaxRate.standard
         items.press(AmountCalculator.Key.Digit(2))
@@ -78,7 +81,7 @@ class EntryItemModelTest {
 
     @Test
     fun turnsDiscountNegativeAndHalvesUnit() {
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(ManualWait().wait)
         items.name = "値引"
         items.press(AmountCalculator.Key.Digit(5))
         items.press(AmountCalculator.Key.DoubleZero)
@@ -96,7 +99,7 @@ class EntryItemModelTest {
     @Test
     fun refusesDraftWithoutNameOrPrice() = modelTest(today = "2026-10-12") { setup ->
         val entry = setup.loadedModel()
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(setup.wait.wait)
 
         items.name = "  "
         items.press(AmountCalculator.Key.Digit(5))
@@ -114,7 +117,7 @@ class EntryItemModelTest {
     @Test
     fun updatesEditedItem() = modelTest(today = "2026-10-12") { setup ->
         val entry = setup.loadedModel()
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(setup.wait.wait)
         entry.addItem(item("牛乳", amount = 200))
         entry.addItem(item("パン", amount = 300))
         items.edit(index = 1, item = entry.state.form.items[1])
@@ -131,7 +134,7 @@ class EntryItemModelTest {
     @Test
     fun followsEditedRowWhenRowsAreRemovedAndRestored() = modelTest(today = "2026-10-12") { setup ->
         val entry = setup.loadedModel()
-        val items = EntryItemEditor()
+        val items = EntryItemEditor(setup.wait.wait)
         entry.addItem(item("牛乳", amount = 200))
         entry.addItem(item("パン", amount = 300))
         items.edit(index = 1, item = entry.state.form.items[1])
@@ -144,6 +147,38 @@ class EntryItemModelTest {
         assertEquals("牛乳", removed?.item?.name)
         assertEquals(0, shifted)
         assertEquals(1, items.editingIndex)
+        assertEquals(listOf("牛乳", "パン"), entry.state.form.items.map { it.name })
+    }
+
+    @Test
+    fun clearsRemovedItemNoticeAfterDuration() = modelTest(today = "2026-10-12") { setup ->
+        val entry = setup.loadedModel()
+        val items = EntryItemEditor(setup.wait.wait)
+        entry.addItem(item("牛乳", amount = 200))
+
+        items.remove(entry, index = 0)
+        setup.wait.advance(by = UndoNotice.duration - 1.seconds)
+        val kept = items.removed.current
+        setup.wait.advance(by = 1.seconds)
+
+        assertEquals("牛乳", kept?.item?.name)
+        assertNull(items.removed.current)
+        assertTrue(entry.state.form.items.isEmpty())
+    }
+
+    @Test
+    fun restoresRemovedItemBeforeDurationEnds() = modelTest(today = "2026-10-12") { setup ->
+        val entry = setup.loadedModel()
+        val items = EntryItemEditor(setup.wait.wait)
+        entry.addItem(item("牛乳", amount = 200))
+        entry.addItem(item("パン", amount = 300))
+
+        items.remove(entry, index = 0)
+        setup.wait.advance(by = UndoNotice.duration - 1.seconds)
+        items.restore(entry)
+        setup.wait.advance(by = 1.seconds)
+
+        assertNull(items.removed.current)
         assertEquals(listOf("牛乳", "パン"), entry.state.form.items.map { it.name })
     }
 }
