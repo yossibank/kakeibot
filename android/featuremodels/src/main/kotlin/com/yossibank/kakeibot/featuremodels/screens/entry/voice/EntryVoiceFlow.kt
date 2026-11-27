@@ -60,13 +60,21 @@ class EntryVoiceFlow internal constructor(
             val transcript: String = "",
             val preview: VoiceReading? = null,
             val levels: List<Float> = quietLevels,
-            val silenceStart: Long? = null,
+            val silence: Silence = Silence(),
             val hasVoice: Boolean = false,
         ) : Phase
 
         data class Reading(
             val transcript: String,
         ) : Phase
+    }
+
+    data class Silence(
+        val startedAt: Long? = null,
+    ) {
+        fun started(at: Long): Silence = copy(startedAt = at)
+
+        fun cleared(): Silence = copy(startedAt = null)
     }
 
     data class Rounds(
@@ -334,7 +342,7 @@ class EntryVoiceFlow internal constructor(
 
             state.move(
                 to = listening.copy(
-                    silenceStart = null,
+                    silence = listening.silence.cleared(),
                     hasVoice = true,
                 ),
             )
@@ -354,7 +362,11 @@ class EntryVoiceFlow internal constructor(
             return
         }
 
-        state.move(to = listening.copy(silenceStart = dependencies.clock.now.toEpochMilli()))
+        state.move(
+            to = listening.copy(
+                silence = listening.silence.started(at = dependencies.clock.now.toEpochMilli()),
+            ),
+        )
 
         runtime.silenceJob = perform {
             dependencies.sleep(input.silenceMillis)

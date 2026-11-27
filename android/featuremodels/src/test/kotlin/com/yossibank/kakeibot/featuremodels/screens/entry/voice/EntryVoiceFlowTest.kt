@@ -154,15 +154,15 @@ class EntryVoiceFlowTest {
         val flow = voiceFlow(source, clock)
 
         flow.start(model, today = setup.today)
-        val before = flow.output.listening?.silenceStart
+        val before = flow.output.listening?.silence?.startedAt
         source.say("500円")
-        val first = flow.output.listening?.silenceStart
+        val first = flow.output.listening?.silence?.startedAt
         clock.advance(millis = 20)
         source.hear(0.8f)
-        val cleared = flow.output.listening?.silenceStart
+        val cleared = flow.output.listening?.silence?.startedAt
         source.say("500円、カードで")
         source.hear(0f)
-        val second = flow.output.listening?.silenceStart
+        val second = flow.output.listening?.silence?.startedAt
         flow.cancel()
 
         assertNull(before)
@@ -171,7 +171,7 @@ class EntryVoiceFlowTest {
         assertNull(cleared)
         assertNotNull(second)
         assertTrue(second > first)
-        assertNull(flow.output.listening?.silenceStart)
+        assertNull(flow.output.listening?.silence?.startedAt)
     }
 
     @Test
@@ -184,7 +184,7 @@ class EntryVoiceFlowTest {
         flow.start(model, today = setup.today)
         source.hear(0.8f)
         source.hear(0f)
-        val counting = flow.output.listening?.silenceStart != null
+        val counting = flow.output.listening?.silence?.startedAt != null
         runCurrent()
         clock.advance(millis = VOICE_SILENCE_MILLIS)
         runCurrent()
