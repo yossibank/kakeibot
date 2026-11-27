@@ -21,14 +21,13 @@ public final class ThemeEditModel: ScreenPerforming {
     ) {
         let draft = theme.map(ThemeDraft.init) ?? ThemeDraft(name: "", palette: palette)
         let state = State(draft: draft)
+        let input = Input(editingId: theme?.id, baseline: draft)
 
         self.state = state
-        self.input = Input(editingId: theme?.id, baseline: draft)
+        self.input = input
         self.output = Output(state: state)
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: Source(state: state, input: input, parts: parts))
         self.dependencies = parts
-
-        flow.connect(self)
     }
 }
 
@@ -78,25 +77,35 @@ public extension ThemeEditModel {
     }
 }
 
+extension ThemeEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.dependencies = parts
+        }
+    }
+}
+
 public extension ThemeEditModel {
     @discardableResult
     func save() async -> Void? {
-        do {
-            let theme = try await dependencies.database.saveTheme(
-                state.draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
+        await source.store()
+    }
+}
 
-            if input.editingId == nil {
-                try await dependencies.database.setSetting(.theme, to: .custom(theme.id))
-            }
-
-            return ()
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return nil
-        }
+extension ThemeEditModel {
+    var source: Source {
+        Source(state: state, input: input, parts: dependencies)
     }
 }
 
@@ -259,7 +268,7 @@ public extension ThemeEditModel.Slot {
     }
 }
 
-extension ThemeEditModel: EditFlowSource {
+extension ThemeEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         input.editingId != nil
     }
@@ -273,7 +282,22 @@ extension ThemeEditModel: EditFlowSource {
     }
 
     func store() async -> Void? {
-        await save()
+        do {
+            let theme = try await dependencies.database.saveTheme(
+                state.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+
+            if input.editingId == nil {
+                try await dependencies.database.setSetting(.theme, to: .custom(theme.id))
+            }
+
+            return ()
+        } catch {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            return nil
+        }
     }
 
     func remove() async throws -> Deletion? {

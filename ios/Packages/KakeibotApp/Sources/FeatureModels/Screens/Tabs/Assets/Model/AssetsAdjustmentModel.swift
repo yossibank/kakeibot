@@ -23,14 +23,13 @@ public final class AssetsAdjustmentModel: ScreenPerforming {
         let state = State()
         let input = Input(wallet: wallet, balance: balance, today: today)
         let output = Output(input: input, state: state)
+        let source = Source(state: state, input: input, output: output, parts: parts)
 
         self.state = state
         self.input = input
         self.output = output
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: source)
         self.dependencies = parts
-
-        flow.connect(self)
     }
 }
 
@@ -77,26 +76,38 @@ public extension AssetsAdjustmentModel {
     }
 }
 
+extension AssetsAdjustmentModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let output: Output
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            output: Output,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.output = output
+            self.dependencies = parts
+        }
+    }
+}
+
 public extension AssetsAdjustmentModel {
     @discardableResult
     func save() async -> Void? {
-        guard output.canSave else {
-            return nil
-        }
+        await source.store()
+    }
+}
 
-        do {
-            try await dependencies.database.saveAdjustment(
-                output.difference,
-                of: input.wallet.id,
-                on: input.today,
-                at: dependencies.clock.now
-            )
-
-            return ()
-        } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
-            return nil
-        }
+extension AssetsAdjustmentModel {
+    var source: Source {
+        Source(state: state, input: input, output: output, parts: dependencies)
     }
 }
 
@@ -132,7 +143,7 @@ public extension AssetsAdjustmentModel.State {
     }
 }
 
-extension AssetsAdjustmentModel: EditFlowSource {
+extension AssetsAdjustmentModel.Source: EditFlowSource {
     var isEditing: Bool {
         false
     }
@@ -146,6 +157,22 @@ extension AssetsAdjustmentModel: EditFlowSource {
     }
 
     func store() async -> Void? {
-        await save()
+        guard output.canSave else {
+            return nil
+        }
+
+        do {
+            try await dependencies.database.saveAdjustment(
+                output.difference,
+                of: input.wallet.id,
+                on: input.today,
+                at: dependencies.clock.now
+            )
+
+            return ()
+        } catch {
+            state.errorNotice.show(AssetsAdjustmentModel.saveFailedMessage, for: error)
+            return nil
+        }
     }
 }

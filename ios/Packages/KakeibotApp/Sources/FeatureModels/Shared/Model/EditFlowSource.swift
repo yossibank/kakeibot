@@ -1,7 +1,7 @@
 import Core
 
 @MainActor
-protocol EditFlowSource<Saved>: AnyObject {
+protocol EditFlowSource<Saved> {
     associatedtype Saved: Sendable
     associatedtype State: NoticeHolding
 

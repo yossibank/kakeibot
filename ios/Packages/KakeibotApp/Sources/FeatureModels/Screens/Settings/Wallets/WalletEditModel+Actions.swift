@@ -138,28 +138,7 @@ public extension WalletEditModel {
 
     @discardableResult
     func save() async -> Wallet? {
-        do {
-            let wallet = try await dependencies.database.save(
-                output.draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
-
-            guard
-                !output.isEditing,
-                output.asksPayment
-            else {
-                return wallet
-            }
-
-            state.payment.addedWallet = wallet
-            state.payment.shown.show(.asking)
-
-            return wallet
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return nil
-        }
+        await source.store()
     }
 
     func finishAddedWallet() {

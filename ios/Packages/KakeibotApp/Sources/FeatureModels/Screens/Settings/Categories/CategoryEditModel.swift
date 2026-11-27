@@ -22,16 +22,15 @@ public final class CategoryEditModel: ScreenPerforming {
         let state = State()
         let input = Input(kind: kind, editingId: id)
         let output = Output(input: input, state: state)
+        let source = Source(state: state, input: input, output: output, parts: parts)
 
         self.state = state
         self.input = input
         self.output = output
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: source)
         self.dependencies = parts
 
         input.baseline = output.snapshot
-
-        flow.connect(self)
     }
 }
 
@@ -81,6 +80,28 @@ public extension CategoryEditModel {
     }
 }
 
+extension CategoryEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let output: Output
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            output: Output,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.output = output
+            self.dependencies = parts
+        }
+    }
+}
+
 public extension CategoryEditModel {
     func start() async {
         await load()
@@ -119,17 +140,13 @@ public extension CategoryEditModel {
 
     @discardableResult
     func save() async -> EntryCategory? {
-        do {
-            return try await dependencies.database.saveCategory(
-                output.draft,
-                tags: state.tags.map(\.draft),
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return nil
-        }
+        await source.store()
+    }
+}
+
+extension CategoryEditModel {
+    var source: Source {
+        Source(state: state, input: input, output: output, parts: dependencies)
     }
 }
 
@@ -164,7 +181,7 @@ extension CategoryEditModel.EditingTag {
     }
 }
 
-extension CategoryEditModel: EditFlowSource {
+extension CategoryEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         input.editingId != nil
     }
@@ -182,7 +199,17 @@ extension CategoryEditModel: EditFlowSource {
     }
 
     func store() async -> EntryCategory? {
-        await save()
+        do {
+            return try await dependencies.database.saveCategory(
+                output.draft,
+                tags: state.tags.map(\.draft),
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+        } catch {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            return nil
+        }
     }
 
     func remove() async throws -> Deletion? {
@@ -198,7 +225,7 @@ extension CategoryEditModel: EditFlowSource {
 
     func deleteFailedMessage(for error: any Error) -> String {
         switch error {
-        case AppDatabase.CategoryWriteError.hasEntries: Self.inUseMessage
+        case AppDatabase.CategoryWriteError.hasEntries: CategoryEditModel.inUseMessage
         default: SettingsEditMessage.deleteFailed
         }
     }

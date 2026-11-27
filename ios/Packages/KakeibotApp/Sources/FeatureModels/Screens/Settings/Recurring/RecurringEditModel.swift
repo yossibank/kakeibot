@@ -25,14 +25,13 @@ public final class RecurringEditModel: ScreenPerforming {
         let input = Input(today: today, editingId: id, paidWallet: wallet)
 
         let output = Output(input: input, state: state)
+        let source = Source(state: state, input: input, output: output, parts: parts)
 
         self.state = state
         self.input = input
         self.output = output
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: source)
         self.dependencies = parts
-
-        flow.connect(self)
     }
 }
 
@@ -64,6 +63,28 @@ public extension RecurringEditModel {
             self.today = today
             self.editingId = editingId
             self.paidWallet = paidWallet
+        }
+    }
+}
+
+extension RecurringEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let output: Output
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            output: Output,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.output = output
+            self.dependencies = parts
         }
     }
 }
@@ -100,6 +121,18 @@ public extension RecurringEditModel {
 
     @discardableResult
     func save(permission: NotificationPermission) async -> Void? {
+        await source.save(permission: permission)
+    }
+}
+
+extension RecurringEditModel {
+    var source: Source {
+        Source(state: state, input: input, output: output, parts: dependencies)
+    }
+}
+
+extension RecurringEditModel.Source {
+    func save(permission: NotificationPermission) async -> Void? {
         if let text = output.problemMessage {
             state.errorNotice.show(text)
             return nil
@@ -123,7 +156,7 @@ public extension RecurringEditModel {
     }
 }
 
-private extension RecurringEditModel {
+private extension RecurringEditModel.Source {
     func requestPermissionIfReminding(_ permission: NotificationPermission) async {
         guard state.schedule.remindDaysBefore != nil else {
             return
@@ -133,7 +166,7 @@ private extension RecurringEditModel {
     }
 }
 
-extension RecurringEditModel: EditFlowSource {
+extension RecurringEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         output.isEditing
     }
@@ -151,7 +184,7 @@ extension RecurringEditModel: EditFlowSource {
     }
 
     func store() async -> Void? {
-        await save()
+        await save(permission: input.permission)
     }
 
     func storeHidden(_ isHidden: Bool) async throws {
