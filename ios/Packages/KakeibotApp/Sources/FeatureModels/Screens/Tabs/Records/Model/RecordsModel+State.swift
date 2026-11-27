@@ -19,6 +19,7 @@ public extension RecordsModel {
         public var adding = Shown<Adding>()
 
         public internal(set) var openItemIds: Set<Entry.ID> = []
+        public internal(set) var pendingDeleteIDs: [Entry.ID] = []
     }
 
     @MainActor
@@ -43,17 +44,14 @@ public extension RecordsModel {
         public let notices: Notices
 
         public internal(set) var outcome = ScreenOutcome<Deletion>()
-        public internal(set) var isMovingForward = true
-
-        public private(set) var month: YearMonth
-        public private(set) var pendingDeleteIDs: [Entry.ID] = []
+        public internal(set) var cursor: MonthCursor
 
         init(
             month: YearMonth,
             wait: ScreenWait
         ) {
             self.notices = Notices(wait: wait)
-            self.month = month
+            self.cursor = MonthCursor(month: month)
         }
     }
 }
@@ -69,7 +67,7 @@ public extension RecordsModel.State {
     }
 
     func move(months: Int) {
-        month = month.adding(months: months)
+        cursor.move(by: months)
         fields.selectedDate = nil
     }
 
@@ -82,18 +80,18 @@ public extension RecordsModel.State {
             return
         }
 
-        pendingDeleteIDs = ids
+        presented.pendingDeleteIDs = ids
         presented.prompt.show(.delete)
     }
 
     func confirmDelete(delete: ([Entry.ID]) -> Void) {
-        let ids = pendingDeleteIDs
+        let ids = presented.pendingDeleteIDs
         cancelDelete()
         delete(ids)
     }
 
     func cancelDelete() {
-        pendingDeleteIDs = []
+        presented.pendingDeleteIDs = []
         presented.prompt.close(.delete)
     }
 }
@@ -104,17 +102,17 @@ extension RecordsModel.State {
         in month: YearMonth
     ) {
         closeSearch()
-        self.month = month
+        cursor.show(month)
         fields.selectedDate = date
     }
 
     func openMonth(_ month: YearMonth) {
         closeSearch()
-        self.month = month
+        cursor.show(month)
         fields.selectedDate = nil
     }
 
     func setMonth(_ month: YearMonth) {
-        self.month = month
+        cursor.show(month)
     }
 }

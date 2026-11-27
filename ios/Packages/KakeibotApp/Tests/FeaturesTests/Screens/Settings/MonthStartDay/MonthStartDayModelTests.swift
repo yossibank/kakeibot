@@ -108,7 +108,7 @@ struct MonthStartDayModelTests {
 
         task.cancel()
 
-        #expect(model.state.month == YearMonth(year: 2026, month: 11))
+        #expect(model.state.cursor.month == YearMonth(year: 2026, month: 11))
         #expect(model.output.periodText == "10/10〜11/9")
         #expect(model.output.expenseTotal == 0)
 

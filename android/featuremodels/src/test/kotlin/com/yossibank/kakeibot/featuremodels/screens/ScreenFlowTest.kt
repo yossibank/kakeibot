@@ -188,7 +188,7 @@ class ScreenFlowTest {
         assertEquals(start, tabs.overview.period.start)
         assertEquals(1200L, tabs.overview.monthExpense)
         assertEquals(start, tabs.records.output.period.start)
-        assertNull(tabs.records.state.month)
+        assertNull(tabs.records.state.cursor.month)
         assertEquals(listOf(late), tabs.records.output.days.map { it.date })
         assertEquals(1200L, tabs.records.output.expenseTotal)
         assertEquals(start, tabs.review.output.period.range.start)

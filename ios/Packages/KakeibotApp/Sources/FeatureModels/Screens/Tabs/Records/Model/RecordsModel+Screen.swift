@@ -124,8 +124,8 @@ public extension RecordsModel.State {
     }
 
     func head(forward isForward: Bool) {
-        if isMovingForward != isForward {
-            isMovingForward = isForward
+        if cursor.isMovingForward != isForward {
+            cursor.head(forward: isForward)
         }
     }
 }

@@ -21,7 +21,7 @@ extension RecordsModelTests {
         }
 
         model.state.move(months: -3)
-        let moved = model.state.month
+        let moved = model.state.cursor.month
 
         try await setup.database.setSetting(.monthStartDay, to: startDay)
 
@@ -32,7 +32,7 @@ extension RecordsModelTests {
         task.cancel()
 
         #expect(moved == YearMonth(year: 2026, month: 7))
-        #expect(model.state.month == YearMonth(year: 2026, month: 10))
+        #expect(model.state.cursor.month == YearMonth(year: 2026, month: 10))
         #expect(model.output.periodText == "9/25〜10/24")
     }
 }

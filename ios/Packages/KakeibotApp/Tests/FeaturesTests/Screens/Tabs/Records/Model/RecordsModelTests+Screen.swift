@@ -98,11 +98,11 @@ extension RecordsModelTests {
     func remembersDirectionOfLastMove() async throws {
         let setup = try await Setup()
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
-        let before = model.state.isMovingForward
+        let before = model.state.cursor.isMovingForward
 
         model.state.head(forward: false)
 
         #expect(before)
-        #expect(model.state.isMovingForward == false)
+        #expect(model.state.cursor.isMovingForward == false)
     }
 }

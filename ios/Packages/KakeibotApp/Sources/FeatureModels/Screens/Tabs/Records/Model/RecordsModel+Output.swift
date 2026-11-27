@@ -24,7 +24,7 @@ public extension RecordsModel {
 
 public extension RecordsModel.Output {
     var period: ClosedRange<LocalDate> {
-        state.month.period(startingOn: input.monthStartDay)
+        state.cursor.month.period(startingOn: input.monthStartDay)
     }
 
     var periodText: String {
@@ -36,7 +36,7 @@ public extension RecordsModel.Output {
     }
 
     var isCurrentMonth: Bool {
-        state.month == currentMonth
+        state.cursor.month == currentMonth
     }
 
     var days: [EntryDay] {
@@ -73,7 +73,7 @@ public extension RecordsModel.Output {
     }
 
     var pendingDeleteCount: Int {
-        state.pendingDeleteIDs.count
+        state.presented.pendingDeleteIDs.count
     }
 
     var searchDays: [EntryDay] {

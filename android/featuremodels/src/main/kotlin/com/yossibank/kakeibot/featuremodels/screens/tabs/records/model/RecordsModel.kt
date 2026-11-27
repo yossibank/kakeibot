@@ -63,11 +63,11 @@ class RecordsModel(
         var fields: Fields by mutableStateOf(Fields())
             private set
 
-        var month: YearMonth? by mutableStateOf(null)
+        var cursor: MonthCursor by mutableStateOf(MonthCursor())
             private set
 
         fun move(to: YearMonth) {
-            month = to
+            cursor = cursor.moved(to)
             fields = fields.copy(selected = null)
         }
 
@@ -76,8 +76,16 @@ class RecordsModel(
         }
 
         internal fun openCurrentMonth() {
-            month = null
+            cursor = cursor.current()
         }
+    }
+
+    data class MonthCursor(
+        val month: YearMonth? = null,
+    ) {
+        fun moved(to: YearMonth): MonthCursor = copy(month = to)
+
+        fun current(): MonthCursor = copy(month = null)
     }
 
     class Notices(
@@ -128,7 +136,7 @@ class RecordsModel(
             }
 
         val shownMonth: YearMonth
-            get() = state.month ?: input.today.periodMonth(startingOn = input.monthStartDay)
+            get() = state.cursor.month ?: input.today.periodMonth(startingOn = input.monthStartDay)
 
         val period: ClosedRange<LocalDate>
             get() = shownMonth.period(startingOn = input.monthStartDay)

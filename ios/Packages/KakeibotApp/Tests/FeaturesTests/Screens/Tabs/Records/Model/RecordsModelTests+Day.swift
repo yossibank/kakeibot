@@ -97,7 +97,7 @@ extension RecordsModelTests {
 
         model.open(date)
 
-        #expect(model.state.month.description == "2026-08")
+        #expect(model.state.cursor.month.description == "2026-08")
         #expect(model.output.shownDate == date)
         #expect(model.input.layout == .calendar)
         #expect(!model.state.fields.isSearching)
@@ -117,7 +117,7 @@ extension RecordsModelTests {
 
         model.openCurrentMonth()
 
-        #expect(model.state.month.description == "2026-10")
+        #expect(model.state.cursor.month.description == "2026-10")
         #expect(model.output.shownDate == setup.today)
         #expect(!model.state.fields.isSearching)
         #expect(model.state.fields.searchText.isEmpty)
@@ -133,7 +133,7 @@ extension RecordsModelTests {
 
         #expect(isCurrentAtFirst)
         #expect(!model.output.isCurrentMonth)
-        #expect(model.state.month < model.output.currentMonth)
+        #expect(model.state.cursor.month < model.output.currentMonth)
     }
 
     @Test

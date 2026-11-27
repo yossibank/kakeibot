@@ -183,7 +183,7 @@ private extension RecordsView {
             monthContent
         }
         .frame(maxWidth: model.input.layout == .list ? Self.listWidth : nil)
-        .pageSlide(slide, page: model.state.month)
+        .pageSlide(slide, page: model.state.cursor.month)
     }
 
     func toolRow(_ slide: PageSlideProxy) -> some View {
@@ -240,13 +240,13 @@ private extension RecordsView {
             .onChange(of: model.input.layout) {
                 finishSelecting()
             }
-            .onChange(of: model.state.month) {
+            .onChange(of: model.state.cursor.month) {
                 finishSelecting()
             }
             .onChange(of: model.state.fields.isSearching) {
                 finishSelecting()
             }
-            .haptic(.selection, trigger: model.state.month)
+            .haptic(.selection, trigger: model.state.cursor.month)
             .haptic(.selection, trigger: model.state.fields.selectedDate)
             .sheet(item: Bindable(model.state).presented.panel.sheet) { sheet in
                 sheetContent(sheet)
@@ -263,7 +263,7 @@ private extension RecordsView {
 
     func monthStepper(_ slide: PageSlideProxy) -> some View {
         PeriodStepper(
-            title: model.state.month.title,
+            title: model.state.cursor.month.title,
             subtitle: model.output.periodText,
             currentTitle: model.output.isCurrentMonth ? nil : "今月",
             transition: monthTextTransition,
@@ -293,7 +293,7 @@ private extension RecordsView {
     }
 
     var monthTextTransition: ContentTransition {
-        .numericText(countsDown: !model.state.isMovingForward)
+        .numericText(countsDown: !model.state.cursor.isMovingForward)
     }
 
     var canSwipeMonth: Bool {
@@ -364,7 +364,7 @@ private extension RecordsView {
     }
 
     func moveToCurrentMonth(with slide: PageSlideProxy) {
-        let isForward = model.state.month < model.output.currentMonth
+        let isForward = model.state.cursor.month < model.output.currentMonth
 
         model.state.head(forward: isForward)
 

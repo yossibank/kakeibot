@@ -87,7 +87,7 @@ class RecordsModelTest {
         setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.monday)
         ModelWait.until { model.input.weekStart == Weekday.monday }
 
-        assertEquals("2026-09", model.state.month.toString())
+        assertEquals("2026-09", model.state.cursor.month.toString())
     }
 
     @Test
