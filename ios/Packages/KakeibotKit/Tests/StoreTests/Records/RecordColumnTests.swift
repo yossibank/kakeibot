@@ -8,7 +8,7 @@ import Testing
 /// プロパティの名前を変えると、表と同期が黙って壊れるので、ここで止める。
 struct RecordColumnTests {
     private static let hint = Comment(
-        rawValue: "Core の型のプロパティの名前を変えたら、CodingKeys で列の名前を元のままに保つ"
+        rawValue: "Core の型のプロパティの名前を変えたら、CodingKeys の rawValue に元のプロパティの名前（camelCase）を書く"
     )
 
     private static let unrecordedTables: Set = [

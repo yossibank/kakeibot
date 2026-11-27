@@ -29,7 +29,9 @@ Android も同じ分け方で、画面のモデルを `:featuremodels` に置く
 
 Core の行の型（`Entry`・`Wallet` など）は、GRDB を知らない。Store が `<型>+Record` で `StoreRecord` に適合させ、表の 1 行として読み書きする。列の名前は、プロパティの名前を snake_case にしたものである。
 
-そのため、Core のプロパティの名前を変えると、表と合わなくなる。StoreTests の `RecordColumnTests` が、見本の行の列と表の列を比べて止める。名前を変える時は、`CodingKeys` で列の名前を元のままに保つ。
+そのため、Core のプロパティの名前を変えると、表と合わなくなる。StoreTests の `RecordColumnTests` が、見本の行の列と表の列を比べて止める。
+
+名前を変える時は、列の名前を保つ。`CodingKeys` の rawValue に、元のプロパティの名前（camelCase）を書く。
 
 同期は表の列をそのまま送るので、表と合えば同期も合う。
 
