@@ -9,7 +9,7 @@ extension Wallet: StoreRecord {
 extension Wallet.Kind: DatabaseValueConvertible {}
 
 extension Wallet: ArchivableRecord {
-    public static var notFound: any Error {
+    static var notFound: any Error {
         AppDatabase.WalletWriteError.walletNotFound
     }
 
@@ -35,7 +35,7 @@ extension Wallet: ArchivableRecord {
 }
 
 extension Wallet: IconBackedRecord {
-    public static var iconNotFound: any Error {
+    static var iconNotFound: any Error {
         AppDatabase.WalletWriteError.iconNotFound
     }
 }

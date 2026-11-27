@@ -21,7 +21,7 @@ extension Recurring: StoreRecord {
 extension Recurring.Frequency: DatabaseValueConvertible {}
 
 extension Recurring: SortableRecord {
-    public static var notFound: any Error {
+    static var notFound: any Error {
         AppDatabase.RecurringWriteError.recurringNotFound
     }
 }

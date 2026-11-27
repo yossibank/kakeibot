@@ -6,7 +6,7 @@ extension EntryTemplate: StoreRecord {
 }
 
 extension EntryTemplate: ArchivableRecord {
-    public static var notFound: any Error {
+    static var notFound: any Error {
         AppDatabase.TemplateWriteError.templateNotFound
     }
 }

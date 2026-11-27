@@ -4,18 +4,39 @@ import GRDB
 
 public extension AppDatabase {
     @discardableResult
-    func save<Draft: IconBackedDraft>(
-        _ draft: Draft,
-        editing id: Draft.Record.ID? = nil,
+    func save(
+        _ draft: WalletDraft,
+        editing id: Wallet.ID? = nil,
         at now: Date
-    ) async throws -> Draft.Record {
-        try await writer.write { db in
-            if let id {
-                try Self.updateIconBacked(id, with: draft, in: db, at: now)
-            } else {
-                try Self.insertIconBacked(draft, into: db, at: now)
-            }
-        }
+    ) async throws -> Wallet {
+        try await saveIconBacked(draft, editing: id, at: now)
+    }
+
+    @discardableResult
+    func save(
+        _ draft: EntryCategoryDraft,
+        editing id: EntryCategory.ID? = nil,
+        at now: Date
+    ) async throws -> EntryCategory {
+        try await saveIconBacked(draft, editing: id, at: now)
+    }
+
+    @discardableResult
+    func save(
+        _ draft: RewardRuleDraft,
+        editing id: RewardRule.ID? = nil,
+        at now: Date
+    ) async throws -> RewardRule {
+        try await saveIconBacked(draft, editing: id, at: now)
+    }
+
+    @discardableResult
+    func save(
+        _ draft: IconDraft,
+        editing id: ShelfIcon.ID? = nil,
+        at now: Date
+    ) async throws -> ShelfIcon {
+        try await saveIconBacked(draft, editing: id, at: now)
     }
 }
 
@@ -55,5 +76,19 @@ extension AppDatabase {
         try record.update(db)
 
         return record
+    }
+
+    func saveIconBacked<Draft: IconBackedDraft>(
+        _ draft: Draft,
+        editing id: Draft.Record.ID?,
+        at now: Date
+    ) async throws -> Draft.Record {
+        try await writer.write { db in
+            if let id {
+                try Self.updateIconBacked(id, with: draft, in: db, at: now)
+            } else {
+                try Self.insertIconBacked(draft, into: db, at: now)
+            }
+        }
     }
 }

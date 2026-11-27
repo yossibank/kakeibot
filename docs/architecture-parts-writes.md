@@ -10,7 +10,7 @@
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
-| `AppDatabase.save(_:editing:at:)` | アイコン付きの 1 件（口座・ごほうびのルール・棚のアイコン）の保存。新規と編集を 1 つにする | `Store/Writes/Methods/AppDatabase+IconBacked.swift` |
+| `AppDatabase.save(_:editing:at:)` | アイコン付きの 1 件（口座・カテゴリ・ごほうびのルール・棚のアイコン）の保存。新規と編集を 1 つにし、下書きの型ごとに 1 つずつある | `Store/Writes/Methods/AppDatabase+IconBacked.swift` |
 | `AppDatabase.reorder(_:at:)` | 並べ替えのできる表の並び順の保存 | `Store/Writes/Methods/AppDatabase+Ordering.swift` |
 | `AppDatabase.setHidden(_:isHidden:at:)` | 非表示にできる表の非表示の切り替え | `Store/Writes/Methods/AppDatabase+Ordering.swift` |
 | `SortableRecord` | 並べ替えのできる表の行。見つからない時のエラーを持つ | `Store/Records/Protocols/` |

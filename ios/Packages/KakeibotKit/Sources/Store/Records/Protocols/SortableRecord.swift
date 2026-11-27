@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public protocol SortableRecord: StoreRecord, Identifiable, Sendable
+protocol SortableRecord: StoreRecord, Identifiable, Sendable
     where ID: DatabaseValueConvertible & Sendable {
     var sortOrder: Int { get set }
     var updatedAt: Date { get set }

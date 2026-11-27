@@ -2,7 +2,7 @@ import Core
 import Foundation
 
 extension IconDraft: IconBackedDraft {
-    public func newRecord(
+    func newRecord(
         iconId: Icon.ID,
         sortOrder: Int,
         at now: Date
@@ -10,7 +10,7 @@ extension IconDraft: IconBackedDraft {
         ShelfIcon(iconId: iconId, sortOrder: sortOrder, createdAt: now, updatedAt: now)
     }
 
-    public func applied(
+    func applied(
         to record: ShelfIcon,
         at now: Date
     ) throws -> ShelfIcon {

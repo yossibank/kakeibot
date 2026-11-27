@@ -6,7 +6,7 @@ extension EntryTag: StoreRecord {
 }
 
 extension EntryTag: ArchivableRecord {
-    public static var notFound: any Error {
+    static var notFound: any Error {
         AppDatabase.CategoryWriteError.tagNotFound
     }
 }

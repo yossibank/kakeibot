@@ -6,7 +6,7 @@ public struct AppDatabase: Sendable {
     let writer: any DatabaseWriter
     let entryListObservation: SharedValueObservation<EntryList>
 
-    public init(_ writer: any DatabaseWriter) throws {
+    init(_ writer: any DatabaseWriter) throws {
         try Self.migrator.migrate(writer)
         self.init(migrated: writer)
     }
