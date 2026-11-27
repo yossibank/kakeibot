@@ -27,7 +27,7 @@ public struct RewardRuleEditSheet: View {
 
     public var body: some View {
         content
-            .settingsDrawerLayer(item: model.state.panel.current) {
+            .settingsDrawerLayer(item: model.state.presented.panel.current) {
                 closePanel()
             } drawer: { panel in
                 drawerView(panel)
@@ -114,7 +114,7 @@ private extension RewardRuleEditSheet {
 
     var editHeader: some View {
         SettingsEditHeader(
-            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
             title: model.flow.output.isEditing ? "ごほうびの決まりを編集" : "ごほうびの決まりを追加",
             isEditing: model.flow.output.isEditing,
             isHidden: model.flow.output.isHidden,
@@ -126,7 +126,7 @@ private extension RewardRuleEditSheet {
             closePanel()
             model.flow.toggleHidden()
         } onDelete: {
-            model.flow.state.prompt.show(.delete)
+            model.flow.state.presented.prompt.show(.delete)
         }
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
@@ -219,13 +219,13 @@ private extension RewardRuleEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            model.state.panel.show(panel)
+            model.state.presented.panel.show(panel)
         }
     }
 
     func hidePanel() {
         withAnimation(.snappy) {
-            model.state.panel.closeAll()
+            model.state.presented.panel.closeAll()
         }
     }
 

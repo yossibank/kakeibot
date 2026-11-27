@@ -36,11 +36,13 @@ public extension RecurringListModel {
         public var type: Entry.Kind = .expense
     }
 
+    typealias Presented = SettingsBoardShown<Recurring.ID, Destination>
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
         public var fields = Fields()
-        public var shown = SettingsBoardShown<Recurring.ID, Destination>()
+        public var presented = Presented()
 
         public private(set) var movingOrder: [Recurring.ID]?
 

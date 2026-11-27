@@ -27,27 +27,27 @@ class RecurringEditModelPromptTest {
     fun showsOnePromptAtATime() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.editModel()
 
-        model.flow.state.prompt.show(EditFlow.Prompt.hideChanges)
-        val hide = model.flow.state.prompt.current
+        model.flow.state.presented.prompt.show(EditFlow.Prompt.hideChanges)
+        val hide = model.flow.state.presented.prompt.current
 
-        model.flow.state.prompt.show(EditFlow.Prompt.delete)
+        model.flow.state.presented.prompt.show(EditFlow.Prompt.delete)
 
         assertEquals(EditFlow.Prompt.hideChanges, hide)
-        assertEquals(EditFlow.Prompt.delete, model.flow.state.prompt.current)
+        assertEquals(EditFlow.Prompt.delete, model.flow.state.presented.prompt.current)
     }
 
     @Test
     fun closesOnlyThePromptInFront() = modelTest(today = "2026-10-17") { setup ->
         val model = setup.editModel()
 
-        model.flow.state.prompt.show(EditFlow.Prompt.hideChanges)
-        model.flow.state.prompt.close(EditFlow.Prompt.discard)
-        val kept = model.flow.state.prompt.current
+        model.flow.state.presented.prompt.show(EditFlow.Prompt.hideChanges)
+        model.flow.state.presented.prompt.close(EditFlow.Prompt.discard)
+        val kept = model.flow.state.presented.prompt.current
 
-        model.flow.state.prompt.close(EditFlow.Prompt.hideChanges)
+        model.flow.state.presented.prompt.close(EditFlow.Prompt.hideChanges)
 
         assertEquals(EditFlow.Prompt.hideChanges, kept)
-        assertNull(model.flow.state.prompt.current)
+        assertNull(model.flow.state.presented.prompt.current)
     }
 
     @Test
@@ -56,7 +56,7 @@ class RecurringEditModelPromptTest {
         val closed = model.state.panel.current
 
         model.open(RecurringPanel.Amount)
-        model.flow.state.prompt.show(EditFlow.Prompt.delete)
+        model.flow.state.presented.prompt.show(EditFlow.Prompt.delete)
         val opened = model.state.panel.current
 
         model.state.panel.closeAll()
@@ -64,7 +64,7 @@ class RecurringEditModelPromptTest {
         assertNull(closed)
         assertEquals(RecurringPanel.Amount, opened)
         assertNull(model.state.panel.current)
-        assertEquals(EditFlow.Prompt.delete, model.flow.state.prompt.current)
+        assertEquals(EditFlow.Prompt.delete, model.flow.state.presented.prompt.current)
     }
 
     @Test
@@ -74,14 +74,14 @@ class RecurringEditModelPromptTest {
 
         model.open(RecurringPanel.Amount)
         model.flow.back()
-        val afterBack = model.flow.state.prompt.current
+        val afterBack = model.flow.state.presented.prompt.current
         model.state.press(AmountCalculator.Key.Digit(5))
         model.open(RecurringPanel.Amount)
         model.flow.close()
 
         assertNull(afterBack)
         assertNull(model.state.panel.current)
-        assertEquals(EditFlow.Prompt.discard, model.flow.state.prompt.current)
+        assertEquals(EditFlow.Prompt.discard, model.flow.state.presented.prompt.current)
         assertEquals(0, model.flow.state.outcome.count)
     }
 

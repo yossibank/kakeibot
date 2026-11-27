@@ -16,4 +16,4 @@ val EntryModel.Output.fee: Int
     get() = if (state.form.type == Entry.Kind.transfer) state.feeCalculator.amount else 0
 
 val EntryModel.Output.activeCalculator: AmountCalculator
-    get() = if (state.field == EntryModel.Field.Fee) state.feeCalculator else state.calculator
+    get() = if (state.focus.field == EntryModel.Field.Fee) state.feeCalculator else state.calculator

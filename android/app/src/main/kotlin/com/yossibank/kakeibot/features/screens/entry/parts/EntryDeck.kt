@@ -74,9 +74,9 @@ fun EntryDeck(
 ) {
     key(model.state.form.type) {
         AnimatedContent(
-            targetState = model.state.field,
+            targetState = model.state.focus.field,
             modifier = modifier,
-            transitionSpec = { deckTransition(isForward = model.state.isForward) },
+            transitionSpec = { deckTransition(isForward = model.state.focus.isForward) },
             label = "EntryDeck",
         ) { field ->
             DeckFace(
@@ -350,7 +350,7 @@ private fun SaveTemplateChip(onSelect: () -> Unit) {
 private fun DateCalendar(model: EntryModel) {
     MonthCalendar(
         selection = model.state.form.date,
-        today = model.state.today,
+        today = model.input.today,
         onSelect = model.state::select,
     )
 }

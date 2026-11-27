@@ -28,7 +28,7 @@ public extension EntryModel {
         public internal(set) var isBillShown = false
     }
 
-    enum Presented: Hashable, Sendable {
+    enum Overlay: Hashable, Sendable {
         case sheet(Sheet)
         case discard
         case menu(EntryCategory)
@@ -69,7 +69,7 @@ public extension EntryModel {
     }
 
     func receive(_ deletion: Deletion) {
-        state.results.deletion.show(deletion)
+        state.notices.deletion.show(deletion)
     }
 
     func reloadAfterSheet() async {
@@ -82,7 +82,7 @@ public extension EntryModel {
     }
 }
 
-public extension EntryModel.Presented {
+public extension EntryModel.Overlay {
     var sheet: EntryModel.Sheet? {
         if case let .sheet(sheet) = self {
             sheet
@@ -172,8 +172,8 @@ public extension EntryModel.State {
     }
 
     func closeSheet() {
-        if let sheet = presented.current?.sheet {
-            presented.close(.sheet(sheet))
+        if let sheet = presented.overlay.current?.sheet {
+            presented.overlay.close(.sheet(sheet))
         }
     }
 
@@ -184,12 +184,12 @@ public extension EntryModel.State {
     }
 
     func openMenu(for category: EntryCategory) {
-        presented.show(.menu(category))
+        presented.overlay.show(.menu(category))
     }
 
     func closeMenu() {
-        if let category = presented.current?.menuCategory {
-            presented.close(.menu(category))
+        if let category = presented.overlay.current?.menuCategory {
+            presented.overlay.close(.menu(category))
         }
     }
 
@@ -210,11 +210,11 @@ public extension EntryModel.State {
     }
 
     func open(_ sheet: EntryModel.Sheet) {
-        presented.show(.sheet(sheet))
+        presented.overlay.show(.sheet(sheet))
         screen.reloadsWallets = sheet.isWallet
     }
 
     func confirmDiscard() {
-        presented.show(.discard)
+        presented.overlay.show(.discard)
     }
 }

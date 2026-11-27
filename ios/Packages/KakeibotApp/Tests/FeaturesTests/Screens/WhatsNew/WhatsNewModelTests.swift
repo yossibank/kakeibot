@@ -10,7 +10,7 @@ struct WhatsNewModelTests {
 
         model.state.choose(oldest.version)
 
-        #expect(model.state.version == oldest.version)
+        #expect(model.state.fields.version == oldest.version)
         #expect(model.output.release?.version == oldest.version)
     }
 

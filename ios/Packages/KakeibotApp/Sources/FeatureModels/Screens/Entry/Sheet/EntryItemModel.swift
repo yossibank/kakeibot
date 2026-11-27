@@ -20,7 +20,7 @@ public extension EntryItemModel {
         case quantity
     }
 
-    enum Presented: Hashable, Sendable {
+    enum Overlay: Hashable, Sendable {
         case help
     }
 
@@ -61,26 +61,39 @@ public extension EntryItemModel {
 
     struct Fields: ScreenEditable {
         public var draft = Draft()
-        public var openIndex: Int?
+    }
+
+    struct Presented: ScreenEditable {
+        public var overlay = Shown<Overlay>()
+        public var row = Shown<Int>()
         public var isSlipOpen: Bool
+    }
+
+    @MainActor
+    struct Notices {
+        public let removed: UndoNotice<EntryModel.RemovedItem>
+
+        init(wait: ScreenWait) {
+            self.removed = UndoNotice(wait: wait)
+        }
     }
 
     @MainActor
     @Observable
     final class State {
-        public var fields: Fields
-        public var presented = Shown<Presented>()
+        public var fields = Fields()
+        public var presented: Presented
 
-        public internal(set) var scroll = ScreenOutcome<Int>()
+        public let notices: Notices
 
-        public let removed: UndoNotice<EntryModel.RemovedItem>
+        public internal(set) var outcome = ScreenOutcome<Int>()
 
         init(
             isSlipOpen: Bool,
             wait: ScreenWait
         ) {
-            self.fields = Fields(isSlipOpen: isSlipOpen)
-            self.removed = UndoNotice(wait: wait)
+            self.presented = Presented(isSlipOpen: isSlipOpen)
+            self.notices = Notices(wait: wait)
         }
     }
 }
@@ -133,7 +146,7 @@ public extension EntryItemModel {
         from entry: EntryModel
     ) {
         if let removed = entry.state.removeItem(at: index) {
-            state.removed.show(removed)
+            state.notices.removed.show(removed)
         }
     }
 
@@ -153,7 +166,7 @@ public extension EntryItemModel {
             return
         }
 
-        state.scroll.send(index)
+        state.outcome.send(index)
     }
 }
 

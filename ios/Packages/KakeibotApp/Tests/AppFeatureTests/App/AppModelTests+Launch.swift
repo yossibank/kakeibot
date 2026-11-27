@@ -22,29 +22,29 @@ extension AppModelTests {
     @Test
     func revealsContentWhenCurtainLeaves() {
         let model = AppModel(openDatabase: AppDatabase.inMemory)
-        let covering = model.state.curtain
+        let covering = model.state.reveal.curtain
 
         model.state.leaveCurtain()
-        let leaving = model.state.curtain
+        let leaving = model.state.reveal.curtain
         model.state.finishCurtain()
         model.state.leaveCurtain()
 
         #expect(covering.isShown && !covering.isRevealed)
         #expect(leaving.isShown && leaving.isRevealed)
-        #expect(model.state.curtain == .finished)
-        #expect(!model.state.curtain.isShown && model.state.curtain.isRevealed)
+        #expect(model.state.reveal.curtain == .finished)
+        #expect(!model.state.reveal.curtain.isShown && model.state.reveal.curtain.isRevealed)
     }
 
     @Test
     func remembersSweepAndHomeLoad() {
         let model = AppModel(openDatabase: AppDatabase.inMemory)
-        let before = [model.state.hasSwept, model.state.isHomeLoaded]
+        let before = [model.state.reveal.hasSwept, model.state.reveal.isHomeLoaded]
 
         model.state.finishSweep()
         model.state.markHomeLoaded()
 
         #expect(before == [false, false])
-        #expect(model.state.hasSwept)
-        #expect(model.state.isHomeLoaded)
+        #expect(model.state.reveal.hasSwept)
+        #expect(model.state.reveal.isHomeLoaded)
     }
 }

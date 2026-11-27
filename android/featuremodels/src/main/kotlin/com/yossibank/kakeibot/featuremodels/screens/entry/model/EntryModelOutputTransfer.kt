@@ -48,7 +48,7 @@ fun EntryModel.Output.balance(of: Wallet): Long? {
         with = Wallet.entriesByWallet(entries)[of.id].orEmpty(),
         valuations = list.valuations,
         adjustments = list.adjustments,
-        through = state.today,
+        through = input.today,
     )
 }
 

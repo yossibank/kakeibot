@@ -26,6 +26,8 @@ import com.yossibank.kakeibot.designsystem.theme.Haptic
 import com.yossibank.kakeibot.designsystem.theme.HapticEffect
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.close
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.receiveTemplate
+import com.yossibank.kakeibot.featuremodels.screens.entry.model.setToday
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
@@ -131,12 +133,12 @@ private fun EntrySheetEffects(
 
     HapticEffect(
         haptic = Haptic.LightImpact,
-        trigger = voice.state.startCount,
+        trigger = voice.state.rounds.starts,
     )
 
     HapticEffect(
         haptic = Haptic.LightImpact,
-        trigger = voice.state.endCount,
+        trigger = voice.state.rounds.ends,
     )
 
     BackHandler(onBack = onBack)
@@ -215,34 +217,34 @@ private fun EntryPresentedLayer(
     parts: ScreenParts,
     onClose: () -> Unit,
 ) {
-    (model.state.presented.current as? EntryModel.Presented.Template)?.let { template ->
+    (model.state.presented.overlay.current as? EntryModel.Overlay.Template)?.let { template ->
         TemplateEditSheet(
             parts = parts,
             draft = template.draft,
             onSave = { model.perform { it.receiveTemplate() } },
-            onClose = model.state.presented::closeAll,
+            onClose = model.state.presented.overlay::closeAll,
         )
     }
 
     AnimatedVisibility(
-        visible = model.state.presented.current == EntryModel.Presented.Items,
+        visible = model.state.presented.overlay.current == EntryModel.Overlay.Items,
         enter = slideInVertically { it },
         exit = slideOutVertically { it },
     ) {
         EntryItemSheet(
             parts = parts,
             model = model,
-            onClose = model.state.presented::closeAll,
+            onClose = model.state.presented.overlay::closeAll,
         )
     }
 
-    if (model.state.presented.current == EntryModel.Presented.Discard) {
+    if (model.state.presented.overlay.current == EntryModel.Overlay.Discard) {
         DiscardDialog(
             onDiscard = {
-                model.state.presented.closeAll()
+                model.state.presented.overlay.closeAll()
                 onClose()
             },
-            onKeep = model.state.presented::closeAll,
+            onKeep = model.state.presented.overlay::closeAll,
         )
     }
 }

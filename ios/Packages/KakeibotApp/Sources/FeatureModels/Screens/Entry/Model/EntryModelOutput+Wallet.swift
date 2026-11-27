@@ -147,7 +147,7 @@ private extension EntryModel.Output {
         let related = Wallet.entriesByWallet(entries)
         let valuations = list.valuations
         let adjustments = list.adjustments
-        let today = state.today
+        let today = input.today
 
         let pairs = wallets.map { wallet in
             let balance = wallet.balance(

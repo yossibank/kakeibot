@@ -227,7 +227,7 @@ extension AppModel {
     }
 
     func observationID<Base: Hashable>(_ base: Base) -> ObservationID<Base> {
-        ObservationID(base: base, round: state.observationRound)
+        ObservationID(base: base, round: state.observation.count)
     }
 
     func returnToForeground() {

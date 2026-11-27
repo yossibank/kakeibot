@@ -6,7 +6,7 @@ import SwiftUI
 extension EntrySheet {
     var sheetBinding: Binding<EntryModel.Sheet?> {
         Binding {
-            model.state.presented.current?.sheet
+            model.state.presented.overlay.current?.sheet
         } set: { sheet in
             if let sheet {
                 model.state.open(sheet)

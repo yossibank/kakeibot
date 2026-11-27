@@ -24,10 +24,14 @@ public extension SettingsMenuSampleModel {
         case failed
     }
 
+    struct Presented: ScreenEditable {
+        public var prompt = Shown<Prompt>()
+    }
+
     @MainActor
     @Observable
     final class State {
-        public var prompt = Shown<Prompt>()
+        public var presented = Presented()
 
         public internal(set) var progress: Progress?
 

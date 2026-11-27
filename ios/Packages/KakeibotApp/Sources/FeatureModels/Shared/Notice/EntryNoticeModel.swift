@@ -29,12 +29,21 @@ public extension EntryNoticeModel {
     }
 
     @MainActor
-    @Observable
-    final class State {
-        let shown: UndoNotice<Notice>
+    struct Notices {
+        let entry: UndoNotice<Notice>
 
         init(wait: ScreenWait) {
-            self.shown = UndoNotice(wait: wait)
+            self.entry = UndoNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    @Observable
+    final class State {
+        let notices: Notices
+
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -231,21 +240,21 @@ public extension EntryNoticeModel.Output {
 
 public extension EntryNoticeModel.State {
     var notice: EntryNoticeModel.Notice? {
-        shown.current
+        notices.entry.current
     }
 
     var id: Int? {
-        shown.id
+        notices.entry.id
     }
 }
 
 extension EntryNoticeModel.State {
     func show(_ notice: EntryNoticeModel.Notice) {
-        shown.show(notice, duration: .seconds(notice.seconds))
+        notices.entry.show(notice, duration: .seconds(notice.seconds))
     }
 
     func clear() {
-        shown.dismiss()
+        notices.entry.dismiss()
     }
 }
 

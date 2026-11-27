@@ -57,7 +57,7 @@ extension WalletEditSheet {
 
     var header: some View {
         SettingsEditHeader(
-            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
             title: title,
             isEditing: model.flow.output.isEditing,
             isHidden: model.flow.output.isHidden,
@@ -70,7 +70,7 @@ extension WalletEditSheet {
             model.flow.toggleHidden()
         } onDelete: {
             focus = nil
-            model.flow.state.prompt.show(.delete)
+            model.flow.state.presented.prompt.show(.delete)
         }
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
@@ -168,8 +168,11 @@ extension WalletEditSheet {
                 .padding(.top, 12)
 
             ForEach(model.input.valuations) { valuation in
-                SwipeRow(id: valuation.id, openId: Bindable(model.state).openValuation.item) {
-                    model.state.openValuation.closeAll()
+                SwipeRow(
+                    id: valuation.id,
+                    openId: Bindable(model.state).presented.openValuation.item
+                ) {
+                    model.state.presented.openValuation.closeAll()
                 } onAction: {
                     model.perform {
                         await $0.deleteValuation(valuation.id)

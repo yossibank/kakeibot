@@ -45,7 +45,7 @@ public struct StampEditSheet: View {
         }
         .overlay(alignment: .top) {
             SettingsEditHeader(
-                isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+                isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
                 title: model.flow.output.isEditing ? "スタンプを編集" : "スタンプを追加",
                 isEditing: model.flow.output.isEditing,
                 isHidden: model.flow.output.isHidden
@@ -56,7 +56,7 @@ public struct StampEditSheet: View {
                 focus = nil
                 model.flow.toggleHidden()
             } onDelete: {
-                model.flow.state.prompt.show(.delete)
+                model.flow.state.presented.prompt.show(.delete)
             }
             .padding(.horizontal, SettingsSpacing.side)
             .padding(.top, SettingsSpacing.top)

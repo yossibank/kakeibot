@@ -165,14 +165,14 @@ extension BackupModelTests {
         let setup = try Setup()
         let model = setup.exporter()
 
-        model.state.presented.show(.importer)
-        model.state.presented.close(.exporter)
-        let kept = model.state.presented.current
+        model.state.presented.dialog.show(.importer)
+        model.state.presented.dialog.close(.exporter)
+        let kept = model.state.presented.dialog.current
 
-        model.state.presented.close(.importer)
+        model.state.presented.dialog.close(.importer)
 
         #expect(kept == .importer)
-        #expect(model.state.presented.current == nil)
+        #expect(model.state.presented.dialog.current == nil)
     }
 
     @Test
@@ -186,6 +186,6 @@ extension BackupModelTests {
 
         #expect(!isMade)
         #expect(model.state.file == nil)
-        #expect(!model.state.presented[.exporter])
+        #expect(!model.state.presented.dialog[.exporter])
     }
 }

@@ -31,26 +31,32 @@ class EntryNoticeModel(
         ) : Notice
     }
 
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        internal val entry = UndoNotice<Notice>(wait)
+    }
+
     class State(
         wait: ScreenWait,
     ) {
-        private val shown = UndoNotice<Notice>(wait)
+        val notices = Notices(wait)
 
         val notice: Notice?
-            get() = shown.current
+            get() = notices.entry.current
 
         val id: Int?
-            get() = shown.id
+            get() = notices.entry.id
 
         internal fun show(notice: Notice) {
-            shown.show(
+            notices.entry.show(
                 item = notice,
                 duration = notice.seconds.seconds,
             )
         }
 
         internal fun clear() {
-            shown.dismiss()
+            notices.entry.dismiss()
         }
     }
 

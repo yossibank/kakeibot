@@ -1,20 +1,24 @@
 import Core
 
 public extension ThemeListModel {
-    enum Offer: Hashable {
+    enum Offer: Hashable, Sendable {
         case create(base: ThemePalette?)
         case select(ThemeChoice)
     }
 
-    enum EditTarget: Hashable, Identifiable {
+    enum EditTarget: Hashable, Identifiable, Sendable {
         case new(base: ThemePalette?)
         case edit(Theme)
     }
 
-    enum Presented: Hashable {
+    enum Overlay: Hashable, Sendable {
         case menu(ThemeChoice)
         case editing(EditTarget)
         case offer(Offer)
+    }
+
+    struct Presented: ScreenEditable {
+        public var overlay = Shown<Overlay>()
     }
 }
 
@@ -41,7 +45,7 @@ public extension ThemeListModel {
     }
 
     func unlock() async {
-        guard let offer = state.presented?.offer else {
+        guard let offer = state.presented.overlay.current?.offer else {
             return
         }
 
@@ -56,7 +60,7 @@ public extension ThemeListModel {
     }
 }
 
-public extension ThemeListModel.Presented {
+public extension ThemeListModel.Overlay {
     var menu: ThemeChoice? {
         guard case let .menu(choice) = self else {
             return nil
@@ -121,16 +125,16 @@ public extension ThemeListModel.State {
         }
     }
 
-    func present(_ presented: ThemeListModel.Presented) {
-        if self.presented != presented {
-            self.presented = presented
+    func present(_ overlay: ThemeListModel.Overlay) {
+        if presented.overlay.current != overlay {
+            presented.overlay.show(overlay)
         }
     }
 
-    func close(_ presented: ThemeListModel.Presented?) {
-        if self.presented == presented,
-           presented != nil {
-            self.presented = nil
+    func close(_ overlay: ThemeListModel.Overlay?) {
+        if let overlay,
+           presented.overlay.current == overlay {
+            presented.overlay.closeAll()
         }
     }
 }

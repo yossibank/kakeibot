@@ -12,14 +12,14 @@ val EntryModel.Output.walletTitle: String
 val EntryModel.Output.dateValue: String
     get() = EntryText.dateValue(
         date = state.form.date,
-        today = state.today,
+        today = input.today,
     )
 
 val EntryModel.Output.canSave: Boolean
     get() = draft?.problems?.isEmpty() == true
 
 val EntryModel.Output.opensKeypadOnSave: Boolean
-    get() = state.field != EntryModel.Field.Amount && isBlank
+    get() = state.focus.field != EntryModel.Field.Amount && isBlank
 
 val EntryModel.Output.saveTitle: String
     get() {

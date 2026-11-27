@@ -40,11 +40,15 @@ public extension RewardRuleEditModel {
         public var name = ""
     }
 
+    struct Presented: ScreenEditable {
+        public var panel = Shown<Panel>()
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var panel = Shown<Panel>()
         public var fields = Fields()
+        public var presented = Presented()
 
         public private(set) var calculator = AmountCalculator()
 

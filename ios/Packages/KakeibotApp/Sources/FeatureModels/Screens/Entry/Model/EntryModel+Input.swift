@@ -6,6 +6,7 @@ public extension EntryModel {
     @MainActor
     @Observable
     final class Input {
+        public internal(set) var today: LocalDate
         public internal(set) var options: EntryOptions?
         public internal(set) var history: EntryList?
         public internal(set) var recentMemos: [String] = []
@@ -27,9 +28,11 @@ public extension EntryModel {
         let startingTemplate: EntryTemplate?
 
         init(
+            today: LocalDate,
             editingId: Entry.ID?,
             startingTemplate: EntryTemplate?
         ) {
+            self.today = today
             self.editingId = editingId
             self.startingTemplate = startingTemplate
         }

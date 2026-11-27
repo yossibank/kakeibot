@@ -63,13 +63,16 @@ public struct ThemeListView: View {
             unlock()
         }
         .haptic(.selection, trigger: model.input.current)
-        .haptic(.impact(weight: .medium), trigger: model.state.presented?.menu) { _, new in
+        .haptic(
+            .impact(weight: .medium),
+            trigger: model.state.presented.overlay.current?.menu
+        ) { _, new in
             new != nil
         }
         .navigationDestination(item: editing) { target in
             editSheet(target)
         }
-        .onChange(of: model.state.presented?.editing) { _, editing in
+        .onChange(of: model.state.presented.overlay.current?.editing) { _, editing in
             if editing == nil {
                 reload()
             }
@@ -92,7 +95,7 @@ extension ThemeListView {
     static let space = "themes"
 
     var offer: ThemeListModel.Offer? {
-        model.state.presented?.offer
+        model.state.presented.overlay.current?.offer
     }
 
     func select(_ choice: ThemeChoice) {
@@ -270,16 +273,17 @@ private extension ThemeListView {
 
     var editing: Binding<ThemeListModel.EditTarget?> {
         Binding {
-            model.state.presented?.editing
+            model.state.presented.overlay.current?.editing
         } set: { target in
             if target == nil {
-                model.state.close(model.state.presented?.editing.map { .editing($0) })
+                let editing = model.state.presented.overlay.current?.editing
+                model.state.close(editing.map { .editing($0) })
             }
         }
     }
 
     var shownMenu: Menu? {
-        guard let choice = model.state.presented?.menu else {
+        guard let choice = model.state.presented.overlay.current?.menu else {
             return nil
         }
 

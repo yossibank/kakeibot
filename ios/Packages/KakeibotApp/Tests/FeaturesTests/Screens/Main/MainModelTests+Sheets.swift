@@ -142,7 +142,7 @@ extension MainModelTests {
 
         await model.setToday(next).value
 
-        #expect(first.state.today == next)
+        #expect(first.input.today == next)
         #expect(model.input.today == next)
         #expect(model.state.submodels.draft !== first)
         #expect(model.state.submodels.draft.state.payment.date == next)

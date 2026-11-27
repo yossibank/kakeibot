@@ -21,7 +21,7 @@ struct AssetsRewardGoalEditSheet: View {
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
-                    isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+                    isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
                     title: model.flow.output.isEditing ? "目標を編集" : "目標を決める",
                     isEditing: model.flow.output.isEditing,
                     isHidden: false,
@@ -29,7 +29,7 @@ struct AssetsRewardGoalEditSheet: View {
                 ) {
                     close()
                 } onHide: {} onDelete: {
-                    model.flow.state.prompt.show(.delete)
+                    model.flow.state.presented.prompt.show(.delete)
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)

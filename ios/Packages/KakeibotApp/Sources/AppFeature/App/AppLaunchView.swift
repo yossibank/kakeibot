@@ -99,7 +99,7 @@ private extension AppLaunchView {
     }
 
     var canReveal: Bool {
-        state.hasSwept && isReady
+        state.reveal.hasSwept && isReady
     }
 
     func sweepRing() async {

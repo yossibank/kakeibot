@@ -36,7 +36,7 @@ class EntryModelVoiceTest {
         assertEquals(wallet.id, walletId)
         assertEquals("コンビニ", store)
         assertEquals(listOf(true, true, true), fromVoice)
-        assertEquals(EntryModel.Field.Amount, model.state.field)
+        assertEquals(EntryModel.Field.Amount, model.state.focus.field)
         assertEquals(0, model.output.amount)
         assertEquals(setup.today, model.state.form.date)
         assertEquals("", model.state.form.memo)

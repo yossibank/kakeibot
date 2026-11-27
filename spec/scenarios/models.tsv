@@ -213,6 +213,12 @@ entry-item.follows-edited-row-when-rows-are-removed-and-restored	EntryItemModelT
 entry-item.clears-removed-item-notice-after-duration	EntryItemModelTests/clearsRemovedItemNoticeAfterDuration	EntryItemModelTest/clearsRemovedItemNoticeAfterDuration	対応	
 entry-item.restores-removed-item-before-duration-ends	EntryItemModelTests/restoresRemovedItemBeforeDurationEnds	EntryItemModelTest/restoresRemovedItemBeforeDurationEnds	対応	
 entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScrollOnlyToExistingRows		未移植	品目のシートに、編集する行へ送る動きが無い
+closing.begins-and-cancels-closing	ClosingTests/beginsAndCancelsClosing		未移植	Android の入力に、閉じ始めた後の保存と見張りを止める印が無い
+field-focus.starts-on-category-moving-forward		FieldFocusTest/startsOnCategoryMovingForward	Androidのみ	iOS は向きを Screen.isForward に持つ
+field-focus.moves-backward-to-an-earlier-field		FieldFocusTest/movesBackwardToAnEarlierField	Androidのみ	iOS は向きを Screen.isForward に持つ
+field-focus.sends-transfer-only-fields-to-amount-outside-transfers		FieldFocusTest/sendsTransferOnlyFieldsToAmountOutsideTransfers	Androidのみ	iOS は向きを Screen.isForward に持つ
+rounds.counts-starts-and-ends-apart	RoundsTests/countsStartsAndEndsApart	RoundsTest/countsStartsAndEndsApart	対応	
+silence.starts-and-clears-silence	SilenceTests/startsAndClearsSilence		未確認	Android は黙り始めた時刻を聞いている段階に持ち、値の型のテストが無い
 entry-voice-speech.scales-level-into-range		EntryVoiceSpeechTest/scalesLevelIntoRange	Androidのみ	android.speech の音の大きさ（dB）を 0〜1 に直す、Android だけの話
 entry-voice-speech.falls-back-to-first-candidate		EntryVoiceSpeechTest/fallsBackToFirstCandidate	Androidのみ	読める候補が無い時に先頭の候補を使う。iOS にテストが無い
 entry-voice-speech.maps-recognizer-errors-to-outcome		EntryVoiceSpeechTest/mapsRecognizerErrorsToOutcome	Androidのみ	android.speech の誤りの番号を結果に読み替える、Android だけの話
@@ -632,10 +638,12 @@ stamp-edit.*	StampEditModelTests/*		未移植	スタンプを編集する画面�
 stamp-list.*	StampListModelTests/*		未移植	スタンプの一覧の画面が無い
 sync-choice.*	SyncChoiceTests/*		未移植	同期の画面が無い
 sync.*	SyncModelTests/*		未移植	同期の画面が無い
+switch-request.holds-asked-value-until-cleared	SwitchRequestTests/holdsAskedValueUntilCleared		未移植	同期の画面が無い
 theme-edit.*	ThemeEditModelTests/*		未移植	テーマを編集する画面が無い
 theme-list.*	ThemeListModelTests/*		未移植	テーマの一覧の画面が無い
 theme-style.*	ThemeStyleModelTests/*		未移植	明暗と見た目を選ぶ画面が無い
 wallet-edit.*	WalletEditModelTests/*		未移植	口座を編集する画面が無い
+balance-sign.follows-kind-only-while-sign-matches-old-kind	BalanceSignTests/followsKindOnlyWhileSignMatchesOldKind		未移植	口座を編集する画面が無い
 wallet-list.*	WalletListModelTests/*		未移植	口座の一覧の画面が無い
 whats-new.*	WhatsNewModelTests/*		未移植	お知らせの画面が無い
 widget-guide.*	WidgetGuideModelTests/*		未移植	ウィジェットの置き方の画面が無い

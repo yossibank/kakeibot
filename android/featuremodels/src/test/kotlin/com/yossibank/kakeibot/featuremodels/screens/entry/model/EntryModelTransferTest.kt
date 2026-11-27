@@ -23,7 +23,7 @@ class EntryModelTransferTest {
         assertEquals(wallets[0].id, model.state.form.walletId)
         assertEquals(wallets[1].id, model.state.form.toWalletId)
         assertNull(model.state.form.categoryId)
-        assertEquals(EntryModel.Field.Transfer, model.state.field)
+        assertEquals(EntryModel.Field.Transfer, model.state.focus.field)
         assertEquals("財布 → 銀行", model.output.routeText)
         assertFalse(model.output.isChanged)
     }
@@ -213,7 +213,7 @@ class EntryModelTransferTest {
         model.state.update { copy(toWalletId = walletId) }
 
         assertFalse(model.save())
-        assertEquals("振替元と振替先を別にしてください", model.state.errorNotice.message)
+        assertEquals("振替元と振替先を別にしてください", model.state.notices.error.message)
     }
 
     @Test
@@ -275,7 +275,7 @@ class EntryModelTransferTest {
         val model = setup.loadedModel()
 
         model.state.focus(EntryModel.Field.Fee)
-        val field = model.state.field
+        val field = model.state.focus.field
         model.state.setFee(110)
 
         assertEquals(EntryModel.Field.Amount, field)

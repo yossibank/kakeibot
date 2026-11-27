@@ -27,7 +27,7 @@ public struct RootView: View {
                         .errorBanner(model.state.notice, bottom: noticeBottom)
                 }
 
-            if model.state.curtain.isShown {
+            if model.state.reveal.curtain.isShown {
                 AppLaunchView(
                     state: model.state,
                     palette: themePalette,
@@ -99,7 +99,7 @@ private extension RootView {
                 parts: opened.parts,
                 today: model.input.today,
                 route: model.route,
-                isRevealed: !model.state.curtain.isShown
+                isRevealed: !model.state.reveal.curtain.isShown
             ) {
                 model.finishRoute()
             } onLoad: {
@@ -142,7 +142,7 @@ private extension RootView {
     var isLaunchReady: Bool {
         switch model.state.launch {
         case .opening: false
-        case .ready: model.state.isHomeLoaded
+        case .ready: model.state.reveal.isHomeLoaded
         case .onboarding, .failed: true
         }
     }
@@ -162,7 +162,7 @@ private extension RootView {
     }
 
     var shownLook: ThemeLook {
-        model.state.curtain.isRevealed ? model.input.look : .followsDevice
+        model.state.reveal.curtain.isRevealed ? model.input.look : .followsDevice
     }
 
     var themePalette: ThemePalette {
@@ -176,7 +176,7 @@ private extension RootView {
     }
 
     var shownStyle: ThemeStyle {
-        model.state.curtain.isRevealed ? model.input.style : .standard
+        model.state.reveal.curtain.isRevealed ? model.input.style : .standard
     }
 }
 

@@ -153,7 +153,7 @@ struct BudgetListModelTests {
         model.startEditing(.total)
         model.state.press(.digit(1))
         model.closeEditing()
-        let isAsking = model.state.prompt.isShowing(.discard)
+        let isAsking = model.state.presented.prompt.isShowing(.discard)
         let kept = model.state.editing
 
         model.cancelEditing()
@@ -161,7 +161,7 @@ struct BudgetListModelTests {
         #expect(unchanged == nil)
         #expect(isAsking)
         #expect(kept == .total)
-        #expect(!model.state.prompt.isShowing(.discard))
+        #expect(!model.state.presented.prompt.isShowing(.discard))
         #expect(model.state.editing == nil)
     }
 

@@ -65,12 +65,13 @@ class EntryModelTemplateTest {
     @Test
     fun closesTemplateSheetAndReloadsAfterSaving() = modelTest(today = "2026-10-15") { setup ->
         val model = setup.loadedModel()
-        model.state.presented.show(EntryModel.Presented.Template(model.output.newTemplateDraft()))
+        val draft = model.output.newTemplateDraft()
+        model.state.presented.overlay.show(EntryModel.Overlay.Template(draft))
         val saved = setup.saveTemplate(name = "社食", amount = 500)
 
         model.receiveTemplate()
 
-        assertNull(model.state.presented.current)
+        assertNull(model.state.presented.overlay.current)
         assertTrue(model.input.allTemplates.any { it.id == saved.id })
     }
 }

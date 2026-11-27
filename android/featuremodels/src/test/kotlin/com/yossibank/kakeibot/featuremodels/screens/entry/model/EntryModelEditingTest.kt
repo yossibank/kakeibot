@@ -149,7 +149,7 @@ class EntryModelEditingTest {
 
         val saved = model.save()
 
-        assertEquals("記録が見つかりませんでした", model.state.errorNotice.message)
+        assertEquals("記録が見つかりませんでした", model.state.notices.error.message)
         assertTrue(model.output.isEditing)
         assertNull(model.state.form.walletId)
         assertNull(model.state.form.categoryId)
@@ -217,8 +217,8 @@ class EntryModelEditingTest {
 
         model.recordAgain()
         val isEditing = model.output.isEditing
-        val message = model.state.errorNotice.message
-        val tone = model.state.errorNotice.tone
+        val message = model.state.notices.error.message
+        val tone = model.state.notices.error.tone
         model.save()
         val entries = setup.database.entryList().entries
         val saved = entries.first { it.id != entry.id }

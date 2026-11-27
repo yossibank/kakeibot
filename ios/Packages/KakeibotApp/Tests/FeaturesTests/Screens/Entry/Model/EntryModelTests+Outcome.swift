@@ -11,12 +11,12 @@ extension EntryModelTests {
         let model = EntryModel(parts: .system(setup.database), date: setup.date)
 
         await model.start()
-        let first = model.state.results.outcome
+        let first = model.state.outcome
         await model.start()
 
         #expect(first.value == .ready(isFirst: true))
-        #expect(model.state.results.outcome.value == .ready(isFirst: false))
-        #expect(model.state.results.outcome != first)
+        #expect(model.state.outcome.value == .ready(isFirst: false))
+        #expect(model.state.outcome != first)
         #expect(model.output.isLoaded)
     }
 
@@ -27,12 +27,12 @@ extension EntryModelTests {
         await model.start()
         let category = try #require(model.output.categories.first)
         model.receive(Deletion(merging: []))
-        model.state.results.hiddenCategory.show(.init(id: category.id, wasSelected: false))
+        model.state.notices.hiddenCategory.show(.init(id: category.id, wasSelected: false))
 
         await model.start()
 
-        #expect(model.state.results.deletion.current == nil)
-        #expect(model.state.results.hiddenCategory.current == nil)
+        #expect(model.state.notices.deletion.current == nil)
+        #expect(model.state.notices.hiddenCategory.current == nil)
     }
 
     @Test
@@ -42,8 +42,8 @@ extension EntryModelTests {
 
         let change = try #require(await model.save())
 
-        #expect(model.state.results.outcome.value == .closed(change))
-        #expect(model.state.results.isClosing)
+        #expect(model.state.outcome.value == .closed(change))
+        #expect(model.state.closing.hasBegun)
     }
 
     @Test
@@ -57,8 +57,8 @@ extension EntryModelTests {
         let change = await model.save()
 
         #expect(change == nil)
-        #expect(model.state.results.outcome.value == nil)
-        #expect(!model.state.results.isClosing)
+        #expect(model.state.outcome.value == nil)
+        #expect(!model.state.closing.hasBegun)
     }
 
     @Test
@@ -72,10 +72,10 @@ extension EntryModelTests {
         let next = await model.saveAndContinue()
 
         #expect(amount == 0)
-        #expect(!model.state.results.isClosing)
+        #expect(!model.state.closing.hasBegun)
         #expect(next != nil)
         #expect(next?.entry.id != change.entry.id)
-        #expect(model.state.results.outcome.value == next.map(EntryModel.Outcome.continued))
+        #expect(model.state.outcome.value == next.map(EntryModel.Outcome.continued))
     }
 
     @Test
@@ -92,8 +92,8 @@ extension EntryModelTests {
         let change = try #require(await model.delete())
 
         #expect(change.kind == .deleted)
-        #expect(model.state.results.outcome.value == .closed(change))
-        #expect(model.state.results.isClosing)
+        #expect(model.state.outcome.value == .closed(change))
+        #expect(model.state.closing.hasBegun)
     }
 
     @Test
@@ -109,7 +109,7 @@ extension EntryModelTests {
 
         #expect(change == nil)
         #expect(history.isEmpty)
-        #expect(model.state.results.outcome.value == nil)
+        #expect(model.state.outcome.value == nil)
     }
 
     @Test
@@ -129,7 +129,7 @@ extension EntryModelTests {
 
         #expect(change == nil)
         #expect(try await setup.database.entry(entry.id) != nil)
-        #expect(!model.state.results.isClosing)
+        #expect(!model.state.closing.hasBegun)
     }
 
     @Test
@@ -139,7 +139,7 @@ extension EntryModelTests {
 
         model.receive(deletion)
 
-        #expect(model.state.results.deletion.current == deletion)
+        #expect(model.state.notices.deletion.current == deletion)
     }
 
     @Test
@@ -155,7 +155,7 @@ extension EntryModelTests {
 
         await model.recordAgain()
 
-        #expect(model.state.results.outcome.value == .categoryMoved)
+        #expect(model.state.outcome.value == .categoryMoved)
         #expect(!model.output.isEditing)
     }
 
@@ -165,13 +165,13 @@ extension EntryModelTests {
         let food = try #require(model.output.selectedCategory)
 
         let hidden = try #require(await model.hideCategory(food))
-        let placed = model.state.results.hiddenCategory.current
-        let hiding = model.state.results.outcome.value
+        let placed = model.state.notices.hiddenCategory.current
+        let hiding = model.state.outcome.value
         await model.showCategory(hidden)
 
         #expect(placed == hidden)
         #expect(hiding == nil)
-        #expect(model.state.results.outcome.value == .categoryMoved)
+        #expect(model.state.outcome.value == .categoryMoved)
     }
 
     @Test
@@ -187,7 +187,7 @@ extension EntryModelTests {
         let hidden = await model.hideCategory(food)
 
         #expect(hidden == nil)
-        #expect(model.state.results.hiddenCategory.current == nil)
+        #expect(model.state.notices.hiddenCategory.current == nil)
     }
 
     @Test
@@ -200,7 +200,7 @@ extension EntryModelTests {
         await model.addCategory(saved.id)
 
         #expect(model.state.category.id == saved.id)
-        #expect(model.state.results.outcome.value == .categoryAdded)
+        #expect(model.state.outcome.value == .categoryAdded)
     }
 
     @Test
@@ -212,14 +212,14 @@ extension EntryModelTests {
         let added = EntryModel.AddedWallet(wallet: wallet, role: .source)
 
         await model.reloadAfterSheet(wallets: false, adding: added)
-        let skipped = model.state.results.outcome.value
+        let skipped = model.state.outcome.value
         let before = model.state.payment.walletId
         await model.reloadAfterSheet(wallets: true, adding: added)
 
         #expect(skipped == nil)
         #expect(before != wallet.id)
         #expect(model.state.payment.walletId == wallet.id)
-        #expect(model.state.results.outcome.value == .walletChosen)
+        #expect(model.state.outcome.value == .walletChosen)
     }
 
     @Test

@@ -280,7 +280,7 @@ private fun Schedule(model: RecurringEditModel) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         ScheduleHeader(model = model)
 
-        if (model.state.isScheduleOpen) {
+        if (model.state.presented.isScheduleOpen) {
             ScheduleChooser(model = model)
         }
     }
@@ -321,7 +321,7 @@ private fun ScheduleHeader(model: RecurringEditModel) {
             modifier = Modifier
                 .padding(start = 4.dp)
                 .size(16.dp)
-                .rotate(if (model.state.isScheduleOpen) 270f else 90f),
+                .rotate(if (model.state.presented.isScheduleOpen) 270f else 90f),
             tint = Palette.accentStrong,
         )
     }

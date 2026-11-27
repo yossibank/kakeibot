@@ -136,7 +136,7 @@ private extension ReminderView {
                         let isSelected = !isPickingTime && model.input.time == time
 
                         timeButton("\(time.hour)", isSelected: isSelected) {
-                            model.state.presented.close(.timePicker)
+                            model.state.presented.picker.close(.timePicker)
 
                             model.perform {
                                 await $0.choose(time)
@@ -145,7 +145,7 @@ private extension ReminderView {
                     }
 
                     timeButton("…", isSelected: isPickingTime) {
-                        model.state.presented.show(.timePicker)
+                        model.state.presented.picker.show(.timePicker)
                     }
                 }
                 .padding(.vertical, 4)
@@ -202,7 +202,7 @@ private extension ReminderView {
     ]
 
     var isPickingTime: Bool {
-        model.state.presented[.timePicker]
+        model.state.presented.picker[.timePicker]
     }
 
     var bellImage: String {

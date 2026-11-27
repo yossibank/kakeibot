@@ -24,7 +24,7 @@ public final class ReminderModel {
 
         let state = State(
             previewDay: today.weekday,
-            presented: Shown(isCustom ? .timePicker : nil),
+            presented: Presented(picker: Shown(isCustom ? .timePicker : nil)),
             wait: parts.wait
         )
 
@@ -38,14 +38,18 @@ public final class ReminderModel {
 }
 
 public extension ReminderModel {
-    enum Presented: Hashable, Sendable {
+    enum Picker: Hashable, Sendable {
         case timePicker
+    }
+
+    struct Presented: ScreenEditable {
+        public var picker: Shown<Picker>
     }
 
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var presented: Shown<Presented>
+        public var presented: Presented
 
         public internal(set) var previewDay: Weekday
 
@@ -53,7 +57,7 @@ public extension ReminderModel {
 
         init(
             previewDay: Weekday,
-            presented: Shown<Presented>,
+            presented: Presented,
             wait: ScreenWait
         ) {
             self.errorNotice = ErrorNotice(wait: wait)

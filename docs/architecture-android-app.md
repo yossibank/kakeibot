@@ -80,7 +80,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 画面からの読み方 | `model.state.x`・`model.input.x`・`model.output.x` の形で読む。モデルに転送のプロパティを足さない |
 | 入力の下書き | 1 つの `data class` にまとめ、`State` の `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
 | 下書きの決まり | 口座・カテゴリ・日付を変えた時の消し込みは、下書きの型の関数に置く |
-| 保存と読み込みの失敗 | `State` の `task`（`featuremodels/shared/model/` の `ModelTask`）に通す。失敗の文は、タブが `notices.error`、ほかが `errorNotice` に持つ |
+| 保存と読み込みの失敗 | `State` の `task`（`featuremodels/shared/model/` の `ModelTask`）に通す。失敗の文は、`notices` の枠を持つモデルが `notices.error`、ほかが `errorNotice` に持つ |
 | 失敗の知らせの消え方 | 押すか、出してから 6 秒たつと消える。入力を変えても、後で成功しても消さない |
 | 知らせを消すまでの秒 | 失敗の知らせは `ErrorNotice` が、取り消しの知らせは `UndoNotice` が数える。画面は時間を数えない |
 | 容量が足りない時 | `ModelTask` が `AppDatabase.isStorageFull` で見分ける。文は「端末の空き容量が足りません」に替える |
@@ -104,7 +104,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 行き先を開く前の待ち | シートが出ていれば閉じ、`MainModel.sheetCloseDelay` だけ待ってから開く。長さは iOS と同じ 600 ミリ秒で、`SheetLayer` が下がりきる |
 | 行き先の日付 | 入力の行き先は、`MainModel.Sheet.Entry` の `date` に入れる。`EntrySheet` が `EntryModel` に渡す |
 | 入口の状態の引き継ぎ | `appfeature/main/` の `rememberMainModel` が、タブとシートを保存する。保存の形は `MainModel` の `saved` と `restore` にある |
-| 確認・引き出し・選んだ行 | モデルの `State` に置く。`EntryModel.Presented`・`RecurringPanel` が当たる |
+| 確認・引き出し・選んだ行 | モデルの `State` に置く。`EntryModel.Overlay`（`presented.overlay`）・`RecurringPanel` が当たる |
 | 画面が書いてよい値 | `State` の値のうち、`ScreenEditable` の型か、シートなどの enum・sealed の値だけ。ほかは `private set` か `internal set` にし、画面は `State` かモデルの関数を呼ぶ |
 | 表示中のもの | `featuremodels/shared/model/` の `Shown<値>` に、出している 1 つを持つ。`show`・`close`（前に出ている時だけ閉じる）・`closeAll` で変える |
 | 同時に出る物 | パネルと確認のように重なって出る物は、`Shown` を 2 つ持つ。1 つに混ぜない |

@@ -43,6 +43,10 @@ public extension RecurringEditModel {
         public var schedule: Schedule
     }
 
+    struct Presented: ScreenEditable {
+        public var panel = Shown<Panel>()
+    }
+
     struct Calculators {
         public internal(set) var amount = AmountCalculator()
         public internal(set) var fee = AmountCalculator()
@@ -51,8 +55,8 @@ public extension RecurringEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var panel = Shown<Panel>()
         public var fields: Fields
+        public var presented = Presented()
 
         public internal(set) var repayment = Repayment()
 

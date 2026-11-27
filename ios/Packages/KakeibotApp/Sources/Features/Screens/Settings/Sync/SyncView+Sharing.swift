@@ -98,7 +98,7 @@ private extension SyncView {
 
             Button {
                 guard item.isShared || isPro else {
-                    model.state.presented.show(.offer(.share(item)))
+                    model.state.presented.dialog.show(.offer(.share(item)))
                     return
                 }
 
@@ -169,7 +169,7 @@ private extension SyncView {
             Spacer(minLength: 0)
 
             Button {
-                model.state.presented.show(.leave(item))
+                model.state.presented.dialog.show(.leave(item))
             } label: {
                 pill(
                     "抜ける",

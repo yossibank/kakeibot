@@ -6,7 +6,11 @@ public extension SyncModel {
         case share(WalletShare)
     }
 
-    enum Presented: Hashable, Sendable {
+    struct Presented: ScreenEditable {
+        public var dialog = Shown<Dialog>()
+    }
+
+    enum Dialog: Hashable, Sendable {
         case choice(SyncChoice)
         case invitation(WalletShare)
         case opened(WalletShare)
@@ -19,11 +23,11 @@ public extension SyncModel {
 public extension SyncModel {
     func askToStop(_ item: WalletShare) {
         closeOpened()
-        state.presented.show(.stop(item))
+        state.presented.dialog.show(.stop(item))
     }
 }
 
-public extension SyncModel.Presented {
+public extension SyncModel.Dialog {
     var choice: SyncChoice? {
         guard case let .choice(choice) = self else {
             return nil
@@ -84,8 +88,8 @@ public extension SyncModel.Offer {
 
 extension SyncModel.State {
     func closeChoice() {
-        if let choice = presented.current?.choice {
-            presented.close(.choice(choice))
+        if let choice = presented.dialog.current?.choice {
+            presented.dialog.close(.choice(choice))
         }
     }
 }

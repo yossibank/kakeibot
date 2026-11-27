@@ -132,26 +132,26 @@ struct EntryVoiceFlowTests {
 
         await flow.start(for: model, today: setup.date) {}
 
-        #expect(flow.state.silenceStart == nil)
+        #expect(flow.state.silence.startedAt == nil)
         #expect(flow.input.silenceDuration == 0.1)
 
         source.say("500円")
-        let first = try #require(flow.state.silenceStart)
+        let first = try #require(flow.state.silence.startedAt)
 
         clock.advance(by: .milliseconds(20))
         source.hear(0.8)
 
-        #expect(flow.state.silenceStart == nil)
+        #expect(flow.state.silence.startedAt == nil)
 
         source.say("500円、カードで")
         source.hear(0)
-        let second = try #require(flow.state.silenceStart)
+        let second = try #require(flow.state.silence.startedAt)
 
         #expect(second > first)
 
         await flow.cancel()
 
-        #expect(flow.state.silenceStart == nil)
+        #expect(flow.state.silence.startedAt == nil)
     }
 
     @Test
@@ -164,7 +164,7 @@ struct EntryVoiceFlowTests {
         await flow.start(for: model, today: setup.date) {}
         source.hear(0.8)
         source.hear(0)
-        let counting = flow.state.silenceStart != nil
+        let counting = flow.state.silence.startedAt != nil
         await ObservationWait.until { flow.state.step == nil }
 
         #expect(counting)
@@ -223,10 +223,10 @@ struct EntryVoiceFlowTests {
         var counts: [Int] = []
 
         await flow.start(for: model, today: setup.date) {}
-        counts.append(flow.state.startCount)
+        counts.append(flow.state.rounds.starts)
         source.say("980円")
         await flow.cancel()
-        counts.append(flow.state.endCount)
+        counts.append(flow.state.rounds.ends)
 
         #expect(model.output.amount == 0)
         #expect(flow.state.step == nil)
@@ -250,7 +250,7 @@ struct EntryVoiceFlowTests {
 
         #expect(step == .denied)
         #expect(flow.state.step == nil)
-        #expect(flow.state.startCount == 0)
+        #expect(flow.state.rounds.starts == 0)
     }
 }
 

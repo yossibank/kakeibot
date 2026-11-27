@@ -52,6 +52,12 @@ public extension EntryModel {
         public var memo = ""
     }
 
+    struct Closing: Equatable, Sendable {
+        public private(set) var hasBegun = false
+
+        public init() {}
+    }
+
     enum Outcome: Hashable, Sendable {
         case ready(isFirst: Bool)
         case closed(EntryChange)
@@ -61,15 +67,18 @@ public extension EntryModel {
         case walletChosen
     }
 
-    struct Results {
+    struct Presented: ScreenEditable {
+        public var overlay = Shown<Overlay>()
+    }
+
+    @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
         public let deletion: UndoNotice<Deletion>
         public let hiddenCategory: UndoNotice<HiddenCategory>
 
-        public internal(set) var outcome = ScreenOutcome<Outcome>()
-        public internal(set) var isClosing = false
-
-        @MainActor
         init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
             self.deletion = UndoNotice(wait: wait)
             self.hiddenCategory = UndoNotice(wait: wait)
         }
@@ -77,12 +86,15 @@ public extension EntryModel {
 
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
-        public var presented = Shown<Presented>()
+        public var presented = Presented()
 
-        public internal(set) var results: Results
-        public internal(set) var today: LocalDate
+        public let notices: Notices
+        public let task = ModelTask()
+
+        public internal(set) var outcome = ScreenOutcome<Outcome>()
+        public internal(set) var closing = Closing()
         public internal(set) var screen: Screen
         public internal(set) var type: Entry.Kind
         public internal(set) var payment: Payment
@@ -91,20 +103,14 @@ public extension EntryModel {
         public internal(set) var items = Items()
         public internal(set) var filled = Filled()
 
-        public let errorNotice: ErrorNotice
-        public let task = ModelTask()
-
         init(
             type: Entry.Kind,
             date: LocalDate,
-            today: LocalDate,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.results = Results(wait: wait)
+            self.notices = Notices(wait: wait)
             self.type = type
             self.payment = Payment(date: date)
-            self.today = today
             self.screen = Screen(deck: EntryModel.Deck.start(for: type))
         }
     }
@@ -125,6 +131,16 @@ extension EntryModel.Items {
         for index in list.indices {
             list[index].readName = nil
         }
+    }
+}
+
+public extension EntryModel.Closing {
+    mutating func begin() {
+        hasBegun = true
+    }
+
+    mutating func cancel() {
+        hasBegun = false
     }
 }
 

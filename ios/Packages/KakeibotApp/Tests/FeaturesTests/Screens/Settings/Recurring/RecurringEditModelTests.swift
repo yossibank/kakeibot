@@ -27,14 +27,14 @@ struct RecurringEditModelTests {
         let setup = try await HomeModelTests.Setup()
         let model = RecurringEditModel(parts: .system(setup.database), today: setup.today)
 
-        model.state.panel.show(.amount)
-        model.state.panel.show(.holiday)
-        let opened = model.state.panel.current
+        model.state.presented.panel.show(.amount)
+        model.state.presented.panel.show(.holiday)
+        let opened = model.state.presented.panel.current
 
-        model.state.panel.closeAll()
+        model.state.presented.panel.closeAll()
 
         #expect(opened == .holiday)
-        #expect(model.state.panel.current == nil)
+        #expect(model.state.presented.panel.current == nil)
     }
 
     @Test

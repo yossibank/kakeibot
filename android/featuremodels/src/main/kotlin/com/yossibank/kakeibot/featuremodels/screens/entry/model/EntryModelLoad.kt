@@ -1,14 +1,19 @@
 package com.yossibank.kakeibot.featuremodels.screens.entry.model
 
+import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.store.writes.methods.EntryWriteError
 import com.yossibank.kakeibot.store.writes.methods.EntryWriteException
 
+fun EntryModel.setToday(today: LocalDate) {
+    input.today = today
+}
+
 fun EntryModel.close(): Boolean {
     if (output.isChanged) {
-        state.presented.show(EntryModel.Presented.Discard)
+        state.presented.overlay.show(EntryModel.Overlay.Discard)
         return false
     }
 
@@ -19,7 +24,7 @@ suspend fun EntryModel.recordAgain() {
     input.editingId = null
     input.original = null
     input.originalFee = null
-    state.startAgain()
+    state.startAgain(today = input.today)
 
     if (output.wallets.none { it.id == state.form.walletId }) {
         setWallet(output.wallets.firstOrNull()?.id)
@@ -44,7 +49,24 @@ suspend fun EntryModel.recordAgain() {
     }
 
     input.baseline = output.snapshot
-    state.errorNotice.inform(RECORD_AGAIN_MESSAGE)
+    state.notices.error.inform(RECORD_AGAIN_MESSAGE)
+}
+
+suspend fun EntryModel.startNext() {
+    state.clear()
+    state.focus(output.startField)
+
+    state.task.attempt(describe = ::describe) {
+        loadHistory()
+    }
+
+    input.baseline = output.snapshot
+}
+
+suspend fun EntryModel.receiveTemplate() {
+    val overlay = state.presented.overlay
+    (overlay.current as? EntryModel.Overlay.Template)?.let(overlay::close)
+    reloadTemplates()
 }
 
 internal fun EntryModel.startNew() {

@@ -18,14 +18,23 @@ public final class DeletionUndo: ScreenPerforming {
 
 public extension DeletionUndo {
     @MainActor
-    @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
         public let deletion: UndoNotice<Deletion>
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.error = ErrorNotice(wait: wait)
             self.deletion = UndoNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    @Observable
+    final class State: NoticesHolding {
+        public let notices: Notices
+
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
         }
     }
 }
@@ -41,7 +50,7 @@ public extension DeletionUndo {
         do {
             try await dependencies.database.restore(deletion)
         } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.notices.error.show(Self.restoreFailedMessage, for: error)
         }
     }
 }

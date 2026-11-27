@@ -61,7 +61,7 @@ extension MainModelTests {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
 
-        #expect(model.state.notices.undo.state.deletion.current == nil)
-        #expect(model.state.notices.undo.state.errorNotice.message == nil)
+        #expect(model.state.notices.undo.state.notices.deletion.current == nil)
+        #expect(model.state.notices.undo.state.notices.error.message == nil)
     }
 }

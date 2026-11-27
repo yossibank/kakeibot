@@ -6,13 +6,13 @@ import Store
 public extension SyncModel {
     func open(_ item: WalletShare) async {
         guard item.isShared else {
-            state.presented.show(.invitation(item))
+            state.presented.dialog.show(.invitation(item))
             return
         }
 
         let id = item.wallet.id
 
-        state.presented.show(.opened(item))
+        state.presented.dialog.show(.opened(item))
         input.members = .loading
 
         do {
@@ -34,13 +34,13 @@ public extension SyncModel {
 
     func cancelInvitation() {
         if let item = output.invitation {
-            state.presented.close(.invitation(item))
+            state.presented.dialog.close(.invitation(item))
         }
     }
 
     func closeOpened() {
         if let item = output.opened {
-            state.presented.close(.opened(item))
+            state.presented.dialog.close(.opened(item))
         }
 
         input.members = .loading
@@ -54,7 +54,7 @@ public extension SyncModel {
             return
         }
 
-        state.presented.close(.invitation(item))
+        state.presented.dialog.close(.invitation(item))
         await show(item, creates: true)
     }
 

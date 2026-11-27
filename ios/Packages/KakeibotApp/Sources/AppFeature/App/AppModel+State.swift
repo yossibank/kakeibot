@@ -30,10 +30,9 @@ extension AppModel {
         let notice: ErrorNotice
 
         private(set) var launch: Launch = .opening
-        private(set) var curtain: Curtain = .covering
-        private(set) var hasSwept = false
-        private(set) var isHomeLoaded = false
-        private(set) var observationRound = 0
+        private(set) var reveal = Reveal()
+
+        let observation = ObservationRound()
 
         @ObservationIgnored var syncEngine: SyncEngine?
         @ObservationIgnored var sharedSyncEngine: SyncEngine?
@@ -68,35 +67,35 @@ extension AppModel.State {
     }
 
     func finishSweep() {
-        guard !hasSwept else {
+        guard !reveal.hasSwept else {
             return
         }
 
-        hasSwept = true
+        reveal.finishSweep()
     }
 
     func leaveCurtain() {
-        guard curtain == .covering else {
+        guard reveal.curtain == .covering else {
             return
         }
 
-        curtain = .leaving
+        reveal.leaveCurtain()
     }
 
     func finishCurtain() {
-        guard curtain != .finished else {
+        guard reveal.curtain != .finished else {
             return
         }
 
-        curtain = .finished
+        reveal.finishCurtain()
     }
 
     func markHomeLoaded() {
-        guard !isHomeLoaded else {
+        guard !reveal.isHomeLoaded else {
             return
         }
 
-        isHomeLoaded = true
+        reveal.markHomeLoaded()
     }
 
     func receiveScene(_ phase: ForegroundReturn.Phase) -> Bool {
@@ -113,7 +112,7 @@ extension AppModel.State {
         }
 
         hasStoppedObservation = false
-        observationRound += 1
+        observation.restart()
     }
 }
 

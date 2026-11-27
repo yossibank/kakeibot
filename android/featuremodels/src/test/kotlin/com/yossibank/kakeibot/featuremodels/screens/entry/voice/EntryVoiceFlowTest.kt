@@ -89,7 +89,7 @@ class EntryVoiceFlowTest {
 
         assertEquals(0, model.output.amount)
         assertEquals(setup.today.adding(days = -1), model.state.form.date)
-        assertEquals(EntryModel.Field.Amount, model.state.field)
+        assertEquals(EntryModel.Field.Amount, model.state.focus.field)
         assertEquals(Outcome.MissingAmount, flow.state.notice?.outcome)
         assertEquals("「昨日のコンビニ」", flow.state.notice?.message)
         assertEquals(false, flow.state.notice?.canUndo)
@@ -247,7 +247,7 @@ class EntryVoiceFlowTest {
         val flow = voiceFlow(source)
 
         flow.start(model, today = setup.today)
-        val startCount = flow.state.startCount
+        val startCount = flow.state.rounds.starts
         source.say("980円")
         flow.cancel()
 
@@ -255,7 +255,7 @@ class EntryVoiceFlowTest {
         assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
         assertNull(flow.state.notice)
         assertTrue(source.isCancelled)
-        assertEquals(listOf(1, 1), listOf(startCount, flow.state.endCount))
+        assertEquals(listOf(1, 1), listOf(startCount, flow.state.rounds.ends))
     }
 
     @Test
@@ -271,6 +271,6 @@ class EntryVoiceFlowTest {
         assertTrue(isActive)
         assertEquals(EntryVoiceFlow.Phase.Idle, flow.state.phase)
         assertFalse(flow.output.isActive)
-        assertEquals(listOf(0, 0), listOf(flow.state.startCount, flow.state.endCount))
+        assertEquals(listOf(0, 0), listOf(flow.state.rounds.starts, flow.state.rounds.ends))
     }
 }

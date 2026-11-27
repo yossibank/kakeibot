@@ -51,7 +51,7 @@ fun RecurringPanelBody(
 
         RecurringPanel.Start -> MonthCalendar(
             selection = model.state.form.startDate,
-            today = model.state.today,
+            today = model.input.today,
             onSelect = { date ->
                 model.state.update { copy(startDate = date) }
                 onClose()
@@ -120,9 +120,9 @@ private fun EndChooser(
 
             ChoiceChip(
                 title = "今日で終える",
-                isSelected = model.output.scheduledEndDate == model.state.today,
+                isSelected = model.output.scheduledEndDate == model.input.today,
                 onSelect = {
-                    model.setEnd(model.state.today)
+                    model.setEnd(model.input.today)
                     onClose()
                 },
             )
@@ -130,7 +130,7 @@ private fun EndChooser(
 
         MonthCalendar(
             selection = model.output.scheduledEndDate ?: model.state.form.startDate,
-            today = model.state.today,
+            today = model.input.today,
             onSelect = {
                 model.setEnd(it)
                 onClose()

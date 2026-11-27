@@ -21,10 +21,10 @@ struct EntryItemSheet: View {
         }
         .ignoresSafeArea(.keyboard)
         .overlay {
-            if items.state.presented.isShowing(.help) {
+            if items.state.presented.overlay.isShowing(.help) {
                 EntryGuideCard(guide: .items) {
                     withAnimation(.snappy) {
-                        items.state.presented.close(.help)
+                        items.state.presented.overlay.close(.help)
                     }
                 }
             }
@@ -90,7 +90,7 @@ private extension EntryItemSheet {
 
             receiptScroll
 
-            if items.state.fields.isSlipOpen {
+            if items.state.presented.isSlipOpen {
                 slip
                     .onGeometryChange(for: CGFloat.self) { proxy in
                         proxy.size.height
@@ -108,7 +108,7 @@ private extension EntryItemSheet {
             }
         }
         .undoNotice(
-            items.state.removed,
+            items.state.notices.removed,
             message: "品目を消しました",
             systemImage: "trash",
             bottom: Self.noticeBottom
@@ -128,7 +128,7 @@ private extension EntryItemSheet {
         HStack {
             RingButton(systemImage: "questionmark") {
                 withAnimation(.snappy) {
-                    items.state.presented.show(.help)
+                    items.state.presented.overlay.show(.help)
                 }
             }
 
@@ -161,7 +161,7 @@ private extension EntryItemSheet {
             } action: { _, geometry in
                 layout.scrollGeometry = geometry
             }
-            .onOutcome(items.state.scroll) { index in
+            .onOutcome(items.state.outcome) { index in
                 withAnimation(.snappy) {
                     proxy.scrollTo(index, anchor: .top)
                 }
