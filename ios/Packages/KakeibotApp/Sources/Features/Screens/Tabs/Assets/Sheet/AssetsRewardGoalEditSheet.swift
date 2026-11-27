@@ -14,7 +14,7 @@ struct AssetsRewardGoalEditSheet: View {
 
     var body: some View {
         content
-            .settingsDrawerLayer(item: model.state.panel.current) {
+            .settingsDrawerLayer(item: model.state.presented.panel.current) {
                 closePanel()
             } drawer: { panel in
                 drawerView(panel)
@@ -41,7 +41,7 @@ struct AssetsRewardGoalEditSheet: View {
                         focus = nil
                     }
             }
-            .errorBanner(model.state.errorNotice)
+            .errorBanner(model.state.notices.error)
             .editSheet(
                 model.flow,
                 deleting: "この目標を削除しますか",
@@ -150,13 +150,13 @@ private extension AssetsRewardGoalEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            model.state.panel.show(panel)
+            model.state.presented.panel.show(panel)
         }
     }
 
     func hidePanel() {
         withAnimation(.snappy) {
-            model.state.panel.closeAll()
+            model.state.presented.panel.closeAll()
         }
     }
 

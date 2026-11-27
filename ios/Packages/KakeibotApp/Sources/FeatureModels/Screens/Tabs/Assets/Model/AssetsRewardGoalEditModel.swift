@@ -51,15 +51,28 @@ public extension AssetsRewardGoalEditModel {
         public var name: String
     }
 
+    struct Presented: ScreenEditable {
+        public var panel: Shown<Panel>
+    }
+
+    @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
     @MainActor
     @Observable
-    final class State: NoticeHolding {
-        public var panel: Shown<Panel>
+    final class State: NoticesHolding {
         public var fields: Fields
+        public var presented: Presented
+
+        public let notices: Notices
 
         public private(set) var calculator: AmountCalculator
-
-        public let errorNotice: ErrorNotice
 
         init(
             name: String,
@@ -67,8 +80,8 @@ public extension AssetsRewardGoalEditModel {
             panel: Panel?,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.panel = Shown(panel)
+            self.notices = Notices(wait: wait)
+            self.presented = Presented(panel: Shown(panel))
             self.fields = Fields(name: name)
             self.calculator = AmountCalculator(amount: amount)
         }
@@ -195,7 +208,7 @@ extension AssetsRewardGoalEditModel.Source: EditFlowSource {
 
             return ()
         } catch {
-            state.errorNotice.show(AssetsRewardGoalEditModel.saveFailedMessage, for: error)
+            state.notices.error.show(AssetsRewardGoalEditModel.saveFailedMessage, for: error)
             return nil
         }
     }

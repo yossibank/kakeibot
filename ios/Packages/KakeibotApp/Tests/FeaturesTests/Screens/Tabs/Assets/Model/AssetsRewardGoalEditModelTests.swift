@@ -34,16 +34,16 @@ struct AssetsRewardGoalEditModelTests {
         let adding = AssetsRewardGoalEditModel(parts: .system(database))
         let editing = AssetsRewardGoalEditModel(parts: .system(database), editing: goal)
 
-        let panelWhenAdding = adding.state.panel.current
-        let panelWhenEditing = editing.state.panel.current
+        let panelWhenAdding = adding.state.presented.panel.current
+        let panelWhenEditing = editing.state.presented.panel.current
 
-        adding.state.panel.closeAll()
-        editing.state.panel.show(.amount)
+        adding.state.presented.panel.closeAll()
+        editing.state.presented.panel.show(.amount)
 
         #expect(panelWhenAdding == .amount)
         #expect(panelWhenEditing == nil)
-        #expect(adding.state.panel.current == nil)
-        #expect(editing.state.panel.current == .amount)
+        #expect(adding.state.presented.panel.current == nil)
+        #expect(editing.state.presented.panel.current == .amount)
     }
 
     @Test
@@ -95,7 +95,7 @@ struct AssetsRewardGoalEditModelTests {
         let isSaved = await model.save() != nil
 
         #expect(!isSaved)
-        #expect(model.state.errorNotice.message == "目標を保存できませんでした")
+        #expect(model.state.notices.error.message == "目標を保存できませんでした")
     }
 
     @Test
@@ -126,7 +126,7 @@ struct AssetsRewardGoalEditModelTests {
 
         #expect(model.flow.state.outcome.value == nil)
         #expect(adding.flow.state.outcome.value == nil)
-        #expect(model.state.errorNotice.message == "目標を削除できませんでした")
-        #expect(adding.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == "目標を削除できませんでした")
+        #expect(adding.state.notices.error.message == nil)
     }
 }

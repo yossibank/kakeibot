@@ -79,15 +79,15 @@ public extension AssetsModel.State {
     }
 
     func open(afterSheet opening: AssetsModel.Opening) {
-        pending = opening
+        presented.pending = opening
     }
 
     func takePending() -> AssetsModel.Opening? {
-        guard let pending else {
+        guard let pending = presented.pending else {
             return nil
         }
 
-        self.pending = nil
+        presented.pending = nil
 
         return pending
     }

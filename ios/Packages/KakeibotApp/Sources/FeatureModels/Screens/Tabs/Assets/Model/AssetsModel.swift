@@ -37,6 +37,7 @@ public extension AssetsModel {
         public var rewardChild = Shown<RewardChild>()
 
         public internal(set) var reward = RewardSheet()
+        public internal(set) var pending: Opening?
     }
 
     @MainActor
@@ -57,8 +58,6 @@ public extension AssetsModel {
         public var presented = Presented()
 
         public let notices: Notices
-
-        public internal(set) var pending: Opening?
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
