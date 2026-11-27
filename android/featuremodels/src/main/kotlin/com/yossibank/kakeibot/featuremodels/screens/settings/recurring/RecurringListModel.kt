@@ -63,11 +63,16 @@ class RecurringListModel(
         ) : DeleteTarget
     }
 
+    data class Fields(
+        val movingOrder: List<Identifier<Recurring>>? = null,
+    ) : ScreenEditable
+
     class Presented(
         editing: Editing?,
     ) : ScreenEditable {
         val editing = Shown(editing)
         val deleting = Shown<DeleteTarget>()
+        val row = Shown<Identifier<Recurring>>()
     }
 
     class Notices(
@@ -86,13 +91,10 @@ class RecurringListModel(
         val task = ModelTask(notices.error)
         val presented = Presented(editing)
 
-        var openId: Identifier<Recurring>? by mutableStateOf(null)
+        var fields: Fields by mutableStateOf(Fields())
             private set
 
         var type: Entry.Kind by mutableStateOf(Entry.Kind.expense)
-            private set
-
-        var movingOrder: List<Identifier<Recurring>>? by mutableStateOf(null)
             private set
 
         fun move(
@@ -100,7 +102,7 @@ class RecurringListModel(
             to: Int,
             among: List<Identifier<Recurring>>,
         ) {
-            val order = (movingOrder ?: among).toMutableList()
+            val order = (fields.movingOrder ?: among).toMutableList()
             val from = order.indexOf(id)
 
             if (from < 0) {
@@ -115,19 +117,23 @@ class RecurringListModel(
 
             order.removeAt(from)
             order.add(target, id)
-            movingOrder = order
+            fields = fields.copy(movingOrder = order)
         }
 
         fun cancelMoving() {
-            movingOrder = null
+            fields = fields.copy(movingOrder = null)
         }
 
         fun open(id: Identifier<Recurring>?) {
-            openId = id
+            if (id == null) {
+                presented.row.closeAll()
+            } else {
+                presented.row.show(id)
+            }
         }
 
         fun select(type: Entry.Kind) {
-            openId = null
+            presented.row.closeAll()
             this.type = type
         }
     }
@@ -251,7 +257,7 @@ class RecurringListModel(
     }
 
     suspend fun finishMoving() {
-        val order = state.movingOrder ?: return
+        val order = state.fields.movingOrder ?: return
         val others = input.recurrings.map { it.id }.filter { it !in order }
 
         state.task.attempt(failure = ORDER_FAILED) {
