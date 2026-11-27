@@ -17,7 +17,7 @@ public final class SyncModel {
         parts: ScreenParts,
         cloud: SyncCloud
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input()
 
         self.state = state
@@ -31,15 +31,19 @@ public extension SyncModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var presented = Shown<Presented>()
 
         public internal(set) var workingWallet: Wallet.ID?
 
+        public let errorNotice: ErrorNotice
         public let task = ModelTask()
         public let shareTask = ModelTask()
 
         var requestedOn: Bool?
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

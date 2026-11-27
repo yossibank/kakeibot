@@ -129,7 +129,7 @@ class EditFlowOutcomeTest {
         assertNull(outcome.isHidden)
         assertFalse(outcome.closes)
         assertFalse(model.input.isHidden)
-        assertEquals("保存できませんでした", model.state.task.message)
+        assertEquals("保存できませんでした", model.state.errorNotice.message)
     }
 
     @Test

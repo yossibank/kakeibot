@@ -6,7 +6,7 @@ import Store
 @MainActor
 @Observable
 public final class SetupModel: ScreenModel {
-    public let state = NoticeState()
+    public let state: NoticeState
     public let input: Input
     public let output: Output
 
@@ -18,6 +18,7 @@ public final class SetupModel: ScreenModel {
     ) {
         let input = Input(newsVersion: newsVersion)
 
+        self.state = NoticeState(wait: parts.wait)
         self.input = input
         self.output = Output(input: input)
         self.dependencies = Dependencies(database: parts.database)

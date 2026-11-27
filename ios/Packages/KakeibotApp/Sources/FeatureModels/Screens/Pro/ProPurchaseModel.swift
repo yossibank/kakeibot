@@ -12,8 +12,11 @@ public final class ProPurchaseModel: ScreenPerforming {
 
     let dependencies: Dependencies
 
-    public init(store: ProStore) {
-        let state = State()
+    public init(
+        store: ProStore,
+        wait: ScreenWait = .system
+    ) {
+        let state = State(wait: wait)
         let input = Input(price: store.cachedPrice())
 
         self.state = state
@@ -32,12 +35,16 @@ public extension ProPurchaseModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
+        public let errorNotice: ErrorNotice
 
         public internal(set) var outcome = ScreenOutcome<Work>()
         public internal(set) var working: Work?
 
         public let task = ModelTask()
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

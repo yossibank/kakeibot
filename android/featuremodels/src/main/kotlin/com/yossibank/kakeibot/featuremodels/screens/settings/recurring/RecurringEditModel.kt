@@ -15,10 +15,12 @@ import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.EditFlow
 import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import com.yossibank.kakeibot.featuremodels.shared.notification.NotificationPermission
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -38,7 +40,7 @@ class RecurringEditModel(
     editingId: Identifier<Recurring>? = null,
     permission: NotificationPermission = NotificationPermission.allowed,
 ) : ScreenPerforming {
-    val state = State(today, type, isScheduleOpen = editingId == null)
+    val state = State(today, type, isScheduleOpen = editingId == null, wait = parts.wait)
     val input = Input(editingId)
     val output = Output(input, state)
     val flow = EditFlow(task = state.task, source = Source())
@@ -49,8 +51,10 @@ class RecurringEditModel(
         today: LocalDate,
         type: Entry.Kind,
         isScheduleOpen: Boolean,
+        wait: ScreenWait,
     ) {
-        val task = ModelTask()
+        val errorNotice = ErrorNotice(wait)
+        val task = ModelTask(errorNotice)
         val panel = Shown<RecurringPanel>()
 
         var today: LocalDate by mutableStateOf(today)

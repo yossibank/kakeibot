@@ -10,10 +10,12 @@ import com.yossibank.kakeibot.core.concepts.date.LocalDate
 import com.yossibank.kakeibot.core.concepts.date.YearMonth
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.featuremodels.shared.entrylist.EntryRowItem
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.Loadable
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.model.TabScreenModel
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -29,7 +31,7 @@ class HomeModel(
     today: LocalDate,
     round: ObservationRound,
 ) : TabScreenModel {
-    val state = State(today)
+    val state = State(today, parts.wait)
     val input = Input()
     val output = Output(input, state)
 
@@ -37,8 +39,10 @@ class HomeModel(
 
     class State(
         today: LocalDate,
+        wait: ScreenWait,
     ) {
-        val task = ModelTask()
+        val errorNotice = ErrorNotice(wait)
+        val task = ModelTask(errorNotice)
 
         var today: LocalDate by mutableStateOf(today)
             internal set
@@ -114,8 +118,8 @@ class HomeModel(
         val round: ObservationRound,
     )
 
-    override val task: ModelTask
-        get() = state.task
+    override val errorNotice: ErrorNotice
+        get() = state.errorNotice
 
     override val isLoadFailed: Boolean
         get() = false

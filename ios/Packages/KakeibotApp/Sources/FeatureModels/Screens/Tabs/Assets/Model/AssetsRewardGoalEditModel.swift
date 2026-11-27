@@ -21,7 +21,14 @@ public final class AssetsRewardGoalEditModel: ScreenPerforming {
     ) {
         let name = goal?.name ?? ""
         let amount = goal?.targetAmount ?? 0
-        let state = State(name: name, amount: amount, panel: goal == nil ? .amount : nil)
+
+        let state = State(
+            name: name,
+            amount: amount,
+            panel: goal == nil ? .amount : nil,
+            wait: parts.wait
+        )
+
         let baseline = RewardGoalDraft(name: name, targetAmount: amount)
         let input = Input(editingId: goal?.id, baseline: baseline, balance: balance)
         let output = Output(input: input, state: state)
@@ -47,17 +54,20 @@ public extension AssetsRewardGoalEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var panel: Shown<Panel>
         public var fields: Fields
 
         public private(set) var calculator: AmountCalculator
 
+        public let errorNotice: ErrorNotice
+
         init(
             name: String,
             amount: Int,
-            panel: Panel?
+            panel: Panel?,
+            wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.panel = Shown(panel)
             self.fields = Fields(name: name)
             self.calculator = AmountCalculator(amount: amount)

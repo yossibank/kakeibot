@@ -7,7 +7,6 @@ public extension RecordsModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var today: LocalDate
         public var selectedDate: LocalDate?
         public var isSearching = false
@@ -20,7 +19,13 @@ public extension RecordsModel {
         public private(set) var month: YearMonth
         public private(set) var pendingDeleteIDs: [Entry.ID] = []
 
-        init(today: LocalDate) {
+        public let errorNotice: ErrorNotice
+
+        init(
+            today: LocalDate,
+            wait: ScreenWait
+        ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.today = today
             self.month = today.yearMonth
         }

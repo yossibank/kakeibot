@@ -51,16 +51,17 @@ public extension BudgetListModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var prompt = Shown<Prompt>()
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
 
+        public let errorNotice: ErrorNotice
         public let cleared: UndoNotice<Cleared>
         public let resetFrom: UndoNotice<YearMonth>
 
         init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.cleared = UndoNotice(wait: wait)
             self.resetFrom = UndoNotice(wait: wait)
         }

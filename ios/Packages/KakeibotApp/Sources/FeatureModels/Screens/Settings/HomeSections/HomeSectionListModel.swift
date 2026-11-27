@@ -6,12 +6,13 @@ import Store
 @MainActor
 @Observable
 public final class HomeSectionListModel {
-    public let state = State()
+    public let state: State
     public let input = Input()
 
     let dependencies: Dependencies
 
     public init(parts: ScreenParts) {
+        self.state = State(wait: parts.wait)
         self.dependencies = Dependencies(database: parts.database)
     }
 }
@@ -25,10 +26,14 @@ public extension HomeSectionListModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
+        public let errorNotice: ErrorNotice
 
         public internal(set) var layout = HomeLayout.standard
         public internal(set) var dragging: Dragging?
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

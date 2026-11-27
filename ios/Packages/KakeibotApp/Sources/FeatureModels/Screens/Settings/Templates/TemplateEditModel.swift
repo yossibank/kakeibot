@@ -19,14 +19,14 @@ public final class TemplateEditModel: ScreenPerforming {
         type: Entry.Kind,
         editing id: EntryTemplate.ID? = nil
     ) {
-        self.init(parts: parts, state: State(type: type), editing: id)
+        self.init(parts: parts, state: State(type: type, wait: parts.wait), editing: id)
     }
 
     public convenience init(
         parts: ScreenParts,
         draft: EntryTemplateDraft
     ) {
-        let state = State(type: draft.type)
+        let state = State(type: draft.type, wait: parts.wait)
 
         state.apply(draft)
 

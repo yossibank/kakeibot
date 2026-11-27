@@ -3,6 +3,7 @@ package com.yossibank.kakeibot.featuremodels.screens.entry.model
 import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.wallet.Wallet
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.support.ModelTestSetup.Companion.month
 import com.yossibank.kakeibot.featuremodels.support.modelTest
@@ -148,7 +149,7 @@ class EntryModelEditingTest {
 
         val saved = model.save()
 
-        assertEquals("記録が見つかりませんでした", model.state.task.message)
+        assertEquals("記録が見つかりませんでした", model.state.errorNotice.message)
         assertTrue(model.output.isEditing)
         assertNull(model.state.form.walletId)
         assertNull(model.state.form.categoryId)
@@ -216,8 +217,8 @@ class EntryModelEditingTest {
 
         model.recordAgain()
         val isEditing = model.output.isEditing
-        val message = model.state.task.message
-        val tone = model.state.task.tone
+        val message = model.state.errorNotice.message
+        val tone = model.state.errorNotice.tone
         model.save()
         val entries = setup.database.entryList().entries
         val saved = entries.first { it.id != entry.id }
@@ -225,7 +226,7 @@ class EntryModelEditingTest {
 
         assertFalse(isEditing)
         assertEquals("同じ内容で新しい記録にしました", message)
-        assertEquals(ModelTask.Tone.info, tone)
+        assertEquals(ErrorNotice.Tone.info, tone)
         assertEquals(980, saved.amount)
         assertEquals("ランチ", saved.memo)
         assertEquals(entry.categoryId, saved.categoryId)

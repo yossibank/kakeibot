@@ -7,8 +7,10 @@ import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.date.MonthStartDay
 import com.yossibank.kakeibot.core.concepts.date.Weekday
 import com.yossibank.kakeibot.core.concepts.setting.SettingsScreen
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldInput
 import com.yossibank.kakeibot.featuremodels.shared.settingsparts.hint.SettingsFoldModel
 import com.yossibank.kakeibot.store.database.AppDatabase
@@ -26,7 +28,7 @@ class SettingsMenuModel(
     parts: ScreenParts,
     screen: Screen = Screen.Menu,
 ) : SettingsFoldModel {
-    val state = State(screen)
+    val state = State(screen, parts.wait)
     val input = Input()
 
     private val dependencies = Dependencies(parts.database)
@@ -43,8 +45,10 @@ class SettingsMenuModel(
 
     class State(
         screen: Screen,
+        wait: ScreenWait,
     ) {
-        val task = ModelTask()
+        val errorNotice = ErrorNotice(wait)
+        val task = ModelTask(errorNotice)
 
         var screen: Screen by mutableStateOf(screen)
             private set

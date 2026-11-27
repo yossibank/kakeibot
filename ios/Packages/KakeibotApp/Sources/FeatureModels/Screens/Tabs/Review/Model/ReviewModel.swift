@@ -17,7 +17,7 @@ public final class ReviewModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State(today: today, checkTime: parts.clock.now)
+        let state = State(today: today, checkTime: parts.clock.now, wait: parts.wait)
         let input = Input()
 
         self.state = state
@@ -31,7 +31,6 @@ public extension ReviewModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var today: LocalDate
         public var sheet: Sheet?
         public var analysisShare: Share?
@@ -45,10 +44,14 @@ public extension ReviewModel {
         public internal(set) var showsStoreReviewCard = false
         public internal(set) var newReportKey: String?
 
+        public let errorNotice: ErrorNotice
+
         init(
             today: LocalDate,
-            checkTime: Date
+            checkTime: Date,
+            wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.today = today
             self.checkTime = checkTime
         }

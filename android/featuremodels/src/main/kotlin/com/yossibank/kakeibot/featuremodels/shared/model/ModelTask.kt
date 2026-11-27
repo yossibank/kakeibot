@@ -1,56 +1,22 @@
 package com.yossibank.kakeibot.featuremodels.shared.model
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.store.database.AppDatabase
 import com.yossibank.kakeibot.store.database.isStorageFull
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 
-class ModelTask {
-    var message: String by mutableStateOf("")
-        private set
-
-    var tone: Tone by mutableStateOf(Tone.error)
-        private set
-
-    var count: Int by mutableIntStateOf(0)
-        private set
-
+class ModelTask(
+    val notice: ErrorNotice,
+) {
     private var running: Int by mutableIntStateOf(0)
-
-    enum class Tone {
-        info,
-        error,
-    }
 
     val isRunning: Boolean
         get() = running > 0
-
-    fun show(message: String) {
-        show(
-            message = message,
-            tone = Tone.error,
-        )
-    }
-
-    fun inform(message: String) {
-        show(
-            message = message,
-            tone = Tone.info,
-        )
-    }
-
-    fun clear() {
-        message = ""
-    }
 
     suspend fun <Value : Any> attempt(
         failure: String,
@@ -71,7 +37,7 @@ class ModelTask {
         } catch (error: CancellationException) {
             throw error
         } catch (error: Exception) {
-            show(if (AppDatabase.isStorageFull(error)) storageFull else describe(error))
+            notice.show(if (AppDatabase.isStorageFull(error)) storageFull else describe(error))
             return null
         } finally {
             running -= 1
@@ -91,7 +57,7 @@ class ModelTask {
         )
 
         if (isFailed) {
-            show(failure)
+            notice.show(failure)
         }
 
         return isFailed
@@ -118,29 +84,7 @@ class ModelTask {
         }
     }
 
-    @Composable
-    fun Timer() {
-        val shown = count
-
-        LaunchedEffect(shown) {
-            if (shown > 0) {
-                delay(MILLIS)
-                clear()
-            }
-        }
-    }
-
-    private fun show(
-        message: String,
-        tone: Tone,
-    ) {
-        this.message = message
-        this.tone = tone
-        count += 1
-    }
-
     companion object {
-        const val MILLIS = 6_000L
         const val saveFailed = "保存できませんでした"
         const val deleteFailed = "削除できませんでした"
         const val settingSaveFailed = "設定を保存できませんでした"

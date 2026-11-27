@@ -13,13 +13,18 @@ public extension HomeModel {
         public var openStamp: StampBook.Tally?
         public var shelf = Shelf()
         public var customized: SetupItem?
-        public var errorNotice = ErrorNotice()
 
         public internal(set) var outcome = ScreenOutcome<EntryChange>()
         public internal(set) var pendingDay: LocalDate?
 
-        init(today: LocalDate) {
+        public let errorNotice: ErrorNotice
+
+        init(
+            today: LocalDate,
+            wait: ScreenWait
+        ) {
             self.today = today
+            self.errorNotice = ErrorNotice(wait: wait)
         }
     }
 }

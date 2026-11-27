@@ -24,7 +24,8 @@ public final class ReminderModel {
 
         let state = State(
             previewDay: today.weekday,
-            presented: Shown(isCustom ? .timePicker : nil)
+            presented: Shown(isCustom ? .timePicker : nil),
+            wait: parts.wait
         )
 
         let input = Input(today: today, time: time, authorization: authorization)
@@ -44,15 +45,18 @@ public extension ReminderModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var presented: Shown<Presented>
 
         public internal(set) var previewDay: Weekday
 
+        public let errorNotice: ErrorNotice
+
         init(
             previewDay: Weekday,
-            presented: Shown<Presented>
+            presented: Shown<Presented>,
+            wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.previewDay = previewDay
             self.presented = presented
         }

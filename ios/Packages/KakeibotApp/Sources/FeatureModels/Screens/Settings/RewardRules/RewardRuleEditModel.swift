@@ -18,7 +18,7 @@ public final class RewardRuleEditModel: ScreenPerforming {
         parts: ScreenParts,
         editing id: RewardRule.ID? = nil
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let output = Output(state: state)
         let input = Input(editingId: id, baseline: output.draft)
         let source = Source(state: state, input: input, output: output, parts: parts)
@@ -43,13 +43,17 @@ public extension RewardRuleEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var panel = Shown<Panel>()
         public var fields = Fields()
 
         public private(set) var calculator = AmountCalculator()
 
+        public let errorNotice: ErrorNotice
         public let icon = SettingsIconEditorModel(glyph: .giftbox)
+
+        init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

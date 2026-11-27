@@ -31,9 +31,9 @@ class HomeModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
 
-        assertEquals("記録を読めませんでした", model.state.task.message)
+        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
         assertNull(model.input.overview.value)
     }
 
@@ -49,7 +49,7 @@ class HomeModelTest {
 
         setup.scope.launch { model.observe() }
         ModelWait.until { model.input.overview.isFailed }
-        val message = model.state.task.message
+        val message = model.state.errorNotice.message
         val overview = model.input.overview.value
         model.retry()
         ModelWait.until { model.input.overview.isLoaded }
@@ -63,7 +63,7 @@ class HomeModelTest {
     fun showsNoNoticeWhileListArrives() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.observedModel()
 
-        assertEquals("", model.state.task.message)
+        assertEquals("", model.state.errorNotice.message)
     }
 
     @Test

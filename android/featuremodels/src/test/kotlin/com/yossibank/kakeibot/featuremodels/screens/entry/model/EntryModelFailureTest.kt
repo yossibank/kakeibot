@@ -23,7 +23,7 @@ class EntryModelFailureTest {
 
         val model = setup.loadedModel()
 
-        assertEquals("保存できませんでした", model.state.task.message)
+        assertEquals("保存できませんでした", model.state.errorNotice.message)
     }
 
     @Test
@@ -39,8 +39,8 @@ class EntryModelFailureTest {
 
         assertTrue(isRunning)
         assertTrue(load.isCancelled)
-        assertEquals("", model.state.task.message)
-        assertEquals(0, model.state.task.count)
+        assertEquals("", model.state.errorNotice.message)
+        assertEquals(0, model.state.errorNotice.count)
         assertFalse(model.state.task.isRunning)
     }
 
@@ -54,7 +54,7 @@ class EntryModelFailureTest {
 
         assertFalse(deleted)
         assertEquals(entry, setup.database.entry(entry.id))
-        assertEquals("保存できませんでした", model.state.task.message)
+        assertEquals("保存できませんでした", model.state.errorNotice.message)
     }
 
     @Test
@@ -65,7 +65,7 @@ class EntryModelFailureTest {
         val deleted = model.delete()
 
         assertFalse(deleted)
-        assertEquals("記録が見つかりませんでした", model.state.task.message)
+        assertEquals("記録が見つかりませんでした", model.state.errorNotice.message)
     }
 
     @Test
@@ -75,7 +75,7 @@ class EntryModelFailureTest {
 
         model.press(1)
 
-        assertEquals("金額を入れてください", model.state.task.message)
+        assertEquals("金額を入れてください", model.state.errorNotice.message)
     }
 
     @Test
@@ -88,7 +88,7 @@ class EntryModelFailureTest {
         val saved = model.save()
 
         assertFalse(saved)
-        assertEquals("端末の空き容量が足りません", model.state.task.message)
-        assertEquals(ModelTask.storageFull, model.state.task.message)
+        assertEquals("端末の空き容量が足りません", model.state.errorNotice.message)
+        assertEquals(ModelTask.storageFull, model.state.errorNotice.message)
     }
 }

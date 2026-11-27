@@ -44,7 +44,7 @@ suspend fun EntryModel.recordAgain() {
     }
 
     input.baseline = output.snapshot
-    state.task.inform(RECORD_AGAIN_MESSAGE)
+    state.errorNotice.inform(RECORD_AGAIN_MESSAGE)
 }
 
 internal fun EntryModel.startNew() {

@@ -27,7 +27,6 @@ public extension WalletEditModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var fields = Fields()
         public var panel = Shown<Drawer>()
         public var openValuation = Shown<Valuation.ID>()
@@ -40,6 +39,7 @@ public extension WalletEditModel {
 
         public internal(set) var valuation = AmountCalculator()
 
+        public let errorNotice: ErrorNotice
         public let icon: SettingsIconEditorModel
         public let valuationDeletion: UndoNotice<Deletion>
 
@@ -47,6 +47,7 @@ public extension WalletEditModel {
             kind: Wallet.Kind,
             wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.kind = kind
             self.isNegative = kind.isDebt
             self.valuationDeletion = UndoNotice(wait: wait)

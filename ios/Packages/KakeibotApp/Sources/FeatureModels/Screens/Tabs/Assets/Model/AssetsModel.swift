@@ -31,16 +31,17 @@ public extension AssetsModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var billPage = 0
         public var sheet: Sheet?
 
         public internal(set) var reward = RewardSheet()
         public internal(set) var pending: Opening?
 
+        public let errorNotice: ErrorNotice
         public let bought: UndoNotice<RewardGoal.ID>
 
         init(wait: ScreenWait) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.bought = UndoNotice(wait: wait)
         }
     }

@@ -250,7 +250,7 @@ class RecordsModelTest {
 
         assertEquals(RecordsLayout.list, model.input.layout)
         assertEquals(RecordsLayout.calendar, setup.database.setting(SettingKey.recordsLayout))
-        assertEquals("保存できませんでした", model.state.task.message)
+        assertEquals("保存できませんでした", model.state.errorNotice.message)
     }
 
     @Test
@@ -262,11 +262,11 @@ class RecordsModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
         setup.database.setSetting(key = SettingKey.weekStart, to = Weekday.sunday)
         ModelWait.until { model.input.weekStart == Weekday.sunday }
 
-        assertEquals("記録を読めませんでした", model.state.task.message)
+        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
         assertFalse(model.input.list.isLoaded)
         assertNull(model.input.list.value)
     }
@@ -283,7 +283,7 @@ class RecordsModelTest {
 
         setup.scope.launch { model.observe() }
         ModelWait.until { model.input.list.isFailed }
-        val message = model.state.task.message
+        val message = model.state.errorNotice.message
         val list = model.input.list.value
         model.retry()
         ModelWait.until { model.input.list.isLoaded }
@@ -299,7 +299,7 @@ class RecordsModelTest {
         val model = setup.recordsModel()
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
 
         assertFalse(model.input.list.isFailed)
     }
@@ -310,10 +310,10 @@ class RecordsModelTest {
         val model = setup.recordsModel()
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.task.message.isNotEmpty() }
+        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
         ModelWait.until { model.input.list.isLoaded }
 
-        assertEquals("記録を読めませんでした", model.state.task.message)
+        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
         assertEquals(MonthStartDay.first, model.input.monthStartDay)
     }
 

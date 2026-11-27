@@ -21,7 +21,8 @@ public final class OnboardingModel: ScreenPerforming {
         let state = State(
             monthStart: MonthStartDayModel(parts: parts, today: today),
             budget: BudgetListModel(parts: parts, today: today),
-            setup: SetupModel(parts: parts, newsVersion: newsVersion)
+            setup: SetupModel(parts: parts, newsVersion: newsVersion),
+            wait: parts.wait
         )
 
         self.state = state
@@ -48,13 +49,13 @@ public extension OnboardingModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var errorNotice = ErrorNotice()
         public var outcome = ScreenOutcome<Void>()
         public var path: [SetupItem] = []
 
         public internal(set) var page: Page = .welcome
         public internal(set) var route: Route?
 
+        public let errorNotice: ErrorNotice
         public let monthStart: MonthStartDayModel
         public let budget: BudgetListModel
         public let setup: SetupModel
@@ -62,8 +63,10 @@ public extension OnboardingModel {
         init(
             monthStart: MonthStartDayModel,
             budget: BudgetListModel,
-            setup: SetupModel
+            setup: SetupModel,
+            wait: ScreenWait
         ) {
+            self.errorNotice = ErrorNotice(wait: wait)
             self.monthStart = monthStart
             self.budget = budget
             self.setup = setup

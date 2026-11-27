@@ -19,7 +19,7 @@ public final class CategoryEditModel: ScreenPerforming {
         kind: EntryCategory.Kind,
         editing id: EntryCategory.ID? = nil
     ) {
-        let state = State()
+        let state = State(wait: parts.wait)
         let input = Input(kind: kind, editingId: id)
         let output = Output(input: input, state: state)
         let source = Source(state: state, input: input, output: output, parts: parts)
