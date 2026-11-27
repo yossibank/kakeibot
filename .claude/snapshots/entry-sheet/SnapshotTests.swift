@@ -278,10 +278,19 @@ private extension SnapshotTests {
             (
                 "applied",
                 "入れた",
-                .init(outcome: .applied, count: 4, text: "昨日、駅前の喫茶店でモーニングセットとコーヒーのおかわりで980円、カードで")
+                .init(
+                    outcome: .applied,
+                    count: 4,
+                    text: "昨日、駅前の喫茶店でモーニングセットとコーヒーのおかわりで980円、カードで",
+                    undo: nil
+                )
             ),
-            ("missing", "金額が読めない", .init(outcome: .missingAmount, count: 1, text: "昨日のコンビニ")),
-            ("unheard", "聞こえない", .init(outcome: .unheard, count: 0, text: ""))
+            (
+                "missing",
+                "金額が読めない",
+                .init(outcome: .missingAmount, count: 1, text: "昨日のコンビニ", undo: nil)
+            ),
+            ("unheard", "聞こえない", .init(outcome: .unheard, count: 0, text: "", undo: nil))
         ]
 
         for (name, title, notice) in notices {
@@ -398,11 +407,11 @@ private extension EntryVoiceFlow.Dependencies {
             prepare: {},
             choose: { _ in nil },
             clock: .fixed(snapshotNow),
+            wait: .system,
             sleep: { duration in
                 try await Task.sleep(for: duration)
             },
-            silence: .seconds(60),
-            noticeDuration: .seconds(60)
+            silence: .seconds(60)
         )
     }
 }
