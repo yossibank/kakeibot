@@ -44,6 +44,7 @@
 | `version` | 書き出しの形式の版。DB の形の版とは別に数える |
 | 古い版 | 読み込みではすべての古い版を受け付ける。読み方は下の図 |
 | キー | camelCase。各要素の項目は [data.md](../docs/data.md)・[data-budget.md](../docs/data-budget.md) の列名を camelCase にしたもの |
+| キーの見本 | すべてのキーは `fixtures/export/export-v1.json` にある。書き出しのキーと上の例は、テストで見本と比べる |
 | 日付・日時・金額 | [data.md](../docs/data.md) と同じ書き方 |
 | 空の値 | `null` |
 | 真偽 | `true` `false` |

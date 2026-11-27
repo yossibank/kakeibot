@@ -11,6 +11,11 @@ enum CoreFixture {
         return try Data(contentsOf: url)
     }
 
+    static func spec(_ path: String) throws -> Data {
+        let url = root.deletingLastPathComponent().appending(path: path)
+        return try Data(contentsOf: url)
+    }
+
     static func load<Value: Decodable>(
         _ path: String,
         as type: Value.Type = Value.self
