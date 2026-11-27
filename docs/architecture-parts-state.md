@@ -75,7 +75,7 @@ iOS だけ。実行中の印と、どれを実行中かを別の値で持たな�
 
 値の型には、モデル抜きのテストを書く。
 
-`make verify` の state-check が、直下の知らせ・裸の値・書ける `var` を見る。型の書いていない値は、文字どおりの値（`false`・`0`・`""`）だけを裸と見る。中身は [architecture](architecture.md#確かめるスクリプト) にある。
+`make verify` の state-check が、直下の知らせ・裸の値・書ける `var` を見る。中身は [architecture](architecture.md#確かめるスクリプト) にある。型の無い値で裸と見るのは、文字どおりの値（`false`・`0`・`""`）と `mutableIntStateOf` などである。
 
 ### 部品の型は枠の中だけに置く
 
