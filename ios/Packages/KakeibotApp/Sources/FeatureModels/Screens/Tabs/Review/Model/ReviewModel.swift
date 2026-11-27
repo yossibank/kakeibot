@@ -31,10 +31,10 @@ public extension ReviewModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var today: LocalDate
-        public var sheet: Sheet?
-        public var analysisShare: Share?
+        public var presented = Shown<Sheet>()
+        public var analysisShare = Shown<Share>()
 
+        public internal(set) var today: LocalDate
         public internal(set) var checkTime: Date
         public internal(set) var pending: Opening?
 
@@ -97,7 +97,7 @@ public extension ReviewModel {
         }
     }
 
-    struct Share: Identifiable {
+    struct Share: Equatable, Identifiable, @unchecked Sendable {
         public let id: AnyHashable
         public let name: String
         public let icon: Icon?

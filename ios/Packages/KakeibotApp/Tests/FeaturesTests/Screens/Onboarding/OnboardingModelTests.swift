@@ -60,7 +60,7 @@ struct OnboardingModelTests {
 
         model.state.open(.wallets)
 
-        #expect(model.state.path == [.wallets])
+        #expect(model.state.fields.path == [.wallets])
     }
 
     @Test

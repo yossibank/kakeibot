@@ -101,7 +101,7 @@ extension WalletEditSheet {
 
     func open(_ panel: Panel) {
         switch panel {
-        case .payment: model.state.payment.shown.show(.editing)
+        case .payment: model.state.paymentStep.show(.editing)
         case .valuation: openValuation()
         case .loanAmount: openLoanAmount()
         }
@@ -152,7 +152,7 @@ extension WalletEditSheet {
     }
 
     func closePayment() {
-        guard model.state.payment.addedWallet == nil else {
+        guard model.state.addedWallet == nil else {
             model.finishAddedWallet()
             return
         }

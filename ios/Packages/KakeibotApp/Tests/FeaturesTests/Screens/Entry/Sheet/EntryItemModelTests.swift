@@ -9,14 +9,14 @@ struct EntryItemModelTests {
         let entry = try await EntryModelTests.newModel()
         let items = entry.newItemModel(isSlipOpen: true)
         entry.state.addItem(name: "牛乳", amount: 200, taxRate: .reduced)
-        items.state.draft.name = "パン"
+        items.state.fields.draft.name = "パン"
 
         items.reset(for: entry)
 
-        #expect(items.state.isSlipOpen)
-        #expect(items.state.draft.name.isEmpty)
-        #expect(items.state.draft.taxRate == .reduced)
-        #expect(items.state.draft.editing == nil)
+        #expect(items.state.fields.isSlipOpen)
+        #expect(items.state.fields.draft.name.isEmpty)
+        #expect(items.state.fields.draft.taxRate == .reduced)
+        #expect(items.state.fields.draft.editing == nil)
     }
 
     @Test
@@ -26,7 +26,7 @@ struct EntryItemModelTests {
         entry.state.addItem(name: "卵", quantity: 3, amount: 600, taxRate: .reduced)
 
         items.edit(0, in: entry)
-        let draft = items.state.draft
+        let draft = items.state.fields.draft
         items.edit(4, in: entry)
 
         #expect(draft.name == "卵")
@@ -35,7 +35,7 @@ struct EntryItemModelTests {
         #expect(draft.taxRate == .reduced)
         #expect(draft.isEditing(0))
         #expect(draft.canSubmit)
-        #expect(items.state.draft == draft)
+        #expect(items.state.fields.draft == draft)
     }
 
     @Test
@@ -45,23 +45,23 @@ struct EntryItemModelTests {
         entry.state.addItem(name: "割引セット", quantity: 3, amount: 100)
 
         items.edit(0, in: entry)
-        let kept = items.state.draft
-        items.state.draft.press(.digit(5))
+        let kept = items.state.fields.draft
+        items.state.fields.draft.press(.digit(5))
 
         #expect(kept.lineQuantity == 3)
         #expect(kept.lineAmount == 100)
-        #expect(items.state.draft.lineQuantity == 1)
-        #expect(items.state.draft.lineAmount == 5)
+        #expect(items.state.fields.draft.lineQuantity == 1)
+        #expect(items.state.fields.draft.lineAmount == 5)
     }
 
     @Test
     func addsItemFromDraft() async throws {
         let entry = try await EntryModelTests.newModel()
         let items = entry.newItemModel()
-        items.state.draft.name = " パン "
-        items.state.draft.taxRate = .standard
-        items.state.draft.press(.digit(2))
-        items.state.draft.press(.doubleZero)
+        items.state.fields.draft.name = " パン "
+        items.state.fields.draft.taxRate = .standard
+        items.state.fields.draft.press(.digit(2))
+        items.state.fields.draft.press(.doubleZero)
 
         items.add(to: entry)
 
@@ -74,18 +74,18 @@ struct EntryItemModelTests {
     func turnsDiscountNegativeAndHalvesUnit() async throws {
         let entry = try await EntryModelTests.newModel()
         let items = entry.newItemModel()
-        items.state.draft.name = "値引"
-        items.state.draft.press(.digit(5))
-        items.state.draft.press(.doubleZero)
-        items.state.draft.target = .quantity
+        items.state.fields.draft.name = "値引"
+        items.state.fields.draft.press(.digit(5))
+        items.state.fields.draft.press(.doubleZero)
+        items.state.fields.draft.target = .quantity
 
-        items.state.draft.toggleDiscount()
-        items.state.draft.halveUnit()
+        items.state.fields.draft.toggleDiscount()
+        items.state.fields.draft.halveUnit()
 
-        #expect(items.state.draft.isDiscount)
-        #expect(items.state.draft.target == .unit)
-        #expect(items.state.draft.unit.amount == 250)
-        #expect(items.state.draft.lineAmount == -250)
+        #expect(items.state.fields.draft.isDiscount)
+        #expect(items.state.fields.draft.target == .unit)
+        #expect(items.state.fields.draft.unit.amount == 250)
+        #expect(items.state.fields.draft.lineAmount == -250)
     }
 
     @Test
@@ -93,17 +93,17 @@ struct EntryItemModelTests {
         let entry = try await EntryModelTests.newModel()
         let items = entry.newItemModel()
 
-        items.state.draft.name = "  "
-        items.state.draft.press(.digit(5))
-        let unnamed = items.state.draft.canSubmit
+        items.state.fields.draft.name = "  "
+        items.state.fields.draft.press(.digit(5))
+        let unnamed = items.state.fields.draft.canSubmit
         items.reset(for: entry)
-        items.state.draft.name = "パン"
-        let unpriced = items.state.draft.canSubmit
-        items.state.draft.press(.digit(5))
+        items.state.fields.draft.name = "パン"
+        let unpriced = items.state.fields.draft.canSubmit
+        items.state.fields.draft.press(.digit(5))
 
         #expect(!unnamed)
         #expect(!unpriced)
-        #expect(items.state.draft.canSubmit)
+        #expect(items.state.fields.draft.canSubmit)
     }
 
     @Test
@@ -113,8 +113,8 @@ struct EntryItemModelTests {
         entry.state.addItem(name: "牛乳", amount: 200)
         entry.state.addItem(name: "パン", amount: 300)
         items.edit(1, in: entry)
-        items.state.draft.name = "食パン"
-        items.state.draft.halveUnit()
+        items.state.fields.draft.name = "食パン"
+        items.state.fields.draft.halveUnit()
 
         items.update(in: entry)
 
@@ -130,15 +130,15 @@ struct EntryItemModelTests {
         entry.state.addItem(name: "パン", amount: 300)
         items.edit(1, in: entry)
 
-        items.state.draft.shiftEditing(afterRemoving: 0)
+        items.state.fields.draft.shiftEditing(afterRemoving: 0)
         items.remove(0, from: entry)
         let removed = try #require(items.state.removed.current)
-        let shifted = items.state.draft.editing?.index
+        let shifted = items.state.fields.draft.editing?.index
         items.restore(removed, in: entry)
 
         #expect(removed.item.name == "牛乳")
         #expect(shifted == 0)
-        #expect(items.state.draft.isEditing(1))
+        #expect(items.state.fields.draft.isEditing(1))
         #expect(entry.state.items.list.map(\.name) == ["牛乳", "パン"])
     }
 

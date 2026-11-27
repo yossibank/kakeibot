@@ -117,7 +117,7 @@ private extension RecordsView {
                 hasUpcoming: hasUpcoming,
                 heat: Self.heat(of: expense, peak: peak)
             ) {
-                model.state.selectedDate = date
+                model.state.fields.selectedDate = date
             }
             .equatable()
         } else {

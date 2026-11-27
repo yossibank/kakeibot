@@ -4,17 +4,26 @@ import Observation
 import Store
 
 public extension RecordsModel {
-    @MainActor
-    @Observable
-    final class State: NoticeHolding {
-        public var today: LocalDate
+    struct Fields: ScreenEditable {
         public var selectedDate: LocalDate?
         public var isSearching = false
         public var searchText = ""
         public var filter = EntryFilter()
-        public var outcome = ScreenOutcome<Deletion>()
-        public var screen = Screen()
+        public var isAddingMark = false
+        public var filterTab: FilterTab = .expense
+        public var clearedSearches: [String]?
+    }
+
+    @MainActor
+    @Observable
+    final class State: NoticeHolding {
+        public var fields = Fields()
+        public var presented = Shown<Presented>()
         public var prompt = Shown<Prompt>()
+
+        public internal(set) var today: LocalDate
+        public internal(set) var outcome = ScreenOutcome<Deletion>()
+        public internal(set) var screen = Screen()
 
         public private(set) var month: YearMonth
         public private(set) var pendingDeleteIDs: [Entry.ID] = []
@@ -34,17 +43,17 @@ public extension RecordsModel {
 
 public extension RecordsModel.State {
     func closeSearch() {
-        isSearching = false
-        searchText = ""
+        fields.isSearching = false
+        fields.searchText = ""
     }
 
     func clearFilter() {
-        filter = EntryFilter()
+        fields.filter = EntryFilter()
     }
 
     func move(months: Int) {
         month = month.adding(months: months)
-        selectedDate = nil
+        fields.selectedDate = nil
     }
 
     func requestDelete(
@@ -79,13 +88,13 @@ extension RecordsModel.State {
     ) {
         closeSearch()
         self.month = month
-        selectedDate = date
+        fields.selectedDate = date
     }
 
     func openMonth(_ month: YearMonth) {
         closeSearch()
         self.month = month
-        selectedDate = nil
+        fields.selectedDate = nil
     }
 
     func setMonth(_ month: YearMonth) {

@@ -8,7 +8,7 @@ extension RecordsView {
         HStack(spacing: 12) {
             SearchField(
                 "メモや金額で探す",
-                text: Bindable(model.state).searchText,
+                text: Bindable(model.state).fields.searchText,
                 focus: $isSearchFocused
             ) {
                 rememberSearch()
@@ -33,9 +33,9 @@ extension RecordsView {
     var searchContent: some View {
         let days = model.output.searchDays
 
-        if EntrySearch(model.state.searchText).isEmpty {
+        if EntrySearch(model.state.fields.searchText).isEmpty {
             RecordsSearchHistory(
-                clearedWords: Bindable(model.state).screen.clearedSearches,
+                clearedWords: Bindable(model.state).fields.clearedSearches,
                 words: model.input.recentSearches,
                 onSelect: selectRecent,
                 onClear: clearRecent,
@@ -55,7 +55,7 @@ extension RecordsView {
 
 private extension RecordsView {
     var searchEmpty: some View {
-        let word = model.state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let word = model.state.fields.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         let hiddenCount = model.output.searchHiddenCount
 
         return PlaceholderEmpty(
@@ -74,7 +74,7 @@ private extension RecordsView {
 
 private extension RecordsView {
     func rememberSearch() {
-        let text = model.state.searchText
+        let text = model.state.fields.searchText
 
         model.perform {
             await $0.rememberSearch(text)
@@ -82,7 +82,7 @@ private extension RecordsView {
     }
 
     func selectRecent(_ word: String) {
-        model.state.searchText = word
+        model.state.fields.searchText = word
         rememberSearch()
     }
 

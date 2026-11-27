@@ -87,7 +87,7 @@ struct EntryReceiptFlowTests {
         }
 
         flow.start(for: model, isPro: false)
-        flow.state.hidesGuide = true
+        flow.state.fields.hidesGuide = true
         flow.cancel()
         await flow.saveGuideChoice(for: model)
         let saved = try await setup.database.setting(.receiptGuideHidden)
@@ -95,7 +95,7 @@ struct EntryReceiptFlowTests {
         flow.start(for: model, isPro: false)
 
         #expect(saved)
-        #expect(!flow.state.hidesGuide)
+        #expect(!flow.state.fields.hidesGuide)
         #expect(flow.state.step == .camera)
     }
 

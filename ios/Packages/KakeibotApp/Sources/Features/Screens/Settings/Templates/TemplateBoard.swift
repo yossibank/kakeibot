@@ -73,7 +73,7 @@ extension TemplateBoard: SettingsBoardSpec {
     }
 
     func header(in model: TemplateListModel) -> some View {
-        CapsulePicker(selection: Bindable(model.state).type, options: Self.typeOptions)
+        CapsulePicker(selection: Bindable(model.state).fields.type, options: Self.typeOptions)
     }
 
     func tile(
@@ -116,12 +116,12 @@ extension TemplateBoard: SettingsBoardSpec {
     }
 
     func addTitle(in model: TemplateListModel) -> String {
-        let typeName = model.state.type == .income ? "収入" : "支出"
+        let typeName = model.state.fields.type == .income ? "収入" : "支出"
         return "\(typeName)のテンプレートを追加"
     }
 
     func newDestination(in model: TemplateListModel) -> Destination {
-        .new(model.state.type)
+        .new(model.state.fields.type)
     }
 
     func destination(editing item: EntryTemplate) -> Destination {

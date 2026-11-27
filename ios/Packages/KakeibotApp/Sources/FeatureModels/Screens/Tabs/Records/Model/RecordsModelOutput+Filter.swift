@@ -4,7 +4,7 @@ import Store
 public extension RecordsModel.Output {
     var isMonthHiddenByFilter: Bool {
         guard
-            !state.filter.isEmpty,
+            !state.fields.filter.isEmpty,
             days.isEmpty,
             let list = input.list.value
         else {
@@ -19,7 +19,7 @@ public extension RecordsModel.Output {
     }
 
     var shownEntryCount: Int {
-        let isSearched = state.isSearching && !EntrySearch(state.searchText).isEmpty
+        let isSearched = state.fields.isSearching && !EntrySearch(state.fields.searchText).isEmpty
         return Self.entryCount(in: isSearched ? searchDays : days)
     }
 }

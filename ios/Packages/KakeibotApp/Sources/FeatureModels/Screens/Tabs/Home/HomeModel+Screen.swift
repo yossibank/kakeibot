@@ -10,7 +10,7 @@ public extension HomeModel {
 public extension HomeModel.State {
     func pickStampDay(_ date: LocalDate) {
         pendingDay = date
-        openStamp = nil
+        presented.closeAll()
     }
 
     func takePendingDay() -> LocalDate? {
@@ -24,8 +24,8 @@ public extension HomeModel.State {
     }
 
     func closeShelf() {
-        if shelf != HomeModel.Shelf() {
-            shelf = HomeModel.Shelf()
+        if fields.shelf != HomeModel.Shelf() {
+            fields.shelf = HomeModel.Shelf()
         }
     }
 }

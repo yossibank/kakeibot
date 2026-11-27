@@ -17,7 +17,7 @@ public extension RecordsModel {
         case delete
     }
 
-    enum Presented: Equatable, Identifiable {
+    enum Presented: Equatable, Identifiable, Sendable {
         case markMenu(LocalDate)
         case stamp(LocalDate)
         case reward(LocalDate)
@@ -27,11 +27,6 @@ public extension RecordsModel {
     }
 
     struct Screen {
-        public var isAddingMark = false
-        public var filterTab: FilterTab = .expense
-        public var clearedSearches: [String]?
-
-        public internal(set) var presented: Presented?
         public internal(set) var selection: Set<Entry.ID>?
         public internal(set) var openItemIds: Set<Entry.ID> = []
         public internal(set) var isMovingForward = true
@@ -77,7 +72,7 @@ public extension RecordsModel.BatchTarget {
 
 public extension RecordsModel.State {
     var markMenuDate: LocalDate? {
-        guard case let .markMenu(date) = screen.presented else {
+        guard case let .markMenu(date) = presented.current else {
             return nil
         }
 
@@ -85,37 +80,28 @@ public extension RecordsModel.State {
     }
 
     var sheet: RecordsModel.Presented? {
-        get {
-            screen.presented?.isSheet == true ? screen.presented : nil
-        }
-        set {
-            if let newValue {
-                present(newValue)
-            } else if screen.presented?.isSheet == true {
-                screen.presented = nil
-            }
-        }
+        presented.sheet
     }
 
     func present(_ presented: RecordsModel.Presented) {
-        screen.isAddingMark = false
+        fields.isAddingMark = false
 
         if presented == .filter {
-            screen.filterTab = .expense
+            fields.filterTab = .expense
         }
 
-        screen.presented = presented
+        self.presented.show(presented)
     }
 
     func finishAddingMark() {
-        if screen.isAddingMark {
-            screen.isAddingMark = false
+        if fields.isAddingMark {
+            fields.isAddingMark = false
         }
     }
 
     func closeMarkMenu() {
         if markMenuDate != nil {
-            screen.presented = nil
+            presented.closeAll()
         }
     }
 
@@ -142,6 +128,21 @@ public extension RecordsModel.State {
     func head(forward isForward: Bool) {
         if screen.isMovingForward != isForward {
             screen.isMovingForward = isForward
+        }
+    }
+}
+
+public extension Shown<RecordsModel.Presented> {
+    var sheet: Value? {
+        get {
+            current?.isSheet == true ? current : nil
+        }
+        set {
+            if let newValue {
+                show(newValue)
+            } else if current?.isSheet == true {
+                closeAll()
+            }
         }
     }
 }

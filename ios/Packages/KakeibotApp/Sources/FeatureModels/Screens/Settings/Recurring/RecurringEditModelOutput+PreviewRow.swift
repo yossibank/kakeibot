@@ -5,7 +5,7 @@ import Store
 
 public extension RecurringEditModel.Output {
     var previewRow: RecurringListModel.Row {
-        let schedule = state.schedule
+        let schedule = state.fields.schedule
         let type = state.type
 
         let text = RecurringText.schedule(

@@ -51,7 +51,7 @@ extension CategoryBoard: SettingsBoardSpec {
     }
 
     func header(in model: CategoryListModel) -> some View {
-        CapsulePicker(selection: Bindable(model.state).kind, options: Self.kindOptions)
+        CapsulePicker(selection: Bindable(model.state).fields.kind, options: Self.kindOptions)
     }
 
     func tile(
@@ -102,11 +102,11 @@ extension CategoryBoard: SettingsBoardSpec {
     }
 
     func addTitle(in model: CategoryListModel) -> String {
-        model.state.kind == .income ? "収入のカテゴリを追加" : "支出のカテゴリを追加"
+        model.state.fields.kind == .income ? "収入のカテゴリを追加" : "支出のカテゴリを追加"
     }
 
     func newDestination(in model: CategoryListModel) -> Destination {
-        .new(model.state.kind)
+        .new(model.state.fields.kind)
     }
 
     func destination(editing item: EntryCategory) -> Destination {

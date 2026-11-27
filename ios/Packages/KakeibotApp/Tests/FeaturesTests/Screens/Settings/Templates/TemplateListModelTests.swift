@@ -55,7 +55,7 @@ struct TemplateListModelTests {
         await model.finishMoving()
         let stored = try await setup.database.templates()
 
-        model.state.type = .income
+        model.state.fields.type = .income
         let income = model.output.shown.map(\.name)
 
         #expect(detail == "日用品・財布")

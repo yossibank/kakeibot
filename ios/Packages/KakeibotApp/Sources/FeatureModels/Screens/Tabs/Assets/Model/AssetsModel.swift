@@ -28,11 +28,16 @@ public final class AssetsModel: ScreenModel {
 }
 
 public extension AssetsModel {
+    struct Fields: ScreenEditable {
+        public var billPage = 0
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var billPage = 0
-        public var sheet: Sheet?
+        public var fields = Fields()
+        public var presented = Shown<Sheet>()
+        public var rewardChild = Shown<RewardChild>()
 
         public internal(set) var reward = RewardSheet()
         public internal(set) var pending: Opening?
@@ -157,7 +162,7 @@ private extension AssetsModel {
             let summary = await AssetsSummary.make(input.latest)
 
             input.summary = summary
-            state.billPage = BillPage.clamped(state.billPage, in: summary.billPages)
+            state.fields.billPage = BillPage.clamped(state.fields.billPage, in: summary.billPages)
         }
     }
 

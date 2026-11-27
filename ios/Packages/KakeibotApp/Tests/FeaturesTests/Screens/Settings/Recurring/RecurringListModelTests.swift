@@ -46,7 +46,7 @@ struct RecurringListModelTests {
         #expect(row.next?.description == "2026-10-27")
         #expect(model.output.monthTotal == 78000)
 
-        model.state.type = .income
+        model.state.fields.type = .income
 
         #expect(model.output.rows.isEmpty)
         #expect(model.output.monthTotal == 0)

@@ -56,7 +56,7 @@ public extension RecordsModel.Output {
     }
 
     var filterTitle: String? {
-        input.list.value?.title(of: state.filter)
+        input.list.value?.title(of: state.fields.filter)
     }
 
     var weeks: [[LocalDate?]] {
@@ -64,7 +64,7 @@ public extension RecordsModel.Output {
     }
 
     var shownDate: LocalDate {
-        if let selectedDate = state.selectedDate,
+        if let selectedDate = state.fields.selectedDate,
            period.contains(selectedDate) {
             return selectedDate
         }
@@ -107,7 +107,7 @@ public extension RecordsModel.Output {
 
 extension RecordsModel.Output {
     var shownFilter: EntryFilter {
-        input.list.value?.widened(state.filter) ?? state.filter
+        input.list.value?.widened(state.fields.filter) ?? state.fields.filter
     }
 
     static func entryCount(in days: [EntryDay]) -> Int {
@@ -179,7 +179,7 @@ private extension RecordsModel.Output {
     }
 
     func makeSearchResult() -> SearchResult {
-        let search = EntrySearch(state.searchText)
+        let search = EntrySearch(state.fields.searchText)
 
         guard
             !search.isEmpty,
@@ -190,7 +190,7 @@ private extension RecordsModel.Output {
 
         let matched = index.days(matching: search)
         let shown = shownFilter.apply(to: matched)
-        let isHidden = !state.filter.isEmpty && shown.isEmpty
+        let isHidden = !state.fields.filter.isEmpty && shown.isEmpty
 
         return SearchResult(
             days: shown,

@@ -3,7 +3,7 @@ import DesignSystem
 import Store
 
 public extension RecordsModel {
-    struct AdjustmentRow: Equatable, Identifiable {
+    struct AdjustmentRow: Equatable, Identifiable, Sendable {
         public let adjustment: Adjustment
         public let walletName: String
     }

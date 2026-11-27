@@ -30,7 +30,7 @@ extension EntrySheet {
                     receipt.confirmGuide()
                     saveReceiptGuideChoice()
                 },
-                hidesNext: Bindable(receipt.state).hidesGuide,
+                hidesNext: Bindable(receipt.state).fields.hidesGuide,
                 guide: .receipt
             ) {
                 withAnimation(.snappy) {

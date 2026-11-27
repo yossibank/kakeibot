@@ -19,7 +19,7 @@ struct CategoryListModelTests {
         let expenseShown = model.output.shown.map(\.name)
         let expenseHidden = model.output.hidden.map(\.name)
 
-        model.state.kind = .income
+        model.state.fields.kind = .income
         let incomeShown = model.output.shown.map(\.name)
 
         #expect(expenseShown.count == 11)

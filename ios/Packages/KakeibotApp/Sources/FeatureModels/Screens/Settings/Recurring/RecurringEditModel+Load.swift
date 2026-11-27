@@ -53,13 +53,13 @@ extension RecurringEditModel {
         state.categoryId = nil
         state.toWalletId = target
         state.setWallet((bank ?? other)?.id)
-        state.schedule.day = Self.billPaymentDay
+        state.fields.schedule.day = Self.billPaymentDay
 
         let destination = output.selectedDestination
         let name = destination?.name ?? ""
 
         if destination?.kind == .card {
-            state.schedule.closingDay = Self.billClosingDay
+            state.fields.schedule.closingDay = Self.billClosingDay
             state.fields.memo = name
         } else {
             state.fields.memo = "\(name)の返済"
@@ -82,7 +82,7 @@ extension RecurringEditModel {
             return
         }
 
-        state.schedule.suggest(output.suggestedHolidayShift)
+        state.fields.schedule.suggest(output.suggestedHolidayShift)
     }
 
     func loadRecurring() async throws {

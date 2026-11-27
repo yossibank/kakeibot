@@ -10,7 +10,7 @@ extension HomeView {
                 SectionTitle("テンプレート")
 
                 CapsulePicker(
-                    selection: Bindable(model.state).templateType,
+                    selection: Bindable(model.state).fields.templateType,
                     options: Self.typeOptions,
                     size: .small
                 )

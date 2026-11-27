@@ -48,7 +48,7 @@ public extension MainModel {
         case assets
     }
 
-    enum Sheet: Hashable, Identifiable {
+    enum Sheet: Hashable, Identifiable, Sendable {
         case new
         case edit(Entry.ID)
         case settings
@@ -67,7 +67,7 @@ public extension MainModel {
     @MainActor
     @Observable
     final class State {
-        public var sheet: Sheet?
+        public var presented = Shown<Sheet>()
 
         public private(set) var tab: Tab = .home
         public private(set) var visitedTabs: Set<Tab> = [.home]

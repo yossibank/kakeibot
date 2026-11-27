@@ -26,7 +26,7 @@ extension RecordsView {
         toolButton(
             systemImage: "line.3.horizontal.decrease",
             title: title,
-            isOn: !model.state.filter.isEmpty
+            isOn: !model.state.fields.filter.isEmpty
         ) {
             model.state.present(.filter)
         }

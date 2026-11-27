@@ -36,8 +36,8 @@ private extension RecurringEditSheet {
             panel: .closing,
             systemImage: "creditcard",
             title: "金額の決め方",
-            value: RecurringText.closingDay(model.state.schedule.closingDay),
-            isEmpty: model.state.schedule.closingDay == nil
+            value: RecurringText.closingDay(model.state.fields.schedule.closingDay),
+            isEmpty: model.state.fields.schedule.closingDay == nil
         )
 
         return [closing, fee]
@@ -69,7 +69,7 @@ private extension RecurringEditSheet {
                 panel: .start,
                 systemImage: "calendar",
                 title: "始まり",
-                value: RecurringText.date(model.state.schedule.startDate),
+                value: RecurringText.date(model.state.fields.schedule.startDate),
                 isEmpty: false
             ),
             .init(
@@ -83,15 +83,15 @@ private extension RecurringEditSheet {
                 panel: .holiday,
                 systemImage: "calendar.badge.exclamationmark",
                 title: "休日なら",
-                value: model.state.schedule.holidayShift.title,
-                isEmpty: model.state.schedule.holidayShift == .none
+                value: model.state.fields.schedule.holidayShift.title,
+                isEmpty: model.state.fields.schedule.holidayShift == .none
             ),
             .init(
                 panel: .remind,
                 systemImage: "bell",
                 title: "前に知らせる",
-                value: RecurringText.remind(model.state.schedule.remindDaysBefore),
-                isEmpty: model.state.schedule.remindDaysBefore == nil
+                value: RecurringText.remind(model.state.fields.schedule.remindDaysBefore),
+                isEmpty: model.state.fields.schedule.remindDaysBefore == nil
             )
         ]
     }

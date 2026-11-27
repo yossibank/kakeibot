@@ -78,10 +78,10 @@ public extension EntryModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var results: Results
         public var fields = Fields()
         public var presented = Shown<Presented>()
 
+        public internal(set) var results: Results
         public internal(set) var today: LocalDate
         public internal(set) var screen: Screen
         public internal(set) var type: Entry.Kind

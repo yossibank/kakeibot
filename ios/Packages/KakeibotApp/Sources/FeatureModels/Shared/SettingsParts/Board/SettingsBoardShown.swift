@@ -1,7 +1,7 @@
 public struct SettingsBoardShown<
     ID: Hashable & Sendable,
     Destination: Hashable & Sendable
->: Equatable, Sendable {
+>: ScreenEditable {
     public var destination: Destination?
     public var openId: ID?
 

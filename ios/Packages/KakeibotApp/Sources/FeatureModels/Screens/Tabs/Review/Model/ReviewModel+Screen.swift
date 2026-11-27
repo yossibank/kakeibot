@@ -1,7 +1,7 @@
 import Core
 
 public extension ReviewModel {
-    enum Sheet {
+    enum Sheet: Equatable, Sendable {
         case share(Share)
         case analysis
         case stamp(StampBook.Tally)
@@ -41,8 +41,8 @@ public extension ReviewModel.Sheet {
 public extension ReviewModel.State {
     func open(afterSheet opening: ReviewModel.Opening) {
         pending = opening
-        analysisShare = nil
-        sheet = nil
+        analysisShare.closeAll()
+        presented.closeAll()
     }
 
     func takePending() -> ReviewModel.Opening? {

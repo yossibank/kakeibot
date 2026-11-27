@@ -21,7 +21,7 @@ extension ReviewView {
                 model.move(by: -1)
             }
 
-            model.state.sheet = .analysis
+            model.state.presented.show(.analysis)
         } label: {
             HStack(spacing: 12) {
                 Image(systemName: bannerSymbol)
@@ -70,7 +70,7 @@ extension ReviewView {
     func analysisSheet(_ slide: PageSlideProxy) -> some View {
         VStack(spacing: 12) {
             SheetHeader {
-                model.state.sheet = nil
+                model.state.presented.closeAll()
             } title: {
                 Text("ふりかえり")
                     .displayFont(.body)
@@ -116,7 +116,7 @@ extension ReviewView {
         .task(id: model.output.noteTrigger) {
             await model.refreshNotes()
         }
-        .sheet(item: Bindable(model.state).analysisShare) { share in
+        .sheet(item: Bindable(model.state).analysisShare.item) { share in
             shareSheet(share)
         }
         .backdrop()
@@ -154,10 +154,10 @@ private extension ReviewView {
                 previousName: model.output.period.previous.displayName,
                 unit: model.input.scale.unitName,
                 onOpenGoal: { item in
-                    model.state.analysisShare = model.output.goalShare(of: item)
+                    model.state.analysisShare.item = model.output.goalShare(of: item)
                 },
                 onOpenWhy: { row, why in
-                    model.state.analysisShare = model.output.whyShare(of: row, why: why)
+                    model.state.analysisShare.item = model.output.whyShare(of: row, why: why)
                 }
             )
             .task(id: model.output.period) {
@@ -187,7 +187,7 @@ private extension ReviewView {
                 move(by: -1, with: slide)
             },
             onOpenMonth: { month in
-                model.state.analysisShare = model.output.monthShare(of: month)
+                model.state.analysisShare.item = model.output.monthShare(of: month)
             }
         )
     }

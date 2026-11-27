@@ -206,9 +206,9 @@ extension ScreenFlowTests.Tabs {
     }
 
     func setToday(_ today: LocalDate) {
-        home.state.today = today
-        records.state.today = today
-        review.state.today = today
+        home.setToday(today)
+        records.setToday(today)
+        review.setToday(today)
         assets.setToday(today)
     }
 

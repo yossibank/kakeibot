@@ -33,7 +33,7 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
 
         await model.load()
-        model.state.filter.walletIds = [options.wallets[0].id]
+        model.state.fields.filter.walletIds = [options.wallets[0].id]
         let date = try #require(LocalDate("2026-10-14"))
 
         #expect(model.output.days.isEmpty)

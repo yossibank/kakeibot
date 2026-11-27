@@ -12,7 +12,7 @@ extension RecurringEditSheet {
 
         case .start:
             MonthCalendar(
-                selection: Bindable(model.state).schedule.startDate,
+                selection: Bindable(model.state).fields.schedule.startDate,
                 today: model.input.today
             )
 
@@ -106,7 +106,7 @@ private extension RecurringEditSheet {
             VStack(spacing: 8) {
                 HStack(spacing: 8) {
                     SettingsChoice("残高から自動", isSelected: model.output.usesAutoCount) {
-                        model.state.repayment.useAutoCount()
+                        model.state.useAutoCount()
                         model.prepareCount()
                     }
 
@@ -155,9 +155,9 @@ private extension RecurringEditSheet {
                 ForEach(HolidayShift.allCases, id: \.self) { shift in
                     SettingsChoice(
                         shift.title,
-                        isSelected: model.state.schedule.holidayShift == shift
+                        isSelected: model.state.fields.schedule.holidayShift == shift
                     ) {
-                        model.state.schedule.choose(shift)
+                        model.state.fields.schedule.choose(shift)
                         closePanel()
                     }
                 }
@@ -175,14 +175,14 @@ private extension RecurringEditSheet {
 
             SettingsChoice(
                 RecurringText.closingDay(nil),
-                isSelected: model.state.schedule.closingDay == nil
+                isSelected: model.state.fields.schedule.closingDay == nil
             ) {
-                model.state.schedule.closingDay = nil
+                model.state.fields.schedule.closingDay = nil
                 closePanel()
             }
 
             MonthStartDayGrid(selection: closingDaySelection) { day in
-                model.state.schedule.closingDay = day.day
+                model.state.fields.schedule.closingDay = day.day
                 closePanel()
             }
         }
@@ -194,9 +194,9 @@ private extension RecurringEditSheet {
             ForEach(RecurringEditModel.remindChoices, id: \.self) { days in
                 SettingsChoice(
                     RecurringText.remind(days),
-                    isSelected: model.state.schedule.remindDaysBefore == days
+                    isSelected: model.state.fields.schedule.remindDaysBefore == days
                 ) {
-                    model.state.schedule.remindDaysBefore = days
+                    model.state.fields.schedule.remindDaysBefore = days
                     closePanel()
                 }
             }
@@ -215,7 +215,7 @@ private extension RecurringEditSheet {
     )
 
     var closingDaySelection: MonthStartDay? {
-        model.state.schedule.closingDay.flatMap { MonthStartDay($0) }
+        model.state.fields.schedule.closingDay.flatMap { MonthStartDay($0) }
     }
 
     var isEndingToday: Bool {
@@ -224,7 +224,7 @@ private extension RecurringEditSheet {
 
     var endBinding: Binding<LocalDate> {
         Binding {
-            model.output.scheduledEndDate ?? model.state.schedule.startDate
+            model.output.scheduledEndDate ?? model.state.fields.schedule.startDate
         } set: { date in
             model.setEnd(date)
         }

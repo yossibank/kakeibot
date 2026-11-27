@@ -7,7 +7,7 @@ struct WidgetGuideModelTests {
     func startsFromQuickRecordOnHome() {
         let model = WidgetGuideModel()
 
-        #expect(model.state.place == .home)
+        #expect(model.state.fields.place == .home)
         #expect(model.state.sample == WidgetGuideSample(widget: .quickRecord, size: .medium))
         #expect(model.state.shownSample == nil)
     }
@@ -33,7 +33,7 @@ struct WidgetGuideModelTests {
         let model = WidgetGuideModel(place: .lockScreen, sample: budget)
 
         model.state.show(nil)
-        model.state.place = .home
+        model.state.fields.place = .home
         model.state.showChosenSample()
 
         #expect(model.state.sample == budget)

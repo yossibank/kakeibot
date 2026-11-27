@@ -12,7 +12,7 @@ extension RecordsView {
 
         case let .stamp(date):
             RecordsStampSheet(
-                isAdding: Bindable(model.state).screen.isAddingMark,
+                isAdding: Bindable(model.state).fields.isAddingMark,
                 date: date,
                 choices: model.output.stampChoices,
                 current: model.output.stampIcon(on: date),

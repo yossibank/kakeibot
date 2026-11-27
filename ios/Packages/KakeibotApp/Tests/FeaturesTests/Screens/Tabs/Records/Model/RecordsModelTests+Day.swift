@@ -91,18 +91,18 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let date = try #require(LocalDate("2026-08-03"))
         model.chooseLayout(.list)
-        model.state.isSearching = true
-        model.state.searchText = "ランチ"
-        model.state.filter = EntryFilter(categoryIds: [category])
+        model.state.fields.isSearching = true
+        model.state.fields.searchText = "ランチ"
+        model.state.fields.filter = EntryFilter(categoryIds: [category])
 
         model.open(date)
 
         #expect(model.state.month.description == "2026-08")
         #expect(model.output.shownDate == date)
         #expect(model.input.layout == .calendar)
-        #expect(!model.state.isSearching)
-        #expect(model.state.searchText.isEmpty)
-        #expect(model.state.filter == EntryFilter(categoryIds: [category]))
+        #expect(!model.state.fields.isSearching)
+        #expect(model.state.fields.searchText.isEmpty)
+        #expect(model.state.fields.filter == EntryFilter(categoryIds: [category]))
     }
 
     @Test
@@ -111,16 +111,16 @@ extension RecordsModelTests {
         let model = RecordsModel(parts: .system(setup.database), today: setup.today)
         let selected = try #require(LocalDate("2026-07-03"))
         model.state.move(months: -3)
-        model.state.selectedDate = selected
-        model.state.isSearching = true
-        model.state.searchText = "ランチ"
+        model.state.fields.selectedDate = selected
+        model.state.fields.isSearching = true
+        model.state.fields.searchText = "ランチ"
 
         model.openCurrentMonth()
 
         #expect(model.state.month.description == "2026-10")
         #expect(model.output.shownDate == setup.today)
-        #expect(!model.state.isSearching)
-        #expect(model.state.searchText.isEmpty)
+        #expect(!model.state.fields.isSearching)
+        #expect(model.state.fields.searchText.isEmpty)
     }
 
     @Test

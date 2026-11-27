@@ -61,11 +61,11 @@ public extension SettingsBoardModel {
 
         order.remove(at: from)
         order.insert(id, at: to)
-        state.movingOrder = order
+        state.setMovingOrder(order)
     }
 
     func cancelMoving() {
-        state.movingOrder = nil
+        state.setMovingOrder(nil)
     }
 
     func finishMoving() async {
@@ -80,12 +80,12 @@ public extension SettingsBoardModel {
             state.errorNotice.show(Self.saveFailedText, for: error)
         }
 
-        state.movingOrder = nil
+        state.setMovingOrder(nil)
     }
 
     @discardableResult
     func hide(_ id: Item.ID) async -> Bool {
-        state.movingOrder = nil
+        state.setMovingOrder(nil)
 
         do {
             try await saveHidden(id, isHidden: true)
@@ -111,7 +111,7 @@ public extension SettingsBoardModel {
 
     @discardableResult
     func delete(_ id: Item.ID) async -> Deletion? {
-        state.movingOrder = nil
+        state.setMovingOrder(nil)
 
         do {
             let deletion = try await remove(id)
@@ -132,7 +132,7 @@ public extension SettingsBoardModel {
 
     @discardableResult
     func deleteHidden() async -> SettingsBulkDelete {
-        state.movingOrder = nil
+        state.setMovingOrder(nil)
 
         let ids = output.hidden.map(\.id)
 

@@ -18,19 +18,13 @@ public extension WalletEditModel {
         public var name = ""
     }
 
-    struct Payment: ScreenEditable {
-        public var shown = Shown<PaymentStep>()
-
-        public internal(set) var addedWallet: Wallet?
-    }
-
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var fields = Fields()
         public var panel = Shown<Drawer>()
         public var openValuation = Shown<Valuation.ID>()
-        public var payment = Payment()
+        public var paymentStep = Shown<PaymentStep>()
 
         public private(set) var kind: Wallet.Kind
         public private(set) var calculator = AmountCalculator()
@@ -38,6 +32,7 @@ public extension WalletEditModel {
         public private(set) var isNegative: Bool
 
         public internal(set) var valuation = AmountCalculator()
+        public internal(set) var addedWallet: Wallet?
 
         public let errorNotice: ErrorNotice
         public let icon: SettingsIconEditorModel

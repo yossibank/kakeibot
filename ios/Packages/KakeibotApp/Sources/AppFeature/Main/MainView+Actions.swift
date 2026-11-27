@@ -36,15 +36,15 @@ extension MainView {
     }
 
     func openEntry(_ id: Entry.ID) {
-        model.state.sheet = .edit(id)
+        model.state.presented.show(.edit(id))
     }
 
     func openRecurring(_ id: Recurring.ID) {
-        model.state.sheet = .recurring(id)
+        model.state.presented.show(.recurring(id))
     }
 
     func openRecurrings() {
-        model.state.sheet = .periodRecurrings
+        model.state.presented.show(.periodRecurrings)
     }
 
     func showDay(_ date: LocalDate) {
@@ -87,7 +87,7 @@ extension MainView {
     }
 
     func openNews() {
-        model.state.sheet = .whatsNew(seenVersion: setup.output.seenNewsVersion)
+        model.state.presented.show(.whatsNew(seenVersion: setup.output.seenNewsVersion))
 
         setup.perform {
             await $0.markNewsSeen()
@@ -104,11 +104,11 @@ extension MainView {
 
     func useTemplate(_ template: EntryTemplate) {
         guard template.amount != nil else {
-            model.state.sheet = .template(template)
+            model.state.presented.show(.template(template))
             return
         }
 
-        model.state.sheet = nil
+        model.state.presented.closeAll()
 
         home.perform {
             await $0.record(template)

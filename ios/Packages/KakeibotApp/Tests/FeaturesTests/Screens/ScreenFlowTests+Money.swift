@@ -98,8 +98,8 @@ extension ScreenFlowTests {
         }
 
         editor.state.fields.memo = "家賃"
-        editor.state.schedule.day = 10
-        editor.state.schedule.startDate = start
+        editor.state.fields.schedule.day = 10
+        editor.state.fields.schedule.startDate = start
         let isSaved = await editor.save() != nil
         await tabs.wait {
             $0.amounts.allSatisfy { $0 == [78000, 78000] }

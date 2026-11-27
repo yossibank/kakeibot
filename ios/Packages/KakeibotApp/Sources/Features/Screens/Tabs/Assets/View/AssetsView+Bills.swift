@@ -12,15 +12,15 @@ extension AssetsView {
                 if model.output.billPages.count > 1 {
                     BillTabs(
                         pages: model.output.billPages,
-                        current: model.state.billPage
+                        current: model.state.fields.billPage
                     ) { index in
-                        model.state.billPage = index
+                        model.state.fields.billPage = index
                     }
                     .padding(.bottom, 12)
                 }
 
                 ResizingPager(
-                    current: Bindable(model.state).billPage,
+                    current: Bindable(model.state).fields.billPage,
                     pages: model.output.billPages,
                     id: \.month,
                     inset: Self.billInset
@@ -33,7 +33,7 @@ extension AssetsView {
         .padding(.horizontal, Self.billInset)
         .padding(.bottom, 16)
         .card()
-        .haptic(.selection, trigger: model.state.billPage)
+        .haptic(.selection, trigger: model.state.fields.billPage)
     }
 }
 

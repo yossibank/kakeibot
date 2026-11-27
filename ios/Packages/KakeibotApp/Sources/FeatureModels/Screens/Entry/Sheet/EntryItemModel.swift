@@ -59,12 +59,16 @@ public extension EntryItemModel {
         }
     }
 
-    @MainActor
-    @Observable
-    final class State {
+    struct Fields: ScreenEditable {
         public var draft = Draft()
         public var openIndex: Int?
         public var isSlipOpen: Bool
+    }
+
+    @MainActor
+    @Observable
+    final class State {
+        public var fields: Fields
         public var presented = Shown<Presented>()
 
         public internal(set) var scroll = ScreenOutcome<Int>()
@@ -75,7 +79,7 @@ public extension EntryItemModel {
             isSlipOpen: Bool,
             wait: ScreenWait
         ) {
-            self.isSlipOpen = isSlipOpen
+            self.fields = Fields(isSlipOpen: isSlipOpen)
             self.removed = UndoNotice(wait: wait)
         }
     }
@@ -83,7 +87,7 @@ public extension EntryItemModel {
 
 public extension EntryItemModel {
     func reset(for entry: EntryModel) {
-        state.draft = Draft(taxRate: entry.state.items.list.last?.taxRate)
+        state.fields.draft = Draft(taxRate: entry.state.items.list.last?.taxRate)
     }
 
     func edit(
@@ -94,11 +98,11 @@ public extension EntryItemModel {
             return
         }
 
-        state.draft = Draft(editing: entry.state.items.list[index], at: index)
+        state.fields.draft = Draft(editing: entry.state.items.list[index], at: index)
     }
 
     func add(to entry: EntryModel) {
-        let draft = state.draft
+        let draft = state.fields.draft
 
         entry.state.addItem(
             name: draft.trimmedName,
@@ -109,7 +113,7 @@ public extension EntryItemModel {
     }
 
     func update(in entry: EntryModel) {
-        let draft = state.draft
+        let draft = state.fields.draft
 
         guard let editing = draft.editing else {
             return
@@ -137,7 +141,7 @@ public extension EntryItemModel {
         _ removed: EntryModel.RemovedItem,
         in entry: EntryModel
     ) {
-        state.draft.shiftEditing(afterRestoring: removed.index)
+        state.fields.draft.shiftEditing(afterRestoring: removed.index)
         entry.state.restoreItem(removed)
     }
 

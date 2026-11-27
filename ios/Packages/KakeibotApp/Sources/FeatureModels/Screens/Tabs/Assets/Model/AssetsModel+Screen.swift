@@ -6,7 +6,7 @@ public extension AssetsModel {
         case unpaid([WalletRow])
     }
 
-    enum Sheet: Equatable {
+    enum Sheet: Equatable, Sendable {
         case reward
         case newGoal
         case newWallet(Wallet.Kind)
@@ -20,18 +20,17 @@ public extension AssetsModel {
         case recurring(Recurring.ID)
     }
 
-    struct GoalTarget: Equatable, Identifiable {
+    struct GoalTarget: Hashable, Identifiable, Sendable {
         public let goal: RewardGoal?
     }
 
-    enum RewardChild: Equatable {
+    enum RewardChild: Hashable, Sendable {
         case goal(GoalTarget)
         case rules
     }
 
     struct RewardSheet: Equatable {
         public internal(set) var isGuideOpen = false
-        public internal(set) var child: RewardChild?
     }
 }
 
@@ -55,45 +54,24 @@ public extension AssetsModel.Sheet {
 
 public extension AssetsModel.State {
     var goalTarget: AssetsModel.GoalTarget? {
-        get {
-            guard case let .goal(target) = reward.child else {
-                return nil
-            }
-
-            return target
-        }
-        set {
-            if let newValue {
-                reward.child = .goal(newValue)
-            } else if goalTarget != nil {
-                reward.child = nil
-            }
-        }
+        rewardChild.goal
     }
 
     var isEditingRules: Bool {
-        get {
-            reward.child == .rules
-        }
-        set {
-            if newValue {
-                reward.child = .rules
-            } else if isEditingRules {
-                reward.child = nil
-            }
-        }
+        rewardChild.isShowing(.rules)
     }
 
     func present(_ sheet: AssetsModel.Sheet) {
         if sheet == .reward {
             reward = AssetsModel.RewardSheet()
+            rewardChild.closeAll()
         }
 
-        self.sheet = sheet
+        presented.show(sheet)
     }
 
     func editGoal(_ goal: RewardGoal?) {
-        reward.child = .goal(AssetsModel.GoalTarget(goal: goal))
+        rewardChild.show(.goal(AssetsModel.GoalTarget(goal: goal)))
     }
 
     func toggleGuide() {
@@ -125,6 +103,25 @@ extension AssetsModel.Sheet: Identifiable {
         case .outlook: .outlook
         case let .entries(.moved(bill)): .moved(bill.id)
         case .entries(.unpaid): .unpaid
+        }
+    }
+}
+
+public extension Shown<AssetsModel.RewardChild> {
+    var goal: AssetsModel.GoalTarget? {
+        get {
+            guard case let .goal(target) = current else {
+                return nil
+            }
+
+            return target
+        }
+        set {
+            if let newValue {
+                show(.goal(newValue))
+            } else if goal != nil {
+                closeAll()
+            }
         }
     }
 }

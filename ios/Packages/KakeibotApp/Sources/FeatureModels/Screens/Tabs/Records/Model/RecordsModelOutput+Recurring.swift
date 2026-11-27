@@ -53,7 +53,7 @@ public extension RecordsModel.Output {
     func listRecurrings(on date: LocalDate) -> [Recurring] {
         guard
             filterTitle == nil,
-            !state.isSearching
+            !state.fields.isSearching
         else {
             return []
         }

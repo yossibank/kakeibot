@@ -30,12 +30,12 @@ public extension HomeModel.Output {
     }
 
     var billPage: Int {
-        BillPage.clamped(state.billPage, in: billPages)
+        BillPage.clamped(state.fields.billPage, in: billPages)
     }
 
     var templates: [EntryTemplate] {
         templatesCache.value {
-            let shown = input.allTemplates.filter { $0.type == state.templateType }
+            let shown = input.allTemplates.filter { $0.type == state.fields.templateType }
             let list = input.list.value
             return list?.ordered(shown, by: input.templateOrder, today: state.today) ?? shown
         }
