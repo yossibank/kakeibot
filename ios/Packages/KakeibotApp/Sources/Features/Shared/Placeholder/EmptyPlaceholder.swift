@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct PlaceholderEmpty<Action: View>: View {
+struct EmptyPlaceholder<Action: View>: View {
     let systemImage: String
     let text: String
     let detail: String?
@@ -47,7 +47,7 @@ struct PlaceholderEmpty<Action: View>: View {
     }
 }
 
-extension PlaceholderEmpty where Action == PrimaryButton? {
+extension EmptyPlaceholder where Action == PrimaryButton? {
     init(
         systemImage: String,
         text: String,
@@ -61,7 +61,7 @@ extension PlaceholderEmpty where Action == PrimaryButton? {
     }
 }
 
-private extension PlaceholderEmpty {
+private extension EmptyPlaceholder {
     static var verticalPadding: CGFloat {
         32
     }
@@ -69,11 +69,11 @@ private extension PlaceholderEmpty {
 
 #Preview {
     VStack(spacing: 0) {
-        PlaceholderEmpty(systemImage: "square.and.pencil", text: "まだ記録がありません", onRecord: {})
+        EmptyPlaceholder(systemImage: "square.and.pencil", text: "まだ記録がありません", onRecord: {})
 
-        PlaceholderEmpty(systemImage: "calendar", text: "この月の記録はありません", onRecord: nil)
+        EmptyPlaceholder(systemImage: "calendar", text: "この月の記録はありません", onRecord: nil)
 
-        PlaceholderEmpty(
+        EmptyPlaceholder(
             systemImage: "magnifyingglass",
             text: "「コーヒー」は見つかりませんでした",
             detail: "金額やメモの一部でも探せます"

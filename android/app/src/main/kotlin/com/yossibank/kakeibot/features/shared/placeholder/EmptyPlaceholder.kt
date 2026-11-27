@@ -18,7 +18,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
 @Composable
-fun PlaceholderEmpty(
+fun EmptyPlaceholder(
     icon: Int,
     text: String,
     modifier: Modifier = Modifier,

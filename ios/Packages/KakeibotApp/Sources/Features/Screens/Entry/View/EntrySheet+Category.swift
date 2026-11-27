@@ -182,7 +182,7 @@ private extension EntrySheet {
     func categoryCell(_ cell: EntryModel.CategoryCell) -> some View {
         switch cell {
         case let .category(category):
-            EntryCategoryCell(
+            EntryCategoryTile(
                 category: category,
                 icon: model.output.icon(for: category),
                 isSelected: model.state.category.id == category.id

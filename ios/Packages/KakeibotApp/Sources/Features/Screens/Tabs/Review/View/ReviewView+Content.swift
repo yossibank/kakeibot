@@ -93,7 +93,7 @@ private extension ReviewView {
         if !model.input.list.isLoaded {
             EmptyView()
         } else if isEmpty {
-            PlaceholderEmpty(
+            EmptyPlaceholder(
                 systemImage: "chart.pie",
                 text: "この期間の記録はありません",
                 onRecord: {

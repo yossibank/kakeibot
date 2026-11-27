@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct SettingsKeypadValue: View {
+struct SettingsKeypadAmount: View {
     let amount: Int
     let isAnimated: Bool
 
@@ -22,7 +22,7 @@ struct SettingsKeypadValue: View {
     }
 }
 
-private extension SettingsKeypadValue {
+private extension SettingsKeypadAmount {
     var animation: Animation? {
         isAnimated ? .snappy : nil
     }

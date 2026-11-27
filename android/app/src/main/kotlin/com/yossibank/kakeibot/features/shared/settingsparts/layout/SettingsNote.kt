@@ -11,7 +11,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
 @Composable
-fun SettingsCaption(
+fun SettingsNote(
     text: String,
     modifier: Modifier = Modifier,
 ) {

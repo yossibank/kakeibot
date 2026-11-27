@@ -336,6 +336,6 @@ private extension WidgetGuideStage {
         }
         .padding(8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 4)
+        .templateCardBackground(cornerRadius: Self.tileRadius, shadowRadius: 4)
     }
 }

@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct SettingsZoneBox: View {
+struct SettingsZoneCard: View {
     @State private var layout = Layout()
 
     @Environment(\.themeStyle.corner) private var corner
@@ -49,14 +49,14 @@ struct SettingsZoneBox: View {
     }
 }
 
-extension SettingsZoneBox {
+extension SettingsZoneCard {
     struct Caption {
         let systemImage: String
         let title: String
     }
 }
 
-private extension SettingsZoneBox {
+private extension SettingsZoneCard {
     struct Layout {
         var phase: OpenPhase = .closed
     }
@@ -68,7 +68,7 @@ private extension SettingsZoneBox {
     }
 }
 
-private extension SettingsZoneBox {
+private extension SettingsZoneCard {
     var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: corner.radius(16))
     }

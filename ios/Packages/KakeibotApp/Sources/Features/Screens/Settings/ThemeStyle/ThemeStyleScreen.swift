@@ -3,7 +3,7 @@ import DesignSystem
 import FeatureModels
 import SwiftUI
 
-struct ThemeStyleFrame<Preview: View, Content: View>: View {
+struct ThemeStyleScreen<Preview: View, Content: View>: View {
     @Environment(\.themeStyle) private var appStyle
 
     let title: String
@@ -60,7 +60,7 @@ struct ThemeStyleFrame<Preview: View, Content: View>: View {
     }
 }
 
-private extension ThemeStyleFrame {
+private extension ThemeStyleScreen {
     static var fade: CGFloat {
         16
     }

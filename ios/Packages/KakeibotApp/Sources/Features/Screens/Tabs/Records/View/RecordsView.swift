@@ -93,7 +93,7 @@ private extension RecordsView {
             if model.output.isMonthHiddenByFilter {
                 filteredEmpty
             } else if model.output.showsNoRecords {
-                PlaceholderEmpty(
+                EmptyPlaceholder(
                     systemImage: "calendar",
                     text: "この月の記録はありません",
                     onRecord: recordAction

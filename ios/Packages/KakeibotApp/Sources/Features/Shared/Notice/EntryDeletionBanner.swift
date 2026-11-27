@@ -11,7 +11,7 @@ struct EntryDeletionBanner: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            NoticeMark(systemImage: "trash", tone: .error)
+            NoticeBadge(systemImage: "trash", tone: .error)
 
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 4) {
@@ -99,7 +99,7 @@ private extension EntryDeletionBanner {
                 .fixedSize()
                 .padding(.horizontal, 16)
                 .frame(height: 34)
-                .goldFace()
+                .goldBackground()
         }
         .buttonStyle(.plain)
     }

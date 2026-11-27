@@ -81,7 +81,7 @@ private extension QuickRecordWidgetView {
     func header(of summary: QuickRecordWidgetSummary) -> some View {
         if let recorded = summary.recorded(at: entry.date) {
             HStack(spacing: 8) {
-                NoticeMark(systemImage: "checkmark", size: Self.badgeSize)
+                NoticeBadge(systemImage: "checkmark", size: Self.badgeSize)
 
                 Text("\(recorded.name) \(Yen.text(recorded.amount)) を記録しました")
                     .textFont(size: .caption)

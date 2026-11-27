@@ -142,7 +142,7 @@ extension WalletEditSheet {
             }
             .buttonStyle(.plain)
 
-            SettingsCaption(balanceHint)
+            SettingsNote(balanceHint)
                 .contentTransition(.opacity)
                 .animation(.snappy, value: model.state.kind)
         }
@@ -154,7 +154,7 @@ extension WalletEditSheet {
                 open(panel)
             }
 
-            SettingsCaption("値動きの分は、収入や支出に入れず、残高だけを合わせます。")
+            SettingsNote("値動きの分は、収入や支出に入れず、残高だけを合わせます。")
 
             if !model.input.valuations.isEmpty {
                 valuationHistory
@@ -182,7 +182,7 @@ extension WalletEditSheet {
                 }
             }
 
-            SettingsCaption("横に払うと消せます。\n消すと、前の評価額から数え直します。")
+            SettingsNote("横に払うと消せます。\n消すと、前の評価額から数え直します。")
         }
     }
 
@@ -228,7 +228,7 @@ extension WalletEditSheet {
                 onDone()
             } content: {
                 VStack(spacing: 12) {
-                    SettingsKeypadValue(amount ?? calculator.amount)
+                    SettingsKeypadAmount(amount ?? calculator.amount)
 
                     Keypad(calculator: calculator) {
                         onDone()

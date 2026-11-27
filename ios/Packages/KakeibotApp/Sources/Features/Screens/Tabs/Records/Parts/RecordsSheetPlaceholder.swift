@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct RecordsSheetEmpty: View {
+struct RecordsSheetPlaceholder: View {
     let systemImage: String
     let title: String
     let message: String

@@ -121,7 +121,7 @@ private extension SettingsIconEditor {
                 field: textField
             )
 
-            SettingsCaption("「外」「推し」のように、短い文字をアイコンにできます")
+            SettingsNote("「外」「推し」のように、短い文字をアイコンにできます")
         }
     }
 

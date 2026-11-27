@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct PlaceholderLoadFailed: View {
+struct LoadFailedPlaceholder: View {
     let onRetry: () -> Void
 
     var body: some View {
@@ -27,7 +27,7 @@ public extension View {
     ) -> some View {
         overlay {
             if isFailed {
-                PlaceholderLoadFailed(onRetry: onRetry)
+                LoadFailedPlaceholder(onRetry: onRetry)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background { Backdrop() }
             }

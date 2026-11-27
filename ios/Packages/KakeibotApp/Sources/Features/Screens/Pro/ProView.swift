@@ -77,7 +77,7 @@ private extension ProView {
                     )
                     .textFont(.subheadline, weight: .bold)
                     .frame(maxWidth: .infinity, minHeight: 48)
-                    .goldFace()
+                    .goldBackground()
                 }
                 .buttonStyle(.plain)
                 .opacity(opacity(of: .purchase))

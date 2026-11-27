@@ -65,10 +65,10 @@ import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintBut
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNote
 import com.yossibank.kakeibot.features.shared.settingsparts.input.SettingsSwitch
-import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsNote
 
 @Composable
 fun BudgetListView(
@@ -260,7 +260,7 @@ private fun Section(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            SettingsCaption(
+            SettingsNote(
                 text = title,
                 modifier = Modifier.weight(1f),
             )

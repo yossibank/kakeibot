@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct EntryCategoryCell: View {
+struct EntryCategoryTile: View {
     @State private var layout = Layout()
 
     let category: EntryCategory
@@ -36,22 +36,22 @@ struct EntryCategoryCell: View {
     }
 }
 
-private extension EntryCategoryCell {
+private extension EntryCategoryTile {
     struct Layout {
         var frame: CGRect = .zero
         var scale: CGFloat = 1
     }
 }
 
-private extension EntryCategoryCell {
+private extension EntryCategoryTile {
     static let menuPressDuration = 0.4
     static let pressedScale: CGFloat = 0.93
 }
 
-extension EntryCategoryCell: Equatable {
+extension EntryCategoryTile: Equatable {
     nonisolated static func == (
-        lhs: EntryCategoryCell,
-        rhs: EntryCategoryCell
+        lhs: EntryCategoryTile,
+        rhs: EntryCategoryTile
     ) -> Bool {
         lhs.category == rhs.category
             && lhs.icon == rhs.icon

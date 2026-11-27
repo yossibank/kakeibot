@@ -30,7 +30,7 @@ public struct PrimaryButton: View {
             .minimumScaleFactor(0.8)
             .padding(.horizontal, 16)
             .frame(maxWidth: .infinity, minHeight: 56)
-            .goldFace()
+            .goldBackground()
         }
         .buttonStyle(.plain)
     }

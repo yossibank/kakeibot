@@ -90,8 +90,8 @@ Android は、次の技術を使う。
 | 下からの引き出し・取り消しの通知 | `designsystem/components/modal/` の `BottomDrawer`・`UndoNotice` |
 | 下からせり上がる全画面の層 | `designsystem/components/modal/` の `SheetLayer`。閉じる動きの間は、最後の中身を出す |
 | 失敗の知らせ | `designsystem/components/notice/` の `NoticeBanner`。タブの画面は、題のすぐ下に出す |
-| 読めなかった時の表示 | `features/shared/placeholder/` の `PlaceholderLoadFailed`。記録・振り返り・資産は、`TabScreen` の `LoadFailedColumn` で画面の全体に出す |
-| 記録が無い時の表示 | `features/shared/placeholder/` の `PlaceholderEmpty`。記録するボタンを付けられる |
+| 読めなかった時の表示 | `features/shared/placeholder/` の `LoadFailedPlaceholder`。記録・振り返り・資産は、`TabScreen` の `LoadFailedColumn` で画面の全体に出す |
+| 記録が無い時の表示 | `features/shared/placeholder/` の `EmptyPlaceholder`。記録するボタンを付けられる |
 | 振替の経路 | `designsystem/components/entry/` の `EntryRoute`。記録の行が、タグの札と一緒に出す |
 | 記録の行のメモ | `designsystem/components/entry/` の `EntryMemo`。左に線を引き、2 行を超えると押して開く |
 | 横に収まらない時に並べ替える | `designsystem/components/layout/` の `HorizontalFit`。iOS の `ViewThatFits` に当たる |

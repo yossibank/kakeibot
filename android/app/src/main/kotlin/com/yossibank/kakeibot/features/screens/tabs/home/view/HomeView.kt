@@ -48,8 +48,8 @@ import com.yossibank.kakeibot.featuremodels.screens.tabs.home.model.HomeModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.features.shared.entrylist.EntryItemRow
-import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderEmpty
-import com.yossibank.kakeibot.features.shared.placeholder.PlaceholderLoadFailed
+import com.yossibank.kakeibot.features.shared.placeholder.EmptyPlaceholder
+import com.yossibank.kakeibot.features.shared.placeholder.LoadFailedPlaceholder
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
 import com.yossibank.kakeibot.features.shared.tab.TabScreen
 import com.yossibank.kakeibot.features.shared.tab.rememberTabModel
@@ -353,11 +353,11 @@ private fun RecentCard(
         )
 
         if (model.input.overview.isFailed) {
-            return@Column PlaceholderLoadFailed(onRetry = model::retry)
+            return@Column LoadFailedPlaceholder(onRetry = model::retry)
         }
 
         if (model.output.showsNoRecords) {
-            PlaceholderEmpty(
+            EmptyPlaceholder(
                 icon = R.drawable.ic_edit,
                 text = "まだ記録がありません",
                 onRecord = onAddEntry,

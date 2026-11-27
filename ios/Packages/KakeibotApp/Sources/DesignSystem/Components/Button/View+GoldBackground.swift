@@ -1,12 +1,12 @@
 import SwiftUI
 
 public extension View {
-    func goldFace() -> some View {
-        modifier(GoldFace())
+    func goldBackground() -> some View {
+        modifier(GoldBackground())
     }
 }
 
-private struct GoldFace: ViewModifier {
+private struct GoldBackground: ViewModifier {
     @Environment(\.isEnabled) private var isEnabled
 
     func body(content: Content) -> some View {
@@ -24,7 +24,7 @@ private struct GoldFace: ViewModifier {
     }
 }
 
-private extension GoldFace {
+private extension GoldBackground {
     @ViewBuilder
     var face: some View {
         if isEnabled {
@@ -41,7 +41,7 @@ private extension GoldFace {
     }
 }
 
-private extension GoldFace {
+private extension GoldBackground {
     static var gold: LinearGradient {
         LinearGradient(
             colors: [

@@ -11,7 +11,7 @@ struct StampTileFace: View {
 
         IconBadge(icon, size: 44)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .settingsTileFace(isHidden: isHidden)
+            .settingsTileBackground(isHidden: isHidden)
             .opacity(opacity)
     }
 }

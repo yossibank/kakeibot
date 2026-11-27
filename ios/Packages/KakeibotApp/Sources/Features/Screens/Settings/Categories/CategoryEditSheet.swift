@@ -196,7 +196,7 @@ private extension CategoryEditSheet {
             }
 
             if model.state.fields.tags.count > 1 {
-                SettingsCaption("長押しで並べ替えられます")
+                SettingsNote("長押しで並べ替えられます")
             }
         }
     }

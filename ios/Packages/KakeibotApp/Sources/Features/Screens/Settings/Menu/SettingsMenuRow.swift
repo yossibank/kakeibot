@@ -49,7 +49,7 @@ struct SettingsMenuRow<Accessory: View>: View {
     }
 }
 
-struct SettingsMenuRowValue: View {
+struct SettingsMenuRowText: View {
     let value: String
     let shortValue: String?
 

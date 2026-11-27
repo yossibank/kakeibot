@@ -105,7 +105,7 @@ private extension RewardRuleEditSheet {
                     }
                 }
 
-                SettingsCaption("達成した日に、この金額を貯金箱に貯めます。")
+                SettingsNote("達成した日に、この金額を貯金箱に貯めます。")
             }
         } save: {
             saveButton

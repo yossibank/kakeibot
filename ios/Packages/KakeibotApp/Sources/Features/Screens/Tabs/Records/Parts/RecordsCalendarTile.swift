@@ -2,7 +2,7 @@ import Core
 import DesignSystem
 import SwiftUI
 
-struct RecordsCalendarCell: View {
+struct RecordsCalendarTile: View {
     @Environment(\.themeStyle.corner) private var corner
 
     let day: Int
@@ -40,7 +40,7 @@ struct RecordsCalendarCell: View {
     }
 }
 
-private extension RecordsCalendarCell {
+private extension RecordsCalendarTile {
     var dayNumber: some View {
         Text(String(day))
             .displayFont(.body)
@@ -121,7 +121,7 @@ private extension RecordsCalendarCell {
     }
 }
 
-private extension RecordsCalendarCell {
+private extension RecordsCalendarTile {
     static let markLineHeight: CGFloat = 14
     static let heatFloor = 0.05
     static let heatRange = 0.3
@@ -147,10 +147,10 @@ private extension RecordsCalendarCell {
     }
 }
 
-extension RecordsCalendarCell: Equatable {
+extension RecordsCalendarTile: Equatable {
     nonisolated static func == (
-        lhs: RecordsCalendarCell,
-        rhs: RecordsCalendarCell
+        lhs: RecordsCalendarTile,
+        rhs: RecordsCalendarTile
     ) -> Bool {
         lhs.day == rhs.day
             && lhs.dayColor == rhs.dayColor

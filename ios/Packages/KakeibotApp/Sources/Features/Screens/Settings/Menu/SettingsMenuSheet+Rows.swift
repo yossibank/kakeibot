@@ -49,8 +49,8 @@ extension SettingsMenuSheet {
         shortValue: String? = nil,
         tint: Color? = nil,
         trailingImage: String = "chevron.right"
-    ) -> SettingsMenuRow<SettingsMenuRowValue?> {
-        let accessory = value.map { SettingsMenuRowValue(value: $0, shortValue: shortValue) }
+    ) -> SettingsMenuRow<SettingsMenuRowText?> {
+        let accessory = value.map { SettingsMenuRowText(value: $0, shortValue: shortValue) }
 
         return SettingsMenuRow(
             title,

@@ -68,10 +68,10 @@ import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.shared.model.EditSheet
 import com.yossibank.kakeibot.features.shared.settingsparts.input.ChoiceChip
-import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsNote
 
 @Composable
 fun TemplateEditSheet(
@@ -149,16 +149,16 @@ private fun TemplateEditContent(
             onDone = onDone,
         )
 
-        SettingsCaption(text = "金額を空にすると、使うときに入れられます。")
+        SettingsNote(text = "金額を空にすると、使うときに入れられます。")
 
-        SettingsCaption(text = "カテゴリ")
+        SettingsNote(text = "カテゴリ")
 
         CategoryGrid(model = model)
 
         val tags = model.output.tags
 
         if (tags.isNotEmpty()) {
-            SettingsCaption(text = "タグ")
+            SettingsNote(text = "タグ")
 
             TagLine(
                 tags = tags.map { TagLineItem(id = it.id, name = it.name) },
@@ -167,7 +167,7 @@ private fun TemplateEditContent(
             )
         }
 
-        SettingsCaption(text = model.output.walletTitle)
+        SettingsNote(text = model.output.walletTitle)
 
         WalletGrid(model = model)
 
@@ -288,7 +288,7 @@ private fun WalletGrid(model: TemplateEditModel) {
 
 @Composable
 private fun BillShiftChooser(model: TemplateEditModel) {
-    SettingsCaption(text = "請求")
+    SettingsNote(text = "請求")
 
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Recurring.billShiftTitles.forEachIndexed { index, title ->
@@ -300,7 +300,7 @@ private fun BillShiftChooser(model: TemplateEditModel) {
         }
     }
 
-    SettingsCaption(
+    SettingsNote(
         text = billNotes[model.state.fields.form.billShift.coerceIn(billNotes.indices)],
     )
 }

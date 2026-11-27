@@ -35,10 +35,10 @@ import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsHintBut
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroCard
 import com.yossibank.kakeibot.features.shared.settingsparts.hint.SettingsIntroNote
 import com.yossibank.kakeibot.features.shared.settingsparts.input.SettingsRow
-import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsNote
 import kotlinx.coroutines.CancellationException
 
 @Composable
@@ -175,7 +175,7 @@ private fun SettingsMenuPage(
 
 @Composable
 private fun SettingsMenuList(model: SettingsMenuModel) {
-    SettingsCaption(text = "予算と期間")
+    SettingsNote(text = "予算と期間")
 
     Column(
         modifier = Modifier

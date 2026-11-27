@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct SettingsHideTarget: View {
+struct SettingsHideZone: View {
     @Binding var zones: SettingsDropZones
 
     let isArmed: Bool
@@ -11,7 +11,7 @@ struct SettingsHideTarget: View {
             .frame(maxWidth: .infinity)
             .frame(height: SettingsDropZones.hideHeight)
             .overlay(alignment: .bottom) {
-                SettingsZoneBox(
+                SettingsZoneCard(
                     isOn: isArmed,
                     closedHeight: SettingsDropZones.hideHeight,
                     tint: Palette.rose,

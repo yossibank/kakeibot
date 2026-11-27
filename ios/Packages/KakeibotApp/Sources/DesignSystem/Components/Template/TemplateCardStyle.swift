@@ -32,7 +32,7 @@ enum TemplateCardStyle {
     }
 }
 
-private struct TemplateCardFace: ViewModifier {
+private struct TemplateCardBackground: ViewModifier {
     @Environment(\.themeStyle.corner) private var corner
 
     let cornerRadius: CGFloat
@@ -70,12 +70,12 @@ private struct TemplateCardFace: ViewModifier {
 }
 
 public extension View {
-    func templateCardFace(
+    func templateCardBackground(
         cornerRadius: CGFloat,
         shadowRadius: CGFloat
     ) -> some View {
         modifier(
-            TemplateCardFace(
+            TemplateCardBackground(
                 cornerRadius: cornerRadius,
                 shadowRadius: shadowRadius
             )

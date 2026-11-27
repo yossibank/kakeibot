@@ -105,7 +105,7 @@ private extension HomeCustomizeCard {
         }
         .padding(12)
         .frame(width: Self.tileSize.width, height: Self.tileSize.height, alignment: .leading)
-        .templateCardFace(cornerRadius: Self.cornerRadius, shadowRadius: 12)
+        .templateCardBackground(cornerRadius: Self.cornerRadius, shadowRadius: 12)
         .overlay {
             RoundedRectangle(cornerRadius: themeStyle.corner.radius(Self.cornerRadius))
                 .strokeBorder(Palette.accentStrong, lineWidth: 1.6)

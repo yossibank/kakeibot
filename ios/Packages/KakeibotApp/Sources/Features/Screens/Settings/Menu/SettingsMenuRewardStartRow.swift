@@ -17,7 +17,7 @@ struct SettingsMenuRewardStartRow: View {
                     systemImage: "gift",
                     tint: nil,
                     trailingImage: "chevron.right",
-                    accessory: SettingsMenuRowValue?.none
+                    accessory: SettingsMenuRowText?.none
                 )
             }
         }

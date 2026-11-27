@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct NoticeMark: View {
+public struct NoticeBadge: View {
     let systemImage: String
     let tone: NoticeBanner.Tone
     let size: CGFloat

@@ -40,7 +40,7 @@ extension RecurringEditSheet {
 private extension RecurringEditSheet {
     var amountKeypad: some View {
         VStack(spacing: 12) {
-            SettingsKeypadValue(model.output.amount)
+            SettingsKeypadAmount(model.output.amount)
 
             Keypad(calculator: model.state.submodels.amount) {
                 closePanel()
@@ -52,7 +52,7 @@ private extension RecurringEditSheet {
 
     var feeKeypad: some View {
         VStack(spacing: 12) {
-            SettingsKeypadValue(model.output.fee)
+            SettingsKeypadAmount(model.output.fee)
 
             FeeChoiceRow(
                 choices: FeeChoiceRow.defaultChoices,

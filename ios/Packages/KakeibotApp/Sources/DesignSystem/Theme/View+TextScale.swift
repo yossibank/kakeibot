@@ -3,11 +3,11 @@ import SwiftUI
 
 public extension View {
     func sharesTextScale(id: some Equatable) -> some View {
-        modifier(SharesTextScale(id: id))
+        modifier(TextScaleGroup(id: id))
     }
 
     func sharedTextScale(floor: Double = TextScale.floor) -> some View {
-        modifier(SharedTextScale(floor: floor))
+        modifier(TextScaleMember(floor: floor))
     }
 }
 
@@ -29,7 +29,7 @@ private struct TextScaleKey: PreferenceKey {
     }
 }
 
-private struct SharesTextScale<ID: Equatable>: ViewModifier {
+private struct TextScaleGroup<ID: Equatable>: ViewModifier {
     @State private var scale = 1.0
     @State private var epoch = 0
 
@@ -56,14 +56,14 @@ private struct SharesTextScale<ID: Equatable>: ViewModifier {
     }
 }
 
-private extension SharesTextScale {
+private extension TextScaleGroup {
     func reset() {
         scale = 1
         epoch += 1
     }
 }
 
-private struct SharedTextScale: ViewModifier {
+private struct TextScaleMember: ViewModifier {
     @State private var available: CGFloat = .infinity
     @State private var needed: CGFloat = 0
 

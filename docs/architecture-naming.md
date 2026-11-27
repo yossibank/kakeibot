@@ -94,10 +94,16 @@
 
 部品と値の型は、役割に合う語尾で終える。新しい型は、次の表から選ぶ。
 
+表は、見た目の部品に当てる。`View`・`ViewModifier`・`Layout`・`Shape`・`*Style` に従う型である。次の型は、表の外にある。
+
+- モデルの値の型。意味で名付ける（`PendingDay`・`RefreshGate`）。
+- 部品に入れ子にしたデータの型（`Field`・`Row`）。
+- 1 つだけの UI の名詞を名前にした部品（`Keypad`・`Chart`・`Gauge`・`Ring`）。
+
 | 語尾 | 役割 | 例 |
 | --- | --- | --- |
 | `View` | 押し込んで開く画面の本体 | `BudgetListView` |
-| `Screen` | 同じ種類の画面で使う外枠。中身は画面から受け取る | `SettingsBoardScreen` |
+| `Screen` | 同じ種類の画面で使う外枠。中身は画面から受け取る | `SettingsBoardScreen`・`ThemeStyleScreen` |
 | `Page` | 同じ種類の画面の全体。状態を持ち、画面ごとの設定を受け取る | `SettingsBoardPage` |
 | `Spec` | 同じ種類の画面で変わる所を書くプロトコル | `SettingsBoardSpec` |
 | `Board` | 設定の一覧の画面ごとの `Spec` の型。`<単数>Board`。`SettingsParts` の並びの部品（`SettingsTileBoard`・`SettingsRowBoard`）は除く | `StampBoard` |
@@ -106,17 +112,59 @@
 | `Card` | 面を持つ 1 かたまり | `StampTallyCard` |
 | `RowCard` | 面を持つ横長の 1 件 | `WalletRowCard` |
 | `IntroCard` | 画面の上の説明カード。中身の値は `IntroContent` | `SyncIntroCard` |
-| `Tile` | 格子に並べる 1 枚 | `SettingsCategoryTile` |
+| `Tile` | 格子に並べる 1 枚。`Cell` は使わない | `SettingsCategoryTile`・`EntryCategoryTile` |
+| `Face` | タイルの面の見た目だけの部品。押す動きは、包む `Tile` が持つ | `CategoryTileFace`・`EntryCategoryFace` |
 | `Row` | 一覧の 1 行 | `SettingsMenuRow` |
+| `Line` | 一覧の外で、横に並べた 1 段。一覧の 1 行は `Row` にする | `TagLine`・`RecordsFilterLine` |
+| `List` | 同じ形の行を縦に並べる入れ物 | `SettingsRowList`・`SetupList` |
+| `Grid` | 格子に並べる入れ物 | `SettingsTileGrid`・`MonthStartDayGrid` |
+| `Section` | 見出しと中身をまとめた 1 区切り | `SettingsFormSection`・`SettingsPreviewSection` |
+| `Header` | 画面かカードの上の段。題と操作を並べる | `SheetHeader`・`SettingsBackHeader` |
+| `Title` | 見出しの文字だけの部品 | `SectionTitle`・`SheetTitle` |
+| `Panel` | 入力か選択肢をまとめた板 | `MenuPanel`・`EntryTransferPanel` |
+| `Bar` | 横長の帯か棒。タブの帯と、割合の棒に使う | `FloatingTabBar`・`BudgetUsageBar` |
+| `Button` | 押して 1 つの操作をする部品 | `PrimaryButton`・`ChipButton` |
+| `Label` | ボタンの中身の見た目。押す動きは持たない | `ChipLabel`・`NoticeActionLabel` |
+| `Menu` | 押すと出る選択肢の並び | `EntryCategoryMenu`・`RecordsMarkMenu` |
+| `Switch` | 2 つの状態を切り替える部品 | `GoldSwitch`・`EntryTypeSwitch` |
+| `Picker` | 選択肢から 1 つを選ぶ部品 | `CapsulePicker`・`SettingsBillShiftPicker` |
+| `Field` | 文字を打ち込む欄 | `SearchField`・`SettingsField` |
+| `Text` | 値か文を文字で出す部品 | `AmountText`・`ReviewEmphasisText` |
+| `Amount` | 金額を大きく出す部品 | `TemplateCardAmount`・`SettingsKeypadAmount` |
+| `Mark` | 地を持たない小さな記号。状態か種類を示す | `SelectionMark`・`BillMark` |
+| `Badge` | 小さな地か枠に、記号か短い文字を 1 つ載せる | `IconBadge`・`NoticeBadge` |
+| `Chip` | 記号と文字を横に並べた小さな札 | `AssetsDebtChip`・`ReviewReportChip` |
+| `Seal` | スタンプの印。形はテーマで変わる | `IconSeal` |
+| `Placeholder` | 中身が無い時と、読めなかった時に代わりに出す部品 | `EmptyPlaceholder`・`LoadFailedPlaceholder` |
+| `Zone` | ドラッグした物を置く場所の部品 | `SettingsShowZone`・`SettingsHideZone` |
+| `Frame` | 部品の後ろに敷く縁と塗り | `SettingsZoneFrame` |
+| `Backdrop` | 後ろに敷く背景の模様 | `Backdrop`・`ThemeStyleBackdrop` |
+| `Reader` | 寸法か操作の口を、中身の関数に渡す入れ物 | `FloatingInputReader`・`PageSlideReader` |
+| `Slot` | 場所だけを受け持つ入れ物。空けておくか、中身を別の `body` で描く | `SheetHeaderSlot`・`EntryLiveSlot` |
+| `Signal` | 見えない部品。値の変化を見て、処理を呼ぶ | `MainLoadSignal`・`MainOutcomeSignal` |
+| `Art` | 機能を見せる絵。絵の部品は頭を `FeatureArt` にそろえる | `FeatureArt`・`EntryReceiptArt` |
 | `Drawer` | 画面の下から出す引き出しと、それを重ねるモディファイア | `SettingsDrawer`・`BudgetKeypadDrawer` |
-| `Layer` | 画面に層を重ねるモディファイア | `SettingsLiftLayer` |
+| `Layer` | 画面に層を重ねるモディファイア | `SettingsLiftLayer`・`ProOfferLayer` |
+| `Background` | 部品の下に面と縁を敷くモディファイア | `CardBackground`・`GoldBackground` |
+| `Font` | 字体を当てるモディファイア | `SansFont`・`RoleFont` |
+| `Layout` | SwiftUI の `Layout` に従う並べ方の型 | `TwoColumnLayout` |
+| `Shape` | SwiftUI の `Shape` に従う型。描く物の名前（`Arc`・`Corners`）で終えてもよい | `EntryReceiptShape` |
+| `Style` | `ButtonStyle` と `LabelStyle` に従う型 | `PressStyle`・`PromiseLabelStyle` |
 | `Preview` | 設定の値を当てた見本 | `ThemePreview`・`HomeSectionPreview` |
 | `Choice` | 選ぶ値 | `AppIconChoice`・`SyncChoice` |
 | `Option` | 画面ごとの選択肢 1 件の部品 | `LaunchScreenOption` |
 | `Banner` | 画面の端に重ねて出す帯と、それを出すモディファイア | `NoticeBanner` |
 | `Notice` | 知らせの値とモデル | `ErrorNotice` |
-| `Note` | 部品に添える短い注記 | `SettingsEmptyNote` |
+| `Note` | 部品に添える短い注記。`Caption` は使わない | `SettingsEmptyNote`・`SettingsNote` |
 | `Scene` | お知らせの使い方のコマ | `WhatsNewScene` |
+
+似た語は、次のとおりに使い分ける。
+
+- `Mark` は記号だけを描く。地か枠を持つと `Badge`、文字も並べると `Chip` にする。
+- `Face` は面の見た目の部品だけに使う。面を敷くモディファイアは `Background` にする。
+- `Value` は値の型だけに使う。文字を出す部品は `Text`、金額は `Amount` にする。
+- 形容詞（`Empty`・`Failed`）で終えず、名詞の語尾（`Placeholder`）にする。
+- モディファイアは `Modifier` で終えず、重ねる物か足す働きの語で終える。
 
 表から外れたまま残している型もある。`SettingsChoice` は値でなく、選ぶ 1 件の部品である。`EntryVoiceNotice` も値でなく、取り消しの付いた知らせの部品である。
 

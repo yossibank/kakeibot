@@ -1,7 +1,7 @@
 import DesignSystem
 import SwiftUI
 
-struct SettingsCaption: View {
+struct SettingsNote: View {
     let text: String
     let kind: Kind
 
@@ -23,14 +23,14 @@ struct SettingsCaption: View {
     }
 }
 
-extension SettingsCaption {
+extension SettingsNote {
     enum Kind {
         case info
         case caution
     }
 }
 
-private extension SettingsCaption {
+private extension SettingsNote {
     var systemImage: String {
         switch kind {
         case .info: "info.circle"

@@ -23,7 +23,7 @@ import com.yossibank.kakeibot.designsystem.theme.Palette
 import com.yossibank.kakeibot.designsystem.theme.textFont
 
 @Composable
-fun PlaceholderLoadFailed(
+fun LoadFailedPlaceholder(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -78,7 +78,7 @@ fun LoadFailedColumn(
     ) {
         if (isFailed) {
             item(key = "loadFailed") {
-                PlaceholderLoadFailed(
+                LoadFailedPlaceholder(
                     onRetry = onRetry,
                     modifier = Modifier.fillParentMaxHeight(),
                 )

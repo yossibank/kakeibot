@@ -23,7 +23,7 @@ extension SyncView {
             .card()
             .disabled(isSharingLocked)
 
-            SettingsCaption("同期のオン・オフに関係なく、口座ごとに共有できます。")
+            SettingsNote("同期のオン・オフに関係なく、口座ごとに共有できます。")
 
             steps
         }
@@ -48,7 +48,7 @@ extension SyncView {
             .card()
             .disabled(isSharingLocked)
 
-            SettingsCaption("抜けると、この \(DeviceName.current) からその口座と記録が消えます。", kind: .caution)
+            SettingsNote("抜けると、この \(DeviceName.current) からその口座と記録が消えます。", kind: .caution)
         }
     }
 }
@@ -141,7 +141,7 @@ private extension SyncView {
                 .textFont(.footnote, weight: .bold)
                 .padding(.horizontal, 16)
                 .frame(minHeight: 32)
-                .goldFace()
+                .goldBackground()
             }
         }
         .opacity(isWorking ? 0 : 1)

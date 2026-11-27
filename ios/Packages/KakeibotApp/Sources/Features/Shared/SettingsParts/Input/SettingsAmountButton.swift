@@ -49,7 +49,7 @@ private extension SettingsAmountButton {
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
         } else {
-            SettingsKeypadValue(amount, isAnimated: false)
+            SettingsKeypadAmount(amount, isAnimated: false)
         }
     }
 }
