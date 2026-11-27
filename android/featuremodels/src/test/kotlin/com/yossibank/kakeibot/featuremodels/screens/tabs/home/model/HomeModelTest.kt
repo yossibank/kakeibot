@@ -31,9 +31,9 @@ class HomeModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
 
-        assertEquals("記録を読めませんでした", model.state.errorNotice.message)
+        assertEquals("記録を読めませんでした", model.state.notices.error.message)
         assertNull(model.input.overview.value)
     }
 
@@ -49,7 +49,7 @@ class HomeModelTest {
 
         setup.scope.launch { model.observe() }
         ModelWait.until { model.input.overview.isFailed }
-        val message = model.state.errorNotice.message
+        val message = model.state.notices.error.message
         val overview = model.input.overview.value
         model.retry()
         ModelWait.until { model.input.overview.isLoaded }
@@ -63,7 +63,7 @@ class HomeModelTest {
     fun showsNoNoticeWhileListArrives() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.observedModel()
 
-        assertEquals("", model.state.errorNotice.message)
+        assertEquals("", model.state.notices.error.message)
     }
 
     @Test
@@ -137,7 +137,7 @@ class HomeModelTest {
         setup.save(Entry.Kind.expense, amount = 300, on = date("2026-11-01"))
         val model = setup.observedModel()
 
-        model.state.today = date("2026-11-01")
+        model.input.today = date("2026-11-01")
         ModelWait.until { model.output.month.toString() == "2026-11" }
 
         assertEquals("11/1〜11/30", model.output.periodText)
@@ -197,7 +197,7 @@ class HomeModelTest {
         setup.save(Entry.Kind.expense, amount = 101, daysAgo = 1)
         val model = setup.observedModel()
 
-        model.state.today = date("2026-10-13")
+        model.input.today = date("2026-10-13")
         ModelWait.until { model.output.recentRows.first().detail == "昨日・財布" }
 
         assertEquals(

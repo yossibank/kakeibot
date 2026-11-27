@@ -6,6 +6,7 @@ public extension HomeModel {
     @MainActor
     @Observable
     final class Input {
+        public internal(set) var today: LocalDate
         public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var templateOrder: TemplateOrder = .manual
         public internal(set) var syncStatus = SyncStatus.off
@@ -18,5 +19,9 @@ public extension HomeModel {
         var homeSections = HomeSection.standard
         var homeHiddenSections: Set<HomeSection> = []
         var stampBook: StampBook?
+
+        init(today: LocalDate) {
+            self.today = today
+        }
     }
 }

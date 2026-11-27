@@ -80,7 +80,7 @@ fun HomeView(
             )
         }
 
-        noticeBanner(notice = model.state.errorNotice)
+        noticeBanner(notice = model.state.notices.error)
 
         item(key = "budget") {
             BudgetCard(

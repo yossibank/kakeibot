@@ -148,7 +148,7 @@ private extension HomeRecurringSheet {
                 .fill(Palette.accent.opacity(.muted))
                 .frame(height: 1)
 
-            Text("今日 \(model.state.today.monthDayText)")
+            Text("今日 \(model.input.today.monthDayText)")
                 .textFont(.caption2)
                 .tracking(1)
                 .foregroundStyle(Palette.accent)
@@ -259,7 +259,7 @@ private extension HomeRecurringSheet {
                 .foregroundStyle(Palette.subtext)
 
         case .upcoming:
-            Text(BillText.days(until: item.date, today: model.state.today))
+            Text(BillText.days(until: item.date, today: model.input.today))
                 .textFont(.caption2)
                 .foregroundStyle(Palette.accent)
 
@@ -277,7 +277,7 @@ private extension HomeRecurringSheet {
     }
 
     var todayIndex: Int {
-        items.firstIndex { $0.date > model.state.today } ?? items.count
+        items.firstIndex { $0.date > model.input.today } ?? items.count
     }
 
     static func opacity(of status: PeriodRecurring.Status) -> Double {

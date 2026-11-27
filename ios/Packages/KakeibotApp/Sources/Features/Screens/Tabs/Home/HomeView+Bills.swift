@@ -58,7 +58,7 @@ private extension HomeView {
                         bill,
                         title: model.output.title(of: bill.recurring),
                         source: model.output.walletName(of: bill.recurring),
-                        today: model.state.today,
+                        today: model.input.today,
                         style: .compact
                     )
                 }

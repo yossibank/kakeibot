@@ -25,7 +25,7 @@ public extension HomeModel {
             input.list = try await .loaded(dependencies.database.entryList())
             input.recurrings = try await dependencies.database.recurrings()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -33,7 +33,7 @@ public extension HomeModel {
         do {
             input.templateOrder = try await dependencies.database.setting(.templateOrder)
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -43,7 +43,7 @@ public extension HomeModel {
         do {
             try await dependencies.database.setSetting(.templateOrder, to: order)
         } catch {
-            state.errorNotice.show(Self.orderSaveFailedMessage, for: error)
+            state.notices.error.show(Self.orderSaveFailedMessage, for: error)
         }
     }
 
@@ -58,7 +58,7 @@ public extension HomeModel {
             try await dependencies.database.setSetting(.homeSections, to: layout.order)
             try await dependencies.database.setSetting(.homeHiddenSections, to: layout.hidden)
         } catch {
-            state.errorNotice.show(Self.layoutSaveFailedMessage, for: error)
+            state.notices.error.show(Self.layoutSaveFailedMessage, for: error)
         }
     }
 
@@ -70,7 +70,7 @@ public extension HomeModel {
                 at: dependencies.clock.now
             )
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -79,7 +79,7 @@ public extension HomeModel {
         do {
             let recordable = try await dependencies.database.entryDraft(
                 for: template,
-                on: state.today
+                on: input.today
             )
 
             guard let draft = recordable else {
@@ -102,7 +102,7 @@ public extension HomeModel {
 
             return change
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
             return nil
         }
     }
@@ -176,7 +176,7 @@ private extension HomeModel {
             input.homeSections = try await dependencies.database.setting(.homeSections)
             input.homeHiddenSections = try await dependencies.database.setting(.homeHiddenSections)
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 

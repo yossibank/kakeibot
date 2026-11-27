@@ -242,6 +242,7 @@ app-review-request.*	AppReviewRequestTests/*		未移植	レビューのお願い
 foreground-return.detects-foreground-after-inactive	ForegroundReturnTests/detectsForegroundAfterInactive	ForegroundReturnTest/detectsForegroundAfterInactive	対応	
 home.opens-picked-day-after-closing-stamp-sheet	HomeModelTests/opensPickedDayAfterClosingStampSheet		未移植	スタンプが、ホームのモデルと画面に無い
 home.starts-shelf-over-after-closing	HomeModelTests/startsShelfOverAfterClosing		未移植	ひな形の棚が、ホームのモデルと画面に無い
+home.glows-customized-item-after-closing-sheet	HomeModelTests/glowsCustomizedItemAfterClosingSheet		未移植	カスタマイズのカードが、ホームのモデルと画面に無い
 home.groups-and-searches-templates-by-category	HomeModelTests/groupsAndSearchesTemplatesByCategory		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-and-remembers-the-order	HomeModelTests/ordersTemplatesAndRemembersTheOrder		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
 home.orders-templates-by-uses-in-ninety-days	HomeModelTests/ordersTemplatesByUsesInNinetyDays		未移植	ホームのモデルと画面に、テンプレートの一覧が無い
