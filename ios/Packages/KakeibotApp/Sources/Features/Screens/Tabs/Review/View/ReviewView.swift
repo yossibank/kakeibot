@@ -172,9 +172,7 @@ private extension ReviewView {
         .sheet(item: Bindable(model.state).sheet, onDismiss: openPending) { sheet in
             sheetView(sheet, slide: slide)
         }
-        .errorBanner(model.state.errorNotice) {
-            model.state.errorNotice.clear()
-        }
+        .errorBanner(model.state.errorNotice)
         .backdrop()
     }
 

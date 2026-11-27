@@ -40,10 +40,8 @@ public struct ThemeListView: View {
         } action: { size in
             layout.size = size
         }
-        .errorBanner(Bindable(model.state).errorNotice)
-        .errorBanner(appIcon.state.errorNotice) {
-            appIcon.state.errorNotice.clear()
-        }
+        .errorBanner(model.state.errorNotice)
+        .errorBanner(appIcon.state.errorNotice)
         .confirmation(
             isPresented: isSuggestingIcon,
             systemImage: "app.badge",

@@ -53,7 +53,7 @@ public struct CategoryEditSheet: View {
             textField: .text,
             below: layout.iconBottom
         )
-        .errorBanner(Bindable(model.state).errorNotice)
+        .errorBanner(model.state.errorNotice)
         .editSheet(
             model.flow,
             deleting: deletion,

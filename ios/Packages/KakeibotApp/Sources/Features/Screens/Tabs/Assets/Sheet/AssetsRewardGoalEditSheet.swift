@@ -41,7 +41,7 @@ struct AssetsRewardGoalEditSheet: View {
                         focus = nil
                     }
             }
-            .errorBanner(Bindable(model.state).errorNotice)
+            .errorBanner(model.state.errorNotice)
             .editSheet(
                 model.flow,
                 deleting: "この目標を削除しますか",

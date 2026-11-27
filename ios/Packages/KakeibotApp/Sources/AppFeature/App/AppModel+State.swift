@@ -27,7 +27,7 @@ extension AppModel {
     @MainActor
     @Observable
     final class State {
-        var notice = ErrorNotice()
+        let notice: ErrorNotice
 
         private(set) var launch: Launch = .opening
         private(set) var curtain: Curtain = .covering
@@ -41,6 +41,10 @@ extension AppModel {
 
         @ObservationIgnored private var foreground = ForegroundReturn()
         @ObservationIgnored private var hasStoppedObservation = false
+
+        init(wait: ScreenWait) {
+            self.notice = ErrorNotice(wait: wait)
+        }
     }
 
     @MainActor

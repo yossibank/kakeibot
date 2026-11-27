@@ -35,7 +35,7 @@ struct ProOfferCard: View {
         }
         .padding(16)
         .floatingCard()
-        .errorBanner(Bindable(model.state).errorNotice)
+        .errorBanner(model.state.errorNotice)
         .onOutcome(model.state.outcome) { _ in
             onUnlock()
         }

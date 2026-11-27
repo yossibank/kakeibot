@@ -15,7 +15,7 @@ import WidgetKit
 @MainActor
 @Observable
 final class AppModel: ScreenPerforming {
-    let state = State()
+    let state: State
     let input: Input
     let dependencies: Dependencies
 
@@ -27,12 +27,14 @@ final class AppModel: ScreenPerforming {
         proStore: ProStore = .live,
         retryDelays: [Duration] = ScreenObservation.retryDelays,
         clock: ScreenClock = .system,
+        wait: ScreenWait = .system,
         currentDay: (@Sendable () -> LocalDate)? = nil
     ) {
         let currentDay = currentDay ?? {
             clock.today
         }
 
+        self.state = State(wait: wait)
         self.input = Input(today: currentDay())
 
         self.dependencies = Dependencies(

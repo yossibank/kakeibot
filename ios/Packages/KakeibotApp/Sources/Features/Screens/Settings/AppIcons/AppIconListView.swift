@@ -41,7 +41,7 @@ public struct AppIconListView: View {
             }
             .scrollIndicators(.hidden)
         }
-        .settingsScreen(errorNotice: Bindable(model.state).errorNotice)
+        .settingsScreen(errorNotice: model.state.errorNotice)
         .haptic(.selection, trigger: model.input.current)
     }
 }

@@ -81,7 +81,7 @@ private extension SettingsBoardPage {
             hideMessage: spec.hideMessage,
             liftScale: spec.liftScale,
             controller: controller,
-            errorNotice: Bindable(model.state).errorNotice
+            errorNotice: model.state.errorNotice
         ) {
             model.state.open(spec.newDestination(in: model))
         } header: {

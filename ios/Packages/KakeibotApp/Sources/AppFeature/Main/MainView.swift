@@ -250,9 +250,7 @@ private extension MainView {
                     await $0.restore(deletion)
                 }
             }
-            .errorBanner(undo.state.errorNotice, bottom: noticeBottom) {
-                undo.state.errorNotice.clear()
-            }
+            .errorBanner(undo.state.errorNotice, bottom: noticeBottom)
             .onChange(of: notice.state.notice) { _, new in
                 if new != nil {
                     replaceNotices(with: .entry)

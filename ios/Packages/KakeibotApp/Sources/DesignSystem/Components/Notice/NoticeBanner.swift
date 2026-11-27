@@ -56,6 +56,11 @@ public extension NoticeBanner {
     }
 }
 
+public extension NoticeBanner {
+    nonisolated static let bottomMargin: CGFloat = 12
+    nonisolated static let sideMargin: CGFloat = 16
+}
+
 extension NoticeBanner.Tone {
     var color: Color {
         switch self {
@@ -63,6 +68,10 @@ extension NoticeBanner.Tone {
         case .error: Palette.rose
         }
     }
+}
+
+public extension EnvironmentValues {
+    @Entry var noticeRound = 0
 }
 
 #Preview {

@@ -86,7 +86,7 @@ private extension OnboardingView {
         .padding(.bottom, 8)
         .frame(maxWidth: Self.contentWidth, maxHeight: .infinity, alignment: .top)
         .frame(maxWidth: .infinity)
-        .errorBanner(Bindable(model.state).errorNotice)
+        .errorBanner(model.state.errorNotice)
         .backdrop()
         .budgetKeypad(model.state.budget)
         .haptic(.selection, trigger: model.state.page)
