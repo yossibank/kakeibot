@@ -134,8 +134,6 @@ fun RecurringEditSheet(
         model.refreshAuthorization()
     }
 
-    model.state.task.Timer()
-
     fun open(next: RecurringPanel) {
         focus.clearFocus()
         model.open(next)
@@ -290,10 +288,10 @@ private fun NameField(model: RecurringEditModel) {
 
 @Composable
 private fun SaveButton(model: RecurringEditModel) {
-    if (model.state.task.message.isNotEmpty()) {
+    if (model.state.errorNotice.message.isNotEmpty()) {
         Text(
-            text = model.state.task.message,
-            modifier = Modifier.clickable(onClick = model.state.task::clear),
+            text = model.state.errorNotice.message,
+            modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
             color = Palette.rose,
             style = textFont(style = FontTextStyle.Caption),
         )

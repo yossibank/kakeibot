@@ -46,7 +46,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.select
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsRecent
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.showsVoice
 import com.yossibank.kakeibot.featuremodels.screens.entry.voice.EntryVoiceFlow
-import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
+import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryDeck
 import com.yossibank.kakeibot.features.screens.entry.parts.EntryRecentRow
@@ -148,7 +148,7 @@ private fun ColumnScope.EntryDeckContent(
     today: LocalDate,
 ) {
     val context = LocalContext.current
-    val isInfo = model.state.task.tone == ModelTask.Tone.info
+    val isInfo = model.state.errorNotice.tone == ErrorNotice.Tone.info
 
     if (voice.output.isActive) {
         EntryVoiceCard(
@@ -181,8 +181,8 @@ private fun ColumnScope.EntryDeckContent(
     }
 
     FittedText(
-        text = model.state.task.message,
-        modifier = Modifier.clickable(onClick = model.state.task::clear),
+        text = model.state.errorNotice.message,
+        modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
         color = if (isInfo) Palette.accent else Palette.rose,
         style = textFont(size = FontSize.Caption),
     )

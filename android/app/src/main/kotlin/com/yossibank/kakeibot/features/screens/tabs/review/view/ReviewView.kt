@@ -94,7 +94,7 @@ fun ReviewView(
             }
         }
 
-        noticeBanner(task = model.state.task)
+        noticeBanner(notice = model.state.errorNotice)
 
         item(key = "period") {
             PeriodStepper(

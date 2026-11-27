@@ -93,8 +93,6 @@ fun TemplateEditSheet(
         model.load()
     }
 
-    model.state.task.Timer()
-
     EditSheet(
         flow = model.flow,
         onSaved = onSave,
@@ -328,8 +326,8 @@ private fun SaveButton(
     onDone: () -> Unit,
 ) {
     FittedText(
-        text = model.state.task.message,
-        modifier = Modifier.clickable(onClick = model.state.task::clear),
+        text = model.state.errorNotice.message,
+        modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
         color = Palette.rose,
         style = textFont(size = FontSize.Caption),
     )

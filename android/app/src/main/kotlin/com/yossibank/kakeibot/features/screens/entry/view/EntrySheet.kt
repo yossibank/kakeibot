@@ -154,8 +154,6 @@ private fun EntrySheetEffects(
             }
         }
     }
-
-    model.state.task.Timer()
 }
 
 @Composable
