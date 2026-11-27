@@ -15,12 +15,16 @@ public extension TemplateEditModel {
         public var billShift = 0
     }
 
+    struct Presented: ScreenEditable {
+        public var panel = Shown<Panel>()
+        public var tagCategory = Shown<EntryCategory>()
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var panel = Shown<Panel>()
-        public var tagCategory = Shown<EntryCategory>()
         public var fields = Fields()
+        public var presented = Presented()
 
         public private(set) var walletId: Wallet.ID?
         public private(set) var categoryId: EntryCategory.ID?

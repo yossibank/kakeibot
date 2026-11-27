@@ -33,11 +33,13 @@ public extension TemplateListModel {
         public var type: Entry.Kind = .expense
     }
 
+    typealias Presented = SettingsBoardShown<EntryTemplate.ID, Destination>
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
         public var fields = Fields()
-        public var shown = SettingsBoardShown<EntryTemplate.ID, Destination>()
+        public var presented = Presented()
 
         public private(set) var movingOrder: [EntryTemplate.ID]?
 
