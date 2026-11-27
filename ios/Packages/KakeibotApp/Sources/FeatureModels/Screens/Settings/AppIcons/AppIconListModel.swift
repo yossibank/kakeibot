@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 public final class AppIconListModel: ScreenPerforming {
-    public let state: NoticesOnlyState
+    public let state: ErrorNoticeState
     public let input: Input
 
     let dependencies: Dependencies
@@ -15,7 +15,7 @@ public final class AppIconListModel: ScreenPerforming {
     ) {
         let name = switcher.currentName()
 
-        self.state = NoticesOnlyState(wait: wait)
+        self.state = ErrorNoticeState(wait: wait)
         self.input = Input(current: AppIconChoice(alternateName: name))
         self.dependencies = Dependencies(switcher: switcher)
     }

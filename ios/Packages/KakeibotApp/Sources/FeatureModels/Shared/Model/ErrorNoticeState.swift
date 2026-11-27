@@ -2,7 +2,7 @@ import Observation
 
 @MainActor
 @Observable
-public final class NoticesOnlyState: NoticesHolding {
+public final class ErrorNoticeState: NoticesHolding {
     public let notices: Notices
 
     public init(wait: ScreenWait) {
@@ -10,7 +10,7 @@ public final class NoticesOnlyState: NoticesHolding {
     }
 }
 
-public extension NoticesOnlyState {
+public extension ErrorNoticeState {
     @MainActor
     struct Notices: ScreenNotices {
         public let error: ErrorNotice

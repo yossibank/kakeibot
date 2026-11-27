@@ -18,7 +18,7 @@
 | `outcome` | `ScreenOutcome` | `ScreenOutcome` | モデル | 画面への結果 |
 | `submodels` | `Submodels` の struct | `Submodels` の class | モデル | State が持つ子のモデル |
 
-状態が `notices` だけのモデルは、iOS では共通の `NoticesOnlyState` を使う。はじめの設定・月の始まり・起動の画面・アプリのアイコンが当たる。`State` の無いモデル（設定の説明カード）は、枠を持たせない。
+状態がエラーの知らせだけのモデルは、iOS では共通の `ErrorNoticeState` を使う。はじめの設定・月の始まり・起動の画面・アプリのアイコンが当たる。`State` の無いモデル（設定の説明カード）は、枠を持たせない。
 
 ### 表示中のものの続きは presented に置く
 
