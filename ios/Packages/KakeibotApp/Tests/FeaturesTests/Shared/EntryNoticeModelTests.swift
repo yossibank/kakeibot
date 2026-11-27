@@ -4,6 +4,7 @@ import Features
 import Foundation
 import Store
 import Testing
+import TestSupport
 
 @MainActor
 struct EntryNoticeModelTests {
@@ -252,6 +253,45 @@ struct EntryNoticeModelTests {
     }
 
     @Test
+    func clearsChangeNoticeAfterDuration() async throws {
+        let setup = try await Setup()
+        let model = try await setup.entryModel()
+        model.state.press(.digit(5))
+
+        let change = try #require(await model.save())
+        setup.notice.show(change)
+        await ObservationWait.until { setup.clock.isSleeping }
+        setup.clock.advance(by: .seconds(3))
+        let kept = setup.notice.state.notice
+        setup.clock.advance(by: .seconds(1))
+        await ObservationWait.until { setup.notice.state.notice == nil }
+
+        #expect(kept == .changed(change))
+        #expect(setup.notice.state.id == nil)
+    }
+
+    @Test
+    func undoesBeforeDurationEndsAndClearsUndoneSooner() async throws {
+        let setup = try await Setup()
+        let model = try await setup.entryModel()
+        model.state.press(.digit(5))
+
+        let change = try #require(await model.save())
+        setup.notice.show(change)
+        await ObservationWait.until { setup.clock.isSleeping }
+        setup.clock.advance(by: .seconds(3))
+        await setup.notice.undo()
+        let entries = try setup.database.snapshot().entries
+        let undone = setup.notice.state.notice
+        await ObservationWait.until { setup.clock.deadlines == [.seconds(5)] }
+        setup.clock.advance(by: .seconds(2))
+        await ObservationWait.until { setup.notice.state.notice == nil }
+
+        #expect(entries.isEmpty)
+        #expect(undone == .undone)
+    }
+
+    @Test
     func restoresNoSpendMarkWhenUndoingNewEntry() async throws {
         let setup = try await Setup()
         try await setup.database.markNoSpendDay(setup.date, at: Date())
@@ -288,6 +328,7 @@ extension EntryNoticeModelTests {
     struct Setup {
         let database: AppDatabase
         let date: LocalDate
+        let clock: ManualWait
         let notice: EntryNoticeModel
     }
 }
@@ -296,10 +337,14 @@ extension EntryNoticeModelTests.Setup {
     init() async throws {
         let database = try AppDatabase.inMemory()
         let date = try #require(LocalDate("2026-10-12"))
-        let notice = EntryNoticeModel(parts: .system(database))
+        let clock = ManualWait()
+
+        let notice = EntryNoticeModel(
+            parts: ScreenParts(database: database, clock: .system, wait: clock.wait)
+        )
 
         try database.insertDefaultsIfEmpty(at: Date())
-        self.init(database: database, date: date, notice: notice)
+        self.init(database: database, date: date, clock: clock, notice: notice)
     }
 
     func entryModel(

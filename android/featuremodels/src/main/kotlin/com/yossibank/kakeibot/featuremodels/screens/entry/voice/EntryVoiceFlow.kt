@@ -13,8 +13,8 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.voiceHints
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.voiceReading
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
+import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.perform
-import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -48,7 +48,7 @@ class EntryVoiceFlow internal constructor(
         makeSource = { EntryVoiceRecognizer.make(context) },
         sleep = { millis -> delay(millis) },
         silenceMillis = SILENCE_MILLIS,
-        noticeMillis = UndoNoticeState.MILLIS,
+        noticeMillis = UndoNotice.duration.inWholeMilliseconds,
     )
 
     sealed interface Phase {

@@ -5,10 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.yossibank.kakeibot.core.concepts.entry.AmountCalculator
 import com.yossibank.kakeibot.core.concepts.entry.EntryItem
-import com.yossibank.kakeibot.featuremodels.shared.notice.UndoNoticeState
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
+import com.yossibank.kakeibot.featuremodels.shared.model.UndoNotice
 import kotlin.math.abs
 
-class EntryItemEditor {
+class EntryItemEditor(
+    wait: ScreenWait,
+) {
     var isOpen by mutableStateOf(false)
     var name by mutableStateOf("")
     var unit by mutableStateOf(AmountCalculator())
@@ -19,7 +22,7 @@ class EntryItemEditor {
     var taxRate: AmountCalculator.TaxRate? by mutableStateOf(null)
     var isDiscount by mutableStateOf(false)
 
-    val removed = UndoNoticeState<RemovedItem>()
+    val removed = UndoNotice<RemovedItem>(wait)
 
     enum class Target {
         Unit,

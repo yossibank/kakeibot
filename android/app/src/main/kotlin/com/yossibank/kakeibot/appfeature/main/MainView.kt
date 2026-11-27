@@ -101,7 +101,7 @@ private fun MainLayers(
 ) {
     val notice = remember(parts) { EntryNoticeModel(parts) }
 
-    LaunchedEffect(notice.state.count) {
+    LaunchedEffect(notice.state.id) {
         if (notice.state.notice != null) {
             model.state.hideTabNotices()
         }

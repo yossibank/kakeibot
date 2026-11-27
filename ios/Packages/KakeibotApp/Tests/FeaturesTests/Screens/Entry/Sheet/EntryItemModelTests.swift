@@ -1,6 +1,7 @@
 import Core
 @testable import FeatureModels
 import Testing
+import TestSupport
 
 @MainActor
 struct EntryItemModelTests {
@@ -139,6 +140,43 @@ struct EntryItemModelTests {
         #expect(removed.item.name == "牛乳")
         #expect(shifted == 0)
         #expect(items.state.fields.draft.isEditing(1))
+        #expect(entry.state.items.list.map(\.name) == ["牛乳", "パン"])
+    }
+
+    @Test
+    func clearsRemovedItemNoticeAfterDuration() async throws {
+        let entry = try await EntryModelTests.newModel()
+        let clock = ManualWait()
+        let items = EntryItemModel(isSlipOpen: false, wait: clock.wait)
+        entry.state.addItem(name: "牛乳", amount: 200)
+
+        items.remove(0, from: entry)
+        await ObservationWait.until { clock.isSleeping }
+        clock.advance(by: UndoNotice<EntryModel.RemovedItem>.duration - .seconds(1))
+        let kept = items.state.removed.current
+        clock.advance(by: .seconds(1))
+        await ObservationWait.until { items.state.removed.current == nil }
+
+        #expect(kept?.item.name == "牛乳")
+        #expect(entry.state.items.list.isEmpty)
+    }
+
+    @Test
+    func restoresRemovedItemBeforeDurationEnds() async throws {
+        let entry = try await EntryModelTests.newModel()
+        let clock = ManualWait()
+        let items = EntryItemModel(isSlipOpen: false, wait: clock.wait)
+        entry.state.addItem(name: "牛乳", amount: 200)
+        entry.state.addItem(name: "パン", amount: 300)
+
+        items.remove(0, from: entry)
+        await ObservationWait.until { clock.isSleeping }
+        clock.advance(by: UndoNotice<EntryModel.RemovedItem>.duration - .seconds(1))
+        let removed = try #require(items.state.removed.take())
+        items.restore(removed, in: entry)
+        clock.advance(by: .seconds(1))
+
+        #expect(items.state.removed.current == nil)
         #expect(entry.state.items.list.map(\.name) == ["牛乳", "パン"])
     }
 

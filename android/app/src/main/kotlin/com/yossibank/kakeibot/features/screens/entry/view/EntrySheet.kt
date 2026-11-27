@@ -230,6 +230,7 @@ private fun EntryPresentedLayer(
         exit = slideOutVertically { it },
     ) {
         EntryItemSheet(
+            parts = parts,
             model = model,
             onClose = model.state.presented::closeAll,
         )

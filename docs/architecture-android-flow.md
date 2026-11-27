@@ -26,7 +26,7 @@
 | 二度押し | 保存・削除・非表示は、`task` が動いている間は受けない |
 | 画面の側 | `features/shared/model/` の `EditSheet` を書く。確認と戻るを持ち、結果で `onSaved`・`onClose` などを呼ぶ |
 | 当てた画面 | 固定費の編集・テンプレートの追加・予算の数字の引き出し |
-| 取り消しの知らせ | モデルが、`state` の `UndoNotice` に出す。予算と固定費の一覧が当たる |
+| 取り消しの知らせ | モデルが、`state` の `UndoNotice` に出す。予算と固定費の一覧・`EntryNoticeModel`・`EntryItemEditor` が当たる |
 | 子の画面の結果 | 親のモデルの `receive`・`receiveHidden` に渡す |
 | 入力の結果 | `EntryModel.Outcome` の `Closed` と `Continued` が、`EntryChange` を持つ |
 | 残す `rememberCoroutineScope` | `designsystem` の動きだけが持つ。画面のファイルには書かない |

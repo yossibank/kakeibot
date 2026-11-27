@@ -14,8 +14,6 @@ fun EntryNoticeBanner(
     model: EntryNoticeModel,
     modifier: Modifier = Modifier,
 ) {
-    model.state.Timer()
-
     when (val notice = model.state.notice) {
         is EntryNoticeModel.Notice.Changed -> {
             val isDeletion = notice.change.isDeletion

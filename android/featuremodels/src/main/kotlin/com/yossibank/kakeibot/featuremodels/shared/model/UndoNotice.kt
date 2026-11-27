@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.Job
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class UndoNotice<Item : Any>(
@@ -22,7 +23,13 @@ class UndoNotice<Item : Any>(
     val current: Item?
         get() = showing?.item
 
-    fun show(item: Item) {
+    val id: Int?
+        get() = showing?.id
+
+    fun show(
+        item: Item,
+        duration: Duration = UndoNotice.duration,
+    ) {
         count += 1
 
         val id = count

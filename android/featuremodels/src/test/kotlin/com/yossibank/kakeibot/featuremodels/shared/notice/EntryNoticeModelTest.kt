@@ -17,6 +17,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 class EntryNoticeModelTest {
     @Test
@@ -182,6 +183,43 @@ class EntryNoticeModelTest {
         notice.clear()
 
         assertEquals(EntryNoticeModel.Notice.Changed(change), shown)
+        assertNull(notice.state.notice)
+    }
+
+    @Test
+    fun clearsChangeNoticeAfterDuration() = modelTest(today = "2026-10-12") { setup ->
+        val notice = EntryNoticeModel(setup.parts)
+        val model = setup.loadedModel()
+        model.press(5)
+
+        model.save()
+        val change = model.change
+        notice.show(change)
+        setup.wait.advance(by = 3.seconds)
+        val kept = notice.state.notice
+        setup.wait.advance(by = 1.seconds)
+
+        assertEquals(EntryNoticeModel.Notice.Changed(change), kept)
+        assertNull(notice.state.notice)
+        assertNull(notice.state.id)
+    }
+
+    @Test
+    fun undoesBeforeDurationEndsAndClearsUndoneSooner() = modelTest(today = "2026-10-12") { setup ->
+        val notice = EntryNoticeModel(setup.parts)
+        val model = setup.loadedModel()
+        model.press(5)
+
+        model.save()
+        notice.show(model.change)
+        setup.wait.advance(by = 3.seconds)
+        notice.undo()
+        val entries = setup.database.entryList().entries
+        val undone = notice.state.notice
+        setup.wait.advance(by = 2.seconds)
+
+        assertTrue(entries.isEmpty())
+        assertEquals(EntryNoticeModel.Notice.Undone, undone)
         assertNull(notice.state.notice)
     }
 
