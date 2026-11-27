@@ -65,6 +65,6 @@ extension HomeModelTests {
         #expect(untouched == nil)
         #expect(pending == nil)
         #expect(model.state.presented.glow.current == .launchScreen)
-        #expect(model.state.customized == nil)
+        #expect(model.state.presented.customized == nil)
     }
 }

@@ -14,6 +14,8 @@ public extension HomeModel {
         public var shelf = Shown<ShelfPage>()
         public var row = Shown<Entry.ID>()
         public var glow = Shown<SetupItem>()
+
+        public internal(set) var customized: SetupItem?
     }
 
     @MainActor
@@ -34,8 +36,7 @@ public extension HomeModel {
         public let notices: Notices
 
         public internal(set) var outcome = ScreenOutcome<EntryChange>()
-        public internal(set) var pendingDay: LocalDate?
-        public internal(set) var customized: SetupItem?
+        public internal(set) var pendingDay = PendingDay()
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)

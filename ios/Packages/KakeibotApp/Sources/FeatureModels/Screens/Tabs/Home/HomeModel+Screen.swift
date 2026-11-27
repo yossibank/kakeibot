@@ -8,18 +8,16 @@ public extension HomeModel {
 
 public extension HomeModel.State {
     func pickStampDay(_ date: LocalDate) {
-        pendingDay = date
+        pendingDay.pick(date)
         presented.stamp.closeAll()
     }
 
     func takePendingDay() -> LocalDate? {
-        guard let pendingDay else {
+        guard pendingDay.date != nil else {
             return nil
         }
 
-        self.pendingDay = nil
-
-        return pendingDay
+        return pendingDay.take()
     }
 
     func closeShelf() {
@@ -33,15 +31,15 @@ public extension HomeModel.State {
     }
 
     func customize(_ item: SetupItem) {
-        customized = item
+        presented.customized = item
     }
 
     func finishCustomizing() {
-        guard let customized else {
+        guard let customized = presented.customized else {
             return
         }
 
-        self.customized = nil
+        presented.customized = nil
         presented.glow.show(customized)
     }
 }
