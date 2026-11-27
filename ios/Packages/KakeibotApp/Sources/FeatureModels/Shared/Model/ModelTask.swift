@@ -1,7 +1,5 @@
 import Observation
 
-/// 実行中の印。どれを実行中かを見る時は、鍵の型を `ModelTask<Work>()` で決める。
-/// 鍵の要らない時は `ModelTask()` と書き、鍵の型は `Never` になる。
 @MainActor
 @Observable
 public final class ModelTask<Key: Hashable & Sendable> {

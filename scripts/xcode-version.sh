@@ -11,7 +11,6 @@ if [[ -z $have ]]; then
     exit 1
 fi
 
-# 版を点で区切り、数で前から比べる。足りていれば 0 を返す
 awk -v need="$need" -v have="$have" 'BEGIN {
     n = split(need, a, ".")
     m = split(have, b, ".")
