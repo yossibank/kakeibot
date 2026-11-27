@@ -8,6 +8,11 @@ public extension CategoryEditModel {
         public var name = ""
     }
 
+    struct Presented: ScreenEditable {
+        public var isMovingTag = false
+        public var ignoresKeyboard = false
+    }
+
     struct TagEdit: Hashable, Sendable {
         public let target: Target
 
@@ -18,13 +23,12 @@ public extension CategoryEditModel {
     @Observable
     final class State: NoticeHolding {
         public var fields = Fields()
+        public var presented = Presented()
 
         public internal(set) var ready = ScreenOutcome<Void>()
-        public internal(set) var isMovingTag = false
-        public internal(set) var ignoresKeyboard = false
 
         public private(set) var tags: [EditingTag] = []
-        public private(set) var tagProblem: String?
+        public private(set) var tagRejection: EntryTagDraft.Problem?
         public private(set) var tagEdit: TagEdit?
 
         public let errorNotice: ErrorNotice
@@ -32,6 +36,16 @@ public extension CategoryEditModel {
 
         init(wait: ScreenWait) {
             self.errorNotice = ErrorNotice(wait: wait)
+        }
+    }
+}
+
+private extension CategoryEditModel {
+    static func message(for problem: EntryTagDraft.Problem) -> String {
+        switch problem {
+        case .emptyName: "タグの名前を入れてください"
+        case .nameTooLong: "タグは \(EntryTagDraft.maxNameLength) 文字までです"
+        case .duplicateName: "同じ名前のタグがあります"
         }
     }
 }
@@ -44,15 +58,19 @@ public extension CategoryEditModel.TagEdit {
 }
 
 public extension CategoryEditModel.State {
+    var tagProblem: String? {
+        tagRejection.map(CategoryEditModel.message(for:))
+    }
+
     func setMovingTag(_ isMoving: Bool) {
-        if isMovingTag != isMoving {
-            isMovingTag = isMoving
+        if presented.isMovingTag != isMoving {
+            presented.isMovingTag = isMoving
         }
     }
 
     func setIgnoresKeyboard(_ ignores: Bool) {
-        if ignoresKeyboard != ignores {
-            ignoresKeyboard = ignores
+        if presented.ignoresKeyboard != ignores {
+            presented.ignoresKeyboard = ignores
         }
     }
 
@@ -121,7 +139,7 @@ public extension CategoryEditModel.State {
         case let .rename(id): tags.first { $0.id == id }?.draft.name ?? ""
         }
 
-        tagProblem = nil
+        tagRejection = nil
         tagEdit = CategoryEditModel.TagEdit(target: target, name: name)
     }
 
@@ -144,8 +162,8 @@ public extension CategoryEditModel.State {
     }
 
     func closeTag() {
-        if tagProblem != nil {
-            tagProblem = nil
+        if tagRejection != nil {
+            tagRejection = nil
         }
 
         if tagEdit != nil {
@@ -170,22 +188,7 @@ private extension CategoryEditModel.State {
         _ tag: EntryTagDraft,
         among others: [EntryTagDraft]
     ) -> Bool {
-        switch tag.problems(among: others).first {
-        case .emptyName:
-            tagProblem = "タグの名前を入れてください"
-            return false
-
-        case .nameTooLong:
-            tagProblem = "タグは \(EntryTagDraft.maxNameLength) 文字までです"
-            return false
-
-        case .duplicateName:
-            tagProblem = "同じ名前のタグがあります"
-            return false
-
-        case nil:
-            tagProblem = nil
-            return true
-        }
+        tagRejection = tag.problems(among: others).first
+        return tagRejection == nil
     }
 }
