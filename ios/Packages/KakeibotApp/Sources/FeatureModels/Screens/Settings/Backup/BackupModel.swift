@@ -42,12 +42,8 @@ public extension BackupModel {
     final class State: NoticesHolding {
         public var presented = Presented()
 
-        public internal(set) var file: BackupFile?
-        public internal(set) var pending: ExportV1?
-        public internal(set) var done: Done?
-        public internal(set) var pressed: Row?
+        public internal(set) var notices: Notices
 
-        public let notices: Notices
         public let task = ModelTask()
 
         init(wait: ScreenWait) {
@@ -150,7 +146,7 @@ public extension BackupModel {
 
         let date = dependencies.clock.now
 
-        state.done = nil
+        state.notices.done = nil
 
         defer {
             state.finishWorking()
@@ -163,7 +159,7 @@ public extension BackupModel {
 
             let name = Self.fileName(of: kind, at: date)
 
-            state.file = BackupFile(kind: kind, data: data, name: name)
+            state.presented.file = BackupFile(kind: kind, data: data, name: name)
             state.presented.dialog.show(.exporter)
 
             return true
@@ -175,13 +171,13 @@ public extension BackupModel {
     }
 
     func finishExport(_ result: Result<URL, any Error>) async {
-        let kind = state.file?.kind
+        let kind = state.presented.file?.kind
 
-        state.file = nil
+        state.presented.file = nil
 
         switch result {
         case .success:
-            state.done = .exported
+            state.notices.done = .exported
 
             if kind == .json {
                 try? await dependencies.database.setSetting(
@@ -197,7 +193,7 @@ public extension BackupModel {
 
     @discardableResult
     func read(_ result: Result<URL, any Error>) async -> Bool {
-        state.done = nil
+        state.notices.done = nil
 
         guard case let .success(url) = result else {
             state.notices.error.show(Self.readFailedMessage)
@@ -229,7 +225,7 @@ public extension BackupModel {
 
     @discardableResult
     func readPrevious(_ item: Previous) async -> Bool {
-        state.done = nil
+        state.notices.done = nil
 
         let export = await Task.detached {
             Result {
@@ -241,19 +237,19 @@ public extension BackupModel {
     }
 
     func cancelRestore() {
-        state.pending = nil
+        state.presented.pending = nil
     }
 
     func restore() async {
         guard
-            let pending = state.pending,
+            let pending = state.presented.pending,
             !state.task.isRunning
         else {
             return
         }
 
         guard await !isSyncActiveNow() else {
-            state.pending = nil
+            state.presented.pending = nil
             state.notices.error.show(Self.syncActiveMessage)
             return
         }
@@ -277,7 +273,7 @@ public extension BackupModel {
             }
 
             try? await dependencies.database.setSetting(.backupExportedAt, to: pending.exportedAt)
-            state.done = .restored
+            state.notices.done = .restored
 
             if pending.data.needsNotifications {
                 await dependencies.permission.requestIfUndecided()
@@ -287,7 +283,7 @@ public extension BackupModel {
         }
 
         await loadPrevious()
-        state.pending = nil
+        state.presented.pending = nil
     }
 }
 
@@ -319,7 +315,7 @@ private extension BackupModel {
 
     func accept(_ export: Result<ExportV1, any Error>) -> Bool {
         do {
-            state.pending = try export.get()
+            state.presented.pending = try export.get()
             state.presented.dialog.show(.restore)
             return true
         } catch {
@@ -358,7 +354,7 @@ private extension BackupModel {
 
 public extension BackupModel.Output {
     var pendingSummary: String? {
-        guard let pending = state.pending else {
+        guard let pending = state.presented.pending else {
             return nil
         }
 

@@ -9,7 +9,7 @@ struct WidgetGuideModelTests {
 
         #expect(model.state.presented.place == .home)
         #expect(model.state.sample == WidgetGuideSample(widget: .quickRecord, size: .medium))
-        #expect(model.state.shownSample == nil)
+        #expect(model.state.presented.shownSample == nil)
     }
 
     @Test
@@ -18,12 +18,12 @@ struct WidgetGuideModelTests {
         let budget = WidgetGuideSample(widget: .budget, size: .small)
 
         model.state.showChosenSample()
-        let aligned = model.state.shownSample
+        let aligned = model.state.presented.shownSample
 
         model.state.show(budget)
 
         #expect(aligned == WidgetGuideSample(widget: .quickRecord, size: .medium))
-        #expect(model.state.shownSample == budget)
+        #expect(model.state.presented.shownSample == budget)
         #expect(model.state.sample == budget)
     }
 
@@ -37,6 +37,6 @@ struct WidgetGuideModelTests {
         model.state.showChosenSample()
 
         #expect(model.state.sample == budget)
-        #expect(model.state.shownSample == budget)
+        #expect(model.state.presented.shownSample == budget)
     }
 }

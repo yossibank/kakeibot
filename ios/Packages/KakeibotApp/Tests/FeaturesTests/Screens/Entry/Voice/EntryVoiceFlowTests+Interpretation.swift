@@ -149,7 +149,7 @@ extension EntryVoiceFlowTests {
         source.releaseStart()
         await starting.value
 
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(source.log.last == "cancel")
     }
 

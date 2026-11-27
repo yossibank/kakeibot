@@ -39,7 +39,7 @@ struct BudgetListModelTests {
         #expect(model.output.totalAmount == 120_000)
         #expect(model.output.amount(for: food.id) == 30000)
         #expect(model.output.categoriesTotal == 30000)
-        #expect(model.state.editing == nil)
+        #expect(model.state.presented.editing == nil)
         #expect(budgets.allSatisfy { $0.fromMonth == model.input.month })
     }
 
@@ -111,7 +111,7 @@ struct BudgetListModelTests {
         #expect(usage.isNearLimit)
         #expect(model.output.spent(for: nil) == 9000)
         #expect(model.output.totalAmount == nil)
-        #expect(model.state.editing == nil)
+        #expect(model.state.presented.editing == nil)
     }
 
     @Test
@@ -148,13 +148,13 @@ struct BudgetListModelTests {
 
         model.startEditing(.total)
         model.closeEditing()
-        let unchanged = model.state.editing
+        let unchanged = model.state.presented.editing
 
         model.startEditing(.total)
         model.state.press(.digit(1))
         model.closeEditing()
         let isAsking = model.state.presented.prompt.isShowing(.discard)
-        let kept = model.state.editing
+        let kept = model.state.presented.editing
 
         model.cancelEditing()
 
@@ -162,7 +162,7 @@ struct BudgetListModelTests {
         #expect(isAsking)
         #expect(kept == .total)
         #expect(!model.state.presented.prompt.isShowing(.discard))
-        #expect(model.state.editing == nil)
+        #expect(model.state.presented.editing == nil)
     }
 
     @Test

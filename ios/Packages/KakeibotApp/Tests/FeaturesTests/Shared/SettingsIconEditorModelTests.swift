@@ -11,7 +11,7 @@ struct SettingsIconEditorModelTests {
 
         model.inputEmoji(value)
 
-        #expect(model.emoji.isEmpty)
+        #expect(model.state.fields.emoji.isEmpty)
     }
 
     @Test(arguments: ["🍙", "🇯🇵", "👍🏽", "👨‍👩‍👧", "1️⃣", "\u{263A}\u{FE0F}"])
@@ -20,7 +20,7 @@ struct SettingsIconEditorModelTests {
 
         model.inputEmoji(value)
 
-        #expect(model.emoji == value)
+        #expect(model.state.fields.emoji == value)
     }
 
     @Test
@@ -44,7 +44,7 @@ struct SettingsIconEditorModelTests {
 
         model.inputEmoji("🍙a🍣1")
 
-        #expect(model.emoji == "🍣")
+        #expect(model.state.fields.emoji == "🍣")
     }
 
     @Test
@@ -54,7 +54,7 @@ struct SettingsIconEditorModelTests {
 
         model.inputText(long)
 
-        #expect(model.text.count == IconDraft.maxTextLength)
+        #expect(model.state.fields.text.count == IconDraft.maxTextLength)
     }
 
     @Test
@@ -68,7 +68,7 @@ struct SettingsIconEditorModelTests {
         model.apply(text)
 
         #expect(appliedEmoji == emoji)
-        #expect(model.markKind == .text)
+        #expect(model.state.fields.markKind == .text)
         #expect(model.draft == text)
         #expect(model.preview.text == "家")
         #expect(model.preview.emoji == nil)

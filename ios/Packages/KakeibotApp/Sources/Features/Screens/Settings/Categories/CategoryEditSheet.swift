@@ -38,10 +38,10 @@ public struct CategoryEditSheet: View {
             ZStack {
                 content
                     .ignoresSafeArea(keyboardRegions)
-                    .floatingInput(isPresented: model.state.tagEdit != nil) {
+                    .floatingInput(isPresented: model.state.presented.tagEdit != nil) {
                         cancelTag()
                     } card: {
-                        if let tagEdit = model.state.tagEdit {
+                        if let tagEdit = model.state.presented.tagEdit {
                             tagCard(tagEdit)
                         }
                     }
@@ -66,7 +66,7 @@ public struct CategoryEditSheet: View {
                 model.state.setIgnoresKeyboard(false)
             }
         }
-        .onOutcome(model.state.ready) { _ in
+        .onOutcome(model.state.outcome) { _ in
             if startsAddingTag {
                 addTag()
             }
@@ -195,7 +195,7 @@ private extension CategoryEditSheet {
                 model.state.setMovingTag(isMoving)
             }
 
-            if model.state.tags.count > 1 {
+            if model.state.fields.tags.count > 1 {
                 SettingsCaption("長押しで並べ替えられます")
             }
         }
@@ -226,7 +226,7 @@ private extension CategoryEditSheet {
     }
 
     var graphColor: Color {
-        Color(hex: model.state.submodels.icon.color) ?? Palette.subtext
+        Color(hex: model.state.submodels.icon.state.fields.color) ?? Palette.subtext
     }
 
     var deletion: SettingsConfirmation {
@@ -253,14 +253,14 @@ private extension CategoryEditSheet {
 
     var tagName: Binding<String> {
         Binding {
-            model.state.tagEdit?.name ?? ""
+            model.state.presented.tagEdit?.name ?? ""
         } set: { name in
             model.state.inputTag(name)
         }
     }
 
     var tagItems: [TagLine<UUID>.Item] {
-        model.state.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
+        model.state.fields.tags.map { TagLine.Item(id: $0.id, name: $0.draft.name) }
     }
 
     func deleteAction(for edit: TagEdit) -> (() -> Void)? {

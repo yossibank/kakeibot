@@ -48,6 +48,8 @@ public extension OnboardingModel {
 
     struct Fields: ScreenEditable {
         public var path: [SetupItem] = []
+
+        public internal(set) var route: Route?
     }
 
     @MainActor
@@ -73,7 +75,6 @@ public extension OnboardingModel {
 
         public internal(set) var outcome = ScreenOutcome<Void>()
         public internal(set) var page: Page = .welcome
-        public internal(set) var route: Route?
 
         public let notices: Notices
         public let submodels: Submodels
@@ -134,7 +135,7 @@ public extension OnboardingModel {
     }
 
     func choose(_ route: Route) {
-        state.route = route
+        state.fields.route = route
     }
 
     func canTurn(forward: Bool) -> Bool {
@@ -205,7 +206,7 @@ private extension OnboardingModel {
 
 public extension OnboardingModel.Output {
     var pages: [OnboardingModel.Page] {
-        state.route?.pages ?? [.welcome]
+        state.fields.route?.pages ?? [.welcome]
     }
 
     var stepPages: [OnboardingModel.Page] {

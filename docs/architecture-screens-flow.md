@@ -34,7 +34,7 @@
 | 項目 | 決まり |
 | --- | --- |
 | `fields` | 入力と選んでいる物を、`ScreenEditable` の `Fields` に入れる。モデルが読む物に限る |
-| `presented` | 表示中のものを、`Presented` に `Shown<値>` を名前で並べて持つ。例は `presented.sheet`・`presented.row` |
+| `presented` | `presented.sheet`・`presented.row` のように、表示中のものを `Shown<値>` で並べる。モデルだけが書く続きは `internal(set)` にする |
 | `notices` | 時間で消える知らせは、モデルが `notices` に出し、時間もモデルが `ScreenWait` で数える。画面は `.task` で時間を数えない |
 | 渡し方 | シートには `presented.x.item` を、確認には `presented.x[.y]` を渡す。入力は `Bindable(model.state).fields.x` で渡す |
 | ほかの値 | `public internal(set)` か `public private(set)` にする。今日は `input` に置き、画面が `setToday` を呼ぶ |

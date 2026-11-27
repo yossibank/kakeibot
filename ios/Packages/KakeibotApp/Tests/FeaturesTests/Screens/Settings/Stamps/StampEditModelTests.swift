@@ -11,7 +11,7 @@ struct StampEditModelTests {
     func addsShelfIcon() async throws {
         let database = try Self.database()
         let model = StampEditModel(parts: .system(database))
-        model.state.submodels.icon.markKind = .emoji
+        model.state.submodels.icon.state.fields.markKind = .emoji
         model.state.submodels.icon.inputEmoji("🎉")
 
         let isSaved = await model.save() != nil
@@ -28,7 +28,7 @@ struct StampEditModelTests {
         let database = try Self.database()
         let model = StampEditModel(parts: .system(database))
 
-        model.state.submodels.icon.markKind = .text
+        model.state.submodels.icon.state.fields.markKind = .text
 
         #expect(!model.flow.output.canSave)
         #expect(model.flow.output.saveTitle == "アイコンを選んでください")
@@ -41,10 +41,10 @@ struct StampEditModelTests {
         let model = StampEditModel(parts: .system(database), editing: first.id)
 
         await model.load()
-        let loadedGlyph = model.state.submodels.icon.glyph
+        let loadedGlyph = model.state.submodels.icon.state.fields.glyph
         let changedBeforeEdit = model.flow.output.isChanged
 
-        model.state.submodels.icon.color = "#4A6FA5"
+        model.state.submodels.icon.state.fields.color = "#4A6FA5"
         let changedAfterEdit = model.flow.output.isChanged
         let isSaved = await model.save() != nil
         let shelf = try await database.shelfIconList()

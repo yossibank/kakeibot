@@ -28,7 +28,7 @@ public extension WalletEditModel.Output {
             kind: state.kind,
             name: state.fields.name,
             mark: state.submodels.icon.mark,
-            color: state.submodels.icon.color,
+            color: state.submodels.icon.state.fields.color,
             initialBalance: initialBalance,
             loanAmount: loan,
             recordedKind: input.recordedKind,

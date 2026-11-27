@@ -54,6 +54,57 @@ struct ModelTaskTests {
         #expect(!task.isRunning)
         #expect(value == 1)
     }
+
+    @Test
+    func marksOnlyTheRunningKey() async {
+        let task = ModelTask()
+        var first = false
+        var second = true
+        var any = false
+
+        await task.attempt(1) {
+            first = task.isRunning(1)
+            second = task.isRunning(2)
+            any = task.isRunning
+        }
+
+        #expect(first)
+        #expect(!second)
+        #expect(any)
+        #expect(!task.isRunning(1))
+        #expect(!task.isRunning)
+    }
+
+    @Test
+    func keepsKeyRunningUntilOuterAttemptEnds() async {
+        let task = ModelTask()
+        var afterInner = false
+        var otherWhileRunning = true
+
+        await task.attempt(1) {
+            await task.attempt(1) {}
+            afterInner = task.isRunning(1)
+            otherWhileRunning = task.isRunning { (key: Int) in key != 1 }
+        }
+
+        #expect(afterInner)
+        #expect(!otherWhileRunning)
+        #expect(!task.isRunning(1))
+    }
+
+    @Test
+    func stopsRunningKeyAfterFailure() async {
+        let task = ModelTask()
+
+        await #expect(throws: Failure.self) {
+            try await task.attempt(1) {
+                throw Failure()
+            }
+        }
+
+        #expect(!task.isRunning(1))
+        #expect(!task.isRunning)
+    }
 }
 
 extension ModelTaskTests {

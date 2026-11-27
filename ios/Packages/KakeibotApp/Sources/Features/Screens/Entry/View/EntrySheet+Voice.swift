@@ -55,7 +55,7 @@ extension EntrySheet {
     }
 
     func cancelVoice() {
-        guard voice.state.step != .denied else {
+        guard voice.state.presented.step != .denied else {
             voice.closeDenied()
             return
         }

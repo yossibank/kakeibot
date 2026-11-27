@@ -295,7 +295,7 @@ struct EntryModelTests {
         model.select(.income)
         let editor = model.newCategoryModel()
         editor.state.fields.name = "配当"
-        editor.state.submodels.icon.glyph = .invest
+        editor.state.submodels.icon.state.fields.glyph = .invest
 
         let saved = try #require(await editor.save())
         await model.reloadCategories(selecting: saved.id)

@@ -23,6 +23,10 @@ public extension HomeSectionListModel {
         public let start: Int
     }
 
+    struct Presented: Equatable, Sendable {
+        public internal(set) var dragging: Dragging?
+    }
+
     @MainActor
     struct Notices: ScreenNotices {
         public let error: ErrorNotice
@@ -37,8 +41,8 @@ public extension HomeSectionListModel {
     final class State: NoticesHolding {
         public let notices: Notices
 
+        public internal(set) var presented = Presented()
         public internal(set) var layout = HomeLayout.standard
-        public internal(set) var dragging: Dragging?
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
@@ -83,17 +87,17 @@ public extension HomeSectionListModel {
     }
 
     func startDragging(_ section: HomeSection) {
-        guard state.dragging == nil else {
+        guard state.presented.dragging == nil else {
             return
         }
 
         let start = state.layout.slots.firstIndex(of: .section(section)) ?? 0
 
-        state.dragging = Dragging(section: section, start: start)
+        state.presented.dragging = Dragging(section: section, start: start)
     }
 
     func moveDragging(bySlots steps: Int) {
-        guard let dragging = state.dragging else {
+        guard let dragging = state.presented.dragging else {
             return
         }
 
@@ -102,11 +106,11 @@ public extension HomeSectionListModel {
 
     @discardableResult
     func finishDragging() -> Bool {
-        guard state.dragging != nil else {
+        guard state.presented.dragging != nil else {
             return false
         }
 
-        state.dragging = nil
+        state.presented.dragging = nil
 
         return true
     }

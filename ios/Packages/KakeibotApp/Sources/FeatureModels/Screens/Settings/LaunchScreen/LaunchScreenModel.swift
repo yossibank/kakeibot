@@ -6,13 +6,13 @@ import Store
 @MainActor
 @Observable
 public final class LaunchScreenModel: SettingSaving {
-    public let state: NoticeState
+    public let state: NoticesOnlyState
     public let input = Input()
 
     let dependencies: Dependencies
 
     public init(parts: ScreenParts) {
-        self.state = NoticeState(wait: parts.wait)
+        self.state = NoticesOnlyState(wait: parts.wait)
         self.dependencies = Dependencies(database: parts.database)
     }
 }

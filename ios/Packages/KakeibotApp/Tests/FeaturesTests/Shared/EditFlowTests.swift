@@ -101,7 +101,7 @@ struct EditFlowTests {
         let (database, stamp) = try await Self.stamp()
         let model = StampEditModel(parts: .system(database), editing: stamp.id)
         await model.load()
-        model.state.submodels.icon.color = "#4A6FA5"
+        model.state.submodels.icon.state.fields.color = "#4A6FA5"
 
         await model.flow.saveTogglingHidden().value
         let outcome = try #require(model.flow.state.outcome.value)
@@ -119,7 +119,7 @@ struct EditFlowTests {
         let (database, stamp) = try await Self.stamp()
         let model = StampEditModel(parts: .system(database), editing: stamp.id)
         await model.load()
-        model.state.submodels.icon.color = "#4A6FA5"
+        model.state.submodels.icon.state.fields.color = "#4A6FA5"
         try await database.failUpdates(to: "shelf_icon", changing: "archived_at")
 
         await model.flow.saveTogglingHidden().value

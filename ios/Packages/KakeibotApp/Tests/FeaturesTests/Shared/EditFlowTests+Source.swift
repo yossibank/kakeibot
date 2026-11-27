@@ -109,7 +109,12 @@ extension EditFlowTests {
     }
 
     @MainActor
-    final class FakeState: NoticeHolding {
-        let errorNotice = ErrorNotice(wait: ManualWait().wait)
+    final class FakeState: NoticesHolding {
+        let notices = FakeNotices()
+    }
+
+    @MainActor
+    struct FakeNotices: ScreenNotices {
+        let error = ErrorNotice(wait: ManualWait().wait)
     }
 }

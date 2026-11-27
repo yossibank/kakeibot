@@ -220,7 +220,7 @@ private extension WidgetGuideView {
 
     var shownSample: Binding<WidgetGuideSample?> {
         Binding {
-            model.state.shownSample
+            model.state.presented.shownSample
         } set: { sample in
             model.state.show(sample)
         }

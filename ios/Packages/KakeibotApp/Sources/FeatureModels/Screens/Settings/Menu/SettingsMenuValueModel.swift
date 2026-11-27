@@ -36,12 +36,18 @@ public extension SettingsMenuValueModel {
         }
     }
 
+    struct Choice: Equatable, Sendable {
+        public private(set) var pending: Value?
+
+        public init() {}
+    }
+
     @MainActor
     @Observable
     final class State: NoticesHolding {
         public let notices: Notices
 
-        public internal(set) var chosen: Value?
+        public internal(set) var choice = Choice()
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
@@ -84,11 +90,11 @@ public extension SettingsMenuValueModel {
     func load() async {
         let key = dependencies.key
         input.value = await (try? dependencies.database.setting(key)) ?? key.defaultValue
-        state.chosen = nil
+        state.choice.clear()
     }
 
     func choose(_ newValue: Value) async {
-        state.chosen = newValue
+        state.choice.begin(newValue)
 
         do {
             try await dependencies.database.setSetting(dependencies.key, to: newValue)
@@ -97,14 +103,32 @@ public extension SettingsMenuValueModel {
             state.notices.error.show(SettingMessage.saveFailed, for: error)
         }
 
-        if state.chosen == newValue {
-            state.chosen = nil
-        }
+        state.choice.end(newValue)
     }
 }
 
 public extension SettingsMenuValueModel.Output {
     var value: Value {
-        state.chosen ?? input.value
+        state.choice.value(over: input.value)
+    }
+}
+
+public extension SettingsMenuValueModel.Choice {
+    func value(over saved: Value) -> Value {
+        pending ?? saved
+    }
+
+    mutating func begin(_ value: Value) {
+        pending = value
+    }
+
+    mutating func end(_ value: Value) {
+        if pending == value {
+            pending = nil
+        }
+    }
+
+    mutating func clear() {
+        pending = nil
     }
 }

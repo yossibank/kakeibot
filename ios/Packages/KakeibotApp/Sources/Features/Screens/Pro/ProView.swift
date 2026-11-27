@@ -107,7 +107,7 @@ private extension ProView {
         work: ProPurchaseModel.Work,
         tint: Color
     ) -> some View {
-        let isWorking = model.state.working == work
+        let isWorking = model.state.task.isRunning(work)
 
         return ZStack {
             Text(title)
@@ -127,7 +127,7 @@ private extension ProView {
 
 private extension ProView {
     func opacity(of work: ProPurchaseModel.Work) -> Double {
-        model.output.isWorking && model.state.working != work
+        model.output.isWorking && !model.state.task.isRunning(work)
             ? 0.4
             : 1
     }

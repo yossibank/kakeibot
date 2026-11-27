@@ -16,6 +16,8 @@ public final class WidgetGuideModel {
 public extension WidgetGuideModel {
     struct Presented: ScreenEditable {
         public var place: WidgetGuidePlace
+
+        public internal(set) var shownSample: WidgetGuideSample?
     }
 
     @MainActor
@@ -24,7 +26,6 @@ public extension WidgetGuideModel {
         public var presented: Presented
 
         public private(set) var sample: WidgetGuideSample
-        public private(set) var shownSample: WidgetGuideSample?
 
         init(
             place: WidgetGuidePlace,
@@ -38,8 +39,8 @@ public extension WidgetGuideModel {
 
 public extension WidgetGuideModel.State {
     func show(_ sample: WidgetGuideSample?) {
-        if shownSample != sample {
-            shownSample = sample
+        if presented.shownSample != sample {
+            presented.shownSample = sample
         }
 
         if let sample,

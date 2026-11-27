@@ -56,7 +56,7 @@ extension WalletEditSheet {
     }
 
     var noteColor: Color {
-        Color(hex: model.state.submodels.icon.color) ?? Palette.subtext
+        Color(hex: model.state.submodels.icon.state.fields.color) ?? Palette.subtext
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
@@ -152,7 +152,7 @@ extension WalletEditSheet {
     }
 
     func closePayment() {
-        guard model.state.addedWallet == nil else {
+        guard model.state.presented.addedWallet == nil else {
             model.finishAddedWallet()
             return
         }

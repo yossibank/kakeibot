@@ -22,6 +22,8 @@ public extension WalletEditModel {
         public var panel = Shown<Drawer>()
         public var openValuation = Shown<Valuation.ID>()
         public var paymentStep = Shown<PaymentStep>()
+
+        public internal(set) var addedWallet: Wallet?
     }
 
     @MainActor
@@ -53,7 +55,6 @@ public extension WalletEditModel {
         public private(set) var kind: Wallet.Kind
         public private(set) var sign: BalanceSign
 
-        public internal(set) var addedWallet: Wallet?
         public internal(set) var submodels: Submodels
 
         public let notices: Notices
@@ -93,11 +94,12 @@ public extension WalletEditModel.State {
 
         let icon = submodels.icon
 
-        guard icon.markKind == .glyph, icon.glyph == WalletEditModel.glyph(for: oldKind) else {
+        guard icon.state.fields.markKind == .glyph,
+              icon.state.fields.glyph == WalletEditModel.glyph(for: oldKind) else {
             return
         }
 
-        icon.glyph = WalletEditModel.glyph(for: kind)
+        icon.state.fields.glyph = WalletEditModel.glyph(for: kind)
     }
 
     func press(_ key: AmountCalculator.Key) {

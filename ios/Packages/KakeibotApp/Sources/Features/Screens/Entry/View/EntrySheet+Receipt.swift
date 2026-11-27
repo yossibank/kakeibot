@@ -23,7 +23,7 @@ extension EntrySheet {
 
     @ViewBuilder
     var receiptLayer: some View {
-        switch receipt.state.step {
+        switch receipt.state.presented.step {
         case .guide:
             EntryGuideCard(
                 onConfirm: {

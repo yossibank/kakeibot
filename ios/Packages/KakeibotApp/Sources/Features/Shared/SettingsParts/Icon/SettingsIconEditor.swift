@@ -19,22 +19,22 @@ struct SettingsIconEditor<Field: Hashable>: View {
             colors
 
             CapsulePicker(
-                selection: $model.markKind,
+                selection: Bindable(model.state).fields.markKind,
                 options: Self.markOptions
             )
 
             markChooser
         }
-        .onChange(of: model.markKind) {
+        .onChange(of: model.state.fields.markKind) {
             focus.wrappedValue = nil
         }
-        .onChange(of: model.glyph) {
+        .onChange(of: model.state.fields.glyph) {
             focus.wrappedValue = nil
         }
-        .onChange(of: model.emoji) {
+        .onChange(of: model.state.fields.emoji) {
             focus.wrappedValue = nil
         }
-        .onChange(of: model.color) {
+        .onChange(of: model.state.fields.color) {
             focus.wrappedValue = nil
         }
     }
@@ -63,7 +63,7 @@ private extension SettingsIconEditor {
 
     @ViewBuilder
     var markChooser: some View {
-        switch model.markKind {
+        switch model.state.fields.markKind {
         case .glyph:
             glyphChooser
 
@@ -126,10 +126,10 @@ private extension SettingsIconEditor {
     }
 
     func glyphButton(_ glyph: Icon.Glyph) -> some View {
-        let isSelected = model.glyph == glyph
+        let isSelected = model.state.fields.glyph == glyph
 
         return Button {
-            model.glyph = glyph
+            model.state.fields.glyph = glyph
         } label: {
             tile(isSelected: isSelected) {
                 Image(systemName: glyph.symbolName)
@@ -145,7 +145,7 @@ private extension SettingsIconEditor {
     }
 
     func emojiButton(_ emoji: String) -> some View {
-        let isSelected = model.emoji == emoji
+        let isSelected = model.state.fields.emoji == emoji
 
         return Button {
             model.inputEmoji(emoji)
@@ -174,12 +174,12 @@ private extension SettingsIconEditor {
     }
 
     func colorButton(_ hex: String) -> some View {
-        let isSelected = model.color == hex
+        let isSelected = model.state.fields.color == hex
         let fill = Color(hex: hex) ?? Palette.subtext
         let ring = isSelected ? fill : Color.clear
 
         return Button {
-            model.color = hex
+            model.state.fields.color = hex
         } label: {
             Circle()
                 .fill(fill)
@@ -222,7 +222,7 @@ private extension SettingsIconEditor {
                 markColor
             },
             set: { color in
-                model.color = color.hex
+                model.state.fields.color = color.hex
             }
         )
     }
@@ -230,7 +230,7 @@ private extension SettingsIconEditor {
     var textBinding: Binding<String> {
         Binding(
             get: {
-                model.text
+                model.state.fields.text
             },
             set: { value in
                 model.inputText(value)
@@ -239,6 +239,6 @@ private extension SettingsIconEditor {
     }
 
     var markColor: Color {
-        Color(hex: model.color) ?? Palette.subtext
+        Color(hex: model.state.fields.color) ?? Palette.subtext
     }
 }

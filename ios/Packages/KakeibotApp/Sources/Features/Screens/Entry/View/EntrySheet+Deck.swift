@@ -50,7 +50,7 @@ extension EntrySheet {
 
     func show(_ next: EntryModel.Deck) {
         if next != .amount,
-           voice.state.step == .listening {
+           voice.state.presented.step == .listening {
             cancelVoice()
         }
 

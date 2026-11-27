@@ -76,7 +76,7 @@ extension BackupModelTests {
         let saved = try await setup.source.setting(.backupExportedAt)
 
         #expect(saved != nil)
-        #expect(model.state.file == nil)
+        #expect(model.state.presented.file == nil)
     }
 
     @Test
@@ -87,7 +87,7 @@ extension BackupModelTests {
         let earlier = setup.now.addingTimeInterval(-90 * 24 * 60 * 60)
         try await setup.source.setSetting(.backupExportedAt, to: earlier)
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         await target.restore()
@@ -121,7 +121,7 @@ extension BackupModelTests {
         let saved = try await setup.source.setting(.backupExportedAt)
 
         #expect(saved == nil)
-        #expect(model.state.file == nil)
+        #expect(model.state.presented.file == nil)
     }
 }
 
@@ -151,12 +151,12 @@ extension BackupModelTests {
         let model = setup.exporter()
 
         model.state.press(.export(.csv))
-        let pressed = model.state.pressed
+        let pressed = model.state.presented.pressed
 
         await model.makeFile(.csv)
 
         #expect(pressed == .export(.csv))
-        #expect(model.state.pressed == nil)
+        #expect(model.state.presented.pressed == nil)
         #expect(!model.state.task.isRunning)
     }
 
@@ -185,7 +185,7 @@ extension BackupModelTests {
         }
 
         #expect(!isMade)
-        #expect(model.state.file == nil)
+        #expect(model.state.presented.file == nil)
         #expect(!model.state.presented.dialog[.exporter])
     }
 }
