@@ -51,13 +51,13 @@ extension AssetsModelTests {
         let model = AssetsModel(parts: .system(setup.database), today: setup.today)
 
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
-        let bought = model.state.bought.take()
+        let bought = model.state.notices.bought.take()
         let isUndone = await model.setPurchased(goal.id, isPurchased: false)
 
         #expect(isSaved)
         #expect(bought == goal.id)
         #expect(isUndone)
-        #expect(model.state.bought.current == nil)
+        #expect(model.state.notices.bought.current == nil)
     }
 
     @Test
@@ -72,8 +72,8 @@ extension AssetsModelTests {
         let isSaved = await model.setPurchased(goal.id, isPurchased: true)
 
         #expect(isSaved == false)
-        #expect(model.state.bought.current == nil)
-        #expect(model.state.errorNotice.message == "目標を保存できませんでした")
+        #expect(model.state.notices.bought.current == nil)
+        #expect(model.state.notices.error.message == "目標を保存できませんでした")
     }
 
     @Test
@@ -87,7 +87,7 @@ extension AssetsModelTests {
         let saved = try #require(bank.goals.first { $0.id == goal.id })
 
         #expect(isSaved == false)
-        #expect(model.state.errorNotice.message == "目標を保存できませんでした")
+        #expect(model.state.notices.error.message == "目標を保存できませんでした")
         #expect(saved.purchasedAt == nil)
         #expect(bank.waitingGoals.map(\.id) == [goal.id])
     }

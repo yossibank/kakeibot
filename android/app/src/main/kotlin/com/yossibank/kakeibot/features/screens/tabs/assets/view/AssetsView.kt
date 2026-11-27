@@ -60,7 +60,7 @@ fun AssetsView(
             )
         }
 
-        noticeBanner(notice = model.state.errorNotice)
+        noticeBanner(notice = model.state.notices.error)
 
         item(key = "total") {
             TotalCard(model = model)

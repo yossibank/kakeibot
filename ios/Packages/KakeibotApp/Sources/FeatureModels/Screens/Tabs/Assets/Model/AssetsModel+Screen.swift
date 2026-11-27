@@ -29,7 +29,7 @@ public extension AssetsModel {
         case rules
     }
 
-    struct RewardSheet: Equatable {
+    struct RewardSheet: Equatable, Sendable {
         public internal(set) var isGuideOpen = false
     }
 }
@@ -54,28 +54,28 @@ public extension AssetsModel.Sheet {
 
 public extension AssetsModel.State {
     var goalTarget: AssetsModel.GoalTarget? {
-        rewardChild.goal
+        presented.rewardChild.goal
     }
 
     var isEditingRules: Bool {
-        rewardChild.isShowing(.rules)
+        presented.rewardChild.isShowing(.rules)
     }
 
     func present(_ sheet: AssetsModel.Sheet) {
         if sheet == .reward {
-            reward = AssetsModel.RewardSheet()
-            rewardChild.closeAll()
+            presented.reward = AssetsModel.RewardSheet()
+            presented.rewardChild.closeAll()
         }
 
-        presented.show(sheet)
+        presented.sheet.show(sheet)
     }
 
     func editGoal(_ goal: RewardGoal?) {
-        rewardChild.show(.goal(AssetsModel.GoalTarget(goal: goal)))
+        presented.rewardChild.show(.goal(AssetsModel.GoalTarget(goal: goal)))
     }
 
     func toggleGuide() {
-        reward.isGuideOpen.toggle()
+        presented.reward.isGuideOpen.toggle()
     }
 
     func open(afterSheet opening: AssetsModel.Opening) {

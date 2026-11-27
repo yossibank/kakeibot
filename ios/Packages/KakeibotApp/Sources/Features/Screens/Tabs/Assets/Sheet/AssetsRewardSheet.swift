@@ -37,15 +37,15 @@ struct AssetsRewardSheet: View {
             .padding(.top, 20)
             .backdrop()
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(isPresented: Bindable(model.state).rewardChild[.rules]) {
+            .navigationDestination(isPresented: isEditingRules) {
                 RewardRuleListView(parts: model.childParts())
             }
         }
-        .sheet(item: Bindable(model.state).rewardChild.goal) { target in
+        .sheet(item: Bindable(model.state).presented.rewardChild.goal) { target in
             AssetsRewardGoalEditSheet(model: model.goalEditModel(editing: target.goal))
         }
         .undoNotice(
-            model.state.bought,
+            model.state.notices.bought,
             message: "買ったものに移しました",
             systemImage: "bag"
         ) { id in
@@ -54,7 +54,7 @@ struct AssetsRewardSheet: View {
             }
         }
         .onDisappear {
-            model.state.bought.dismiss()
+            model.state.notices.bought.dismiss()
         }
         .presentationSizing(.tallForm)
     }
@@ -117,7 +117,7 @@ private extension AssetsRewardSheet {
                         Image(systemName: "chevron.down")
                             .sansFont(.micro, weight: .semibold)
                             .foregroundStyle(Palette.accent)
-                            .rotationEffect(.degrees(model.state.reward.isGuideOpen ? 180 : 0))
+                            .rotationEffect(.degrees(isGuideOpen ? 180 : 0))
 
                         Spacer()
                     }
@@ -128,7 +128,7 @@ private extension AssetsRewardSheet {
                 SectionTitle("使い方")
             }
 
-            if !isSetUp || model.state.reward.isGuideOpen {
+            if !isSetUp || isGuideOpen {
                 guideCard
             }
         }
@@ -168,13 +168,13 @@ private extension AssetsRewardSheet {
                 Spacer()
 
                 ToolButton(systemImage: "pencil") {
-                    model.state.rewardChild.show(.rules)
+                    model.state.presented.rewardChild.show(.rules)
                 }
             }
 
             if model.output.rewardRules.isEmpty {
                 AddButton("決まりを追加") {
-                    model.state.rewardChild.show(.rules)
+                    model.state.presented.rewardChild.show(.rules)
                 }
             } else {
                 VStack(spacing: 12) {
@@ -275,5 +275,13 @@ private extension AssetsRewardSheet {
 private extension AssetsRewardSheet {
     var isSetUp: Bool {
         !model.output.rewardRules.isEmpty && model.output.rewardGoal != nil
+    }
+
+    var isGuideOpen: Bool {
+        model.state.presented.reward.isGuideOpen
+    }
+
+    var isEditingRules: Binding<Bool> {
+        Bindable(model.state).presented.rewardChild[.rules]
     }
 }

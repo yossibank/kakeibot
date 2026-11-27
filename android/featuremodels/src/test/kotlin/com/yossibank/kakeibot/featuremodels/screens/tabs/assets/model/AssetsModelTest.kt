@@ -29,9 +29,9 @@ class AssetsModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
 
-        assertEquals("残高を読めませんでした", model.state.errorNotice.message)
+        assertEquals("残高を読めませんでした", model.state.notices.error.message)
         assertTrue(model.output.rows.isEmpty())
     }
 
@@ -47,7 +47,7 @@ class AssetsModelTest {
 
         setup.scope.launch { model.observe() }
         ModelWait.until { model.input.list.isFailed }
-        val message = model.state.errorNotice.message
+        val message = model.state.notices.error.message
         val list = model.input.list.value
         model.retry()
         ModelWait.until { model.input.list.isLoaded }
