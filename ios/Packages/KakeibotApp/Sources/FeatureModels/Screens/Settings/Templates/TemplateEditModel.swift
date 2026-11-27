@@ -120,11 +120,11 @@ public extension TemplateEditModel {
             input.cardBills = try await dependencies.database.recurrings()
             try await loadTemplate()
 
-            if state.categoryId == nil {
+            if state.fields.categoryId == nil {
                 state.setCategory(output.categories.first?.id)
             }
 
-            if state.walletId == nil {
+            if state.fields.walletId == nil {
                 state.setWallet(output.wallets.first?.id)
             }
 

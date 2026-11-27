@@ -13,6 +13,9 @@ public extension TemplateEditModel {
         public var name = ""
         public var memo = ""
         public var billShift = 0
+        public var walletId: Wallet.ID?
+        public var categoryId: EntryCategory.ID?
+        public var tagId: EntryTag.ID?
     }
 
     struct Presented: ScreenEditable {
@@ -42,9 +45,6 @@ public extension TemplateEditModel {
 
         public internal(set) var submodels = Submodels()
 
-        public private(set) var walletId: Wallet.ID?
-        public private(set) var categoryId: EntryCategory.ID?
-        public private(set) var tagId: EntryTag.ID?
         public private(set) var type: Entry.Kind
 
         public let notices: Notices
@@ -61,25 +61,25 @@ public extension TemplateEditModel {
 
 public extension TemplateEditModel.State {
     func setWallet(_ id: Wallet.ID?) {
-        guard id != walletId else {
+        guard id != fields.walletId else {
             return
         }
 
-        walletId = id
+        fields.walletId = id
         fields.billShift = 0
     }
 
     func setCategory(_ id: EntryCategory.ID?) {
-        guard id != categoryId else {
+        guard id != fields.categoryId else {
             return
         }
 
-        categoryId = id
-        tagId = nil
+        fields.categoryId = id
+        fields.tagId = nil
     }
 
     func toggleTag(_ id: EntryTag.ID) {
-        tagId = tagId == id ? nil : id
+        fields.tagId = fields.tagId == id ? nil : id
     }
 
     func press(_ key: AmountCalculator.Key) {
@@ -92,9 +92,9 @@ extension TemplateEditModel.State {
         fields.name = draft.name
         type = draft.type
         submodels.calculator = AmountCalculator(amount: draft.amount ?? 0)
-        categoryId = draft.categoryId
-        tagId = draft.tagId
-        walletId = draft.walletId
+        fields.categoryId = draft.categoryId
+        fields.tagId = draft.tagId
+        fields.walletId = draft.walletId
         fields.memo = draft.memo
         fields.billShift = draft.billShift
     }
