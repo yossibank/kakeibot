@@ -2,6 +2,10 @@ import Core
 import SwiftUI
 
 public struct AmountText: View {
+    @Environment(\.themeStyle.displayFont) private var displayFont
+    @Environment(\.themeStyle.textSize.scale) private var textSize
+    @Environment(\.sharedTextScale) private var shared
+
     let amount: Int
     let type: Entry.Kind?
     let font: FontSpec
@@ -26,11 +30,7 @@ public struct AmountText: View {
     }
 
     public var body: some View {
-        let text = isCompact
-            ? Yen.compactText(amount, type: type, sign: sign)
-            : Yen.text(amount, type: type, sign: sign)
-
-        Text(text)
+        amountText
             .modifier(AmountFont(spec: font))
             .monospacedDigit()
             .modifier(AmountTint(color: color ?? typeColor))
@@ -48,6 +48,42 @@ public extension AmountText {
 }
 
 private extension AmountText {
+    static let compactUnitRatio = 0.6
+
+    var amountText: Text {
+        guard isCompact else {
+            return Text(Yen.text(amount, type: type, sign: sign))
+        }
+
+        let text = Yen.compactText(amount, type: type, sign: sign)
+
+        guard
+            text.hasSuffix(Yen.compactUnit),
+            let unitFont
+        else {
+            return Text(text)
+        }
+
+        let number = Text(text.dropLast(Yen.compactUnit.count))
+        let unit = Text(Yen.compactUnit).font(unitFont)
+
+        return Text("\(number)\(unit)")
+    }
+
+    var unitFont: Font? {
+        guard case let .size(size, weight) = font else {
+            return nil
+        }
+
+        let points = Font.points(size.rawValue, scale: textSize, shared: shared)
+
+        return .display(
+            size: points * Self.compactUnitRatio,
+            weight: weight,
+            in: displayFont
+        )
+    }
+
     var typeColor: Color? {
         switch type {
         case .income: Palette.accent
