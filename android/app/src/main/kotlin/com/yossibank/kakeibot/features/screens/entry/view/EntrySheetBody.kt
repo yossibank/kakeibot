@@ -89,7 +89,7 @@ internal fun EntryBody(
 
         EntrySlip(
             model = model,
-            onOpenItems = { model.state.presented.show(EntryModel.Presented.Items) },
+            onOpenItems = { model.state.presented.overlay.show(EntryModel.Overlay.Items) },
             onVoice = startVoice.takeIf {
                 voice.input.isAvailable && model.output.showsVoice && !voice.output.isActive
             },
@@ -148,7 +148,7 @@ private fun ColumnScope.EntryDeckContent(
     today: LocalDate,
 ) {
     val context = LocalContext.current
-    val isInfo = model.state.errorNotice.tone == ErrorNotice.Tone.info
+    val isInfo = model.state.notices.error.tone == ErrorNotice.Tone.info
 
     if (voice.output.isActive) {
         EntryVoiceCard(
@@ -170,10 +170,10 @@ private fun ColumnScope.EntryDeckContent(
     } else {
         EntryDeck(
             model = model,
-            onOpenItems = { model.state.presented.show(EntryModel.Presented.Items) },
+            onOpenItems = { model.state.presented.overlay.show(EntryModel.Overlay.Items) },
             onSaveTemplate = {
-                model.state.presented.show(
-                    EntryModel.Presented.Template(model.output.newTemplateDraft()),
+                model.state.presented.overlay.show(
+                    EntryModel.Overlay.Template(model.output.newTemplateDraft()),
                 )
             },
             modifier = Modifier.weight(1f),
@@ -181,8 +181,8 @@ private fun ColumnScope.EntryDeckContent(
     }
 
     FittedText(
-        text = model.state.errorNotice.message,
-        modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
+        text = model.state.notices.error.message,
+        modifier = Modifier.clickable(onClick = model.state.notices.error::clear),
         color = if (isInfo) Palette.accent else Palette.rose,
         style = textFont(size = FontSize.Caption),
     )

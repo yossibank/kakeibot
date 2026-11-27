@@ -14,7 +14,7 @@ struct EntryItemModelTests {
 
         items.reset(for: entry)
 
-        #expect(items.state.fields.isSlipOpen)
+        #expect(items.state.presented.isSlipOpen)
         #expect(items.state.fields.draft.name.isEmpty)
         #expect(items.state.fields.draft.taxRate == .reduced)
         #expect(items.state.fields.draft.editing == nil)
@@ -133,7 +133,7 @@ struct EntryItemModelTests {
 
         items.state.fields.draft.shiftEditing(afterRemoving: 0)
         items.remove(0, from: entry)
-        let removed = try #require(items.state.removed.current)
+        let removed = try #require(items.state.notices.removed.current)
         let shifted = items.state.fields.draft.editing?.index
         items.restore(removed, in: entry)
 
@@ -153,9 +153,9 @@ struct EntryItemModelTests {
         items.remove(0, from: entry)
         await ObservationWait.until { clock.isSleeping }
         clock.advance(by: UndoNotice<EntryModel.RemovedItem>.duration - .seconds(1))
-        let kept = items.state.removed.current
+        let kept = items.state.notices.removed.current
         clock.advance(by: .seconds(1))
-        await ObservationWait.until { items.state.removed.current == nil }
+        await ObservationWait.until { items.state.notices.removed.current == nil }
 
         #expect(kept?.item.name == "牛乳")
         #expect(entry.state.items.list.isEmpty)
@@ -172,11 +172,11 @@ struct EntryItemModelTests {
         items.remove(0, from: entry)
         await ObservationWait.until { clock.isSleeping }
         clock.advance(by: UndoNotice<EntryModel.RemovedItem>.duration - .seconds(1))
-        let removed = try #require(items.state.removed.take())
+        let removed = try #require(items.state.notices.removed.take())
         items.restore(removed, in: entry)
         clock.advance(by: .seconds(1))
 
-        #expect(items.state.removed.current == nil)
+        #expect(items.state.notices.removed.current == nil)
         #expect(entry.state.items.list.map(\.name) == ["牛乳", "パン"])
     }
 
@@ -187,13 +187,13 @@ struct EntryItemModelTests {
         entry.state.addItem(name: "牛乳", amount: 200)
 
         items.scroll(to: 3, in: entry)
-        let missing = items.state.scroll
+        let missing = items.state.outcome
         items.scroll(to: 0, in: entry)
-        let first = items.state.scroll
+        let first = items.state.outcome
         items.scroll(to: 0, in: entry)
 
         #expect(missing.value == nil)
         #expect(first.value == 0)
-        #expect(items.state.scroll != first)
+        #expect(items.state.outcome != first)
     }
 }

@@ -51,7 +51,7 @@ public extension EntryModel.Output {
             budget: usage.baseBudget,
             carryover: usage.carryover,
             spent: usage.spent - totals.current + totals.after,
-            today: state.today,
+            today: input.today,
             periodEnd: monthOverview.period.upperBound
         )
     }
@@ -173,7 +173,7 @@ private extension EntryModel.Output {
             recurrings: [],
             monthStartDay: input.monthStartDay,
             carryoverFrom: input.carryoverFrom,
-            today: state.today
+            today: input.today
         )
 
         return MonthSummary(

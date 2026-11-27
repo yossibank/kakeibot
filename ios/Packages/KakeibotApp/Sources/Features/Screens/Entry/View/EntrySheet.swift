@@ -72,7 +72,7 @@ extension EntrySheet {
     }
 
     var today: LocalDate {
-        model.state.today
+        model.input.today
     }
 
     init(
@@ -198,7 +198,7 @@ private extension EntrySheet {
                     }
                 }
 
-            if let category = model.state.presented.current?.menuCategory {
+            if let category = model.state.presented.overlay.current?.menuCategory {
                 categoryMenuLayer(category, at: layout.menuFrame)
             }
 
@@ -223,7 +223,7 @@ private extension EntrySheet {
         content
             .haptic(
                 .impact(weight: .medium),
-                trigger: model.state.presented.current?.menuCategory
+                trigger: model.state.presented.overlay.current?.menuCategory
             ) { _, category in
                 category != nil
             }
@@ -232,11 +232,11 @@ private extension EntrySheet {
                     show(.amount)
                 }
             }
-            .haptic(.impact(weight: .light), trigger: voice.state.startCount)
-            .haptic(.impact(weight: .light), trigger: voice.state.endCount)
-            .errorBanner(model.state.errorNotice, bottom: bannerBottom)
+            .haptic(.impact(weight: .light), trigger: voice.state.rounds.starts)
+            .haptic(.impact(weight: .light), trigger: voice.state.rounds.ends)
+            .errorBanner(model.state.notices.error, bottom: bannerBottom)
             .deletionNotice(
-                model.state.results.deletion,
+                model.state.notices.deletion,
                 bottom: bannerBottom
             ) { deletion in
                 model.perform {
@@ -245,14 +245,14 @@ private extension EntrySheet {
                 }
             }
             .undoNotice(
-                model.state.results.hiddenCategory,
+                model.state.notices.hiddenCategory,
                 bottom: bannerBottom
             ) { hidden in
                 model.perform {
                     await $0.showCategory(hidden)
                 }
             }
-            .onOutcome(model.state.results.outcome) { outcome in
+            .onOutcome(model.state.outcome) { outcome in
                 receive(outcome)
             }
             .onOutcome(receipt.state.outcome) { outcome in
@@ -274,7 +274,7 @@ private extension EntrySheet {
 
     func presented(_ content: some View) -> some View {
         content
-            .proOffer(receipt.state.offer, presentsInSheet: true) {
+            .proOffer(receipt.state.presented.offer.current, presentsInSheet: true) {
                 receipt.closeOffer()
             } onUnlock: {
                 receipt.closeOffer()
@@ -285,7 +285,7 @@ private extension EntrySheet {
             .backdrop()
             .modifier(
                 EntryDiscardGuard(
-                    isPresented: Bindable(model.state).presented[.discard],
+                    isPresented: Bindable(model.state).presented.overlay[.discard],
                     model: model
                 ) {
                     dismiss()

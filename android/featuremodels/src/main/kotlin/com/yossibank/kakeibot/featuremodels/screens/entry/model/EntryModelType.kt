@@ -14,7 +14,7 @@ val EntryModel.Output.startField: EntryModel.Field
     }
 
 val EntryModel.Output.showsRecent: Boolean
-    get() = isBlank && state.field == startField
+    get() = isBlank && state.focus.field == startField
 
 fun EntryModel.select(type: Entry.Kind) {
     if (state.form.type == type) {

@@ -69,6 +69,15 @@ class EntryVoiceFlow internal constructor(
         ) : Phase
     }
 
+    data class Rounds(
+        val starts: Int = 0,
+        val ends: Int = 0,
+    ) {
+        fun started(): Rounds = copy(starts = starts + 1)
+
+        fun ended(): Rounds = copy(ends = ends + 1)
+    }
+
     class State {
         var phase: Phase by mutableStateOf(Phase.Idle)
             private set
@@ -76,10 +85,7 @@ class EntryVoiceFlow internal constructor(
         var notice: EntryVoiceResult? by mutableStateOf(null)
             private set
 
-        var startCount: Int by mutableStateOf(0)
-            private set
-
-        var endCount: Int by mutableStateOf(0)
+        var rounds: Rounds by mutableStateOf(Rounds())
             private set
 
         var undo: VoiceUndo? = null
@@ -87,16 +93,16 @@ class EntryVoiceFlow internal constructor(
 
         fun start() {
             phase = Phase.Listening()
-            startCount += 1
+            rounds = rounds.started()
         }
 
         fun finish(transcript: String) {
             phase = Phase.Reading(transcript = transcript)
-            endCount += 1
+            rounds = rounds.ended()
         }
 
         fun countEnd() {
-            endCount += 1
+            rounds = rounds.ended()
         }
 
         fun move(to: Phase) {

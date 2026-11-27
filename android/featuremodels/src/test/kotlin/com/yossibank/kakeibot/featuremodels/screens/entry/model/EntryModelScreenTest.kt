@@ -15,16 +15,16 @@ class EntryModelScreenTest {
 
         model.state.focus(EntryModel.Field.Fee)
         model.press(3)
-        val fee = model.state.field
-        val feeForward = model.state.isForward
+        val fee = model.state.focus.field
+        val feeForward = model.state.focus.isForward
         model.state.focus(EntryModel.Field.Transfer)
         model.press(5)
 
         assertEquals(EntryModel.Field.Fee, fee)
         assertTrue(feeForward)
         assertEquals(3, model.output.fee)
-        assertEquals(EntryModel.Field.Transfer, model.state.field)
-        assertFalse(model.state.isForward)
+        assertEquals(EntryModel.Field.Transfer, model.state.focus.field)
+        assertFalse(model.state.focus.isForward)
         assertEquals(5, model.output.amount)
     }
 
@@ -34,14 +34,14 @@ class EntryModelScreenTest {
         model.state.focus(EntryModel.Field.Date)
 
         model.select(type = Entry.Kind.transfer)
-        val transfer = model.state.field
+        val transfer = model.state.focus.field
         model.state.focus(EntryModel.Field.Fee)
         model.press(3)
         model.select(type = Entry.Kind.income)
         model.press(5)
 
         assertEquals(EntryModel.Field.Transfer, transfer)
-        assertEquals(EntryModel.Field.Category, model.state.field)
+        assertEquals(EntryModel.Field.Category, model.state.focus.field)
         assertEquals(3, model.state.feeCalculator.amount)
         assertEquals(5, model.output.amount)
     }
@@ -50,12 +50,12 @@ class EntryModelScreenTest {
     fun keepsOneShownAtATime() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.loadedModel()
 
-        model.state.presented.show(EntryModel.Presented.Items)
-        model.state.presented.show(EntryModel.Presented.Discard)
-        val discard = model.state.presented.current
-        model.state.presented.closeAll()
+        model.state.presented.overlay.show(EntryModel.Overlay.Items)
+        model.state.presented.overlay.show(EntryModel.Overlay.Discard)
+        val discard = model.state.presented.overlay.current
+        model.state.presented.overlay.closeAll()
 
-        assertEquals(EntryModel.Presented.Discard, discard)
-        assertNull(model.state.presented.current)
+        assertEquals(EntryModel.Overlay.Discard, discard)
+        assertNull(model.state.presented.overlay.current)
     }
 }

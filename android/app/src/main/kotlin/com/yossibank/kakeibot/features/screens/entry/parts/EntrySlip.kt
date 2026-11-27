@@ -94,7 +94,7 @@ fun EntrySlip(
             title = "日付",
             value = model.output.dateValue,
             isFromVoice = model.output.isDateFromVoice,
-            isActive = model.state.field == EntryModel.Field.Date,
+            isActive = model.state.focus.field == EntryModel.Field.Date,
             onSelect = { model.state.focus(EntryModel.Field.Date) },
         ) {
             DayTile(day = model.state.form.date.day)
@@ -127,7 +127,7 @@ private fun CategoryFields(
         value = preview?.categoryId
             ?.let { id -> model.output.categories.firstOrNull { it.id == id }?.name }
             ?: model.output.categoryText,
-        isActive = model.state.field == EntryModel.Field.Category,
+        isActive = model.state.focus.field == EntryModel.Field.Category,
         onSelect = { model.state.focus(EntryModel.Field.Category) },
     ) {
         IconTile(
@@ -142,7 +142,7 @@ private fun CategoryFields(
         title = model.output.walletTitle,
         value = model.output.wallet?.name ?: "選ぶ",
         isFromVoice = model.output.isWalletFromVoice,
-        isActive = model.state.field == EntryModel.Field.Wallet,
+        isActive = model.state.focus.field == EntryModel.Field.Wallet,
         onSelect = { model.state.focus(EntryModel.Field.Wallet) },
     ) {
         IconTile(
@@ -154,7 +154,7 @@ private fun CategoryFields(
 
 @Composable
 private fun TransferFields(model: EntryModel) {
-    val field = model.state.field.field(of = Entry.Kind.transfer)
+    val field = model.state.focus.field.field(of = Entry.Kind.transfer)
 
     SlipRow(
         title = "振替",
@@ -170,7 +170,7 @@ private fun TransferFields(model: EntryModel) {
     SlipRow(
         title = "手数料",
         value = if (model.output.fee > 0) AmountText.text(model.output.fee) else "なし",
-        isActive = model.state.field == EntryModel.Field.Fee,
+        isActive = model.state.focus.field == EntryModel.Field.Fee,
         onSelect = { model.state.focus(EntryModel.Field.Fee) },
     ) {
         SymbolTile(icon = R.drawable.ic_bank)
@@ -229,7 +229,7 @@ private fun AmountRow(
     model: EntryModel,
     listening: EntryVoiceFlow.Phase.Listening?,
 ) {
-    val isActive = model.state.field == EntryModel.Field.Amount
+    val isActive = model.state.focus.field == EntryModel.Field.Amount
 
     EntrySlipActiveRow(
         isActive = isActive,
@@ -293,7 +293,7 @@ private fun RowScope.AmountStatus(
     model: EntryModel,
     listening: EntryVoiceFlow.Phase.Listening?,
 ) {
-    val isFee = model.state.field == EntryModel.Field.Fee
+    val isFee = model.state.focus.field == EntryModel.Field.Fee
     val expression = if (isFee) null else model.output.expressionText
 
     if (listening != null) {

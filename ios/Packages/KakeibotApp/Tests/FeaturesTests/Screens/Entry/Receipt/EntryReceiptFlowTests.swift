@@ -58,7 +58,7 @@ struct EntryReceiptFlowTests {
         flow.start(for: model, isPro: true)
 
         #expect(flow.state.step == .guide)
-        #expect(flow.state.offer == nil)
+        #expect(flow.state.presented.offer.current == nil)
     }
 
     @Test
@@ -74,7 +74,7 @@ struct EntryReceiptFlowTests {
         flow.start(for: model, isPro: false)
 
         #expect(flow.state.step == .camera)
-        #expect(flow.state.offer == nil)
+        #expect(flow.state.presented.offer.current == nil)
     }
 
     @Test
@@ -131,14 +131,14 @@ struct EntryReceiptFlowTests {
         }
 
         flow.start(for: model, isPro: false)
-        let offer = flow.state.offer
+        let offer = flow.state.presented.offer.current
         let step = flow.state.step
         flow.closeOffer()
         flow.start(for: model, isPro: true)
 
         #expect(offer == EntryReceiptFlow.offerFeature)
         #expect(step == nil)
-        #expect(flow.state.offer == nil)
+        #expect(flow.state.presented.offer.current == nil)
         #expect(flow.state.step == .guide)
     }
 

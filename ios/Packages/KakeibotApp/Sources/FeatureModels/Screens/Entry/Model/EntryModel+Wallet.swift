@@ -69,7 +69,7 @@ public extension EntryModel {
 
         if let added {
             choose(added.wallet.id, as: added.role)
-            state.results.outcome.send(.walletChosen)
+            state.outcome.send(.walletChosen)
         }
     }
 
@@ -122,8 +122,8 @@ public extension EntryModel {
     }
 
     func setToday(_ today: LocalDate) {
-        if state.today != today {
-            state.today = today
+        if input.today != today {
+            input.today = today
         }
     }
 
@@ -131,7 +131,7 @@ public extension EntryModel {
         do {
             for try await list in dependencies.database.entryListUpdates() {
                 guard
-                    !state.results.isClosing,
+                    !state.closing.hasBegun,
                     list != input.history
                 else {
                     continue

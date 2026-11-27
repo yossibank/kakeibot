@@ -66,7 +66,7 @@ class EntryModelTest {
 
         assertEquals(options.expenseCategories.first().id, model.state.form.categoryId)
         assertEquals(options.wallets.first().id, model.state.form.walletId)
-        assertEquals(EntryModel.Field.Category, model.state.field)
+        assertEquals(EntryModel.Field.Category, model.state.focus.field)
         assertTrue(model.output.isBlank)
         assertTrue(model.output.showsRecent)
     }
@@ -171,7 +171,7 @@ class EntryModelTest {
         val saved = model.save()
 
         assertFalse(saved)
-        assertEquals("金額を入れてください", model.state.errorNotice.message)
+        assertEquals("金額を入れてください", model.state.notices.error.message)
     }
 
     @Test
@@ -181,7 +181,7 @@ class EntryModelTest {
         model.state.update { copy(categoryId = null) }
 
         assertFalse(model.save())
-        assertEquals("カテゴリを選んでください", model.state.errorNotice.message)
+        assertEquals("カテゴリを選んでください", model.state.notices.error.message)
     }
 
     @Test
@@ -214,7 +214,7 @@ class EntryModelTest {
         val saved = model.save()
 
         assertFalse(saved)
-        assertEquals("記録が見つかりませんでした", model.state.errorNotice.message)
+        assertEquals("記録が見つかりませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -340,7 +340,7 @@ class EntryModelTest {
 
         assertEquals(7, model.output.amount)
         assertEquals("おやつ", model.state.form.memo)
-        assertEquals(EntryModel.Field.Amount, model.state.field)
+        assertEquals(EntryModel.Field.Amount, model.state.focus.field)
     }
 
     @Test

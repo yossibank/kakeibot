@@ -23,11 +23,10 @@ public final class EntryModel: ScreenPerforming {
         let state = State(
             type: type,
             date: date,
-            today: parts.clock.today,
             wait: parts.wait
         )
 
-        let input = Input(editingId: id, startingTemplate: template)
+        let input = Input(today: parts.clock.today, editingId: id, startingTemplate: template)
 
         self.state = state
         self.input = input
@@ -40,14 +39,14 @@ public extension EntryModel {
     func start() async {
         let isFirst = !output.isLoaded
 
-        state.results.deletion.dismiss()
-        state.results.hiddenCategory.dismiss()
+        state.notices.deletion.dismiss()
+        state.notices.hiddenCategory.dismiss()
 
         if isFirst {
             await load()
         }
 
-        state.results.outcome.send(.ready(isFirst: isFirst))
+        state.outcome.send(.ready(isFirst: isFirst))
     }
 
     func load() async {
@@ -129,7 +128,7 @@ public extension EntryModel {
         }
 
         beginClosing()
-        state.results.outcome.send(.closed(change))
+        state.outcome.send(.closed(change))
 
         return change
     }
@@ -141,7 +140,7 @@ public extension EntryModel {
         }
 
         await startNext()
-        state.results.outcome.send(.continued(change))
+        state.outcome.send(.continued(change))
 
         return change
     }
@@ -156,7 +155,7 @@ public extension EntryModel {
         }
 
         input.baseline = output.snapshot
-        state.results.isClosing = false
+        state.closing.cancel()
     }
 
     func recordAgain() async {
@@ -167,7 +166,7 @@ public extension EntryModel {
         state.keypad.feeCalculator = AmountCalculator()
         state.filled.templateId = nil
         updateToday()
-        state.setDate(state.today)
+        state.setDate(input.today)
         state.payment.billMonth = nil
         state.items = Items()
         state.keypad.target = .amount
@@ -199,9 +198,9 @@ public extension EntryModel {
         }
 
         input.baseline = output.snapshot
-        state.results.isClosing = false
+        state.closing.cancel()
         state.errorNotice.inform(Self.recordAgainMessage)
-        state.results.outcome.send(.categoryMoved)
+        state.outcome.send(.categoryMoved)
     }
 
     @discardableResult
@@ -209,7 +208,7 @@ public extension EntryModel {
         guard
             let original = input.original,
             !state.task.isRunning,
-            !state.results.isClosing
+            !state.closing.hasBegun
         else {
             return nil
         }
@@ -239,7 +238,7 @@ public extension EntryModel {
             )
 
             beginClosing()
-            state.results.outcome.send(.closed(change))
+            state.outcome.send(.closed(change))
 
             return change
         } catch {
@@ -249,7 +248,7 @@ public extension EntryModel {
     }
 
     func beginClosing() {
-        state.results.isClosing = true
+        state.closing.begin()
     }
 
     func newNoticeModel() -> EntryNoticeModel {
@@ -281,7 +280,7 @@ private extension EntryModel {
     func store() async -> EntryChange? {
         guard
             !state.task.isRunning,
-            !state.results.isClosing,
+            !state.closing.hasBegun,
             let draft = output.draft
         else {
             return nil

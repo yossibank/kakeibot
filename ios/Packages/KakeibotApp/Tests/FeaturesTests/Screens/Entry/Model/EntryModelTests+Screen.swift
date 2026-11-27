@@ -109,17 +109,17 @@ extension EntryModelTests {
         let wallet = try #require(await editor.save())
 
         model.state.open(.newWallet(.source))
-        let opened = model.state.presented.current?.sheet
+        let opened = model.state.presented.overlay.current?.sheet
         model.receive(wallet, as: .source)
         model.state.closeSheet()
         await model.reloadAfterSheet()
-        let chosen = model.state.results.outcome
+        let chosen = model.state.outcome
         await model.reloadAfterSheet()
 
         #expect(opened == .newWallet(.source))
         #expect(model.state.payment.walletId == wallet.id)
         #expect(chosen.value == .walletChosen)
-        #expect(model.state.results.outcome == chosen)
+        #expect(model.state.outcome == chosen)
     }
 
     @Test
@@ -132,7 +132,7 @@ extension EntryModelTests {
         await model.reloadAfterSheet()
 
         #expect(model.state.payment.walletId == before)
-        #expect(model.state.results.outcome.value == nil)
+        #expect(model.state.outcome.value == nil)
     }
 
     @Test
@@ -142,10 +142,10 @@ extension EntryModelTests {
 
         model.state.openMenu(for: category)
         model.state.editMemo(true)
-        let menu = model.state.presented.current
+        let menu = model.state.presented.overlay.current
         let isEditingMemo = model.state.screen.isEditingMemo
         model.state.confirmDiscard()
-        let discard = model.state.presented.current
+        let discard = model.state.presented.overlay.current
         model.state.closeMenu()
         model.state.editMemo(false)
 
@@ -153,7 +153,7 @@ extension EntryModelTests {
         #expect(isEditingMemo)
         #expect(discard == .discard)
         #expect(discard?.menuCategory == nil)
-        #expect(model.state.presented[.discard])
+        #expect(model.state.presented.overlay[.discard])
         #expect(!model.state.screen.isEditingMemo)
     }
 
@@ -164,15 +164,15 @@ extension EntryModelTests {
 
         model.state.openMenu(for: category)
         model.state.open(.editCategory(category))
-        let sheet = model.state.presented.current
-        model.state.presented[.discard] = false
-        let kept = model.state.presented.current
+        let sheet = model.state.presented.overlay.current
+        model.state.presented.overlay[.discard] = false
+        let kept = model.state.presented.overlay.current
         model.state.closeSheet()
 
         #expect(sheet == .sheet(.editCategory(category)))
         #expect(sheet?.menuCategory == nil)
         #expect(kept == .sheet(.editCategory(category)))
-        #expect(model.state.presented.current == nil)
+        #expect(model.state.presented.overlay.current == nil)
     }
 
     @Test

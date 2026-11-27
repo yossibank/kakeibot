@@ -48,13 +48,17 @@ public extension EntryReceiptFlow {
         public var hidesGuide = false
     }
 
+    struct Presented: ScreenEditable {
+        public var offer = Shown<String>()
+    }
+
     @MainActor
     @Observable
     final class State {
         public var fields = Fields()
+        public var presented = Presented()
 
         public private(set) var step: Step?
-        public private(set) var offer: String?
 
         public internal(set) var outcome = ScreenOutcome<Outcome>()
     }
@@ -151,15 +155,15 @@ public extension EntryReceiptFlow {
 
 extension EntryReceiptFlow.State {
     func showOffer(_ feature: String) {
-        offer = feature
+        presented.offer.show(feature)
     }
 
     func closeOffer() {
-        offer = nil
+        presented.offer.closeAll()
     }
 
     func open(showsGuide: Bool) {
-        offer = nil
+        presented.offer.closeAll()
         fields.hidesGuide = false
         step = showsGuide ? .guide : .camera
     }

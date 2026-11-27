@@ -68,7 +68,7 @@ private extension EntryVoiceCard {
                     .frame(width: Self.cancelWidth)
 
                 EntryVoiceFinishButton(
-                    start: flow.state.silenceStart,
+                    start: flow.state.silence.startedAt,
                     duration: flow.input.silenceDuration,
                     isSpent: isReading,
                     action: onFinish

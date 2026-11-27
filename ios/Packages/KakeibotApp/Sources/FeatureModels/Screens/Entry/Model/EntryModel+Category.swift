@@ -50,7 +50,7 @@ public extension EntryModel {
 
     func addCategory(_ id: EntryCategory.ID) async {
         await reloadCategories(selecting: id)
-        state.results.outcome.send(.categoryAdded)
+        state.outcome.send(.categoryAdded)
     }
 
     func reloadCategories(selecting id: EntryCategory.ID? = nil) async {
@@ -130,12 +130,12 @@ public extension EntryModel {
             )
 
             await reloadCategories()
-            state.results.hiddenCategory.show(hidden)
+            state.notices.hiddenCategory.show(hidden)
 
             return hidden
         } catch {
             report(error)
-            state.results.hiddenCategory.dismiss()
+            state.notices.hiddenCategory.dismiss()
             return nil
         }
     }
@@ -149,7 +149,7 @@ public extension EntryModel {
             )
 
             await reloadCategories(selecting: hidden.wasSelected ? hidden.id : nil)
-            state.results.outcome.send(.categoryMoved)
+            state.outcome.send(.categoryMoved)
         } catch {
             state.errorNotice.show(Self.restoreFailedMessage, for: error)
         }

@@ -12,7 +12,7 @@ extension EntryModelTests {
         let model = try await Self.fixedModel(setup)
         let today = LocalDate(Self.fixedNow, in: .current)
 
-        #expect(model.state.today == today)
+        #expect(model.input.today == today)
         #expect(model.output.monthOverview.period.contains(today))
         #expect(model.output.monthTotalText == "今月の食費 ¥500")
     }

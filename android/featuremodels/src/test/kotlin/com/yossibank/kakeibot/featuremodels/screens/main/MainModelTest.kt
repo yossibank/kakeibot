@@ -76,7 +76,7 @@ class MainModelTest {
         assertEquals(MainModel.Tab.Home, model.state.tabs.current)
         assertEquals(MainModel.Sheet.Entry(editing = null, date = date), sheet)
         assertEquals(date, entry.state.form.date)
-        assertEquals(setup.today, entry.state.today)
+        assertEquals(setup.today, entry.input.today)
     }
 
     @Test

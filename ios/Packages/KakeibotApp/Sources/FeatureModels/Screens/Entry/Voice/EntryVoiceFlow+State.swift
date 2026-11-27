@@ -15,9 +15,8 @@ public extension EntryVoiceFlow {
     @Observable
     final class State {
         public private(set) var step: Step?
-        public private(set) var silenceStart: Date?
-        public private(set) var startCount = 0
-        public private(set) var endCount = 0
+        public private(set) var silence = Silence()
+        public private(set) var rounds = Rounds()
         public private(set) var notice: Notice?
 
         private(set) var undo: EntryModel.VoiceUndo?
@@ -92,29 +91,29 @@ extension EntryVoiceFlow.State {
 
     func startListening() {
         step = .listening
-        startCount += 1
+        rounds.start()
     }
 
     func startSilence(at date: Date) {
-        silenceStart = date
+        silence.start(at: date)
     }
 
     func clearSilence() {
-        silenceStart = nil
+        silence.clear()
     }
 
     func finish() {
-        silenceStart = nil
+        silence.clear()
         step = .reading
-        endCount += 1
+        rounds.end()
     }
 
     func countEnd() {
-        endCount += 1
+        rounds.end()
     }
 
     func reset() {
-        silenceStart = nil
+        silence.clear()
         step = nil
     }
 }

@@ -81,7 +81,7 @@ extension EntryItemSheet {
             return
         }
 
-        items.state.fields.openIndex = nil
+        items.state.presented.row.closeAll()
         focus = nil
 
         withoutAnimation {
@@ -92,7 +92,7 @@ extension EntryItemSheet {
     }
 
     func remove(_ index: Int) {
-        items.state.fields.openIndex = nil
+        items.state.presented.row.closeAll()
 
         if draft.isEditing(index) {
             resetInput()
@@ -107,7 +107,7 @@ extension EntryItemSheet {
 
     func showSlip(scrollingTo index: Int) {
         withAnimation(.snappy) {
-            items.state.fields.isSlipOpen = true
+            items.state.presented.isSlipOpen = true
         } completion: {
             items.scroll(to: index, in: model)
         }
@@ -254,7 +254,7 @@ private extension EntryItemSheet {
             geometry.contentOffset.y > settledOffset(of: geometry) + 1
         else {
             withAnimation(.snappy) {
-                items.state.fields.isSlipOpen = false
+                items.state.presented.isSlipOpen = false
             }
 
             return
@@ -264,7 +264,7 @@ private extension EntryItemSheet {
             layout.scrollPosition.scrollTo(y: settledOffset(of: geometry))
         } completion: {
             withAnimation(.snappy) {
-                items.state.fields.isSlipOpen = false
+                items.state.presented.isSlipOpen = false
             }
         }
     }

@@ -14,6 +14,7 @@ import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenOutcome
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
@@ -44,8 +45,8 @@ class EntryModel(
     editing: Identifier<Entry>? = null,
     date: LocalDate = today,
 ) : ScreenPerforming {
-    val state = State(today, date, parts.wait)
-    val input = Input(editing)
+    val state = State(date, parts.wait)
+    val input = Input(today, editing)
     val output = Output(input, state)
 
     private val dependencies = Dependencies(parts.database, parts.clock)
@@ -70,28 +71,52 @@ class EntryModel(
         ) : Outcome
     }
 
-    sealed interface Presented {
-        data object Discard : Presented
+    sealed interface Overlay {
+        data object Discard : Overlay
 
-        data object Items : Presented
+        data object Items : Overlay
 
         data class Template(
             val draft: EntryTemplateDraft,
-        ) : Presented
+        ) : Overlay
+    }
+
+    class Presented : ScreenEditable {
+        val overlay = Shown<Overlay>()
+    }
+
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+    }
+
+    data class FieldFocus(
+        val field: Field = Field.Category,
+        val isForward: Boolean = true,
+    ) {
+        fun moved(
+            to: Field,
+            type: Entry.Kind,
+        ): FieldFocus {
+            val isTransferOnly = to == Field.Fee || to == Field.Transfer
+            val next = if (isTransferOnly && type != Entry.Kind.transfer) Field.Amount else to
+
+            return FieldFocus(
+                field = next,
+                isForward = next.order(of = type) >= field.order(of = type),
+            )
+        }
     }
 
     class State(
-        today: LocalDate,
         date: LocalDate,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
         val outcome = ScreenOutcome<Outcome>()
-        val presented = Shown<Presented>()
-
-        var today: LocalDate by mutableStateOf(today)
-            internal set
+        val presented = Presented()
 
         var form: EntryForm by mutableStateOf(EntryForm(date = date))
             private set
@@ -102,10 +127,7 @@ class EntryModel(
         var feeCalculator: AmountCalculator by mutableStateOf(AmountCalculator())
             private set
 
-        var field: Field by mutableStateOf(Field.Category)
-            private set
-
-        var isForward: Boolean by mutableStateOf(true)
+        var focus: FieldFocus by mutableStateOf(FieldFocus())
             private set
 
         var voiceFilled: VoiceFilled? by mutableStateOf(null)
@@ -116,12 +138,7 @@ class EntryModel(
         }
 
         fun focus(field: Field) {
-            val type = form.type
-            val isTransferOnly = field == Field.Fee || field == Field.Transfer
-            val next = if (isTransferOnly && type != Entry.Kind.transfer) Field.Amount else field
-
-            isForward = next.order(of = type) >= this.field.order(of = type)
-            this.field = next
+            focus = focus.moved(to = field, type = form.type)
         }
 
         fun select(date: LocalDate) {
@@ -130,7 +147,7 @@ class EntryModel(
         }
 
         fun press(key: AmountCalculator.Key) {
-            if (field == Field.Fee) {
+            if (focus.field == Field.Fee) {
                 feeCalculator = feeCalculator.press(key)
             } else {
                 calculator = calculator.press(key)
@@ -172,7 +189,7 @@ class EntryModel(
             feeCalculator = AmountCalculator(amount = fee)
         }
 
-        internal fun startAgain() {
+        internal fun startAgain(today: LocalDate) {
             form = form.copy(
                 date = today,
                 billMonth = null,
@@ -188,8 +205,12 @@ class EntryModel(
     }
 
     class Input(
+        today: LocalDate,
         editingId: Identifier<Entry>?,
     ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var editingId: Identifier<Entry>? by mutableStateOf(editingId)
             internal set
 
@@ -235,10 +256,6 @@ class EntryModel(
         val database: AppDatabase,
         val clock: ScreenClock,
     )
-
-    fun setToday(today: LocalDate) {
-        state.today = today
-    }
 
     suspend fun load() {
         val database = dependencies.database
@@ -320,26 +337,10 @@ class EntryModel(
         return change != null
     }
 
-    suspend fun startNext() {
-        state.clear()
-        state.focus(output.startField)
-
-        state.task.attempt(describe = ::describe) {
-            loadHistory()
-        }
-
-        input.baseline = output.snapshot
-    }
-
     suspend fun reloadTemplates() {
         state.task.attempt(describe = ::describe) {
             input.allTemplates = dependencies.database.templates()
         }
-    }
-
-    suspend fun receiveTemplate() {
-        (state.presented.current as? Presented.Template)?.let(state.presented::close)
-        reloadTemplates()
     }
 
     internal suspend fun loadHistory() {
@@ -360,7 +361,7 @@ class EntryModel(
         val problem = draft.problems.firstOrNull()
 
         if (problem != null) {
-            state.errorNotice.show(output.message(of = problem))
+            state.notices.error.show(output.message(of = problem))
             return null
         }
 
