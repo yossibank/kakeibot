@@ -21,7 +21,7 @@ struct BackupModelTests {
         let export = try ExportV1(json: file.data)
 
         #expect(isMade)
-        #expect(model.state.presented[.exporter])
+        #expect(model.state.presented.dialog[.exporter])
         #expect(file.name == "kakeibot-2026-10-03.json")
         #expect(export.app == ExportV1.App(platform: .ios, version: "1.2"))
     }
@@ -234,7 +234,7 @@ struct BackupModelTests {
         await target.restore()
 
         #expect(isRead)
-        #expect(target.state.presented[.restore])
+        #expect(target.state.presented.dialog[.restore])
         #expect(try setup.target.snapshot().wallets.count == before.wallets.count)
     }
 
@@ -349,7 +349,7 @@ struct BackupModelTests {
         let newer = Data(#"{"format":"kakeibot-export","version":99}"#.utf8)
 
         #expect(!model.read(other))
-        #expect(!model.state.presented[.restore])
+        #expect(!model.state.presented.dialog[.restore])
         #expect(model.state.errorNotice.message == "かけいぼっとのバックアップではありません")
 
         #expect(!model.read(newer))
