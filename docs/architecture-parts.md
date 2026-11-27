@@ -20,7 +20,7 @@
 | `SettingsBoardModel` | 並べ替え・非表示・削除のできる、設定の一覧のモデル | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardListModel` | 一覧を DB から読み、監視するモデル。`SettingsBoardPage` に載せる画面は、これに適合させる | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardDatabaseModel` | `ScreenParts` だけで作れる一覧のモデル。`SettingsBoardSpec` の `makeModel()` の既定の実装を使える | `FeatureModels/Shared/SettingsParts/Board/Model/` |
-| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並び・知らせ・消した物（`removed`）・出している物（`shown`）を持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
+| `SettingsBoardState` | 一覧のモデルの状態で、並べ替え中の並び・知らせ・消した物（`removed`）・出している物（`presented`）を持つ。それだけの時は `SettingsBoardMovingState` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardInput` | 一覧のモデルの入力で、DB から読んだ一覧と、説明カード・非表示の一覧を閉じたかを持つ。それだけの時は `SettingsBoardSnapshotInput` を使う | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardOutput` | 一覧のモデルの出力。出す行・非表示の行・並べ替え中の行を出す | `FeatureModels/Shared/SettingsParts/Board/Model/` |
 | `SettingsBoardSpec` | 一覧の画面ごとの設定（題・文言・並びの形・タイル・編集画面・確認）。画面ごとに 1 つ書く | `Features/Shared/SettingsParts/Board/` |
@@ -50,7 +50,7 @@
 
 | 仕組み | 使いどころ | 置き場所 |
 | --- | --- | --- |
-| `SettingsBoardPage` | 設定の一覧の画面の全体で、`SettingsBoardSpec` を受け取り、モデルと監視を持つ。行き先と確認は、モデルの `shown` から読む | `Features/Shared/SettingsParts/Board/` |
+| `SettingsBoardPage` | 設定の一覧の画面の全体で、`SettingsBoardSpec` を受け取り、モデルと監視を持つ。行き先と確認は、モデルの `presented` から読む | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardLayout` | 一覧の並びの形。`tiles`（タイル）、`swipeCards`（幅を測って置く、横に払える行）、`swipeRows`（横に払える行） | `Features/Shared/SettingsParts/Board/` |
 | `SettingsConfirmation` | 行を非表示・削除する前の確認の文言。`SettingsBoardSpec` が返す | `Features/Shared/SettingsParts/Board/` |
 | `SettingsBoardDestination` | 新規と編集だけの行き先。`SettingsBoardMovingState` が使い、`SettingsBoardSpec` の既定の実装がある | `FeatureModels/Shared/SettingsParts/Board/` |
