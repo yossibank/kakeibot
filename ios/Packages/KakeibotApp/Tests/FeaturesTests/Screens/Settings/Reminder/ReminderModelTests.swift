@@ -224,13 +224,13 @@ extension ReminderModelTests {
             )
         }
 
-        let picking = models.map { $0.state.presented[.timePicker] }
+        let picking = models.map { $0.state.presented.picker[.timePicker] }
 
-        models[2].state.presented.close(.timePicker)
-        models[0].state.presented.show(.timePicker)
+        models[2].state.presented.picker.close(.timePicker)
+        models[0].state.presented.picker.show(.timePicker)
 
         #expect(picking == [false, false, true])
-        #expect(!models[2].state.presented[.timePicker])
-        #expect(models[0].state.presented[.timePicker])
+        #expect(!models[2].state.presented.picker[.timePicker])
+        #expect(models[0].state.presented.picker[.timePicker])
     }
 }
