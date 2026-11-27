@@ -176,7 +176,7 @@ extension SettingsMenuSheet {
                 ThemeStyleLookView(model: ThemeStyleModel(parts: parts))
             } label: {
                 row("形と動き", systemImage: "square.on.circle") {
-                    ThemeStyleMarks()
+                    ThemeStyleMarkLine()
                 }
             }
         }

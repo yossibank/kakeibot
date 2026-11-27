@@ -24,7 +24,7 @@ public struct RecordsRewardSheet: View {
                 header
 
                 if rules.isEmpty {
-                    RecordsSheetEmpty(
+                    RecordsSheetPlaceholder(
                         systemImage: "gift",
                         title: "ごほうびの決まりがまだありません",
                         message: "決まりを作ると、ここで達成を付けられます",

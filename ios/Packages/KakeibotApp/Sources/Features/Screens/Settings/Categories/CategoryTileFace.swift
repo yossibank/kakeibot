@@ -20,7 +20,7 @@ struct CategoryTileFace: View {
                 .minimumScaleFactor(TextScale.floor)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .settingsTileFace(isHidden: isHidden)
+        .settingsTileBackground(isHidden: isHidden)
         .opacity(opacity)
     }
 }

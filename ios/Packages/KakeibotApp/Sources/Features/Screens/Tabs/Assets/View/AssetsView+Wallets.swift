@@ -249,7 +249,7 @@ private extension AssetsView {
             .padding(.horizontal, 12)
             .frame(maxWidth: fills ? .infinity : nil)
             .frame(height: 32)
-            .goldFace()
+            .goldBackground()
     }
 
     func adjustMessage(showsReason: Bool) -> some View {

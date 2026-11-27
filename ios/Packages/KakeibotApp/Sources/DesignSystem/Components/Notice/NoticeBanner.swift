@@ -23,7 +23,7 @@ public struct NoticeBanner: View {
 
     public var body: some View {
         HStack(spacing: 12) {
-            NoticeMark(systemImage: systemImage, tone: tone)
+            NoticeBadge(systemImage: systemImage, tone: tone)
 
             Text(message)
                 .textFont(.footnote)

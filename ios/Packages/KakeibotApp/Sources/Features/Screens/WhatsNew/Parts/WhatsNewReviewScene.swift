@@ -59,7 +59,7 @@ private extension WhatsNewReviewScene {
 
     var closing: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ReviewReportLabel(title: "10月の結果")
+            ReviewReportTitle(title: "10月の結果")
 
             HStack(spacing: 4) {
                 Text("予算内")
@@ -107,7 +107,7 @@ private extension WhatsNewReviewScene {
     var goal: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                ReviewReportLabel(title: "11月の一手")
+                ReviewReportTitle(title: "11月の一手")
 
                 Text("外食は 4 回まで")
                     .textFont(size: .small, weight: .bold)

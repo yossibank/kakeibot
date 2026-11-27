@@ -114,11 +114,11 @@ private extension EntryRow {
             details
 
             if let route {
-                EntryRoute(source: route.source, destination: route.destination)
+                EntryRouteLine(source: route.source, destination: route.destination)
             }
 
             if let memo, tag != nil || detail == nil || route != nil {
-                EntryMemo(memo)
+                EntryMemoText(memo)
             }
         }
     }
@@ -150,14 +150,14 @@ private extension EntryRow {
                     detailText(detailMemo.detail)
                         .fixedSize()
 
-                    EntryMemo(detailMemo.memo)
+                    EntryMemoText(detailMemo.memo)
                         .fixedSize()
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     detailText(detailMemo.detail)
 
-                    EntryMemo(detailMemo.memo)
+                    EntryMemoText(detailMemo.memo)
                 }
             }
         } else if let detail {

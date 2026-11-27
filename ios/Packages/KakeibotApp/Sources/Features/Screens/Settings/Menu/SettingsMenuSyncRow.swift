@@ -22,7 +22,7 @@ struct SettingsMenuSyncRow: View {
                     systemImage: "icloud",
                     tint: nil,
                     trailingImage: "chevron.right",
-                    accessory: SettingsMenuRowValue(
+                    accessory: SettingsMenuRowText(
                         value: status.isEnabled ? "オン" : "オフ",
                         shortValue: nil
                     )

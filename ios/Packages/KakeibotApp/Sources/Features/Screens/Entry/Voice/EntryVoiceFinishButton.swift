@@ -19,7 +19,7 @@ struct EntryVoiceFinishButton: View {
                             .scaleEffect(x: filled(at: context.date), anchor: .leading)
                     }
                     .clipShape(.capsule)
-                    .goldFace()
+                    .goldBackground()
             }
         }
         .buttonStyle(.plain)

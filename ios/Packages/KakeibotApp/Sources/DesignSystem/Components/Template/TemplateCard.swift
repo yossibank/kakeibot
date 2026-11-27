@@ -63,7 +63,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
     }
 }
 
-public extension TemplateCard where Name == TemplateCardName, Amount == TemplateCardAmount {
+public extension TemplateCard where Name == TemplateCardTitle, Amount == TemplateCardAmount {
     init(
         icon: Icon?,
         name: String,
@@ -72,7 +72,7 @@ public extension TemplateCard where Name == TemplateCardName, Amount == Template
         size: TemplateCardSize = .regular
     ) {
         self.init(icon: icon, detail: detail, size: size) {
-            TemplateCardName(name: name, size: size)
+            TemplateCardTitle(name: name, size: size)
         } amount: {
             TemplateCardAmount(amount: amount, size: size)
         }

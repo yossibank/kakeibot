@@ -84,7 +84,7 @@ private extension WhatsNewWidgetScene {
         }
         .padding(4)
         .frame(height: 40)
-        .templateCardFace(cornerRadius: 8, shadowRadius: 2)
+        .templateCardBackground(cornerRadius: 8, shadowRadius: 2)
     }
 }
 

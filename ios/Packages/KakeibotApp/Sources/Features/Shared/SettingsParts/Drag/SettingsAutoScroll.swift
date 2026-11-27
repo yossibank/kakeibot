@@ -85,7 +85,7 @@ private extension SettingsAutoScroll {
     }
 }
 
-private struct SettingsAutoScrollModifier: ViewModifier {
+private struct SettingsAutoScrollTracker: ViewModifier {
     @Bindable var autoScroll: SettingsAutoScroll
 
     func body(content: Content) -> some View {
@@ -111,7 +111,7 @@ private struct SettingsAutoScrollModifier: ViewModifier {
     }
 }
 
-private extension SettingsAutoScrollModifier {
+private extension SettingsAutoScrollTracker {
     struct Metrics: Equatable {
         let offset: CGFloat
         let maxOffset: CGFloat
@@ -120,6 +120,6 @@ private extension SettingsAutoScrollModifier {
 
 extension View {
     func settingsAutoScroll(_ autoScroll: SettingsAutoScroll) -> some View {
-        modifier(SettingsAutoScrollModifier(autoScroll: autoScroll))
+        modifier(SettingsAutoScrollTracker(autoScroll: autoScroll))
     }
 }

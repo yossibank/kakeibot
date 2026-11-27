@@ -104,7 +104,7 @@ private extension RecordsView {
                 && !isNoSpend
                 && !model.output.upcomingRecurrings(on: date).isEmpty
 
-            RecordsCalendarCell(
+            RecordsCalendarTile(
                 day: date.day,
                 dayColor: dayColor(date, isShown: isShown),
                 isShown: isShown,

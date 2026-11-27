@@ -148,14 +148,14 @@ private fun RowScope.Texts(
         )
 
         if (route != null) {
-            EntryRoute(
+            EntryRouteLine(
                 source = route.source,
                 destination = route.destination,
             )
         }
 
         if (memo != null && showsMemo) {
-            EntryMemo(text = memo)
+            EntryMemoText(text = memo)
         }
     }
 }
@@ -195,14 +195,14 @@ private fun Details(
                 ) {
                     Note(text = detail)
 
-                    EntryMemo(text = memo)
+                    EntryMemoText(text = memo)
                 }
             },
             narrow = {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Note(text = detail)
 
-                    EntryMemo(text = memo)
+                    EntryMemoText(text = memo)
                 }
             },
         )

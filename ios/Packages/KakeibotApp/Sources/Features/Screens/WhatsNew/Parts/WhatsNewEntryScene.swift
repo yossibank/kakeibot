@@ -85,7 +85,7 @@ private extension WhatsNewEntryScene {
                 .textFont(size: .caption, weight: .bold)
                 .frame(maxWidth: .infinity)
                 .frame(height: 26)
-                .goldFace()
+                .goldBackground()
         }
         .padding(.horizontal, 8)
     }

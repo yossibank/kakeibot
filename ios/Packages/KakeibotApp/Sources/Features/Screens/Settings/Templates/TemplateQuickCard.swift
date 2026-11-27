@@ -20,7 +20,7 @@ struct TemplateQuickCard: View {
                         onOpen(.amount)
                     }
 
-                    SettingsCaption("金額を空にすると、使うときに入れられます。")
+                    SettingsNote("金額を空にすると、使うときに入れられます。")
                 }
             }
 

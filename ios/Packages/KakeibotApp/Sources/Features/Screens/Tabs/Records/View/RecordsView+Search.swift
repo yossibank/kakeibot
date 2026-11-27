@@ -59,7 +59,7 @@ private extension RecordsView {
         let word = model.state.fields.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         let hiddenCount = model.output.searchHiddenCount
 
-        return PlaceholderEmpty(
+        return EmptyPlaceholder(
             systemImage: "magnifyingglass",
             text: "「\(word)」は見つかりませんでした",
             detail: "金額やメモの一部でも探せます"

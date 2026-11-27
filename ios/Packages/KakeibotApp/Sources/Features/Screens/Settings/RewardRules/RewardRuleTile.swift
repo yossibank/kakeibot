@@ -58,7 +58,7 @@ struct RewardRuleTile: View {
             glow
         }
         .clipShape(RoundedRectangle(cornerRadius: corner.radius(16)))
-        .settingsTileFace(isHidden: isHidden)
+        .settingsTileBackground(isHidden: isHidden)
         .opacity(opacity)
     }
 }

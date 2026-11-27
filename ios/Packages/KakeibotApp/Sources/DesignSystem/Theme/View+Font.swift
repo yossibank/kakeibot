@@ -6,14 +6,14 @@ public extension View {
         _ size: FontSize,
         weight: Font.Weight = .regular
     ) -> some View {
-        modifier(ThemeFontModifier(role: .display, spec: .size(size, weight)))
+        modifier(RoleFont(role: .display, spec: .size(size, weight)))
     }
 
     func displayFont(
         style: Font.TextStyle,
         weight: Font.Weight? = nil
     ) -> some View {
-        modifier(ThemeFontModifier(role: .display, spec: .style(style, weight)))
+        modifier(RoleFont(role: .display, spec: .style(style, weight)))
     }
 
     func sansFont(
@@ -27,18 +27,18 @@ public extension View {
         _ style: Font.TextStyle,
         weight: Font.Weight? = nil
     ) -> some View {
-        modifier(ThemeFontModifier(role: .text, spec: .style(style, weight)))
+        modifier(RoleFont(role: .text, spec: .style(style, weight)))
     }
 
     func textFont(
         size: FontSize,
         weight: Font.Weight = .regular
     ) -> some View {
-        modifier(ThemeFontModifier(role: .text, spec: .size(size, weight)))
+        modifier(RoleFont(role: .text, spec: .size(size, weight)))
     }
 }
 
-private struct ThemeFontModifier: ViewModifier {
+private struct RoleFont: ViewModifier {
     @Environment(\.themeStyle.displayFont) private var displayFont
     @Environment(\.themeStyle.textFont) private var textFont
     @Environment(\.themeStyle.textSize.scale) private var textSize
@@ -53,7 +53,7 @@ private struct ThemeFontModifier: ViewModifier {
     }
 }
 
-private extension ThemeFontModifier {
+private extension RoleFont {
     enum Role {
         case display
         case text
@@ -65,7 +65,7 @@ private extension ThemeFontModifier {
     }
 }
 
-private extension ThemeFontModifier.Spec {
+private extension RoleFont.Spec {
     func font(
         in font: ThemeFont,
         scale: Double,

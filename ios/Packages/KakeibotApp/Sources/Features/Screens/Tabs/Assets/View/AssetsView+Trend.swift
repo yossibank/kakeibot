@@ -10,7 +10,7 @@ extension AssetsView {
                 netWorthRow
             }
 
-            AssetsBalanceTrend(
+            AssetsBalanceChart(
                 totals: model.output.monthTotals.map(\.total),
                 netWorths: netWorths
             )
@@ -36,7 +36,7 @@ private extension AssetsView {
     var trendLegend: some View {
         HStack(spacing: 16) {
             legend("手元のお金", color: Palette.accent)
-            legend("純資産", color: AssetsBalanceTrend.netWorthColor)
+            legend("純資産", color: AssetsBalanceChart.netWorthColor)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)
     }

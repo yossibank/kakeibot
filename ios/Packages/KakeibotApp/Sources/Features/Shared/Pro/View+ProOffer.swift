@@ -9,7 +9,7 @@ public extension View {
         onUnlock: @escaping () -> Void
     ) -> some View {
         modifier(
-            ProOfferModifier(
+            ProOfferLayer(
                 feature: feature,
                 presentsInSheet: presentsInSheet,
                 onCancel: onCancel,
@@ -41,7 +41,7 @@ private extension View {
     }
 }
 
-private struct ProOfferModifier: ViewModifier {
+private struct ProOfferLayer: ViewModifier {
     @State private var model = ProOfferModel()
 
     @Environment(\.isPro) private var isPro

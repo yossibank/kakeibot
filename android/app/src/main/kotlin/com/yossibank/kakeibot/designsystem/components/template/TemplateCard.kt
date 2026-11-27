@@ -131,7 +131,7 @@ fun TemplateCard(
 }
 
 @Composable
-fun TemplateCardName(
+fun TemplateCardTitle(
     name: String,
     size: TemplateCardSize,
 ) {

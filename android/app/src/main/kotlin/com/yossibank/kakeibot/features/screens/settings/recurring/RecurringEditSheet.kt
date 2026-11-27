@@ -93,10 +93,10 @@ import com.yossibank.kakeibot.featuremodels.shared.notice.Deletion
 import com.yossibank.kakeibot.features.shared.model.EditSheet
 import com.yossibank.kakeibot.features.shared.notification.rememberNotificationPermission
 import com.yossibank.kakeibot.features.shared.settingsparts.input.RoundIconButton
-import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsCaption
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsDivider
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsFrame
 import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsHeader
+import com.yossibank.kakeibot.features.shared.settingsparts.layout.SettingsNote
 
 @Composable
 fun RecurringEditSheet(
@@ -251,7 +251,7 @@ private fun RecurringEditContent(
         if (model.output.isLoanRepayment &&
             (model.output.plannedTotal != null || model.output.autoPlan != null)
         ) {
-            RecurringLoanPlan(
+            RecurringLoanPlanCard(
                 model = model,
                 onMatch = model.state::useAutoCount,
             )
@@ -268,7 +268,7 @@ private fun PreviewCard(model: RecurringEditModel) {
     Column(verticalArrangement = Arrangement.spacedBy(previewSpacing)) {
         RecurringRowCard(row = model.output.previewRow)
 
-        SettingsCaption(text = "一覧では、このカードで並びます")
+        SettingsNote(text = "一覧では、このカードで並びます")
     }
 }
 

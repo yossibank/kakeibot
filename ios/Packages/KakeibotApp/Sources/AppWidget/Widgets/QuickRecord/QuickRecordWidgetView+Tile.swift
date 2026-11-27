@@ -61,7 +61,7 @@ private extension QuickRecordWidgetView {
         .padding(.horizontal, 8)
         .padding(.vertical, padding / 2)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .templateCardFace(cornerRadius: Self.tileRadius, shadowRadius: 4)
+        .templateCardBackground(cornerRadius: Self.tileRadius, shadowRadius: 4)
     }
 
     func tileText(

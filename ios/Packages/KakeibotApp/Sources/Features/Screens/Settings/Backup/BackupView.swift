@@ -152,7 +152,7 @@ private extension BackupView {
             .padding(.horizontal, 16)
             .card()
 
-            SettingsCaption(
+            SettingsNote(
                 restoreNote,
                 kind: model.input.isSyncActive
                     ? .info

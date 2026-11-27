@@ -22,7 +22,7 @@ struct RecordsStampSheet: View {
                 header
 
                 if choices.isEmpty {
-                    RecordsSheetEmpty(
+                    RecordsSheetPlaceholder(
                         systemImage: "seal",
                         title: "スタンプがまだありません",
                         message: "スタンプを作ると、ここから押せます",

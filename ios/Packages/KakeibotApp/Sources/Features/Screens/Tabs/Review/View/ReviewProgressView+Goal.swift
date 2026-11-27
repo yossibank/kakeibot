@@ -8,7 +8,7 @@ extension ReviewProgressView {
         let status = item.goal.status(of: item.progress)
 
         return VStack(alignment: .leading, spacing: 12) {
-            ReviewReportLabel(title: "\(currentName)の一手")
+            ReviewReportTitle(title: "\(currentName)の一手")
 
             ReviewEmphasisText(
                 parts: item.titleParts(unit: unit),

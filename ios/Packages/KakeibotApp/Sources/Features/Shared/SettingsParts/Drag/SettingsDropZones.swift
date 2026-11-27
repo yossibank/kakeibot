@@ -62,7 +62,7 @@ private struct SettingsShowZone: View {
     let isTargeted: Bool
 
     var body: some View {
-        SettingsZoneBox(
+        SettingsZoneCard(
             isOn: isTargeted,
             closedHeight: SettingsDropZones.showHeight,
             tint: Palette.accent,

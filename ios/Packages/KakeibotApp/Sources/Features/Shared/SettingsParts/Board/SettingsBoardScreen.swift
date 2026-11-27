@@ -149,7 +149,7 @@ private extension SettingsBoardScreen {
         let drag = controller.drag
 
         if drag.lift != nil {
-            SettingsHideTarget(
+            SettingsHideZone(
                 zones: Bindable(drag).zones,
                 isArmed: drag.isOverHide
             )

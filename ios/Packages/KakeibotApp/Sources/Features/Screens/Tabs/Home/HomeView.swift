@@ -158,9 +158,9 @@ private extension HomeView {
             }
 
             if model.input.list.isFailed {
-                PlaceholderLoadFailed(onRetry: onRetry)
+                LoadFailedPlaceholder(onRetry: onRetry)
             } else if model.output.showsNoRecords {
-                PlaceholderEmpty(
+                EmptyPlaceholder(
                     systemImage: "square.and.pencil",
                     text: "まだ記録がありません",
                     onRecord: {

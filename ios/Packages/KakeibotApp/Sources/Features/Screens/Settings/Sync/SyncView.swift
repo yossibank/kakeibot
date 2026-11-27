@@ -116,7 +116,7 @@ private extension SyncView {
                     .padding(.horizontal, 16)
                     .card()
 
-                    SettingsCaption(model.output.footnote)
+                    SettingsNote(model.output.footnote)
                 }
 
                 if !model.input.shares.isEmpty {

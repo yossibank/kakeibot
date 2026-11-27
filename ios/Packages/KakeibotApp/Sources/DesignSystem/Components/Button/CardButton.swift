@@ -42,7 +42,7 @@ private extension CardButton {
             Text(title)
                 .textFont(.subheadline, weight: .bold)
                 .frame(maxWidth: .infinity, minHeight: height)
-                .goldFace()
+                .goldBackground()
 
         case let .outlined(color):
             Text(title)
