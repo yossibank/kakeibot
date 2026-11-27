@@ -41,13 +41,13 @@ public struct WhatsNewSheet: View {
                         .padding(.vertical, 8)
                     }
                 }
-                .id(model.state.version)
+                .id(model.state.fields.version)
                 .transition(.opacity)
                 .scrollIndicators(.hidden)
                 .contentMargins(.horizontal, 20, for: .scrollContent)
                 .padding(.horizontal, -20)
             }
-            .animation(.snappy, value: model.state.version)
+            .animation(.snappy, value: model.state.fields.version)
         }
         .padding(.horizontal, 20)
         .padding(.top, 20)
@@ -80,14 +80,14 @@ private extension WhatsNewSheet {
             }
             .padding(.vertical, 2)
         }
-        .haptic(.selection, trigger: model.state.version)
+        .haptic(.selection, trigger: model.state.fields.version)
         .scrollIndicators(.hidden)
         .contentMargins(.horizontal, 20, for: .scrollContent)
         .padding(.horizontal, -20)
     }
 
     func versionChip(_ release: WhatsNewRelease) -> some View {
-        let isSelected = release.version == model.state.version
+        let isSelected = release.version == model.state.fields.version
 
         return Button {
             model.state.choose(release.version)

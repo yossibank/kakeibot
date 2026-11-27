@@ -1,4 +1,5 @@
 import Core
+import FeatureModels
 import Observation
 
 @MainActor
@@ -22,13 +23,17 @@ final class WhatsNewModel {
 }
 
 extension WhatsNewModel {
+    struct Fields: ScreenEditable {
+        var version: String
+    }
+
     @MainActor
     @Observable
     final class State {
-        private(set) var version: String
+        var fields: Fields
 
         init(version: String) {
-            self.version = version
+            self.fields = Fields(version: version)
         }
     }
 
@@ -60,7 +65,7 @@ extension WhatsNewModel {
 extension WhatsNewModel.Output {
     var release: WhatsNewRelease? {
         let releases = WhatsNewRelease.all
-        return releases.first { $0.version == state.version } ?? releases.first
+        return releases.first { $0.version == state.fields.version } ?? releases.first
     }
 
     func isNew(_ release: WhatsNewRelease) -> Bool {
@@ -70,10 +75,10 @@ extension WhatsNewModel.Output {
 
 extension WhatsNewModel.State {
     func choose(_ version: String) {
-        guard version != self.version else {
+        guard version != fields.version else {
             return
         }
 
-        self.version = version
+        fields.version = version
     }
 }
