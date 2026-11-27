@@ -3,7 +3,7 @@ import Store
 
 @MainActor
 protocol SettingSaving: AnyObject {
-    associatedtype State: NoticeHolding
+    associatedtype State: NoticesHolding
 
     var state: State { get }
 }

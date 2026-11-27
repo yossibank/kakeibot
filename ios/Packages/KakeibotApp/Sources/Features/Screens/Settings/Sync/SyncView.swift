@@ -104,8 +104,7 @@ private extension SyncView {
                             CapsulePicker(selection: onBinding, options: Self.onOptions)
                         }
                         .frame(minHeight: 58)
-                        .disabled(model.state.task.isRunning || model.output
-                            .isSwitching || !canChange)
+                        .disabled(isSwitchLocked)
 
                         if let progress = model.output.progress {
                             Hairline()
@@ -206,6 +205,11 @@ private extension SyncView {
 
     var canChange: Bool {
         model.input.isOn || model.output.isAvailable
+    }
+
+    var isSwitchLocked: Bool {
+        let isRunning = model.state.task.isRunning(SyncModel.Work.switching)
+        return isRunning || model.output.isSwitching || !canChange
     }
 
     var onBinding: Binding<Bool> {

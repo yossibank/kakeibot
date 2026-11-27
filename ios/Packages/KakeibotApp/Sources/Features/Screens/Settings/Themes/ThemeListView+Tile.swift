@@ -12,7 +12,7 @@ extension ThemeListView {
     ) -> some View {
         let isCurrent = choice == model.input.current
         let titleColor = isCurrent ? Palette.accentStrong : Palette.subtext
-        let scale: CGFloat = model.state.pressing == choice ? 0.94 : 1
+        let scale: CGFloat = model.state.presented.pressing == choice ? 0.94 : 1
 
         return VStack(spacing: 8) {
             preview(palette, isCurrent: isCurrent)

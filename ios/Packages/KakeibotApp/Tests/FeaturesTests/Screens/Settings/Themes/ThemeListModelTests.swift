@@ -41,11 +41,11 @@ struct ThemeListModelTests {
         let model = ThemeListModel(parts: .system(setup.database), appIcon: appIcon)
 
         await model.select(.preset(.sage))
-        let suggested = model.state.suggestedIcon
+        let suggested = model.state.presented.suggestedIcon
         await model.use(suggested)
 
         #expect(suggested == .sage)
-        #expect(model.state.suggestedIcon == nil)
+        #expect(model.state.presented.suggestedIcon == nil)
         #expect(switcher.name == "AppIcon-Sage")
     }
 
@@ -58,7 +58,7 @@ struct ThemeListModelTests {
 
         await model.select(.preset(.wine))
 
-        #expect(model.state.suggestedIcon == nil)
+        #expect(model.state.presented.suggestedIcon == nil)
     }
 }
 
@@ -119,7 +119,7 @@ extension ThemeListModelTests {
         let choice = ThemeChoice.preset(.forest)
 
         model.state.press(choice)
-        let pressed = model.state.pressing
+        let pressed = model.state.presented.pressing
         model.state.press(nil)
         model.state.present(.menu(choice))
         let menu = model.state.presented.overlay.current?.menu
@@ -131,7 +131,7 @@ extension ThemeListModelTests {
         model.state.close(kept)
 
         #expect(pressed == choice)
-        #expect(model.state.pressing == nil)
+        #expect(model.state.presented.pressing == nil)
         #expect(menu == choice)
         #expect(kept == .editing(.new(base: nil)))
         #expect(model.state.presented.overlay.current == nil)

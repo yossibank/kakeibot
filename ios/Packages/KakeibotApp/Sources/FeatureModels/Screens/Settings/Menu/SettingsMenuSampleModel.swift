@@ -28,12 +28,16 @@ public extension SettingsMenuSampleModel {
         public var prompt = Shown<Prompt>()
     }
 
+    struct Notices: Equatable, Sendable {
+        public internal(set) var progress: Progress?
+    }
+
     @MainActor
     @Observable
     final class State {
         public var presented = Presented()
 
-        public internal(set) var progress: Progress?
+        public internal(set) var notices = Notices()
 
         public let task = ModelTask()
     }
@@ -43,7 +47,7 @@ public extension SettingsMenuSampleModel {
             return
         }
 
-        state.progress = nil
+        state.notices.progress = nil
 
         do {
             try await state.task.attempt {
@@ -54,9 +58,9 @@ public extension SettingsMenuSampleModel {
                 )
             }
 
-            state.progress = .inserted
+            state.notices.progress = .inserted
         } catch {
-            state.progress = .failed
+            state.notices.progress = .failed
         }
     }
 }

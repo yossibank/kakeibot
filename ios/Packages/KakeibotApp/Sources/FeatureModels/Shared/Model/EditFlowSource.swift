@@ -3,7 +3,7 @@ import Core
 @MainActor
 protocol EditFlowSource<Saved> {
     associatedtype Saved: Sendable
-    associatedtype State: NoticeHolding
+    associatedtype State: NoticesHolding
 
     var state: State { get }
     var isEditing: Bool { get }

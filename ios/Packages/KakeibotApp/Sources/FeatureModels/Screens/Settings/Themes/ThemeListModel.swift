@@ -44,9 +44,6 @@ public extension ThemeListModel {
 
         public let notices: Notices
 
-        public internal(set) var suggestedIcon: AppIconChoice?
-        public internal(set) var pressing: ThemeChoice?
-
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
         }
@@ -106,15 +103,15 @@ public extension ThemeListModel {
         }
 
         guard let icon = AppIconChoice(choice) else {
-            state.suggestedIcon = nil
+            state.presented.suggestedIcon = nil
             return
         }
 
-        state.suggestedIcon = icon == dependencies.appIcon.input.current ? nil : icon
+        state.presented.suggestedIcon = icon == dependencies.appIcon.input.current ? nil : icon
     }
 
     func use(_ icon: AppIconChoice?) async {
-        state.suggestedIcon = nil
+        state.presented.suggestedIcon = nil
 
         guard let icon else {
             return
@@ -124,7 +121,7 @@ public extension ThemeListModel {
     }
 
     func dismissSuggestion() {
-        state.suggestedIcon = nil
+        state.presented.suggestedIcon = nil
     }
 
     func receive(_ deletion: Deletion) {

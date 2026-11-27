@@ -61,7 +61,7 @@ extension HomeSectionListModelTests {
 
         model.startDragging(moved)
         model.startDragging(other)
-        let dragging = model.state.dragging
+        let dragging = model.state.presented.dragging
 
         model.moveDragging(bySlots: -start)
         let isFinished = model.finishDragging()
@@ -72,6 +72,6 @@ extension HomeSectionListModelTests {
         #expect(model.state.layout.slots.first == .section(moved))
         #expect(isFinished)
         #expect(!isFinishedAgain)
-        #expect(model.state.dragging == nil)
+        #expect(model.state.presented.dragging == nil)
     }
 }

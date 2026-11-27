@@ -21,12 +21,17 @@ public extension EntryVoiceFlow {
         }
     }
 
+    struct Presented: Equatable, Sendable {
+        public internal(set) var step: EntryVoiceFlow.Step?
+    }
+
     @MainActor
     @Observable
     final class State {
+        public internal(set) var presented = Presented()
+
         public let notices: Notices
 
-        public private(set) var step: Step?
         public private(set) var silence = Silence()
         public private(set) var rounds = Rounds()
 
@@ -79,17 +84,17 @@ public extension EntryVoiceFlow {
 
 extension EntryVoiceFlow.State {
     func setDenied(_ isDenied: Bool) {
-        step = isDenied ? .denied : nil
+        presented.step = isDenied ? .denied : nil
     }
 
     func closeDenied() {
-        if step == .denied {
-            step = nil
+        if presented.step == .denied {
+            presented.step = nil
         }
     }
 
     func startListening() {
-        step = .listening
+        presented.step = .listening
         rounds.start()
     }
 
@@ -103,7 +108,7 @@ extension EntryVoiceFlow.State {
 
     func finish() {
         silence.clear()
-        step = .reading
+        presented.step = .reading
         rounds.end()
     }
 
@@ -113,7 +118,7 @@ extension EntryVoiceFlow.State {
 
     func reset() {
         silence.clear()
-        step = nil
+        presented.step = nil
     }
 }
 
@@ -141,6 +146,6 @@ public extension EntryVoiceFlow.Notice {
 
 public extension EntryVoiceFlow.Output {
     var isActive: Bool {
-        state.step != nil
+        state.presented.step != nil
     }
 }

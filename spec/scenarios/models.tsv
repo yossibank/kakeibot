@@ -486,6 +486,7 @@ settings-menu-value.saves-chosen-day	SettingsMenuValueModelTests/savesChosenDay	
 settings-menu-value.rolls-back-and-tells-when-saving-fails	SettingsMenuValueModelTests/rollsBackAndTellsWhenSavingFails	SettingsMenuModelTest/tellsWhenSavingFails	対応	選んだ値を先に出さない作りで、値を戻す動きは通らない
 settings-menu-value.keeps-later-choice-when-earlier-save-fails	SettingsMenuValueModelTests/keepsLaterChoiceWhenEarlierSaveFails	SettingsMenuModelTest/keepsLaterChoiceWhenEarlierSaveFails	対応	選んだ値を先に出さない作りで、DB の観察から後の値になる
 settings-menu-value.returns-to-saved-day-when-both-quick-saves-fail	SettingsMenuValueModelTests/returnsToSavedDayWhenBothQuickSavesFail	SettingsMenuModelTest/returnsToSavedDayWhenBothQuickSavesFail	対応	選んだ値を先に出さない作りで、保存した値のまま変わらない
+settings-menu-value-choice.shows-pending-value-until-its-save-ends	SettingsMenuValueChoiceTests/showsPendingValueUntilItsSaveEnds		iOSのみ	選んだ値を先に出さない作りで、Android に保存中の値は無い
 month-start-day.chooses-and-saves-start-day	MonthStartDayModelTests/choosesAndSavesStartDay	SettingsMenuModelTest/choosesAndSavesStartDay	対応	期間の文は画面が PeriodText から出し、モデルは保存と観察だけをする
 month-start-day.rolls-back-and-tells-when-saving-fails	MonthStartDayModelTests/rollsBackAndTellsWhenSavingFails	SettingsMenuModelTest/tellsWhenMonthStartCannotBeSaved	対応	選んだ値を先に出さない作りで、値を戻す動きは通らない
 month-start-day.keeps-shift-when-changing-day	MonthStartDayModelTests/keepsShiftWhenChangingDay	SettingsMenuModelTest/keepsShiftWhenChangingDay	対応	ずらしを残す所と文は PeriodText にあり、モデルは保存だけをする
@@ -530,6 +531,9 @@ edit-flow.puts-open-part-away-before-closing-on-back		EditFlowTest/putsOpenPartA
 task.returns-value-and-marks-running	ModelTaskTests/returnsValueAndMarksRunning	ModelTaskTest/returnsValueAndMarksRunning	対応	
 task.runs-action-while-running	ModelTaskTests/runsActionWhileRunning	ModelTaskTest/runsActionWhileRunning	対応	
 task.stops-running-after-failure	ModelTaskTests/stopsRunningAfterFailure	ModelTaskTest/stopsRunningAfterFailure	対応	
+task.marks-only-the-running-key	ModelTaskTests/marksOnlyTheRunningKey		iOSのみ	どれが動いているかを出す画面（Pro・同期）が Android に無い
+task.keeps-key-running-until-outer-attempt-ends	ModelTaskTests/keepsKeyRunningUntilOuterAttemptEnds		iOSのみ	どれが動いているかを出す画面（Pro・同期）が Android に無い
+task.stops-running-key-after-failure	ModelTaskTests/stopsRunningKeyAfterFailure		iOSのみ	どれが動いているかを出す画面（Pro・同期）が Android に無い
 shown.shows-one-prompt-at-a-time	ShownTests/showsOnePromptAtATime	RecurringEditModelPromptTest/showsOnePromptAtATime ShownTest/showsOnePromptAtATime	対応	
 shown.closes-only-the-prompt-in-front	ShownTests/closesOnlyThePromptInFront	RecurringEditModelPromptTest/closesOnlyThePromptInFront ShownTest/closesOnlyThePromptInFront	対応	
 shown.closes-whatever-is-shown	ShownTests/closesWhateverIsShown	ShownTest/closesWhateverIsShown	対応	
@@ -639,7 +643,6 @@ stamp-list.*	StampListModelTests/*		未移植	スタンプの一覧の画面が�
 sync-choice.*	SyncChoiceTests/*		未移植	同期の画面が無い
 sync.*	SyncModelTests/*		未移植	同期の画面が無い
 switch-request.holds-asked-value-until-cleared	SwitchRequestTests/holdsAskedValueUntilCleared		未移植	同期の画面が無い
-wallet-work.ends-only-the-wallet-it-began	WalletWorkTests/endsOnlyTheWalletItBegan		未移植	同期の画面が無い
 theme-edit.*	ThemeEditModelTests/*		未移植	テーマを編集する画面が無い
 theme-list.*	ThemeListModelTests/*		未移植	テーマの一覧の画面が無い
 theme-style.*	ThemeStyleModelTests/*		未移植	明暗と見た目を選ぶ画面が無い

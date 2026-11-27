@@ -108,7 +108,7 @@ private extension SyncView {
             } label: {
                 shareLabel(
                     isShared: item.isShared,
-                    isWorking: model.state.walletWork.isWorking(on: item.wallet.id)
+                    isWorking: model.state.task.isRunning(SyncModel.Work.sharing(item.wallet.id))
                 )
             }
             .buttonStyle(.plain)
@@ -176,7 +176,7 @@ private extension SyncView {
                     systemImage: nil,
                     color: Palette.rose,
                     isFilled: false,
-                    isWorking: model.state.walletWork.isWorking(on: item.wallet.id)
+                    isWorking: model.state.task.isRunning(SyncModel.Work.sharing(item.wallet.id))
                 )
             }
             .buttonStyle(.plain)
@@ -225,6 +225,6 @@ private extension SyncView {
 
 private extension SyncView {
     var isSharingLocked: Bool {
-        model.state.task.isRunning || model.state.shareTask.isRunning || !model.output.isAvailable
+        model.state.task.isRunning || !model.output.isAvailable
     }
 }

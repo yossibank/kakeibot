@@ -123,7 +123,7 @@ extension WalletEditModel.Source: EditFlowSource {
                 return wallet
             }
 
-            state.addedWallet = wallet
+            state.presented.addedWallet = wallet
             state.presented.paymentStep.show(.asking)
 
             return wallet
@@ -134,7 +134,7 @@ extension WalletEditModel.Source: EditFlowSource {
     }
 
     func keepsOpen(after saved: Wallet) -> Bool {
-        state.addedWallet?.id == saved.id
+        state.presented.addedWallet?.id == saved.id
     }
 
     func storeHidden(_ isHidden: Bool) async throws {

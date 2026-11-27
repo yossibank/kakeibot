@@ -5,20 +5,13 @@ import Observation
 @MainActor
 @Observable
 public final class SettingsIconEditorModel: ScreenPerforming {
-    public var markKind: MarkKind = .glyph
-    public var glyph: Icon.Glyph
-    public var color: String
-
-    public private(set) var emoji = ""
-    public private(set) var text = ""
-    public private(set) var isPresented = false
+    public let state: State
 
     public init(
         glyph: Icon.Glyph,
         color: String = SettingsIconEditorModel.colors[0]
     ) {
-        self.glyph = glyph
-        self.color = color
+        self.state = State(fields: Fields(glyph: glyph, color: color))
     }
 }
 
@@ -37,6 +30,34 @@ public extension SettingsIconEditorModel {
     struct EmojiSection {
         public let title: String
         public let emojis: [String]
+    }
+
+    enum Panel: Hashable, Sendable {
+        case editor
+    }
+
+    struct Fields: ScreenEditable {
+        public var markKind: MarkKind = .glyph
+        public var glyph: Icon.Glyph
+        public var color: String
+
+        public private(set) var emoji = ""
+        public private(set) var text = ""
+    }
+
+    struct Presented: ScreenEditable {
+        public var panel = Shown<Panel>()
+    }
+
+    @MainActor
+    @Observable
+    final class State {
+        public var fields: Fields
+        public var presented = Presented()
+
+        init(fields: Fields) {
+            self.fields = fields
+        }
     }
 }
 
@@ -238,48 +259,48 @@ public extension SettingsIconEditorModel {
     ]
 
     var mark: IconDraft.Mark {
-        switch markKind {
-        case .glyph: .glyph(glyph)
-        case .emoji: .emoji(emoji)
-        case .text: .text(text)
-        }
+        state.fields.mark
     }
 
     var draft: IconDraft {
-        IconDraft(mark: mark, color: color)
+        IconDraft(mark: mark, color: state.fields.color)
     }
 
     var preview: Icon {
+        let fields = state.fields
         let date = Date(timeIntervalSince1970: 0)
 
         return Icon(
-            emoji: markKind == .emoji ? emoji : nil,
-            text: markKind == .text ? text : nil,
-            glyph: markKind == .glyph ? glyph : nil,
-            color: color,
+            emoji: fields.markKind == .emoji ? fields.emoji : nil,
+            text: fields.markKind == .text ? fields.text : nil,
+            glyph: fields.markKind == .glyph ? fields.glyph : nil,
+            color: fields.color,
             createdAt: date,
             updatedAt: date
         )
     }
 
+    var isPresented: Bool {
+        state.presented.panel.isShowing(.editor)
+    }
+
     func inputEmoji(_ value: String) {
-        let last = value.last { Self.isEmoji($0) }
-        emoji = last.map(String.init) ?? ""
+        state.fields.inputEmoji(value)
     }
 
     func inputText(_ value: String) {
-        text = String(value.prefix(IconDraft.maxTextLength))
+        state.fields.inputText(value)
     }
 
     func present() {
         if !isPresented {
-            isPresented = true
+            state.presented.panel.show(.editor)
         }
     }
 
     func dismiss() {
         if isPresented {
-            isPresented = false
+            state.presented.panel.close(.editor)
         }
     }
 
@@ -288,6 +309,29 @@ public extension SettingsIconEditorModel {
     }
 
     func apply(_ draft: IconDraft) {
+        state.fields.apply(draft)
+    }
+}
+
+public extension SettingsIconEditorModel.Fields {
+    var mark: IconDraft.Mark {
+        switch markKind {
+        case .glyph: .glyph(glyph)
+        case .emoji: .emoji(emoji)
+        case .text: .text(text)
+        }
+    }
+
+    mutating func inputEmoji(_ value: String) {
+        let last = value.last { Self.isEmoji($0) }
+        emoji = last.map(String.init) ?? ""
+    }
+
+    mutating func inputText(_ value: String) {
+        text = String(value.prefix(IconDraft.maxTextLength))
+    }
+
+    mutating func apply(_ draft: IconDraft) {
         color = draft.color
 
         switch draft.mark {
@@ -306,7 +350,7 @@ public extension SettingsIconEditorModel {
     }
 }
 
-private extension SettingsIconEditorModel {
+private extension SettingsIconEditorModel.Fields {
     static func isEmoji(_ character: Character) -> Bool {
         let scalars = character.unicodeScalars
 

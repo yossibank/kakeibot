@@ -34,7 +34,7 @@ public struct HomeSectionListView: View {
                     .padding(.vertical, 8)
             }
             .scrollIndicators(.hidden)
-            .scrollDisabled(model.state.dragging != nil)
+            .scrollDisabled(model.state.presented.dragging != nil)
         }
         .settingsScreen(errorNotice: model.state.notices.error)
         .animation(.snappy, value: model.state.layout)
@@ -71,7 +71,7 @@ private extension HomeSectionListView {
                         .overlay(alignment: .top) {
                             if index > 0,
                                slots[index - 1].section != nil,
-                               model.state.dragging?.section != section {
+                               model.state.presented.dragging?.section != section {
                                 Hairline()
                                     .padding(.horizontal, 16)
                             }
@@ -126,7 +126,7 @@ private extension HomeSectionListView {
     func row(_ section: HomeSection) -> some View {
         let isHidden = model.state.layout.isHidden(section)
         let opacity = isHidden ? Emphasis.medium.rawValue : 1
-        let isDragging = model.state.dragging?.section == section
+        let isDragging = model.state.presented.dragging?.section == section
         let scale = isDragging ? Self.liftScale : 1
 
         return HStack(spacing: 12) {
@@ -204,7 +204,7 @@ private extension HomeSectionListView {
 
     func offset(of section: HomeSection) -> CGFloat {
         guard
-            let dragging = model.state.dragging,
+            let dragging = model.state.presented.dragging,
             dragging.section == section,
             let index = model.state.layout.slots.firstIndex(of: .section(section))
         else {
@@ -215,11 +215,11 @@ private extension HomeSectionListView {
     }
 
     func layer(of section: HomeSection) -> Double {
-        model.state.dragging?.section == section ? 1 : 0
+        model.state.presented.dragging?.section == section ? 1 : 0
     }
 
     func startDragging(_ section: HomeSection) {
-        guard model.state.dragging == nil else {
+        guard model.state.presented.dragging == nil else {
             return
         }
 
@@ -241,7 +241,7 @@ private extension HomeSectionListView {
     }
 
     func finishDragging() {
-        guard model.state.dragging != nil else {
+        guard model.state.presented.dragging != nil else {
             return
         }
 

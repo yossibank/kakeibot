@@ -29,6 +29,11 @@ public extension ThemeStyleModel {
         case text(ThemeFont)
     }
 
+    struct Presented: Equatable, Sendable {
+        public internal(set) var fontOffer: FontOffer?
+        public internal(set) var preview: ThemeStyle?
+    }
+
     @MainActor
     struct Notices: ScreenNotices {
         public let error: ErrorNotice
@@ -41,11 +46,9 @@ public extension ThemeStyleModel {
     @MainActor
     @Observable
     final class State: NoticesHolding {
+        public internal(set) var presented = Presented()
+
         public let notices: Notices
-
-        public internal(set) var fontOffer: FontOffer?
-
-        public private(set) var preview: ThemeStyle?
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
@@ -139,7 +142,7 @@ public extension ThemeStyleModel {
             isLocked,
             offer.font != savedFont(for: offer)
         else {
-            state.fontOffer = nil
+            state.presented.fontOffer = nil
             cancelPreview()
             await save(offer)
 
@@ -153,20 +156,20 @@ public extension ThemeStyleModel {
         case let .text(font): preview(textFont: font)
         }
 
-        state.fontOffer = offer
+        state.presented.fontOffer = offer
     }
 
     func closeFontOffer() {
-        state.fontOffer = nil
+        state.presented.fontOffer = nil
         cancelPreview()
     }
 
     func unlockFont() async {
-        guard let offer = state.fontOffer else {
+        guard let offer = state.presented.fontOffer else {
             return
         }
 
-        state.fontOffer = nil
+        state.presented.fontOffer = nil
         await save(offer)
     }
 
@@ -243,7 +246,7 @@ private extension ThemeStyleModel {
 
 public extension ThemeStyleModel.Output {
     var style: ThemeStyle {
-        state.preview ?? input.style
+        state.presented.preview ?? input.style
     }
 
     var savedStyle: ThemeStyle {
@@ -257,13 +260,13 @@ extension ThemeStyleModel.State {
         at keyPath: WritableKeyPath<ThemeStyle, Value>,
         over saved: ThemeStyle
     ) {
-        var style = preview ?? saved
+        var style = presented.preview ?? saved
         style[keyPath: keyPath] = value
-        preview = style
+        presented.preview = style
     }
 
     func clearPreview() {
-        preview = nil
+        presented.preview = nil
     }
 }
 

@@ -19,7 +19,7 @@ extension WalletEditModelTests {
         #expect(outcome.saved?.name == "へそくり")
         #expect(outcome.closes)
         #expect(!model.state.presented.paymentStep.isShowing(.asking))
-        #expect(model.state.addedWallet == nil)
+        #expect(model.state.presented.addedWallet == nil)
     }
 
     @Test
@@ -30,7 +30,7 @@ extension WalletEditModelTests {
         model.state.setKind(.card)
 
         await model.flow.save().value
-        let saved = try #require(model.state.addedWallet)
+        let saved = try #require(model.state.presented.addedWallet)
         let asked = model.flow.state.outcome.value
         let isAsking = model.state.presented.paymentStep.isShowing(.asking)
         model.finishAddedWallet()
@@ -38,7 +38,7 @@ extension WalletEditModelTests {
 
         #expect(asked == nil)
         #expect(isAsking)
-        #expect(model.state.addedWallet?.id == saved.id)
+        #expect(model.state.presented.addedWallet?.id == saved.id)
         #expect(outcome.saved?.id == saved.id)
         #expect(outcome.closes)
     }
@@ -53,7 +53,7 @@ extension WalletEditModelTests {
 
         await model.flow.save().value
 
-        #expect(model.state.addedWallet == nil)
+        #expect(model.state.presented.addedWallet == nil)
         #expect(model.flow.state.outcome.value == nil)
         #expect(!model.state.presented.paymentStep.isShowing(.asking))
         #expect(model.state.notices.error.message == "保存できませんでした")

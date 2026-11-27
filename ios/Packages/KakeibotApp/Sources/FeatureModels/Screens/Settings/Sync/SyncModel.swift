@@ -42,13 +42,10 @@ public extension SyncModel {
     final class State: NoticesHolding {
         public var presented = Presented()
 
-        public internal(set) var walletWork = WalletWork()
-
         public let notices: Notices
         public let task = ModelTask()
-        public let shareTask = ModelTask()
 
-        var request = SwitchRequest()
+        public internal(set) var request = SwitchRequest()
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
@@ -124,7 +121,7 @@ public extension SyncModel {
 
     func request(_ isOn: Bool) -> Bool {
         guard
-            !state.task.isRunning,
+            !state.task.isRunning(Work.switching),
             !output.isSwitching
         else {
             return false
@@ -217,7 +214,7 @@ private extension SyncModel {
     }
 
     func turnOn() async {
-        await state.task.attempt {
+        await state.task.attempt(Work.switching) {
             input.account = await dependencies.cloud.account()
 
             guard output.isAvailable else {
@@ -248,7 +245,7 @@ private extension SyncModel {
         state.notices.error.clear()
 
         do {
-            try await state.task.attempt {
+            try await state.task.attempt(Work.switching) {
                 try await operation()
                 input.isOn = try await dependencies.database.isSyncEnabled()
             }

@@ -157,8 +157,8 @@ struct ThemeStyleModelTests {
         await model.choose(.display(.rounded), isPro: false)
         let style = try await setup.database.style()
 
-        #expect(model.state.fontOffer == .display(.rounded))
-        #expect(model.state.fontOffer?.feature == "\(ThemeFont.rounded.title)の字体")
+        #expect(model.state.presented.fontOffer == .display(.rounded))
+        #expect(model.state.presented.fontOffer?.feature == "\(ThemeFont.rounded.title)の字体")
         #expect(model.output.style.displayFont == .rounded)
         #expect(style == .standard)
     }
@@ -173,8 +173,8 @@ struct ThemeStyleModelTests {
         await model.choose(.text(.gothic), isPro: false)
         let style = try await setup.database.style()
 
-        #expect(model.state.fontOffer == nil)
-        #expect(model.state.preview == nil)
+        #expect(model.state.presented.fontOffer == nil)
+        #expect(model.state.presented.preview == nil)
         #expect(style.textFont == .gothic)
     }
 
@@ -187,7 +187,7 @@ struct ThemeStyleModelTests {
         await model.choose(.display(.rounded), isPro: true)
         let style = try await setup.database.style()
 
-        #expect(model.state.fontOffer == nil)
+        #expect(model.state.presented.fontOffer == nil)
         #expect(style.displayFont == .rounded)
     }
 
@@ -201,7 +201,7 @@ struct ThemeStyleModelTests {
         await model.unlockFont()
         let style = try await setup.database.style()
 
-        #expect(model.state.fontOffer == nil)
+        #expect(model.state.presented.fontOffer == nil)
         #expect(style.textFont == .rounded)
     }
 
@@ -216,7 +216,7 @@ struct ThemeStyleModelTests {
         await model.unlockFont()
         let style = try await setup.database.style()
 
-        #expect(model.state.fontOffer == nil)
+        #expect(model.state.presented.fontOffer == nil)
         #expect(model.output.style == .standard)
         #expect(style == .standard)
     }

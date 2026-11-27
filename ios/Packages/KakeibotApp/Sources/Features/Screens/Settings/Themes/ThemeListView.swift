@@ -50,7 +50,7 @@ public struct ThemeListView: View {
             keepTitle: "そのまま",
             confirmTitle: "そろえる",
             role: .suggestion
-        ) { [icon = model.state.suggestedIcon] in
+        ) { [icon = model.state.presented.suggestedIcon] in
             model.perform {
                 await $0.use(icon)
             }
@@ -298,7 +298,7 @@ private extension ThemeListView {
 
     var isSuggestingIcon: Binding<Bool> {
         Binding {
-            model.state.suggestedIcon != nil
+            model.state.presented.suggestedIcon != nil
         } set: { isShown in
             if !isShown {
                 model.dismissSuggestion()
@@ -307,7 +307,7 @@ private extension ThemeListView {
     }
 
     var suggestionMessage: String {
-        let title = model.state.suggestedIcon?.title ?? ""
+        let title = model.state.presented.suggestedIcon?.title ?? ""
         return "アプリアイコンも\(title)にできます"
     }
 

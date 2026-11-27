@@ -61,15 +61,15 @@ public extension BudgetListModel.Output {
     }
 
     var editingAmount: Int? {
-        state.editing.flatMap { amount(for: $0.categoryId) }
+        state.presented.editing.flatMap { amount(for: $0.categoryId) }
     }
 
     var editingTitle: String {
-        (state.editing ?? .total).title
+        (state.presented.editing ?? .total).title
     }
 
     var suggestions: [BudgetListModel.Suggestion] {
-        guard let editing = state.editing else {
+        guard let editing = state.presented.editing else {
             return []
         }
 
@@ -94,7 +94,7 @@ public extension BudgetListModel.Output {
     }
 
     var isChanged: Bool {
-        state.editing != nil && state.submodels.calculator.amount != (editingAmount ?? 0)
+        state.presented.editing != nil && state.submodels.calculator.amount != (editingAmount ?? 0)
     }
 
     var saveTitle: String {

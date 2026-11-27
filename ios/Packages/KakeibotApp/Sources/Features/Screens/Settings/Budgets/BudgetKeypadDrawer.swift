@@ -8,12 +8,12 @@ private struct BudgetKeypadDrawer: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .settingsDrawerLayer(item: model.state.editing) {
+            .settingsDrawerLayer(item: model.state.presented.editing) {
                 model.closeEditing()
             } drawer: { _ in
                 drawer
             }
-            .animation(.snappy, value: model.state.editing)
+            .animation(.snappy, value: model.state.presented.editing)
             .confirmsDiscard(
                 when: model.output.isChanged,
                 isPresented: Bindable(model.state).presented.prompt[.discard]

@@ -33,7 +33,7 @@ public final class EntryReceiptFlow: ScreenPerforming {
 }
 
 public extension EntryReceiptFlow {
-    enum Step: Hashable {
+    enum Step: Hashable, Sendable {
         case guide
         case camera
         case reading
@@ -50,6 +50,8 @@ public extension EntryReceiptFlow {
 
     struct Presented: ScreenEditable {
         public var offer = Shown<String>()
+
+        public internal(set) var step: Step?
     }
 
     @MainActor
@@ -57,8 +59,6 @@ public extension EntryReceiptFlow {
     final class State {
         public var fields = Fields()
         public var presented = Presented()
-
-        public private(set) var step: Step?
 
         public internal(set) var outcome = ScreenOutcome<Outcome>()
     }
@@ -165,24 +165,24 @@ extension EntryReceiptFlow.State {
     func open(showsGuide: Bool) {
         presented.offer.closeAll()
         fields.hidesGuide = false
-        step = showsGuide ? .guide : .camera
+        presented.step = showsGuide ? .guide : .camera
     }
 
     func openCamera() {
-        step = .camera
+        presented.step = .camera
     }
 
     func startReading() {
-        step = .reading
+        presented.step = .reading
     }
 
     func close() {
-        step = nil
+        presented.step = nil
     }
 }
 
 public extension EntryReceiptFlow.Output {
     var isScanning: Bool {
-        state.step == .camera
+        state.presented.step == .camera
     }
 }

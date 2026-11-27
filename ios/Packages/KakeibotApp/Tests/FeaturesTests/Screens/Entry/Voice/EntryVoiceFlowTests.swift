@@ -37,7 +37,7 @@ struct EntryVoiceFlowTests {
         #expect(flow.state.notices.result.current?.count == 4)
         #expect(flow.state.notices.result.current?.title == "声から 4 つ入れました")
         #expect(applied == 1)
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(source.isFinished)
 
         flow.undoLast(in: model)
@@ -95,9 +95,9 @@ struct EntryVoiceFlowTests {
 
         await flow.start(for: model, today: setup.date) {}
         source.say("500円")
-        await ObservationWait.until { flow.state.step == nil }
+        await ObservationWait.until { flow.state.presented.step == nil }
 
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(model.output.amount == 500)
         #expect(source.isFinished)
     }
@@ -165,10 +165,10 @@ struct EntryVoiceFlowTests {
         source.hear(0.8)
         source.hear(0)
         let counting = flow.state.silence.startedAt != nil
-        await ObservationWait.until { flow.state.step == nil }
+        await ObservationWait.until { flow.state.presented.step == nil }
 
         #expect(counting)
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(source.isFinished)
     }
 
@@ -192,7 +192,7 @@ struct EntryVoiceFlowTests {
 
         await silence.value
 
-        #expect(flow.state.step == .listening)
+        #expect(flow.state.presented.step == .listening)
 
         await flow.cancel()
     }
@@ -234,7 +234,7 @@ struct EntryVoiceFlowTests {
         counts.append(flow.state.rounds.ends)
 
         #expect(model.output.amount == 0)
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(flow.state.notices.result.current == nil)
         #expect(source.isCancelled)
         #expect(counts == [1, 1])
@@ -250,11 +250,11 @@ struct EntryVoiceFlowTests {
         let flow = EntryVoiceFlow(dependencies: dependencies)
 
         await flow.start(for: model, today: setup.date) {}
-        let step = flow.state.step
+        let step = flow.state.presented.step
         flow.closeDenied()
 
         #expect(step == .denied)
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(flow.state.rounds.starts == 0)
     }
 }

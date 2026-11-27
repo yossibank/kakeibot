@@ -17,11 +17,11 @@ struct EntryReceiptFlowTests {
         }
 
         flow.start(for: model, isPro: false)
-        let guide = flow.state.step
+        let guide = flow.state.presented.step
         flow.confirmGuide()
 
         #expect(guide == .guide)
-        #expect(flow.state.step == .camera)
+        #expect(flow.state.presented.step == .camera)
         #expect(flow.output.isScanning)
     }
 
@@ -57,7 +57,7 @@ struct EntryReceiptFlowTests {
 
         flow.start(for: model, isPro: true)
 
-        #expect(flow.state.step == .guide)
+        #expect(flow.state.presented.step == .guide)
         #expect(flow.state.presented.offer.current == nil)
     }
 
@@ -73,7 +73,7 @@ struct EntryReceiptFlowTests {
 
         flow.start(for: model, isPro: false)
 
-        #expect(flow.state.step == .camera)
+        #expect(flow.state.presented.step == .camera)
         #expect(flow.state.presented.offer.current == nil)
     }
 
@@ -96,7 +96,7 @@ struct EntryReceiptFlowTests {
 
         #expect(saved)
         #expect(!flow.state.fields.hidesGuide)
-        #expect(flow.state.step == .camera)
+        #expect(flow.state.presented.step == .camera)
     }
 
     @Test
@@ -117,7 +117,7 @@ struct EntryReceiptFlowTests {
         flow.start(for: model, isPro: false)
 
         #expect(!saved)
-        #expect(flow.state.step == .guide)
+        #expect(flow.state.presented.step == .guide)
     }
 
     @Test
@@ -132,14 +132,14 @@ struct EntryReceiptFlowTests {
 
         flow.start(for: model, isPro: false)
         let offer = flow.state.presented.offer.current
-        let step = flow.state.step
+        let step = flow.state.presented.step
         flow.closeOffer()
         flow.start(for: model, isPro: true)
 
         #expect(offer == EntryReceiptFlow.offerFeature)
         #expect(step == nil)
         #expect(flow.state.presented.offer.current == nil)
-        #expect(flow.state.step == .guide)
+        #expect(flow.state.presented.step == .guide)
     }
 
     @Test
@@ -155,7 +155,7 @@ struct EntryReceiptFlowTests {
         let outcome = await flow.scan([], into: model)
 
         #expect(outcome == .read(itemCount: 0, hasAmount: true))
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(model.output.amount == 911)
         #expect(model.state.fields.store == "スーパー青葉")
         #expect(model.state.notices.error.message == EntryReceiptFlow.totalMessage)
@@ -230,7 +230,7 @@ struct EntryReceiptFlowTests {
 
         #expect(outcome == .unread)
         #expect(flow.state.outcome.value == nil)
-        #expect(flow.state.step == nil)
+        #expect(flow.state.presented.step == nil)
         #expect(model.state.notices.error.message == EntryReceiptFlow.unreadMessage)
         #expect(model.output.amount == 0)
     }

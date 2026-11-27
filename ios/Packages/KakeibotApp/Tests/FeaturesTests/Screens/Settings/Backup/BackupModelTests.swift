@@ -17,7 +17,7 @@ struct BackupModelTests {
         )
 
         let isMade = await model.makeFile(.json)
-        let file = try #require(model.state.file)
+        let file = try #require(model.state.presented.file)
         let export = try ExportV1(json: file.data)
 
         #expect(isMade)
@@ -32,7 +32,7 @@ struct BackupModelTests {
         let model = setup.exporter()
 
         await model.makeFile(.csv)
-        let file = try #require(model.state.file)
+        let file = try #require(model.state.presented.file)
         let text = String(decoding: file.data, as: UTF8.self)
 
         #expect(file.name == "kakeibot-2026-10-03.csv")
@@ -45,7 +45,7 @@ struct BackupModelTests {
         let source = setup.exporter()
         let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         let isRead = target.read(file.data)
         let summary = target.output.pendingSummary
@@ -53,7 +53,7 @@ struct BackupModelTests {
 
         #expect(isRead)
         #expect(summary == "2026/10/3 に書き出した記録 0 件・口座 2 件に置き換えます。いまのデータは退避するので、読み込んだ後もこの画面から戻せます")
-        #expect(target.state.pending == nil)
+        #expect(target.state.presented.pending == nil)
         #expect(target.state.doneMessage == "読み込みました")
         #expect(try setup.target.snapshot() == setup.source.snapshot())
     }
@@ -64,14 +64,14 @@ struct BackupModelTests {
         let source = setup.exporter()
         let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
         target.read(file.data)
         try await setup.target.turnOnSync()
         let before = try setup.target.snapshot()
 
         await target.restore()
 
-        #expect(target.state.pending == nil)
+        #expect(target.state.presented.pending == nil)
         #expect(target.state.doneMessage == nil)
         #expect(target.state.notices.error.message == "同期と共有をやめると、読み込めます")
         #expect(try setup.target.snapshot() == before)
@@ -91,7 +91,7 @@ struct BackupModelTests {
 
         try await setup.source.setSetting(.reminderTime, to: .evening)
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         await target.restore()
@@ -132,7 +132,7 @@ struct BackupModelTests {
         )
 
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         await target.restore()
@@ -154,7 +154,7 @@ struct BackupModelTests {
         )
 
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         await target.restore()
@@ -169,13 +169,13 @@ struct BackupModelTests {
         let source = setup.exporter()
         let target = BackupModel(parts: .system(setup.target), stash: setup.stash)
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         target.cancelRestore()
         await target.restore()
 
-        #expect(target.state.pending == nil)
+        #expect(target.state.presented.pending == nil)
         #expect(try setup.target.snapshot().wallets.isEmpty)
     }
 
@@ -187,7 +187,7 @@ struct BackupModelTests {
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let before = try setup.target.snapshot()
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         await target.restore()
@@ -208,7 +208,7 @@ struct BackupModelTests {
         let source = setup.exporter()
         let target = BackupModel(parts: .system(setup.target), stash: stash)
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         await target.restore()
@@ -226,7 +226,7 @@ struct BackupModelTests {
         try setup.target.insertDefaultsIfEmpty(at: setup.now)
         let before = try setup.target.snapshot()
         await source.makeFile(.json)
-        let file = try #require(source.state.file)
+        let file = try #require(source.state.presented.file)
 
         target.read(file.data)
         await target.restore()
@@ -293,7 +293,7 @@ struct BackupModelTests {
         #expect(model.input.previous.count == 1)
         #expect(item.url == setup.stash.urls[1])
         #expect(isRead)
-        #expect(model.state.pending?.exportedAt == setup.now)
+        #expect(model.state.presented.pending?.exportedAt == setup.now)
     }
 
     @Test

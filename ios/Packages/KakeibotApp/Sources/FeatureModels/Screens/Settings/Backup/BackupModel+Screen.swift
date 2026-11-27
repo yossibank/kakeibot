@@ -1,3 +1,5 @@
+import Core
+
 public extension BackupModel {
     enum Dialog: Hashable, Sendable {
         case exporter
@@ -7,11 +9,17 @@ public extension BackupModel {
 
     struct Presented: ScreenEditable {
         public var dialog = Shown<Dialog>()
+
+        public internal(set) var file: BackupModel.BackupFile?
+        public internal(set) var pending: ExportV1?
+        public internal(set) var pressed: Row?
     }
 
     @MainActor
     struct Notices: ScreenNotices {
         public let error: ErrorNotice
+
+        public internal(set) var done: Done?
 
         init(wait: ScreenWait) {
             self.error = ErrorNotice(wait: wait)
@@ -41,20 +49,20 @@ public extension BackupModel.Done {
 
 public extension BackupModel.State {
     var doneMessage: String? {
-        done?.message
+        notices.done?.message
     }
 
     func press(_ row: BackupModel.Row) {
-        if pressed != row {
-            pressed = row
+        if presented.pressed != row {
+            presented.pressed = row
         }
     }
 }
 
 extension BackupModel.State {
     func finishWorking() {
-        if pressed != nil {
-            pressed = nil
+        if presented.pressed != nil {
+            presented.pressed = nil
         }
     }
 }

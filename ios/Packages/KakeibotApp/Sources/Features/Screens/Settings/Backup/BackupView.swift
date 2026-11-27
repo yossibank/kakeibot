@@ -36,7 +36,7 @@ public struct BackupView: View {
             isPresented: Bindable(model.state).presented.dialog[.exporter],
             document: document,
             contentType: exportType,
-            defaultFilename: model.state.file?.name
+            defaultFilename: model.state.presented.file?.name
         ) { result in
             model.perform {
                 await $0.finishExport(result)
@@ -168,7 +168,7 @@ private extension BackupView {
         detail: String,
         action: @escaping () -> Void
     ) -> some View {
-        let isWorking = model.state.task.isRunning && model.state.pressed == row
+        let isWorking = model.state.task.isRunning && model.state.presented.pressed == row
 
         return Button {
             model.state.press(row)
@@ -217,11 +217,11 @@ private extension BackupView {
     }
 
     var document: BackupDocument? {
-        model.state.file.map { BackupDocument(data: $0.data) }
+        model.state.presented.file.map { BackupDocument(data: $0.data) }
     }
 
     var exportType: UTType {
-        model.state.file?.kind == .csv ? .commaSeparatedText : .json
+        model.state.presented.file?.kind == .csv ? .commaSeparatedText : .json
     }
 
     var hint: SettingsFold {

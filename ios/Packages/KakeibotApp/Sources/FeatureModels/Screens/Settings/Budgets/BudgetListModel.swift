@@ -28,7 +28,7 @@ public final class BudgetListModel {
 }
 
 public extension BudgetListModel {
-    enum Target: Hashable, Identifiable {
+    enum Target: Hashable, Identifiable, Sendable {
         case total
         case category(EntryCategory)
     }
@@ -50,6 +50,8 @@ public extension BudgetListModel {
 
     struct Presented: ScreenEditable {
         public var prompt = Shown<Prompt>()
+
+        public internal(set) var editing: Target?
     }
 
     @MainActor
@@ -74,7 +76,6 @@ public extension BudgetListModel {
     final class State: NoticesHolding {
         public var presented = Presented()
 
-        public internal(set) var editing: Target?
         public internal(set) var submodels = Submodels()
 
         public let notices: Notices
@@ -156,7 +157,7 @@ public extension BudgetListModel {
     func startEditing(_ target: Target) {
         let amount = output.amount(for: target.categoryId) ?? 0
         state.submodels.calculator = AmountCalculator(amount: amount)
-        state.editing = target
+        state.presented.editing = target
     }
 
     func closeEditing() {
@@ -168,7 +169,7 @@ public extension BudgetListModel {
     }
 
     func cancelEditing() {
-        state.editing = nil
+        state.presented.editing = nil
 
         if state.presented.prompt.isShowing(.discard) {
             state.presented.prompt.close(.discard)
@@ -198,7 +199,7 @@ public extension BudgetListModel {
     @discardableResult
     func clear() async -> Cleared? {
         guard
-            let editing = state.editing,
+            let editing = state.presented.editing,
             let amount = output.editingAmount,
             await setBudget(nil) else {
             return nil
@@ -237,7 +238,7 @@ private extension BudgetListModel {
 
     @discardableResult
     func setBudget(_ amount: Int?) async -> Bool {
-        guard let editing = state.editing else {
+        guard let editing = state.presented.editing else {
             return false
         }
 
@@ -249,7 +250,7 @@ private extension BudgetListModel {
             )
 
             input.budgets = try await dependencies.database.budgets()
-            state.editing = nil
+            state.presented.editing = nil
 
             return true
         } catch {

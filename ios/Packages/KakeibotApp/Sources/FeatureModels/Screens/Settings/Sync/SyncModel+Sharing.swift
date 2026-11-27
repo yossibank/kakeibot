@@ -49,7 +49,7 @@ public extension SyncModel {
     func confirmInvitation() async {
         guard
             let item = output.invitation,
-            !state.shareTask.isRunning
+            !state.task.isRunning(where: \Work.isSharing)
         else {
             return
         }
@@ -61,7 +61,7 @@ public extension SyncModel {
     func inviteMore() async {
         guard
             let item = output.opened,
-            !state.shareTask.isRunning
+            !state.task.isRunning(where: \Work.isSharing)
         else {
             return
         }
@@ -71,7 +71,7 @@ public extension SyncModel {
     }
 
     func stopSharing(_ item: WalletShare) async {
-        guard !state.shareTask.isRunning else {
+        guard !state.task.isRunning(where: \Work.isSharing) else {
             return
         }
 
@@ -79,7 +79,7 @@ public extension SyncModel {
     }
 
     func leave(_ item: JoinedShare) async {
-        guard !state.shareTask.isRunning else {
+        guard !state.task.isRunning(where: \Work.isSharing) else {
             return
         }
 
@@ -136,11 +136,10 @@ private extension SyncModel {
         failure: String,
         _ operation: () async throws -> Void
     ) async {
-        state.walletWork.begin(id)
         state.notices.error.clear()
 
         do {
-            try await state.shareTask.attempt {
+            try await state.task.attempt(Work.sharing(id)) {
                 try await operation()
             }
         } catch {
@@ -153,7 +152,5 @@ private extension SyncModel {
 
             state.notices.error.show(failure, for: error)
         }
-
-        state.walletWork.end(id)
     }
 }

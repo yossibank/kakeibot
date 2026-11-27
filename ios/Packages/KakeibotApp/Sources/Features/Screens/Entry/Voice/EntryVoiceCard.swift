@@ -15,7 +15,7 @@ struct EntryVoiceCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if flow.state.step == .denied {
+            if flow.state.presented.step == .denied {
                 denied
             } else {
                 listening
@@ -209,7 +209,7 @@ private extension EntryVoiceCard {
     static let waveHeight: CGFloat = 40
 
     var isReading: Bool {
-        flow.state.step == .reading
+        flow.state.presented.step == .reading
     }
 
     var transcriptStyle: Font.TextStyle {

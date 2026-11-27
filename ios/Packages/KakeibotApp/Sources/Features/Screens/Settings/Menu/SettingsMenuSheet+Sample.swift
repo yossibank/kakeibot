@@ -34,7 +34,7 @@ extension SettingsMenuSheet {
                     .frame(maxWidth: .infinity)
             }
 
-            if let message = sample.state.progress?.message {
+            if let message = sample.state.notices.progress?.message {
                 Text(message)
                     .textFont(.footnote)
                     .foregroundStyle(Palette.subtext)

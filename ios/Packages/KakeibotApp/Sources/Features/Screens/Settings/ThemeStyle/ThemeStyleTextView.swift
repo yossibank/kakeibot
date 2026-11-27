@@ -47,7 +47,7 @@ public struct ThemeStyleTextView: View {
 
             textFontChoices
         }
-        .proOffer(model.state.fontOffer?.feature) {
+        .proOffer(model.state.presented.fontOffer?.feature) {
             model.closeFontOffer()
         } onUnlock: {
             model.perform {

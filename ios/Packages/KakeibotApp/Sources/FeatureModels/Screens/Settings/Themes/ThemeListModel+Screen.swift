@@ -19,6 +19,9 @@ public extension ThemeListModel {
 
     struct Presented: ScreenEditable {
         public var overlay = Shown<Overlay>()
+
+        public internal(set) var suggestedIcon: AppIconChoice?
+        public internal(set) var pressing: ThemeChoice?
     }
 }
 
@@ -120,8 +123,8 @@ public extension ThemeListModel.Offer {
 
 public extension ThemeListModel.State {
     func press(_ choice: ThemeChoice?) {
-        if pressing != choice {
-            pressing = choice
+        if presented.pressing != choice {
+            presented.pressing = choice
         }
     }
 

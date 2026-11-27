@@ -13,20 +13,20 @@ struct CategoryEditModelTests {
         let model = CategoryEditModel(parts: .system(database), kind: .expense)
 
         model.state.submodels.icon.inputEmoji("ab🍙")
-        let emoji = model.state.submodels.icon.emoji
+        let emoji = model.state.submodels.icon.state.fields.emoji
 
         model.state.submodels.icon.inputEmoji("🍙🐶")
-        let lastEmoji = model.state.submodels.icon.emoji
+        let lastEmoji = model.state.submodels.icon.state.fields.emoji
 
         model.state.submodels.icon.inputEmoji("abc")
-        let noEmoji = model.state.submodels.icon.emoji
+        let noEmoji = model.state.submodels.icon.state.fields.emoji
 
         model.state.submodels.icon.inputText("サブスク")
 
         #expect(emoji == "🍙")
         #expect(lastEmoji == "🐶")
         #expect(noEmoji.isEmpty)
-        #expect(model.state.submodels.icon.text == "サブス")
+        #expect(model.state.submodels.icon.state.fields.text == "サブス")
     }
 
     @Test
@@ -37,10 +37,10 @@ struct CategoryEditModelTests {
         model.state.inputTag("朝ごはん")
         let isAdded = model.state.commitTag()
         model.state.closeTag()
-        let id = try #require(model.state.tags.first?.id)
+        let id = try #require(model.state.fields.tags.first?.id)
 
         model.state.showTag(.rename(id))
-        let shown = model.state.tagEdit
+        let shown = model.state.presented.tagEdit
         model.state.inputTag("モーニング")
         let isRenamed = model.state.commitTag()
         model.state.closeTag()
@@ -49,8 +49,8 @@ struct CategoryEditModelTests {
         #expect(shown?.target == .rename(id))
         #expect(shown?.name == "朝ごはん")
         #expect(isRenamed)
-        #expect(model.state.tags.map(\.draft.name) == ["モーニング"])
-        #expect(model.state.tagEdit == nil)
+        #expect(model.state.fields.tags.map(\.draft.name) == ["モーニング"])
+        #expect(model.state.presented.tagEdit == nil)
     }
 
     @Test
@@ -61,7 +61,7 @@ struct CategoryEditModelTests {
         model.state.showTag(.add)
         let isAdded = model.state.commitTag()
         let problem = model.state.tagProblem
-        let shown = model.state.tagEdit
+        let shown = model.state.presented.tagEdit
 
         model.state.closeTag()
 
@@ -69,8 +69,8 @@ struct CategoryEditModelTests {
         #expect(problem == "タグの名前を入れてください")
         #expect(shown?.target == .add)
         #expect(model.state.tagProblem == nil)
-        #expect(model.state.tagEdit == nil)
-        #expect(model.state.tags.isEmpty)
+        #expect(model.state.presented.tagEdit == nil)
+        #expect(model.state.fields.tags.isEmpty)
     }
 
     @Test
@@ -78,7 +78,7 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let model = CategoryEditModel(parts: .system(database), kind: .income)
         model.state.fields.name = "配当"
-        model.state.submodels.icon.glyph = .invest
+        model.state.submodels.icon.state.fields.glyph = .invest
 
         let canSaveBeforeName = CategoryEditModel(parts: .system(database), kind: .income)
             .flow.output.canSave
@@ -107,9 +107,9 @@ struct CategoryEditModelTests {
 
         #expect(model.flow.output.isEditing)
         #expect(model.state.fields.name == "食費")
-        #expect(model.state.submodels.icon.markKind == .glyph)
-        #expect(model.state.submodels.icon.glyph == .food)
-        #expect(model.state.submodels.icon.color == "#E07A5F")
+        #expect(model.state.submodels.icon.state.fields.markKind == .glyph)
+        #expect(model.state.submodels.icon.state.fields.glyph == .food)
+        #expect(model.state.submodels.icon.state.fields.color == "#E07A5F")
         #expect(!model.flow.output.isHidden)
         #expect(!model.flow.output.isChanged)
     }
@@ -162,7 +162,7 @@ struct CategoryEditModelTests {
         model.state.fields.name = ""
         let cleared = model.flow.output.isChanged
 
-        #expect(model.state.submodels.icon.glyph == .food)
+        #expect(model.state.submodels.icon.state.fields.glyph == .food)
         #expect(!start)
         #expect(named)
         #expect(!cleared)
@@ -184,12 +184,12 @@ struct CategoryEditModelTests {
         let added = model.state.addTag("朝ごはん") && model.state.addTag("昼ごはん")
         let blankAdded = model.state.addTag(" ")
         let blankError = model.state.tagProblem
-        let breakfast = try #require(model.state.tags.first)
-        let lunch = try #require(model.state.tags.last)
+        let breakfast = try #require(model.state.fields.tags.first)
+        let lunch = try #require(model.state.fields.tags.last)
         let renamed = model.state.renameTag(lunch.id, to: "ランチ")
         model.state.removeTag(breakfast.id)
         let snackAdded = model.state.addTag("おやつ")
-        let snack = try #require(model.state.tags.last)
+        let snack = try #require(model.state.fields.tags.last)
         model.state.moveTag(snack.id, to: 0)
 
         let changed = model.flow.output.isChanged
@@ -214,7 +214,7 @@ struct CategoryEditModelTests {
         _ = model.state.addTag("昼ごはん")
         let duplicated = model.state.addTag(" 朝ごはん ")
         let addError = model.state.tagProblem
-        let lunch = try #require(model.state.tags.last)
+        let lunch = try #require(model.state.fields.tags.last)
         let renamed = model.state.renameTag(lunch.id, to: "朝ごはん")
         let renameError = model.state.tagProblem
         let kept = model.state.renameTag(lunch.id, to: "昼ごはん")
@@ -224,7 +224,7 @@ struct CategoryEditModelTests {
         #expect(!renamed)
         #expect(renameError == "同じ名前のタグがあります")
         #expect(kept)
-        #expect(model.state.tags.count == 2)
+        #expect(model.state.fields.tags.count == 2)
     }
 
     @Test
@@ -272,7 +272,7 @@ struct CategoryEditModelTests {
             editing: food.id
         )
         await reopened.load()
-        let tag = try #require(reopened.state.tags.first)
+        let tag = try #require(reopened.state.fields.tags.first)
 
         reopened.state.removeTag(tag.id)
         let changed = reopened.flow.output.isChanged
@@ -309,13 +309,13 @@ struct CategoryEditModelTests {
             kind: .expense,
             editing: category.id
         )
-        let start = editing.state.ready
+        let start = editing.state.outcome
 
         await adding.start()
         await editing.start()
 
-        #expect(adding.state.ready != start)
-        #expect(editing.state.ready != start)
+        #expect(adding.state.outcome != start)
+        #expect(editing.state.outcome != start)
         #expect(editing.state.fields.name == category.name)
     }
 }

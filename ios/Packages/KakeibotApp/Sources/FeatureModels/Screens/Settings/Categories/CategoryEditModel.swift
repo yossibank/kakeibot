@@ -105,7 +105,7 @@ extension CategoryEditModel {
 public extension CategoryEditModel {
     func start() async {
         await load()
-        state.ready.send(())
+        state.outcome.send(())
     }
 
     func load() async {
@@ -161,7 +161,7 @@ public extension CategoryEditModel.Output {
             kind: input.kind,
             name: state.fields.name,
             mark: state.submodels.icon.mark,
-            color: state.submodels.icon.color
+            color: state.submodels.icon.state.fields.color
         )
     }
 }
@@ -170,7 +170,7 @@ extension CategoryEditModel.Output {
     var snapshot: CategoryEditModel.Snapshot {
         CategoryEditModel.Snapshot(
             draft: draft,
-            tags: state.tags.map(\.draft)
+            tags: state.fields.tags.map(\.draft)
         )
     }
 }
@@ -202,7 +202,7 @@ extension CategoryEditModel.Source: EditFlowSource {
         do {
             return try await dependencies.database.saveCategory(
                 output.draft,
-                tags: state.tags.map(\.draft),
+                tags: state.fields.tags.map(\.draft),
                 editing: input.editingId,
                 at: dependencies.clock.now
             )

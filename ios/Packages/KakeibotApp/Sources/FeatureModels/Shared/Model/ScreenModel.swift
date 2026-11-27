@@ -2,7 +2,7 @@ import DesignSystem
 
 @MainActor
 public protocol ScreenModel: ScreenPerforming {
-    associatedtype State: NoticeHolding
+    associatedtype State: NoticesHolding
 
     static var loadFailedMessage: String { get }
 

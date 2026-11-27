@@ -23,7 +23,7 @@ public final class EntryVoiceFlow: ScreenPerforming {
 }
 
 public extension EntryVoiceFlow {
-    enum Step: Hashable {
+    enum Step: Hashable, Sendable {
         case listening
         case reading
         case denied
@@ -65,7 +65,7 @@ public extension EntryVoiceFlow {
         today: LocalDate,
         onApplied: @escaping @MainActor () -> Void
     ) async {
-        guard state.step == nil, !input.isStarting else {
+        guard state.presented.step == nil, !input.isStarting else {
             return
         }
 
@@ -110,7 +110,7 @@ public extension EntryVoiceFlow {
             return
         }
 
-        guard input.source === source, state.step == .listening else {
+        guard input.source === source, state.presented.step == .listening else {
             await source.cancel()
             return
         }
@@ -119,7 +119,7 @@ public extension EntryVoiceFlow {
     }
 
     func finish() async {
-        guard state.step == .listening, let source = input.source,
+        guard state.presented.step == .listening, let source = input.source,
               let session = input.session else {
             return
         }
@@ -178,12 +178,12 @@ private extension EntryVoiceFlow {
     }
 
     func receive(_ event: EntryVoiceEvent) {
-        if state.step == .reading, case let .transcript(transcript) = event {
+        if state.presented.step == .reading, case let .transcript(transcript) = event {
             input.transcript = transcript
             return
         }
 
-        guard state.step == .listening else {
+        guard state.presented.step == .listening else {
             return
         }
 

@@ -14,7 +14,7 @@ extension EntrySheet {
             deck: deck,
             today: today,
             isMemoActive: model.state.screen.isEditingMemo,
-            listening: voice.state.step == .listening ? voice : nil,
+            listening: voice.state.presented.step == .listening ? voice : nil,
             preview: voice.input.preview,
             growth: layout.slipGrowth,
             onSelect: { next in

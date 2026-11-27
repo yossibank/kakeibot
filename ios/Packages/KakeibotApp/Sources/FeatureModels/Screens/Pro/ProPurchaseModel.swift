@@ -27,7 +27,7 @@ public final class ProPurchaseModel: ScreenPerforming {
 }
 
 public extension ProPurchaseModel {
-    enum Work: Sendable {
+    enum Work: Hashable, Sendable {
         case purchase
         case restore
     }
@@ -47,7 +47,6 @@ public extension ProPurchaseModel {
         public let notices: Notices
 
         public internal(set) var outcome = ScreenOutcome<Work>()
-        public internal(set) var working: Work?
 
         public let task = ModelTask()
 
@@ -153,15 +152,10 @@ private extension ProPurchaseModel {
             return nil
         }
 
-        state.working = work
         state.notices.error.clear()
 
-        defer {
-            state.working = nil
-        }
-
         do {
-            return try await state.task.attempt {
+            return try await state.task.attempt(work) {
                 try await operation()
             }
         } catch ProStoreError.cancelled {

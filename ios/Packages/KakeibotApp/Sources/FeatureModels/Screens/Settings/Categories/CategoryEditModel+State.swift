@@ -6,11 +6,16 @@ import Observation
 public extension CategoryEditModel {
     struct Fields: ScreenEditable {
         public var name = ""
+
+        public internal(set) var tags: [EditingTag] = []
     }
 
     struct Presented: ScreenEditable {
         public var isMovingTag = false
         public var ignoresKeyboard = false
+
+        public internal(set) var tagEdit: TagEdit?
+        public internal(set) var tagRejection: EntryTagDraft.Problem?
     }
 
     struct TagEdit: Hashable, Sendable {
@@ -39,11 +44,7 @@ public extension CategoryEditModel {
         public var fields = Fields()
         public var presented = Presented()
 
-        public internal(set) var ready = ScreenOutcome<Void>()
-
-        public private(set) var tags: [EditingTag] = []
-        public private(set) var tagRejection: EntryTagDraft.Problem?
-        public private(set) var tagEdit: TagEdit?
+        public internal(set) var outcome = ScreenOutcome<Void>()
 
         public let notices: Notices
         public let submodels = Submodels()
@@ -73,7 +74,7 @@ public extension CategoryEditModel.TagEdit {
 
 public extension CategoryEditModel.State {
     var tagProblem: String? {
-        tagRejection.map(CategoryEditModel.message(for:))
+        presented.tagRejection.map(CategoryEditModel.message(for:))
     }
 
     func setMovingTag(_ isMoving: Bool) {
@@ -91,13 +92,13 @@ public extension CategoryEditModel.State {
     func addTag(_ name: String) -> Bool {
         let draft = EntryTagDraft(name: name)
 
-        guard check(draft, among: tags.map(\.draft)) else {
+        guard check(draft, among: fields.tags.map(\.draft)) else {
             return false
         }
 
         let tag = CategoryEditModel.EditingTag(id: UUID(), draft: draft)
 
-        tags.append(tag)
+        fields.tags.append(tag)
 
         return true
     }
@@ -106,12 +107,12 @@ public extension CategoryEditModel.State {
         _ id: UUID,
         to name: String
     ) -> Bool {
-        guard let index = tags.firstIndex(where: { $0.id == id }) else {
+        guard let index = fields.tags.firstIndex(where: { $0.id == id }) else {
             return false
         }
 
-        let others = tags.filter { $0.id != id }.map(\.draft)
-        var draft = tags[index].draft
+        let others = fields.tags.filter { $0.id != id }.map(\.draft)
+        var draft = fields.tags[index].draft
 
         draft.name = name
 
@@ -119,7 +120,7 @@ public extension CategoryEditModel.State {
             return false
         }
 
-        tags[index].draft = draft
+        fields.tags[index].draft = draft
 
         return true
     }
@@ -128,44 +129,44 @@ public extension CategoryEditModel.State {
         _ id: UUID,
         to index: Int
     ) {
-        guard let from = tags.firstIndex(where: { $0.id == id }) else {
+        guard let from = fields.tags.firstIndex(where: { $0.id == id }) else {
             return
         }
 
-        let to = min(max(index, 0), tags.count - 1)
+        let to = min(max(index, 0), fields.tags.count - 1)
 
         guard from != to else {
             return
         }
 
-        let tag = tags.remove(at: from)
+        let tag = fields.tags.remove(at: from)
 
-        tags.insert(tag, at: to)
+        fields.tags.insert(tag, at: to)
     }
 
     func removeTag(_ id: UUID) {
-        tags.removeAll { $0.id == id }
+        fields.tags.removeAll { $0.id == id }
     }
 
     func showTag(_ target: CategoryEditModel.TagEdit.Target) {
         let name = switch target {
         case .add: ""
-        case let .rename(id): tags.first { $0.id == id }?.draft.name ?? ""
+        case let .rename(id): fields.tags.first { $0.id == id }?.draft.name ?? ""
         }
 
-        tagRejection = nil
-        tagEdit = CategoryEditModel.TagEdit(target: target, name: name)
+        presented.tagRejection = nil
+        presented.tagEdit = CategoryEditModel.TagEdit(target: target, name: name)
     }
 
     func inputTag(_ name: String) {
-        if let tagEdit,
+        if let tagEdit = presented.tagEdit,
            tagEdit.name != name {
-            self.tagEdit?.name = name
+            presented.tagEdit?.name = name
         }
     }
 
     func commitTag() -> Bool {
-        guard let tagEdit else {
+        guard let tagEdit = presented.tagEdit else {
             return true
         }
 
@@ -176,12 +177,12 @@ public extension CategoryEditModel.State {
     }
 
     func closeTag() {
-        if tagRejection != nil {
-            tagRejection = nil
+        if presented.tagRejection != nil {
+            presented.tagRejection = nil
         }
 
-        if tagEdit != nil {
-            tagEdit = nil
+        if presented.tagEdit != nil {
+            presented.tagEdit = nil
         }
     }
 }
@@ -193,7 +194,7 @@ extension CategoryEditModel.State {
     ) {
         fields.name = draft.name
         submodels.icon.apply(draft.icon)
-        self.tags = tags
+        fields.tags = tags
     }
 }
 
@@ -202,7 +203,7 @@ private extension CategoryEditModel.State {
         _ tag: EntryTagDraft,
         among others: [EntryTagDraft]
     ) -> Bool {
-        tagRejection = tag.problems(among: others).first
-        return tagRejection == nil
+        presented.tagRejection = tag.problems(among: others).first
+        return presented.tagRejection == nil
     }
 }

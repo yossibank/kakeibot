@@ -1,5 +1,5 @@
 @MainActor
-public protocol NoticesHolding: NoticeHolding {
+public protocol NoticesHolding: AnyObject {
     associatedtype Notices: ScreenNotices
 
     var notices: Notices { get }
