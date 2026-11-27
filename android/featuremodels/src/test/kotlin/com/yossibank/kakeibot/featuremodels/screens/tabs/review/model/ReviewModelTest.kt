@@ -152,7 +152,7 @@ class ReviewModelTest {
         assertEquals("2026-12-31", year.endInclusive.toString())
         assertEquals("2026年", model.output.title)
         assertEquals("1/1〜12/31", model.output.rangeText)
-        assertEquals(0, model.state.offset)
+        assertEquals(0, model.state.cursor.offset)
     }
 
     @Test
@@ -201,7 +201,7 @@ class ReviewModelTest {
         model.state.move(count = 2)
 
         assertEquals("2026-10-01", model.output.period.range.start.toString())
-        assertEquals(0, model.state.offset)
+        assertEquals(0, model.state.cursor.offset)
     }
 
     @Test

@@ -15,11 +15,11 @@ extension ReviewModelTests {
         }
 
         await model.refreshStoreReviewCard()
-        let before = model.state.showsStoreReviewCard
+        let before = model.output.showsStoreReviewCard
 
         try await setup.save(.expense, amount: 980, on: "2026-10-12")
         await model.refreshStoreReviewCard()
-        let after = model.state.showsStoreReviewCard
+        let after = model.output.showsStoreReviewCard
 
         #expect(!before)
         #expect(after)
@@ -37,7 +37,7 @@ extension ReviewModelTests {
         await model.refreshStoreReviewCard()
         await model.closeStoreReviewCard()
         await model.refreshStoreReviewCard()
-        let shows = model.state.showsStoreReviewCard
+        let shows = model.output.showsStoreReviewCard
         let closed = try await setup.database.setting(.storeReviewCardClosed)
 
         #expect(!shows)

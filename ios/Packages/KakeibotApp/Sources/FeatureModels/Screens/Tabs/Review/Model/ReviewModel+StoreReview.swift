@@ -7,16 +7,24 @@ public extension ReviewModel {
     func refreshStoreReviewCard() async {
         let isClosed = await (try? dependencies.database.setting(.storeReviewCardClosed)) ?? true
         let count = await (try? dependencies.database.entryHistory().count) ?? 0
-        state.showsStoreReviewCard = !isClosed && count >= Self.storeReviewEntries
+
+        input.isStoreReviewClosed = isClosed
+        input.historyCount = count
     }
 
     func closeStoreReviewCard() async {
-        state.showsStoreReviewCard = false
+        input.isStoreReviewClosed = true
         try? await dependencies.database.setSetting(.storeReviewCardClosed, to: true)
     }
 
     func openStoreReview() async {
         await closeStoreReviewCard()
         try? await dependencies.database.setSetting(.storeReviewOpened, to: true)
+    }
+}
+
+public extension ReviewModel.Output {
+    var showsStoreReviewCard: Bool {
+        !input.isStoreReviewClosed && input.historyCount >= ReviewModel.storeReviewEntries
     }
 }

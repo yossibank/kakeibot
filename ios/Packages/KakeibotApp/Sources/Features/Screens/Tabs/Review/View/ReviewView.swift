@@ -41,7 +41,7 @@ public struct ReviewView: View {
 
 extension ReviewView {
     var periodTextTransition: ContentTransition {
-        .numericText(countsDown: !model.state.isMovingForward)
+        .numericText(countsDown: !model.state.cursor.isMovingForward)
     }
 
     var periodTitle: String {

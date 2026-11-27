@@ -40,17 +40,17 @@ public extension ReviewModel.Sheet {
 
 public extension ReviewModel.State {
     func open(afterSheet opening: ReviewModel.Opening) {
-        pending = opening
+        presented.pending = opening
         presented.analysisShare.closeAll()
         presented.sheet.closeAll()
     }
 
     func takePending() -> ReviewModel.Opening? {
-        guard let pending else {
+        guard let pending = presented.pending else {
             return nil
         }
 
-        self.pending = nil
+        presented.pending = nil
 
         return pending
     }

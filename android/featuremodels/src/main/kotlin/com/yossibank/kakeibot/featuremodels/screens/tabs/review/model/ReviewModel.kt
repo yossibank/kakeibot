@@ -76,20 +76,30 @@ class ReviewModel(
         val notices = Notices(wait)
         val task = ModelTask(notices.error)
 
-        var offset: Int by mutableStateOf(0)
+        var cursor: PeriodCursor by mutableStateOf(PeriodCursor())
             private set
 
         fun move(count: Int) {
-            if (offset + count > 0) {
-                return
-            }
-
-            offset += count
+            cursor = cursor.moved(count)
         }
 
         internal fun restart() {
-            offset = 0
+            cursor = cursor.restarted()
         }
+    }
+
+    data class PeriodCursor(
+        val offset: Int = 0,
+    ) {
+        val canMoveForward: Boolean
+            get() = offset < 0
+
+        fun moved(count: Int): PeriodCursor {
+            val next = offset + count
+            return if (next > 0) this else copy(offset = next)
+        }
+
+        fun restarted(): PeriodCursor = copy(offset = 0)
     }
 
     class Notices(
@@ -130,10 +140,10 @@ class ReviewModel(
                 containing = input.today,
                 monthStartDay = input.monthStartDay,
                 weekStart = input.weekStart,
-            ).adding(count = state.offset)
+            ).adding(count = state.cursor.offset)
 
         val canMoveForward: Boolean
-            get() = state.offset < 0
+            get() = state.cursor.canMoveForward
 
         val title: String
             get() {

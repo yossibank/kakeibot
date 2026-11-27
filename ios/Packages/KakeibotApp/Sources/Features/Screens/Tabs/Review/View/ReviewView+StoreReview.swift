@@ -5,7 +5,7 @@ import SwiftUI
 extension ReviewView {
     @ViewBuilder
     var storeReviewCard: some View {
-        if model.state.showsStoreReviewCard {
+        if model.output.showsStoreReviewCard {
             VStack(alignment: .leading, spacing: 12) {
                 CardHeader("使ってみていかがですか", systemImage: "star")
 

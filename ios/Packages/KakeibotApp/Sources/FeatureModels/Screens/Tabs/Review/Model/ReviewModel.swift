@@ -17,8 +17,8 @@ public final class ReviewModel: ScreenModel {
         parts: ScreenParts,
         today: LocalDate
     ) {
-        let state = State(checkTime: parts.clock.now, wait: parts.wait)
-        let input = Input(today: today)
+        let state = State(wait: parts.wait)
+        let input = Input(today: today, checkTime: parts.clock.now)
 
         self.state = state
         self.input = input
@@ -32,6 +32,7 @@ public extension ReviewModel {
     @Observable
     final class Input {
         public internal(set) var today: LocalDate
+        public internal(set) var checkTime: Date
         public internal(set) var scale: ReviewPeriod.Scale = .month
         public internal(set) var kind: ReviewKind = .expense
         public internal(set) var monthStartDay: MonthStartDay = .first
@@ -41,6 +42,9 @@ public extension ReviewModel {
         public internal(set) var stampBook: StampBook?
         public internal(set) var list: Loadable<EntryList> = .loading
         public internal(set) var goals: [ReviewGoal] = []
+        public internal(set) var isStoreReviewClosed = true
+        public internal(set) var historyCount = 0
+        public internal(set) var seenReports: Set<String>?
 
         var reasons: [String: String] = [:]
         var notes: [String: String] = [:]
@@ -50,8 +54,12 @@ public extension ReviewModel {
         @ObservationIgnored var reasonRequests: Set<String> = []
         @ObservationIgnored var noteRequests: Set<String> = []
 
-        init(today: LocalDate) {
+        init(
+            today: LocalDate,
+            checkTime: Date
+        ) {
             self.today = today
+            self.checkTime = checkTime
         }
     }
 
@@ -192,15 +200,15 @@ public extension ReviewModel.Output {
             weekStart: input.weekStart
         )
 
-        return current.adding(state.offset)
+        return current.adding(state.cursor.offset)
     }
 
     var canMoveForward: Bool {
-        state.offset < 0
+        state.cursor.offset < 0
     }
 
     var isCurrentPeriod: Bool {
-        state.offset == 0
+        state.cursor.isCurrent
     }
 
     var summary: ReviewSummary {
@@ -288,7 +296,7 @@ public extension ReviewModel.Output {
     }
 
     func canMove(by count: Int) -> Bool {
-        state.offset + count <= 0
+        state.cursor.canMove(by: count)
     }
 }
 
