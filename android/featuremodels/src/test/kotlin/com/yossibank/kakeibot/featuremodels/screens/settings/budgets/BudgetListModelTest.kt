@@ -156,7 +156,7 @@ class BudgetListModelTest {
         model.startEditing(Target.Total)
         model.press(1)
         model.flow.close()
-        val isAsking = model.flow.state.prompt.isShowing(EditFlow.Prompt.discard)
+        val isAsking = model.flow.state.presented.prompt.isShowing(EditFlow.Prompt.discard)
         val kept = model.state.editing
 
         model.flow.discard()
@@ -165,7 +165,7 @@ class BudgetListModelTest {
         assertEquals(1, closedOnce)
         assertTrue(isAsking)
         assertEquals(Target.Total, kept)
-        assertNull(model.flow.state.prompt.current)
+        assertNull(model.flow.state.presented.prompt.current)
         assertEquals(2, model.flow.state.outcome.count)
     }
 

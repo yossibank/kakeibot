@@ -16,7 +16,7 @@ private struct BudgetKeypadDrawer: ViewModifier {
             .animation(.snappy, value: model.state.editing)
             .confirmsDiscard(
                 when: model.output.isChanged,
-                isPresented: Bindable(model.state).prompt[.discard]
+                isPresented: Bindable(model.state).presented.prompt[.discard]
             ) {
                 model.cancelEditing()
             }

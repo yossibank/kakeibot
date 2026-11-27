@@ -41,8 +41,8 @@ class BudgetListModel(
     parts: ScreenParts,
     today: LocalDate,
 ) : SettingsFoldModel {
-    val state = State(today, parts.wait)
-    val input = Input()
+    val state = State(parts.wait)
+    val input = Input(today)
     val output = Output(input, state)
     val flow = EditFlow(task = state.task, source = Source())
 
@@ -78,16 +78,12 @@ class BudgetListModel(
     )
 
     class State(
-        today: LocalDate,
         wait: ScreenWait,
     ) {
         val errorNotice = ErrorNotice(wait)
         val task = ModelTask(errorNotice)
         val cleared = UndoNotice<Cleared>(wait)
         val resetFrom = UndoNotice<YearMonth>(wait)
-
-        var today: LocalDate by mutableStateOf(today)
-            internal set
 
         var editing: Target? by mutableStateOf(null)
             private set
@@ -116,7 +112,12 @@ class BudgetListModel(
         }
     }
 
-    class Input {
+    class Input(
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var overview: MonthOverview? by mutableStateOf(null)
             internal set
 
@@ -239,7 +240,7 @@ class BudgetListModel(
                 observe(database.categoryListUpdates()) { input.categoryList = it }
             }
 
-            val overviews = snapshotFlow { state.today }.flatMapLatest { day ->
+            val overviews = snapshotFlow { input.today }.flatMapLatest { day ->
                 database.monthOverviewUpdates(
                     on = day,
                     list = dependencies.entryList,
@@ -258,7 +259,7 @@ class BudgetListModel(
     }
 
     fun setToday(today: LocalDate) {
-        state.today = today
+        input.today = today
     }
 
     suspend fun finishEditing() {
