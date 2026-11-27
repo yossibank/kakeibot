@@ -45,6 +45,7 @@ Xcode と [Homebrew](https://brew.sh/) が要る。Android は [Android Studio](
 
 - 文書・JSON・筋書きの一覧（`make verify-docs` と同じ）
 - 書き方と設計と並び
+- コメント
 - 余白
 - 画面のモデルの `State` の直下
 - 依存
