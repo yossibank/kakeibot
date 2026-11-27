@@ -9,7 +9,7 @@ fun MainModel.saved(): List<String> {
         state.visitedTabs.joinToString(SEPARATOR) { it.name },
     )
 
-    return tabs + saved(state.sheet.current)
+    return tabs + saved(state.presented.sheet.current)
 }
 
 fun MainModel.Companion.restore(saved: List<String>): MainModel = MainModel(

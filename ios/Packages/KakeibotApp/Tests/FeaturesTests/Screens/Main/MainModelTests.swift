@@ -48,10 +48,10 @@ struct MainModelTests {
         entry.openLaunchSheet(preferring: nil)
         preferred.openLaunchSheet(preferring: .settings)
 
-        #expect(home.state.presented.current == nil)
-        #expect(entry.state.presented.current == .new)
+        #expect(home.state.presented.sheet.current == nil)
+        #expect(entry.state.presented.sheet.current == .new)
         #expect(entry.state.tab == .home)
-        #expect(preferred.state.presented.current == .settings)
+        #expect(preferred.state.presented.sheet.current == .settings)
     }
 
     @Test
@@ -72,7 +72,7 @@ struct MainModelTests {
         await probe.value
 
         #expect(tabAfterRoute == .home)
-        #expect(model.state.presented.current == nil)
+        #expect(model.state.presented.sheet.current == nil)
         #expect(model.state.visitedTabs == [.home, .records])
     }
 
@@ -86,8 +86,8 @@ struct MainModelTests {
         await model.open(.entry(date))
 
         #expect(model.state.tab == .home)
-        #expect(model.state.presented.current == .new)
-        #expect(model.state.draft.state.payment.date == date)
+        #expect(model.state.presented.sheet.current == .new)
+        #expect(model.state.submodels.draft.state.payment.date == date)
         #expect(!model.state.startsReceipt)
     }
 
@@ -101,7 +101,7 @@ struct MainModelTests {
         await model.open(.recurring(id))
 
         #expect(model.state.tab == .review)
-        #expect(model.state.presented.current == .recurring(id))
+        #expect(model.state.presented.sheet.current == .recurring(id))
     }
 
     @Test
@@ -113,12 +113,12 @@ struct MainModelTests {
         model.state.select(.records)
 
         await model.open(.template(lunch.id))
-        let found = model.state.presented.current
+        let found = model.state.presented.sheet.current
         await model.open(.template(EntryTemplate.ID()))
 
         #expect(found == .template(lunch))
         #expect(model.state.tab == .home)
-        #expect(model.state.presented.current == nil)
+        #expect(model.state.presented.sheet.current == nil)
     }
 
     @Test
@@ -130,7 +130,7 @@ struct MainModelTests {
         await model.open(.newTemplate)
 
         #expect(model.state.tab == .home)
-        #expect(model.state.presented.current == .newTemplate)
+        #expect(model.state.presented.sheet.current == .newTemplate)
     }
 
     @Test
@@ -138,16 +138,16 @@ struct MainModelTests {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
         model.addEntry(on: setup.date.adding(days: -3))
-        model.state.presented.closeAll()
+        model.state.presented.sheet.closeAll()
 
         await model.open(.receipt)
         let startsAfterRoute = model.state.startsReceipt
-        let dateAfterRoute = model.state.draft.state.payment.date
+        let dateAfterRoute = model.state.submodels.draft.state.payment.date
         await model.prepareDraft().value
 
         #expect(startsAfterRoute)
         #expect(dateAfterRoute == setup.date)
-        #expect(model.state.presented.current == .new)
+        #expect(model.state.presented.sheet.current == .new)
         #expect(model.state.tab == .home)
         #expect(!model.state.startsReceipt)
     }
@@ -169,6 +169,6 @@ extension MainModelTests {
     }
 
     static func seen(in model: MainModel) -> Seen {
-        Seen(sheet: model.state.presented.current, tab: model.state.tab)
+        Seen(sheet: model.state.presented.sheet.current, tab: model.state.tab)
     }
 }

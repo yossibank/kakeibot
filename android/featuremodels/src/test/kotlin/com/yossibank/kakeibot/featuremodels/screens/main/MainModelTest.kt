@@ -52,7 +52,7 @@ class MainModelTest {
         probe.join()
 
         assertEquals(MainModel.Tab.Home, tabAfterRoute)
-        assertNull(model.state.sheet.current)
+        assertNull(model.state.presented.sheet.current)
         assertEquals(setOf(MainModel.Tab.Home, MainModel.Tab.Records), model.state.visitedTabs)
         assertEquals(0, currentTime)
     }
@@ -64,7 +64,7 @@ class MainModelTest {
 
         model.open(PlannedNotification.Route.Entry(date = date))
 
-        val sheet = model.state.sheet.current as? MainModel.Sheet.Entry
+        val sheet = model.state.presented.sheet.current as? MainModel.Sheet.Entry
 
         val entry = EntryModel(
             parts = setup.parts,
@@ -86,12 +86,15 @@ class MainModelTest {
         model.state.select(MainModel.Tab.Review)
 
         model.open(PlannedNotification.Route.Recurring(id = id))
-        val first = model.state.sheet.current
+        val first = model.state.presented.sheet.current
         model.open(PlannedNotification.Route.Recurring(id = id))
 
         assertEquals(MainModel.Tab.Review, model.state.tab)
         assertEquals(MainModel.Sheet.Settings(recurring = id, round = 1), first)
-        assertEquals(MainModel.Sheet.Settings(recurring = id, round = 2), model.state.sheet.current)
+        assertEquals(
+            MainModel.Sheet.Settings(recurring = id, round = 2),
+            model.state.presented.sheet.current,
+        )
     }
 
     @Test
@@ -199,8 +202,8 @@ class MainModelTest {
             MainModel.Tab.entries.toSet() - MainModel.Tab.Records,
             restored.state.visitedTabs,
         )
-        assertEquals(MainModel.Sheet.Entry(editing = id), restored.state.sheet.current)
-        assertEquals(entry, MainModel.restore(dated.saved()).state.sheet.current)
+        assertEquals(MainModel.Sheet.Entry(editing = id), restored.state.presented.sheet.current)
+        assertEquals(entry, MainModel.restore(dated.saved()).state.presented.sheet.current)
     }
 }
 
@@ -210,6 +213,6 @@ private data class Seen(
 )
 
 private fun seen(model: MainModel): Seen = Seen(
-    sheet = model.state.sheet.current,
+    sheet = model.state.presented.sheet.current,
     tab = model.state.tab,
 )

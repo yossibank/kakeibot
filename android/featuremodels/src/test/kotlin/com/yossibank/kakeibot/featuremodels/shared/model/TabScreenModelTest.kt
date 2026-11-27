@@ -22,9 +22,9 @@ class TabScreenModelTest {
         tabs.review.setToday(next)
         tabs.assets.setToday(next)
 
-        assertEquals(next, tabs.home.state.today)
-        assertEquals(next, tabs.records.state.today)
-        assertEquals(next, tabs.review.state.today)
+        assertEquals(next, tabs.home.input.today)
+        assertEquals(next, tabs.records.input.today)
+        assertEquals(next, tabs.review.input.today)
         assertEquals(next, tabs.assets.input.today)
     }
 

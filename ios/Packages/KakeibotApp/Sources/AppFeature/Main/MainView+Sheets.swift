@@ -9,7 +9,7 @@ extension MainView {
         switch sheet {
         case .new:
             EntrySheet(
-                model: model.state.draft,
+                model: model.state.submodels.draft,
                 startsReceipt: model.state.startsReceipt,
                 onChange: show
             )
@@ -28,7 +28,7 @@ extension MainView {
             templateEntrySheet(template)
 
         case .transfer:
-            EntrySheet(model: model.state.draft, onChange: show)
+            EntrySheet(model: model.state.submodels.draft, onChange: show)
 
         case .templates:
             HomeTemplateShelfSheet(
@@ -75,7 +75,7 @@ private extension MainView {
         HomeRecurringSheet(
             model: home,
             onOpenRecurring: { id in
-                model.state.presented.show(.recurring(id))
+                model.state.presented.sheet.show(.recurring(id))
             }
         )
     }

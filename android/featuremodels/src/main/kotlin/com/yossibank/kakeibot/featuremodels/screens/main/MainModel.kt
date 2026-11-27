@@ -10,6 +10,7 @@ import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
 import com.yossibank.kakeibot.featuremodels.shared.model.ForegroundReturn
 import com.yossibank.kakeibot.featuremodels.shared.model.ObservationRound
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.model.Shown
 import kotlinx.coroutines.delay
@@ -50,12 +51,18 @@ class MainModel(
         ) : Sheet
     }
 
+    class Presented(
+        sheet: Sheet?,
+    ) : ScreenEditable {
+        val sheet = Shown(sheet)
+    }
+
     class State(
         tab: Tab,
         visitedTabs: Set<Tab>,
         sheet: Sheet?,
     ) {
-        val sheet = Shown(sheet)
+        val presented = Presented(sheet)
 
         var tab: Tab by mutableStateOf(tab)
             private set
@@ -97,7 +104,7 @@ class MainModel(
         internal fun openSettings(recurring: Identifier<Recurring>) {
             round += 1
 
-            sheet.show(
+            presented.sheet.show(
                 Sheet.Settings(
                     recurring = recurring,
                     round = round,
@@ -111,7 +118,7 @@ class MainModel(
     )
 
     suspend fun open(route: PlannedNotification.Route) {
-        if (state.sheet.current != null) {
+        if (state.presented.sheet.current != null) {
             closeSheet()
         }
 
@@ -122,7 +129,7 @@ class MainModel(
 
             is PlannedNotification.Route.Entry -> {
                 state.select(Tab.Home)
-                state.sheet.show(Sheet.Entry(editing = null, date = route.date))
+                state.presented.sheet.show(Sheet.Entry(editing = null, date = route.date))
             }
 
             else -> {
@@ -132,11 +139,11 @@ class MainModel(
     }
 
     fun openEntry(editing: Identifier<Record>?) {
-        state.sheet.show(Sheet.Entry(editing = editing))
+        state.presented.sheet.show(Sheet.Entry(editing = editing))
     }
 
     private suspend fun closeSheet() {
-        state.sheet.closeAll()
+        state.presented.sheet.closeAll()
         delay(dependencies.closeDelay)
     }
 

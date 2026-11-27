@@ -159,8 +159,8 @@ private fun MainSheets(
     model: MainModel,
     notice: EntryNoticeModel,
 ) {
-    val sheet = model.state.sheet.current
-    val close = model.state.sheet::closeAll
+    val sheet = model.state.presented.sheet.current
+    val close = model.state.presented.sheet::closeAll
 
     SheetLayer(
         item = sheet as? MainModel.Sheet.Entry,
@@ -219,11 +219,13 @@ private fun MainTabs(
                         HomeView(
                             parts = parts,
                             today = today,
-                            onOpenBudget = { model.state.sheet.show(MainModel.Sheet.Budget) },
+                            onOpenBudget = {
+                                model.state.presented.sheet.show(MainModel.Sheet.Budget)
+                            },
                             onOpenEntry = model::openEntry,
                             onAddEntry = { model.openEntry(editing = null) },
                             onOpenSettings = {
-                                model.state.sheet.show(MainModel.Sheet.Settings())
+                                model.state.presented.sheet.show(MainModel.Sheet.Settings())
                             },
                         )
                     }

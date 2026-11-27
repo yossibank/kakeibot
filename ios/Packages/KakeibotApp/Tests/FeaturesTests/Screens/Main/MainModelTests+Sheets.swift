@@ -9,7 +9,7 @@ extension MainModelTests {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
         model.state.select(.records)
-        model.state.presented.show(.settings)
+        model.state.presented.sheet.show(.settings)
         var whileWaiting: Seen?
 
         let route = model.perform {
@@ -32,7 +32,7 @@ extension MainModelTests {
         let model = Self.model(setup)
         let id = Recurring.ID()
         model.state.select(.records)
-        model.state.presented.show(.settings)
+        model.state.presented.sheet.show(.settings)
         var afterSecond: Seen?
 
         let first = model.perform {
@@ -54,7 +54,7 @@ extension MainModelTests {
     func closesSheetBeforeMovingToTab() async throws {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
-        model.state.presented.show(.whatsNew(seenVersion: nil))
+        model.state.presented.sheet.show(.whatsNew(seenVersion: nil))
         var whileWaiting: Seen?
 
         let move = model.perform {
@@ -100,9 +100,9 @@ extension MainModelTests {
 
         model.addEntry(on: date)
 
-        #expect(model.state.presented.current == .new)
-        #expect(model.state.draft.state.payment.date == date)
-        #expect(model.state.draft.state.type == .expense)
+        #expect(model.state.presented.sheet.current == .new)
+        #expect(model.state.submodels.draft.state.payment.date == date)
+        #expect(model.state.submodels.draft.state.type == .expense)
     }
 
     @Test
@@ -112,24 +112,24 @@ extension MainModelTests {
 
         model.addTransfer()
 
-        #expect(model.state.presented.current == .transfer)
-        #expect(model.state.draft.state.type == .transfer)
+        #expect(model.state.presented.sheet.current == .transfer)
+        #expect(model.state.submodels.draft.state.type == .transfer)
     }
 
     @Test
     func replacesDraftAfterSheetCloses() async throws {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
-        let first = model.state.draft
+        let first = model.state.submodels.draft
         model.addTransfer()
-        model.state.presented.closeAll()
+        model.state.presented.sheet.closeAll()
 
         await model.prepareDraft().value
 
-        #expect(model.state.draft !== first)
-        #expect(model.state.draft.state.type == .expense)
-        #expect(model.state.draft.state.payment.date == setup.date)
-        #expect(model.state.draft.output.isLoaded)
+        #expect(model.state.submodels.draft !== first)
+        #expect(model.state.submodels.draft.state.type == .expense)
+        #expect(model.state.submodels.draft.state.payment.date == setup.date)
+        #expect(model.state.submodels.draft.output.isLoaded)
         #expect(!first.output.isLoaded)
     }
 
@@ -137,14 +137,14 @@ extension MainModelTests {
     func replacesDraftWhenDayChanges() async throws {
         let setup = try await TemplateSetup()
         let model = Self.model(setup)
-        let first = model.state.draft
+        let first = model.state.submodels.draft
         let next = setup.date.adding(days: 1)
 
         await model.setToday(next).value
 
         #expect(first.state.today == next)
-        #expect(model.state.today == next)
-        #expect(model.state.draft !== first)
-        #expect(model.state.draft.state.payment.date == next)
+        #expect(model.input.today == next)
+        #expect(model.state.submodels.draft !== first)
+        #expect(model.state.submodels.draft.state.payment.date == next)
     }
 }
