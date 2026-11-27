@@ -24,15 +24,24 @@ public extension HomeSectionListModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
+    final class State: NoticesHolding {
+        public let notices: Notices
 
         public internal(set) var layout = HomeLayout.standard
         public internal(set) var dragging: Dragging?
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -61,7 +70,7 @@ public extension HomeSectionListModel {
             state.layout = layout
             input.saved = .loaded(layout)
         } catch {
-            state.errorNotice.show(SettingMessage.loadFailed)
+            state.notices.error.show(SettingMessage.loadFailed)
             input.saved = .failed
         }
     }
@@ -108,7 +117,7 @@ public extension HomeSectionListModel {
             try await dependencies.database.setSetting(.homeHiddenSections, to: state.layout.hidden)
             input.saved = .loaded(state.layout)
         } catch {
-            state.errorNotice.show(SettingMessage.saveFailed, for: error)
+            state.notices.error.show(SettingMessage.saveFailed, for: error)
         }
     }
 }

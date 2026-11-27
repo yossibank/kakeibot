@@ -122,7 +122,7 @@ public extension CategoryEditModel {
                 let category,
                 let icon = list.icons[category.iconId]
             else {
-                state.errorNotice.show(Self.loadFailedMessage)
+                state.notices.error.show(Self.loadFailedMessage)
                 return
             }
 
@@ -134,7 +134,7 @@ public extension CategoryEditModel {
             input.isHidden = category.archivedAt != nil
             input.baseline = output.snapshot
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -160,8 +160,8 @@ public extension CategoryEditModel.Output {
         EntryCategoryDraft(
             kind: input.kind,
             name: state.fields.name,
-            mark: state.icon.mark,
-            color: state.icon.color
+            mark: state.submodels.icon.mark,
+            color: state.submodels.icon.color
         )
     }
 }
@@ -207,7 +207,7 @@ extension CategoryEditModel.Source: EditFlowSource {
                 at: dependencies.clock.now
             )
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.notices.error.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }

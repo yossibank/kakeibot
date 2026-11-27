@@ -90,11 +90,11 @@ public extension BudgetListModel.Output {
     }
 
     var canSave: Bool {
-        state.calculator.amount > 0
+        state.submodels.calculator.amount > 0
     }
 
     var isChanged: Bool {
-        state.editing != nil && state.calculator.amount != (editingAmount ?? 0)
+        state.editing != nil && state.submodels.calculator.amount != (editingAmount ?? 0)
     }
 
     var saveTitle: String {

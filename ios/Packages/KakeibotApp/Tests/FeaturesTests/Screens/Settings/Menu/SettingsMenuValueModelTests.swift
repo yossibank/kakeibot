@@ -35,7 +35,7 @@ struct SettingsMenuValueModelTests {
 
         #expect(model.output.value == .monday)
         #expect(saved == .monday)
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -50,7 +50,7 @@ struct SettingsMenuValueModelTests {
 
         #expect(model.output.value == .sunday)
         #expect(saved == .sunday)
-        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
+        #expect(model.state.notices.error.message == "設定を保存できませんでした")
     }
 
     @Test

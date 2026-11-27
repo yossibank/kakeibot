@@ -28,14 +28,23 @@ public final class SettingsMenuValueModel<Value: Equatable & Sendable>: ScreenPe
 
 public extension SettingsMenuValueModel {
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
+    final class State: NoticesHolding {
+        public let notices: Notices
 
         public internal(set) var chosen: Value?
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -85,7 +94,7 @@ public extension SettingsMenuValueModel {
             try await dependencies.database.setSetting(dependencies.key, to: newValue)
             input.value = newValue
         } catch {
-            state.errorNotice.show(SettingMessage.saveFailed, for: error)
+            state.notices.error.show(SettingMessage.saveFailed, for: error)
         }
 
         if state.chosen == newValue {

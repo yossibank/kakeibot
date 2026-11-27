@@ -73,7 +73,7 @@ struct BackupModelTests {
 
         #expect(target.state.pending == nil)
         #expect(target.state.doneMessage == nil)
-        #expect(target.state.errorNotice.message == "同期と共有をやめると、読み込めます")
+        #expect(target.state.notices.error.message == "同期と共有をやめると、読み込めます")
         #expect(try setup.target.snapshot() == before)
     }
 
@@ -213,7 +213,7 @@ struct BackupModelTests {
         target.read(file.data)
         await target.restore()
 
-        #expect(target.state.errorNotice.message == "バックアップを読めませんでした。いまのデータはそのままです")
+        #expect(target.state.notices.error.message == "バックアップを読めませんでした。いまのデータはそのままです")
         #expect(try setup.target.snapshot().wallets.isEmpty)
         #expect(target.input.previous.isEmpty)
     }
@@ -350,13 +350,13 @@ struct BackupModelTests {
 
         #expect(!model.read(other))
         #expect(!model.state.presented.dialog[.restore])
-        #expect(model.state.errorNotice.message == "かけいぼっとのバックアップではありません")
+        #expect(model.state.notices.error.message == "かけいぼっとのバックアップではありません")
 
         #expect(!model.read(newer))
-        #expect(model.state.errorNotice.message == "新しい版のアプリで書き出したファイルです")
+        #expect(model.state.notices.error.message == "新しい版のアプリで書き出したファイルです")
 
         #expect(!model.read(Data("x".utf8)))
-        #expect(model.state.errorNotice.message == "ファイルを読めませんでした")
+        #expect(model.state.notices.error.message == "ファイルを読めませんでした")
     }
 }
 

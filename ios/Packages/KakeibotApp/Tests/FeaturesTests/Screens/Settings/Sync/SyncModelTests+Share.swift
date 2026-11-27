@@ -35,7 +35,7 @@ extension SyncModelTests {
         #expect(shared.isShared)
         #expect(model.output.invitation == nil)
         #expect(model.state.workingWallet == nil)
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -139,7 +139,7 @@ extension SyncModelTests {
         await model.open(item)
         await model.inviteMore()
 
-        #expect(model.state.errorNotice.message == "招待を保存できませんでした。時間をおいて試してください")
+        #expect(model.state.notices.error.message == "招待を保存できませんでした。時間をおいて試してください")
     }
 
     @Test
@@ -155,7 +155,7 @@ extension SyncModelTests {
 
         #expect(after.isShared == false)
         #expect(model.state.workingWallet == nil)
-        #expect(model.state.errorNotice.message == "共有を開けませんでした。時間をおいて試してください")
+        #expect(model.state.notices.error.message == "共有を開けませんでした。時間をおいて試してください")
     }
 
     @Test
@@ -169,7 +169,7 @@ extension SyncModelTests {
         let after = try await firstShare(in: setup.database)
 
         #expect(after.isShared)
-        #expect(model.state.errorNotice.message == "共有を終えられませんでした。時間をおいて試してください")
+        #expect(model.state.notices.error.message == "共有を終えられませんでした。時間をおいて試してください")
     }
 }
 

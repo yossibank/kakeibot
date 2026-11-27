@@ -38,7 +38,7 @@ struct MonthStartDayModelTests {
 
         #expect(model.input.startDay == .first)
         #expect(saved == .first)
-        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
+        #expect(model.state.notices.error.message == "設定を保存できませんでした")
     }
 
     @Test

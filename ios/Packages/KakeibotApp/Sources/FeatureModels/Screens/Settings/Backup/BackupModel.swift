@@ -39,7 +39,7 @@ public final class BackupModel {
 public extension BackupModel {
     @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var presented = Presented()
 
         public internal(set) var file: BackupFile?
@@ -47,11 +47,11 @@ public extension BackupModel {
         public internal(set) var done: Done?
         public internal(set) var pressed: Row?
 
-        public let errorNotice: ErrorNotice
+        public let notices: Notices
         public let task = ModelTask()
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -168,7 +168,7 @@ public extension BackupModel {
 
             return true
         } catch {
-            state.errorNotice.show(Self.exportFailedMessage)
+            state.notices.error.show(Self.exportFailedMessage)
             state.presented.dialog.close(.exporter)
             return false
         }
@@ -191,7 +191,7 @@ public extension BackupModel {
             }
 
         case .failure:
-            state.errorNotice.show(Self.exportFailedMessage)
+            state.notices.error.show(Self.exportFailedMessage)
         }
     }
 
@@ -200,7 +200,7 @@ public extension BackupModel {
         state.done = nil
 
         guard case let .success(url) = result else {
-            state.errorNotice.show(Self.readFailedMessage)
+            state.notices.error.show(Self.readFailedMessage)
             state.presented.dialog.close(.restore)
             return false
         }
@@ -254,7 +254,7 @@ public extension BackupModel {
 
         guard await !isSyncActiveNow() else {
             state.pending = nil
-            state.errorNotice.show(Self.syncActiveMessage)
+            state.notices.error.show(Self.syncActiveMessage)
             return
         }
 
@@ -283,7 +283,7 @@ public extension BackupModel {
                 await dependencies.permission.requestIfUndecided()
             }
         } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.notices.error.show(Self.restoreFailedMessage, for: error)
         }
 
         await loadPrevious()
@@ -323,7 +323,7 @@ private extension BackupModel {
             state.presented.dialog.show(.restore)
             return true
         } catch {
-            state.errorNotice.show(Self.readMessage(for: error))
+            state.notices.error.show(Self.readMessage(for: error))
             state.presented.dialog.close(.restore)
             return false
         }

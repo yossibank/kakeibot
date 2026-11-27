@@ -53,7 +53,7 @@ public struct RecurringEditSheet: View {
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
             }
-            .errorBanner(model.state.errorNotice)
+            .errorBanner(model.state.notices.error)
             .background {
                 Backdrop()
                     .ignoresSafeArea()

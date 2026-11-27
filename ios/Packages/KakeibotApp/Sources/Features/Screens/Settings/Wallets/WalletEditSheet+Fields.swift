@@ -92,10 +92,10 @@ extension WalletEditSheet {
         ) {
             Button {
                 focus = nil
-                model.state.icon.present()
+                model.state.submodels.icon.present()
             } label: {
                 WalletRowIcon(
-                    icon: model.state.icon.preview,
+                    icon: model.state.submodels.icon.preview,
                     strokeWidth: iconStrokeWidth
                 )
                 .overlay(alignment: .bottomTrailing) {

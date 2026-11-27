@@ -47,20 +47,29 @@ public extension ReminderModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var presented: Presented
 
         public internal(set) var previewDay: Weekday
 
-        public let errorNotice: ErrorNotice
+        public let notices: Notices
 
         init(
             previewDay: Weekday,
             presented: Presented,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
             self.previewDay = previewDay
             self.presented = presented
         }
@@ -150,7 +159,7 @@ public extension ReminderModel {
             input.notifications = .loaded(notifications)
             input.lastTime = time ?? input.lastTime
         } else {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
             input.notifications = .failed
         }
 
@@ -164,12 +173,12 @@ public extension ReminderModel {
     func choose(_ time: ReminderTime?) async {
         input.time = time
         input.lastTime = time ?? input.lastTime
-        state.errorNotice.clear()
+        state.notices.error.clear()
 
         do {
             try await dependencies.database.setSetting(.reminderTime, to: time)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
 
         guard time != nil else {

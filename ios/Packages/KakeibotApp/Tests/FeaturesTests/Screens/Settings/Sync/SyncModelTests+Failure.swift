@@ -17,7 +17,7 @@ extension SyncModelTests {
         #expect(await cloud.deleted)
         #expect(model.input.isOn == false)
         #expect(!model.state.task.isRunning)
-        #expect(model.state.errorNotice.message == "同期を切り替えられませんでした。時間をおいて試してください")
+        #expect(model.state.notices.error.message == "同期を切り替えられませんでした。時間をおいて試してください")
         #expect(try await setup.database.isSyncEnabled() == false)
     }
 
@@ -33,7 +33,7 @@ extension SyncModelTests {
         await model.useCloudData()
 
         #expect(model.input.isOn == false)
-        #expect(model.state.errorNotice.message == "同期を切り替えられませんでした。時間をおいて試してください")
+        #expect(model.state.notices.error.message == "同期を切り替えられませんでした。時間をおいて試してください")
         #expect(try await setup.database.hasEntries())
         #expect(await cloud.deleted == false)
     }

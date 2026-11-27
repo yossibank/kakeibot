@@ -22,7 +22,7 @@ struct WalletEditModelTests {
         let list = try await setup.database.entryList()
         let icon = try #require(list.icons[saved.iconId])
 
-        #expect(model.state.calculator.amount == 38000)
+        #expect(model.state.submodels.calculator.amount == 38000)
         #expect(saved.initialBalance == -38000)
         #expect(saved.kind == .card)
         #expect(icon.glyph == .card)
@@ -39,7 +39,7 @@ struct WalletEditModelTests {
         let empty = model.flow.output.saveTitle
         model.state.fields.name = "楽天カード"
         let named = model.flow.output.saveTitle
-        model.state.icon.markKind = .emoji
+        model.state.submodels.icon.markKind = .emoji
         let noMark = model.flow.output.saveTitle
 
         #expect(empty == "名前を入れてください")
@@ -75,12 +75,12 @@ struct WalletEditModelTests {
         let model = WalletEditModel(parts: .system(setup.database))
 
         model.state.setKind(.bank)
-        let followed = model.state.icon.glyph
-        model.state.icon.glyph = .coin
+        let followed = model.state.submodels.icon.glyph
+        model.state.submodels.icon.glyph = .coin
         model.state.setKind(.card)
 
         #expect(followed == .bank)
-        #expect(model.state.icon.glyph == .coin)
+        #expect(model.state.submodels.icon.glyph == .coin)
     }
 
     @Test

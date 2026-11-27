@@ -86,7 +86,7 @@ extension SyncModelTests {
         await model.setOn(true)
 
         #expect(model.output.shownOn == false)
-        #expect(model.state.errorNotice.message != nil)
+        #expect(model.state.notices.error.message != nil)
     }
 
     @Test
@@ -100,7 +100,7 @@ extension SyncModelTests {
         await model.setOn(false)
 
         #expect(model.output.shownOn)
-        #expect(model.state.errorNotice.message != nil)
+        #expect(model.state.notices.error.message != nil)
     }
 
     @Test

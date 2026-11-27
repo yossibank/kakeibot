@@ -51,7 +51,7 @@ struct SetupModelTests {
         task.cancel()
 
         #expect(entryOpened)
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -72,7 +72,7 @@ struct SetupModelTests {
 
         #expect(seen == WhatsNewRelease.latestVersion)
         #expect(model.output.hasUnreadNews == false)
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -122,7 +122,7 @@ struct SetupModelTests {
 
         await model.closeCard()
 
-        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
+        #expect(model.state.notices.error.message == "設定を保存できませんでした")
     }
 }
 

@@ -25,13 +25,13 @@ public struct StampEditSheet: View {
     public var body: some View {
         SettingsEditForm(showsSave: focus == nil) {
             SettingsPreviewSection(note: "カレンダーの日に、このスタンプで押します") {
-                StampTileFace(icon: model.state.icon.preview, isHidden: false)
+                StampTileFace(icon: model.state.submodels.icon.preview, isHidden: false)
                     .frame(width: 80, height: 78)
             }
 
             SettingsFormCard {
                 SettingsIconEditor(
-                    model: model.state.icon,
+                    model: model.state.submodels.icon,
                     focus: $focus,
                     textField: .text
                 )
@@ -66,7 +66,7 @@ public struct StampEditSheet: View {
             focus = nil
         }
         .backdrop()
-        .errorBanner(model.state.errorNotice)
+        .errorBanner(model.state.notices.error)
         .editSheet(
             model.flow,
             deleting: "このスタンプを削除しますか",

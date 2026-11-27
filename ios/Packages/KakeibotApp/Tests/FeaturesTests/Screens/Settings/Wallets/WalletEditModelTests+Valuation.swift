@@ -79,7 +79,7 @@ extension WalletEditModelTests {
         let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
         model.startValuation()
-        let start = model.state.valuation.amount
+        let start = model.state.submodels.valuation.amount
         model.state.pressValuation(.clear)
         model.state.pressValuation(.digit(1))
         model.state.pressValuation(.digit(2))
@@ -168,7 +168,7 @@ extension WalletEditModelTests {
         let deletion = await model.deleteValuation(id)
 
         #expect(deletion == nil)
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
         #expect(model.input.valuations.isEmpty)
     }
 }

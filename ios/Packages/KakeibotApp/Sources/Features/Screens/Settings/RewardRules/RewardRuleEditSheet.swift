@@ -33,7 +33,7 @@ public struct RewardRuleEditSheet: View {
                 drawerView(panel)
             }
             .iconEditorDrawer(
-                model: model.state.icon,
+                model: model.state.submodels.icon,
                 focus: $focus,
                 textField: .text,
                 below: layout.iconBottom
@@ -48,7 +48,7 @@ public struct RewardRuleEditSheet: View {
                         focus = nil
                     }
             }
-            .errorBanner(model.state.errorNotice)
+            .errorBanner(model.state.notices.error)
             .editSheet(
                 model.flow,
                 deleting: deletion,
@@ -136,10 +136,10 @@ private extension RewardRuleEditSheet {
         SettingsPreviewSection(note: "ごほうび貯金箱では、このタイルで並びます") {
             Button {
                 focus = nil
-                model.state.icon.present()
+                model.state.submodels.icon.present()
             } label: {
                 RewardRuleTile(
-                    icon: model.state.icon.preview,
+                    icon: model.state.submodels.icon.preview,
                     name: model.state.fields.name.isEmpty ? "名前" : model.state.fields.name,
                     amount: model.output.amount ?? 0,
                     total: nil,
@@ -147,7 +147,7 @@ private extension RewardRuleEditSheet {
                 )
                 .frame(width: 172, height: 156)
                 .overlay {
-                    if model.state.icon.isPresented {
+                    if model.state.submodels.icon.isPresented {
                         RoundedRectangle(cornerRadius: corner.radius(16))
                             .stroke(Palette.accent, lineWidth: 2)
                     }
@@ -180,7 +180,7 @@ private extension RewardRuleEditSheet {
             closePanel()
         } content: {
             VStack(spacing: 12) {
-                Keypad(calculator: model.state.calculator) {
+                Keypad(calculator: model.state.submodels.calculator) {
                     closePanel()
                 } onKey: { key in
                     model.state.press(key)

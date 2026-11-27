@@ -33,13 +33,13 @@ public struct WalletEditSheet: View {
             editorStack
         }
         .iconEditorDrawer(
-            model: model.state.icon,
+            model: model.state.submodels.icon,
             focus: $focus,
             textField: .text,
             below: layout.iconBottom
         )
-        .errorBanner(model.state.errorNotice)
-        .deletionNotice(model.state.valuationDeletion) { deletion in
+        .errorBanner(model.state.notices.error)
+        .deletionNotice(model.state.notices.valuationDeletion) { deletion in
             model.perform {
                 await $0.restore(deletion)
             }
@@ -87,7 +87,7 @@ private extension WalletEditSheet {
             if model.state.presented.panel.isShowing(.amount) {
                 amountDrawer(
                     "最初の残高",
-                    calculator: model.state.calculator,
+                    calculator: model.state.submodels.calculator,
                     amount: model.output.initialBalance,
                     onPress: model.state.press,
                     onDismiss: closeAmount,
@@ -98,7 +98,7 @@ private extension WalletEditSheet {
             if model.state.presented.panel.isShowing(.valuation) {
                 amountDrawer(
                     "今の評価額",
-                    calculator: model.state.valuation,
+                    calculator: model.state.submodels.valuation,
                     onPress: model.state.pressValuation,
                     onDismiss: closeValuation
                 ) {
@@ -113,7 +113,7 @@ private extension WalletEditSheet {
             if model.state.presented.panel.isShowing(.loanAmount) {
                 amountDrawer(
                     "最初に借りた額",
-                    calculator: model.state.loanAmount,
+                    calculator: model.state.submodels.loanAmount,
                     onPress: model.state.pressLoanAmount,
                     onDismiss: closeLoanAmount,
                     onDone: closeLoanAmount

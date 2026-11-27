@@ -62,7 +62,7 @@ public extension MonthStartDayModel {
         do {
             input.startDay = try await dependencies.database.setting(.monthStartDay)
         } catch {
-            state.errorNotice.show(SettingMessage.loadFailed)
+            state.notices.error.show(SettingMessage.loadFailed)
         }
     }
 

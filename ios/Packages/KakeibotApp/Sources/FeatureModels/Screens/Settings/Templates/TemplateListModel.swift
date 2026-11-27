@@ -35,6 +35,8 @@ public extension TemplateListModel {
 
     typealias Presented = SettingsBoardShown<EntryTemplate.ID, Destination>
 
+    typealias Notices = SettingsBoardNotices<EntryTemplate.ID>
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
@@ -43,12 +45,10 @@ public extension TemplateListModel {
 
         public private(set) var movingOrder: [EntryTemplate.ID]?
 
-        public let errorNotice: ErrorNotice
-        public let removed: SettingsBoardRemoved<EntryTemplate.ID>
+        public let notices: Notices
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.removed = SettingsBoardRemoved(wait: wait)
+            self.notices = SettingsBoardNotices(wait: wait)
         }
     }
 
@@ -84,7 +84,7 @@ public extension TemplateListModel {
             input.snapshot = try await read()
             input.list = try await dependencies.database.entryList()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -143,7 +143,7 @@ extension TemplateListModel: SettingsBoardModel {
         do {
             input.snapshot = try await read()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 

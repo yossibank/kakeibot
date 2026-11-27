@@ -8,12 +8,10 @@ public final class SettingsBoardMovingState<ID: Hashable & Sendable>: SettingsBo
 
     public private(set) var movingOrder: [ID]?
 
-    public let errorNotice: ErrorNotice
-    public let removed: SettingsBoardRemoved<ID>
+    public let notices: SettingsBoardNotices<ID>
 
     public init(wait: ScreenWait) {
-        self.errorNotice = ErrorNotice(wait: wait)
-        self.removed = SettingsBoardRemoved(wait: wait)
+        self.notices = SettingsBoardNotices(wait: wait)
     }
 }
 

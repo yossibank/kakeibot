@@ -38,6 +38,8 @@ public extension RecurringListModel {
 
     typealias Presented = SettingsBoardShown<Recurring.ID, Destination>
 
+    typealias Notices = SettingsBoardNotices<Recurring.ID>
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
@@ -46,12 +48,10 @@ public extension RecurringListModel {
 
         public private(set) var movingOrder: [Recurring.ID]?
 
-        public let errorNotice: ErrorNotice
-        public let removed: SettingsBoardRemoved<Recurring.ID>
+        public let notices: Notices
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.removed = SettingsBoardRemoved(wait: wait)
+            self.notices = SettingsBoardNotices(wait: wait)
         }
     }
 

@@ -72,7 +72,7 @@ struct SettingsBoardModelTests {
         let isHidden = await board.hide("b")
 
         #expect(isHidden)
-        #expect(board.state.removed.hidden.current == "b")
+        #expect(board.state.notices.removed.hidden.current == "b")
     }
 
     @Test
@@ -82,7 +82,7 @@ struct SettingsBoardModelTests {
         let deletion = await board.delete("b")
 
         #expect(deletion != nil)
-        #expect(board.state.removed.deletion.current?.id == deletion?.id)
+        #expect(board.state.notices.removed.deletion.current?.id == deletion?.id)
     }
 
     @Test
@@ -93,8 +93,8 @@ struct SettingsBoardModelTests {
         let deletion = await board.delete("b")
 
         #expect(deletion == nil)
-        #expect(board.state.removed.deletion.current == nil)
-        #expect(board.state.errorNotice.message == "削除できませんでした")
+        #expect(board.state.notices.removed.deletion.current == nil)
+        #expect(board.state.notices.error.message == "削除できませんでした")
     }
 
     @Test
@@ -103,8 +103,8 @@ struct SettingsBoardModelTests {
 
         let result = await board.deleteHidden()
 
-        #expect(board.state.removed.deletion.current?.id == result.deletion?.id)
-        #expect(board.state.removed.bulkDelete?.keptCount == 1)
+        #expect(board.state.notices.removed.deletion.current?.id == result.deletion?.id)
+        #expect(board.state.notices.removed.bulkDelete?.keptCount == 1)
     }
 
     @Test
@@ -114,7 +114,7 @@ struct SettingsBoardModelTests {
 
         board.receive(deletion)
 
-        #expect(board.state.removed.deletion.current?.id == deletion.id)
+        #expect(board.state.notices.removed.deletion.current?.id == deletion.id)
     }
 
     @Test
@@ -123,7 +123,7 @@ struct SettingsBoardModelTests {
 
         board.receiveHidden("a")
 
-        #expect(board.state.removed.hidden.current == "a")
+        #expect(board.state.notices.removed.hidden.current == "a")
     }
 
     @Test
@@ -134,7 +134,7 @@ struct SettingsBoardModelTests {
 
         #expect(result.deletion == nil)
         #expect(board.removed.isEmpty)
-        #expect(board.state.errorNotice.message == nil)
+        #expect(board.state.notices.error.message == nil)
     }
 
     @Test
@@ -149,7 +149,7 @@ struct SettingsBoardModelTests {
         #expect(board.removed == ["x", "y"])
         #expect(board.reloadCount == 1)
         #expect(board.state.movingOrder == nil)
-        #expect(board.state.errorNotice.message == nil)
+        #expect(board.state.notices.error.message == nil)
     }
 
     @Test
@@ -163,7 +163,7 @@ struct SettingsBoardModelTests {
         #expect(board.removed == ["x"])
         #expect(result.note(for: result.deletion) == "記録がある 1 件は残しました")
         #expect(result.note(for: other) == nil)
-        #expect(board.state.errorNotice.message == nil)
+        #expect(board.state.notices.error.message == nil)
     }
 
     @Test
@@ -173,8 +173,8 @@ struct SettingsBoardModelTests {
         let result = await board.deleteHidden()
 
         #expect(result.deletion == nil)
-        #expect(board.state.errorNotice.message == "記録があるので削除しませんでした")
-        #expect(board.state.errorNotice.tone == .info)
+        #expect(board.state.notices.error.message == "記録があるので削除しませんでした")
+        #expect(board.state.notices.error.tone == .info)
     }
 
     @Test
@@ -184,8 +184,8 @@ struct SettingsBoardModelTests {
         let result = await board.deleteHidden()
 
         #expect(result.deletion == nil)
-        #expect(board.state.errorNotice.message == "削除できないものがありました")
-        #expect(board.state.errorNotice.tone == .error)
+        #expect(board.state.notices.error.message == "削除できないものがありました")
+        #expect(board.state.notices.error.tone == .error)
     }
 }
 

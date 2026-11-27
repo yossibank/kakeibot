@@ -47,27 +47,36 @@ public extension RecurringEditModel {
         public var panel = Shown<Panel>()
     }
 
-    struct Calculators {
+    struct Submodels {
         public internal(set) var amount = AmountCalculator()
         public internal(set) var fee = AmountCalculator()
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields: Fields
         public var presented = Presented()
 
         public internal(set) var repayment = Repayment()
+        public internal(set) var submodels = Submodels()
 
         public private(set) var walletId: Wallet.ID?
-        public private(set) var calculators = Calculators()
 
         public internal(set) var type: Entry.Kind
         public internal(set) var categoryId: EntryCategory.ID?
         public internal(set) var toWalletId: Wallet.ID?
 
-        public let errorNotice: ErrorNotice
+        public let notices: Notices
 
         init(
             type: Entry.Kind,
@@ -75,7 +84,7 @@ public extension RecurringEditModel {
             isScheduleOpen: Bool,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
             self.type = type
 
             self.fields = Fields(
@@ -150,22 +159,22 @@ public extension RecurringEditModel.State {
     }
 
     func press(_ key: AmountCalculator.Key) {
-        calculators.amount.press(key)
+        submodels.amount.press(key)
     }
 
     func pressFee(_ key: AmountCalculator.Key) {
-        calculators.fee.press(key)
+        submodels.fee.press(key)
     }
 
     func setFee(_ amount: Int) {
-        calculators.fee = AmountCalculator(amount: amount)
+        submodels.fee = AmountCalculator(amount: amount)
     }
 }
 
 extension RecurringEditModel.State {
     func apply(_ draft: RecurringDraft) {
         type = draft.type
-        calculators.amount = AmountCalculator(amount: draft.amount)
+        submodels.amount = AmountCalculator(amount: draft.amount)
         categoryId = draft.categoryId
         walletId = draft.walletId
         toWalletId = draft.toWalletId
@@ -175,7 +184,7 @@ extension RecurringEditModel.State {
         fields.schedule.day = draft.day
         fields.schedule.load(draft.holidayShift)
         fields.schedule.closingDay = draft.closingDay
-        calculators.fee = AmountCalculator(amount: draft.fee)
+        submodels.fee = AmountCalculator(amount: draft.fee)
         fields.billShift = draft.billShift
         fields.schedule.startDate = draft.startDate
         fields.schedule.endDate = draft.endDate

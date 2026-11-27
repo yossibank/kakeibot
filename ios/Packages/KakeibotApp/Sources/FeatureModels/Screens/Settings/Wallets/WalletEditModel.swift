@@ -128,7 +128,7 @@ extension WalletEditModel.Source: EditFlowSource {
 
             return wallet
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.notices.error.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }

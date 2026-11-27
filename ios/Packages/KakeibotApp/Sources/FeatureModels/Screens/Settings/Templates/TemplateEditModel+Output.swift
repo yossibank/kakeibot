@@ -19,7 +19,7 @@ public extension TemplateEditModel {
 
 public extension TemplateEditModel.Output {
     var amount: Int? {
-        state.calculator.amount > 0 ? state.calculator.amount : nil
+        state.submodels.calculator.amount > 0 ? state.submodels.calculator.amount : nil
     }
 
     var typeName: String {

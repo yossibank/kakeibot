@@ -42,7 +42,7 @@ private extension RecurringEditSheet {
         VStack(spacing: 12) {
             SettingsKeypadValue(model.output.amount)
 
-            Keypad(calculator: model.state.calculators.amount) {
+            Keypad(calculator: model.state.submodels.amount) {
                 closePanel()
             } onKey: { key in
                 model.state.press(key)
@@ -61,7 +61,7 @@ private extension RecurringEditSheet {
                 model.state.setFee(amount)
             }
 
-            Keypad(calculator: model.state.calculators.fee) {
+            Keypad(calculator: model.state.submodels.fee) {
                 closePanel()
             } onKey: { key in
                 model.state.pressFee(key)

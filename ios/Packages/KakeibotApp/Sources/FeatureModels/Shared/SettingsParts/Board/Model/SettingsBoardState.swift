@@ -1,12 +1,12 @@
 import Observation
 
 @MainActor
-public protocol SettingsBoardState: NoticeHolding, Observable {
+public protocol SettingsBoardState: NoticesHolding, Observable
+    where Notices == SettingsBoardNotices<ID> {
     associatedtype ID: Hashable & Sendable
     associatedtype Destination: Hashable & Sendable
 
     var movingOrder: [ID]? { get }
-    var removed: SettingsBoardRemoved<ID> { get }
     var presented: SettingsBoardShown<ID, Destination> { get set }
 
     func setMovingOrder(_ order: [ID]?)

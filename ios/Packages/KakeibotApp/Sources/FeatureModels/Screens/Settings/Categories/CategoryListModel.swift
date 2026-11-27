@@ -38,6 +38,8 @@ public extension CategoryListModel {
 
     typealias Presented = SettingsBoardShown<EntryCategory.ID, Destination>
 
+    typealias Notices = SettingsBoardNotices<EntryCategory.ID>
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
@@ -46,16 +48,14 @@ public extension CategoryListModel {
 
         public private(set) var movingOrder: [EntryCategory.ID]?
 
-        public let errorNotice: ErrorNotice
-        public let removed: SettingsBoardRemoved<EntryCategory.ID>
+        public let notices: Notices
 
         init(
             kind: EntryCategory.Kind,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = SettingsBoardNotices(wait: wait)
             self.fields = Fields(kind: kind)
-            self.removed = SettingsBoardRemoved(wait: wait)
         }
     }
 

@@ -32,20 +32,20 @@ private extension BudgetKeypadDrawer {
         } content: {
             VStack(spacing: 12) {
                 AmountText(
-                    model.state.calculator.amount,
+                    model.state.submodels.calculator.amount,
                     font: .size(.largeTitle, weight: .bold),
                     color: Palette.accentStrong
                 )
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
                 .contentTransition(.numericText())
-                .animation(.snappy, value: model.state.calculator.amount)
+                .animation(.snappy, value: model.state.submodels.calculator.amount)
 
                 if !model.output.suggestions.isEmpty {
                     suggestionRow
                 }
 
-                Keypad(calculator: model.state.calculator) {
+                Keypad(calculator: model.state.submodels.calculator) {
                     model.perform {
                         await $0.finishEditing()
                     }
@@ -89,7 +89,7 @@ private extension BudgetKeypadDrawer {
 
     func suggestionChip(_ suggestion: BudgetListModel.Suggestion) -> some View {
         ChipButton(
-            isSelected: model.state.calculator.amount == suggestion.amount,
+            isSelected: model.state.submodels.calculator.amount == suggestion.amount,
             width: .fill
         ) {
             model.state.choose(suggestion)

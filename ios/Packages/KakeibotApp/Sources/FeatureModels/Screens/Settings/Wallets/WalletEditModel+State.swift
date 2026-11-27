@@ -25,35 +25,52 @@ public extension WalletEditModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+        public let valuationDeletion: UndoNotice<Deletion>
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+            self.valuationDeletion = UndoNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    struct Submodels {
+        public internal(set) var calculator = AmountCalculator()
+        public internal(set) var loanAmount = AmountCalculator()
+        public internal(set) var valuation = AmountCalculator()
+
+        public let icon: SettingsIconEditorModel
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
         public var presented = Presented()
 
         public private(set) var kind: Wallet.Kind
-        public private(set) var calculator = AmountCalculator()
-        public private(set) var loanAmount = AmountCalculator()
         public private(set) var sign: BalanceSign
 
-        public internal(set) var valuation = AmountCalculator()
         public internal(set) var addedWallet: Wallet?
+        public internal(set) var submodels: Submodels
 
-        public let errorNotice: ErrorNotice
-        public let icon: SettingsIconEditorModel
-        public let valuationDeletion: UndoNotice<Deletion>
+        public let notices: Notices
 
         init(
             kind: Wallet.Kind,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
             self.kind = kind
             self.sign = BalanceSign(isNegative: kind.isDebt)
-            self.valuationDeletion = UndoNotice(wait: wait)
 
-            self.icon = SettingsIconEditorModel(
-                glyph: WalletEditModel.glyph(for: kind),
-                color: WalletEditModel.defaultColor
+            self.submodels = Submodels(
+                icon: SettingsIconEditorModel(
+                    glyph: WalletEditModel.glyph(for: kind),
+                    color: WalletEditModel.defaultColor
+                )
             )
         }
     }
@@ -74,6 +91,8 @@ public extension WalletEditModel.State {
         self.kind = kind
         sign.follow(from: oldKind, to: kind)
 
+        let icon = submodels.icon
+
         guard icon.markKind == .glyph, icon.glyph == WalletEditModel.glyph(for: oldKind) else {
             return
         }
@@ -83,11 +102,11 @@ public extension WalletEditModel.State {
 
     func press(_ key: AmountCalculator.Key) {
         guard
-            calculator.tokens.isEmpty,
+            submodels.calculator.tokens.isEmpty,
             case let .operation(operation) = key,
             operation == .add || operation == .subtract
         else {
-            calculator.press(key)
+            submodels.calculator.press(key)
             return
         }
 
@@ -95,11 +114,11 @@ public extension WalletEditModel.State {
     }
 
     func pressValuation(_ key: AmountCalculator.Key) {
-        valuation.press(key)
+        submodels.valuation.press(key)
     }
 
     func pressLoanAmount(_ key: AmountCalculator.Key) {
-        loanAmount.press(key)
+        submodels.loanAmount.press(key)
     }
 }
 
@@ -107,9 +126,9 @@ extension WalletEditModel.State {
     func apply(_ draft: WalletDraft) {
         fields.name = draft.name
         kind = draft.kind
-        icon.apply(draft.icon)
+        submodels.icon.apply(draft.icon)
         sign.set(draft.initialBalance < 0)
-        calculator = AmountCalculator(amount: abs(draft.initialBalance))
-        loanAmount = AmountCalculator(amount: draft.loanAmount ?? 0)
+        submodels.calculator = AmountCalculator(amount: abs(draft.initialBalance))
+        submodels.loanAmount = AmountCalculator(amount: draft.loanAmount ?? 0)
     }
 }

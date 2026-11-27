@@ -30,16 +30,25 @@ public extension ThemeStyleModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
+    final class State: NoticesHolding {
+        public let notices: Notices
 
         public internal(set) var fontOffer: FontOffer?
 
         public private(set) var preview: ThemeStyle?
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -86,7 +95,7 @@ public extension ThemeStyleModel {
         do {
             input.style = try await dependencies.database.style()
         } catch {
-            state.errorNotice.show(SettingMessage.loadFailed)
+            state.notices.error.show(SettingMessage.loadFailed)
         }
     }
 

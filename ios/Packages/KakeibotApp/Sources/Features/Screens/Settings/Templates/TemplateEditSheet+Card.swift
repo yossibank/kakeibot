@@ -172,7 +172,7 @@ private extension TemplateEditSheet {
     }
 
     var nameLine: Color {
-        if model.state.errorNotice.message != nil,
+        if model.state.notices.error.message != nil,
            model.state.fields.name.isEmpty {
             Palette.rose
         } else if focus == .name {

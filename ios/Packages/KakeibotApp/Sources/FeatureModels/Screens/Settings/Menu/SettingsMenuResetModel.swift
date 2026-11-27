@@ -33,15 +33,24 @@ public extension SettingsMenuResetModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var presented = Presented()
 
-        public let errorNotice: ErrorNotice
+        public let notices: Notices
         public let task = ModelTask()
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -75,13 +84,13 @@ public extension SettingsMenuResetModel {
                 input.hasSharedWallets = try await sharesWallets()
             }
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage, for: error)
+            state.notices.error.show(Self.loadFailedMessage, for: error)
             state.presented.prompt.close(.deleteAll)
             return false
         }
 
         guard input.count > 0 else {
-            state.errorNotice.inform(Self.emptyMessage)
+            state.notices.error.inform(Self.emptyMessage)
             state.presented.prompt.close(.deleteAll)
             return false
         }
@@ -101,9 +110,9 @@ public extension SettingsMenuResetModel {
                 try await dependencies.database.deleteAllRecords(at: dependencies.clock.now)
             }
 
-            state.errorNotice.inform(Self.deletedMessage)
+            state.notices.error.inform(Self.deletedMessage)
         } catch {
-            state.errorNotice.show(Self.deleteFailedMessage, for: error)
+            state.notices.error.show(Self.deleteFailedMessage, for: error)
         }
     }
 }

@@ -44,7 +44,7 @@ extension WalletEditSheet {
             title: "最初に借りた額",
             value: model.output.loanAmountText,
             detail: model.output.repaidText,
-            isEmpty: model.state.loanAmount.amount == 0,
+            isEmpty: model.state.submodels.loanAmount.amount == 0,
             isAmount: true
         )
     }
@@ -56,12 +56,12 @@ extension WalletEditSheet {
     }
 
     var noteColor: Color {
-        Color(hex: model.state.icon.color) ?? Palette.subtext
+        Color(hex: model.state.submodels.icon.color) ?? Palette.subtext
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
         let isEntering = model.state.presented.panel.isShowing(.valuation)
-        let amount = isEntering ? model.state.valuation.amount : model.input.balance
+        let amount = isEntering ? model.state.submodels.valuation.amount : model.input.balance
 
         return [
             .init(
@@ -92,7 +92,7 @@ extension WalletEditSheet {
     }
 
     var iconStrokeWidth: CGFloat {
-        model.state.icon.isPresented ? 2 : IconBadge.lineWidth
+        model.state.submodels.icon.isPresented ? 2 : IconBadge.lineWidth
     }
 
     var amountStroke: Color {

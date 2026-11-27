@@ -27,20 +27,28 @@ public final class ThemeListModel {
 
 public extension ThemeListModel {
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+        public let deletion: UndoNotice<Deletion>
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+            self.deletion = UndoNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var presented = Presented()
 
-        public let errorNotice: ErrorNotice
+        public let notices: Notices
 
         public internal(set) var suggestedIcon: AppIconChoice?
         public internal(set) var pressing: ThemeChoice?
 
-        public let deletion: UndoNotice<Deletion>
-
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.deletion = UndoNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -76,7 +84,7 @@ public extension ThemeListModel {
             input.current = try await dependencies.database.setting(.theme)
             input.customThemes = try await dependencies.database.customThemes()
         } catch {
-            state.errorNotice.show(SettingMessage.loadFailed)
+            state.notices.error.show(SettingMessage.loadFailed)
         }
     }
 
@@ -93,7 +101,7 @@ public extension ThemeListModel {
             try await dependencies.database.setSetting(.theme, to: choice)
         } catch {
             input.current = previous
-            state.errorNotice.show(SettingMessage.saveFailed, for: error)
+            state.notices.error.show(SettingMessage.saveFailed, for: error)
             return
         }
 
@@ -120,14 +128,14 @@ public extension ThemeListModel {
     }
 
     func receive(_ deletion: Deletion) {
-        state.deletion.show(deletion)
+        state.notices.deletion.show(deletion)
     }
 
     func restore(_ deletion: Deletion) async {
         do {
             try await dependencies.database.restore(deletion)
         } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.notices.error.show(Self.restoreFailedMessage, for: error)
         }
 
         await load()

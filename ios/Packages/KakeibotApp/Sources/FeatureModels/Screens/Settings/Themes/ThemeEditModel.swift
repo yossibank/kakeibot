@@ -33,9 +33,18 @@ public final class ThemeEditModel: ScreenPerforming {
 
 public extension ThemeEditModel {
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
+    final class State: NoticesHolding {
+        public let notices: Notices
 
         public internal(set) var draft: ThemeDraft
 
@@ -43,7 +52,7 @@ public extension ThemeEditModel {
             draft: ThemeDraft,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
             self.draft = draft
         }
     }
@@ -299,7 +308,7 @@ extension ThemeEditModel.Source: EditFlowSource {
 
             return ()
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.notices.error.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }

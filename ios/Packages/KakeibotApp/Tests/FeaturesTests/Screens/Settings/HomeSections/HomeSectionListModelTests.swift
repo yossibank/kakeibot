@@ -44,7 +44,7 @@ struct HomeSectionListModelTests {
         await model.save()
         let order = try await database.setting(.homeSections)
 
-        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
+        #expect(model.state.notices.error.message == "設定を保存できませんでした")
         #expect(order == HomeSection.standard)
     }
 }

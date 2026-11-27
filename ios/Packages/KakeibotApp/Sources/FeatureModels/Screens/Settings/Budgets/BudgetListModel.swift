@@ -53,21 +53,34 @@ public extension BudgetListModel {
     }
 
     @MainActor
-    @Observable
-    final class State: NoticeHolding {
-        public var presented = Presented()
-
-        public internal(set) var editing: Target?
-        public internal(set) var calculator = AmountCalculator()
-
-        public let errorNotice: ErrorNotice
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
         public let cleared: UndoNotice<Cleared>
         public let resetFrom: UndoNotice<YearMonth>
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.error = ErrorNotice(wait: wait)
             self.cleared = UndoNotice(wait: wait)
             self.resetFrom = UndoNotice(wait: wait)
+        }
+    }
+
+    struct Submodels {
+        public internal(set) var calculator = AmountCalculator()
+    }
+
+    @MainActor
+    @Observable
+    final class State: NoticesHolding {
+        public var presented = Presented()
+
+        public internal(set) var editing: Target?
+        public internal(set) var submodels = Submodels()
+
+        public let notices: Notices
+
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -112,7 +125,7 @@ public extension BudgetListModel {
             input.recurrings = try await database.recurrings()
             input.carryoverFrom = try await database.setting(.budgetCarryoverFrom)
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -127,11 +140,11 @@ public extension BudgetListModel {
             let previous = input.carryoverFrom,
             output.carryover != 0,
             await saveCarryoverFrom(input.month) else {
-            state.resetFrom.dismiss()
+            state.notices.resetFrom.dismiss()
             return nil
         }
 
-        state.resetFrom.show(previous)
+        state.notices.resetFrom.show(previous)
 
         return previous
     }
@@ -142,7 +155,7 @@ public extension BudgetListModel {
 
     func startEditing(_ target: Target) {
         let amount = output.amount(for: target.categoryId) ?? 0
-        state.calculator = AmountCalculator(amount: amount)
+        state.submodels.calculator = AmountCalculator(amount: amount)
         state.editing = target
     }
 
@@ -167,19 +180,19 @@ public extension BudgetListModel {
             return
         }
 
-        await setBudget(state.calculator.amount)
+        await setBudget(state.submodels.calculator.amount)
     }
 
     func finishEditing() async {
         guard
             output.canSave,
-            state.calculator.amount != output.editingAmount
+            state.submodels.calculator.amount != output.editingAmount
         else {
             cancelEditing()
             return
         }
 
-        await setBudget(state.calculator.amount)
+        await setBudget(state.submodels.calculator.amount)
     }
 
     @discardableResult
@@ -197,7 +210,7 @@ public extension BudgetListModel {
             month: input.month
         )
 
-        state.cleared.show(cleared)
+        state.notices.cleared.show(cleared)
 
         return cleared
     }
@@ -212,7 +225,7 @@ public extension BudgetListModel {
 
             input.budgets = try await dependencies.database.budgets()
         } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.notices.error.show(Self.restoreFailedMessage, for: error)
         }
     }
 }
@@ -240,7 +253,7 @@ private extension BudgetListModel {
 
             return true
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
             return false
         }
     }
@@ -255,7 +268,7 @@ private extension BudgetListModel {
             input.carryoverFrom = start
             return true
         } catch {
-            state.errorNotice.show(failure, for: error)
+            state.notices.error.show(failure, for: error)
             return false
         }
     }
@@ -263,11 +276,11 @@ private extension BudgetListModel {
 
 public extension BudgetListModel.State {
     func choose(_ suggestion: BudgetListModel.Suggestion) {
-        calculator = AmountCalculator(amount: suggestion.amount)
+        submodels.calculator = AmountCalculator(amount: suggestion.amount)
     }
 
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        submodels.calculator.press(key)
     }
 }
 

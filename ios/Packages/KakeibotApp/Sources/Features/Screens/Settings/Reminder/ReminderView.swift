@@ -30,7 +30,7 @@ public struct ReminderView: View {
 
             sections
         }
-        .settingsScreen(errorNotice: model.state.errorNotice)
+        .settingsScreen(errorNotice: model.state.notices.error)
         .animation(.snappy, value: model.input.time)
         .animation(.snappy, value: model.output.isDenied)
         .animation(.snappy, value: isPickingTime)

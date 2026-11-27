@@ -42,7 +42,7 @@ public struct ThemeEditSheet: View {
             focus = nil
         }
         .backdrop()
-        .errorBanner(model.state.errorNotice)
+        .errorBanner(model.state.notices.error)
         .editSheet(
             model.flow,
             deleting: "このテーマを削除しますか",

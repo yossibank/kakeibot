@@ -60,7 +60,7 @@ struct TemplateEditModelTests {
         await model.load()
         let canSaveWithoutName = model.flow.output.canSave
         let refused = await model.save()
-        let refusal = model.state.errorNotice.message
+        let refusal = model.state.notices.error.message
         model.state.fields.name = "ランチ"
         model.state.press(.digit(9))
         model.state.press(.digit(8))
@@ -134,7 +134,7 @@ struct TemplateEditModelTests {
 
         model.state.press(.digit(9))
 
-        #expect(model.state.errorNotice.message == "名前を入れてください")
+        #expect(model.state.notices.error.message == "名前を入れてください")
     }
 }
 

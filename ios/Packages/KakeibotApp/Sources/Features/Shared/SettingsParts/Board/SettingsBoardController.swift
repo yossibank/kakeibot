@@ -11,7 +11,7 @@ struct SettingsBoardController<Model: SettingsBoardModel> {
 
 extension SettingsBoardController {
     var removed: SettingsBoardRemoved<Model.Item.ID> {
-        model.state.removed
+        model.state.notices.removed
     }
 
     func follow(

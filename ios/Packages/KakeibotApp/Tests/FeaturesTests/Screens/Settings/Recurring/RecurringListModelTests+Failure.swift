@@ -15,7 +15,7 @@ extension RecurringListModelTests {
 
         await model.load()
 
-        #expect(model.state.errorNotice.message == "固定費を読めませんでした")
+        #expect(model.state.notices.error.message == "固定費を読めませんでした")
     }
 
     @Test
@@ -38,14 +38,14 @@ extension RecurringListModelTests {
         try await setup.database.failWrites(to: "recurring")
 
         await model.hide(rent.id)
-        let hiding = model.state.errorNotice.message
+        let hiding = model.state.notices.error.message
         await model.show(rent.id)
-        let showing = model.state.errorNotice.message
+        let showing = model.state.notices.error.message
         _ = await model.delete(rent.id)
-        let deleting = model.state.errorNotice.message
+        let deleting = model.state.notices.error.message
         model.move(last.id, to: 0)
         await model.finishMoving()
-        let moving = model.state.errorNotice.message
+        let moving = model.state.notices.error.message
 
         #expect(hiding == "非表示にできませんでした")
         #expect(showing == "表示に戻せませんでした")

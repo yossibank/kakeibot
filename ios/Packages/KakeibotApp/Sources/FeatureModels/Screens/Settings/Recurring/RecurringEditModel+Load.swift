@@ -27,7 +27,7 @@ public extension RecurringEditModel {
         } catch is CancellationError {
             return
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 }

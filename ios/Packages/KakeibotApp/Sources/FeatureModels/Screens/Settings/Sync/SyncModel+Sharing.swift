@@ -111,7 +111,7 @@ private extension SyncModel {
         }
 
         let onFail: SyncCloud.Fail = { [weak self] in
-            self?.state.errorNotice.show(Self.inviteFailedMessage)
+            self?.state.notices.error.show(Self.inviteFailedMessage)
         }
 
         await workOnWallet(id, failure: Self.shareFailedMessage) {
@@ -137,7 +137,7 @@ private extension SyncModel {
         _ operation: () async throws -> Void
     ) async {
         state.workingWallet = id
-        state.errorNotice.clear()
+        state.notices.error.clear()
 
         do {
             try await state.shareTask.attempt {
@@ -151,7 +151,7 @@ private extension SyncModel {
                 "\(failure, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
             )
 
-            state.errorNotice.show(failure, for: error)
+            state.notices.error.show(failure, for: error)
         }
 
         if state.workingWallet == id {

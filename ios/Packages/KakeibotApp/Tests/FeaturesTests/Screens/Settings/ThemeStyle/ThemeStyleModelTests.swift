@@ -145,7 +145,7 @@ struct ThemeStyleModelTests {
         await model.choose(displayFont: .rounded)
 
         #expect(model.output.style == .standard)
-        #expect(model.state.errorNotice.message == "設定を保存できませんでした")
+        #expect(model.state.notices.error.message == "設定を保存できませんでした")
     }
 
     @Test

@@ -34,7 +34,7 @@ struct AppIconListModelTests {
         await model.select(.black)
 
         #expect(model.input.current == .white)
-        #expect(model.state.errorNotice.message == "アイコンを変えられませんでした")
+        #expect(model.state.notices.error.message == "アイコンを変えられませんでした")
     }
 }
 
