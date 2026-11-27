@@ -48,12 +48,12 @@ public struct CategoryEditSheet: View {
             }
         }
         .iconEditorDrawer(
-            model: model.state.icon,
+            model: model.state.submodels.icon,
             focus: $focus,
             textField: .text,
             below: layout.iconBottom
         )
-        .errorBanner(model.state.errorNotice)
+        .errorBanner(model.state.notices.error)
         .editSheet(
             model.flow,
             deleting: deletion,
@@ -158,16 +158,16 @@ private extension CategoryEditSheet {
         ) {
             Button {
                 focus = nil
-                model.state.icon.present()
+                model.state.submodels.icon.present()
             } label: {
                 CategoryTileFace(
-                    icon: model.state.icon.preview,
+                    icon: model.state.submodels.icon.preview,
                     name: model.state.fields.name.isEmpty ? "名前" : model.state.fields.name,
                     isHidden: false
                 )
                 .frame(width: 80, height: 78)
                 .overlay {
-                    if model.state.icon.isPresented {
+                    if model.state.submodels.icon.isPresented {
                         RoundedRectangle(cornerRadius: corner.radius(16))
                             .stroke(Palette.accent, lineWidth: 2)
                     }
@@ -226,7 +226,7 @@ private extension CategoryEditSheet {
     }
 
     var graphColor: Color {
-        Color(hex: model.state.icon.color) ?? Palette.subtext
+        Color(hex: model.state.submodels.icon.color) ?? Palette.subtext
     }
 
     var deletion: SettingsConfirmation {

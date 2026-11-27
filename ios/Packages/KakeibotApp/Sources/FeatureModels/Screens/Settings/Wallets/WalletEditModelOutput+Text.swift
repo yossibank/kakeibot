@@ -19,13 +19,13 @@ public extension WalletEditModel.Output {
     }
 
     var loanAmountText: String {
-        state.loanAmount.amount > 0 ? Yen.text(state.loanAmount.amount) : "未入力"
+        state.submodels.loanAmount.amount > 0 ? Yen.text(state.submodels.loanAmount.amount) : "未入力"
     }
 
     var repaidText: String? {
-        let borrowed = state.loanAmount.amount
+        let borrowed = state.submodels.loanAmount.amount
 
-        guard borrowed > 0, isEditing || state.calculator.amount > 0 else {
+        guard borrowed > 0, isEditing || state.submodels.calculator.amount > 0 else {
             return nil
         }
 

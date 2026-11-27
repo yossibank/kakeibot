@@ -14,7 +14,7 @@ struct AssetsAdjustmentSheet: View {
         FittedSheet {
             content
         }
-        .errorBanner(model.state.errorNotice)
+        .errorBanner(model.state.notices.error)
         .editSheet(model.flow)
     }
 }
@@ -27,7 +27,7 @@ extension AssetsAdjustmentSheet {
             slip
 
             Keypad(
-                calculator: model.state.calculator,
+                calculator: model.state.submodels.calculator,
                 onKey: model.state.press
             )
 
@@ -123,14 +123,14 @@ private extension AssetsAdjustmentSheet {
             EntryReceiptLeader()
 
             AmountText(
-                model.state.calculator.amount,
+                model.state.submodels.calculator.amount,
                 font: .size(.title, weight: .bold),
                 color: Palette.accentStrong
             )
             .lineLimit(1)
             .fixedSize()
             .contentTransition(.numericText())
-            .animation(.snappy, value: model.state.calculator.amount)
+            .animation(.snappy, value: model.state.submodels.calculator.amount)
         }
     }
 

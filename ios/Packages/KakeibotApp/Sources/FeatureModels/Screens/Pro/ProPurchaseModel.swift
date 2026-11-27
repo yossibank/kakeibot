@@ -33,9 +33,18 @@ public extension ProPurchaseModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
+    final class State: NoticesHolding {
+        public let notices: Notices
 
         public internal(set) var outcome = ScreenOutcome<Work>()
         public internal(set) var working: Work?
@@ -43,7 +52,7 @@ public extension ProPurchaseModel {
         public let task = ModelTask()
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -119,7 +128,7 @@ public extension ProPurchaseModel {
         }
 
         guard status.isUnlocked else {
-            state.errorNotice.inform(Self.nothingToRestoreMessage)
+            state.notices.error.inform(Self.nothingToRestoreMessage)
             return false
         }
 
@@ -145,7 +154,7 @@ private extension ProPurchaseModel {
         }
 
         state.working = work
-        state.errorNotice.clear()
+        state.notices.error.clear()
 
         defer {
             state.working = nil
@@ -165,7 +174,7 @@ private extension ProPurchaseModel {
                 "\(failedMessage, privacy: .public) \(code.domain, privacy: .public) \(code.code) \(detail)"
             )
 
-            state.errorNotice.show(failedMessage)
+            state.notices.error.show(failedMessage)
 
             return nil
         }

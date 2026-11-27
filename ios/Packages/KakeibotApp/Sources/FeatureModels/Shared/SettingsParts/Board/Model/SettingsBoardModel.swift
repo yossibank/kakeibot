@@ -77,7 +77,7 @@ public extension SettingsBoardModel {
             try await saveOrder(movingOrder)
             await reload()
         } catch {
-            state.errorNotice.show(Self.saveFailedText, for: error)
+            state.notices.error.show(Self.saveFailedText, for: error)
         }
 
         state.setMovingOrder(nil)
@@ -90,12 +90,12 @@ public extension SettingsBoardModel {
         do {
             try await saveHidden(id, isHidden: true)
             await reload()
-            state.removed.hidden.show(id)
+            state.notices.removed.hidden.show(id)
 
             return true
         } catch {
             let message = hideFailedMessage(for: error) ?? Self.hideFailedText
-            state.errorNotice.show(message, for: error)
+            state.notices.error.show(message, for: error)
             return false
         }
     }
@@ -105,7 +105,7 @@ public extension SettingsBoardModel {
             try await saveHidden(id, isHidden: false)
             await reload()
         } catch {
-            state.errorNotice.show(Self.showFailedText, for: error)
+            state.notices.error.show(Self.showFailedText, for: error)
         }
     }
 
@@ -117,14 +117,14 @@ public extension SettingsBoardModel {
             let deletion = try await remove(id)
 
             await reload()
-            state.removed.deletion.show(deletion)
+            state.notices.removed.deletion.show(deletion)
 
             return deletion
         } catch {
             let message = deleteFailedMessage(for: error) ?? Self.deleteFailedText
 
-            state.errorNotice.show(message, for: error)
-            state.removed.deletion.dismiss()
+            state.notices.error.show(message, for: error)
+            state.notices.removed.deletion.dismiss()
 
             return nil
         }
@@ -145,28 +145,28 @@ public extension SettingsBoardModel {
         await reload()
 
         if let message = result.errorMessage {
-            state.errorNotice.show(message)
+            state.notices.error.show(message)
         } else if let message = result.infoMessage {
-            state.errorNotice.inform(message)
+            state.notices.error.inform(message)
         }
 
-        state.removed.bulkDelete = result
+        state.notices.removed.bulkDelete = result
 
         if let deletion = result.deletion {
-            state.removed.deletion.show(deletion)
+            state.notices.removed.deletion.show(deletion)
         } else {
-            state.removed.deletion.dismiss()
+            state.notices.removed.deletion.dismiss()
         }
 
         return result
     }
 
     func receive(_ deletion: Deletion) {
-        state.removed.deletion.show(deletion)
+        state.notices.removed.deletion.show(deletion)
     }
 
     func receiveHidden(_ id: Item.ID) {
-        state.removed.hidden.show(id)
+        state.notices.removed.hidden.show(id)
     }
 
     func restore(_ deletion: Deletion) async {
@@ -174,7 +174,7 @@ public extension SettingsBoardModel {
             try await restoreRemoved(deletion)
             await reload()
         } catch {
-            state.errorNotice.show(Self.restoreFailedText, for: error)
+            state.notices.error.show(Self.restoreFailedText, for: error)
         }
     }
 }

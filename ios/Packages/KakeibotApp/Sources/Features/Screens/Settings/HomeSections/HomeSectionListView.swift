@@ -36,7 +36,7 @@ public struct HomeSectionListView: View {
             .scrollIndicators(.hidden)
             .scrollDisabled(model.state.dragging != nil)
         }
-        .settingsScreen(errorNotice: model.state.errorNotice)
+        .settingsScreen(errorNotice: model.state.notices.error)
         .animation(.snappy, value: model.state.layout)
         .transaction(value: model.input.saved.isSettled) { transaction in
             transaction.disablesAnimations = true

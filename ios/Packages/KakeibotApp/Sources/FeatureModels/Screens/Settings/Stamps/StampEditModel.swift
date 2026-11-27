@@ -18,7 +18,7 @@ public final class StampEditModel: ScreenPerforming {
         editing id: ShelfIcon.ID? = nil
     ) {
         let state = State(wait: parts.wait)
-        let input = Input(editingId: id, baseline: state.icon.draft)
+        let input = Input(editingId: id, baseline: state.submodels.icon.draft)
 
         self.state = state
         self.input = input
@@ -29,13 +29,27 @@ public final class StampEditModel: ScreenPerforming {
 
 public extension StampEditModel {
     @MainActor
-    @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
-        public let icon = SettingsIconEditorModel(glyph: .star)
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    struct Submodels {
+        public let icon = SettingsIconEditorModel(glyph: .star)
+    }
+
+    @MainActor
+    @Observable
+    final class State: NoticesHolding {
+        public let notices: Notices
+        public let submodels = Submodels()
+
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -90,15 +104,15 @@ public extension StampEditModel {
                 let shelfIcon,
                 let saved = shelf.icons[shelfIcon.iconId]
             else {
-                state.errorNotice.show(Self.loadFailedMessage)
+                state.notices.error.show(Self.loadFailedMessage)
                 return
             }
 
-            state.icon.apply(saved)
+            state.submodels.icon.apply(saved)
             input.isHidden = shelfIcon.archivedAt != nil
-            input.baseline = state.icon.draft
+            input.baseline = state.submodels.icon.draft
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -124,11 +138,11 @@ extension StampEditModel.Source: EditFlowSource {
     }
 
     var isChanged: Bool {
-        input.baseline.map { $0 != state.icon.draft } ?? false
+        input.baseline.map { $0 != state.submodels.icon.draft } ?? false
     }
 
     var problem: String? {
-        state.icon.draft.problems.first?.message
+        state.submodels.icon.draft.problems.first?.message
     }
 
     var isHidden: Bool {
@@ -138,14 +152,14 @@ extension StampEditModel.Source: EditFlowSource {
     func store() async -> Void? {
         do {
             try await dependencies.database.save(
-                state.icon.draft,
+                state.submodels.icon.draft,
                 editing: input.editingId,
                 at: dependencies.clock.now
             )
 
             return ()
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.notices.error.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }

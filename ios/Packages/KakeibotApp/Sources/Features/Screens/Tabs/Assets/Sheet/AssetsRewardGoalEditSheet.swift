@@ -74,7 +74,7 @@ private extension AssetsRewardGoalEditSheet {
                 VStack(spacing: SettingsSpacing.form) {
                     AssetsRewardGoalCard(
                         name: model.state.fields.name.isEmpty ? "欲しい物" : model.state.fields.name,
-                        targetAmount: model.state.calculator.amount,
+                        targetAmount: model.state.submodels.calculator.amount,
                         remaining: model.output.remaining,
                         progress: model.output.progress
                     )
@@ -118,7 +118,7 @@ private extension AssetsRewardGoalEditSheet {
             closePanel()
         } content: {
             VStack(spacing: 12) {
-                Keypad(calculator: model.state.calculator) {
+                Keypad(calculator: model.state.submodels.calculator) {
                     closePanel()
                 } onKey: { key in
                     model.state.press(key)
@@ -139,8 +139,8 @@ private extension AssetsRewardGoalEditSheet {
                 panel: .amount,
                 systemImage: "yensign",
                 title: "目標の額",
-                value: Yen.text(model.state.calculator.amount),
-                isEmpty: model.state.calculator.amount == 0,
+                value: Yen.text(model.state.submodels.calculator.amount),
+                isEmpty: model.state.submodels.calculator.amount == 0,
                 isAmount: true
             )
         ]

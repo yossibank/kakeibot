@@ -29,7 +29,7 @@ public extension SettingsBoardListModel {
         do {
             self[keyPath: snapshot] = try await read()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 }

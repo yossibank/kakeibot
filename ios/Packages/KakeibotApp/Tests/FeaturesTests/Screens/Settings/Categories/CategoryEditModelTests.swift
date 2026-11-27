@@ -12,21 +12,21 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let model = CategoryEditModel(parts: .system(database), kind: .expense)
 
-        model.state.icon.inputEmoji("ab🍙")
-        let emoji = model.state.icon.emoji
+        model.state.submodels.icon.inputEmoji("ab🍙")
+        let emoji = model.state.submodels.icon.emoji
 
-        model.state.icon.inputEmoji("🍙🐶")
-        let lastEmoji = model.state.icon.emoji
+        model.state.submodels.icon.inputEmoji("🍙🐶")
+        let lastEmoji = model.state.submodels.icon.emoji
 
-        model.state.icon.inputEmoji("abc")
-        let noEmoji = model.state.icon.emoji
+        model.state.submodels.icon.inputEmoji("abc")
+        let noEmoji = model.state.submodels.icon.emoji
 
-        model.state.icon.inputText("サブスク")
+        model.state.submodels.icon.inputText("サブスク")
 
         #expect(emoji == "🍙")
         #expect(lastEmoji == "🐶")
         #expect(noEmoji.isEmpty)
-        #expect(model.state.icon.text == "サブス")
+        #expect(model.state.submodels.icon.text == "サブス")
     }
 
     @Test
@@ -78,7 +78,7 @@ struct CategoryEditModelTests {
         let database = try Self.database()
         let model = CategoryEditModel(parts: .system(database), kind: .income)
         model.state.fields.name = "配当"
-        model.state.icon.glyph = .invest
+        model.state.submodels.icon.glyph = .invest
 
         let canSaveBeforeName = CategoryEditModel(parts: .system(database), kind: .income)
             .flow.output.canSave
@@ -107,9 +107,9 @@ struct CategoryEditModelTests {
 
         #expect(model.flow.output.isEditing)
         #expect(model.state.fields.name == "食費")
-        #expect(model.state.icon.markKind == .glyph)
-        #expect(model.state.icon.glyph == .food)
-        #expect(model.state.icon.color == "#E07A5F")
+        #expect(model.state.submodels.icon.markKind == .glyph)
+        #expect(model.state.submodels.icon.glyph == .food)
+        #expect(model.state.submodels.icon.color == "#E07A5F")
         #expect(!model.flow.output.isHidden)
         #expect(!model.flow.output.isChanged)
     }
@@ -162,7 +162,7 @@ struct CategoryEditModelTests {
         model.state.fields.name = ""
         let cleared = model.flow.output.isChanged
 
-        #expect(model.state.icon.glyph == .food)
+        #expect(model.state.submodels.icon.glyph == .food)
         #expect(!start)
         #expect(named)
         #expect(!cleared)

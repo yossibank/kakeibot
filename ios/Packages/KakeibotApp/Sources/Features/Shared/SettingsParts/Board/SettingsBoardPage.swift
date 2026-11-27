@@ -83,7 +83,7 @@ private extension SettingsBoardPage {
             hideMessage: spec.hideMessage,
             liftScale: spec.liftScale,
             controller: controller,
-            errorNotice: model.state.errorNotice
+            errorNotice: model.state.notices.error
         ) {
             model.state.open(spec.newDestination(in: model))
         } header: {

@@ -20,7 +20,7 @@ extension SyncModelTests {
         #expect(await cloud.shareCalls == ["leave _owner"])
         #expect(joined.isEmpty)
         #expect(wallets.contains { $0.id == item.wallet.id } == false)
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -67,7 +67,7 @@ extension SyncModelTests {
         let joined = try await joinedShares(in: setup.database)
 
         #expect(joined.map(\.wallet.id) == [item.wallet.id])
-        #expect(model.state.errorNotice.message == "共有から抜けられませんでした。時間をおいて試してください")
+        #expect(model.state.notices.error.message == "共有から抜けられませんでした。時間をおいて試してください")
     }
 }
 

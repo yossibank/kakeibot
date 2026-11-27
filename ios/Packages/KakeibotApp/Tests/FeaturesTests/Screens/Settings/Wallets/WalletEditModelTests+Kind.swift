@@ -13,7 +13,7 @@ extension WalletEditModelTests {
 
         #expect(model.state.kind == .cash)
         #expect(!model.state.isNegative)
-        #expect(model.state.icon.glyph == .cash)
+        #expect(model.state.submodels.icon.glyph == .cash)
     }
 
     @Test
@@ -27,11 +27,11 @@ extension WalletEditModelTests {
 
         #expect(card.state.kind == .card)
         #expect(card.state.isNegative)
-        #expect(card.state.icon.glyph == .card)
+        #expect(card.state.submodels.icon.glyph == .card)
         #expect(!card.flow.output.isChanged)
         #expect(investment.state.kind == .investment)
         #expect(!investment.state.isNegative)
-        #expect(investment.state.icon.glyph == .invest)
+        #expect(investment.state.submodels.icon.glyph == .invest)
     }
 
     @Test
@@ -41,13 +41,13 @@ extension WalletEditModelTests {
 
         model.state.setKind(.bank)
         let bank = model.state.isNegative
-        let bankGlyph = model.state.icon.glyph
+        let bankGlyph = model.state.submodels.icon.glyph
         model.state.setKind(.loan)
 
         #expect(!bank)
         #expect(bankGlyph == .bank)
         #expect(model.state.isNegative)
-        #expect(model.state.icon.glyph == .contract)
+        #expect(model.state.submodels.icon.glyph == .contract)
     }
 
     @Test

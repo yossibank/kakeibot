@@ -51,6 +51,8 @@ class RecurringEditModel(
     class Presented(
         isScheduleOpen: Boolean,
     ) : ScreenEditable {
+        val panel = Shown<RecurringPanel>()
+
         var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
             private set
 
@@ -59,16 +61,30 @@ class RecurringEditModel(
         }
     }
 
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+    }
+
+    class Submodels {
+        var calculator by mutableStateOf(AmountCalculator())
+            internal set
+
+        var feeCalculator by mutableStateOf(AmountCalculator())
+            internal set
+    }
+
     class State(
         today: LocalDate,
         type: Entry.Kind,
         isScheduleOpen: Boolean,
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
-        val panel = Shown<RecurringPanel>()
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
         val presented = Presented(isScheduleOpen)
+        val submodels = Submodels()
 
         var form: RecurringEditForm by mutableStateOf(
             RecurringEditForm.starting(
@@ -76,12 +92,6 @@ class RecurringEditModel(
                 type = type,
             ),
         )
-            private set
-
-        var calculator by mutableStateOf(AmountCalculator())
-            private set
-
-        var feeCalculator by mutableStateOf(AmountCalculator())
             private set
 
         var loan by mutableStateOf(RecurringLoanInput())
@@ -112,15 +122,15 @@ class RecurringEditModel(
         }
 
         fun press(key: AmountCalculator.Key) {
-            calculator = calculator.press(key)
+            submodels.calculator = submodels.calculator.press(key)
         }
 
         fun pressFee(key: AmountCalculator.Key) {
-            feeCalculator = feeCalculator.press(key)
+            submodels.feeCalculator = submodels.feeCalculator.press(key)
         }
 
         fun setFee(amount: Int) {
-            feeCalculator = AmountCalculator(amount = amount)
+            submodels.feeCalculator = AmountCalculator(amount = amount)
         }
 
         fun useAutoCount() {
@@ -134,8 +144,8 @@ class RecurringEditModel(
             val draft = RecurringDraft(recurring = recurring)
 
             form = RecurringEditForm.of(draft)
-            calculator = AmountCalculator(amount = draft.amount)
-            feeCalculator = AmountCalculator(amount = draft.fee)
+            submodels.calculator = AmountCalculator(amount = draft.amount)
+            submodels.feeCalculator = AmountCalculator(amount = draft.fee)
             loan = loan.copy(manualFinal = recurring.finalAmount)
         }
     }
@@ -174,10 +184,10 @@ class RecurringEditModel(
         internal val state: State,
     ) {
         val amount: Int
-            get() = state.calculator.amount
+            get() = state.submodels.calculator.amount
 
         val fee: Int
-            get() = state.feeCalculator.amount
+            get() = state.submodels.feeCalculator.amount
 
         fun icon(of: Identifier<Icon>): Icon? = input.options?.icons?.get(of)
 
@@ -205,8 +215,8 @@ class RecurringEditModel(
             get() = input.isHidden
 
         override fun rest(): Boolean {
-            val isOpen = state.panel.current != null
-            state.panel.closeAll()
+            val isOpen = state.presented.panel.current != null
+            state.presented.panel.closeAll()
             return isOpen
         }
 

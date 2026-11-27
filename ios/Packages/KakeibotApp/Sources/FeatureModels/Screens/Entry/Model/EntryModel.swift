@@ -199,7 +199,7 @@ public extension EntryModel {
 
         input.baseline = output.snapshot
         state.closing.cancel()
-        state.errorNotice.inform(Self.recordAgainMessage)
+        state.notices.error.inform(Self.recordAgainMessage)
         state.outcome.send(.categoryMoved)
     }
 
@@ -270,7 +270,7 @@ extension EntryModel {
             return
         }
 
-        state.errorNotice.show(Self.message(for: error))
+        state.notices.error.show(Self.message(for: error))
     }
 }
 

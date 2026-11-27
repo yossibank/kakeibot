@@ -7,7 +7,7 @@ import SwiftUI
 extension MainView {
     var isLoaded: Bool {
         let isHomeLoaded = Self.isSettled(home.input.list, home.state.notices.error)
-        let isSetupLoaded = setup.output.isLoaded || setup.state.errorNotice.message != nil
+        let isSetupLoaded = setup.output.isLoaded || setup.state.notices.error.message != nil
         let isLaunchChosen = model.input.launchScreen != nil
         return isHomeLoaded && isSetupLoaded && isLaunchChosen && areTabsLoaded
     }

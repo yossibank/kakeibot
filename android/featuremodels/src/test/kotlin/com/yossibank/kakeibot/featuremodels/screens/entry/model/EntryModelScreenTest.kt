@@ -42,7 +42,7 @@ class EntryModelScreenTest {
 
         assertEquals(EntryModel.Field.Transfer, transfer)
         assertEquals(EntryModel.Field.Category, model.state.focus.field)
-        assertEquals(3, model.state.feeCalculator.amount)
+        assertEquals(3, model.state.submodels.feeCalculator.amount)
         assertEquals(5, model.output.amount)
     }
 

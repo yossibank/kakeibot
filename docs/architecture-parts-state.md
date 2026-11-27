@@ -42,6 +42,19 @@
 
 値の型には、モデル抜きのテストを書く。
 
+### 部品の型は枠の中だけに置く
+
+次の部品の型は、`State` の直下に置かず、枠の中に置く。同じ役目の値を 2 通りで書かないためである。
+
+| 型 | 枠 |
+| --- | --- |
+| `ErrorNotice` | `notices.error` |
+| `UndoNotice`（取り消しの知らせ） | `notices` の意味の名前（`notices.deletion` など） |
+| `Shown` | `presented` の意味の名前 |
+| 中に持つモデル・`AmountCalculator` | `submodels` の意味の名前（`submodels.icon` など） |
+
+`errorNotice` の共通の読み口は残し、`notices.error` を返す。
+
 ## 🪝 タブとメインの値の型
 
 | モデル | 値の型 | 中身 |

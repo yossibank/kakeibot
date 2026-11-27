@@ -54,7 +54,7 @@ extension AppModelTests {
 
         #expect(try await database.isSyncEnabled() == false)
         #expect(!model.input.isPro)
-        #expect(model.state.notice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -84,7 +84,7 @@ extension AppModelTests {
 
         #expect(try await database.isSyncEnabled() == false)
         #expect(!model.input.isPro)
-        #expect(model.state.notice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -108,7 +108,7 @@ extension AppModelTests {
 
         #expect(try await database.isSyncEnabled())
         #expect(!model.input.isPro)
-        #expect(model.state.notice.message == "同期を止められませんでした。設定の「同期と共有」から止めてください")
+        #expect(model.state.notices.error.message == "同期を止められませんでした。設定の「同期と共有」から止めてください")
     }
 
     @Test

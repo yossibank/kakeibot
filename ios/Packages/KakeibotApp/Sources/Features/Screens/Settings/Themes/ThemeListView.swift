@@ -40,8 +40,8 @@ public struct ThemeListView: View {
         } action: { size in
             layout.size = size
         }
-        .errorBanner(model.state.errorNotice)
-        .errorBanner(appIcon.state.errorNotice)
+        .errorBanner(model.state.notices.error)
+        .errorBanner(appIcon.state.notices.error)
         .confirmation(
             isPresented: isSuggestingIcon,
             systemImage: "app.badge",
@@ -147,7 +147,7 @@ private extension ThemeListView {
             }
             .scrollIndicators(.hidden)
             .scrollDisabled(shownMenu != nil)
-            .deletionNotice(model.state.deletion) { deletion in
+            .deletionNotice(model.state.notices.deletion) { deletion in
                 restore(deletion)
             }
 

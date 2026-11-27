@@ -12,7 +12,7 @@ public struct BudgetListView: View {
 
     public var body: some View {
         content
-            .errorBanner(model.state.errorNotice)
+            .errorBanner(model.state.notices.error)
             .budgetKeypad(model)
             .toolbar(.hidden, for: .navigationBar)
             .haptic(.selection, trigger: model.input.budgets)
@@ -60,7 +60,7 @@ private extension BudgetListView {
             }
             .scrollIndicators(.hidden)
             .undoNotice(
-                model.state.cleared,
+                model.state.notices.cleared,
                 message: clearedMessage,
                 systemImage: "chart.bar"
             ) { cleared in
@@ -69,7 +69,7 @@ private extension BudgetListView {
                 }
             }
             .undoNotice(
-                model.state.resetFrom,
+                model.state.notices.resetFrom,
                 message: "繰越を 0 に戻しました",
                 systemImage: "arrow.counterclockwise"
             ) { start in
@@ -365,7 +365,7 @@ private extension BudgetListView {
     }
 
     var clearedMessage: String {
-        model.state.cleared.current.map { "\($0.target.title)をなくしました" } ?? ""
+        model.state.notices.cleared.current.map { "\($0.target.title)をなくしました" } ?? ""
     }
 
     var hint: SettingsFold {

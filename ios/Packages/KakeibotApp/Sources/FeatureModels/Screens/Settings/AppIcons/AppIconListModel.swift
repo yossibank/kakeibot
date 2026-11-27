@@ -53,7 +53,7 @@ public extension AppIconListModel {
             try await dependencies.switcher.setName(choice.alternateName)
         } catch {
             input.current = previous
-            state.errorNotice.show(Self.changeFailedMessage)
+            state.notices.error.show(Self.changeFailedMessage)
         }
     }
 }

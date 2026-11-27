@@ -2,10 +2,21 @@ import Observation
 
 @MainActor
 @Observable
-public final class NoticeState: NoticeHolding {
-    public let errorNotice: ErrorNotice
+public final class NoticeState: NoticesHolding {
+    public let notices: Notices
 
     public init(wait: ScreenWait) {
-        self.errorNotice = ErrorNotice(wait: wait)
+        self.notices = Notices(wait: wait)
+    }
+}
+
+public extension NoticeState {
+    @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
     }
 }

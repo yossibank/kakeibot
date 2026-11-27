@@ -20,7 +20,7 @@ data class VoiceFilled(
 )
 
 fun EntryModel.apply(reading: VoiceReading): VoiceUndo {
-    val calculator = state.calculator
+    val calculator = state.submodels.calculator
 
     val undo = VoiceUndo(
         form = state.form,

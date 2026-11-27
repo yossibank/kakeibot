@@ -18,17 +18,17 @@ public extension WalletEditModel {
 
 public extension WalletEditModel.Output {
     var initialBalance: Int {
-        state.isNegative ? -state.calculator.amount : state.calculator.amount
+        state.isNegative ? -state.submodels.calculator.amount : state.submodels.calculator.amount
     }
 
     var draft: WalletDraft {
-        let loan = state.loanAmount.amount > 0 ? state.loanAmount.amount : nil
+        let loan = state.submodels.loanAmount.amount > 0 ? state.submodels.loanAmount.amount : nil
 
         return WalletDraft(
             kind: state.kind,
             name: state.fields.name,
-            mark: state.icon.mark,
-            color: state.icon.color,
+            mark: state.submodels.icon.mark,
+            color: state.submodels.icon.color,
             initialBalance: initialBalance,
             loanAmount: loan,
             recordedKind: input.recordedKind,

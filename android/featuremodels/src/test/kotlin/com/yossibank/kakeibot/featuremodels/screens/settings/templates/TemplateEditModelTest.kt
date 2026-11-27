@@ -81,7 +81,7 @@ class TemplateEditModelTest {
         model.load()
 
         val refused = model.flow.save()
-        val refusal = model.state.errorNotice.message
+        val refusal = model.state.notices.error.message
         model.state.update { copy(name = "ランチ") }
         model.state.press(AmountCalculator.Key.Digit(9))
         model.state.press(AmountCalculator.Key.Digit(8))
@@ -104,7 +104,7 @@ class TemplateEditModelTest {
 
         model.state.press(AmountCalculator.Key.Digit(9))
 
-        assertEquals("名前を入れてください", model.state.errorNotice.message)
+        assertEquals("名前を入れてください", model.state.notices.error.message)
     }
 
     @Test
@@ -113,13 +113,13 @@ class TemplateEditModelTest {
         model.state.update { copy(name = "給料", categoryId = null, walletId = null) }
 
         model.flow.save()
-        val category = model.state.errorNotice.message
+        val category = model.state.notices.error.message
         model.load()
         model.state.update { copy(walletId = null) }
         model.flow.save()
 
         assertEquals("カテゴリを選んでください", category)
-        assertEquals("入金先を選んでください", model.state.errorNotice.message)
+        assertEquals("入金先を選んでください", model.state.notices.error.message)
     }
 
     @Test

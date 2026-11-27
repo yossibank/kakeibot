@@ -65,7 +65,7 @@ struct RewardRuleEditModelTests {
         let isSaved = await model.save() != nil
 
         #expect(!isSaved)
-        #expect(model.state.errorNotice.message == "保存できませんでした")
+        #expect(model.state.notices.error.message == "保存できませんでした")
     }
 
     @Test
@@ -97,7 +97,7 @@ struct RewardRuleEditModelTests {
 
         #expect(model.input.hasLogs)
         #expect(model.flow.state.outcome.value == nil)
-        #expect(model.state.errorNotice.message == "削除できませんでした")
+        #expect(model.state.notices.error.message == "削除できませんでした")
         #expect(rules.map(\.id) == [rule.id])
     }
 

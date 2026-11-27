@@ -114,7 +114,7 @@ fun TemplateEditSheet(
         )
 
         Keypad(
-            calculator = model.state.calculator,
+            calculator = model.state.submodels.calculator,
             onKey = { key ->
                 focus.clearFocus()
                 model.state.press(key)
@@ -326,8 +326,8 @@ private fun SaveButton(
     onDone: () -> Unit,
 ) {
     FittedText(
-        text = model.state.errorNotice.message,
-        modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
+        text = model.state.notices.error.message,
+        modifier = Modifier.clickable(onClick = model.state.notices.error::clear),
         color = Palette.rose,
         style = textFont(size = FontSize.Caption),
     )

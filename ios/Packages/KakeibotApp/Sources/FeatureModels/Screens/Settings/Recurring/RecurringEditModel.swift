@@ -140,7 +140,7 @@ extension RecurringEditModel {
 extension RecurringEditModel.Source {
     func save(permission: NotificationPermission) async -> Void? {
         if let text = output.problemMessage {
-            state.errorNotice.show(text)
+            state.notices.error.show(text)
             return nil
         }
 
@@ -156,7 +156,7 @@ extension RecurringEditModel.Source {
 
             return ()
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.notices.error.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }

@@ -51,18 +51,32 @@ public extension OnboardingModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    struct Submodels {
+        public let monthStart: MonthStartDayModel
+        public let budget: BudgetListModel
+        public let setup: SetupModel
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
 
         public internal(set) var outcome = ScreenOutcome<Void>()
         public internal(set) var page: Page = .welcome
         public internal(set) var route: Route?
 
-        public let errorNotice: ErrorNotice
-        public let monthStart: MonthStartDayModel
-        public let budget: BudgetListModel
-        public let setup: SetupModel
+        public let notices: Notices
+        public let submodels: Submodels
 
         init(
             monthStart: MonthStartDayModel,
@@ -70,10 +84,13 @@ public extension OnboardingModel {
             setup: SetupModel,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
-            self.monthStart = monthStart
-            self.budget = budget
-            self.setup = setup
+            self.notices = Notices(wait: wait)
+
+            self.submodels = Submodels(
+                monthStart: monthStart,
+                budget: budget,
+                setup: setup
+            )
         }
     }
 
@@ -95,14 +112,14 @@ public extension OnboardingModel {
 
 public extension OnboardingModel {
     func load() async {
-        await state.monthStart.load()
-        await state.budget.load()
+        await state.submodels.monthStart.load()
+        await state.submodels.budget.load()
 
         do {
             try await dependencies.database.insertTemplatesIfEmpty(at: dependencies.clock.now)
             input.weekStart = try await dependencies.database.setting(.weekStart)
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -112,7 +129,7 @@ public extension OnboardingModel {
         do {
             try await dependencies.database.setSetting(.weekStart, to: weekStart)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -134,7 +151,7 @@ public extension OnboardingModel {
 
     func refreshPage() async {
         if state.page == .budget {
-            await state.budget.load()
+            await state.submodels.budget.load()
         }
     }
 
@@ -148,7 +165,7 @@ public extension OnboardingModel {
 
     @discardableResult
     func finish() async -> Bool {
-        let version = state.setup.input.newsVersion
+        let version = state.submodels.setup.input.newsVersion
 
         do {
             let seen = try await dependencies.database.setting(.whatsNewSeenVersion)
@@ -162,7 +179,7 @@ public extension OnboardingModel {
 
             return true
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
             return false
         }
     }

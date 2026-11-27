@@ -4,7 +4,7 @@ import Store
 
 public extension WalletEditModel {
     func startValuation() {
-        state.valuation = AmountCalculator(amount: max(input.balance, 0))
+        state.submodels.valuation = AmountCalculator(amount: max(input.balance, 0))
     }
 
     @discardableResult
@@ -13,7 +13,7 @@ public extension WalletEditModel {
             return false
         }
 
-        let amount = state.valuation.amount
+        let amount = state.submodels.valuation.amount
 
         do {
             try await dependencies.database.saveValuation(
@@ -28,7 +28,7 @@ public extension WalletEditModel {
 
             return true
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.notices.error.show(SettingsEditMessage.saveFailed, for: error)
             return false
         }
     }
@@ -41,15 +41,15 @@ public extension WalletEditModel {
             await loadBalance()
 
             if let deletion {
-                state.valuationDeletion.show(deletion)
+                state.notices.valuationDeletion.show(deletion)
             } else {
-                state.valuationDeletion.dismiss()
+                state.notices.valuationDeletion.dismiss()
             }
 
             return deletion
         } catch {
-            state.errorNotice.show(SettingsEditMessage.deleteFailed, for: error)
-            state.valuationDeletion.dismiss()
+            state.notices.error.show(SettingsEditMessage.deleteFailed, for: error)
+            state.notices.valuationDeletion.dismiss()
             return nil
         }
     }
@@ -59,7 +59,7 @@ public extension WalletEditModel {
             try await dependencies.database.restore(deletion)
             await loadBalance()
         } catch {
-            state.errorNotice.show(Self.restoreFailedMessage, for: error)
+            state.notices.error.show(Self.restoreFailedMessage, for: error)
         }
     }
 
@@ -80,7 +80,7 @@ public extension WalletEditModel {
             input.baseline?.recordedKind = input.recordedKind
             input.baseline?.hasValuations = input.hasValuations
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -96,7 +96,7 @@ public extension WalletEditModel {
                 let wallet = list.wallets[editingId],
                 let icon = list.icons[wallet.iconId]
             else {
-                state.errorNotice.show(Self.loadFailedMessage)
+                state.notices.error.show(Self.loadFailedMessage)
                 return
             }
 
@@ -109,7 +109,7 @@ public extension WalletEditModel {
             input.baseline = output.draft
             await loadPayment()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -123,7 +123,7 @@ public extension WalletEditModel {
                 recurring.type == .transfer && recurring.toWalletId == editingId
             }
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 

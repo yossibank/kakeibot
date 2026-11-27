@@ -76,7 +76,7 @@ fun BudgetKeypadDrawer(model: BudgetListModel) {
 @Composable
 private fun ColumnScope.Drawer(model: BudgetListModel) {
     AmountText(
-        amount = model.state.calculator.amount,
+        amount = model.state.submodels.calculator.amount,
         style = displayFont(
             size = FontSize.LargeTitle,
             weight = FontWeight.Bold,
@@ -89,15 +89,15 @@ private fun ColumnScope.Drawer(model: BudgetListModel) {
     }
 
     Keypad(
-        calculator = model.state.calculator,
+        calculator = model.state.submodels.calculator,
         onKey = model.state::press,
         keyHeight = Metrics.keyHeight,
     )
 
-    if (model.state.errorNotice.message.isNotEmpty()) {
+    if (model.state.notices.error.message.isNotEmpty()) {
         Text(
-            text = model.state.errorNotice.message,
-            modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
+            text = model.state.notices.error.message,
+            modifier = Modifier.clickable(onClick = model.state.notices.error::clear),
             color = Palette.rose,
             style = textFont(style = FontTextStyle.Caption),
         )
@@ -136,7 +136,7 @@ private fun SuggestionRow(model: BudgetListModel) {
         model.output.suggestions.forEach { suggestion ->
             SuggestionChip(
                 suggestion = suggestion,
-                isSelected = model.state.calculator.amount == suggestion.amount,
+                isSelected = model.state.submodels.calculator.amount == suggestion.amount,
                 onSelect = { model.state.choose(suggestion) },
                 modifier = Modifier.weight(1f),
             )

@@ -331,7 +331,7 @@ private extension AppModel {
                 return
             }
 
-            state.notice.show(Self.recurringFailedMessage, for: error)
+            state.notices.error.show(Self.recurringFailedMessage, for: error)
         }
     }
 }

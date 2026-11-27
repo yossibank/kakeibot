@@ -10,10 +10,16 @@ val EntryModel.Output.isBlank: Boolean
     get() = !isEditing && amount <= 0
 
 val EntryModel.Output.amount: Int
-    get() = state.calculator.amount
+    get() = state.submodels.calculator.amount
 
 val EntryModel.Output.fee: Int
-    get() = if (state.form.type == Entry.Kind.transfer) state.feeCalculator.amount else 0
+    get() = if (state.form.type == Entry.Kind.transfer) state.submodels.feeCalculator.amount else 0
 
 val EntryModel.Output.activeCalculator: AmountCalculator
-    get() = if (state.focus.field == EntryModel.Field.Fee) state.feeCalculator else state.calculator
+    get() = if (state.focus.field ==
+        EntryModel.Field.Fee
+    ) {
+        state.submodels.feeCalculator
+    } else {
+        state.submodels.calculator
+    }

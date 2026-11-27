@@ -12,7 +12,7 @@ extension EntryModelTests {
 
         await model.load()
 
-        #expect(model.state.errorNotice.message == "保存できませんでした")
+        #expect(model.state.notices.error.message == "保存できませんでした")
     }
 
     @Test
@@ -32,7 +32,7 @@ extension EntryModelTests {
 
         #expect(deleted == nil)
         #expect(stored == entry)
-        #expect(model.state.errorNotice.message == "保存できませんでした")
+        #expect(model.state.notices.error.message == "保存できませんでした")
     }
 
     @Test
@@ -44,6 +44,6 @@ extension EntryModelTests {
 
         model.state.press(.digit(1))
 
-        #expect(model.state.errorNotice.message == "金額を入れてください")
+        #expect(model.state.notices.error.message == "金額を入れてください")
     }
 }

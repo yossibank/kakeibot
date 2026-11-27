@@ -202,14 +202,14 @@ private fun EditActions(model: RecurringEditModel) {
 @Composable
 private fun RecurringDrawer(model: RecurringEditModel) {
     BottomDrawer(
-        item = model.state.panel.current,
+        item = model.state.presented.panel.current,
         title = { it.title },
-        onClose = model.state.panel::closeAll,
+        onClose = model.state.presented.panel::closeAll,
     ) { current ->
         RecurringPanelBody(
             panel = current,
             model = model,
-            onClose = model.state.panel::closeAll,
+            onClose = model.state.presented.panel::closeAll,
         )
     }
 }
@@ -288,10 +288,10 @@ private fun NameField(model: RecurringEditModel) {
 
 @Composable
 private fun SaveButton(model: RecurringEditModel) {
-    if (model.state.errorNotice.message.isNotEmpty()) {
+    if (model.state.notices.error.message.isNotEmpty()) {
         Text(
-            text = model.state.errorNotice.message,
-            modifier = Modifier.clickable(onClick = model.state.errorNotice::clear),
+            text = model.state.notices.error.message,
+            modifier = Modifier.clickable(onClick = model.state.notices.error::clear),
             color = Palette.rose,
             style = textFont(style = FontTextStyle.Caption),
         )

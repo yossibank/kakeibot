@@ -35,14 +35,28 @@ public final class AssetsAdjustmentModel: ScreenPerforming {
 
 public extension AssetsAdjustmentModel {
     @MainActor
-    @Observable
-    final class State: NoticeHolding {
-        public let errorNotice: ErrorNotice
-
-        public private(set) var calculator = AmountCalculator()
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    struct Submodels {
+        public internal(set) var calculator = AmountCalculator()
+    }
+
+    @MainActor
+    @Observable
+    final class State: NoticesHolding {
+        public let notices: Notices
+
+        public internal(set) var submodels = Submodels()
+
+        init(wait: ScreenWait) {
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -121,7 +135,7 @@ private extension AssetsAdjustmentModel {
 
 public extension AssetsAdjustmentModel.Output {
     var difference: Int {
-        state.calculator.amount - input.balance
+        state.submodels.calculator.amount - input.balance
     }
 
     var canSave: Bool {
@@ -143,7 +157,7 @@ public extension AssetsAdjustmentModel.Output {
 
 public extension AssetsAdjustmentModel.State {
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        submodels.calculator.press(key)
     }
 }
 
@@ -153,7 +167,7 @@ extension AssetsAdjustmentModel.Source: EditFlowSource {
     }
 
     var isChanged: Bool {
-        state.calculator.amount != 0
+        state.submodels.calculator.amount != 0
     }
 
     var problem: String? {
@@ -175,7 +189,7 @@ extension AssetsAdjustmentModel.Source: EditFlowSource {
 
             return ()
         } catch {
-            state.errorNotice.show(AssetsAdjustmentModel.saveFailedMessage, for: error)
+            state.notices.error.show(AssetsAdjustmentModel.saveFailedMessage, for: error)
             return nil
         }
     }

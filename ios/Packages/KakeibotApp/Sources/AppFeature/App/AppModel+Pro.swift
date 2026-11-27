@@ -47,7 +47,7 @@ private extension AppModel {
 
             try await database.turnOffSync()
         } catch {
-            state.notice.show(Self.stopSyncFailedMessage)
+            state.notices.error.show(Self.stopSyncFailedMessage)
         }
     }
 }

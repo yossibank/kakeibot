@@ -9,7 +9,7 @@ extension TemplateEditSheet {
         switch panel {
         case .amount:
             VStack(spacing: 12) {
-                Keypad(calculator: model.state.calculator) {
+                Keypad(calculator: model.state.submodels.calculator) {
                     closePanel()
                 } onKey: { key in
                     model.state.press(key)

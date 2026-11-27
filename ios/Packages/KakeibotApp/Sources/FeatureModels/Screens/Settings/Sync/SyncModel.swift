@@ -29,20 +29,29 @@ public final class SyncModel {
 
 public extension SyncModel {
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var presented = Presented()
 
         public internal(set) var workingWallet: Wallet.ID?
 
-        public let errorNotice: ErrorNotice
+        public let notices: Notices
         public let task = ModelTask()
         public let shareTask = ModelTask()
 
         var request = SwitchRequest()
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -80,7 +89,7 @@ public extension SyncModel {
         do {
             input.isOn = try await dependencies.database.isSyncEnabled()
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
 
         input.account = await dependencies.cloud.account()
@@ -236,7 +245,7 @@ private extension SyncModel {
     }
 
     func work(_ operation: () async throws -> Void) async {
-        state.errorNotice.clear()
+        state.notices.error.clear()
 
         do {
             try await state.task.attempt {
@@ -244,7 +253,7 @@ private extension SyncModel {
                 input.isOn = try await dependencies.database.isSyncEnabled()
             }
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 }

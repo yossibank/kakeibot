@@ -175,7 +175,7 @@ private fun DeckContent(
         EntryModel.Field.Date -> DateCalendar(model = model)
 
         EntryModel.Field.Amount -> AmountKeypad(
-            calculator = model.state.calculator,
+            calculator = model.state.submodels.calculator,
             onKey = model.state::press,
         )
 
@@ -196,7 +196,7 @@ private fun FeeDeck(model: EntryModel) {
 
         Box(modifier = Modifier.weight(1f)) {
             AmountKeypad(
-                calculator = model.state.feeCalculator,
+                calculator = model.state.submodels.feeCalculator,
                 onKey = model.state::press,
             )
         }

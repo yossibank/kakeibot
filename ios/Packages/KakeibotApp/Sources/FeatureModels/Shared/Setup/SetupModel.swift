@@ -113,7 +113,7 @@ public extension SetupModel {
         do {
             try await dependencies.database.setSetting(.whatsNewSeenVersion, to: version)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 
@@ -151,7 +151,7 @@ private extension SetupModel {
         do {
             try await dependencies.database.setSetting(key, to: value)
         } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
+            state.notices.error.show(Self.saveFailedMessage, for: error)
         }
     }
 }

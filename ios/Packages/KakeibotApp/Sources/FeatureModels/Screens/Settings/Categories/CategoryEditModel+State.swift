@@ -20,8 +20,22 @@ public extension CategoryEditModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    struct Submodels {
+        public let icon = SettingsIconEditorModel(glyph: .food)
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
         public var presented = Presented()
 
@@ -31,11 +45,11 @@ public extension CategoryEditModel {
         public private(set) var tagRejection: EntryTagDraft.Problem?
         public private(set) var tagEdit: TagEdit?
 
-        public let errorNotice: ErrorNotice
-        public let icon = SettingsIconEditorModel(glyph: .food)
+        public let notices: Notices
+        public let submodels = Submodels()
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 }
@@ -178,7 +192,7 @@ extension CategoryEditModel.State {
         tags: [CategoryEditModel.EditingTag]
     ) {
         fields.name = draft.name
-        icon.apply(draft.icon)
+        submodels.icon.apply(draft.icon)
         self.tags = tags
     }
 }

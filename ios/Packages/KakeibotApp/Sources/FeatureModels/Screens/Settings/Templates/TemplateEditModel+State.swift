@@ -21,24 +21,39 @@ public extension TemplateEditModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    struct Submodels {
+        public internal(set) var calculator = AmountCalculator()
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
         public var presented = Presented()
+
+        public internal(set) var submodels = Submodels()
 
         public private(set) var walletId: Wallet.ID?
         public private(set) var categoryId: EntryCategory.ID?
         public private(set) var tagId: EntryTag.ID?
         public private(set) var type: Entry.Kind
-        public private(set) var calculator = AmountCalculator()
 
-        public let errorNotice: ErrorNotice
+        public let notices: Notices
 
         init(
             type: Entry.Kind,
             wait: ScreenWait
         ) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
             self.type = type
         }
     }
@@ -68,7 +83,7 @@ public extension TemplateEditModel.State {
     }
 
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        submodels.calculator.press(key)
     }
 }
 
@@ -76,7 +91,7 @@ extension TemplateEditModel.State {
     func apply(_ draft: EntryTemplateDraft) {
         fields.name = draft.name
         type = draft.type
-        calculator = AmountCalculator(amount: draft.amount ?? 0)
+        submodels.calculator = AmountCalculator(amount: draft.amount ?? 0)
         categoryId = draft.categoryId
         tagId = draft.tagId
         walletId = draft.walletId

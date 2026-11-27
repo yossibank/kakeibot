@@ -45,18 +45,33 @@ public extension RewardRuleEditModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
+    struct Submodels {
+        public internal(set) var calculator = AmountCalculator()
+
+        public let icon = SettingsIconEditorModel(glyph: .giftbox)
+    }
+
+    @MainActor
     @Observable
-    final class State: NoticeHolding {
+    final class State: NoticesHolding {
         public var fields = Fields()
         public var presented = Presented()
 
-        public private(set) var calculator = AmountCalculator()
+        public internal(set) var submodels = Submodels()
 
-        public let errorNotice: ErrorNotice
-        public let icon = SettingsIconEditorModel(glyph: .giftbox)
+        public let notices: Notices
 
         init(wait: ScreenWait) {
-            self.errorNotice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 
@@ -124,7 +139,7 @@ public extension RewardRuleEditModel {
                 let rule,
                 let saved = list.icons[rule.iconId]
             else {
-                state.errorNotice.show(Self.loadFailedMessage)
+                state.notices.error.show(Self.loadFailedMessage)
                 return
             }
 
@@ -133,7 +148,7 @@ public extension RewardRuleEditModel {
             input.isHidden = !rule.isActive
             input.baseline = output.draft
         } catch {
-            state.errorNotice.show(Self.loadFailedMessage)
+            state.notices.error.show(Self.loadFailedMessage)
         }
     }
 
@@ -155,21 +170,21 @@ private extension RewardRuleEditModel {
 
 public extension RewardRuleEditModel.Output {
     var amount: Int? {
-        state.calculator.amount > 0 ? state.calculator.amount : nil
+        state.submodels.calculator.amount > 0 ? state.submodels.calculator.amount : nil
     }
 
     var draft: RewardRuleDraft {
         RewardRuleDraft(
             name: state.fields.name,
-            amount: state.calculator.amount,
-            icon: state.icon.draft
+            amount: state.submodels.calculator.amount,
+            icon: state.submodels.icon.draft
         )
     }
 }
 
 public extension RewardRuleEditModel.State {
     func press(_ key: AmountCalculator.Key) {
-        calculator.press(key)
+        submodels.calculator.press(key)
     }
 }
 
@@ -179,8 +194,8 @@ extension RewardRuleEditModel.State {
         icon saved: Icon
     ) {
         fields.name = rule.name
-        calculator = AmountCalculator(amount: rule.amount)
-        icon.apply(saved)
+        submodels.calculator = AmountCalculator(amount: rule.amount)
+        submodels.icon.apply(saved)
     }
 }
 
@@ -211,7 +226,7 @@ extension RewardRuleEditModel.Source: EditFlowSource {
 
             return ()
         } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            state.notices.error.show(SettingsEditMessage.saveFailed, for: error)
             return nil
         }
     }

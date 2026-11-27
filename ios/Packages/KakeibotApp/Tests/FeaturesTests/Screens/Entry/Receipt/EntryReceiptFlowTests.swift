@@ -158,7 +158,7 @@ struct EntryReceiptFlowTests {
         #expect(flow.state.step == nil)
         #expect(model.output.amount == 911)
         #expect(model.state.fields.store == "スーパー青葉")
-        #expect(model.state.errorNotice.message == EntryReceiptFlow.totalMessage)
+        #expect(model.state.notices.error.message == EntryReceiptFlow.totalMessage)
     }
 
     @Test
@@ -178,7 +178,7 @@ struct EntryReceiptFlowTests {
         let outcome = await flow.scan([], into: model)
 
         #expect(outcome == .read(itemCount: 2, hasAmount: true))
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
         #expect(model.output.amount == 616)
     }
 
@@ -213,7 +213,7 @@ struct EntryReceiptFlowTests {
         let outcome = await flow.scan([], into: model)
 
         #expect(outcome == .read(itemCount: 0, hasAmount: false))
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
         #expect(model.output.amount == 5)
     }
 
@@ -231,7 +231,7 @@ struct EntryReceiptFlowTests {
         #expect(outcome == .unread)
         #expect(flow.state.outcome.value == nil)
         #expect(flow.state.step == nil)
-        #expect(model.state.errorNotice.message == EntryReceiptFlow.unreadMessage)
+        #expect(model.state.notices.error.message == EntryReceiptFlow.unreadMessage)
         #expect(model.output.amount == 0)
     }
 }

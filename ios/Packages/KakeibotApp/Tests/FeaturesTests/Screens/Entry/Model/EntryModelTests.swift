@@ -83,7 +83,7 @@ struct EntryModelTests {
 
         #expect(model.output.canSave == false)
         #expect(saved == nil)
-        #expect(model.state.errorNotice.message == "金額を入れてください")
+        #expect(model.state.notices.error.message == "金額を入れてください")
     }
 
     @Test
@@ -124,7 +124,7 @@ struct EntryModelTests {
         let stored = try await setup.database.entry(entry.id)
 
         #expect(!model.output.isEditing)
-        #expect(model.state.errorNotice.message == "同じ内容で新しい記録にしました")
+        #expect(model.state.notices.error.message == "同じ内容で新しい記録にしました")
         #expect(saved?.entry.id != entry.id)
         #expect(saved?.entry.amount == 980)
         #expect(saved?.entry.memo == "ランチ")
@@ -255,8 +255,8 @@ struct EntryModelTests {
         task.cancel()
         await task.value
 
-        #expect(model.state.errorNotice.message == nil)
-        #expect(model.state.errorNotice.count == 0)
+        #expect(model.state.notices.error.message == nil)
+        #expect(model.state.notices.error.count == 0)
     }
 
     @Test
@@ -295,7 +295,7 @@ struct EntryModelTests {
         model.select(.income)
         let editor = model.newCategoryModel()
         editor.state.fields.name = "配当"
-        editor.state.icon.glyph = .invest
+        editor.state.submodels.icon.glyph = .invest
 
         let saved = try #require(await editor.save())
         await model.reloadCategories(selecting: saved.id)

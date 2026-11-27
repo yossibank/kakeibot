@@ -65,7 +65,7 @@ class RecurringListModelTest {
         val model = setup.observedModel()
 
         val hidden = model.hide(saved.id)
-        val noticed = model.state.hidden.current
+        val noticed = model.state.notices.hidden.current
         ModelWait.until { model.output.hiddenRows.isNotEmpty() }
         val shownWhileHidden = model.output.rows.size
         val totalWhileHidden = model.output.monthTotal
@@ -105,7 +105,7 @@ class RecurringListModelTest {
         val model = setup.observedModel()
 
         val deletion = assertNotNull(model.delete(saved.id))
-        val noticed = model.state.deleted.current
+        val noticed = model.state.notices.deleted.current
         ModelWait.until { model.output.rows.isEmpty() }
         model.restore(deletion)
         ModelWait.until { model.output.rows.isNotEmpty() }
@@ -128,7 +128,7 @@ class RecurringListModelTest {
 
         assertNull(none)
         assertNotNull(deletion)
-        assertEquals(deletion, model.state.deleted.current)
+        assertEquals(deletion, model.state.notices.deleted.current)
         assertEquals(
             listOf("サブスク"),
             setup.database.recurrings(includingHidden = true).map {
@@ -185,9 +185,9 @@ class RecurringListModelTest {
         )
 
         setup.scope.launch { model.observe() }
-        ModelWait.until { model.state.errorNotice.message.isNotEmpty() }
+        ModelWait.until { model.state.notices.error.message.isNotEmpty() }
 
-        assertEquals("固定費を読めませんでした", model.state.errorNotice.message)
+        assertEquals("固定費を読めませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -199,14 +199,14 @@ class RecurringListModelTest {
         setup.database.failWrites(to = "recurring")
 
         model.hide(rent.id)
-        val hiding = model.state.errorNotice.message
+        val hiding = model.state.notices.error.message
         model.show(rent.id)
-        val showing = model.state.errorNotice.message
+        val showing = model.state.notices.error.message
         model.delete(rent.id)
-        val deleting = model.state.errorNotice.message
+        val deleting = model.state.notices.error.message
         model.move(id = second, to = 0)
         model.finishMoving()
-        val moving = model.state.errorNotice.message
+        val moving = model.state.notices.error.message
 
         assertEquals("非表示にできませんでした", hiding)
         assertEquals("表示に戻せませんでした", showing)
@@ -250,18 +250,18 @@ class RecurringListModelTest {
         val model = RecurringListModel(parts = setup.parts, today = setup.today)
         val one = DeleteTarget.One(Identifier())
 
-        model.state.deleting.show(one)
-        model.state.deleting.show(DeleteTarget.AllHidden)
-        val asked = model.state.deleting.current
+        model.state.presented.deleting.show(one)
+        model.state.presented.deleting.show(DeleteTarget.AllHidden)
+        val asked = model.state.presented.deleting.current
 
-        model.state.deleting.close(one)
-        val kept = model.state.deleting.current
+        model.state.presented.deleting.close(one)
+        val kept = model.state.presented.deleting.current
 
-        model.state.deleting.close(DeleteTarget.AllHidden)
+        model.state.presented.deleting.close(DeleteTarget.AllHidden)
 
         assertEquals(DeleteTarget.AllHidden, asked)
         assertEquals(DeleteTarget.AllHidden, kept)
-        assertNull(model.state.deleting.current)
+        assertNull(model.state.presented.deleting.current)
     }
 
     @Test
@@ -271,12 +271,12 @@ class RecurringListModelTest {
         val open = Identifier<Recurring>()
         model.state.open(open)
 
-        model.state.editing.show(Editing.Existing(editing))
+        model.state.presented.editing.show(Editing.Existing(editing))
 
-        assertEquals(Editing.Existing(editing), model.state.editing.current)
-        assertEquals(editing, (model.state.editing.current as? Editing.Existing)?.id)
+        assertEquals(Editing.Existing(editing), model.state.presented.editing.current)
+        assertEquals(editing, (model.state.presented.editing.current as? Editing.Existing)?.id)
         assertEquals(open, model.state.openId)
-        assertNull(model.state.deleting.current)
+        assertNull(model.state.presented.deleting.current)
     }
 
     @Test
@@ -286,14 +286,14 @@ class RecurringListModelTest {
         val model = setup.observedModel(count = 2)
         setup.database.failDeletes(from = "recurring", where = "memo = '家賃'")
         model.delete(other.id)
-        val shown = model.state.deleted.current
+        val shown = model.state.notices.deleted.current
 
         val deletion = model.delete(rent.id)
 
         assertNotNull(shown)
         assertNull(deletion)
-        assertNull(model.state.deleted.current)
-        assertEquals("削除できませんでした", model.state.errorNotice.message)
+        assertNull(model.state.notices.deleted.current)
+        assertEquals("削除できませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -301,11 +301,11 @@ class RecurringListModelTest {
         val saved = setup.saveRecurring(amount = 78000, day = 27, memo = "家賃")
         val model = setup.observedModel()
         val deletion = checkNotNull(model.delete(saved.id))
-        model.state.deleted.dismiss()
+        model.state.notices.deleted.dismiss()
 
         model.receive(deletion)
 
-        assertEquals(deletion, model.state.deleted.current)
+        assertEquals(deletion, model.state.notices.deleted.current)
     }
 
     @Test
@@ -315,7 +315,7 @@ class RecurringListModelTest {
 
         model.receiveHidden(saved.id)
 
-        assertEquals(saved.id, model.state.hidden.current)
+        assertEquals(saved.id, model.state.notices.hidden.current)
     }
 
     @Test
@@ -331,7 +331,7 @@ class RecurringListModelTest {
         val deletion = model.deleteHidden()
 
         assertNotNull(deletion)
-        assertEquals("削除できないものがありました", model.state.errorNotice.message)
+        assertEquals("削除できないものがありました", model.state.notices.error.message)
         assertEquals(
             listOf("家賃"),
             setup.database.recurrings(includingHidden = true).map { it.memo },

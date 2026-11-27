@@ -18,7 +18,7 @@ struct SettingsMenuResetModelTests {
         #expect(isReady)
         #expect(model.state.presented.prompt[.deleteAll])
         #expect(model.input.count == 1)
-        #expect(model.state.errorNotice.message == nil)
+        #expect(model.state.notices.error.message == nil)
     }
 
     @Test
@@ -30,7 +30,7 @@ struct SettingsMenuResetModelTests {
 
         #expect(!isReady)
         #expect(!model.state.presented.prompt[.deleteAll])
-        #expect(model.state.errorNotice.message == "削除する記録はありません")
+        #expect(model.state.notices.error.message == "削除する記録はありません")
     }
 
     @Test
@@ -45,7 +45,7 @@ struct SettingsMenuResetModelTests {
 
         #expect(!isReady)
         #expect(!model.state.presented.prompt[.deleteAll])
-        #expect(model.state.errorNotice.message == "記録の件数を読めませんでした")
+        #expect(model.state.notices.error.message == "記録の件数を読めませんでした")
     }
 
     @Test

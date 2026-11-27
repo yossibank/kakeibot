@@ -45,7 +45,7 @@ extension WalletEditModelTests {
 
         let model = WalletEditModel(parts: .system(setup.database), editing: saved.id)
         await model.load()
-        let loaded = model.state.loanAmount.amount
+        let loaded = model.state.submodels.loanAmount.amount
         let isChanged = model.flow.output.isChanged
         let repaid = model.output.repaidText
         model.state.setKind(.bank)
@@ -139,6 +139,6 @@ extension WalletEditModelTests {
 
         #expect(bankModel.flow.state.outcome.value?.isHidden == true)
         #expect(cashModel.flow.state.outcome.value == nil)
-        #expect(cashModel.state.errorNotice.message == "最後の 1 つの口座は非表示にできません")
+        #expect(cashModel.state.notices.error.message == "最後の 1 つの口座は非表示にできません")
     }
 }

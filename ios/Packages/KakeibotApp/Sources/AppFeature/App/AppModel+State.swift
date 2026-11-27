@@ -25,9 +25,18 @@ extension AppModel {
     }
 
     @MainActor
+    struct Notices: ScreenNotices {
+        let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
+    @MainActor
     @Observable
     final class State {
-        let notice: ErrorNotice
+        let notices: Notices
 
         private(set) var launch: Launch = .opening
         private(set) var reveal = Reveal()
@@ -42,7 +51,7 @@ extension AppModel {
         @ObservationIgnored private var hasStoppedObservation = false
 
         init(wait: ScreenWait) {
-            self.notice = ErrorNotice(wait: wait)
+            self.notices = Notices(wait: wait)
         }
     }
 

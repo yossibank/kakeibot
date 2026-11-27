@@ -131,14 +131,14 @@ public extension EntryReceiptFlow {
         state.close()
 
         guard !reading.isEmpty else {
-            model.state.errorNotice.show(Self.unreadMessage)
+            model.state.notices.error.show(Self.unreadMessage)
             return .unread
         }
 
         let hasAmount = await model.apply(reading)
 
         if reading.items.isEmpty, hasAmount {
-            model.state.errorNotice.inform(Self.totalMessage)
+            model.state.notices.error.inform(Self.totalMessage)
         }
 
         let outcome = Outcome.read(itemCount: reading.items.count, hasAmount: hasAmount)

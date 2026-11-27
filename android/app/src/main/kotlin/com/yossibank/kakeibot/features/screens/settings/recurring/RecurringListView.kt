@@ -81,9 +81,9 @@ fun RecurringListView(
 
     val actions = RecurringRowActions(
         onOpen = model.state::open,
-        onEdit = { model.state.editing.show(Editing.Existing(it)) },
+        onEdit = { model.state.presented.editing.show(Editing.Existing(it)) },
         onHide = { id -> model.perform { it.hide(id) } },
-        onDelete = { model.state.deleting.show(DeleteTarget.One(it)) },
+        onDelete = { model.state.presented.deleting.show(DeleteTarget.One(it)) },
     )
 
     RecurringListFrame(
@@ -163,8 +163,8 @@ private fun RecurringNotices(
     model: RecurringListModel,
     modifier: Modifier = Modifier,
 ) {
-    val hiddenNotice = model.state.hidden
-    val deletedNotice = model.state.deleted
+    val hiddenNotice = model.state.notices.hidden
+    val deletedNotice = model.state.notices.deleted
 
     Column(
         modifier = modifier
@@ -194,13 +194,13 @@ private fun RecurringNotices(
             )
         }
 
-        if (model.state.errorNotice.message.isNotEmpty()) {
+        if (model.state.notices.error.message.isNotEmpty()) {
             Text(
-                text = model.state.errorNotice.message,
+                text = model.state.notices.error.message,
                 modifier = Modifier
                     .fillMaxWidth()
                     .card()
-                    .clickable(onClick = model.state.errorNotice::clear)
+                    .clickable(onClick = model.state.notices.error::clear)
                     .padding(12.dp),
                 color = Palette.rose,
                 style = textFont(style = FontTextStyle.Caption),
@@ -216,11 +216,11 @@ private fun EditingSheet(
     today: LocalDate,
 ) {
     AnimatedVisibility(
-        visible = model.state.editing.current != null,
+        visible = model.state.presented.editing.current != null,
         enter = slideInHorizontally { it },
         exit = slideOutHorizontally { it },
     ) {
-        val current = remember { model.state.editing.current }
+        val current = remember { model.state.presented.editing.current }
 
         if (current != null) {
             RecurringEditSheet(
@@ -228,7 +228,7 @@ private fun EditingSheet(
                 today = today,
                 type = model.state.type,
                 editingId = (current as? Editing.Existing)?.id,
-                onClose = { model.state.editing.close(current) },
+                onClose = { model.state.presented.editing.close(current) },
                 onDelete = model::receive,
                 onHide = { (current as? Editing.Existing)?.id?.let(model::receiveHidden) },
             )
@@ -287,7 +287,7 @@ private fun RecurringContent(
                 rows = model.output.hiddenRows,
                 isOpen = model.input.hiddenList.isClosed != true,
                 onToggle = { model.perform { it.toggleHiddenList() } },
-                onDeleteAll = { model.state.deleting.show(DeleteTarget.AllHidden) },
+                onDeleteAll = { model.state.presented.deleting.show(DeleteTarget.AllHidden) },
                 onEdit = actions.onEdit,
                 onShow = { id -> model.perform { it.show(id) } },
             )
@@ -305,7 +305,7 @@ private fun BottomAction(
     } else {
         PrimaryButton(
             title = "${model.state.type.title}の固定費を追加",
-            onClick = { model.state.editing.show(Editing.New) },
+            onClick = { model.state.presented.editing.show(Editing.New) },
             modifier = Modifier.fillMaxWidth(),
             icon = R.drawable.ic_add,
         )
@@ -314,14 +314,14 @@ private fun BottomAction(
 
 @Composable
 private fun DeleteConfirm(model: RecurringListModel) {
-    model.state.deleting.current?.let { target ->
+    model.state.presented.deleting.current?.let { target ->
         val isAll = target == DeleteTarget.AllHidden
 
         DeleteDialog(
             title = if (isAll) "非表示の固定費をまとめて削除しますか" else "この固定費を削除しますか",
             message = "これまでに作った記録は残ります",
             onConfirm = {
-                model.state.deleting.close(target)
+                model.state.presented.deleting.close(target)
 
                 model.perform {
                     when (target) {
@@ -330,7 +330,7 @@ private fun DeleteConfirm(model: RecurringListModel) {
                     }
                 }
             },
-            onDismiss = { model.state.deleting.close(target) },
+            onDismiss = { model.state.presented.deleting.close(target) },
         )
     }
 }

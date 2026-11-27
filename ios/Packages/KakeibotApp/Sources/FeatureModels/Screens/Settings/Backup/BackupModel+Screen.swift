@@ -9,6 +9,15 @@ public extension BackupModel {
         public var dialog = Shown<Dialog>()
     }
 
+    @MainActor
+    struct Notices: ScreenNotices {
+        public let error: ErrorNotice
+
+        init(wait: ScreenWait) {
+            self.error = ErrorNotice(wait: wait)
+        }
+    }
+
     enum Done: Hashable, Sendable {
         case exported
         case restored

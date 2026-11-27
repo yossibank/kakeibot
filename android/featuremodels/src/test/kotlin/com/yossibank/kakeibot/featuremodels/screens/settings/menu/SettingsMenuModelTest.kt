@@ -26,7 +26,7 @@ class SettingsMenuModelTest {
         ModelWait.until { model.input.weekStart == Weekday.wednesday }
 
         assertEquals(Weekday.wednesday, setup.database.setting(SettingKey.weekStart))
-        assertEquals("", model.state.errorNotice.message)
+        assertEquals("", model.state.notices.error.message)
     }
 
     @Test
@@ -39,7 +39,7 @@ class SettingsMenuModelTest {
 
         assertEquals(before, model.input.weekStart)
         assertEquals(before, setup.database.setting(SettingKey.weekStart))
-        assertEquals("設定を保存できませんでした", model.state.errorNotice.message)
+        assertEquals("設定を保存できませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -52,7 +52,7 @@ class SettingsMenuModelTest {
 
         assertEquals(MonthStartDay.first, model.input.monthStartDay)
         assertEquals(MonthStartDay.first, setup.database.setting(SettingKey.monthStartDay))
-        assertEquals("設定を保存できませんでした", model.state.errorNotice.message)
+        assertEquals("設定を保存できませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -67,7 +67,7 @@ class SettingsMenuModelTest {
         ModelWait.until { model.input.weekStart == Weekday.tuesday }
 
         assertEquals(Weekday.tuesday, setup.database.setting(SettingKey.weekStart))
-        assertEquals("設定を保存できませんでした", model.state.errorNotice.message)
+        assertEquals("設定を保存できませんでした", model.state.notices.error.message)
     }
 
     @Test
@@ -82,7 +82,7 @@ class SettingsMenuModelTest {
 
         assertEquals(Weekday.sunday, model.input.weekStart)
         assertEquals(Weekday.sunday, setup.database.setting(SettingKey.weekStart))
-        assertEquals(2, model.state.errorNotice.count)
+        assertEquals(2, model.state.notices.error.count)
     }
 
     @Test

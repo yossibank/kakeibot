@@ -77,25 +77,34 @@ class BudgetListModel(
         val amount: Int,
     )
 
+    class Notices(
+        wait: ScreenWait,
+    ) {
+        val error = ErrorNotice(wait)
+        val cleared = UndoNotice<Cleared>(wait)
+        val resetFrom = UndoNotice<YearMonth>(wait)
+    }
+
+    class Submodels {
+        var calculator by mutableStateOf(AmountCalculator())
+            internal set
+    }
+
     class State(
         wait: ScreenWait,
     ) {
-        val errorNotice = ErrorNotice(wait)
-        val task = ModelTask(errorNotice)
-        val cleared = UndoNotice<Cleared>(wait)
-        val resetFrom = UndoNotice<YearMonth>(wait)
+        val notices = Notices(wait)
+        val task = ModelTask(notices.error)
+        val submodels = Submodels()
 
         var editing: Target? by mutableStateOf(null)
-            private set
-
-        var calculator by mutableStateOf(AmountCalculator())
             private set
 
         fun startEditing(
             target: Target,
             amount: Int,
         ) {
-            calculator = AmountCalculator(amount = amount)
+            submodels.calculator = AmountCalculator(amount = amount)
             editing = target
         }
 
@@ -104,11 +113,11 @@ class BudgetListModel(
         }
 
         fun choose(suggestion: Suggestion) {
-            calculator = AmountCalculator(amount = suggestion.amount)
+            submodels.calculator = AmountCalculator(amount = suggestion.amount)
         }
 
         fun press(key: AmountCalculator.Key) {
-            calculator = calculator.press(key)
+            submodels.calculator = submodels.calculator.press(key)
         }
     }
 
@@ -173,10 +182,11 @@ class BudgetListModel(
             get() = state.editing?.let { amount(it.categoryId) }
 
         val canSave: Boolean
-            get() = state.calculator.amount > 0
+            get() = state.submodels.calculator.amount > 0
 
         val isChanged: Boolean
-            get() = state.editing != null && state.calculator.amount != (editingAmount ?: 0)
+            get() = state.editing != null &&
+                state.submodels.calculator.amount != (editingAmount ?: 0)
 
         fun amount(categoryId: Identifier<EntryCategory>?): Int? {
             val month = month ?: return null
@@ -214,7 +224,8 @@ class BudgetListModel(
         override val readyTitle: String
             get() = "${output.month?.month ?: ""}月からこの額にする"
 
-        override suspend fun store(): Unit? = if (setBudget(state.calculator.amount)) Unit else null
+        override suspend fun store(): Unit? =
+            if (setBudget(state.submodels.calculator.amount)) Unit else null
     }
 
     override suspend fun loadFold(fold: SettingsFoldInput) {
@@ -263,12 +274,12 @@ class BudgetListModel(
     }
 
     suspend fun finishEditing() {
-        if (!output.canSave || state.calculator.amount == output.editingAmount) {
+        if (!output.canSave || state.submodels.calculator.amount == output.editingAmount) {
             state.cancelEditing()
             return
         }
 
-        setBudget(state.calculator.amount)
+        setBudget(state.submodels.calculator.amount)
     }
 
     suspend fun clear(): Cleared? {
@@ -286,7 +297,7 @@ class BudgetListModel(
             month = month,
         )
 
-        state.cleared.show(cleared)
+        state.notices.cleared.show(cleared)
 
         return cleared
     }
@@ -312,7 +323,7 @@ class BudgetListModel(
             return null
         }
 
-        state.resetFrom.show(previous)
+        state.notices.resetFrom.show(previous)
 
         return previous
     }

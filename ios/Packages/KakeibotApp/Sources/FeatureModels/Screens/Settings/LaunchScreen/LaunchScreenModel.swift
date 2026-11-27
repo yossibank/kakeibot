@@ -38,7 +38,7 @@ public extension LaunchScreenModel {
         do {
             input.screen = try await dependencies.database.setting(.launchScreen)
         } catch {
-            state.errorNotice.show(SettingMessage.loadFailed)
+            state.notices.error.show(SettingMessage.loadFailed)
         }
     }
 

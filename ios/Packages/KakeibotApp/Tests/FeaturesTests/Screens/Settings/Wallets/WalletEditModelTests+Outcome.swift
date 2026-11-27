@@ -56,7 +56,7 @@ extension WalletEditModelTests {
         #expect(model.state.addedWallet == nil)
         #expect(model.flow.state.outcome.value == nil)
         #expect(!model.state.presented.paymentStep.isShowing(.asking))
-        #expect(model.state.errorNotice.message == "保存できませんでした")
+        #expect(model.state.notices.error.message == "保存できませんでした")
     }
 
     @Test
@@ -93,7 +93,7 @@ extension WalletEditModelTests {
 
         #expect(model.flow.state.outcome.value == nil)
         #expect(!model.flow.output.isHidden)
-        #expect(model.state.errorNotice.message == "最後の 1 つの口座は非表示にできません")
+        #expect(model.state.notices.error.message == "最後の 1 つの口座は非表示にできません")
     }
 
     @Test
@@ -154,7 +154,7 @@ extension WalletEditModelTests {
         let deletion = await model.deleteValuation(valuation.id)
 
         #expect(deletion != nil)
-        #expect(model.state.valuationDeletion.current?.id == deletion?.id)
+        #expect(model.state.notices.valuationDeletion.current?.id == deletion?.id)
     }
 }
 
