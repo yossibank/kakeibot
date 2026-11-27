@@ -1,7 +1,7 @@
 import Core
 import Foundation
 import GRDB
-import Store
+@testable import Store
 import Testing
 
 struct EntryListTests {

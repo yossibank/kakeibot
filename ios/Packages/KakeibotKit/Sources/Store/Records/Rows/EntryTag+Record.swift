@@ -10,3 +10,8 @@ extension EntryTag: ArchivableRecord {
         AppDatabase.CategoryWriteError.tagNotFound
     }
 }
+
+extension EntryTag: ArchivableRow {
+    public static let ordering = OrderedRowWrite<EntryTag>.sortable
+    public static let hiding = HidableRowWrite<EntryTag>.hidable
+}

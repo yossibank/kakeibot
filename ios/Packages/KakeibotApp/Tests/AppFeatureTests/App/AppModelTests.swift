@@ -3,7 +3,7 @@ import Core
 import Foundation
 import GRDB
 import Notifications
-import Store
+@testable import Store
 import Testing
 import TestSupport
 

@@ -26,4 +26,8 @@ extension Recurring: SortableRecord {
     }
 }
 
+extension Recurring: OrderedRow {
+    public static let ordering = OrderedRowWrite<Recurring>.sortable
+}
+
 extension HolidayShift: DatabaseValueConvertible {}

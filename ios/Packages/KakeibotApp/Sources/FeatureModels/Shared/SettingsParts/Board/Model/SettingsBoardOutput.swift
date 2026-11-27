@@ -33,7 +33,7 @@ public extension SettingsBoardOutput {
     }
 }
 
-public extension SettingsBoardOutput where Item: ArchivableRecord {
+public extension SettingsBoardOutput where Item: ArchivableRow {
     func isHidden(_ item: Item) -> Bool {
         item.archivedAt != nil
     }

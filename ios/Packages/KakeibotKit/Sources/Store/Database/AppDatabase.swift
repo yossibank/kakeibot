@@ -3,8 +3,7 @@ import Foundation
 import GRDB
 
 public struct AppDatabase: Sendable {
-    public let writer: any DatabaseWriter
-
+    let writer: any DatabaseWriter
     let entryListObservation: SharedValueObservation<EntryList>
 
     public init(_ writer: any DatabaseWriter) throws {

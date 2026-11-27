@@ -19,6 +19,12 @@ Android も同じ分け方で、画面のモデルを `:featuremodels` に置く
 
 `Features` は `Store` に依存しない。DB は `ScreenParts` に包んで受け取り、`FeatureModels` のモデルだけが開く。
 
+`Store` の外には、GRDB の型を見せない。
+
+- `AppDatabase` の `writer` は Store の中だけが使う。ほかのパッケージのテストは `@testable import Store` で読む。
+- 並べ替えと非表示は、`OrderedRow`・`HidableRow`・`ArchivableRow` で頼む。行の決まりの `HidableRecord`・`ArchivableRecord` は、Store の中だけで使う。
+- アイコン付きの保存の `IconBackedDraft` は、まだ GRDB の行の決まりを見せている。
+
 `Features` と `AppFeature` には `MemberImportVisibility` を付ける。import していないモジュールの関数は呼べない。`import Store` が `AppModel` の 4 ファイルだけなのは、`make verify` が確かめる。
 
 テストのターゲットを除いた依存は、次の図のとおりである。

@@ -1,7 +1,7 @@
 import Core
 import FeatureModels
 import Features
-import Store
+@testable import Store
 import Testing
 
 @MainActor

@@ -13,7 +13,7 @@ extension Wallet: ArchivableRecord {
         AppDatabase.WalletWriteError.walletNotFound
     }
 
-    public static func setHidden(
+    static func setHidden(
         _ id: ID,
         _ isHidden: Bool,
         in db: Database,
@@ -38,4 +38,9 @@ extension Wallet: IconBackedRecord {
     public static var iconNotFound: any Error {
         AppDatabase.WalletWriteError.iconNotFound
     }
+}
+
+extension Wallet: ArchivableRow {
+    public static let ordering = OrderedRowWrite<Wallet>.sortable
+    public static let hiding = HidableRowWrite<Wallet>.hidable
 }

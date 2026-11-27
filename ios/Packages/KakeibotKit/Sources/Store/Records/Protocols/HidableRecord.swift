@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-public protocol HidableRecord: SortableRecord {
+protocol HidableRecord: SortableRecord {
     static func setHidden(
         _ id: ID,
         _ isHidden: Bool,
