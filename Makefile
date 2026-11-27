@@ -87,6 +87,8 @@ verify: verify-docs
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py || { echo "NG claude-config に code-design-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt')
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/code-check-comments.py || { echo "NG claude-config に code-check-comments が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh code-comments python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-check-comments.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt' '*.kts' '*.sh' '*.yml' '*.yaml' '*.toml' Makefile '*/Makefile')
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py || { echo "NG claude-config に swift-layout-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh swift-layout python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-layout-check.py $$(git ls-files --cached --others --exclude-standard '*.swift')
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/kotlin-layout-check.py || { echo "NG claude-config に kotlin-layout-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
