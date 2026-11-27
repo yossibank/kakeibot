@@ -34,7 +34,7 @@ extension EntryItemSheet {
 
             SettingsField(
                 "品名",
-                text: Bindable(items.state).draft.name,
+                text: Bindable(items.state).fields.draft.name,
                 focus: $focus,
                 field: .name
             )
@@ -56,7 +56,7 @@ extension EntryItemSheet {
             equation
 
             Keypad(calculator: draft.activeCalculator, accessories: accessories) { key in
-                items.state.draft.press(key)
+                items.state.fields.draft.press(key)
             }
 
             PrimaryButton(draft.editing == nil ? "追加" : "変更") {
@@ -81,7 +81,7 @@ extension EntryItemSheet {
             return
         }
 
-        items.state.openIndex = nil
+        items.state.fields.openIndex = nil
         focus = nil
 
         withoutAnimation {
@@ -92,12 +92,12 @@ extension EntryItemSheet {
     }
 
     func remove(_ index: Int) {
-        items.state.openIndex = nil
+        items.state.fields.openIndex = nil
 
         if draft.isEditing(index) {
             resetInput()
         } else {
-            items.state.draft.shiftEditing(afterRemoving: index)
+            items.state.fields.draft.shiftEditing(afterRemoving: index)
         }
 
         withAnimation(.snappy) {
@@ -107,7 +107,7 @@ extension EntryItemSheet {
 
     func showSlip(scrollingTo index: Int) {
         withAnimation(.snappy) {
-            items.state.isSlipOpen = true
+            items.state.fields.isSlipOpen = true
         } completion: {
             items.scroll(to: index, in: model)
         }
@@ -144,7 +144,7 @@ private extension EntryItemSheet {
             }
 
             CapsulePicker(
-                selection: Bindable(items.state).draft.taxRate,
+                selection: Bindable(items.state).fields.draft.taxRate,
                 options: Self.taxOptions,
                 size: .small
             )
@@ -160,7 +160,7 @@ private extension EntryItemSheet {
         let isSelected = draft.target == target
 
         return Button {
-            items.state.draft.target = target
+            items.state.fields.draft.target = target
         } label: {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(label)
@@ -187,7 +187,7 @@ private extension EntryItemSheet {
 
     func suggestionButton(_ suggestion: String) -> some View {
         ChipButton {
-            items.state.draft.name = suggestion
+            items.state.fields.draft.name = suggestion
             focus = nil
         } content: {
             Text(suggestion)
@@ -210,10 +210,10 @@ private extension EntryItemSheet {
     var accessories: [Keypad.Accessory] {
         [
             Keypad.Accessory("値引", isActive: draft.isDiscount) {
-                items.state.draft.toggleDiscount()
+                items.state.fields.draft.toggleDiscount()
             },
             Keypad.Accessory("半額") {
-                items.state.draft.halveUnit()
+                items.state.fields.draft.halveUnit()
             }
         ]
     }
@@ -254,7 +254,7 @@ private extension EntryItemSheet {
             geometry.contentOffset.y > settledOffset(of: geometry) + 1
         else {
             withAnimation(.snappy) {
-                items.state.isSlipOpen = false
+                items.state.fields.isSlipOpen = false
             }
 
             return
@@ -264,7 +264,7 @@ private extension EntryItemSheet {
             layout.scrollPosition.scrollTo(y: settledOffset(of: geometry))
         } completion: {
             withAnimation(.snappy) {
-                items.state.isSlipOpen = false
+                items.state.fields.isSlipOpen = false
             }
         }
     }

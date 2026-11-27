@@ -44,10 +44,14 @@ public extension EntryReceiptFlow {
         case read(itemCount: Int, hasAmount: Bool)
     }
 
+    struct Fields: ScreenEditable {
+        public var hidesGuide = false
+    }
+
     @MainActor
     @Observable
     final class State {
-        public var hidesGuide = false
+        public var fields = Fields()
 
         public private(set) var step: Step?
         public private(set) var offer: String?
@@ -100,7 +104,7 @@ public extension EntryReceiptFlow {
     }
 
     func saveGuideChoice(for model: EntryModel) async {
-        guard state.hidesGuide else {
+        guard state.fields.hidesGuide else {
             return
         }
 
@@ -156,7 +160,7 @@ extension EntryReceiptFlow.State {
 
     func open(showsGuide: Bool) {
         offer = nil
-        hidesGuide = false
+        fields.hidesGuide = false
         step = showsGuide ? .guide : .camera
     }
 

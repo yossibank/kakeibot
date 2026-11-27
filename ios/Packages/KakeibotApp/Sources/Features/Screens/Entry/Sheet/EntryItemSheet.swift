@@ -53,7 +53,7 @@ extension EntryItemSheet {
     ]
 
     var draft: EntryItemModel.Draft {
-        items.state.draft
+        items.state.fields.draft
     }
 
     var showsRates: Bool {
@@ -90,7 +90,7 @@ private extension EntryItemSheet {
 
             receiptScroll
 
-            if items.state.isSlipOpen {
+            if items.state.fields.isSlipOpen {
                 slip
                     .onGeometryChange(for: CGFloat.self) { proxy in
                         proxy.size.height

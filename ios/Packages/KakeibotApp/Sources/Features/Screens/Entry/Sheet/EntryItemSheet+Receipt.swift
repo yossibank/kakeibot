@@ -127,14 +127,14 @@ extension EntryItemSheet {
         _ item: EntryItem.Draft,
         at index: Int
     ) -> some View {
-        let isEditing = items.state.isSlipOpen && draft.isEditing(index)
+        let isEditing = items.state.fields.isSlipOpen && draft.isEditing(index)
         let isSuspect = model.output.suspectItemIndices.contains(index)
         let isNegative = item.amount < 0
         let amountColor = isSuspect ? Palette.amber : isNegative ? Palette.rose : Palette.text
 
         return SwipeRow(
             id: index,
-            openId: Bindable(items.state).openIndex,
+            openId: Bindable(items.state).fields.openIndex,
             actionInset: 2
         ) {
             edit(index)
