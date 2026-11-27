@@ -34,7 +34,7 @@
 | 項目 | 決まり |
 | --- | --- |
 | `fields` | 入力・選んでいる物・開いている行を、`ScreenEditable` の struct の `Fields` に入れる |
-| 表示中のもの | シート・確認・パネルを `Shown<値>` に持つ。名前は `presented`・`prompt` で、重なって出る物だけ別の名前にする |
+| 表示中のもの | シートは `presented`、確認は `prompt`、パネルは `panel` の `Shown<値>` に持つ。重なって出る物だけ別の名前にする |
 | 渡し方 | `.sheet(item:)` には `Shown` の `item` を、確認には `shown[.x]` を渡す。入力は `Bindable(model.state).fields.x` で渡す |
 | ほかの値 | `public internal(set)` か `public private(set)` にする。今日のようにモデルが決める値は、画面が `setToday` などを呼ぶ |
 | 部品の値 | `ErrorNotice`・`UndoNotice`・アイコンの編集は `let` で持つ。設定の一覧の `SettingsBoardShown` は `public var` で持つ |
