@@ -245,23 +245,23 @@ private extension MainView {
         return Color.clear
             .padding(.leading, Self.noticeLeading(hasSidebar: hasSidebar))
             .entryNotice(notice, above: noticeAbove)
-            .deletionNotice(undo.state.deletion, bottom: noticeBottom) { deletion in
+            .deletionNotice(undo.state.notices.deletion, bottom: noticeBottom) { deletion in
                 undo.perform {
                     await $0.restore(deletion)
                 }
             }
-            .errorBanner(undo.state.errorNotice, bottom: noticeBottom)
+            .errorBanner(undo.state.notices.error, bottom: noticeBottom)
             .onChange(of: notice.state.notice) { _, new in
                 if new != nil {
                     replaceNotices(with: .entry)
                 }
             }
-            .onChange(of: undo.state.deletion.id) { _, new in
+            .onChange(of: undo.state.notices.deletion.id) { _, new in
                 if new != nil {
                     replaceNotices(with: .deletion)
                 }
             }
-            .onChange(of: undo.state.errorNotice.count) {
+            .onChange(of: undo.state.notices.error.count) {
                 replaceNotices(with: .undoError)
             }
             .onChange(of: tabErrorCounts) {
@@ -303,11 +303,11 @@ private extension MainView {
         }
 
         if source != .deletion {
-            model.state.notices.undo.state.deletion.dismiss()
+            model.state.notices.undo.state.notices.deletion.dismiss()
         }
 
         if source != .undoError {
-            model.state.notices.undo.state.errorNotice.clear()
+            model.state.notices.undo.state.notices.error.clear()
         }
 
         if source != .tab {

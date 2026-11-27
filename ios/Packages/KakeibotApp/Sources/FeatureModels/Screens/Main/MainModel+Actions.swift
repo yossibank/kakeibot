@@ -74,7 +74,7 @@ public extension MainModel {
     }
 
     func receive(_ deletion: Deletion) {
-        state.notices.undo.state.deletion.show(deletion)
+        state.notices.undo.state.notices.deletion.show(deletion)
     }
 
     func addEntry(on date: LocalDate) {
@@ -100,7 +100,7 @@ public extension MainModel {
 
     @discardableResult
     func setToday(_ today: LocalDate) -> Task<Void, Never> {
-        state.submodels.draft.state.today = today
+        state.submodels.draft.setToday(today)
         input.today = today
         return prepareDraft()
     }
