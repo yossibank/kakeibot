@@ -2,7 +2,8 @@
 
 > [!NOTE]
 > 画面のモデルの `State` に、何をどの名前で置くかが分かる。
-> 部品は [architecture-parts](architecture-parts.md)、画面が書く値は [architecture-screens-flow](architecture-screens-flow.md#-画面がモデルに書く値) にある。
+> 部品は [architecture-parts](architecture-parts.md) にある。
+> 画面が書く値は [architecture-screens-flow](architecture-screens-flow.md#-画面がモデルに書く値) にある。
 
 ## 🗺️ State の枠
 
@@ -19,9 +20,17 @@
 
 ## 📏 直下に置ける物
 
-`State` の直下には、枠と部品の型（`ObservationRound` など）と、振る舞いを持つ値の型だけを置く。値の型は 1 概念 1 プロパティで置き、Swift は `private(set)` か `internal(set)`、Kotlin は `private set` にする。
+`State` の直下に置ける物は、次のものだけである。
 
-裸の値は直下に置かない。裸の値は `Bool`・数・文字列・日付と、その Optional・配列・Set である。次の行き先に送る。
+- 枠
+- 部品の型（`ObservationRound` など）
+- 振る舞いを持つ値の型（1 概念 1 プロパティ）
+
+書けるのはモデルだけにする。Swift は `private(set)` か `internal(set)` にする。Kotlin は `private set` にする。
+
+裸の値は直下に置かない。裸の値とは、`Bool`・数・文字列・日付のことである。その Optional・配列・Set も含む。
+
+裸の値は、次の行き先に送る。
 
 | 値の種類 | 例 | 行き先 |
 | --- | --- | --- |
