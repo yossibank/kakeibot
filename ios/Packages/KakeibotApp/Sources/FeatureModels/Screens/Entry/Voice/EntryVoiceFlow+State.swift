@@ -31,6 +31,7 @@ public extension EntryVoiceFlow {
         public internal(set) var presented = Presented()
 
         public let notices: Notices
+        public let task = ModelTask()
 
         public private(set) var silence = Silence()
         public private(set) var rounds = Rounds()
@@ -49,12 +50,6 @@ public extension EntryVoiceFlow {
         public internal(set) var levels = EntryVoiceFlow.quietLevels
 
         public let silenceDuration: TimeInterval
-
-        @ObservationIgnored var source: (any EntryVoiceSource)?
-        @ObservationIgnored var session: Session?
-        @ObservationIgnored var lastVoice: Date?
-        @ObservationIgnored var silenceTask: Task<Void, Never>?
-        @ObservationIgnored var isStarting = false
 
         init(silenceDuration: TimeInterval) {
             self.silenceDuration = silenceDuration
@@ -79,6 +74,14 @@ public extension EntryVoiceFlow {
         let model: EntryModel
         let today: LocalDate
         let onApplied: @MainActor () -> Void
+    }
+
+    @MainActor
+    internal final class Runtime {
+        var source: (any EntryVoiceSource)?
+        var session: Session?
+        var lastVoice: Date?
+        var silenceTask: Task<Void, Never>?
     }
 }
 

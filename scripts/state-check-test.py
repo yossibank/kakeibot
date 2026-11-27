@@ -37,6 +37,28 @@ public final class EntryModel {
             notices = Notices()
         }
     }
+
+    @MainActor
+    @Observable
+    final class Input {
+        public internal(set) var isAvailable = false
+        public internal(set) var isFetching = false
+        public internal(set) var cardClosed: Bool?
+        public let silenceDuration: TimeInterval
+
+        @ObservationIgnored var latest: AssetsSummary.Input
+        @ObservationIgnored var permission = NotificationPermission.allowed
+//INPUT
+
+        var isEmpty: Bool {
+            latest.isEmpty
+        }
+    }
+
+    final class Runtime {
+        var silenceTask: Task<Void, Never>?
+        var isStarting = false
+    }
 }
 """
 KOTLIN_SOURCE = """
@@ -66,6 +88,22 @@ class EntryModel {
             val amount: Int = 0,
         )
     }
+
+    class Input(
+        val isAvailable: Boolean,
+        today: LocalDate,
+    ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
+        var isHidden: Boolean by mutableStateOf(false)
+            internal set
+//INPUT
+    }
+
+    private class Runtime {
+        var silenceJob: Job? = null
+    }
 }
 """
 SWIFT_CASES = [
@@ -85,6 +123,16 @@ KOTLIN_CASES = [
     ("直下のエラー", "        val error = ErrorNotice()", "知らせは State の直下に置かず"),
     ("private set の無い var", "        var tabs: TabSelection by mutableStateOf(TabSelection())", "（private set）"),
 ]
+SWIFT_INPUT_CASES = [
+    ("Input の Task", "        @ObservationIgnored var silenceTask: Task<Void, Never>?", "動いている Task と Job は Input に置かない"),
+    ("Input の実行中の印", "        @ObservationIgnored var isRefreshing = false", "実行中の印と、走らせ直すための印は Input に置かない"),
+    ("Input の走らせ直す印", "        var needsRefresh: Bool = false", "実行中の印と、走らせ直すための印は Input に置かない"),
+    ("Input の見ない Bool", "        @ObservationIgnored\n        var isReady = false", "実行中の印と、走らせ直すための印は Input に置かない"),
+]
+KOTLIN_INPUT_CASES = [
+    ("Input の Job", "        var job: Job? = null", "動いている Task と Job は Input に置かない"),
+    ("Input の実行中の印", "        var isStarting: Boolean by mutableStateOf(false)\n            internal set", "実行中の印と、走らせ直すための印は Input に置かない"),
+]
 
 
 def write(root, relative, text):
@@ -94,10 +142,10 @@ def write(root, relative, text):
         file.write(text)
 
 
-def run(swift_member="", kotlin_member=""):
+def run(swift_member="", kotlin_member="", swift_input="", kotlin_input=""):
     with tempfile.TemporaryDirectory() as root:
-        write(root, SWIFT, SWIFT_SOURCE.replace("//MEMBER", swift_member))
-        write(root, KOTLIN, KOTLIN_SOURCE.replace("//MEMBER", kotlin_member))
+        write(root, SWIFT, SWIFT_SOURCE.replace("//MEMBER", swift_member).replace("//INPUT", swift_input))
+        write(root, KOTLIN, KOTLIN_SOURCE.replace("//MEMBER", kotlin_member).replace("//INPUT", kotlin_input))
         command = [sys.executable, "-I", CHECK, "--root", root]
         return subprocess.run(command, capture_output=True, text=True, check=False)
 
@@ -107,10 +155,12 @@ def main():
     result = run()
 
     if result.returncode != 0 or result.stdout.strip():
-        failures.append(f"error: 正しい State: 出力が違う\n{result.stdout}{result.stderr}")
+        failures.append(f"error: 正しい State と Input: 出力が違う\n{result.stdout}{result.stderr}")
 
     cases = [(name, {"swift_member": member}, expected) for name, member, expected in SWIFT_CASES]
     cases += [(name, {"kotlin_member": member}, expected) for name, member, expected in KOTLIN_CASES]
+    cases += [(name, {"swift_input": member}, expected) for name, member, expected in SWIFT_INPUT_CASES]
+    cases += [(name, {"kotlin_input": member}, expected) for name, member, expected in KOTLIN_INPUT_CASES]
 
     for name, members, expected in cases:
         result = run(**members)

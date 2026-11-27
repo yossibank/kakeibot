@@ -48,7 +48,7 @@ public extension ProPurchaseModel {
 
         public internal(set) var outcome = ScreenOutcome<Work>()
 
-        public let task = ModelTask()
+        public let task = ModelTask<Work>()
 
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)

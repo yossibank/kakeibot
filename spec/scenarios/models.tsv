@@ -314,6 +314,8 @@ assets-entry-sheet.*	AssetsEntrySheetTests/*		未移植	カードごとの未払
 assets-wallet-section.splits-owned-and-owed-totals	AssetsWalletSectionTests/splitsOwnedAndOwedTotals		未確認	Android も資産と負債に分けるが、合計のテストが無い
 assets-wallet-section.shares-all-to-owned-without-balances	AssetsWalletSectionTests/sharesAllToOwnedWithoutBalances		未移植	資産と負債の割合の棒が、資産の画面に無い
 assets-wallet-section.counts-unpaid-across-cards	AssetsWalletSectionTests/countsUnpaidAcrossCards		未移植	資産の行に、カードの未払いの内訳が無い
+refresh-gate.runs-once-more-for-requests-while-running	RefreshGateTests/runsOnceMoreForRequestsWhileRunning		iOSのみ	Android は残高を derivedStateOf で出し、作り直しをまとめる要が無い
+refresh-gate.starts-again-after-stopping	RefreshGateTests/startsAgainAfterStopping		iOSのみ	Android は残高を derivedStateOf で出し、作り直しをまとめる要が無い
 records.shows-adjustment-on-its-day-without-totals	RecordsModelTests/showsAdjustmentOnItsDayWithoutTotals		未移植	残高の調整を記録の画面に出す機能が、モデルにも画面にも無い
 records.hides-adjustments-while-filtering	RecordsModelTests/hidesAdjustmentsWhileFiltering		未移植	残高の調整の行も絞り込みも、記録のモデルと画面に無い
 records.deletes-adjustment-with-undo	RecordsModelTests/deletesAdjustmentWithUndo		未移植	残高の調整を消す・元に戻す操作が、記録のモデルと画面に無い
@@ -403,6 +405,7 @@ review.scales-balance-bars-to-larger-expense		ReviewModelTest/scalesBalanceBarsT
 review.keeps-selection-only-after-saving		ReviewModelTest/keepsSelectionOnlyAfterSaving	Androidのみ	選んだだけでは保存せず、saveSelection で保存する。iOS にテストは無い
 review.reads-saved-selection-when-observing		ReviewModelTest/readsSavedSelectionWhenObserving	Androidのみ	observe の初めに保存済みの選択を読む。iOS にテストは無い
 review.leaves-out-categories-missing-from-list		ReviewModelTest/leavesOutCategoriesMissingFromList	Androidのみ	一覧に無いカテゴリを内訳から落とす。iOS にテストは無い
+comment-requests.begins-each-key-once-until-cancelled	CommentRequestsTests/beginsEachKeyOnceUntilCancelled		iOSのみ	振り返りの文を Apple の FoundationModels で書く仕組みで、Android に相手が無い
 period-cursor.moves-back-and-stops-at-current	PeriodCursorTests/movesBackAndStopsAtCurrent	PeriodCursorTest/movesBackAndForward PeriodCursorTest/staysWhenMovingPastCurrent	対応	Android は動く向きを持たない
 period-cursor.returns-to-current-moving-forward	PeriodCursorTests/returnsToCurrentMovingForward		未移植	Android の PeriodCursor に、今の期間へ戻す関数が無い
 period-cursor.restarts-with-given-direction	PeriodCursorTests/restartsWithGivenDirection	PeriodCursorTest/restartsAtCurrent	対応	Android は動く向きを持たない

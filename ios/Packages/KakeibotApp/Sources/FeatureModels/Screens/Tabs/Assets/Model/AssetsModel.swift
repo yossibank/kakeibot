@@ -59,6 +59,8 @@ public extension AssetsModel {
 
         public let notices: Notices
 
+        public internal(set) var refresh = RefreshGate()
+
         init(wait: ScreenWait) {
             self.notices = Notices(wait: wait)
         }
@@ -73,8 +75,6 @@ public extension AssetsModel {
         var summary: AssetsSummary
 
         @ObservationIgnored var latest: AssetsSummary.Input
-        @ObservationIgnored var isRefreshing = false
-        @ObservationIgnored var needsRefresh = false
 
         init(today: LocalDate) {
             let latest = AssetsSummary.Input(today: today)
@@ -157,23 +157,12 @@ private extension AssetsModel {
     }
 
     func refresh() async {
-        input.needsRefresh = true
-
-        guard !input.isRefreshing else {
+        guard state.refresh.request() else {
             return
         }
 
-        input.isRefreshing = true
-
-        defer {
-            input.isRefreshing = false
-        }
-
-        while input.needsRefresh {
-            input.needsRefresh = false
-
+        while state.refresh.next() {
             let summary = await AssetsSummary.make(input.latest)
-
             input.summary = summary
             state.fields.billPage = BillPage.clamped(state.fields.billPage, in: summary.billPages)
         }

@@ -234,7 +234,7 @@ extension SyncModelTests {
         let item = try await firstShare(in: setup.database)
         await model.open(item)
 
-        await model.state.task.attempt(SyncModel.Work.sharing(item.wallet.id)) {
+        await model.state.task.attempt(.sharing(item.wallet.id)) {
             await model.confirmInvitation()
         }
 

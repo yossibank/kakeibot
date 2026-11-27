@@ -1,12 +1,26 @@
 import Observation
 
+/// 実行中の印。どれを実行中かを見る時は、鍵の型を `ModelTask<Work>()` で決める。
+/// 鍵の要らない時は `ModelTask()` と書き、鍵の型は `Never` になる。
 @MainActor
 @Observable
-public final class ModelTask {
+public final class ModelTask<Key: Hashable & Sendable> {
     private var running = 0
-    private var keys: [AnyHashable: Int] = [:]
+    private var keys: [Key: Int]
 
-    public init() {}
+    public convenience init() {
+        self.init(keys: [:])
+    }
+
+    private init(keys: [Key: Int]) {
+        self.keys = keys
+    }
+}
+
+public extension ModelTask where Key == Never {
+    convenience init() {
+        self.init(keys: [:])
+    }
 }
 
 public extension ModelTask {
@@ -14,12 +28,12 @@ public extension ModelTask {
         running > 0
     }
 
-    func isRunning(_ key: some Hashable & Sendable) -> Bool {
-        keys[AnyHashable(key)] != nil
+    func isRunning(_ key: Key) -> Bool {
+        keys[key] != nil
     }
 
-    func isRunning<Key: Hashable & Sendable>(where matches: (Key) -> Bool) -> Bool {
-        keys.keys.contains { ($0.base as? Key).map(matches) ?? false }
+    func isRunning(where matches: (Key) -> Bool) -> Bool {
+        keys.keys.contains(where: matches)
     }
 
     @discardableResult
@@ -35,11 +49,9 @@ public extension ModelTask {
 
     @discardableResult
     func attempt<Value>(
-        _ key: some Hashable & Sendable,
+        _ key: Key,
         _ action: @MainActor () async throws -> Value
     ) async rethrows -> Value {
-        let key = AnyHashable(key)
-
         keys[key, default: 0] += 1
 
         defer {
