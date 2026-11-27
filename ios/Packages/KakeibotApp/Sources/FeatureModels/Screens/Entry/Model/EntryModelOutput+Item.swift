@@ -58,13 +58,10 @@ public extension EntryModel.Output {
     }
 
     func itemNameSuggestions(for text: String) -> [String] {
-        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        let recent = input.recentItemNames
-
-        let names = text.isEmpty
-            ? recent
-            : recent.filter { $0 != text && $0.localizedStandardContains(text) }
-
-        return Array(names.prefix(EntryModel.itemSuggestionLimit))
+        EntryModel.suggestions(
+            from: input.recentItemNames,
+            for: text,
+            limit: EntryModel.itemSuggestionLimit
+        )
     }
 }

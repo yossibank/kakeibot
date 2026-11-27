@@ -23,7 +23,9 @@ public extension EntryModel.Output {
             .filter { $0.archivedAt == nil }
             .map(\.name)
 
-        let memos: [String] = input.recentMemos.compactMap { memo in
+        let recentMemos = input.recentMemos.prefix(EntryModel.memoSuggestionLimit)
+
+        let memos: [String] = recentMemos.compactMap { memo in
             memo.split(whereSeparator: \.isNewline).first.map(String.init)
         }
 

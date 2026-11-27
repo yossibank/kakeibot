@@ -28,6 +28,14 @@ public extension EntryModel.Output {
         }
     }
 
+    var memoSuggestions: [String] {
+        EntryModel.suggestions(
+            from: input.recentMemos,
+            for: state.fields.memo,
+            limit: EntryModel.memoSuggestionLimit
+        )
+    }
+
     var typeName: String {
         state.type.name
     }
