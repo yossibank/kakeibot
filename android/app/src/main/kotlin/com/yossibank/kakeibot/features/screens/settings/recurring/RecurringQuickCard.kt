@@ -74,7 +74,7 @@ fun RecurringQuickCard(
             )
         }
 
-        if (model.state.form.type != Entry.Kind.transfer) {
+        if (model.state.fields.form.type != Entry.Kind.transfer) {
             SettingsDivider()
 
             Section(title = "カテゴリ") {
@@ -87,7 +87,7 @@ fun RecurringQuickCard(
         Section(title = model.output.walletTitle) {
             WalletChips(
                 model = model,
-                selection = model.state.form.walletId,
+                selection = model.state.fields.form.walletId,
                 onSelect = { model.state.select(wallet = it) },
             )
 
@@ -96,7 +96,7 @@ fun RecurringQuickCard(
             }
         }
 
-        if (model.state.form.type == Entry.Kind.transfer) {
+        if (model.state.fields.form.type == Entry.Kind.transfer) {
             SettingsDivider()
 
             Section(title = EntryText.destinationTitle) {
@@ -207,7 +207,7 @@ private fun CategoryGrid(model: RecurringEditModel) {
         model.output.categories.forEach { category ->
             ChoiceChip(
                 title = category.name,
-                isSelected = category.id == model.state.form.categoryId,
+                isSelected = category.id == model.state.fields.form.categoryId,
                 onSelect = { model.select(category = category.id) },
             ) {
                 IconTile(
@@ -245,7 +245,7 @@ private fun WalletChips(
 private fun DestinationGrid(model: RecurringEditModel) {
     WalletChips(
         model = model,
-        selection = model.state.form.toWalletId,
+        selection = model.state.fields.form.toWalletId,
         onSelect = { id -> model.state.update { copy(toWalletId = id) } },
     )
 }
@@ -267,7 +267,7 @@ private fun BillShiftChips(model: RecurringEditModel) {
 
                 ChoiceChip(
                     title = date?.let { "$title・${Recurring.billText(paidOn = it)}" } ?: title,
-                    isSelected = model.state.form.billShift == index,
+                    isSelected = model.state.fields.form.billShift == index,
                     onSelect = { model.state.update { copy(billShift = index) } },
                 )
             }
@@ -307,9 +307,9 @@ private fun ScheduleHeader(model: RecurringEditModel) {
 
         Text(
             text = RecurringText.schedule(
-                frequency = model.state.form.frequency,
-                month = model.state.form.month,
-                day = model.state.form.day,
+                frequency = model.state.fields.form.frequency,
+                month = model.state.fields.form.month,
+                day = model.state.fields.form.day,
             ),
             color = Palette.accentStrong,
             style = textFont(style = FontTextStyle.Footnote),
@@ -331,13 +331,13 @@ private fun ScheduleHeader(model: RecurringEditModel) {
 @Composable
 private fun ScheduleChooser(model: RecurringEditModel) {
     SegmentSwitch(
-        selection = model.state.form.frequency,
+        selection = model.state.fields.form.frequency,
         options = frequencies,
         onSelect = { frequency -> model.state.update { copy(frequency = frequency) } },
         modifier = Modifier.fillMaxWidth(),
     )
 
-    if (model.state.form.frequency == Recurring.Frequency.yearly) {
+    if (model.state.fields.form.frequency == Recurring.Frequency.yearly) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -345,7 +345,7 @@ private fun ScheduleChooser(model: RecurringEditModel) {
             (1..12).forEach { month ->
                 ChoiceChip(
                     title = "$month 月",
-                    isSelected = model.state.form.month == month,
+                    isSelected = model.state.fields.form.month == month,
                     onSelect = { model.state.update { copy(month = month) } },
                     modifier = Modifier.widthIn(min = 64.dp),
                 )
@@ -354,7 +354,7 @@ private fun ScheduleChooser(model: RecurringEditModel) {
     }
 
     DayGrid(
-        selection = model.state.form.day,
+        selection = model.state.fields.form.day,
         onSelect = { day -> model.state.update { copy(day = day) } },
     )
 }

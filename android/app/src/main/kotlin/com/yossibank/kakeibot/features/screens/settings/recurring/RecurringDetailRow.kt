@@ -26,7 +26,7 @@ val RecurringEditModel.detailRows: List<RecurringDetailRow>
 
 private val RecurringEditModel.transferRows: List<RecurringDetailRow>
     get() {
-        if (state.form.type != Entry.Kind.transfer) {
+        if (state.fields.form.type != Entry.Kind.transfer) {
             return emptyList()
         }
 
@@ -71,8 +71,8 @@ private val RecurringEditModel.closingRow: RecurringDetailRow?
         return RecurringDetailRow(
             panel = RecurringPanel.Closing,
             icon = R.drawable.ic_card,
-            value = RecurringText.closingDay(state.form.closingDay),
-            isEmpty = state.form.closingDay == null,
+            value = RecurringText.closingDay(state.fields.form.closingDay),
+            isEmpty = state.fields.form.closingDay == null,
         )
     }
 
@@ -84,7 +84,7 @@ private val RecurringEditModel.scheduleRows: List<RecurringDetailRow>
             RecurringDetailRow(
                 panel = RecurringPanel.Start,
                 icon = R.drawable.ic_calendar,
-                value = RecurringText.date(state.form.startDate),
+                value = RecurringText.date(state.fields.form.startDate),
                 isEmpty = false,
             ),
             RecurringDetailRow(
@@ -96,14 +96,14 @@ private val RecurringEditModel.scheduleRows: List<RecurringDetailRow>
             RecurringDetailRow(
                 panel = RecurringPanel.Holiday,
                 icon = R.drawable.ic_calendar,
-                value = state.form.holidayShift.title,
-                isEmpty = state.form.holidayShift == HolidayShift.none,
+                value = state.fields.form.holidayShift.title,
+                isEmpty = state.fields.form.holidayShift == HolidayShift.none,
             ),
             RecurringDetailRow(
                 panel = RecurringPanel.Remind,
                 icon = R.drawable.ic_bell,
-                value = RecurringText.remind(state.form.remindDaysBefore),
-                isEmpty = state.form.remindDaysBefore == null,
+                value = RecurringText.remind(state.fields.form.remindDaysBefore),
+                isEmpty = state.fields.form.remindDaysBefore == null,
             ),
         )
     }

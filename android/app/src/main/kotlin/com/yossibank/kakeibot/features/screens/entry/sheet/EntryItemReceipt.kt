@@ -67,7 +67,6 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.amount
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.hasItemAdjustment
@@ -76,6 +75,7 @@ import com.yossibank.kakeibot.featuremodels.screens.entry.model.itemTotals
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.setStore
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.setTaxIncluded
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.store
+import com.yossibank.kakeibot.featuremodels.screens.entry.sheet.EntryItemModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import com.yossibank.kakeibot.featuremodels.shared.period.PeriodText
 import kotlinx.coroutines.delay
@@ -83,7 +83,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun EntryItemReceipt(
     model: EntryModel,
-    editor: EntryItemEditor,
+    items: EntryItemModel,
 ) {
     val totals = model.output.itemTotals
     val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(8.dp))
@@ -109,7 +109,7 @@ fun EntryItemReceipt(
 
         ReceiptItems(
             model = model,
-            editor = editor,
+            items = items,
         )
 
         Hairline(color = Palette.paperEdge)
@@ -138,7 +138,7 @@ private fun ReceiptHeader(model: EntryModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        val date = model.state.form.date
+        val date = model.state.fields.form.date
 
         Text(
             text = "${date.year}/${PeriodText.weekdayDate(date)}",
@@ -153,9 +153,9 @@ private fun ReceiptHeader(model: EntryModel) {
 @Composable
 private fun ReceiptItems(
     model: EntryModel,
-    editor: EntryItemEditor,
+    items: EntryItemModel,
 ) {
-    if (model.state.form.items.isEmpty()) {
+    if (model.state.fields.form.items.isEmpty()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -177,14 +177,17 @@ private fun ReceiptItems(
         }
     } else {
         Column {
-            model.state.form.items.forEachIndexed { index, item ->
+            model.state.fields.form.items.forEachIndexed { index, item ->
                 key(index, item) {
                     ItemRow(
                         item = item,
-                        isEditing = editor.isOpen && editor.editingIndex == index,
-                        showsRate = model.state.form.items.map { it.taxRate }.toSet().size > 1,
-                        onSelect = { editor.edit(index, item) },
-                        onRemove = { editor.remove(model, index) },
+                        isEditing =
+                            items.state.presented.isSlipOpen &&
+                                items.state.fields.draft.isEditing(index),
+                        showsRate =
+                            model.state.fields.form.items.map { it.taxRate }.toSet().size > 1,
+                        onSelect = { items.edit(index, item) },
+                        onRemove = { items.remove(model, index) },
                     )
                 }
             }
@@ -206,7 +209,7 @@ private fun ReceiptSummary(
         TaxModeLine(model = model)
 
         totals.taxes.forEach { tax ->
-            val title = if (model.state.form.taxIncluded) "内消費税" else "消費税"
+            val title = if (model.state.fields.form.taxIncluded) "内消費税" else "消費税"
 
             SummaryLine(
                 title = "${tax.rate.rawValue}%対象 ${AmountText.text(tax.base.toInt())}",
@@ -228,7 +231,7 @@ private fun TaxModeLine(model: EntryModel) {
         )
 
         SegmentSwitch(
-            selection = model.state.form.taxIncluded,
+            selection = model.state.fields.form.taxIncluded,
             options = listOf(false to "外税", true to "内税"),
             onSelect = model::setTaxIncluded,
         )
@@ -261,7 +264,7 @@ private fun ReceiptTotal(model: EntryModel) {
 
 @Composable
 private fun ReceiptCount(model: EntryModel) {
-    if (model.state.form.items.isNotEmpty()) {
+    if (model.state.fields.form.items.isNotEmpty()) {
         Row {
             Text(
                 text = "お買上点数",

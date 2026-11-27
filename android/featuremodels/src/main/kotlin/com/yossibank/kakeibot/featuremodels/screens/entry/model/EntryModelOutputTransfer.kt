@@ -54,7 +54,7 @@ fun EntryModel.Output.balance(of: Wallet): Long? {
 
 val EntryModel.Output.isOverSourceBalance: Boolean
     get() {
-        if (state.form.type != Entry.Kind.transfer || amount <= 0) {
+        if (state.fields.form.type != Entry.Kind.transfer || amount <= 0) {
             return false
         }
 
@@ -68,7 +68,7 @@ val EntryModel.Output.loanRemaining: Long?
         val wallet = toWallet ?: return null
         val balance = balance(of = wallet) ?: return null
 
-        if (state.form.type != Entry.Kind.transfer || wallet.kind != Wallet.Kind.loan ||
+        if (state.fields.form.type != Entry.Kind.transfer || wallet.kind != Wallet.Kind.loan ||
             balance >= 0
         ) {
             return null
@@ -91,7 +91,7 @@ fun EntryModel.Output.afterLine(
     of: Wallet,
     isSource: Boolean,
 ): BalanceLine? {
-    if (state.form.type != Entry.Kind.transfer || amount <= 0) {
+    if (state.fields.form.type != Entry.Kind.transfer || amount <= 0) {
         return null
     }
 

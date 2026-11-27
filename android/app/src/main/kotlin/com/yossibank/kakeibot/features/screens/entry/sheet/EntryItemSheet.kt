@@ -67,22 +67,20 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
-import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
+import com.yossibank.kakeibot.featuremodels.screens.entry.sheet.EntryItemModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun EntryItemSheet(
-    parts: ScreenParts,
     model: EntryModel,
     onClose: () -> Unit,
 ) {
-    val editor = remember(model) { EntryItemEditor(wait = parts.wait) }
+    val items = model.state.submodels.items
 
     BackHandler {
-        if (editor.isOpen) {
-            editor.close()
+        if (items.state.presented.isSlipOpen) {
+            items.state.close()
         } else {
             onClose()
         }
@@ -111,23 +109,23 @@ fun EntryItemSheet(
             ) {
                 EntryItemReceipt(
                     model = model,
-                    editor = editor,
+                    items = items,
                 )
             }
 
-            if (editor.isOpen) {
+            if (items.state.presented.isSlipOpen) {
                 EntryItemSlip(
                     model = model,
-                    editor = editor,
+                    items = items,
                 )
             } else {
-                AddBar(onAdd = { editor.open(model) })
+                AddBar(onAdd = { items.open(model) })
             }
         }
 
         ItemUndoNotice(
             model = model,
-            editor = editor,
+            items = items,
         )
     }
 }
@@ -167,9 +165,9 @@ private fun SheetHeader(onClose: () -> Unit) {
 @Composable
 private fun BoxScope.ItemUndoNotice(
     model: EntryModel,
-    editor: EntryItemEditor,
+    items: EntryItemModel,
 ) {
-    if (editor.removed.current != null) {
+    if (items.state.notices.removed.current != null) {
         UndoNotice(
             title = "品目を消しました",
             icon = R.drawable.ic_trash,
@@ -181,7 +179,7 @@ private fun BoxScope.ItemUndoNotice(
                     end = 20.dp,
                     bottom = 76.dp,
                 ),
-            onUndo = { editor.restore(model) },
+            onUndo = { items.restore(model) },
         )
     }
 }

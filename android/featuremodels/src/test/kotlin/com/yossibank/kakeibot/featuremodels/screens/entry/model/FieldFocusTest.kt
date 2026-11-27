@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 class FieldFocusTest {
     @Test
     fun startsOnCategoryMovingForward() {
-        val focus = EntryModel.FieldFocus()
+        val focus = FieldFocus()
 
         assertEquals(EntryModel.Field.Category, focus.field)
         assertTrue(focus.isForward)
@@ -17,7 +17,7 @@ class FieldFocusTest {
 
     @Test
     fun movesBackwardToAnEarlierField() {
-        val focus = EntryModel.FieldFocus()
+        val focus = FieldFocus()
             .moved(to = EntryModel.Field.Amount, type = Entry.Kind.expense)
             .moved(to = EntryModel.Field.Category, type = Entry.Kind.expense)
 
@@ -27,7 +27,7 @@ class FieldFocusTest {
 
     @Test
     fun sendsTransferOnlyFieldsToAmountOutsideTransfers() {
-        val focus = EntryModel.FieldFocus()
+        val focus = FieldFocus()
             .moved(to = EntryModel.Field.Fee, type = Entry.Kind.expense)
 
         assertEquals(EntryModel.Field.Amount, focus.field)

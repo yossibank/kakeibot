@@ -78,8 +78,8 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 操作の置き場所 | 状態だけを変える操作は `State` の関数に置く。DB や `output` が要る操作は、モデルの関数に置く |
 | 分けたファイル | `Output` の計算は、`EntryModelOutputText.kt` のように拡張プロパティのファイルへ出す |
 | 画面からの読み方 | `model.state.x`・`model.input.x`・`model.output.x` の形で読む。モデルに転送のプロパティを足さない |
-| 入力の下書き | 1 つの `data class` にまとめ、`State` の `update` で書き換える。`EntryForm`・`RecurringEditForm` が当たる |
-| 下書きの決まり | 口座・カテゴリ・日付を変えた時の消し込みは、下書きの型の関数に置く |
+| 入力の下書き | 1 つの `data class` にまとめ、`fields.form` に持つ。`EntryForm`・`RecurringEditForm`・`EntryTemplateDraft` が当たる |
+| 下書きの決まり | 書き換えは `State` の `update` に通す。口座・カテゴリ・日付を変えた時の消し込みは、下書きの型の関数に置く |
 | 保存と読み込みの失敗 | `State` の `task`（`featuremodels/shared/model/` の `ModelTask`）に通す。失敗の文は、`notices` の枠を持つモデルが `notices.error`、ほかが `errorNotice` に持つ |
 | 失敗の知らせの消え方 | 押すか、出してから 6 秒たつと消える。入力を変えても、後で成功しても消さない |
 | 知らせを消すまでの秒 | 失敗の知らせは `ErrorNotice` が、取り消しの知らせは `UndoNotice` が数える。画面は時間を数えない |
@@ -104,6 +104,7 @@ iOS の FeatureModels は DesignSystem に頼る。Android の `designsystem` �
 | 行き先を開く前の待ち | シートが出ていれば閉じ、`MainModel.sheetCloseDelay` だけ待ってから開く。長さは iOS と同じ 600 ミリ秒で、`SheetLayer` が下がりきる |
 | 行き先の日付 | 入力の行き先は、`MainModel.Sheet.Entry` の `date` に入れる。`EntrySheet` が `EntryModel` に渡す |
 | 入口の状態の引き継ぎ | `appfeature/main/` の `rememberMainModel` が、タブとシートを保存する。保存の形は `MainModel` の `saved` と `restore` にある |
+| 子の画面のモデル | `State` の `submodels` に持ち、親のモデルが作る。品目のシートの `EntryItemModel` は、シートを開くたびに `State.openItems` が作り直す |
 | 確認・引き出し・選んだ行 | モデルの `State` に置く。`EntryModel.Overlay`（`presented.overlay`）・`RecurringPanel` が当たる |
 | 画面が書いてよい値 | `State` の値のうち、`ScreenEditable` の型か、シートなどの enum・sealed の値だけ。ほかは `private set` か `internal set` にし、画面は `State` かモデルの関数を呼ぶ |
 | 表示中のもの | `featuremodels/shared/model/` の `Shown<値>` に、出している 1 つを持つ。`show`・`close`（前に出ている時だけ閉じる）・`closeAll` で変える |

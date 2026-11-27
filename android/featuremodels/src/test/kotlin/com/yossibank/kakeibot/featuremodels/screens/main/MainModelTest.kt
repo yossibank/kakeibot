@@ -75,7 +75,7 @@ class MainModelTest {
 
         assertEquals(MainModel.Tab.Home, model.state.tabs.current)
         assertEquals(MainModel.Sheet.Entry(editing = null, date = date), sheet)
-        assertEquals(date, entry.state.form.date)
+        assertEquals(date, entry.state.fields.form.date)
         assertEquals(setup.today, entry.input.today)
     }
 
@@ -143,16 +143,16 @@ class MainModelTest {
 
         model.state.changeScene(to = ForegroundReturn.Phase.Inactive)
         model.state.changeScene(to = ForegroundReturn.Phase.Active)
-        val afterInactive = model.state.observationRound
+        val afterInactive = model.state.observation.count
         model.state.changeScene(to = ForegroundReturn.Phase.Background)
         model.state.changeScene(to = ForegroundReturn.Phase.Inactive)
         model.state.changeScene(to = ForegroundReturn.Phase.Active)
-        val afterBackground = model.state.observationRound
+        val afterBackground = model.state.observation.count
         model.state.changeScene(to = ForegroundReturn.Phase.Active)
 
         assertEquals(0, afterInactive)
         assertEquals(1, afterBackground)
-        assertEquals(1, model.state.observationRound)
+        assertEquals(1, model.state.observation.count)
     }
 
     @Test
@@ -166,11 +166,11 @@ class MainModelTest {
         )
 
         model.state.restartObservation()
-        val afterRestart = model.state.observationRound
+        val afterRestart = model.state.observation.count
         assets.retry()
 
         assertEquals(1, afterRestart)
-        assertEquals(2, model.state.observationRound)
+        assertEquals(2, model.state.observation.count)
     }
 
     @Test
@@ -180,7 +180,7 @@ class MainModelTest {
         model.state.hideTabNotices()
 
         assertEquals(1, model.state.notices.round)
-        assertEquals(0, model.state.observationRound)
+        assertEquals(0, model.state.observation.count)
     }
 
     @Test

@@ -66,16 +66,16 @@ import com.yossibank.kakeibot.designsystem.theme.displayFont
 import com.yossibank.kakeibot.designsystem.theme.opacity
 import com.yossibank.kakeibot.designsystem.theme.radius
 import com.yossibank.kakeibot.designsystem.theme.textFont
-import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryItemEditor
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.EntryModel
 import com.yossibank.kakeibot.featuremodels.screens.entry.model.itemNameSuggestions
+import com.yossibank.kakeibot.featuremodels.screens.entry.sheet.EntryItemModel
 import com.yossibank.kakeibot.featuremodels.shared.amount.AmountText
 import kotlinx.coroutines.delay
 
 @Composable
 fun EntryItemSlip(
     model: EntryModel,
-    editor: EntryItemEditor,
+    items: EntryItemModel,
 ) {
     val focus = LocalFocusManager.current
 
@@ -99,43 +99,43 @@ fun EntryItemSlip(
             ),
         verticalArrangement = Arrangement.spacedBy(slipSpacing),
     ) {
-        SlipHeader(editor = editor)
+        SlipHeader(items = items)
 
-        NameField(editor = editor)
+        NameField(items = items)
 
         Suggestions(
             model = model,
-            editor = editor,
+            items = items,
         )
 
-        Equation(editor = editor)
+        Equation(items = items)
 
-        TaxRow(editor = editor)
+        TaxRow(items = items)
 
         Keypad(
-            calculator = editor.activeCalculator,
+            calculator = items.state.fields.draft.activeCalculator,
             onKey = { key ->
                 focus.clearFocus()
-                editor.press(key)
+                items.state.press(key)
             },
             keyHeight = 44.dp,
         )
 
         SubmitButton(
-            editor = editor,
+            items = items,
             onSubmit = {
                 focus.clearFocus()
-                editor.submit(model)
+                items.submit(model)
             },
         )
     }
 }
 
 @Composable
-private fun SlipHeader(editor: EntryItemEditor) {
+private fun SlipHeader(items: EntryItemModel) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = editor.editingIndex?.let { "品目 ${it + 1} を変更" } ?: "品目を追加",
+            text = items.state.fields.draft.editing?.index?.let { "品目 ${it + 1} を変更" } ?: "品目を追加",
             modifier = Modifier.weight(1f),
             color = Palette.text,
             style = textFont(
@@ -146,7 +146,7 @@ private fun SlipHeader(editor: EntryItemEditor) {
 
         CircleIconButton(
             icon = R.drawable.ic_close,
-            onClick = editor::close,
+            onClick = items.state::close,
             size = 36.dp,
             iconSize = 20.dp,
             fill = SolidColor(Color.Transparent),
@@ -158,10 +158,10 @@ private fun SlipHeader(editor: EntryItemEditor) {
 @Composable
 private fun Suggestions(
     model: EntryModel,
-    editor: EntryItemEditor,
+    items: EntryItemModel,
 ) {
     val focus = LocalFocusManager.current
-    val suggestions = model.output.itemNameSuggestions(editor.name)
+    val suggestions = model.output.itemNameSuggestions(items.state.fields.draft.name)
 
     if (suggestions.isNotEmpty()) {
         Row(
@@ -174,7 +174,7 @@ private fun Suggestions(
                     isSelected = false,
                     onSelect = {
                         focus.clearFocus()
-                        editor.name = suggestion
+                        items.state.setName(suggestion)
                     },
                 )
             }
@@ -183,7 +183,7 @@ private fun Suggestions(
 }
 
 @Composable
-private fun TaxRow(editor: EntryItemEditor) {
+private fun TaxRow(items: EntryItemModel) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf(
             null to "税込",
@@ -192,8 +192,8 @@ private fun TaxRow(editor: EntryItemEditor) {
         ).forEach { (rate, title) ->
             EntryItemChip(
                 title = title,
-                isSelected = editor.taxRate == rate,
-                onSelect = { editor.taxRate = rate },
+                isSelected = items.state.fields.draft.taxRate == rate,
+                onSelect = { items.state.select(taxRate = rate) },
             )
         }
 
@@ -201,21 +201,21 @@ private fun TaxRow(editor: EntryItemEditor) {
 
         EntryItemChip(
             title = "値引",
-            isSelected = editor.isDiscount,
-            onSelect = { editor.isDiscount = !editor.isDiscount },
+            isSelected = items.state.fields.draft.isDiscount,
+            onSelect = { items.state.toggleDiscount() },
         )
 
         EntryItemChip(
             title = "半額",
             isSelected = false,
-            onSelect = editor::halveUnit,
+            onSelect = items.state::halveUnit,
         )
     }
 }
 
 @Composable
 private fun SubmitButton(
-    editor: EntryItemEditor,
+    items: EntryItemModel,
     onSubmit: () -> Unit,
 ) {
     Box(
@@ -224,7 +224,7 @@ private fun SubmitButton(
             .height(48.dp)
             .clip(CircleShape)
             .background(
-                if (editor.canSubmit) {
+                if (items.state.fields.draft.canSubmit) {
                     Palette.accent
                 } else {
                     Palette.accent.opacity(
@@ -233,13 +233,13 @@ private fun SubmitButton(
                 },
             )
             .clickable(
-                enabled = editor.canSubmit,
+                enabled = items.state.fields.draft.canSubmit,
                 onClick = onSubmit,
             ),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = if (editor.editingIndex == null) "追加" else "変更",
+            text = if (items.state.fields.draft.editing == null) "追加" else "変更",
             color = Palette.backgroundTop,
             style = textFont(
                 size = FontSize.Body,
@@ -250,13 +250,13 @@ private fun SubmitButton(
 }
 
 @Composable
-private fun NameField(editor: EntryItemEditor) {
+private fun NameField(items: EntryItemModel) {
     val focus = LocalFocusManager.current
     val shape = RoundedCornerShape(LocalThemeStyle.current.corner.radius(12.dp))
 
     PlaceholderTextField(
-        value = editor.name,
-        onChange = { editor.name = it },
+        value = items.state.fields.draft.name,
+        onChange = { items.state.setName(it) },
         placeholder = "品名",
         style = textFont(size = FontSize.Body),
         modifier = Modifier
@@ -276,25 +276,25 @@ private fun NameField(editor: EntryItemEditor) {
 }
 
 @Composable
-private fun Equation(editor: EntryItemEditor) {
+private fun Equation(items: EntryItemModel) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Token(
             label = "単価",
-            value = AmountText.text(editor.unit.amount),
-            isSelected = editor.target == EntryItemEditor.Target.Unit,
-            onSelect = { editor.target = EntryItemEditor.Target.Unit },
+            value = AmountText.text(items.state.fields.draft.unit.amount),
+            isSelected = items.state.fields.draft.target == EntryItemModel.Target.Unit,
+            onSelect = { items.state.enter(EntryItemModel.Target.Unit) },
         )
 
         Operator(text = "×")
 
         Token(
             label = "数量",
-            value = editor.quantityValue.toString(),
-            isSelected = editor.target == EntryItemEditor.Target.Quantity,
-            onSelect = { editor.target = EntryItemEditor.Target.Quantity },
+            value = items.state.fields.draft.quantityValue.toString(),
+            isSelected = items.state.fields.draft.target == EntryItemModel.Target.Quantity,
+            onSelect = { items.state.enter(EntryItemModel.Target.Quantity) },
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -302,8 +302,8 @@ private fun Equation(editor: EntryItemEditor) {
         Operator(text = "=")
 
         FittedText(
-            text = AmountText.text(editor.lineAmount.toInt()),
-            color = if (editor.isDiscount) Palette.rose else Palette.accentStrong,
+            text = AmountText.text(items.state.fields.draft.lineAmount.toInt()),
+            color = if (items.state.fields.draft.isDiscount) Palette.rose else Palette.accentStrong,
             style = displayFont(
                 size = FontSize.Body,
                 weight = FontWeight.Bold,

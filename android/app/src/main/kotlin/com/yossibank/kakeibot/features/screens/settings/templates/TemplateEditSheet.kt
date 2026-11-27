@@ -162,7 +162,7 @@ private fun TemplateEditContent(
 
             TagLine(
                 tags = tags.map { TagLineItem(id = it.id, name = it.name) },
-                selection = model.state.form.tagId,
+                selection = model.state.fields.form.tagId,
                 onSelect = model.state::toggleTag,
             )
         }
@@ -195,7 +195,7 @@ private fun Preview(
             size = TemplateCardSize.Large,
             name = {
                 PlaceholderTextField(
-                    value = model.state.form.name,
+                    value = model.state.fields.form.name,
                     onChange = { name -> model.state.update { copy(name = name) } },
                     placeholder = "名前を入れる",
                     style = displayFont(
@@ -230,7 +230,7 @@ private fun MemoCard(
             .card(),
     ) {
         PlaceholderTextField(
-            value = model.state.form.memo,
+            value = model.state.fields.form.memo,
             onChange = { memo -> model.state.update { copy(memo = memo) } },
             placeholder = "メモを書く",
             style = textFont(style = FontTextStyle.Body),
@@ -252,7 +252,7 @@ private fun CategoryGrid(model: TemplateEditModel) {
         model.output.categories.forEach { category ->
             ChoiceChip(
                 title = category.name,
-                isSelected = category.id == model.state.form.categoryId,
+                isSelected = category.id == model.state.fields.form.categoryId,
                 onSelect = { model.state.select(category) },
             ) {
                 IconTile(
@@ -274,7 +274,7 @@ private fun WalletGrid(model: TemplateEditModel) {
         model.output.wallets.forEach { wallet ->
             ChoiceChip(
                 title = wallet.name,
-                isSelected = wallet.id == model.state.form.walletId,
+                isSelected = wallet.id == model.state.fields.form.walletId,
                 onSelect = { model.state.select(wallet) },
             ) {
                 IconTile(
@@ -294,14 +294,14 @@ private fun BillShiftChooser(model: TemplateEditModel) {
         Recurring.billShiftTitles.forEachIndexed { index, title ->
             ChoiceChip(
                 title = title,
-                isSelected = model.state.form.billShift == index,
+                isSelected = model.state.fields.form.billShift == index,
                 onSelect = { model.state.update { copy(billShift = index) } },
             )
         }
     }
 
     SettingsCaption(
-        text = billNotes[model.state.form.billShift.coerceIn(billNotes.indices)],
+        text = billNotes[model.state.fields.form.billShift.coerceIn(billNotes.indices)],
     )
 }
 
@@ -368,7 +368,7 @@ private fun CapsulePreview(model: TemplateEditModel) {
         }
 
         FittedText(
-            text = model.state.form.name.ifEmpty { "名前" },
+            text = model.state.fields.form.name.ifEmpty { "名前" },
             color = Palette.text,
             modifier = Modifier.weight(1f, fill = false),
             style = textFont(size = FontSize.Caption),

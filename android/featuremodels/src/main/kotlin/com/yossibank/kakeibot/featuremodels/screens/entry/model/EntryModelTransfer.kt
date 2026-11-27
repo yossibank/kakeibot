@@ -34,7 +34,7 @@ fun EntryModel.State.swapWallets() {
 }
 
 internal fun EntryModel.chooseDestination() {
-    val form = state.form
+    val form = state.fields.form
 
     if (form.toWalletId != null && form.toWalletId != form.walletId) {
         return

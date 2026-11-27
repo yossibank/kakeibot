@@ -20,8 +20,8 @@ class EntryModelVoiceTest {
         )
         val undo = model.apply(reading)
         val amount = model.output.amount
-        val date = model.state.form.date
-        val walletId = model.state.form.walletId
+        val date = model.state.fields.form.date
+        val walletId = model.state.fields.form.walletId
         val store = model.state.store
         val fromVoice =
             listOf(
@@ -38,8 +38,8 @@ class EntryModelVoiceTest {
         assertEquals(listOf(true, true, true), fromVoice)
         assertEquals(EntryModel.Field.Amount, model.state.focus.field)
         assertEquals(0, model.output.amount)
-        assertEquals(setup.today, model.state.form.date)
-        assertEquals("", model.state.form.memo)
+        assertEquals(setup.today, model.state.fields.form.date)
+        assertEquals("", model.state.fields.form.memo)
         assertFalse(model.output.isDateFromVoice)
     }
 
@@ -51,7 +51,7 @@ class EntryModelVoiceTest {
         model.apply(model.output.voiceReading(text = "昨日のコンビニ", today = setup.today))
 
         assertEquals(5, model.output.amount)
-        assertEquals(setup.today.adding(days = -1), model.state.form.date)
+        assertEquals(setup.today.adding(days = -1), model.state.fields.form.date)
     }
 
     @Test

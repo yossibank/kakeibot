@@ -75,6 +75,11 @@ class RecurringEditModel(
             internal set
     }
 
+    data class Fields(
+        val form: RecurringEditForm,
+        val isHolidayShiftChosen: Boolean = false,
+    ) : ScreenEditable
+
     class State(
         today: LocalDate,
         type: Entry.Kind,
@@ -86,18 +91,17 @@ class RecurringEditModel(
         val presented = Presented(isScheduleOpen)
         val submodels = Submodels()
 
-        var form: RecurringEditForm by mutableStateOf(
-            RecurringEditForm.starting(
-                today = today,
-                type = type,
+        var fields: Fields by mutableStateOf(
+            Fields(
+                form = RecurringEditForm.starting(
+                    today = today,
+                    type = type,
+                ),
             ),
         )
             private set
 
-        var loan by mutableStateOf(RecurringLoanInput())
-            private set
-
-        var isHolidayShiftChosen = false
+        var repayment: RecurringRepayment by mutableStateOf(RecurringRepayment())
             private set
 
         fun toggleSchedule() {
@@ -105,20 +109,18 @@ class RecurringEditModel(
         }
 
         fun update(change: RecurringEditForm.() -> RecurringEditForm) {
-            form = form.change()
-        }
-
-        fun updateLoan(change: RecurringLoanInput.() -> RecurringLoanInput) {
-            loan = loan.change()
+            fields = fields.copy(form = fields.form.change())
         }
 
         fun select(wallet: Identifier<Wallet>) {
-            form = form.withWallet(wallet)
+            update { withWallet(wallet) }
         }
 
         fun choose(shift: HolidayShift) {
-            form = form.copy(holidayShift = shift)
-            isHolidayShiftChosen = true
+            fields = fields.copy(
+                form = fields.form.copy(holidayShift = shift),
+                isHolidayShiftChosen = true,
+            )
         }
 
         fun press(key: AmountCalculator.Key) {
@@ -134,19 +136,28 @@ class RecurringEditModel(
         }
 
         fun useAutoCount() {
-            loan = loan.copy(
-                isCountAuto = true,
-                manualFinal = null,
-            )
+            repayment = repayment.usingAutoCount()
         }
 
         fun load(recurring: Recurring) {
             val draft = RecurringDraft(recurring = recurring)
 
-            form = RecurringEditForm.of(draft)
+            update { RecurringEditForm.of(draft) }
             submodels.calculator = AmountCalculator(amount = draft.amount)
             submodels.feeCalculator = AmountCalculator(amount = draft.fee)
-            loan = loan.copy(manualFinal = recurring.finalAmount)
+            repayment = repayment.loaded(final = recurring.finalAmount)
+        }
+
+        internal fun setCount(count: AmountCalculator) {
+            repayment = repayment.counted(count)
+        }
+
+        internal fun useManualCount(final: Int?) {
+            repayment = repayment.usingManualCount(final)
+        }
+
+        internal fun setCountAuto(isAuto: Boolean) {
+            repayment = repayment.countAuto(isAuto)
         }
     }
 
@@ -238,13 +249,13 @@ class RecurringEditModel(
             loadLoanBalances()
             loadRecurring()
 
-            if (state.form.categoryId == null) {
+            if (state.fields.form.categoryId == null) {
                 state.update { copy(categoryId = output.categories.firstOrNull()?.id) }
             }
 
             suggestHolidayShift()
 
-            if (state.form.walletId == null) {
+            if (state.fields.form.walletId == null) {
                 state.update { copy(walletId = output.wallets.firstOrNull()?.id) }
             }
 
@@ -276,7 +287,7 @@ class RecurringEditModel(
             return null
         }
 
-        if (state.form.remindDaysBefore != null) {
+        if (state.fields.form.remindDaysBefore != null) {
             dependencies.permission.requestIfUndecided()
         }
 

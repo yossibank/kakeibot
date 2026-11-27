@@ -5,16 +5,16 @@ import com.yossibank.kakeibot.core.concepts.entry.Entry
 import com.yossibank.kakeibot.core.concepts.voice.VoiceReading
 
 val EntryModel.Output.isWalletFromVoice: Boolean
-    get() = state.voiceFilled?.walletId?.let { it == state.form.walletId } ?: false
+    get() = state.filled.voice?.walletId?.let { it == state.fields.form.walletId } ?: false
 
 val EntryModel.Output.isDateFromVoice: Boolean
-    get() = state.voiceFilled?.date?.let { it == state.form.date } ?: false
+    get() = state.filled.voice?.date?.let { it == state.fields.form.date } ?: false
 
 val EntryModel.Output.isMemoFromVoice: Boolean
-    get() = state.voiceFilled?.memo?.let { it.isNotEmpty() && it == state.store } ?: false
+    get() = state.filled.voice?.memo?.let { it.isNotEmpty() && it == state.store } ?: false
 
 val EntryModel.Output.showsVoice: Boolean
-    get() = state.form.type != Entry.Kind.transfer
+    get() = state.fields.form.type != Entry.Kind.transfer
 
 val EntryModel.Output.voiceHints: List<String>
     get() {

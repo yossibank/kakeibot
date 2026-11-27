@@ -6,12 +6,12 @@ import com.yossibank.kakeibot.core.shared.Identifier
 
 fun EntryModel.select(wallet: Wallet) {
     setWallet(wallet.id)
-    val isTransfer = state.form.type == Entry.Kind.transfer
+    val isTransfer = state.fields.form.type == Entry.Kind.transfer
     state.focus(if (isTransfer) EntryModel.Field.Transfer else EntryModel.Field.Amount)
 }
 
 internal fun EntryModel.setWallet(id: Identifier<Wallet>?) {
-    val form = state.form
+    val form = state.fields.form
 
     val moved = form.withWallet(
         id = id,

@@ -20,9 +20,9 @@ class EntryModelTransferTest {
         val wallets = setup.options().wallets
         val model = setup.transferModel()
 
-        assertEquals(wallets[0].id, model.state.form.walletId)
-        assertEquals(wallets[1].id, model.state.form.toWalletId)
-        assertNull(model.state.form.categoryId)
+        assertEquals(wallets[0].id, model.state.fields.form.walletId)
+        assertEquals(wallets[1].id, model.state.fields.form.toWalletId)
+        assertNull(model.state.fields.form.categoryId)
         assertEquals(EntryModel.Field.Transfer, model.state.focus.field)
         assertEquals("財布 → 銀行", model.output.routeText)
         assertFalse(model.output.isChanged)
@@ -49,17 +49,17 @@ class EntryModelTransferTest {
     fun keepsCategoryWhenComingBackFromTransfer() = modelTest(today = "2026-10-12") { setup ->
         val bank = setup.options().wallets[1]
         val model = setup.loadedModel()
-        val category = model.state.form.categoryId
+        val category = model.state.fields.form.categoryId
 
         model.select(type = Entry.Kind.transfer)
-        val transferCategory = model.state.form.categoryId
-        val destination = model.state.form.toWalletId
+        val transferCategory = model.state.fields.form.categoryId
+        val destination = model.state.fields.form.toWalletId
         model.select(type = Entry.Kind.expense)
 
         assertNull(transferCategory)
         assertEquals(bank.id, destination)
-        assertEquals(category, model.state.form.categoryId)
-        assertEquals(bank.id, model.state.form.toWalletId)
+        assertEquals(category, model.state.fields.form.categoryId)
+        assertEquals(bank.id, model.state.fields.form.toWalletId)
     }
 
     @Test
@@ -71,7 +71,7 @@ class EntryModelTransferTest {
         model.select(type = Entry.Kind.income)
         model.select(type = Entry.Kind.transfer)
 
-        assertEquals(card.id, model.state.form.toWalletId)
+        assertEquals(card.id, model.state.fields.form.toWalletId)
     }
 
     @Test
@@ -83,8 +83,8 @@ class EntryModelTransferTest {
 
         model.select(type = Entry.Kind.transfer)
 
-        assertEquals(wallets[1].id, model.state.form.walletId)
-        assertEquals(wallets[0].id, model.state.form.toWalletId)
+        assertEquals(wallets[1].id, model.state.fields.form.walletId)
+        assertEquals(wallets[0].id, model.state.fields.form.toWalletId)
     }
 
     @Test
@@ -231,8 +231,8 @@ class EntryModelTransferTest {
         model.applyTransfer(model.output.recentTransfers.last())
 
         assertEquals(listOf(1000, 5000, 3000), amounts)
-        assertEquals(cash, model.state.form.walletId)
-        assertEquals(bank, model.state.form.toWalletId)
+        assertEquals(cash, model.state.fields.form.walletId)
+        assertEquals(bank, model.state.fields.form.toWalletId)
         assertEquals(3000, model.output.amount)
     }
 
@@ -250,8 +250,8 @@ class EntryModelTransferTest {
         model.state.applyRoute(routes.last())
 
         assertEquals(listOf(bank, cash), routes.map { it.walletId })
-        assertEquals(cash, model.state.form.walletId)
-        assertEquals(bank, model.state.form.toWalletId)
+        assertEquals(cash, model.state.fields.form.walletId)
+        assertEquals(bank, model.state.fields.form.toWalletId)
     }
 
     @Test
@@ -312,7 +312,7 @@ class EntryModelTransferTest {
         val fee = setup.database.entryList().entries.first { it.transferId != null }
         val model = setup.loadedModel(editing = fee.id)
 
-        assertEquals(Entry.Kind.transfer, model.state.form.type)
+        assertEquals(Entry.Kind.transfer, model.state.fields.form.type)
         assertEquals(5000, model.output.amount)
         assertEquals(110, model.output.fee)
         assertEquals(fee.transferId, model.input.editingId)
@@ -325,24 +325,24 @@ class EntryModelTransferTest {
 
         model.state.update { copy(billMonth = month("2026-11")) }
         model.select(wallet = wallets[1])
-        val afterWallet = model.state.form.billMonth
+        val afterWallet = model.state.fields.form.billMonth
         model.state.update { copy(billMonth = month("2026-11")) }
         model.state.select(date = date("2026-10-13"))
 
         assertNull(afterWallet)
-        assertNull(model.state.form.billMonth)
+        assertNull(model.state.fields.form.billMonth)
     }
 
     @Test
     fun choosesDestinationByRole() = modelTest(today = "2026-10-12") { setup ->
         val model = setup.transferModel()
-        val source = model.state.form.walletId
+        val source = model.state.fields.form.walletId
         val wallet = model.output.wallets.last { it.id != source }
 
         model.state.selectDestination(wallet)
 
-        assertEquals(wallet.id, model.state.form.toWalletId)
-        assertEquals(source, model.state.form.walletId)
+        assertEquals(wallet.id, model.state.fields.form.toWalletId)
+        assertEquals(source, model.state.fields.form.walletId)
     }
 
     @Test

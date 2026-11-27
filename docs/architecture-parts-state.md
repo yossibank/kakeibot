@@ -102,6 +102,8 @@ ID の型（`…ID`・`Identifier<…>`）も裸の値として扱う。その O
 
 画面が直に書かない入力は、`Fields` の中で `internal(set)` か `private(set)` にする。モデルの関数で確かめてから入れる。カテゴリの編集のタグと、アイコンの絵文字と文字と、オンボーディングの道筋が当たる。
 
+Android の入力の下書きの `data class`（`EntryForm` など）は、`fields.form` に持つ。下書きの外の印（固定費の休日の扱いを人が選んだか）も、`fields` に並べる。
+
 ## 🪝 タブとメインの値の型
 
 | モデル | 値の型 | 中身 |
@@ -113,6 +115,7 @@ ID の型（`…ID`・`Identifier<…>`）も裸の値として扱う。その O
 | Main | `EntryLaunch` | 入力をレシートで始めるかと、先に温めている間か。iOS だけ |
 | Entry | `Closing` | 保存か削除で閉じ始めた印。`begin`・`cancel`。iOS だけ |
 | Entry | `FieldFocus` | 今の欄と、欄を進む向き。`moved`。Android だけ |
+| RecurringEdit | `Repayment`（Android は `RecurringRepayment`） | 返済の回数と、回数を自動で決めるか、手で決めた最後の額。`useAutoCount` など（Android は `usingAutoCount` などの値を返す関数） |
 | EntryVoice | `Rounds` | 聞き始めと聞き終わりの回。`start`・`end` |
 | EntryVoice | `Silence` | 黙り始めた時刻。`start(at:)`・`clear`。iOS だけ |
 | App | `Reveal` | 起動の幕と、輪を回し終えたか、ホームを読み終えたか。iOS だけ |

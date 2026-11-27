@@ -19,6 +19,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
 import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
@@ -52,6 +53,10 @@ class TemplateEditModel(
             internal set
     }
 
+    data class Fields(
+        val form: EntryTemplateDraft,
+    ) : ScreenEditable
+
     class State(
         draft: EntryTemplateDraft,
         wait: ScreenWait,
@@ -60,23 +65,23 @@ class TemplateEditModel(
         val task = ModelTask(notices.error)
         val submodels = Submodels(amount = draft.amount ?: 0)
 
-        var form: EntryTemplateDraft by mutableStateOf(draft)
+        var fields: Fields by mutableStateOf(Fields(form = draft))
             private set
 
         fun update(change: EntryTemplateDraft.() -> EntryTemplateDraft) {
-            form = form.change()
+            fields = fields.copy(form = fields.form.change())
         }
 
         fun select(category: EntryCategory?) {
-            form = form.withCategory(category?.id)
+            update { withCategory(category?.id) }
         }
 
         fun select(wallet: Wallet) {
-            form = form.withWallet(wallet.id)
+            update { withWallet(wallet.id) }
         }
 
         fun toggleTag(id: Identifier<EntryTag>) {
-            form = form.copy(tagId = if (form.tagId == id) null else id)
+            update { copy(tagId = if (tagId == id) null else id) }
         }
 
         fun press(key: AmountCalculator.Key) {
@@ -100,16 +105,16 @@ class TemplateEditModel(
         private val state: State,
     ) {
         val billRecurring: Recurring?
-            get() = input.cardBills.cardBill(paidBy = state.form.walletId)
+            get() = input.cardBills.cardBill(paidBy = state.fields.form.walletId)
 
         val category: EntryCategory?
-            get() = categories.firstOrNull { it.id == state.form.categoryId }
+            get() = categories.firstOrNull { it.id == state.fields.form.categoryId }
 
         val wallet: Wallet?
-            get() = wallets.firstOrNull { it.id == state.form.walletId }
+            get() = wallets.firstOrNull { it.id == state.fields.form.walletId }
 
         val tag: EntryTag?
-            get() = tags.firstOrNull { it.id == state.form.tagId }
+            get() = tags.firstOrNull { it.id == state.fields.form.tagId }
 
         val detail: String
             get() = listOfNotNull(category?.name, tag?.name, wallet?.name).joinToString("・")
@@ -118,10 +123,10 @@ class TemplateEditModel(
             get() = state.submodels.calculator.amount.takeIf { it > 0 }
 
         val walletTitle: String
-            get() = if (state.form.type == Entry.Kind.income) "入金先" else "支払い元"
+            get() = if (state.fields.form.type == Entry.Kind.income) "入金先" else "支払い元"
 
         val categories: List<EntryCategory>
-            get() = when (state.form.type) {
+            get() = when (state.fields.form.type) {
                 Entry.Kind.income -> input.options?.incomeCategories ?: emptyList()
                 else -> input.options?.expenseCategories ?: emptyList()
             }
@@ -131,14 +136,14 @@ class TemplateEditModel(
 
         val tags: List<EntryTag>
             get() = (input.options?.tags ?: emptyList()).filter { tag ->
-                tag.categoryId == state.form.categoryId &&
-                    (tag.archivedAt == null || tag.id == state.form.tagId)
+                tag.categoryId == state.fields.form.categoryId &&
+                    (tag.archivedAt == null || tag.id == state.fields.form.tagId)
             }
 
         val draft: EntryTemplateDraft
-            get() = state.form.copy(
+            get() = state.fields.form.copy(
                 amount = amount,
-                billShift = if (billRecurring == null) 0 else state.form.billShift,
+                billShift = if (billRecurring == null) 0 else state.fields.form.billShift,
             )
 
         val problemMessage: String?
@@ -185,11 +190,11 @@ class TemplateEditModel(
             input.options = dependencies.database.entryOptions()
             input.cardBills = dependencies.database.recurrings()
 
-            if (output.categories.none { it.id == state.form.categoryId }) {
+            if (output.categories.none { it.id == state.fields.form.categoryId }) {
                 state.update { withCategory(output.categories.firstOrNull()?.id) }
             }
 
-            if (output.wallets.none { it.id == state.form.walletId }) {
+            if (output.wallets.none { it.id == state.fields.form.walletId }) {
                 state.update {
                     copy(
                         walletId = output.wallets.firstOrNull()?.id,

@@ -11,6 +11,7 @@ import com.yossibank.kakeibot.core.concepts.entry.EntryTemplate
 import com.yossibank.kakeibot.core.concepts.entry.EntryTemplateDraft
 import com.yossibank.kakeibot.core.concepts.recurring.Recurring
 import com.yossibank.kakeibot.core.shared.Identifier
+import com.yossibank.kakeibot.featuremodels.screens.entry.sheet.EntryItemModel
 import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
@@ -91,62 +92,62 @@ class EntryModel(
         val error = ErrorNotice(wait)
     }
 
-    class Submodels {
+    class Submodels(
+        wait: ScreenWait,
+    ) {
         var calculator: AmountCalculator by mutableStateOf(AmountCalculator())
             internal set
 
         var feeCalculator: AmountCalculator by mutableStateOf(AmountCalculator())
             internal set
+
+        var items: EntryItemModel by mutableStateOf(EntryItemModel(wait))
+            internal set
     }
 
-    data class FieldFocus(
-        val field: Field = Field.Category,
-        val isForward: Boolean = true,
-    ) {
-        fun moved(
-            to: Field,
-            type: Entry.Kind,
-        ): FieldFocus {
-            val isTransferOnly = to == Field.Fee || to == Field.Transfer
-            val next = if (isTransferOnly && type != Entry.Kind.transfer) Field.Amount else to
+    data class Fields(
+        val form: EntryForm,
+    ) : ScreenEditable
 
-            return FieldFocus(
-                field = next,
-                isForward = next.order(of = type) >= field.order(of = type),
-            )
-        }
-    }
+    data class Filled(
+        val voice: VoiceFilled? = null,
+    )
 
     class State(
         date: LocalDate,
-        wait: ScreenWait,
+        private val wait: ScreenWait,
     ) {
         val notices = Notices(wait)
         val task = ModelTask(notices.error)
         val outcome = ScreenOutcome<Outcome>()
         val presented = Presented()
-        val submodels = Submodels()
+        val submodels = Submodels(wait)
 
-        var form: EntryForm by mutableStateOf(EntryForm(date = date))
+        var fields: Fields by mutableStateOf(Fields(form = EntryForm(date = date)))
             private set
 
         var focus: FieldFocus by mutableStateOf(FieldFocus())
             private set
 
-        var voiceFilled: VoiceFilled? by mutableStateOf(null)
+        var filled: Filled by mutableStateOf(Filled())
             private set
 
         fun update(change: EntryForm.() -> EntryForm) {
-            form = form.change()
+            fields = fields.copy(form = fields.form.change())
         }
 
         fun focus(field: Field) {
-            focus = focus.moved(to = field, type = form.type)
+            focus = focus.moved(to = field, type = fields.form.type)
         }
 
         fun select(date: LocalDate) {
-            form = form.withDate(date)
+            update { withDate(date) }
             focus(Field.Amount)
+        }
+
+        fun openItems() {
+            submodels.items = EntryItemModel(wait)
+            presented.overlay.show(Overlay.Items)
         }
 
         fun press(key: AmountCalculator.Key) {
@@ -166,10 +167,10 @@ class EntryModel(
         }
 
         fun clear() {
-            form = form.cleared()
+            update { cleared() }
             submodels.calculator = AmountCalculator()
             submodels.feeCalculator = AmountCalculator()
-            voiceFilled = null
+            filled = Filled()
         }
 
         internal fun fill(
@@ -177,9 +178,9 @@ class EntryModel(
             calculator: AmountCalculator,
             voiceFilled: VoiceFilled?,
         ) {
-            this.form = form
+            fields = fields.copy(form = form)
             submodels.calculator = calculator
-            this.voiceFilled = voiceFilled
+            filled = Filled(voice = voiceFilled)
         }
 
         internal fun load(
@@ -187,22 +188,24 @@ class EntryModel(
             amount: Int,
             fee: Int,
         ) {
-            this.form = form
+            fields = fields.copy(form = form)
             submodels.calculator = AmountCalculator(amount = amount)
             submodels.feeCalculator = AmountCalculator(amount = fee)
         }
 
         internal fun startAgain(today: LocalDate) {
-            form = form.copy(
-                date = today,
-                billMonth = null,
-                items = emptyList(),
-                taxIncluded = false,
-                templateId = null,
-            )
+            update {
+                copy(
+                    date = today,
+                    billMonth = null,
+                    items = emptyList(),
+                    taxIncluded = false,
+                    templateId = null,
+                )
+            }
 
             submodels.feeCalculator = AmountCalculator()
-            voiceFilled = null
+            filled = Filled()
             focus(Field.Amount)
         }
     }
@@ -217,10 +220,10 @@ class EntryModel(
         var editingId: Identifier<Entry>? by mutableStateOf(editingId)
             internal set
 
-        var original: Entry? = null
+        var original: Entry? by mutableStateOf(null)
             internal set
 
-        var originalFee: Entry? = null
+        var originalFee: Entry? by mutableStateOf(null)
             internal set
 
         var history: EntryList? by mutableStateOf(null)
@@ -232,7 +235,7 @@ class EntryModel(
         var recentMemos: List<String> by mutableStateOf(emptyList())
             internal set
 
-        var cardBills: List<Recurring> = emptyList()
+        var cardBills: List<Recurring> by mutableStateOf(emptyList())
             internal set
 
         var options: EntryOptions? by mutableStateOf(null)
@@ -241,18 +244,12 @@ class EntryModel(
         var allTemplates: List<EntryTemplate> by mutableStateOf(emptyList())
             internal set
 
-        internal var baseline: Snapshot? by mutableStateOf(null)
+        internal var baseline: EntrySnapshot? by mutableStateOf(null)
     }
 
     class Output(
         internal val input: Input,
         internal val state: State,
-    )
-
-    internal data class Snapshot(
-        val form: EntryForm,
-        val calculator: AmountCalculator,
-        val feeCalculator: AmountCalculator,
     )
 
     private class Dependencies(

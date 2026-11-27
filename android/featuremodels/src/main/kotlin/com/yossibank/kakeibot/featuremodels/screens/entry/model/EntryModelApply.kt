@@ -13,7 +13,7 @@ fun EntryModel.apply(template: EntryTemplate) {
 
     val billMonth = input.cardBills
         .cardBill(paidBy = template.walletId)
-        ?.billMonth(used = state.form.date, shift = template.billShift)
+        ?.billMonth(used = state.fields.form.date, shift = template.billShift)
 
     state.update { withCategory(template.categoryId).copy(tagId = tagId) }
     setWallet(template.walletId)
@@ -68,10 +68,16 @@ fun EntryModel.applyTransfer(entry: Entry) {
 
 fun EntryModel.Output.newTemplateDraft(): EntryTemplateDraft = EntryTemplateDraft(
     name = "",
-    type = if (state.form.type == Entry.Kind.income) Entry.Kind.income else Entry.Kind.expense,
+    type = if (state.fields.form.type ==
+        Entry.Kind.income
+    ) {
+        Entry.Kind.income
+    } else {
+        Entry.Kind.expense
+    },
     amount = amount.takeIf { it > 0 },
-    categoryId = state.form.categoryId,
-    tagId = state.form.tagId,
-    walletId = state.form.walletId,
-    memo = state.form.memo,
+    categoryId = state.fields.form.categoryId,
+    tagId = state.fields.form.tagId,
+    walletId = state.fields.form.walletId,
+    memo = state.fields.form.memo,
 )

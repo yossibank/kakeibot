@@ -13,7 +13,13 @@ val EntryModel.Output.amount: Int
     get() = state.submodels.calculator.amount
 
 val EntryModel.Output.fee: Int
-    get() = if (state.form.type == Entry.Kind.transfer) state.submodels.feeCalculator.amount else 0
+    get() = if (state.fields.form.type ==
+        Entry.Kind.transfer
+    ) {
+        state.submodels.feeCalculator.amount
+    } else {
+        0
+    }
 
 val EntryModel.Output.activeCalculator: AmountCalculator
     get() = if (state.focus.field ==

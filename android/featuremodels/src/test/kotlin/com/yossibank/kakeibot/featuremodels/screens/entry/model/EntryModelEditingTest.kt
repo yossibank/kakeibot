@@ -54,8 +54,8 @@ class EntryModelEditingTest {
 
         val model = setup.loadedModel(editing = entry.id)
 
-        assertEquals(cash, model.state.form.walletId)
-        assertEquals(entry.billMonth, model.state.form.billMonth)
+        assertEquals(cash, model.state.fields.form.walletId)
+        assertEquals(entry.billMonth, model.state.fields.form.billMonth)
         assertNotNull(model.output.wallet(of = cash))
         assertNotNull(model.output.wallet(of = wallets[1].id))
         assertEquals(cash, model.output.wallet?.id)
@@ -72,8 +72,8 @@ class EntryModelEditingTest {
 
         val model = setup.loadedModel(editing = transfer.id)
 
-        assertEquals(cash, model.state.form.walletId)
-        assertEquals(bank, model.state.form.toWalletId)
+        assertEquals(cash, model.state.fields.form.walletId)
+        assertEquals(bank, model.state.fields.form.toWalletId)
         assertNotNull(model.output.wallet(of = bank))
         assertEquals("財布 → 銀行", model.output.routeText)
     }
@@ -86,7 +86,7 @@ class EntryModelEditingTest {
 
         val model = setup.loadedModel(editing = entry.id)
 
-        assertEquals(salary, model.state.form.categoryId)
+        assertEquals(salary, model.state.fields.form.categoryId)
         assertEquals(salary, model.output.category?.id)
         assertFalse(model.output.isChanged)
     }
@@ -101,7 +101,7 @@ class EntryModelEditingTest {
         model.select(type = Entry.Kind.expense)
         model.select(type = Entry.Kind.income)
 
-        assertEquals(salary, model.state.form.categoryId)
+        assertEquals(salary, model.state.fields.form.categoryId)
     }
 
     @Test
@@ -136,8 +136,8 @@ class EntryModelEditingTest {
 
         val model = setup.loadedModel(editing = entry.id)
 
-        assertEquals(bank, model.state.form.walletId)
-        assertEquals(copies[0].id, model.state.form.categoryId)
+        assertEquals(bank, model.state.fields.form.walletId)
+        assertEquals(copies[0].id, model.state.fields.form.categoryId)
         assertEquals(own.name, model.output.category?.name)
         assertEquals(bank, model.output.category?.walletId)
         assertFalse(model.output.isChanged)
@@ -151,8 +151,8 @@ class EntryModelEditingTest {
 
         assertEquals("記録が見つかりませんでした", model.state.notices.error.message)
         assertTrue(model.output.isEditing)
-        assertNull(model.state.form.walletId)
-        assertNull(model.state.form.categoryId)
+        assertNull(model.state.fields.form.walletId)
+        assertNull(model.state.fields.form.categoryId)
         assertFalse(model.output.isChanged)
         assertFalse(saved)
     }
@@ -178,7 +178,7 @@ class EntryModelEditingTest {
             billMonth = month("2026-11"),
         )
         val model = setup.loadedModel(editing = entry.id)
-        val loaded = model.state.form.billMonth
+        val loaded = model.state.fields.form.billMonth
 
         val saved = model.save()
 

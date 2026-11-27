@@ -103,9 +103,6 @@ class MainModel(
 
         private val foreground = ForegroundReturn()
 
-        val observationRound: Int
-            get() = observation.count
-
         fun select(tab: Tab) {
             tabs = tabs.selected(tab)
         }

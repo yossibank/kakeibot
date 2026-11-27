@@ -213,6 +213,8 @@ entry-item.follows-edited-row-when-rows-are-removed-and-restored	EntryItemModelT
 entry-item.clears-removed-item-notice-after-duration	EntryItemModelTests/clearsRemovedItemNoticeAfterDuration	EntryItemModelTest/clearsRemovedItemNoticeAfterDuration	対応	
 entry-item.restores-removed-item-before-duration-ends	EntryItemModelTests/restoresRemovedItemBeforeDurationEnds	EntryItemModelTest/restoresRemovedItemBeforeDurationEnds	対応	
 entry-item.asks-to-scroll-only-to-existing-rows	EntryItemModelTests/asksToScrollOnlyToExistingRows		未移植	品目のシートに、編集する行へ送る動きが無い
+entry-item.keeps-draft-when-slip-closes		EntryItemModelTest/keepsDraftWhenSlipCloses	Androidのみ	入力の枠を閉じても書きかけの品名を残す。iOS にこのテストが無い
+entry-item.starts-fresh-each-time-items-open		EntryItemModelTest/startsFreshEachTimeItemsOpen	Androidのみ	品目のシートを開くたびに新しいモデルにする。iOS は画面がモデルを作る
 closing.begins-and-cancels-closing	ClosingTests/beginsAndCancelsClosing		未移植	Android の入力に、閉じ始めた後の保存と見張りを止める印が無い
 field-focus.starts-on-category-moving-forward		FieldFocusTest/startsOnCategoryMovingForward	Androidのみ	iOS は向きを Screen.isForward に持つ
 field-focus.moves-backward-to-an-earlier-field		FieldFocusTest/movesBackwardToAnEarlierField	Androidのみ	iOS は向きを Screen.isForward に持つ
@@ -450,6 +452,8 @@ recurring-edit.fails-to-load-missing-recurring		RecurringEditModelTest/failsToLo
 recurring-edit.uses-closing-day-only-for-card-transfer		RecurringEditModelTest/usesClosingDayOnlyForCardTransfer	Androidのみ	締め日はカードへの振替の時だけ下書きに残す。iOS にこのテストが無い
 recurring-edit.does-not-warn-before-asking-for-reminders		RecurringEditModelTest/doesNotWarnBeforeAskingForReminders	Androidのみ	まだ許可を尋ねていない時は「届かない」を出さない。iOS にこのテストが無い
 recurring-edit-prompt.closes-panel-before-asking-to-discard		RecurringEditModelPromptTest/closesPanelBeforeAskingToDiscard	Androidのみ	戻る操作はパネルを先に閉じ、閉じる操作は変わっていれば捨てる確認を出す。iOS は画面で行う
+recurring-repayment.forgets-manual-final-when-count-turns-auto		RecurringRepaymentTest/forgetsManualFinalWhenCountTurnsAuto	Androidのみ	返済の回数の値の型をモデル抜きで確かめる。iOS にこのテストが無い
+recurring-repayment.keeps-manual-final-when-loaded-or-counted		RecurringRepaymentTest/keepsManualFinalWhenLoadedOrCounted	Androidのみ	返済の回数の値の型をモデル抜きで確かめる。iOS にこのテストが無い
 recurring-list.lists-with-schedule-and-next-date	RecurringListModelTests/listsWithScheduleAndNextDate	RecurringListModelTest/listsWithScheduleAndNextDate	対応	
 recurring-list.totals-month-from-month-start-day	RecurringListModelTests/totalsMonthFromMonthStartDay	RecurringListModelTest/totalsMonthFromMonthStartDay	対応	
 recurring-list.hides-and-shows-recurring	RecurringListModelTests/hidesAndShowsRecurring	RecurringListModelTest/hidesAndShowsRecurring	対応	

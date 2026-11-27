@@ -10,7 +10,7 @@ const val RECENT_TRANSFER_LIMIT = 3
 
 val EntryModel.Output.recentEntries: List<Entry>
     get() {
-        if (state.form.type == Entry.Kind.transfer) {
+        if (state.fields.form.type == Entry.Kind.transfer) {
             return emptyList()
         }
 
@@ -22,7 +22,7 @@ val EntryModel.Output.recentEntries: List<Entry>
 
         return (input.history?.entries ?: emptyList())
             .filter { entry ->
-                entry.type == state.form.type &&
+                entry.type == state.fields.form.type &&
                     entry.recurringId == null &&
                     entry.transferId == null &&
                     entry.id != input.editingId &&
@@ -41,7 +41,7 @@ val EntryModel.Output.recentEntries: List<Entry>
 
 val EntryModel.Output.recentTransfers: List<Entry>
     get() {
-        if (state.form.type != Entry.Kind.transfer) {
+        if (state.fields.form.type != Entry.Kind.transfer) {
             return emptyList()
         }
 
@@ -81,7 +81,7 @@ fun EntryModel.Output.fee(of: Entry): Int = (input.history?.entries ?: emptyList
     ?.amount ?: 0
 
 val EntryModel.Output.hasRecent: Boolean
-    get() = if (state.form.type == Entry.Kind.transfer) {
+    get() = if (state.fields.form.type == Entry.Kind.transfer) {
         recentTransfers.isNotEmpty()
     } else {
         templates.isNotEmpty() || recentEntries.isNotEmpty()

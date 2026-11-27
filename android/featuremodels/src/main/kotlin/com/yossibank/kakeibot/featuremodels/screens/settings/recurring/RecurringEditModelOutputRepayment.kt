@@ -9,7 +9,7 @@ import com.yossibank.kakeibot.core.concepts.recurring.scheduledAmount
 import com.yossibank.kakeibot.featuremodels.shared.amount.clamped
 
 val RecurringEditModel.Output.countCalculator: AmountCalculator
-    get() = state.loan.count
+    get() = state.repayment.count
 
 val RecurringEditModel.Output.loanOwed: Int?
     get() {
@@ -17,7 +17,7 @@ val RecurringEditModel.Output.loanOwed: Int?
             return null
         }
 
-        val balance = state.form.toWalletId?.let { input.loanBalances[it] } ?: return null
+        val balance = state.fields.form.toWalletId?.let { input.loanBalances[it] } ?: return null
 
         return if (balance < 0) (-balance).clamped else null
     }
@@ -31,12 +31,12 @@ val RecurringEditModel.Output.autoPlan: RepaymentPlan?
     }
 
 val RecurringEditModel.Output.usesAutoCount: Boolean
-    get() = state.loan.isCountAuto && autoPlan != null
+    get() = state.repayment.isCountAuto && autoPlan != null
 
 val RecurringEditModel.Output.repaymentStart: LocalDate
     get() {
-        val next = input.generatedUntil?.adding(days = 1) ?: state.form.startDate
-        return maxOf(state.form.startDate, next)
+        val next = input.generatedUntil?.adding(days = 1) ?: state.fields.form.startDate
+        return maxOf(state.fields.form.startDate, next)
     }
 
 val RecurringEditModel.Output.scheduledEndDate: LocalDate?
@@ -44,7 +44,7 @@ val RecurringEditModel.Output.scheduledEndDate: LocalDate?
         val plan = autoPlan
 
         if (!usesAutoCount || plan == null) {
-            return state.form.endDate
+            return state.fields.form.endDate
         }
 
         return autoEndDate(plan)
@@ -56,7 +56,7 @@ val RecurringEditModel.Output.finalAmount: Int?
             return null
         }
 
-        return if (usesAutoCount) autoPlan?.finalAmount else state.loan.manualFinal
+        return if (usesAutoCount) autoPlan?.finalAmount else state.repayment.manualFinal
     }
 
 val RecurringEditModel.Output.repaymentCount: Int?

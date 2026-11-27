@@ -9,7 +9,7 @@ fun EntryModel.Field.field(of: Entry.Kind): EntryModel.Field {
 
 val EntryModel.Output.startField: EntryModel.Field
     get() {
-        val isTransfer = state.form.type == Entry.Kind.transfer
+        val isTransfer = state.fields.form.type == Entry.Kind.transfer
         return if (isTransfer) EntryModel.Field.Transfer else EntryModel.Field.Category
     }
 
@@ -17,7 +17,7 @@ val EntryModel.Output.showsRecent: Boolean
     get() = isBlank && state.focus.field == startField
 
 fun EntryModel.select(type: Entry.Kind) {
-    if (state.form.type == type) {
+    if (state.fields.form.type == type) {
         return
     }
 
@@ -29,7 +29,7 @@ fun EntryModel.select(type: Entry.Kind) {
         setWallet(output.usualWalletId)
     }
 
-    val form = state.form
+    val form = state.fields.form
     val categories = output.categories
     val remembered = form.categoryByType[type]
 

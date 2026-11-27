@@ -33,15 +33,15 @@ import com.yossibank.kakeibot.store.writes.types.Deletion
 import java.time.Instant
 
 val RecurringEditModel.Output.walletTitle: String
-    get() = EntryText.walletTitle(state.form.type)
+    get() = EntryText.walletTitle(state.fields.form.type)
 
 val RecurringEditModel.Output.billRecurring: Recurring?
     get() {
-        if (state.form.type == Entry.Kind.transfer) {
+        if (state.fields.form.type == Entry.Kind.transfer) {
             return null
         }
 
-        return input.cardBills.cardBill(paidBy = state.form.walletId)
+        return input.cardBills.cardBill(paidBy = state.fields.form.walletId)
     }
 
 val RecurringEditModel.Output.billDates: List<LocalDate>
@@ -56,22 +56,24 @@ val RecurringEditModel.Output.billDates: List<LocalDate>
     }
 
 val RecurringEditModel.Output.canUseClosingDay: Boolean
-    get() = state.form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.card
+    get() = state.fields.form.type == Entry.Kind.transfer &&
+        selectedDestination?.kind == Wallet.Kind.card
 
 val RecurringEditModel.Output.isCardBill: Boolean
-    get() = canUseClosingDay && state.form.closingDay != null
+    get() = canUseClosingDay && state.fields.form.closingDay != null
 
 val RecurringEditModel.Output.isLoanRepayment: Boolean
-    get() = state.form.type == Entry.Kind.transfer && selectedDestination?.kind == Wallet.Kind.loan
+    get() = state.fields.form.type == Entry.Kind.transfer &&
+        selectedDestination?.kind == Wallet.Kind.loan
 
 val RecurringEditModel.Output.isNotificationDenied: Boolean
     get() {
         val isDenied = input.authorization == NotificationAuthorization.denied
-        return state.form.remindDaysBefore != null && isDenied
+        return state.fields.form.remindDaysBefore != null && isDenied
     }
 
 val RecurringEditModel.Output.categories: List<EntryCategory>
-    get() = when (state.form.type) {
+    get() = when (state.fields.form.type) {
         Entry.Kind.expense -> input.options?.expenseCategories.orEmpty()
         Entry.Kind.income -> input.options?.incomeCategories.orEmpty()
         Entry.Kind.transfer -> emptyList()
@@ -81,13 +83,13 @@ val RecurringEditModel.Output.wallets: List<Wallet>
     get() = input.options?.wallets.orEmpty()
 
 val RecurringEditModel.Output.selectedCategory: EntryCategory?
-    get() = categories.firstOrNull { it.id == state.form.categoryId }
+    get() = categories.firstOrNull { it.id == state.fields.form.categoryId }
 
 val RecurringEditModel.Output.selectedWallet: Wallet?
-    get() = wallets.firstOrNull { it.id == state.form.walletId }
+    get() = wallets.firstOrNull { it.id == state.fields.form.walletId }
 
 val RecurringEditModel.Output.selectedDestination: Wallet?
-    get() = wallets.firstOrNull { it.id == state.form.toWalletId }
+    get() = wallets.firstOrNull { it.id == state.fields.form.toWalletId }
 
 internal fun RecurringEditModel.Output.message(problem: RecurringDraft.Problem): String =
     when (problem) {

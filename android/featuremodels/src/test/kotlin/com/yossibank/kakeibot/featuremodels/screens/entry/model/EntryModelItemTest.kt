@@ -58,7 +58,7 @@ class EntryModelItemTest {
         model.restoreItem(removed)
 
         assertEquals(250, afterRemove)
-        assertEquals(listOf("牛乳", "パン"), model.state.form.items.map { it.name })
+        assertEquals(listOf("牛乳", "パン"), model.state.fields.form.items.map { it.name })
         assertEquals(646, model.output.amount)
     }
 
@@ -77,7 +77,7 @@ class EntryModelItemTest {
         assertEquals(listOf(51L, 39L), model.output.itemTotals.taxes.map { it.amount })
         assertEquals(1674, model.output.amount)
         assertEquals(0L, model.output.itemAdjustment)
-        assertEquals(4, model.output.state.form.items.size)
+        assertEquals(4, model.output.state.fields.form.items.size)
         assertEquals(5, model.output.itemCount)
     }
 
@@ -99,12 +99,12 @@ class EntryModelItemTest {
         val model = setup.loadedModel()
 
         model.state.setStore("青葉")
-        val added = model.state.form.memo
+        val added = model.state.fields.form.memo
         model.state.update { copy(memo = "若葉\n特売") }
         model.state.setStore("青葉\n本店")
 
         assertEquals("青葉", added)
-        assertEquals("青葉 本店\n特売", model.state.form.memo)
+        assertEquals("青葉 本店\n特売", model.state.fields.form.memo)
         assertEquals("青葉 本店", model.state.store)
     }
 
@@ -161,7 +161,7 @@ class EntryModelItemTest {
         )
         val model = setup.loadedModel(editing = entry.id)
 
-        val loaded = model.state.form.items
+        val loaded = model.state.fields.form.items
         model.removeItem(index = 0)
 
         assertEquals(listOf(item("パン", amount = 250)), loaded)

@@ -18,8 +18,8 @@ class EntryModelRecentTest {
         model.applyRecent(saved)
 
         assertEquals(980, model.output.amount)
-        assertEquals(saved.categoryId, model.state.form.categoryId)
-        assertEquals(saved.walletId, model.state.form.walletId)
+        assertEquals(saved.categoryId, model.state.fields.form.categoryId)
+        assertEquals(saved.walletId, model.state.fields.form.walletId)
     }
 
     @Test
@@ -41,8 +41,8 @@ class EntryModelRecentTest {
 
         model.applyRecent(saved)
 
-        assertEquals(category.id, model.state.form.categoryId)
-        assertEquals(tag.id, model.state.form.tagId)
+        assertEquals(category.id, model.state.fields.form.categoryId)
+        assertEquals(tag.id, model.state.fields.form.tagId)
     }
 
     @Test
@@ -67,9 +67,9 @@ class EntryModelRecentTest {
 
         model.applyRecent(saved)
 
-        assertEquals(shared.id, model.state.form.walletId)
+        assertEquals(shared.id, model.state.fields.form.walletId)
         assertEquals(shared.id, model.output.category?.walletId)
-        assertNull(model.state.form.tagId)
+        assertNull(model.state.fields.form.tagId)
         assertEquals(980, model.output.amount)
     }
 

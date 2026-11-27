@@ -227,7 +227,7 @@ private fun RecurringEditContent(
     ) {
         if (!model.flow.output.isEditing) {
             SegmentSwitch(
-                selection = model.state.form.type,
+                selection = model.state.fields.form.type,
                 options = typeOptions,
                 onSelect = model::select,
                 modifier = Modifier.fillMaxWidth(),
@@ -275,9 +275,9 @@ private fun PreviewCard(model: RecurringEditModel) {
 @Composable
 private fun NameField(model: RecurringEditModel) {
     PlaceholderTextField(
-        value = model.state.form.memo,
+        value = model.state.fields.form.memo,
         onChange = { memo -> model.state.update { copy(memo = memo) } },
-        placeholder = RecurringText.namePrompt(model.state.form.type),
+        placeholder = RecurringText.namePrompt(model.state.fields.form.type),
         style = textFont(style = FontTextStyle.Body),
         modifier = Modifier
             .fillMaxWidth()

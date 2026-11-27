@@ -89,7 +89,7 @@ internal fun EntryBody(
 
         EntrySlip(
             model = model,
-            onOpenItems = { model.state.presented.overlay.show(EntryModel.Overlay.Items) },
+            onOpenItems = { model.state.openItems() },
             onVoice = startVoice.takeIf {
                 voice.input.isAvailable && model.output.showsVoice && !voice.output.isActive
             },
@@ -113,7 +113,7 @@ private fun EntryHeader(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         EntryTypeSwitch(
-            selection = model.state.form.type,
+            selection = model.state.fields.form.type,
             onSelect = { model.select(type = it) },
         )
 
@@ -170,7 +170,7 @@ private fun ColumnScope.EntryDeckContent(
     } else {
         EntryDeck(
             model = model,
-            onOpenItems = { model.state.presented.overlay.show(EntryModel.Overlay.Items) },
+            onOpenItems = { model.state.openItems() },
             onSaveTemplate = {
                 model.state.presented.overlay.show(
                     EntryModel.Overlay.Template(model.output.newTemplateDraft()),

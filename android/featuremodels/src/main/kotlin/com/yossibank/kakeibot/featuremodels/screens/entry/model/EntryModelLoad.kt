@@ -26,21 +26,21 @@ suspend fun EntryModel.recordAgain() {
     input.originalFee = null
     state.startAgain(today = input.today)
 
-    if (output.wallets.none { it.id == state.form.walletId }) {
+    if (output.wallets.none { it.id == state.fields.form.walletId }) {
         setWallet(output.wallets.firstOrNull()?.id)
     }
 
-    if (output.wallets.none { it.id == state.form.toWalletId }) {
+    if (output.wallets.none { it.id == state.fields.form.toWalletId }) {
         state.update { copy(toWalletId = null) }
     }
 
-    if (state.form.type == Entry.Kind.transfer) {
+    if (state.fields.form.type == Entry.Kind.transfer) {
         chooseDestination()
-    } else if (output.categories.none { it.id == state.form.categoryId }) {
+    } else if (output.categories.none { it.id == state.fields.form.categoryId }) {
         state.update { withCategory(output.categories.firstOrNull()?.id) }
     }
 
-    if (output.tags.none { it.id == state.form.tagId && it.archivedAt == null }) {
+    if (output.tags.none { it.id == state.fields.form.tagId && it.archivedAt == null }) {
         state.update { copy(tagId = null) }
     }
 

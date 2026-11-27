@@ -122,8 +122,8 @@ private fun RouteChip(
     route: TransferRoute,
 ) {
     val isApplied =
-        model.state.form.walletId == route.walletId &&
-            model.state.form.toWalletId == route.toWalletId
+        model.state.fields.form.walletId == route.walletId &&
+            model.state.fields.form.toWalletId == route.toWalletId
 
     val fill = if (isApplied) Palette.accent.opacity(Emphasis.Soft) else Color.Transparent
     val rim = if (isApplied) Palette.accent else Palette.accent.opacity(Emphasis.Muted)

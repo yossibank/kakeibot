@@ -101,10 +101,10 @@ class RecurringEditModelTest {
 
         model.load()
 
-        assertEquals(Entry.Kind.transfer, model.state.form.type)
-        assertNull(model.state.form.categoryId)
-        assertNotNull(model.state.form.toWalletId)
-        assertNotEquals(model.state.form.walletId, model.state.form.toWalletId)
+        assertEquals(Entry.Kind.transfer, model.state.fields.form.type)
+        assertNull(model.state.fields.form.categoryId)
+        assertNotNull(model.state.fields.form.toWalletId)
+        assertNotEquals(model.state.fields.form.walletId, model.state.fields.form.toWalletId)
         assertFalse(model.flow.output.isChanged)
     }
 
@@ -142,15 +142,15 @@ class RecurringEditModelTest {
         model.load()
 
         model.select(type = Entry.Kind.income)
-        val salary = model.state.form.holidayShift
+        val salary = model.state.fields.form.holidayShift
         model.select(type = Entry.Kind.transfer)
-        val transfer = model.state.form.holidayShift
+        val transfer = model.state.fields.form.holidayShift
         model.state.choose(HolidayShift.none)
         model.select(type = Entry.Kind.income)
 
         assertEquals(HolidayShift.previous, salary)
         assertEquals(HolidayShift.next, transfer)
-        assertEquals(HolidayShift.none, model.state.form.holidayShift)
+        assertEquals(HolidayShift.none, model.state.fields.form.holidayShift)
     }
 
     @Test
