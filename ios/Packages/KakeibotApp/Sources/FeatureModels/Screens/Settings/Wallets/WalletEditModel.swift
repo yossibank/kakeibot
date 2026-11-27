@@ -124,7 +124,7 @@ extension WalletEditModel.Source: EditFlowSource {
             }
 
             state.addedWallet = wallet
-            state.paymentStep.show(.asking)
+            state.presented.paymentStep.show(.asking)
 
             return wallet
         } catch {

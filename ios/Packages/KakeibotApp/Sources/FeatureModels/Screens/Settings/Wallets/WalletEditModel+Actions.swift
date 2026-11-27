@@ -24,7 +24,7 @@ public extension WalletEditModel {
             )
 
             await loadBalance()
-            state.panel.close(.valuation)
+            state.presented.panel.close(.valuation)
 
             return true
         } catch {

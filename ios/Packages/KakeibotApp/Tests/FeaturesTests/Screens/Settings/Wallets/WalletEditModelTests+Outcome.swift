@@ -18,7 +18,7 @@ extension WalletEditModelTests {
         #expect(wallets.contains { $0.id == outcome.saved?.id })
         #expect(outcome.saved?.name == "へそくり")
         #expect(outcome.closes)
-        #expect(!model.state.paymentStep.isShowing(.asking))
+        #expect(!model.state.presented.paymentStep.isShowing(.asking))
         #expect(model.state.addedWallet == nil)
     }
 
@@ -32,7 +32,7 @@ extension WalletEditModelTests {
         await model.flow.save().value
         let saved = try #require(model.state.addedWallet)
         let asked = model.flow.state.outcome.value
-        let isAsking = model.state.paymentStep.isShowing(.asking)
+        let isAsking = model.state.presented.paymentStep.isShowing(.asking)
         model.finishAddedWallet()
         let outcome = try #require(model.flow.state.outcome.value)
 
@@ -55,7 +55,7 @@ extension WalletEditModelTests {
 
         #expect(model.state.addedWallet == nil)
         #expect(model.flow.state.outcome.value == nil)
-        #expect(!model.state.paymentStep.isShowing(.asking))
+        #expect(!model.state.presented.paymentStep.isShowing(.asking))
         #expect(model.state.errorNotice.message == "保存できませんでした")
     }
 
@@ -119,13 +119,13 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let model = try await Self.investment(in: setup)
         model.startValuation()
-        model.state.panel.show(.valuation)
+        model.state.presented.panel.show(.valuation)
         model.state.pressValuation(.digit(5))
 
         let isSaved = await model.saveValuation()
 
         #expect(isSaved)
-        #expect(model.state.panel.current == nil)
+        #expect(model.state.presented.panel.current == nil)
     }
 
     @Test
@@ -133,14 +133,14 @@ extension WalletEditModelTests {
         let setup = try await Setup()
         let model = try await Self.investment(in: setup)
         model.startValuation()
-        model.state.panel.show(.valuation)
+        model.state.presented.panel.show(.valuation)
         model.state.pressValuation(.digit(5))
         try await setup.database.failWrites(to: "valuation")
 
         let isSaved = await model.saveValuation()
 
         #expect(!isSaved)
-        #expect(model.state.panel.current == .valuation)
+        #expect(model.state.presented.panel.current == .valuation)
     }
 
     @Test

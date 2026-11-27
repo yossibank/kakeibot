@@ -18,18 +18,22 @@ public extension WalletEditModel {
         public var name = ""
     }
 
+    struct Presented: ScreenEditable {
+        public var panel = Shown<Drawer>()
+        public var openValuation = Shown<Valuation.ID>()
+        public var paymentStep = Shown<PaymentStep>()
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
         public var fields = Fields()
-        public var panel = Shown<Drawer>()
-        public var openValuation = Shown<Valuation.ID>()
-        public var paymentStep = Shown<PaymentStep>()
+        public var presented = Presented()
 
         public private(set) var kind: Wallet.Kind
         public private(set) var calculator = AmountCalculator()
         public private(set) var loanAmount = AmountCalculator()
-        public private(set) var isNegative: Bool
+        public private(set) var sign: BalanceSign
 
         public internal(set) var valuation = AmountCalculator()
         public internal(set) var addedWallet: Wallet?
@@ -44,7 +48,7 @@ public extension WalletEditModel {
         ) {
             self.errorNotice = ErrorNotice(wait: wait)
             self.kind = kind
-            self.isNegative = kind.isDebt
+            self.sign = BalanceSign(isNegative: kind.isDebt)
             self.valuationDeletion = UndoNotice(wait: wait)
 
             self.icon = SettingsIconEditorModel(
@@ -56,18 +60,19 @@ public extension WalletEditModel {
 }
 
 public extension WalletEditModel.State {
+    var isNegative: Bool {
+        sign.isNegative
+    }
+
     func setNegative(_ isNegative: Bool) {
-        self.isNegative = isNegative
+        sign.set(isNegative)
     }
 
     func setKind(_ kind: Wallet.Kind) {
         let oldKind = self.kind
 
         self.kind = kind
-
-        if isNegative == oldKind.isDebt {
-            isNegative = kind.isDebt
-        }
+        sign.follow(from: oldKind, to: kind)
 
         guard icon.markKind == .glyph, icon.glyph == WalletEditModel.glyph(for: oldKind) else {
             return
@@ -86,7 +91,7 @@ public extension WalletEditModel.State {
             return
         }
 
-        isNegative = operation == .subtract
+        sign.set(operation == .subtract)
     }
 
     func pressValuation(_ key: AmountCalculator.Key) {
@@ -103,7 +108,7 @@ extension WalletEditModel.State {
         fields.name = draft.name
         kind = draft.kind
         icon.apply(draft.icon)
-        isNegative = draft.initialBalance < 0
+        sign.set(draft.initialBalance < 0)
         calculator = AmountCalculator(amount: abs(draft.initialBalance))
         loanAmount = AmountCalculator(amount: draft.loanAmount ?? 0)
     }
