@@ -95,7 +95,7 @@ private extension ThemeListView {
 
     func closeMenu() {
         withAnimation(.snappy(duration: 0.2)) {
-            model.state.close(model.state.presented?.menu.map { .menu($0) })
+            model.state.close(model.state.presented.overlay.current?.menu.map { .menu($0) })
         }
     }
 

@@ -46,7 +46,7 @@ public struct TemplateEditSheet: View {
                     }
                 }
                 .sheet(
-                    item: Bindable(model.state).tagCategory.item,
+                    item: Bindable(model.state).presented.tagCategory.item,
                     onDismiss: reloadTags
                 ) { category in
                     CategoryEditSheet(
@@ -72,7 +72,7 @@ extension TemplateEditSheet {
 
 extension TemplateEditSheet {
     var drawerPanel: Panel? {
-        model.state.panel.isShowing(.memo) ? nil : model.state.panel.current
+        model.state.presented.panel.isShowing(.memo) ? nil : model.state.presented.panel.current
     }
 
     var saveButton: some View {
@@ -87,7 +87,7 @@ extension TemplateEditSheet {
         focus = nil
 
         withAnimation(.snappy) {
-            model.state.panel.show(panel)
+            model.state.presented.panel.show(panel)
         }
     }
 
@@ -123,7 +123,7 @@ private extension TemplateEditSheet {
     var layeredContent: some View {
         content
             .ignoresSafeArea(keyboardRegions)
-            .floatingInput(isPresented: model.state.panel.isShowing(.memo)) {
+            .floatingInput(isPresented: model.state.presented.panel.isShowing(.memo)) {
                 closePanel()
             } card: {
                 memoCard
@@ -139,7 +139,7 @@ private extension TemplateEditSheet {
             }
             .overlay(alignment: .top) {
                 SettingsEditHeader(
-                    isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+                    isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
                     title: title,
                     isEditing: model.flow.output.isEditing,
                     isHidden: model.flow.output.isHidden,
@@ -150,7 +150,7 @@ private extension TemplateEditSheet {
                 } onHide: {
                     model.flow.toggleHidden()
                 } onDelete: {
-                    model.flow.state.prompt.show(.delete)
+                    model.flow.state.presented.prompt.show(.delete)
                 }
                 .padding(.horizontal, SettingsSpacing.side)
                 .padding(.top, SettingsSpacing.top)
@@ -172,7 +172,7 @@ private extension TemplateEditSheet {
     }
 
     var keyboardRegions: SafeAreaRegions {
-        model.state.panel.isShowing(.memo) ? .keyboard : []
+        model.state.presented.panel.isShowing(.memo) ? .keyboard : []
     }
 
     var memoValue: String {
@@ -218,7 +218,7 @@ private extension TemplateEditSheet {
 
     func hidePanel() {
         withAnimation(.snappy) {
-            model.state.panel.closeAll()
+            model.state.presented.panel.closeAll()
         }
     }
 }

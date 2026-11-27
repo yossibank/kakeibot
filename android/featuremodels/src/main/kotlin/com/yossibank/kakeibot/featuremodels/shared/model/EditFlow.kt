@@ -24,10 +24,14 @@ class EditFlow<Saved : Any>(
         val closes: Boolean = true,
     )
 
+    class Presented : ScreenEditable {
+        val prompt = Shown<Prompt>()
+    }
+
     class State<Saved : Any>(
         val task: ModelTask,
     ) {
-        val prompt = Shown<Prompt>()
+        val presented = Presented()
         val outcome = ScreenOutcome<Outcome<Saved>>()
     }
 
@@ -61,7 +65,7 @@ class EditFlow<Saved : Any>(
         source.rest()
 
         if (source.isChanged) {
-            state.prompt.show(Prompt.discard)
+            state.presented.prompt.show(Prompt.discard)
             return
         }
 
@@ -77,7 +81,7 @@ class EditFlow<Saved : Any>(
     }
 
     fun discard() {
-        state.prompt.close(Prompt.discard)
+        state.presented.prompt.close(Prompt.discard)
         state.outcome.send(Outcome())
     }
 
@@ -95,7 +99,7 @@ class EditFlow<Saved : Any>(
 
     suspend fun toggleHidden() {
         if (output.asksBeforeHiding) {
-            state.prompt.show(Prompt.hide)
+            state.presented.prompt.show(Prompt.hide)
             return
         }
 
@@ -104,7 +108,7 @@ class EditFlow<Saved : Any>(
 
     suspend fun continueHiding() {
         if (source.isChanged) {
-            state.prompt.show(Prompt.hideChanges)
+            state.presented.prompt.show(Prompt.hideChanges)
             return
         }
 

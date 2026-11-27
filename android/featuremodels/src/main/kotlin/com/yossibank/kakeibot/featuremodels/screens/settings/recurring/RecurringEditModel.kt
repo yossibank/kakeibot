@@ -18,6 +18,7 @@ import com.yossibank.kakeibot.featuremodels.shared.model.EditFlowSource
 import com.yossibank.kakeibot.featuremodels.shared.model.ErrorNotice
 import com.yossibank.kakeibot.featuremodels.shared.model.ModelTask
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenClock
+import com.yossibank.kakeibot.featuremodels.shared.model.ScreenEditable
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenParts
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenPerforming
 import com.yossibank.kakeibot.featuremodels.shared.model.ScreenWait
@@ -41,11 +42,22 @@ class RecurringEditModel(
     permission: NotificationPermission = NotificationPermission.allowed,
 ) : ScreenPerforming {
     val state = State(today, type, isScheduleOpen = editingId == null, wait = parts.wait)
-    val input = Input(editingId)
+    val input = Input(editingId, today)
     val output = Output(input, state)
     val flow = EditFlow(task = state.task, source = Source())
 
     private val dependencies = Dependencies(parts.database, parts.clock, permission)
+
+    class Presented(
+        isScheduleOpen: Boolean,
+    ) : ScreenEditable {
+        var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
+            private set
+
+        fun toggleSchedule() {
+            isScheduleOpen = !isScheduleOpen
+        }
+    }
 
     class State(
         today: LocalDate,
@@ -56,12 +68,7 @@ class RecurringEditModel(
         val errorNotice = ErrorNotice(wait)
         val task = ModelTask(errorNotice)
         val panel = Shown<RecurringPanel>()
-
-        var today: LocalDate by mutableStateOf(today)
-            internal set
-
-        var isScheduleOpen: Boolean by mutableStateOf(isScheduleOpen)
-            private set
+        val presented = Presented(isScheduleOpen)
 
         var form: RecurringEditForm by mutableStateOf(
             RecurringEditForm.starting(
@@ -84,7 +91,7 @@ class RecurringEditModel(
             private set
 
         fun toggleSchedule() {
-            isScheduleOpen = !isScheduleOpen
+            presented.toggleSchedule()
         }
 
         fun update(change: RecurringEditForm.() -> RecurringEditForm) {
@@ -135,7 +142,11 @@ class RecurringEditModel(
 
     class Input(
         val editingId: Identifier<Recurring>?,
+        today: LocalDate,
     ) {
+        var today: LocalDate by mutableStateOf(today)
+            internal set
+
         var isHidden: Boolean by mutableStateOf(false)
             internal set
 
@@ -234,7 +245,7 @@ class RecurringEditModel(
     }
 
     fun setToday(today: LocalDate) {
-        state.today = today
+        input.today = today
     }
 
     fun refreshAuthorization() {
@@ -246,7 +257,7 @@ class RecurringEditModel(
             dependencies.database.saveRecurring(
                 draft = output.draft,
                 editing = input.editingId,
-                today = state.today,
+                today = input.today,
                 at = dependencies.clock.now,
             )
         }
@@ -277,7 +288,7 @@ class RecurringEditModel(
         dependencies.database.setRecurringHidden(
             id = id,
             isHidden = isHidden,
-            today = state.today,
+            today = input.today,
             at = dependencies.clock.now,
         )
 
@@ -292,7 +303,7 @@ class RecurringEditModel(
             .associate { wallet ->
                 wallet.id to list.balance(
                     of = wallet,
-                    through = state.today,
+                    through = input.today,
                 )
             }
     }

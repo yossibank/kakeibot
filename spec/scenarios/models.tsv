@@ -638,10 +638,12 @@ stamp-edit.*	StampEditModelTests/*		未移植	スタンプを編集する画面�
 stamp-list.*	StampListModelTests/*		未移植	スタンプの一覧の画面が無い
 sync-choice.*	SyncChoiceTests/*		未移植	同期の画面が無い
 sync.*	SyncModelTests/*		未移植	同期の画面が無い
+switch-request.holds-asked-value-until-cleared	SwitchRequestTests/holdsAskedValueUntilCleared		未移植	同期の画面が無い
 theme-edit.*	ThemeEditModelTests/*		未移植	テーマを編集する画面が無い
 theme-list.*	ThemeListModelTests/*		未移植	テーマの一覧の画面が無い
 theme-style.*	ThemeStyleModelTests/*		未移植	明暗と見た目を選ぶ画面が無い
 wallet-edit.*	WalletEditModelTests/*		未移植	口座を編集する画面が無い
+balance-sign.follows-kind-only-while-sign-matches-old-kind	BalanceSignTests/followsKindOnlyWhileSignMatchesOldKind		未移植	口座を編集する画面が無い
 wallet-list.*	WalletListModelTests/*		未移植	口座の一覧の画面が無い
 whats-new.*	WhatsNewModelTests/*		未移植	お知らせの画面が無い
 widget-guide.*	WidgetGuideModelTests/*		未移植	ウィジェットの置き方の画面が無い

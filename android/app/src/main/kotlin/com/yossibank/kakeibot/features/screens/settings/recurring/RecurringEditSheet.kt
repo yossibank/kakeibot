@@ -193,7 +193,7 @@ private fun EditActions(model: RecurringEditModel) {
 
             RoundIconButton(
                 icon = R.drawable.ic_trash,
-                onSelect = { model.flow.state.prompt.show(EditFlow.Prompt.delete) },
+                onSelect = { model.flow.state.presented.prompt.show(EditFlow.Prompt.delete) },
             )
         }
     }

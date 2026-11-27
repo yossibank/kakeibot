@@ -38,7 +38,7 @@ class TemplateEditModelTest {
         val changedAfterLoad = model.flow.output.isChanged
         model.state.update { copy(name = "ランチ") }
         model.flow.close()
-        val asked = model.flow.state.prompt.isShowing(EditFlow.Prompt.discard)
+        val asked = model.flow.state.presented.prompt.isShowing(EditFlow.Prompt.discard)
         val pending = model.flow.state.outcome.value
         model.flow.discard()
 

@@ -40,11 +40,11 @@ public extension BackupModel {
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var presented = Shown<Presented>()
+        public var presented = Presented()
 
         public internal(set) var file: BackupFile?
         public internal(set) var pending: ExportV1?
-        public internal(set) var doneMessage: String?
+        public internal(set) var done: Done?
         public internal(set) var pressed: Row?
 
         public let errorNotice: ErrorNotice
@@ -150,7 +150,7 @@ public extension BackupModel {
 
         let date = dependencies.clock.now
 
-        state.doneMessage = nil
+        state.done = nil
 
         defer {
             state.finishWorking()
@@ -164,12 +164,12 @@ public extension BackupModel {
             let name = Self.fileName(of: kind, at: date)
 
             state.file = BackupFile(kind: kind, data: data, name: name)
-            state.presented.show(.exporter)
+            state.presented.dialog.show(.exporter)
 
             return true
         } catch {
             state.errorNotice.show(Self.exportFailedMessage)
-            state.presented.close(.exporter)
+            state.presented.dialog.close(.exporter)
             return false
         }
     }
@@ -181,7 +181,7 @@ public extension BackupModel {
 
         switch result {
         case .success:
-            state.doneMessage = Self.exportedMessage
+            state.done = .exported
 
             if kind == .json {
                 try? await dependencies.database.setSetting(
@@ -197,11 +197,11 @@ public extension BackupModel {
 
     @discardableResult
     func read(_ result: Result<URL, any Error>) async -> Bool {
-        state.doneMessage = nil
+        state.done = nil
 
         guard case let .success(url) = result else {
             state.errorNotice.show(Self.readFailedMessage)
-            state.presented.close(.restore)
+            state.presented.dialog.close(.restore)
             return false
         }
 
@@ -229,7 +229,7 @@ public extension BackupModel {
 
     @discardableResult
     func readPrevious(_ item: Previous) async -> Bool {
-        state.doneMessage = nil
+        state.done = nil
 
         let export = await Task.detached {
             Result {
@@ -277,7 +277,7 @@ public extension BackupModel {
             }
 
             try? await dependencies.database.setSetting(.backupExportedAt, to: pending.exportedAt)
-            state.doneMessage = Self.restoredMessage
+            state.done = .restored
 
             if pending.data.needsNotifications {
                 await dependencies.permission.requestIfUndecided()
@@ -292,8 +292,6 @@ public extension BackupModel {
 }
 
 private extension BackupModel {
-    static let exportedMessage = "書き出しました"
-    static let restoredMessage = "読み込みました"
     static let exportFailedMessage = "書き出せませんでした"
     static let readFailedMessage = "ファイルを読めませんでした"
     static let unknownFormatMessage = "かけいぼっとのバックアップではありません"
@@ -322,11 +320,11 @@ private extension BackupModel {
     func accept(_ export: Result<ExportV1, any Error>) -> Bool {
         do {
             state.pending = try export.get()
-            state.presented.show(.restore)
+            state.presented.dialog.show(.restore)
             return true
         } catch {
             state.errorNotice.show(Self.readMessage(for: error))
-            state.presented.close(.restore)
+            state.presented.dialog.close(.restore)
             return false
         }
     }

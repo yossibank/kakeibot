@@ -55,13 +55,13 @@ public struct WalletEditSheet: View {
         .onChange(of: model.state.kind) {
             focus = nil
         }
-        .sheet(isPresented: Bindable(model.state).paymentStep[.editing]) {
+        .sheet(isPresented: Bindable(model.state).presented.paymentStep[.editing]) {
             closePayment()
         } content: {
             RecurringEditSheet(model: model.paymentModel())
         }
         .confirmation(
-            isPresented: Bindable(model.state).paymentStep[.asking],
+            isPresented: Bindable(model.state).presented.paymentStep[.asking],
             systemImage: "repeat",
             title: model.output.paymentQuestion,
             message: model.output.paymentQuestionNote,
@@ -70,7 +70,7 @@ public struct WalletEditSheet: View {
             role: .suggestion,
             onKeep: model.finishAddedWallet
         ) {
-            model.state.paymentStep.show(.editing)
+            model.state.presented.paymentStep.show(.editing)
         }
         .task {
             await model.load()
@@ -84,7 +84,7 @@ private extension WalletEditSheet {
         ZStack(alignment: .bottom) {
             content
 
-            if model.state.panel.isShowing(.amount) {
+            if model.state.presented.panel.isShowing(.amount) {
                 amountDrawer(
                     "最初の残高",
                     calculator: model.state.calculator,
@@ -95,7 +95,7 @@ private extension WalletEditSheet {
                 )
             }
 
-            if model.state.panel.isShowing(.valuation) {
+            if model.state.presented.panel.isShowing(.valuation) {
                 amountDrawer(
                     "今の評価額",
                     calculator: model.state.valuation,
@@ -110,7 +110,7 @@ private extension WalletEditSheet {
                 }
             }
 
-            if model.state.panel.isShowing(.loanAmount) {
+            if model.state.presented.panel.isShowing(.loanAmount) {
                 amountDrawer(
                     "最初に借りた額",
                     calculator: model.state.loanAmount,
@@ -120,7 +120,7 @@ private extension WalletEditSheet {
                 )
             }
         }
-        .animation(.snappy, value: model.state.panel)
+        .animation(.snappy, value: model.state.presented.panel)
     }
 }
 

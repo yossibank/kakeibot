@@ -89,8 +89,8 @@ class RecurringEditModelTest {
         val adding = setup.editModel()
         val editing = setup.editModel(editingId = Identifier())
 
-        assertTrue(adding.state.isScheduleOpen)
-        assertFalse(editing.state.isScheduleOpen)
+        assertTrue(adding.state.presented.isScheduleOpen)
+        assertFalse(editing.state.presented.isScheduleOpen)
         assertFalse(adding.flow.output.isEditing)
         assertTrue(editing.flow.output.isEditing)
     }

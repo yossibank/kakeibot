@@ -27,7 +27,7 @@ val RecurringEditModel.Output.previewRow: RecurringRow
         val next = recurring(
             endDate = scheduledEndDate,
             finalAmount = null,
-        ).nextDate(onOrAfter = state.today)
+        ).nextDate(onOrAfter = input.today)
 
         val closing = if (canUseClosingDay) {
             state.form.closingDay?.let(RecurringText::closingNote)

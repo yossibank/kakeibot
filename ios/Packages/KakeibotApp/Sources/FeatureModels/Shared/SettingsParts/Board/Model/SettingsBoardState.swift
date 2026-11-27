@@ -7,27 +7,27 @@ public protocol SettingsBoardState: NoticeHolding, Observable {
 
     var movingOrder: [ID]? { get }
     var removed: SettingsBoardRemoved<ID> { get }
-    var shown: SettingsBoardShown<ID, Destination> { get set }
+    var presented: SettingsBoardShown<ID, Destination> { get set }
 
     func setMovingOrder(_ order: [ID]?)
 }
 
 public extension SettingsBoardState {
     func open(_ destination: Destination) {
-        if shown.destination != destination {
-            shown.destination = destination
+        if presented.destination != destination {
+            presented.destination = destination
         }
     }
 
     func ask(_ prompt: SettingsBoardPrompt<ID>) {
-        if shown.prompt != prompt {
-            shown.prompt = prompt
+        if presented.prompt != prompt {
+            presented.prompt = prompt
         }
     }
 
     func closePrompt(_ prompt: SettingsBoardPrompt<ID>) {
-        if shown.prompt == prompt {
-            shown.prompt = nil
+        if presented.prompt == prompt {
+            presented.prompt = nil
         }
     }
 }

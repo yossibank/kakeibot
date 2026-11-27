@@ -100,7 +100,7 @@ public extension TemplateEditModel {
 
     func openTags() {
         if let category = output.selectedCategory {
-            state.tagCategory.show(category)
+            state.presented.tagCategory.show(category)
         }
     }
 

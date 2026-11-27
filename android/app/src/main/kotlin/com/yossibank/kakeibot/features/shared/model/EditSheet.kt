@@ -56,11 +56,11 @@ private fun PromptDialogs(
     deleting: String,
     note: String?,
 ) {
-    when (val prompt = flow.state.prompt.current) {
+    when (val prompt = flow.state.presented.prompt.current) {
         EditFlow.Prompt.discard -> {
             DiscardDialog(
                 onDiscard = flow::discard,
-                onKeep = { flow.state.prompt.close(prompt) },
+                onKeep = { flow.state.presented.prompt.close(prompt) },
             )
         }
 
@@ -69,10 +69,10 @@ private fun PromptDialogs(
                 title = deleting,
                 message = note,
                 onConfirm = {
-                    flow.state.prompt.close(prompt)
+                    flow.state.presented.prompt.close(prompt)
                     flow.perform { it.delete() }
                 },
-                onDismiss = { flow.state.prompt.close(prompt) },
+                onDismiss = { flow.state.presented.prompt.close(prompt) },
             )
         }
 
@@ -81,14 +81,14 @@ private fun PromptDialogs(
                 isHidden = flow.output.isHidden,
                 canSave = flow.output.canSave,
                 onSave = {
-                    flow.state.prompt.close(prompt)
+                    flow.state.presented.prompt.close(prompt)
                     flow.perform { it.saveTogglingHidden() }
                 },
                 onDiscard = {
-                    flow.state.prompt.close(prompt)
+                    flow.state.presented.prompt.close(prompt)
                     flow.perform { it.setHidden(!it.output.isHidden) }
                 },
-                onKeep = { flow.state.prompt.close(prompt) },
+                onKeep = { flow.state.presented.prompt.close(prompt) },
             )
         }
 

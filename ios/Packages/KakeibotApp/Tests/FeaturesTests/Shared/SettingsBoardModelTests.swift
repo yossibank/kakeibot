@@ -38,10 +38,10 @@ struct SettingsBoardModelTests {
 
         board.state.ask(.delete("a"))
         board.state.ask(.hide("a"))
-        let asked = board.state.shown.prompt
+        let asked = board.state.presented.prompt
 
         board.state.closePrompt(.delete("a"))
-        let kept = board.state.shown.prompt
+        let kept = board.state.presented.prompt
 
         board.state.closePrompt(.hide("a"))
 
@@ -49,20 +49,20 @@ struct SettingsBoardModelTests {
         #expect(asked?.hidingId == "a")
         #expect(asked?.deletingId == nil)
         #expect(kept == .hide("a"))
-        #expect(board.state.shown.prompt == nil)
+        #expect(board.state.presented.prompt == nil)
     }
 
     @Test
     func opensEditorWhileKeepingOpenRow() {
         let board = FakeBoard(visible: ["a", "b"])
-        board.state.shown.openId = "b"
+        board.state.presented.openId = "b"
 
         board.state.open(.edit("a"))
 
-        #expect(board.state.shown.destination == .edit("a"))
-        #expect(board.state.shown.destination?.editingID == "a")
-        #expect(board.state.shown.openId == "b")
-        #expect(board.state.shown.prompt == nil)
+        #expect(board.state.presented.destination == .edit("a"))
+        #expect(board.state.presented.destination?.editingID == "a")
+        #expect(board.state.presented.openId == "b")
+        #expect(board.state.presented.prompt == nil)
     }
 
     @Test

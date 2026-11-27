@@ -40,15 +40,15 @@ public extension SyncModel.Output {
     }
 
     var choice: SyncChoice? {
-        state.presented.current?.choice
+        state.presented.dialog.current?.choice
     }
 
     var invitation: WalletShare? {
-        state.presented.current?.invitation
+        state.presented.dialog.current?.invitation
     }
 
     var opened: WalletShare? {
-        state.presented.current?.opened
+        state.presented.dialog.current?.opened
     }
 
     var isChoosing: Bool {
@@ -56,11 +56,11 @@ public extension SyncModel.Output {
     }
 
     var shownOn: Bool {
-        state.requestedOn ?? input.isOn
+        state.request.isOn ?? input.isOn
     }
 
     var isSwitching: Bool {
-        state.requestedOn != nil
+        state.request.isPending
     }
 
     var progress: SyncProgress? {

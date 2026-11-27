@@ -15,7 +15,7 @@ public struct SyncView: View {
     }
 
     public var body: some View {
-        let presented = model.state.presented.current
+        let presented = model.state.presented.dialog.current
 
         content
             .confirmation(
@@ -213,7 +213,7 @@ private extension SyncView {
             model.output.shownOn
         } set: { isOn in
             guard !isOn || isPro else {
-                model.state.presented.show(.offer(.sync))
+                model.state.presented.dialog.show(.offer(.sync))
                 return
             }
 
@@ -239,7 +239,7 @@ private extension SyncView {
         return true
     }
 
-    func isPresenting(_ presented: SyncModel.Presented?) -> Binding<Bool> {
+    func isPresenting(_ presented: SyncModel.Dialog?) -> Binding<Bool> {
         Binding {
             presented != nil
         } set: { isPresented in
@@ -249,9 +249,9 @@ private extension SyncView {
         }
     }
 
-    func close(_ presented: SyncModel.Presented?) {
+    func close(_ presented: SyncModel.Dialog?) {
         if let presented {
-            model.state.presented.close(presented)
+            model.state.presented.dialog.close(presented)
         }
     }
 
@@ -266,11 +266,11 @@ private extension SyncView {
     }
 
     func unlock() {
-        guard let offer = model.state.presented.current?.offer else {
+        guard let offer = model.state.presented.dialog.current?.offer else {
             return
         }
 
-        model.state.presented.close(.offer(offer))
+        model.state.presented.dialog.close(.offer(offer))
 
         switch offer {
         case .sync:

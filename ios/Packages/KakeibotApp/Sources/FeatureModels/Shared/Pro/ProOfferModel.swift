@@ -9,27 +9,31 @@ public final class ProOfferModel {
 }
 
 public extension ProOfferModel {
-    enum Presented: Hashable, Sendable {
+    enum Destination: Hashable, Sendable {
         case pro
+    }
+
+    struct Presented: ScreenEditable {
+        public var destination = Shown<Destination>()
     }
 
     @MainActor
     @Observable
     final class State {
-        public var presented = Shown<Presented>()
+        public var presented = Presented()
     }
 }
 
 public extension ProOfferModel {
     func showPro() {
-        state.presented.show(.pro)
+        state.presented.destination.show(.pro)
     }
 
     func closePro() {
-        guard state.presented.isShowing(.pro) else {
+        guard state.presented.destination.isShowing(.pro) else {
             return
         }
 
-        state.presented.close(.pro)
+        state.presented.destination.close(.pro)
     }
 }

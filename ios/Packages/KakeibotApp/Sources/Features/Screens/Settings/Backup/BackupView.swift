@@ -33,7 +33,7 @@ public struct BackupView: View {
         }
         .animation(.snappy, value: model.state.doneMessage)
         .fileExporter(
-            isPresented: Bindable(model.state).presented[.exporter],
+            isPresented: Bindable(model.state).presented.dialog[.exporter],
             document: document,
             contentType: exportType,
             defaultFilename: model.state.file?.name
@@ -43,7 +43,7 @@ public struct BackupView: View {
             }
         }
         .fileImporter(
-            isPresented: Bindable(model.state).presented[.importer],
+            isPresented: Bindable(model.state).presented.dialog[.importer],
             allowedContentTypes: [.json]
         ) { result in
             model.perform {
@@ -51,7 +51,7 @@ public struct BackupView: View {
             }
         }
         .confirmation(
-            isPresented: Bindable(model.state).presented[.restore],
+            isPresented: Bindable(model.state).presented.dialog[.restore],
             systemImage: "arrow.triangle.2.circlepath",
             title: "データを置き換えますか",
             message: model.output.pendingSummary ?? "",
@@ -235,7 +235,7 @@ private extension BackupView {
     }
 
     func importFile() {
-        model.state.presented.show(.importer)
+        model.state.presented.dialog.show(.importer)
     }
 
     func restorePrevious(_ item: BackupModel.Previous) {

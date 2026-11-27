@@ -60,7 +60,7 @@ extension WalletEditSheet {
     }
 
     var valuationItems: [SettingsRowList<Panel>.Item] {
-        let isEntering = model.state.panel.isShowing(.valuation)
+        let isEntering = model.state.presented.panel.isShowing(.valuation)
         let amount = isEntering ? model.state.valuation.amount : model.input.balance
 
         return [
@@ -96,12 +96,12 @@ extension WalletEditSheet {
     }
 
     var amountStroke: Color {
-        model.state.panel.isShowing(.amount) ? signColor : signColor.opacity(.muted)
+        model.state.presented.panel.isShowing(.amount) ? signColor : signColor.opacity(.muted)
     }
 
     func open(_ panel: Panel) {
         switch panel {
-        case .payment: model.state.paymentStep.show(.editing)
+        case .payment: model.state.presented.paymentStep.show(.editing)
         case .valuation: openValuation()
         case .loanAmount: openLoanAmount()
         }
@@ -138,9 +138,9 @@ extension WalletEditSheet {
     func show(_ drawer: WalletEditModel.Drawer?) {
         withAnimation(.snappy) {
             if let drawer {
-                model.state.panel.show(drawer)
+                model.state.presented.panel.show(drawer)
             } else {
-                model.state.panel.closeAll()
+                model.state.presented.panel.closeAll()
             }
         }
     }

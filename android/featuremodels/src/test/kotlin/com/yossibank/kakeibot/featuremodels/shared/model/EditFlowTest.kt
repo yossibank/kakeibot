@@ -20,7 +20,7 @@ class EditFlowTest {
         flow.close()
         val outcome = flow.state.outcome.value
 
-        assertNull(flow.state.prompt.current)
+        assertNull(flow.state.presented.prompt.current)
         assertEquals(true, outcome?.closes)
         assertNull(outcome?.saved)
     }
@@ -31,13 +31,13 @@ class EditFlowTest {
         val flow = EditFlow(task = manualTask(), source = source)
 
         flow.close()
-        val asked = flow.state.prompt.current
+        val asked = flow.state.presented.prompt.current
         val sent = flow.state.outcome.count
         flow.discard()
 
         assertEquals(EditFlow.Prompt.discard, asked)
         assertEquals(0, sent)
-        assertNull(flow.state.prompt.current)
+        assertNull(flow.state.presented.prompt.current)
         assertEquals(true, flow.state.outcome.value?.closes)
     }
 
@@ -111,9 +111,9 @@ class EditFlowTest {
         changed.toggleHidden()
         unchanged.toggleHidden()
 
-        assertEquals(EditFlow.Prompt.hideChanges, changed.state.prompt.current)
+        assertEquals(EditFlow.Prompt.hideChanges, changed.state.presented.prompt.current)
         assertEquals(0, changed.state.outcome.count)
-        assertNull(unchanged.state.prompt.current)
+        assertNull(unchanged.state.presented.prompt.current)
         assertEquals(true, unchanged.state.outcome.value?.isHidden)
     }
 
@@ -127,12 +127,12 @@ class EditFlowTest {
         val flow = EditFlow(task = manualTask(), source = source)
 
         flow.toggleHidden()
-        val asked = flow.state.prompt.current
+        val asked = flow.state.presented.prompt.current
 
         flow.continueHiding()
 
         assertEquals(EditFlow.Prompt.hide, asked)
-        assertEquals(EditFlow.Prompt.hideChanges, flow.state.prompt.current)
+        assertEquals(EditFlow.Prompt.hideChanges, flow.state.presented.prompt.current)
         assertEquals(0, flow.state.outcome.count)
     }
 

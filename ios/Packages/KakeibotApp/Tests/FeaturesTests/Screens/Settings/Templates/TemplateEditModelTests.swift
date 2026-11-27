@@ -29,15 +29,15 @@ struct TemplateEditModelTests {
         let database = try Self.database()
         let model = TemplateEditModel(parts: .system(database), type: .expense)
 
-        model.state.panel.show(.amount)
-        model.state.panel.show(.memo)
-        let opened = model.state.panel.current
+        model.state.presented.panel.show(.amount)
+        model.state.presented.panel.show(.memo)
+        let opened = model.state.presented.panel.current
 
-        model.state.panel.closeAll()
+        model.state.presented.panel.closeAll()
 
         #expect(opened == .memo)
-        #expect(model.state.panel.current == nil)
-        #expect(model.state.tagCategory.current == nil)
+        #expect(model.state.presented.panel.current == nil)
+        #expect(model.state.presented.tagCategory.current == nil)
     }
 
     @Test
@@ -114,7 +114,7 @@ struct TemplateEditModelTests {
         model.state.fields.name = "ランチ"
 
         model.flow.close()
-        let asked = model.flow.state.prompt.isShowing(.discard)
+        let asked = model.flow.state.presented.prompt.isShowing(.discard)
         let pending = model.flow.state.outcome.value
 
         model.flow.discard()

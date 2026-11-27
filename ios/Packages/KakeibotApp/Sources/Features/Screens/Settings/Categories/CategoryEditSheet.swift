@@ -119,7 +119,7 @@ private extension CategoryEditSheet {
             }
             .disabled(!model.flow.output.canSave)
         }
-        .scrollDisabled(model.state.isMovingTag)
+        .scrollDisabled(model.state.presented.isMovingTag)
         .overlay(alignment: .top) {
             header
                 .padding(.horizontal, SettingsSpacing.side)
@@ -134,7 +134,7 @@ private extension CategoryEditSheet {
 
     var header: some View {
         SettingsEditHeader(
-            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
             title: model.flow.output.isEditing ? "カテゴリを編集" : "カテゴリを追加",
             isEditing: model.flow.output.isEditing,
             isHidden: model.flow.output.isHidden,
@@ -146,7 +146,7 @@ private extension CategoryEditSheet {
         } onHide: {
             model.flow.toggleHidden()
         } onDelete: {
-            model.flow.state.prompt.show(.delete)
+            model.flow.state.presented.prompt.show(.delete)
         }
     }
 
@@ -248,7 +248,7 @@ private extension CategoryEditSheet {
     }
 
     var keyboardRegions: SafeAreaRegions {
-        model.state.ignoresKeyboard ? .keyboard : []
+        model.state.presented.ignoresKeyboard ? .keyboard : []
     }
 
     var tagName: Binding<String> {

@@ -61,7 +61,7 @@ private extension ThemeEditSheet {
 private extension ThemeEditSheet {
     var header: some View {
         SettingsEditHeader(
-            isMenuOpen: Bindable(model.flow.state).prompt[.menu],
+            isMenuOpen: Bindable(model.flow.state).presented.prompt[.menu],
             title: model.flow.output.isEditing ? "テーマを編集" : "テーマを追加",
             isEditing: model.flow.output.isEditing,
             isHidden: false,
@@ -70,7 +70,7 @@ private extension ThemeEditSheet {
             close()
         } onHide: {} onDelete: {
             focus = nil
-            model.flow.state.prompt.show(.delete)
+            model.flow.state.presented.prompt.show(.delete)
         }
     }
 

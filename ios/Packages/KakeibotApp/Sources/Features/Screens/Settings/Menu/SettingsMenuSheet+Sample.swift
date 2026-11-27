@@ -9,7 +9,7 @@ extension SettingsMenuSheet {
             sectionTitle("開発")
 
             Button {
-                sample.state.prompt.show(.insert)
+                sample.state.presented.prompt.show(.insert)
             } label: {
                 row("テストデータを入れる", systemImage: "wand.and.stars")
             }
@@ -19,7 +19,7 @@ extension SettingsMenuSheet {
             .card()
             .confirmationDialog(
                 "4 か月分の記録・予算・テンプレート・固定費を足します",
-                isPresented: Bindable(sample.state).prompt[.insert],
+                isPresented: Bindable(sample.state).presented.prompt[.insert],
                 titleVisibility: .visible
             ) {
                 Button("足す") {

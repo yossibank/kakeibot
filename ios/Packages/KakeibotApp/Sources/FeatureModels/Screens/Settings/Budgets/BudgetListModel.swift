@@ -48,10 +48,14 @@ public extension BudgetListModel {
         case discard
     }
 
+    struct Presented: ScreenEditable {
+        public var prompt = Shown<Prompt>()
+    }
+
     @MainActor
     @Observable
     final class State: NoticeHolding {
-        public var prompt = Shown<Prompt>()
+        public var presented = Presented()
 
         public internal(set) var editing: Target?
         public internal(set) var calculator = AmountCalculator()
@@ -144,7 +148,7 @@ public extension BudgetListModel {
 
     func closeEditing() {
         if output.isChanged {
-            state.prompt.show(.discard)
+            state.presented.prompt.show(.discard)
         } else {
             cancelEditing()
         }
@@ -153,8 +157,8 @@ public extension BudgetListModel {
     func cancelEditing() {
         state.editing = nil
 
-        if state.prompt.isShowing(.discard) {
-            state.prompt.close(.discard)
+        if state.presented.prompt.isShowing(.discard) {
+            state.presented.prompt.close(.discard)
         }
     }
 

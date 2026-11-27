@@ -81,7 +81,7 @@ extension ThemeListModelTests {
         await model.load()
 
         await model.choose(.custom(saved.id), isPro: false)
-        let offered = model.state.presented
+        let offered = model.state.presented.overlay.current
         let kept = model.input.current
 
         await model.unlock()
@@ -89,7 +89,7 @@ extension ThemeListModelTests {
         #expect(offered == .offer(.select(.custom(saved.id))))
         #expect(offered?.offer?.feature == "作ったテーマ")
         #expect(kept == .system)
-        #expect(model.state.presented == nil)
+        #expect(model.state.presented.overlay.current == nil)
         #expect(model.input.current == .custom(saved.id))
     }
 
@@ -100,16 +100,16 @@ extension ThemeListModelTests {
         let base = ThemePreset.wine.palette
 
         model.create(base: base, isPro: false)
-        let offered = model.state.presented
+        let offered = model.state.presented.overlay.current
 
         await model.unlock()
-        let unlocked = model.state.presented
+        let unlocked = model.state.presented.overlay.current
 
         model.create(base: nil, isPro: true)
 
         #expect(offered == .offer(.create(base: base)))
         #expect(unlocked == .editing(.new(base: base)))
-        #expect(model.state.presented?.editing == .new(base: nil))
+        #expect(model.state.presented.overlay.current?.editing == .new(base: nil))
     }
 
     @Test
@@ -122,11 +122,11 @@ extension ThemeListModelTests {
         let pressed = model.state.pressing
         model.state.press(nil)
         model.state.present(.menu(choice))
-        let menu = model.state.presented?.menu
+        let menu = model.state.presented.overlay.current?.menu
 
         model.state.present(.editing(.new(base: nil)))
         model.state.close(.menu(choice))
-        let kept = model.state.presented
+        let kept = model.state.presented.overlay.current
 
         model.state.close(kept)
 
@@ -134,7 +134,7 @@ extension ThemeListModelTests {
         #expect(model.state.pressing == nil)
         #expect(menu == choice)
         #expect(kept == .editing(.new(base: nil)))
-        #expect(model.state.presented == nil)
+        #expect(model.state.presented.overlay.current == nil)
     }
 
     @Test

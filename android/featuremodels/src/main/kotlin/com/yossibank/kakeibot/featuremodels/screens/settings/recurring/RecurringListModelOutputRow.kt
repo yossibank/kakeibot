@@ -38,7 +38,7 @@ private fun RecurringListModel.Output.row(
         day = of.day,
     )
 
-    val next = of.nextDate(onOrAfter = state.today)
+    val next = of.nextDate(onOrAfter = input.today)
 
     return RecurringRow(
         id = of.id,
@@ -51,7 +51,7 @@ private fun RecurringListModel.Output.row(
         amount = list
             .amount(
                 of = of,
-                on = next ?: state.today,
+                on = next ?: input.today,
             ).clamped,
         type = of.type,
         icon = list.icon(of = of),

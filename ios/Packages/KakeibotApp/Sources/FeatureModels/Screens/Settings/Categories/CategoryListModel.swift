@@ -36,11 +36,13 @@ public extension CategoryListModel {
         public var kind: EntryCategory.Kind
     }
 
+    typealias Presented = SettingsBoardShown<EntryCategory.ID, Destination>
+
     @MainActor
     @Observable
     final class State: SettingsBoardState {
         public var fields: Fields
-        public var shown = SettingsBoardShown<EntryCategory.ID, Destination>()
+        public var presented = Presented()
 
         public private(set) var movingOrder: [EntryCategory.ID]?
 

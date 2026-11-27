@@ -191,19 +191,19 @@ extension SyncModelTests {
         let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
 
-        model.state.presented.show(.offer(.sync))
-        let feature = model.state.presented.current?.offer?.feature
+        model.state.presented.dialog.show(.offer(.sync))
+        let feature = model.state.presented.dialog.current?.offer?.feature
 
-        model.state.presented.show(.offer(.share(item)))
-        model.state.presented.close(.offer(.sync))
-        let kept = model.state.presented.current
+        model.state.presented.dialog.show(.offer(.share(item)))
+        model.state.presented.dialog.close(.offer(.sync))
+        let kept = model.state.presented.dialog.current
 
-        model.state.presented.closeAll()
+        model.state.presented.dialog.closeAll()
 
         #expect(feature == "端末間の同期")
         #expect(kept == .offer(.share(item)))
         #expect(kept?.offer?.feature == "家族との共有")
-        #expect(model.state.presented.current == nil)
+        #expect(model.state.presented.dialog.current == nil)
     }
 
     @Test
@@ -222,8 +222,8 @@ extension SyncModelTests {
 
         #expect(opened == shared)
         #expect(model.output.opened == nil)
-        #expect(model.state.presented.current?.stopping == shared)
-        #expect(model.state.presented.current?.leaving == nil)
+        #expect(model.state.presented.dialog.current?.stopping == shared)
+        #expect(model.state.presented.dialog.current?.leaving == nil)
     }
 
     @Test
@@ -251,11 +251,11 @@ extension SyncModelTests {
         let cloud = FakeCloud(hasData: false)
         let model = SyncModel(parts: .system(setup.database), cloud: cloud.cloud)
         let item = try await firstShare(in: setup.database)
-        model.state.presented.show(.offer(.sync))
+        model.state.presented.dialog.show(.offer(.sync))
 
         await model.open(item)
 
         #expect(model.output.invitation == item)
-        #expect(model.state.presented.current?.offer == nil)
+        #expect(model.state.presented.dialog.current?.offer == nil)
     }
 }
