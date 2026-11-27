@@ -7,14 +7,12 @@ public final class EditFlow<Saved: Sendable> {
     public let state: State
     public let output: Output
 
-    let connection: Connection
+    let source: any EditFlowSource<Saved>
 
-    init() {
-        let connection = Connection()
-
+    init(source: some EditFlowSource<Saved>) {
         self.state = State()
-        self.output = Output(connection: connection)
-        self.connection = connection
+        self.output = Output(source: source)
+        self.source = source
     }
 }
 
@@ -58,24 +56,17 @@ public extension EditFlow {
 
     @MainActor
     final class Output {
-        let connection: Connection
+        let source: any EditFlowSource<Saved>
 
-        init(connection: Connection) {
-            self.connection = connection
+        init(source: any EditFlowSource<Saved>) {
+            self.source = source
         }
-    }
-}
-
-extension EditFlow {
-    @MainActor
-    final class Connection {
-        weak var source: (any EditFlowSource<Saved>)?
     }
 }
 
 public extension EditFlow {
     func close() {
-        _ = connection.source?.rest()
+        _ = source.rest()
 
         if output.isChanged {
             state.prompt.show(.discard)
@@ -106,19 +97,12 @@ public extension EditFlow {
 }
 
 extension EditFlow {
-    func connect(_ source: any EditFlowSource<Saved>) {
-        connection.source = source
-    }
-
     func finish(saved: Saved) {
         state.outcome.send(Outcome(saved: saved))
     }
 
     func run(_ work: @MainActor (any EditFlowSource<Saved>) async -> Void) async {
-        guard
-            let source = connection.source,
-            !state.task.isRunning
-        else {
+        guard !state.task.isRunning else {
             return
         }
 
@@ -141,30 +125,26 @@ extension EditFlow {
 
 public extension EditFlow.Output {
     var isEditing: Bool {
-        connection.source?.isEditing ?? false
+        source.isEditing
     }
 
     var isChanged: Bool {
-        connection.source?.isChanged ?? false
+        source.isChanged
     }
 
     var isHidden: Bool {
-        connection.source?.isHidden ?? false
+        source.isHidden
     }
 
     var canSave: Bool {
-        connection.source?.problem == nil
+        source.problem == nil
     }
 
     var saveTitle: String {
-        connection.source.map { $0.problem ?? $0.readyTitle } ?? ""
+        source.problem ?? source.readyTitle
     }
 
     var asksBeforeHiding: Bool {
-        guard let source = connection.source else {
-            return false
-        }
-
-        return !source.isHidden && source.asksBeforeHiding
+        !source.isHidden && source.asksBeforeHiding
     }
 }

@@ -26,7 +26,7 @@
 | `SettingsEditSheet` | 1 件を編集する画面。モデルと、削除・非表示の受け取りだけで作れる | `Features/Shared/SettingsParts/Input/` |
 | `ScreenEditable` | 画面が書いてよい値の型の印。`State` の `public var` は、これに従う型かシートの `enum` だけにする | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `TabScreenModel` | タブ 4 つの監視と、失敗の画面を出すかを持つ。今日は iOS の `MainView` と Kotlin の `rememberTabModel` から受ける | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
-| `EditFlowSource` | `EditFlow` に渡す元で、変わったか・問題の文・保存・非表示・削除を返す。Swift はモデルが従って `connect` し、Kotlin は入れ子の `Source` で書く | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
+| `EditFlowSource` | `EditFlow` に渡す元で、変わったか・問題の文・保存・非表示・削除を返す。モデルの入れ子の `Source` が state・input・依存を持ち、流れは作る時に受けて強く持つ | `FeatureModels/Shared/Model/`・`featuremodels/shared/model/` |
 | `NamedIconDraft` | 名前とアイコンを持つ下書き（カテゴリ・口座）。アイコンの下書きと、名前とアイコンの問題を共通にする | `Core/Shared/` |
 | `WidgetFallbackEntry` | ウィジェットの項目。読めなかった時の空と、見本を返す | `AppWidget/Shared/` |
 | `WidgetTimelineProvider` | ウィジェットの提供元。`timeline(at:isPreview:)` だけ書けば、残りは既定の実装を使える | `AppWidget/Shared/` |

@@ -20,14 +20,14 @@ public final class RewardRuleEditModel: ScreenPerforming {
     ) {
         let state = State()
         let output = Output(state: state)
+        let input = Input(editingId: id, baseline: output.draft)
+        let source = Source(state: state, input: input, output: output, parts: parts)
 
         self.state = state
-        self.input = Input(editingId: id, baseline: output.draft)
+        self.input = input
         self.output = output
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: source)
         self.dependencies = parts
-
-        flow.connect(self)
     }
 }
 
@@ -80,6 +80,28 @@ public extension RewardRuleEditModel {
     }
 }
 
+extension RewardRuleEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let output: Output
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            output: Output,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.output = output
+            self.dependencies = parts
+        }
+    }
+}
+
 public extension RewardRuleEditModel {
     func load() async {
         guard let editingId = input.editingId else {
@@ -109,18 +131,13 @@ public extension RewardRuleEditModel {
 
     @discardableResult
     func save() async -> Void? {
-        do {
-            try await dependencies.database.save(
-                output.draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
+        await source.store()
+    }
+}
 
-            return ()
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return nil
-        }
+extension RewardRuleEditModel {
+    var source: Source {
+        Source(state: state, input: input, output: output, parts: dependencies)
     }
 }
 
@@ -159,7 +176,7 @@ extension RewardRuleEditModel.State {
     }
 }
 
-extension RewardRuleEditModel: EditFlowSource {
+extension RewardRuleEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         input.editingId != nil
     }
@@ -177,7 +194,18 @@ extension RewardRuleEditModel: EditFlowSource {
     }
 
     func store() async -> Void? {
-        await save()
+        do {
+            try await dependencies.database.save(
+                output.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+
+            return ()
+        } catch {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            return nil
+        }
     }
 
     func storeHidden(_ isHidden: Bool) async throws {

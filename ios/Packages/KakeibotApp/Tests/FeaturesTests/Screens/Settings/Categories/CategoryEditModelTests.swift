@@ -80,8 +80,8 @@ struct CategoryEditModelTests {
         model.state.fields.name = "配当"
         model.state.icon.glyph = .invest
 
-        let empty = CategoryEditModel(parts: .system(database), kind: .income)
-        let canSaveBeforeName = empty.flow.output.canSave
+        let canSaveBeforeName = CategoryEditModel(parts: .system(database), kind: .income)
+            .flow.output.canSave
         let saved = await model.save()
         let list = try await database.categoryList()
         let category = list.categories.first { $0.name == "配当" }

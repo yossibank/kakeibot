@@ -25,14 +25,13 @@ public final class AssetsRewardGoalEditModel: ScreenPerforming {
         let baseline = RewardGoalDraft(name: name, targetAmount: amount)
         let input = Input(editingId: goal?.id, baseline: baseline, balance: balance)
         let output = Output(input: input, state: state)
+        let source = Source(state: state, input: input, output: output, parts: parts)
 
         self.state = state
         self.input = input
         self.output = output
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: source)
         self.dependencies = parts
-
-        flow.connect(self)
     }
 }
 
@@ -99,21 +98,38 @@ public extension AssetsRewardGoalEditModel {
     }
 }
 
+extension AssetsRewardGoalEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let output: Output
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            output: Output,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.output = output
+            self.dependencies = parts
+        }
+    }
+}
+
 public extension AssetsRewardGoalEditModel {
     @discardableResult
     func save() async -> Void? {
-        do {
-            try await dependencies.database.saveRewardGoal(
-                output.draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
+        await source.store()
+    }
+}
 
-            return ()
-        } catch {
-            state.errorNotice.show(Self.saveFailedMessage, for: error)
-            return nil
-        }
+extension AssetsRewardGoalEditModel {
+    var source: Source {
+        Source(state: state, input: input, output: output, parts: dependencies)
     }
 }
 
@@ -146,7 +162,7 @@ public extension AssetsRewardGoalEditModel.State {
     }
 }
 
-extension AssetsRewardGoalEditModel: EditFlowSource {
+extension AssetsRewardGoalEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         input.editingId != nil
     }
@@ -160,7 +176,18 @@ extension AssetsRewardGoalEditModel: EditFlowSource {
     }
 
     func store() async -> Void? {
-        await save()
+        do {
+            try await dependencies.database.saveRewardGoal(
+                output.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+
+            return ()
+        } catch {
+            state.errorNotice.show(AssetsRewardGoalEditModel.saveFailedMessage, for: error)
+            return nil
+        }
     }
 
     func remove() async throws -> Deletion? {
@@ -174,6 +201,6 @@ extension AssetsRewardGoalEditModel: EditFlowSource {
     }
 
     func deleteFailedMessage(for _: any Error) -> String {
-        Self.deleteFailedMessage
+        AssetsRewardGoalEditModel.deleteFailedMessage
     }
 }

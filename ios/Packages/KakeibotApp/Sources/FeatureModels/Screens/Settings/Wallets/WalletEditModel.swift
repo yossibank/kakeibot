@@ -21,16 +21,37 @@ public final class WalletEditModel: ScreenPerforming {
         let state = State(kind: kind, wait: parts.wait)
         let input = Input(editingId: id)
         let output = Output(input: input, state: state)
+        let source = Source(state: state, input: input, output: output, parts: parts)
 
         self.state = state
         self.input = input
         self.output = output
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: source)
         self.dependencies = parts
 
         input.baseline = output.draft
+    }
+}
 
-        flow.connect(self)
+extension WalletEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let output: Output
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            output: Output,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.output = output
+            self.dependencies = parts
+        }
     }
 }
 
@@ -52,6 +73,10 @@ public extension WalletEditModel {
 extension WalletEditModel {
     static let defaultColor = "#C9A465"
 
+    var source: Source {
+        Source(state: state, input: input, output: output, parts: dependencies)
+    }
+
     static func hasEntries(
         of wallet: Wallet,
         in list: EntryList
@@ -62,7 +87,7 @@ extension WalletEditModel {
     }
 }
 
-extension WalletEditModel: EditFlowSource {
+extension WalletEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         input.editingId != nil
     }
@@ -84,7 +109,28 @@ extension WalletEditModel: EditFlowSource {
     }
 
     func store() async -> Wallet? {
-        await save()
+        do {
+            let wallet = try await dependencies.database.save(
+                output.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+
+            guard
+                !output.isEditing,
+                output.asksPayment
+            else {
+                return wallet
+            }
+
+            state.payment.addedWallet = wallet
+            state.payment.shown.show(.asking)
+
+            return wallet
+        } catch {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            return nil
+        }
     }
 
     func keepsOpen(after saved: Wallet) -> Bool {

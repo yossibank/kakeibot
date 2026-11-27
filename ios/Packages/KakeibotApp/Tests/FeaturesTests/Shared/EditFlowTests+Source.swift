@@ -7,38 +7,39 @@ extension EditFlowTests {
     @Test
     func namesProblemInsteadOfSaving() async {
         let source = FakeSource(problem: "名前を入れてください")
+        let flow = EditFlow(source: source)
 
-        await source.flow.save().value
+        await flow.save().value
 
         #expect(source.storeCount == 0)
-        #expect(!source.flow.output.canSave)
-        #expect(source.flow.output.saveTitle == "名前を入れてください")
+        #expect(!flow.output.canSave)
+        #expect(flow.output.saveTitle == "名前を入れてください")
         #expect(source.state.errorNotice.message == "名前を入れてください")
-        #expect(source.flow.state.outcome.value == nil)
+        #expect(flow.state.outcome.value == nil)
     }
 
     @Test
     func namesSaveByWhetherEditing() {
-        let adding = FakeSource()
-        let editing = FakeSource(isEditing: true)
+        let adding = EditFlow(source: FakeSource())
+        let editing = EditFlow(source: FakeSource(isEditing: true))
 
-        #expect(adding.flow.output.saveTitle == "追加する")
-        #expect(editing.flow.output.saveTitle == "変更を保存")
-        #expect(editing.flow.output.canSave)
+        #expect(adding.output.saveTitle == "追加する")
+        #expect(editing.output.saveTitle == "変更を保存")
+        #expect(editing.output.canSave)
     }
 
     @Test
     func asksBeforeHidingChanges() async {
-        let changed = FakeSource(isEditing: true, isChanged: true)
-        let unchanged = FakeSource(isEditing: true)
+        let changed = EditFlow(source: FakeSource(isEditing: true, isChanged: true))
+        let unchanged = EditFlow(source: FakeSource(isEditing: true))
 
-        changed.flow.toggleHidden()
-        await unchanged.flow.setHidden(true).value
+        changed.toggleHidden()
+        await unchanged.setHidden(true).value
 
-        #expect(changed.flow.state.prompt.current == .hideChanges)
-        #expect(changed.flow.state.outcome.value == nil)
-        #expect(unchanged.flow.state.prompt.current == nil)
-        #expect(unchanged.flow.state.outcome.value?.isHidden == true)
+        #expect(changed.state.prompt.current == .hideChanges)
+        #expect(changed.state.outcome.value == nil)
+        #expect(unchanged.state.prompt.current == nil)
+        #expect(unchanged.state.outcome.value?.isHidden == true)
     }
 
     @Test
@@ -48,25 +49,27 @@ extension EditFlowTests {
             isChanged: true,
             asksBeforeHiding: true
         )
+        let flow = EditFlow(source: source)
 
-        source.flow.toggleHidden()
-        let asked = source.flow.state.prompt.current
+        flow.toggleHidden()
+        let asked = flow.state.prompt.current
 
-        source.flow.continueHiding()
+        flow.continueHiding()
 
         #expect(asked == .hide)
-        #expect(source.flow.state.prompt.current == .hideChanges)
-        #expect(source.flow.state.outcome.value == nil)
+        #expect(flow.state.prompt.current == .hideChanges)
+        #expect(flow.state.outcome.value == nil)
     }
 
     @Test
     func keepsSheetOpenWhenNothingToDelete() async {
         let source = FakeSource()
+        let flow = EditFlow(source: source)
 
-        await source.flow.delete().value
+        await flow.delete().value
 
         #expect(source.removeCount == 0)
-        #expect(source.flow.state.outcome.value == nil)
+        #expect(flow.state.outcome.value == nil)
     }
 }
 
@@ -74,7 +77,6 @@ extension EditFlowTests {
     @MainActor
     final class FakeSource: EditFlowSource {
         let state = FakeState()
-        let flow = EditFlow<String>()
         let isEditing: Bool
         let isChanged: Bool
         let problem: String?
@@ -93,8 +95,6 @@ extension EditFlowTests {
             self.isChanged = isChanged
             self.problem = problem
             self.asksBeforeHiding = asksBeforeHiding
-
-            flow.connect(self)
         }
 
         func store() async -> String? {

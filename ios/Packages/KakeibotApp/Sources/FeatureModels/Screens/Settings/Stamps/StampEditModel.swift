@@ -18,13 +18,12 @@ public final class StampEditModel: ScreenPerforming {
         editing id: ShelfIcon.ID? = nil
     ) {
         let state = State()
+        let input = Input(editingId: id, baseline: state.icon.draft)
 
         self.state = state
-        self.input = Input(editingId: id, baseline: state.icon.draft)
-        self.flow = EditFlow()
+        self.input = input
+        self.flow = EditFlow(source: Source(state: state, input: input, parts: parts))
         self.dependencies = parts
-
-        flow.connect(self)
     }
 }
 
@@ -51,6 +50,25 @@ public extension StampEditModel {
         ) {
             self.editingId = editingId
             self.baseline = baseline
+        }
+    }
+}
+
+extension StampEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.dependencies = parts
         }
     }
 }
@@ -83,18 +101,13 @@ public extension StampEditModel {
 
     @discardableResult
     func save() async -> Void? {
-        do {
-            try await dependencies.database.save(
-                state.icon.draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
+        await source.store()
+    }
+}
 
-            return ()
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return nil
-        }
+extension StampEditModel {
+    var source: Source {
+        Source(state: state, input: input, parts: dependencies)
     }
 }
 
@@ -102,7 +115,7 @@ private extension StampEditModel {
     static let loadFailedMessage = "スタンプを読めませんでした"
 }
 
-extension StampEditModel: EditFlowSource {
+extension StampEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         input.editingId != nil
     }
@@ -120,7 +133,18 @@ extension StampEditModel: EditFlowSource {
     }
 
     func store() async -> Void? {
-        await save()
+        do {
+            try await dependencies.database.save(
+                state.icon.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+
+            return ()
+        } catch {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            return nil
+        }
     }
 
     func storeHidden(_ isHidden: Bool) async throws {

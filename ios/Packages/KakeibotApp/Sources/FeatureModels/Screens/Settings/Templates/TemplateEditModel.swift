@@ -40,14 +40,13 @@ public final class TemplateEditModel: ScreenPerforming {
     ) {
         let input = Input(editingId: id)
         let output = Output(input: input, state: state)
+        let source = Source(state: state, input: input, output: output, parts: parts)
 
         self.state = state
         self.input = input
         self.output = output
-        self.flow = EditFlow()
+        self.flow = EditFlow(source: source)
         self.dependencies = parts
-
-        flow.connect(self)
     }
 }
 
@@ -64,6 +63,28 @@ public extension TemplateEditModel {
 
         init(editingId: EntryTemplate.ID?) {
             self.editingId = editingId
+        }
+    }
+}
+
+extension TemplateEditModel {
+    @MainActor
+    struct Source {
+        let state: State
+        let input: Input
+        let output: Output
+        let dependencies: ScreenParts
+
+        init(
+            state: State,
+            input: Input,
+            output: Output,
+            parts: ScreenParts
+        ) {
+            self.state = state
+            self.input = input
+            self.output = output
+            self.dependencies = parts
         }
     }
 }
@@ -117,21 +138,13 @@ public extension TemplateEditModel {
 
     @discardableResult
     func save() async -> EntryTemplate? {
-        if let text = output.problemMessage {
-            state.errorNotice.show(text)
-            return nil
-        }
+        await source.store()
+    }
+}
 
-        do {
-            return try await dependencies.database.saveTemplate(
-                output.draft,
-                editing: input.editingId,
-                at: dependencies.clock.now
-            )
-        } catch {
-            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
-            return nil
-        }
+extension TemplateEditModel {
+    var source: Source {
+        Source(state: state, input: input, output: output, parts: dependencies)
     }
 }
 
@@ -155,7 +168,7 @@ private extension TemplateEditModel {
     }
 }
 
-extension TemplateEditModel: EditFlowSource {
+extension TemplateEditModel.Source: EditFlowSource {
     var isEditing: Bool {
         input.editingId != nil
     }
@@ -173,7 +186,21 @@ extension TemplateEditModel: EditFlowSource {
     }
 
     func store() async -> EntryTemplate? {
-        await save()
+        if let text = output.problemMessage {
+            state.errorNotice.show(text)
+            return nil
+        }
+
+        do {
+            return try await dependencies.database.saveTemplate(
+                output.draft,
+                editing: input.editingId,
+                at: dependencies.clock.now
+            )
+        } catch {
+            state.errorNotice.show(SettingsEditMessage.saveFailed, for: error)
+            return nil
+        }
     }
 
     func storeHidden(_ isHidden: Bool) async throws {
