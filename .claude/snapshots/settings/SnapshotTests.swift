@@ -121,7 +121,7 @@ struct SnapshotTests {
         }
 
         for type in Entry.Kind.allCases {
-            recurring.state.type = type
+            recurring.state.fields.type = type
 
             for variant in Self.variants {
                 try Self.write(
@@ -181,8 +181,8 @@ struct SnapshotTests {
         await expenseEdit.load()
         await transferEdit.load()
 
-        expenseEdit.state.schedule.day = 27
-        transferEdit.state.toWalletId = card?.id
+        expenseEdit.state.fields.schedule.day = 27
+        transferEdit.state.fields.toWalletId = card?.id
 
         for variant in Self.variants {
             try Self.write(
@@ -199,7 +199,7 @@ struct SnapshotTests {
             )
         }
 
-        transferEdit.state.schedule.closingDay = 27
+        transferEdit.state.fields.schedule.closingDay = 27
 
         for variant in Self.variants {
             try Self.write(
@@ -256,7 +256,7 @@ struct SnapshotTests {
         await budgetDrawer.load()
 
         budgetDrawer.startEditing(.total)
-        minusWallet.state.name = "楽天カード"
+        minusWallet.state.fields.name = "楽天カード"
         minusWallet.state.setKind(.card)
 
         for key in [AmountCalculator.Key.digit(5), .digit(2), .tripleZero] {

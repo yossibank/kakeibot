@@ -30,7 +30,7 @@ struct SnapshotTests {
 
         for layout in [RecordsLayout.calendar, .list] {
             model.chooseLayout(layout)
-            model.state.selectedDate = today
+            model.state.fields.selectedDate = today
 
             for variant in Self.variants {
                 let view = RecordsView(
@@ -276,8 +276,8 @@ private extension SnapshotTests {
         let options = try await database.entryOptions()
         let income = try #require(options.incomeCategories.last)
 
-        model.state.isSearching = true
-        model.state.searchText = "サブスクの解約金"
+        model.state.fields.isSearching = true
+        model.state.fields.searchText = "サブスクの解約金"
 
         for variant in variants {
             try write(
@@ -288,11 +288,11 @@ private extension SnapshotTests {
             )
         }
 
-        model.state.searchText = "発表会"
+        model.state.fields.searchText = "発表会"
 
         let category = try #require(model.output.searchDays.first?.entries.first?.categoryId)
 
-        model.state.filter = EntryFilter(categoryIds: [income.id])
+        model.state.fields.filter = EntryFilter(categoryIds: [income.id])
 
         for variant in variants {
             try write(
@@ -303,7 +303,7 @@ private extension SnapshotTests {
             )
         }
 
-        model.state.filter = EntryFilter(categoryIds: [category])
+        model.state.fields.filter = EntryFilter(categoryIds: [category])
         model.openCurrentMonth()
 
         for variant in variants {
@@ -313,7 +313,7 @@ private extension SnapshotTests {
             try write(sheet, variant: variant, title: "記録 › 絞り込み", to: "records-filter-sheet")
         }
 
-        model.state.filter = EntryFilter(categoryIds: [income.id])
+        model.state.fields.filter = EntryFilter(categoryIds: [income.id])
 
         for variant in variants {
             let sheet = RecordsFilterSheet(model: model)
@@ -342,7 +342,7 @@ private extension SnapshotTests {
     }
 
     static func deletions(in model: RecordsModel) -> [(String, EntryChange)] {
-        guard let list = model.input.list else {
+        guard let list = model.input.list.value else {
             return []
         }
 

@@ -65,7 +65,7 @@ iOS の言語は Swift 6 で、ほかの技術は共通の形と同じである�
 | --- | --- |
 | `.claude/snapshots/` | `ui-snapshot` で描くセット。名前は描く場所（`tabs-`・`entry-`・`settings-`・`components`・`widget`・`store`）で始める |
 | `.claude/snapshots/store/` | `store/screenshots/raw/` の画面に文言を重ね、ストアのスクリーンショットを描く |
-| `scripts/snapshot-scroll.py` | セットの `patch.py` から呼ぶ。スクロールを伸ばして全体を描けるようにし、ガラスの効果を背景に変える |
+| `scripts/snapshot-scroll.py` | セットの `patch.py` から呼ぶ。スクロール・ガラスの効果・UIKit の部品・入力欄を、描ける形に差し替える |
 
 ## 📱 ios
 

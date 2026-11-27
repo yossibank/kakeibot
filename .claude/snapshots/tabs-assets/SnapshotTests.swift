@@ -61,7 +61,7 @@ struct SnapshotTests {
                 to: "assets-bills"
             )
 
-            model.state.billPage = 1
+            model.state.fields.billPage = 1
 
             try Self.write(
                 view.billCard.padding(16),
@@ -70,12 +70,12 @@ struct SnapshotTests {
                 to: "assets-bills-next"
             )
 
-            model.state.billPage = 0
+            model.state.fields.billPage = 0
 
             let content = AssetsEntrySheet.Content.unpaid(of: model.output.rows)
 
             let unpaidSheet = AssetsEntrySheet(content: content) { _ in }
-                .frame(height: 1200)
+                .frame(height: 1200, alignment: .top)
 
             try Self.write(unpaidSheet, variant: variant, title: "資産 › 未払いの記録", to: "assets-unpaid")
 
