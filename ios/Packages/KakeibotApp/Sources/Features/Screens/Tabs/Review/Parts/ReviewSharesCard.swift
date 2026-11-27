@@ -201,12 +201,13 @@ private extension ReviewSharesCard {
         share.icon.flatMap { Color(hex: $0.color) } ?? Palette.accent
     }
 
-    static func slices(_ shares: [ReviewModel.Share]) -> [DonutChart<AnyHashable>.Slice] {
+    static func slices(_ shares: [ReviewModel.Share])
+        -> [DonutChart<ReviewModel.Share.Key?>.Slice] {
         let others = otherShares(shares) ?? []
         let main = shares.dropLast(others.count)
 
         let slices = main.map { share in
-            DonutChart<AnyHashable>.Slice(
+            DonutChart<ReviewModel.Share.Key?>.Slice(
                 id: share.id,
                 value: share.amount,
                 color: color(of: share)
@@ -217,8 +218,8 @@ private extension ReviewSharesCard {
             return slices
         }
 
-        let other = DonutChart<AnyHashable>.Slice(
-            id: "others",
+        let other = DonutChart<ReviewModel.Share.Key?>.Slice(
+            id: nil,
             value: others.reduce(0) { $0 + $1.amount },
             color: Palette.hint
         )

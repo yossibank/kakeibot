@@ -40,7 +40,7 @@ public extension ReviewModel.Output {
         let ranked = breakdown.byCategory.compactMap { id, amount in
             list.categories[id].map { category in
                 let share = ReviewModel.Share(
-                    id: category.id,
+                    id: .category(category.id),
                     name: category.name,
                     icon: list.icons[category.iconId],
                     amount: amount,
@@ -66,7 +66,7 @@ public extension ReviewModel.Output {
         let ranked = breakdown.byWallet.compactMap { id, amount in
             list.wallets[id].map { wallet in
                 let share = ReviewModel.Share(
-                    id: wallet.id,
+                    id: .wallet(wallet.id),
                     name: wallet.name,
                     icon: list.icons[wallet.iconId],
                     amount: amount,
@@ -133,7 +133,7 @@ public extension ReviewModel.Output {
         let total = max(total(of: input.kind), 1)
 
         return ReviewModel.Share(
-            id: ReviewModel.recurringShareId,
+            id: .recurring,
             name: "固定費",
             icon: nil,
             amount: recurringTotal,

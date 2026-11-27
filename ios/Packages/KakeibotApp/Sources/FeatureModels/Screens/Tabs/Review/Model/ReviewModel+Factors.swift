@@ -1,8 +1,8 @@
 import Core
 import Foundation
 
-extension ReviewModel {
-    struct FactorKey: Hashable {
+public extension ReviewModel {
+    struct FactorKey: Hashable, Sendable {
         let categoryId: EntryCategory.ID
         let memo: String?
         let range: ClosedRange<LocalDate>
@@ -69,7 +69,7 @@ private extension ReviewModel.Output {
         let amount = factorEntries(of: key).reduce(0) { $0 + $1.amount }
 
         return ReviewModel.Share(
-            id: AnyHashable(key),
+            id: .factor(key),
             name: name,
             icon: list.icons[category.iconId],
             amount: amount,

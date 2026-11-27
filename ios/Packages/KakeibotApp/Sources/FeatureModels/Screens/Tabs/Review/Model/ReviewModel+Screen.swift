@@ -19,7 +19,7 @@ public extension ReviewModel {
         _ id: Entry.ID,
         in share: Share
     ) {
-        let isRecurring = share.id == Self.recurringShareId
+        let isRecurring = share.id == .recurring
 
         if isRecurring,
            let recurringId = output.recurringId(of: id) {
@@ -32,7 +32,7 @@ public extension ReviewModel {
 
 public extension ReviewModel.Sheet {
     enum Key: Hashable {
-        case share(AnyHashable)
+        case share(ReviewModel.Share.Key)
         case analysis
         case stamp(Icon.ID)
     }
