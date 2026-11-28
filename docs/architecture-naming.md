@@ -18,6 +18,7 @@
 | `AppWidget/Widgets/` | コントロールの `kind` の文字列は、フォルダを移しても変えない |
 | DesignSystem の題材のフォルダ | `Budget/`・`Date/`・`Entry/`・`Tag/`・`Template/` |
 | お知らせの版の中身 | `WhatsNew/Model/` の `WhatsNewRelease+V<版>.swift` に 1 版ずつ置く。版の `.` は `_` にする |
+| お知らせの使い方のコマ | 1 つの機能のコマ（`WhatsNew<機能>Scene`）は `WhatsNew/Scenes/` に置く。コマを選ぶ `WhatsNewScene` は `Parts/` に残す |
 
 設定の画面をまとめる時は、次の領域に分ける。入口の `Menu/` は、まとめずに残す。
 

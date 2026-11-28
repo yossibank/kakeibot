@@ -110,7 +110,7 @@ KakeibotApp/
 | `Features/Screens/Pro/` | Pro の画面 |
 | `Features/Screens/Settings/` | 設定の項目ごとの画面。Menu は入口 |
 | `Features/Screens/Tabs/` | Assets・Home・Records・Review |
-| `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート。`Model/` に版とモデル、`View/` にシートとカードとページ送り、`Parts/` に使い方のコマ |
+| `Features/Screens/WhatsNew/` | お知らせの版と機能の一覧と、それを並べるシート。`View/` にシートとカードとページ送りを置き、版とコマの置き場所は [architecture-naming](architecture-naming.md) にある |
 | `Features/Shared/Bill/` | これからの引き落としの行・月のタブ・見込みと確定の印と、その言葉 |
 | `Features/Shared/DateChoice/` | 月の始まりの日を選ぶ部品 |
 | `Features/Shared/FeatureArt/` | お知らせと Pro で機能を見せる絵（レシート・伝票・iPhone の枠・見本）と、縮める枠 |

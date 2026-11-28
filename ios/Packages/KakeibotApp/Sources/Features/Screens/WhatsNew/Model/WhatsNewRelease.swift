@@ -49,6 +49,7 @@ public extension WhatsNewRelease {
 
 extension WhatsNewRelease {
     static let all = [
+        v1_10_0,
         v1_9_0,
         v1_8_0,
         v1_7_0,
