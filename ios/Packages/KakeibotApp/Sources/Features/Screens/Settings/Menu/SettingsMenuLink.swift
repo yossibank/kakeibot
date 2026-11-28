@@ -12,8 +12,8 @@ enum SettingsMenuLink {
     static let review =
         URL(string: "https://apps.apple.com/app/id\(appStoreId)?action=write-review")
 
-    static var modelIdentifier: String {
-        DeviceName.modelIdentifier
+    static var modelName: String {
+        DeviceName.modelName
     }
 
     static var systemVersion: String {
@@ -23,7 +23,7 @@ enum SettingsMenuLink {
     }
 
     static func contact(
-        model: String = modelIdentifier,
+        model: String = modelName,
         system: String = systemVersion,
         app: String = Bundle.main.shortVersion
     ) -> URL? {

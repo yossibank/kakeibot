@@ -579,7 +579,7 @@ bill-text.*	BillTextTests/*		未移植	請求の文（BillText）と請求の行
 deletion-notice.names-single-deleted-item	DeletionNoticeTests/namesSingleDeletedItem	DeletionNoticeTest/namesSingleDeletedItem	対応	
 deletion-notice.falls-back-to-kind-and-count	DeletionNoticeTests/fallsBackToKindAndCount	DeletionNoticeTest/fallsBackToKindAndCount	対応	
 derived.*	DerivedTests/*		iOSのみ	Swift の Observation 用の計算の覚え置きで、Android は derivedStateOf を使う
-device-name.*	DeviceNameTests/*		iOSのみ	iPhone と iPad の呼び分けで、Android は呼び分けず「端末」と書く
+device-name.*	DeviceNameTests/*		iOSのみ	呼び分けと機種名の変換。Android は「端末」と書き、問い合わせのフォームが無い
 entry-list-filter.*	EntryListFilterTests/*		未移植	記録の絞り込み（filterCategories・widened）のモデルと画面が無い
 entry-notice.undoes-new-entry	EntryNoticeModelTests/undoesNewEntry	EntryNoticeModelTest/undoesNewEntry	対応	
 entry-notice.restores-fee-deleted-from-stale-list	EntryNoticeModelTests/restoresFeeDeletedFromStaleList		未移植	一覧の行から記録を消す操作が無い
