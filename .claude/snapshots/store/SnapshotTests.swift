@@ -975,7 +975,7 @@ private extension SnapshotTests {
         Shot(
             file: "07-font",
             lines: ["フォントも、", "選べる"],
-            lead: .note("手書きやドットなど 6 種類"),
+            lead: .note("手書きや教科書など 10 種類"),
             phones: [
                 Phone(name: "05-font-hand", x: 12, y: 196, width: 250, angle: -4),
                 Phone(name: "05-font-text", x: 132, y: 270, width: 220, angle: 5)
@@ -1074,7 +1074,7 @@ private extension SnapshotTests {
             Page(
                 file: "07-font",
                 lines: ["フォントも、", "選べる"],
-                lead: .note("手書きやドットなど 6 種類"),
+                lead: .note("手書きや教科書など 10 種類"),
                 art: font
             ),
             Page(
