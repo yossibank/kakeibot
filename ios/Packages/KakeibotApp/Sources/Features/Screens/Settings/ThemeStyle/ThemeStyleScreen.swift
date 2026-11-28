@@ -20,8 +20,7 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
 
             preview
                 .animation(.snappy(duration: 0.25), value: model.output.style)
-                .environment(\.themeStyle, model.output.style)
-                .font(model.output.style.bodyFont)
+                .themeStyle(model.output.style)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: SettingsSpacing.section) {
@@ -41,8 +40,7 @@ struct ThemeStyleScreen<Preview: View, Content: View>: View {
             .padding(.horizontal, -20)
             .scrollIndicators(.hidden)
         }
-        .environment(\.themeStyle, shownStyle)
-        .font(shownStyle.bodyFont)
+        .themeStyle(shownStyle)
         .padding(.horizontal, SettingsSpacing.side)
         .padding(.top, SettingsSpacing.top)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

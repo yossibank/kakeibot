@@ -9,6 +9,10 @@ enum class ThemeFont(
     handwriting("handwriting"),
     dot("dot"),
     pop("pop"),
+    textbook("textbook"),
+    boldMincho("boldMincho"),
+    boldGothic("boldGothic"),
+    kanaMincho("kanaMincho"),
     ;
 
     companion object {

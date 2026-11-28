@@ -40,8 +40,8 @@ expense・income の列は、描画に使わない。
 | settings_opened | `true` `false` | 今は読み書きしない |
 | launch_screen | `home`・`records`・`review`・`assets`・`entry` | 空ならホーム |
 | corner_style | `square`・`small`・`standard`・`large` | 空なら `standard`。`square` は角を丸めない |
-| font_style | 見出しと金額の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop` | 空なら `mincho` |
-| text_font_style | 本文の字体。`mincho`・`gothic`・`rounded`・`handwriting`・`dot`・`pop` | 空なら `gothic` |
+| font_style | 見出しと金額の字体。値は `ThemeFont` の case の名前 | 空なら `mincho` |
+| text_font_style | 本文の字体。値は `ThemeFont` の case の名前 | 空なら `gothic` |
 | text_size | 文字の大きさ。`small`・`standard`・`large` | 空なら `standard` |
 | row_spacing | 記録の一覧の行の高さと上下の余白。`compact`・`standard`・`relaxed` | 空なら `standard` |
 | stamp_shape | スタンプの印の形。`circle`・`rounded`・`seal`（塗らない二重の輪） | 空なら `circle`。`rounded` は corner_style に従う |

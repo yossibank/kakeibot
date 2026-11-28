@@ -94,10 +94,10 @@ private extension ThemeStyleTextView {
                 )
 
                 TemplateCard(
-                    icon: .styleSample(.transit),
-                    name: "電車",
-                    detail: "交通・財布",
-                    amount: 440
+                    icon: .styleSample(.cafe),
+                    name: "Coffee",
+                    detail: "食費・財布",
+                    amount: 380
                 )
             }
         }
@@ -133,6 +133,7 @@ private extension ThemeStyleTextView {
             fontSample(
                 Yen.text(Self.sampleAmount),
                 font: .display(.headline, in: font, scale: 1),
+                of: font,
                 scale: 0.5
             )
         } choose: { font in
@@ -152,6 +153,7 @@ private extension ThemeStyleTextView {
             fontSample(
                 Self.sampleText,
                 font: .text(.subheadline, in: font, scale: 1),
+                of: font,
                 scale: 0.8
             )
         } choose: { font in
@@ -159,16 +161,53 @@ private extension ThemeStyleTextView {
         }
     }
 
+    @ViewBuilder
     func fontSample(
         _ text: String,
         font: Font,
+        of option: ThemeFont,
         scale: CGFloat
     ) -> some View {
-        Text(text)
-            .font(font)
-            .foregroundStyle(Palette.text)
-            .lineLimit(1)
-            .minimumScaleFactor(scale)
+        switch ThemeFontLoader.shared.phase(of: option) {
+        case .ready:
+            Text(text)
+                .font(font)
+                .foregroundStyle(Palette.text)
+                .lineLimit(1)
+                .minimumScaleFactor(scale)
+
+        case .checking:
+            Text(text)
+                .font(font)
+                .lineLimit(1)
+                .minimumScaleFactor(scale)
+                .hidden()
+
+        case .loading:
+            HStack(spacing: 4) {
+                ProgressView()
+                    .controlSize(.mini)
+
+                Text("読み込み中")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+
+        case .notLoaded:
+            HStack(spacing: 4) {
+                Image(systemName: "arrow.down.circle")
+                    .sansFont(.caption)
+                    .foregroundStyle(Palette.accent)
+
+                Text("押して読み込む")
+                    .textFont(.caption2)
+                    .foregroundStyle(Palette.subtext)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+        }
     }
 }
 
@@ -201,6 +240,8 @@ private extension ThemeStyleTextView {
     }
 
     func choose(_ offer: ThemeStyleModel.FontOffer) {
+        ThemeFontLoader.shared.load(offer.font)
+
         model.perform { [isPro] in
             await $0.choose(offer, isPro: isPro)
         }

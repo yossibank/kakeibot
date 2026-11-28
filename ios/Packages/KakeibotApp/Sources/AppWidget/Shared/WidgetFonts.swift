@@ -3,7 +3,6 @@ import Foundation
 
 public enum WidgetFonts {
     private static let fileNames = [
-        "KleeOne-Regular.ttf",
         "DotGothic16-Regular.ttf",
         "HachiMaruPop-Regular.ttf"
     ]

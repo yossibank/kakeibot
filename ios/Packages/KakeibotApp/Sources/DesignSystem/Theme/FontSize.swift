@@ -103,9 +103,9 @@ private extension ThemeFont {
         switch self {
         case .mincho, .gothic: nil
         case .rounded: "HiraMaruProN-W4"
-        case .handwriting: "KleeOne-Regular"
         case .dot: "DotGothic16-Regular"
         case .pop: "HachiMaruPop-Regular"
+        case .handwriting, .textbook, .boldMincho, .boldGothic, .kanaMincho: downloadName
         }
     }
 }

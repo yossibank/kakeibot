@@ -72,6 +72,8 @@
 | `PageSlideReader` | 頁めくりの入れ物。動きの値を中に持って中身に `PageSlideProxy` を渡し、画面は値を持たない | `DesignSystem/Components/Navigation/` |
 | `PageSlideProxy` | 頁めくりの口。`pageSlide` と `onPageSwipe` に渡し、ボタンからは `run(forward:)` で頁を送る | `DesignSystem/Components/Navigation/` |
 | `ResizingPager` | 横に送る頁の入れ物。送っている途中も、隣の頁との間で高さをなめらかに変える | `DesignSystem/Components/Navigation/` |
+| `themeStyle(_:)` | 文字と見た目を下の画面に渡す modifier。落とす字体を読み込み、済むまでは明朝かゴシックを渡す | `DesignSystem/Theme/` |
+| `ThemeFontLoader` | iOS が配るフォントを落とす口。字体ごとに、まだ・読み込み中・済みを持つ | `DesignSystem/Theme/` |
 
 `Loadable` の値は、監視の中で次のように移る。
 
