@@ -41,6 +41,7 @@ extension WhatsNewScene {
         case widget(WhatsNewWidgetScene.Step)
         case analysis(WhatsNewAnalysisScene.Step)
         case review(WhatsNewReviewScene.Step)
+        case font(WhatsNewFontScene.Step)
     }
 }
 
@@ -67,6 +68,7 @@ private extension WhatsNewScene {
         case let .widget(step): WhatsNewWidgetScene(step: step)
         case let .analysis(step): WhatsNewAnalysisScene(step: step)
         case let .review(step): WhatsNewReviewScene(step: step)
+        case let .font(step): WhatsNewFontScene(step: step)
         }
     }
 }

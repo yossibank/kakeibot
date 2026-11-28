@@ -11,7 +11,10 @@ struct WhatsNewIconScene: View {
                 .whatsNewTapped()
 
         case .grid:
-            grid
+            grid(Self.symbols, emojis: Self.emojis)
+
+        case .added:
+            grid(Self.addedSymbols, emojis: [])
 
         case .row:
             row
@@ -25,6 +28,7 @@ extension WhatsNewIconScene {
         case row
         case button
         case grid
+        case added
     }
 }
 
@@ -57,9 +61,12 @@ private extension WhatsNewIconScene {
             .background(Palette.lit.opacity(.subtle), in: .rect(cornerRadius: 16))
     }
 
-    var grid: some View {
+    func grid(
+        _ symbols: [[String]],
+        emojis: [String]
+    ) -> some View {
         VStack(spacing: 8) {
-            ForEach(Self.symbols, id: \.self) { row in
+            ForEach(symbols, id: \.self) { row in
                 HStack(spacing: 8) {
                     ForEach(row, id: \.self) { symbol in
                         Image(systemName: symbol)
@@ -70,11 +77,13 @@ private extension WhatsNewIconScene {
                 }
             }
 
-            HStack(spacing: 4) {
-                ForEach(Self.emojis, id: \.self) { emoji in
-                    Text(emoji)
-                        .font(.system(size: 18))
-                        .frame(width: 26, height: 26)
+            if !emojis.isEmpty {
+                HStack(spacing: 4) {
+                    ForEach(emojis, id: \.self) { emoji in
+                        Text(emoji)
+                            .font(.system(size: 18))
+                            .frame(width: 26, height: 26)
+                    }
                 }
             }
         }
@@ -89,5 +98,11 @@ private extension WhatsNewIconScene {
     static let symbols = [
         ["figure.climbing", "film.stack", "dryer"],
         ["giftcard", "play.rectangle", "figure.bowling"]
+    ]
+
+    static let addedSymbols = [
+        ["pizza.slice", "headphones.over.ear", "applewatch"],
+        ["lungs", "pill", "medical.thermometer"],
+        ["yensign.building.classical", "receipt", "bitcoinsign"]
     ]
 }
