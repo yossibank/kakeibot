@@ -25,7 +25,7 @@ extension View {
     }
 
     func reviewStatGrid() -> some View {
-        background(Palette.accent.opacity(.soft))
+        background(Palette.lit.opacity(.soft))
             .clipShape(.rect(cornerRadius: ReviewReportRadius.panel))
     }
 }

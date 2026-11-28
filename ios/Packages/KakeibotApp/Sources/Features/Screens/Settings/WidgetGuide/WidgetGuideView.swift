@@ -133,7 +133,7 @@ private extension WidgetGuideView {
                             .sansFont(.small, weight: .medium)
                             .foregroundStyle(Palette.accent)
                             .frame(width: 34, height: 34)
-                            .background(Palette.accent.opacity(.subtle), in: Circle())
+                            .background(Palette.lit.opacity(.subtle), in: Circle())
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(ability.title)

@@ -275,7 +275,7 @@ private extension ReviewProgressView {
 private extension ReviewProgressView {
     static var pathFill: LinearGradient {
         LinearGradient(
-            colors: [Palette.accent.opacity(.strong), Palette.accent.opacity(.subtle)],
+            colors: [Palette.lit.opacity(.strong), Palette.lit.opacity(.subtle)],
             startPoint: .top,
             endPoint: .bottom
         )

@@ -29,7 +29,7 @@ extension ReviewView {
                     .foregroundStyle(Palette.accent)
                     .frame(width: 40, height: 40)
                     .background(
-                        Palette.accent.opacity(.subtle),
+                        Palette.lit.opacity(.subtle),
                         in: .rect(cornerRadius: ReviewReportRadius.block)
                     )
 

@@ -11,7 +11,7 @@ struct ProFeatureCard: View {
                     .sansFont(.small, weight: .medium)
                     .foregroundStyle(Palette.accent)
                     .frame(width: 38, height: 38)
-                    .background(Palette.accent.opacity(.subtle), in: Circle())
+                    .background(Palette.lit.opacity(.subtle), in: Circle())
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(feature.name)

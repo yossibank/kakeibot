@@ -253,6 +253,7 @@ private extension EntrySlip {
 
                 DisclosureMark(.strongLink)
                     .foregroundStyle(arrowColor)
+                    .rotationEffect(.degrees(isSelected ? 90 : 0))
             }
             .padding(.leading, 16)
             .padding(.trailing, 12)

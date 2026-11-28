@@ -115,7 +115,7 @@ private extension HomeSectionPreview {
         HStack(spacing: 4) {
             ForEach(0..<4, id: \.self) { index in
                 let isPressed = index < 2
-                let fillColor = isPressed ? Palette.accent.opacity(.muted) : Color.clear
+                let fillColor = isPressed ? Palette.lit.opacity(.muted) : Color.clear
                 let strokeOpacity = isPressed ? 1 : 0.5
 
                 Circle()

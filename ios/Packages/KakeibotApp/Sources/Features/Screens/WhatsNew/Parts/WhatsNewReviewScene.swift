@@ -52,7 +52,7 @@ private extension WhatsNewReviewScene {
                 .textFont(size: .micro, weight: .semibold)
                 .padding(.horizontal, 8)
                 .frame(height: 22)
-                .background(Palette.accent.opacity(.faint), in: .capsule)
+                .background(Palette.lit.opacity(.faint), in: .capsule)
             }
         }
     }

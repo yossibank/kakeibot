@@ -215,7 +215,7 @@ private extension FeatureArt {
                 .font(.system(size: 18))
                 .foregroundStyle(Palette.accent)
                 .frame(width: 44, height: 44)
-                .background(Palette.accent.opacity(.subtle), in: Circle())
+                .background(Palette.lit.opacity(.subtle), in: Circle())
                 .overlay {
                     Circle()
                         .stroke(Palette.outline, lineWidth: 1)

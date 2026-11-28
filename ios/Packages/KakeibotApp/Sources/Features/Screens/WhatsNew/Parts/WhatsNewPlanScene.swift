@@ -94,7 +94,7 @@ private extension WhatsNewPlanScene {
         isSelected: Bool
     ) -> some View {
         let color = isSelected ? Palette.accentStrong : Palette.hint
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = isSelected ? Palette.lit.opacity(.subtle) : Color.clear
 
         return VStack(spacing: 2) {
             Image(systemName: systemImage)

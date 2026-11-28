@@ -109,7 +109,7 @@ private extension WhatsNewWalletScene {
     func kindChip(_ kind: Wallet.Kind) -> some View {
         let isSelected = kind == .card
         let textColor = isSelected ? Palette.accentStrong : Palette.subtext
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = isSelected ? Palette.lit.opacity(.subtle) : Color.clear
         let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
 
         return Text(kind.title)

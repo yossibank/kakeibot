@@ -131,7 +131,7 @@ private extension RecordsFilterSheet {
 
     func choice(_ item: Item) -> some View {
         let ring = item.isOn ? Palette.accent : Palette.line
-        let fill = item.isOn ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = item.isOn ? Palette.lit.opacity(.subtle) : Color.clear
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
 
         return Button {
@@ -195,7 +195,7 @@ private extension RecordsFilterSheet {
 
     var showTitle: String {
         let count = model.output.shownEntryCount
-        return count > 0 ? "\(count) 件を表示" : "当てはまる記録はありません"
+        return count > 0 ? "\(count) 件を表示" : "該当なし"
     }
 
     var tabOptions: [CapsulePicker<RecordsModel.FilterTab>.Option] {

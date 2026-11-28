@@ -195,7 +195,7 @@ private extension ReviewClosingView {
         .padding(12)
         .frame(maxWidth: .infinity)
         .background(
-            Palette.accent.opacity(.faint),
+            Palette.lit.opacity(.faint),
             in: .rect(cornerRadius: ReviewReportRadius.panel)
         )
         .overlay {

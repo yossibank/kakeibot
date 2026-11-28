@@ -134,9 +134,9 @@ private extension GoldSwitch {
     static var gold: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accent.mix(with: Palette.accentStrong, by: 0.3),
-                Palette.accent,
-                Palette.accent.mix(with: Palette.accentDeep, by: 0.45)
+                Palette.goldFace.mix(with: Palette.goldLight, by: 0.3),
+                Palette.goldFace,
+                Palette.goldFace.mix(with: Palette.goldShade, by: 0.45)
             ],
             startPoint: .top,
             endPoint: .bottom

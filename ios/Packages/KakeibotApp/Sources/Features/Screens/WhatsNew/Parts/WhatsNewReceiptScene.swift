@@ -47,6 +47,6 @@ private extension WhatsNewReceiptScene {
         .foregroundStyle(Palette.accentStrong)
         .padding(.horizontal, 8)
         .frame(height: 24)
-        .background(Palette.accent.opacity(.subtle), in: .capsule)
+        .background(Palette.lit.opacity(.subtle), in: .capsule)
     }
 }

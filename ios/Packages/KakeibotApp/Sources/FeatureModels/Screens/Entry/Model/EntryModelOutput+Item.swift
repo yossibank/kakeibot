@@ -60,6 +60,7 @@ public extension EntryModel.Output {
     func itemNameSuggestions(for text: String) -> [String] {
         EntryModel.suggestions(
             from: input.recentItemNames,
+            readings: input.readings,
             for: text,
             limit: EntryModel.itemSuggestionLimit
         )

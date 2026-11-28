@@ -126,7 +126,7 @@ private extension WhatsNewEntryScene {
                 .textFont(size: .caption, weight: .semibold)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 24, height: 24)
-                .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 8))
+                .background(Palette.lit.opacity(.subtle), in: .rect(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(shortcut.name)

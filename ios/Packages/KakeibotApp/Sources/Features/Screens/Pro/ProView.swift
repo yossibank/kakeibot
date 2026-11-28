@@ -35,6 +35,8 @@ public struct ProView: View {
                 }
                 .padding(.vertical, 8)
             }
+            .contentMargins(.horizontal, SettingsSpacing.side, for: .scrollContent)
+            .padding(.horizontal, -SettingsSpacing.side)
             .scrollIndicators(.hidden)
 
             purchaseBar

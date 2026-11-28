@@ -17,10 +17,6 @@ struct EntryWalletPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(title)
-                    .textFont(.subheadline, weight: .semibold)
-                    .foregroundStyle(Palette.accentStrong)
-
                 Spacer()
 
                 ChipButton("追加", systemImage: "plus", action: onAdd)
@@ -93,7 +89,7 @@ private extension EntryWalletPanel {
             .sansFont(.micro, weight: .heavy)
             .foregroundStyle(Palette.backgroundBottom)
             .frame(width: Self.badgeSize, height: Self.badgeSize)
-            .background(Palette.accent, in: .circle)
+            .background(Palette.goldFace, in: .circle)
             .offset(x: -4, y: -4)
     }
 
@@ -101,7 +97,7 @@ private extension EntryWalletPanel {
         let isSelected = selectedId == wallet.id
         let isLocked = takenId == wallet.id && !shown.isEditing
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Palette.panel.opacity(.strong)
+        let fill = isSelected ? Palette.lit.opacity(.subtle) : Palette.tile.opacity(.strong)
         let ring = isSelected ? Palette.accent : Palette.line
 
         return Button {
@@ -197,13 +193,6 @@ private extension EntryWalletPanel {
 
     var editImage: String {
         shown.isEditing ? "checkmark" : "pencil"
-    }
-
-    var title: String {
-        switch role {
-        case .source: model.output.walletTitle
-        case .destination: EntryModel.destinationTitle
-        }
     }
 
     var selectedId: Wallet.ID? {

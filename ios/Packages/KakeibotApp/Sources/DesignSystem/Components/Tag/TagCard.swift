@@ -83,7 +83,7 @@ private extension TagCard {
     var fill: Color {
         switch style {
         case .plain: Palette.panel
-        case .selected: Palette.accent.opacity(.soft)
+        case .selected: Palette.lit.opacity(.soft)
         case .add: Color.clear
         }
     }

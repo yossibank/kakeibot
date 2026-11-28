@@ -151,7 +151,7 @@ private extension ReviewClosingView {
 
                 case .noSpend:
                     Circle()
-                        .fill(Palette.accent.opacity(.subtle))
+                        .fill(Palette.lit.opacity(.subtle))
                         .overlay {
                             Circle()
                                 .strokeBorder(Palette.accent, lineWidth: 1.5)
@@ -232,7 +232,7 @@ private extension ReviewClosingView {
 
     static var recordedFill: RadialGradient {
         RadialGradient(
-            colors: [Palette.accentDeep, Palette.accent],
+            colors: [Palette.goldShade, Palette.goldFace],
             center: .topLeading,
             startRadius: 0,
             endRadius: 32

@@ -23,7 +23,7 @@ private extension MonthStartDayGrid {
     func dayButton(_ day: MonthStartDay) -> some View {
         let isSelected = selection?.day == day.day
         let textColor = isSelected ? Palette.backgroundBottom : Palette.text
-        let fill = isSelected ? Palette.accent : Palette.accent.opacity(.faint)
+        let fill = isSelected ? Palette.accent : Palette.lit.opacity(.faint)
         let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
 
         return Button {

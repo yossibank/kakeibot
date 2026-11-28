@@ -144,7 +144,7 @@ private extension WidgetGuideStage {
         case .home:
             AnyShapeStyle(
                 LinearGradient(
-                    colors: [Palette.accent.opacity(.soft), Palette.accent.opacity(.faint)],
+                    colors: [Palette.lit.opacity(.soft), Palette.lit.opacity(.faint)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )

@@ -33,7 +33,7 @@ struct ThemePreview: View {
             ForEach(Self.rows, id: \.self) { width in
                 HStack(spacing: 8) {
                     Circle()
-                        .fill(Palette.accent.opacity(.muted))
+                        .fill(Palette.lit.opacity(.muted))
                         .frame(width: 10, height: 10)
 
                     Capsule()

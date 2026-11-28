@@ -79,7 +79,7 @@ private extension BillTabs {
 private extension BillTabs {
     static var selectedFace: LinearGradient {
         LinearGradient(
-            colors: [Palette.accent, Palette.accentDeep],
+            colors: [Palette.goldFace, Palette.goldShade],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

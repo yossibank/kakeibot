@@ -116,7 +116,7 @@ private extension AssetsView {
         .padding(.vertical, 12)
         .padding(.horizontal, 12)
         .background(
-            Palette.accent.opacity(.faint),
+            Palette.lit.opacity(.faint),
             in: .rect(cornerRadius: corner.radius(16))
         )
     }

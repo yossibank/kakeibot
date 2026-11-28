@@ -233,7 +233,7 @@ private extension AssetsRewardSheet {
                 .monospacedDigit()
                 .foregroundStyle(Palette.accent)
                 .frame(width: 22, height: 22)
-                .background(Palette.accent.opacity(.subtle), in: Circle())
+                .background(Palette.lit.opacity(.subtle), in: Circle())
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)

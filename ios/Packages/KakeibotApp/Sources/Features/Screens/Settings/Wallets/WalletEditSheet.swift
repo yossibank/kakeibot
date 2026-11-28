@@ -10,6 +10,7 @@ public struct WalletEditSheet: View {
     @FocusState var focus: Field?
 
     @Environment(\.themeStyle.corner) var corner
+    @Environment(\.colorScheme) var colorScheme
 
     let onSave: (Wallet) -> Void
     let onDelete: (Deletion) -> Void

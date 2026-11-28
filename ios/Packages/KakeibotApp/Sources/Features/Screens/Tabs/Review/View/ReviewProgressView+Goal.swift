@@ -75,7 +75,7 @@ private extension ReviewProgressView {
     ) -> some View {
         HStack(spacing: 4) {
             ForEach(0..<max(target, 1), id: \.self) { index in
-                let fill = index < count ? Palette.accent : Palette.accent.opacity(.subtle)
+                let fill = index < count ? Palette.accent : Palette.lit.opacity(.subtle)
 
                 Capsule()
                     .fill(fill)

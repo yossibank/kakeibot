@@ -117,7 +117,7 @@ private extension Keypad {
 
     func accessoryButton(_ accessory: Accessory) -> some View {
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
-        let fill = accessory.isActive ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = accessory.isActive ? Palette.lit.opacity(.subtle) : Color.clear
         let rim = accessory.isActive ? Palette.accent : Palette.accent.opacity(.muted)
 
         return Button(action: accessory.action) {
@@ -266,9 +266,9 @@ private extension Keypad {
     ) -> Color {
         switch key {
         case .digit, .doubleZero, .tripleZero, .delete, .clear: Color.clear
-        case .tax: isActive ? Palette.accent.opacity(.subtle) : Color.clear
-        case .operation: Palette.accent.opacity(.subtle)
-        case .equals: showsDone ? Color.clear : Palette.accent
+        case .tax: isActive ? Palette.lit.opacity(.subtle) : Color.clear
+        case .operation: Palette.lit.opacity(.subtle)
+        case .equals: showsDone ? Color.clear : Palette.goldFace
         }
     }
 

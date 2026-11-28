@@ -177,7 +177,7 @@ private extension EntryItemSheet {
             .padding(.horizontal, 8)
             .padding(.vertical, 8)
             .background(
-                isSelected ? Palette.accent.opacity(.subtle) : Color.clear,
+                isSelected ? Palette.lit.opacity(.subtle) : Color.clear,
                 in: .rect(cornerRadius: corner.radius(8))
             )
             .contentShape(.rect)

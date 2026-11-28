@@ -29,8 +29,9 @@ public extension EntryModel.Output {
     }
 
     var memoSuggestions: [String] {
-        EntryModel.suggestions(
+        EntryModel.suggestionsOrRecent(
             from: input.recentMemos,
+            readings: input.readings,
             for: state.fields.memo,
             limit: EntryModel.memoSuggestionLimit
         )
@@ -38,6 +39,18 @@ public extension EntryModel.Output {
 
     var typeName: String {
         state.type.name
+    }
+
+    var deckTitle: String {
+        switch state.screen.deck {
+        case .category: "カテゴリを選ぶ"
+        case .transfer: "振替の中身を選ぶ"
+        case .amount: "金額を入れる"
+        case .fee: "手数料を入れる"
+        case .wallet(.source): "\(walletTitle)を選ぶ"
+        case .wallet(.destination): "\(EntryModel.destinationTitle)を選ぶ"
+        case .date: "日付を選ぶ"
+        }
     }
 
     var budgetUsage: BudgetUsage? {

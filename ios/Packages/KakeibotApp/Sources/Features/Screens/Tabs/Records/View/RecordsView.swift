@@ -182,6 +182,9 @@ private extension RecordsView {
         Group {
             monthContent
         }
+        .transaction(value: selection != nil) { transaction in
+            transaction.animation = nil
+        }
         .frame(maxWidth: model.input.layout == .list ? Self.listWidth : nil)
         .pageSlide(slide, page: model.state.cursor.month)
     }

@@ -191,6 +191,32 @@ extension EntryModelTests {
     }
 
     @Test
+    func suggestsKanjiByReading() {
+        let recent = ["コンビニ", "昼食", "大根と人参", "電車", "シャツ", "歯医者"]
+
+        let lunch = EntryModel.suggestions(from: recent, for: "ちゅう", limit: 6)
+        let radish = EntryModel.suggestions(from: recent, for: "にんじん", limit: 6)
+        let tooth = EntryModel.suggestions(from: recent, for: "は", limit: 6)
+
+        #expect(lunch == ["昼食"])
+        #expect(radish == ["大根と人参"])
+        #expect(tooth == ["歯医者"])
+    }
+
+    @Test
+    func showsRecentWhenNothingMatches() {
+        let recent = ["コンビニ", "昼食", "ランチ"]
+
+        let none = EntryModel.suggestionsOrRecent(from: recent, for: "ぴざ", limit: 2)
+        let typed = EntryModel.suggestionsOrRecent(from: recent, for: "ランチ", limit: 6)
+        let items = EntryModel.suggestions(from: recent, for: "ぴざ", limit: 2)
+
+        #expect(none == ["コンビニ", "昼食"])
+        #expect(typed == ["コンビニ", "昼食"])
+        #expect(items.isEmpty)
+    }
+
+    @Test
     func showsQuantityOnlyWhenMany() {
         let pair = EntryItem.Draft(name: "牛乳", quantity: 2, amount: 396)
         let uneven = EntryItem.Draft(name: "卵", quantity: 3, amount: 200)

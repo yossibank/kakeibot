@@ -179,7 +179,7 @@ private extension ReviewClosingView {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(
-                Palette.accent.opacity(.faint),
+                Palette.lit.opacity(.faint),
                 in: .rect(cornerRadius: ReviewReportRadius.block)
             )
             .contentShape(.rect)
@@ -201,7 +201,7 @@ private extension ReviewClosingView {
 
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Palette.accent.opacity(.subtle))
+                    .fill(Palette.lit.opacity(.subtle))
                     .frame(height: 6)
 
                 Capsule()
@@ -236,7 +236,7 @@ private extension ReviewClosingView {
                 .foregroundStyle(Palette.accent)
                 .frame(width: 36, height: 36)
                 .background(
-                    Palette.accent.opacity(.subtle),
+                    Palette.lit.opacity(.subtle),
                     in: .rect(cornerRadius: ReviewReportRadius.block)
                 )
 

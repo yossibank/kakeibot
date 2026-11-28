@@ -27,7 +27,7 @@ public struct BandLinkButton: View {
             .foregroundStyle(Palette.accent)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 16))
+            .background(Palette.lit.opacity(.faint), in: .rect(cornerRadius: 16))
             .contentShape(.rect)
         }
         .buttonStyle(.plain)

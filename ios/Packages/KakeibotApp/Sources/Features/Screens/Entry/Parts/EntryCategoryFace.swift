@@ -36,6 +36,6 @@ private extension EntryCategoryFace {
             return Palette.panel
         }
 
-        return isLit ? Palette.accent.opacity(.subtle) : Color.clear
+        return isLit ? Palette.lit.opacity(.subtle) : Color.clear
     }
 }

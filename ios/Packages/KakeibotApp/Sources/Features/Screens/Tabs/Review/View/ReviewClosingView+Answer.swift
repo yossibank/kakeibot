@@ -106,7 +106,7 @@ private extension ReviewClosingView {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            Palette.accent.opacity(.faint),
+            Palette.lit.opacity(.faint),
             in: .rect(cornerRadius: ReviewReportRadius.panel)
         )
         .overlay {
@@ -134,7 +134,7 @@ private extension ReviewClosingView {
                 .frame(width: 40, alignment: .leading)
 
             Capsule()
-                .fill(Palette.accent.opacity(.subtle))
+                .fill(Palette.lit.opacity(.subtle))
                 .frame(height: 12)
                 .overlay {
                     GeometryReader { proxy in

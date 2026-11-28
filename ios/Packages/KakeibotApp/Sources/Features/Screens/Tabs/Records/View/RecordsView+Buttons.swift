@@ -38,7 +38,7 @@ extension RecordsView {
         isOn: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
-        let fill = isOn ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = isOn ? Palette.lit.opacity(.subtle) : Color.clear
         let ring = isOn ? Palette.accent : Palette.line
 
         return Button(action: action) {

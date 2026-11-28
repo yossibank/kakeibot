@@ -54,7 +54,7 @@ private extension WhatsNewIconScene {
             .font(.system(size: 30))
             .foregroundStyle(Palette.accent)
             .frame(width: 64, height: 64)
-            .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 16))
+            .background(Palette.lit.opacity(.subtle), in: .rect(cornerRadius: 16))
     }
 
     var grid: some View {

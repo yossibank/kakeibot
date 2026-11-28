@@ -31,11 +31,22 @@ extension EntrySheet {
         .padding(Self.panelInset)
         .background {
             panelShape
-                .fill(Self.wellFill)
+                .fill(wellFill)
                 .overlay {
                     panelShape
                         .strokeBorder(Palette.accent.opacity(.soft), lineWidth: 1)
+                        .mask {
+                            Rectangle()
+                                .overlay(alignment: .topLeading) {
+                                    legendGap
+                                        .blendMode(.destinationOut)
+                                }
+                                .compositingGroup()
+                        }
                 }
+        }
+        .overlay(alignment: .topLeading) {
+            deckLegend
         }
         .onGeometryChange(for: CGFloat.self) { proxy in
             proxy.size.height
@@ -89,10 +100,25 @@ extension EntrySheet {
 }
 
 private extension EntrySheet {
-    static var wellFill: some ShapeStyle {
-        Palette.panel
-            .mix(with: Palette.accent, by: 0.02)
-            .shadow(.inner(color: Palette.shadow.opacity(.faint), radius: 4, y: 2))
+    var deckLegend: some View {
+        legendSlot(legendText)
+    }
+
+    var legendGap: some View {
+        legendSlot(legendText.background(.black))
+    }
+
+    @ViewBuilder
+    var legendText: some View {
+        if !voice.output.isActive || deck != .amount {
+            Text(model.output.deckTitle)
+                .textFont(.caption, weight: .bold)
+                .foregroundStyle(Palette.accent)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     @ViewBuilder
@@ -104,6 +130,7 @@ private extension EntrySheet {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .padding(.top, Self.legendSpace)
 
         case .transfer:
             ScrollView {
@@ -111,6 +138,7 @@ private extension EntrySheet {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .padding(.top, Self.legendSpace + Self.transferGap)
 
         case .amount, .fee:
             amountDeck
@@ -130,6 +158,7 @@ private extension EntrySheet {
             }
             .scrollBounceBehavior(.basedOnSize)
             .scrollIndicators(.hidden)
+            .padding(.top, Self.legendSpace)
         }
     }
 
@@ -142,12 +171,9 @@ private extension EntrySheet {
                 ) { amount in
                     model.state.setFee(amount)
                 }
+                .padding(.top, Self.legendSpace)
             } else if !voice.output.isActive {
                 HStack(spacing: 8) {
-                    Text("金額を入力")
-                        .textFont(.caption2, weight: .bold)
-                        .foregroundStyle(Palette.subtext)
-
                     Spacer(minLength: 0)
 
                     if model.output.showsItems {
@@ -224,11 +250,21 @@ private extension EntrySheet {
             )
         }
     }
+
+    func legendSlot(_ content: some View) -> some View {
+        content
+            .frame(height: 0)
+            .padding(.leading, Self.legendInset)
+            .allowsHitTesting(false)
+    }
 }
 
 private extension EntrySheet {
-    static let amountTitleHeight: CGFloat = 28
     static let panelInset: CGFloat = 12
+    static let amountTitleHeight: CGFloat = 28
+    static let legendInset: CGFloat = 24
+    static let legendSpace: CGFloat = 8
+    static let transferGap: CGFloat = 8
     static let dateSpacing: CGFloat = 8
     static let maxKeyHeight: CGFloat = 64
 
@@ -241,13 +277,13 @@ private extension EntrySheet {
     static var panelNeed: CGFloat {
         let chips = ChipButton<ChipLabel>.Size.regular.height
         let calendar = MonthCalendar.height(isCompact: true)
-        let dateDeck = chips + dateSpacing + calendar
+        let dateDeck = legendSpace + chips + dateSpacing + calendar
         return panelInset * 3 + saveHeight + dateDeck
     }
 
     static var pillMark: LinearGradient {
         LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent],
+            colors: [Palette.goldLight, Palette.goldFace],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
@@ -255,7 +291,7 @@ private extension EntrySheet {
 
     static var pillFill: LinearGradient {
         LinearGradient(
-            colors: [Palette.accent.opacity(.subtle), .clear],
+            colors: [Palette.lit.opacity(.subtle), .clear],
             startPoint: .top,
             endPoint: .bottom
         )
@@ -270,6 +306,18 @@ private extension EntrySheet {
             insertion: .move(edge: entering).combined(with: .opacity),
             removal: .move(edge: leaving).combined(with: .opacity)
         )
+    }
+
+    var wellFill: AnyShapeStyle {
+        guard colorScheme == .dark else {
+            return AnyShapeStyle(Palette.cardTop)
+        }
+
+        let sunken = Palette.panel
+            .mix(with: Palette.accent, by: 0.02)
+            .shadow(.inner(color: Palette.shadow.opacity(.faint), radius: 4, y: 2))
+
+        return AnyShapeStyle(sunken)
     }
 
     var panelShape: RoundedRectangle {

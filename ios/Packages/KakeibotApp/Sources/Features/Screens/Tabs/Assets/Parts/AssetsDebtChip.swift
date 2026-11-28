@@ -44,6 +44,6 @@ private extension AssetsDebtChip {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(Palette.accent.opacity(.faint), in: .capsule)
+        .background(Palette.lit.opacity(.faint), in: .capsule)
     }
 }

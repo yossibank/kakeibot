@@ -309,7 +309,7 @@ private extension AssetsView {
     static let labeledNameMinWidth: CGFloat = 48
 
     static let unpaidTapOutsets = EdgeInsets(
-        top: 0,
+        top: 8,
         leading: 0,
         bottom: 8,
         trailing: 0

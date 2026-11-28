@@ -19,6 +19,10 @@ extension EntrySheet {
                 selection: model.state.category.tagId,
                 onSelect: { id in
                     model.state.toggleTag(id)
+
+                    if model.state.category.tagId == id {
+                        show(.amount)
+                    }
                 },
                 onAdd: {
                     editTags()
@@ -260,7 +264,10 @@ private extension EntrySheet {
 
     func select(_ category: EntryCategory) {
         model.state.setCategory(category.id)
-        show(.amount)
+
+        if model.output.tags.isEmpty {
+            show(.amount)
+        }
     }
 
     func openMenu(

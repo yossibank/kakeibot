@@ -153,8 +153,8 @@ private extension CapsulePicker {
     static var thumbFill: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accent.opacity(.muted),
-                Palette.accent.opacity(.soft)
+                Palette.lit.opacity(.muted),
+                Palette.lit.opacity(.soft)
             ],
             startPoint: .top,
             endPoint: .bottom

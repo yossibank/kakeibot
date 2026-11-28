@@ -48,8 +48,8 @@ private extension HeaderButton {
     static var fill: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accent.opacity(.subtle),
-                Palette.accent.opacity(.faint)
+                Palette.lit.opacity(.subtle),
+                Palette.lit.opacity(.faint)
             ],
             startPoint: .top,
             endPoint: .bottom

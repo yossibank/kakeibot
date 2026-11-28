@@ -45,7 +45,7 @@ public struct TemplateRowCard: View {
             Spacer(minLength: 8)
 
             Rectangle()
-                .fill(Palette.accent.opacity(.soft))
+                .fill(Palette.lit.opacity(.soft))
                 .frame(width: 0.5, height: fit.dividerHeight)
 
             TemplateCardAmount(amount: amount, size: .regular)

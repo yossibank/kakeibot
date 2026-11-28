@@ -58,6 +58,7 @@ public extension EntryModel {
             input.options = try await database.entryOptions()
             input.recentMemos = try await database.recentMemos(limit: limit)
             input.recentItemNames = try await database.recentItemNames(limit: itemLimit)
+            input.readings = Self.readings(of: input.recentMemos + input.recentItemNames)
             input.allTemplates = try await database.templates()
 
             input.cardBills = try await database.recurrings()

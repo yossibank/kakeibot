@@ -133,7 +133,7 @@ extension WalletEditSheet {
                 .padding(.leading, 16)
                 .padding(.trailing, 12)
                 .frame(height: 46)
-                .background(signColor.opacity(.subtle), in: .rect(cornerRadius: corner.radius(16)))
+                .background(Palette.field, in: .rect(cornerRadius: corner.radius(16)))
                 .overlay {
                     RoundedRectangle(cornerRadius: corner.radius(16))
                         .stroke(amountStroke, lineWidth: 1)
@@ -268,7 +268,8 @@ extension WalletEditSheet {
         let isSelected = model.state.isNegative == isNegative
         let tint = isNegative ? Palette.rose : Palette.accent
         let color = isSelected ? tint : Palette.subtext
-        let fill = isSelected ? tint.opacity(.subtle) : Color.clear
+        let strength = colorScheme == .light ? 0.5 : 1
+        let fill = isSelected ? tint.opacity(.subtle).opacity(strength) : Color.clear
         let stroke = isSelected ? tint : Palette.accent.opacity(.soft)
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
 

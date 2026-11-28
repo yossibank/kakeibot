@@ -36,6 +36,7 @@ extension EntryModel {
 
     static func suggestions(
         from recent: [String],
+        readings: [String: String] = [:],
         for text: String,
         limit: Int
     ) -> [String] {
@@ -48,21 +49,56 @@ extension EntryModel {
         let key = suggestionKey(text)
 
         let matches: [(name: String, isPrefix: Bool)] = recent.compactMap { name in
-            let nameKey = suggestionKey(name)
-
-            guard
-                name != text,
-                let range = nameKey.range(of: key, options: suggestionOptions)
-            else {
+            guard name != text else {
                 return nil
             }
 
-            return (name, range.lowerBound == nameKey.startIndex)
+            let nameKey = suggestionKey(name)
+
+            if let range = nameKey.range(of: key, options: suggestionOptions) {
+                return (name, range.lowerBound == nameKey.startIndex)
+            }
+
+            let reading = readings[name] ?? reading(of: name)
+
+            guard let range = reading.range(of: key, options: suggestionOptions) else {
+                return nil
+            }
+
+            return (name, range.lowerBound == reading.startIndex)
         }
 
         let ordered = matches.filter(\.isPrefix) + matches.filter { !$0.isPrefix }
 
         return Array(ordered.prefix(limit).map(\.name))
+    }
+
+    static func suggestionsOrRecent(
+        from recent: [String],
+        readings: [String: String] = [:],
+        for text: String,
+        limit: Int
+    ) -> [String] {
+        let matches = suggestions(
+            from: recent,
+            readings: readings,
+            for: text,
+            limit: limit
+        )
+
+        guard matches.isEmpty else {
+            return matches
+        }
+
+        let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let others = recent.filter { $0 != text }
+
+        return Array(others.prefix(limit))
+    }
+
+    static func readings(of names: [String]) -> [String: String] {
+        let pairs = Set(names).map { ($0, reading(of: $0)) }
+        return Dictionary(uniqueKeysWithValues: pairs)
     }
 }
 
@@ -75,5 +111,31 @@ private extension EntryModel {
 
     static func suggestionKey(_ text: String) -> String {
         text.applyingTransform(.hiraganaToKatakana, reverse: false) ?? text
+    }
+
+    static func reading(of text: String) -> String {
+        let source = text as CFString
+        let range = CFRange(location: 0, length: CFStringGetLength(source))
+        let locale = Locale(identifier: "ja_JP") as CFLocale
+
+        let tokenizer = CFStringTokenizerCreate(
+            nil,
+            source,
+            range,
+            kCFStringTokenizerUnitWordBoundary,
+            locale
+        )
+
+        var sounds: [String] = []
+
+        while !CFStringTokenizerAdvanceToNextToken(tokenizer).isEmpty {
+            let attribute = kCFStringTokenizerAttributeLatinTranscription
+            let sound = CFStringTokenizerCopyCurrentTokenAttribute(tokenizer, attribute) as? String
+            sounds.append(sound ?? "")
+        }
+
+        let latin = sounds.joined()
+
+        return latin.applyingTransform(.latinToKatakana, reverse: false) ?? latin
     }
 }

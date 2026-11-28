@@ -159,7 +159,7 @@ private extension WhatsNewSheet {
             }
         }
         .padding(16)
-        .background(Palette.accent.opacity(.subtle), in: .rect(cornerRadius: 20))
+        .background(Palette.lit.opacity(.subtle), in: .rect(cornerRadius: 20))
         .overlay {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Palette.outline, lineWidth: 1)

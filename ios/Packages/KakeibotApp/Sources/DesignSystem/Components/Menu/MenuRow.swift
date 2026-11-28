@@ -75,6 +75,6 @@ private extension MenuRow {
     }
 
     var selectionFill: Color {
-        isSelected ? Palette.accent.opacity(.faint) : Color.clear
+        isSelected ? Palette.lit.opacity(.faint) : Color.clear
     }
 }

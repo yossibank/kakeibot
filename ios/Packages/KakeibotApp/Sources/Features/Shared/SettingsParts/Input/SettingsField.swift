@@ -68,7 +68,7 @@ struct SettingsField<Field: Hashable>: View {
         .padding(.leading, 16)
         .padding(.trailing, 4)
         .frame(height: 46)
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
+        .background(Palette.field, in: .rect(cornerRadius: corner.radius(16)))
         .overlay {
             RoundedRectangle(cornerRadius: corner.radius(16))
                 .stroke(stroke, lineWidth: 1)

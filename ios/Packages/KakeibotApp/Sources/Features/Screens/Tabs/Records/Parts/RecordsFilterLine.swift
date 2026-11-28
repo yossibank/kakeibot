@@ -29,7 +29,7 @@ struct RecordsFilterLine: View {
             .buttonStyle(.plain)
         }
         .padding(.leading, 12)
-        .background(Palette.accent.opacity(.subtle), in: Capsule())
+        .background(Palette.lit.opacity(.subtle), in: Capsule())
         .contentShape(.rect)
         .onTapGesture(perform: onOpen)
         .transition(.opacity)
