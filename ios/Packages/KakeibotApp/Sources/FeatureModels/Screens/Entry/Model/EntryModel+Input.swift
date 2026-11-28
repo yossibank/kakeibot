@@ -16,6 +16,7 @@ public extension EntryModel {
         public internal(set) var receiptGuideHidden = false
         public internal(set) var editingId: Entry.ID?
 
+        var readings: [String: String] = [:]
         var allTemplates: [EntryTemplate] = []
         var cardBills: [Recurring] = []
         var budgets: [Budget] = []

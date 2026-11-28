@@ -29,8 +29,9 @@ public extension EntryModel.Output {
     }
 
     var memoSuggestions: [String] {
-        EntryModel.suggestions(
+        EntryModel.suggestionsOrRecent(
             from: input.recentMemos,
+            readings: input.readings,
             for: state.fields.memo,
             limit: EntryModel.memoSuggestionLimit
         )

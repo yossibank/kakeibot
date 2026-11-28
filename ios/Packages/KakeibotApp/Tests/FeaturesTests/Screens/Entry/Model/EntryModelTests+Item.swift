@@ -174,7 +174,7 @@ extension EntryModelTests {
 
         #expect(Set(all) == ["牛乳", "低脂肪乳", "パン"])
         #expect(Set(milk) == ["牛乳", "低脂肪乳"])
-        #expect(Set(exact) == ["牛乳", "低脂肪乳"])
+        #expect(exact.isEmpty)
     }
 
     @Test
@@ -207,11 +207,13 @@ extension EntryModelTests {
     func showsRecentWhenNothingMatches() {
         let recent = ["コンビニ", "昼食", "ランチ"]
 
-        let none = EntryModel.suggestions(from: recent, for: "ぴざ", limit: 2)
-        let typed = EntryModel.suggestions(from: recent, for: "ランチ", limit: 6)
+        let none = EntryModel.suggestionsOrRecent(from: recent, for: "ぴざ", limit: 2)
+        let typed = EntryModel.suggestionsOrRecent(from: recent, for: "ランチ", limit: 6)
+        let items = EntryModel.suggestions(from: recent, for: "ぴざ", limit: 2)
 
         #expect(none == ["コンビニ", "昼食"])
         #expect(typed == ["コンビニ", "昼食"])
+        #expect(items.isEmpty)
     }
 
     @Test
