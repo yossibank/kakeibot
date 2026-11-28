@@ -107,7 +107,7 @@ $$\text{品目の合計} = \text{小計} + \sum \text{率ごとの消費税}$$
 
 内税は、率ごとに対象額を足してから 1 回だけ四捨五入する。品目の合計は小計のままにする。
 
-$$\text{うち消費税} = \operatorname{round}\left(\text{対象額} \times \frac{\text{率}}{100 + \text{率}}\right)$$
+$$\text{うち消費税} = \text{round}\left(\text{対象額} \times \frac{\text{率}}{100 + \text{率}}\right)$$
 
 ### 伝票とレシートの見た目
 
