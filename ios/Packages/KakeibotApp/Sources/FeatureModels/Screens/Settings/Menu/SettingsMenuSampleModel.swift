@@ -64,7 +64,6 @@ public extension SettingsMenuSampleModel {
         }
     }
 }
-#endif
 
 public extension SettingsMenuSampleModel.Progress {
     var message: String? {
@@ -74,3 +73,4 @@ public extension SettingsMenuSampleModel.Progress {
         }
     }
 }
+#endif
