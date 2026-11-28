@@ -176,7 +176,7 @@ private extension ReviewProgressView {
 
             case .upcoming:
                 UnevenRoundedRectangle(topLeadingRadius: 4, topTrailingRadius: 4)
-                    .fill(Palette.accent.opacity(.faint))
+                    .fill(Palette.lit.opacity(.faint))
                     .frame(height: 4)
             }
         }

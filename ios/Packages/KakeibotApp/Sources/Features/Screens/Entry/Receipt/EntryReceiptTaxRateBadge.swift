@@ -15,7 +15,7 @@ struct EntryReceiptTaxRateBadge: View {
             .padding(.horizontal, 4)
             .frame(minWidth: Self.minWidth)
             .padding(.vertical, 1)
-            .background(Palette.accent.opacity(.subtle), in: .capsule)
+            .background(Palette.lit.opacity(.subtle), in: .capsule)
     }
 }
 

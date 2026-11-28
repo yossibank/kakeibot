@@ -168,7 +168,7 @@ private extension ReminderView {
     var wallpaper: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accent.opacity(.muted),
+                Palette.lit.opacity(.muted),
                 Palette.rose.opacity(.soft),
                 Palette.accentDeep.opacity(.soft)
             ],

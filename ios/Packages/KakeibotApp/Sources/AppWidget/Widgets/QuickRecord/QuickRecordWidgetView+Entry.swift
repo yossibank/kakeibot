@@ -115,7 +115,7 @@ private struct QuickRecordEntryOutline: ViewModifier {
         let shape = RoundedRectangle(cornerRadius: corner.radius(QuickRecordWidgetView.tileRadius))
 
         return content
-            .background(Palette.accent.opacity(.subtle), in: shape)
+            .background(Palette.lit.opacity(.subtle), in: shape)
             .overlay {
                 shape
                     .strokeBorder(Palette.accent.opacity(.medium), style: .dashed)

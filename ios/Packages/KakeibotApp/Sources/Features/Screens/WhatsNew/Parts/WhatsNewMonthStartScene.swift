@@ -109,7 +109,7 @@ private extension WhatsNewMonthStartScene {
                 .foregroundStyle(Palette.accentStrong)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 2)
-                .background(Palette.accent.opacity(.subtle), in: .capsule)
+                .background(Palette.lit.opacity(.subtle), in: .capsule)
         }
         .monospacedDigit()
     }

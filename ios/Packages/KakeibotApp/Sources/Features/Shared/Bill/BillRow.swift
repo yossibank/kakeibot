@@ -168,7 +168,7 @@ private extension BillRow {
         }
         .padding(12)
         .background(
-            Palette.accent.opacity(.faint),
+            Palette.lit.opacity(.faint),
             in: .rect(cornerRadius: corner.radius(20))
         )
         .contentShape(.rect)
@@ -229,7 +229,7 @@ private extension BillRow {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule()
-                    .fill(Palette.accent.opacity(.soft))
+                    .fill(Palette.lit.opacity(.soft))
 
                 Capsule()
                     .fill(balanceColor)

@@ -95,7 +95,7 @@ private extension ReminderView {
                 .sansFont(.headline, weight: .light)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 48, height: 48)
-                .background(Palette.accent.opacity(.subtle), in: Circle())
+                .background(Palette.lit.opacity(.subtle), in: Circle())
                 .contentTransition(.symbolEffect(.replace))
                 .symbolEffect(
                     .wiggle,

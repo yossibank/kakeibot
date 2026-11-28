@@ -18,6 +18,8 @@ entry.counts-items-with-quantity	EntryModelTests/countsItemsWithQuantity	EntryMo
 entry.edits-store-as-first-memo-line	EntryModelTests/editsStoreAsFirstMemoLine	EntryModelItemTest/editsStoreAsFirstMemoLine	対応	
 entry.suggests-recent-item-names	EntryModelTests/suggestsRecentItemNames	EntryModelItemTest/suggestsRecentItemNames	対応	
 entry.narrows-suggestions-by-typed-text	EntryModelTests/narrowsSuggestionsByTypedText		未移植	Android は、ひらがなとカタカナ・全角と半角を同じに見ず、頭が合う候補を先に並べない
+entry.suggests-kanji-by-reading	EntryModelTests/suggestsKanjiByReading		未移植	Android は、漢字の候補を読みで探さない
+entry.shows-recent-when-nothing-matches	EntryModelTests/showsRecentWhenNothingMatches		未移植	Android は、合う候補が無い時に最近の入力を並べない
 entry.shows-quantity-only-when-many	EntryModelTests/showsQuantityOnlyWhenMany	EntryModelItemTest/showsQuantityOnlyWhenMany	対応	
 entry.splits-amount-into-unit-price	EntryModelTests/splitsAmountIntoUnitPrice	EntryModelItemTest/splitsAmountIntoUnitPrice	対応	
 entry.shows-month-total-of-category-without-budget	EntryModelTests/showsMonthTotalOfCategoryWithoutBudget		未移植	入力画面に今月の合計（monthTotalText）を出す所が無い

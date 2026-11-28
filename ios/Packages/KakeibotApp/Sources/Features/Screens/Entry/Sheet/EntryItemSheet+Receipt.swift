@@ -298,7 +298,7 @@ private extension EntryItemSheet {
 
             if isEditing {
                 Rectangle()
-                    .fill(Palette.accent.opacity(.subtle))
+                    .fill(Palette.lit.opacity(.subtle))
             } else if isSuspect {
                 Rectangle()
                     .fill(Palette.amber.opacity(.subtle))

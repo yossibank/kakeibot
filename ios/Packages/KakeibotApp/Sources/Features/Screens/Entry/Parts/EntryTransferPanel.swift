@@ -71,7 +71,7 @@ private extension EntryTransferPanel {
         .foregroundStyle(Palette.accent)
         .padding(.horizontal, 8)
         .frame(height: 24)
-        .background(Palette.accent.opacity(.subtle), in: .capsule)
+        .background(Palette.lit.opacity(.subtle), in: .capsule)
         .animation(.snappy, value: model.output.amount)
     }
 

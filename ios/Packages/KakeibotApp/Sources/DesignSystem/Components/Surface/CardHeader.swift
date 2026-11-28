@@ -28,7 +28,7 @@ public struct CardHeader<Accessory: View>: View {
                     .sansFont(.small, weight: .semibold)
                     .foregroundStyle(Palette.accent)
                     .frame(width: Self.iconSize, height: Self.iconSize)
-                    .background(Palette.accent.opacity(.subtle), in: Circle())
+                    .background(Palette.lit.opacity(.subtle), in: Circle())
             }
 
             SectionTitle(title)

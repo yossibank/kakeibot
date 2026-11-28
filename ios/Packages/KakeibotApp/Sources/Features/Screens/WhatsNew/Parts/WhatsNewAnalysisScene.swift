@@ -43,7 +43,7 @@ private extension WhatsNewAnalysisScene {
             segment("分析", systemImage: "sparkles", isSelected: true)
         }
         .padding(4)
-        .background(Palette.accent.opacity(.faint), in: .rect(cornerRadius: 12))
+        .background(Palette.lit.opacity(.faint), in: .rect(cornerRadius: 12))
         .padding(4)
         .background(Palette.card, in: .rect(cornerRadius: 16))
         .overlay {
@@ -137,7 +137,7 @@ private extension WhatsNewAnalysisScene {
         return VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .bottom, spacing: 4) {
                 RoundedRectangle(cornerRadius: 2)
-                    .fill(Palette.accent.opacity(.soft))
+                    .fill(Palette.lit.opacity(.soft))
                     .frame(width: 12, height: 28 * metric.previous)
 
                 RoundedRectangle(cornerRadius: 2)

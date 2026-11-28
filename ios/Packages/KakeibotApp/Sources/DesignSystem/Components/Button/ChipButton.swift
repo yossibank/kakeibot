@@ -111,7 +111,7 @@ private extension ChipButton {
     }
 
     var fill: Color {
-        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        isSelected ? Palette.lit.opacity(.subtle) : Color.clear
     }
 
     var stroke: Color {

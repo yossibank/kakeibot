@@ -27,7 +27,7 @@ struct LaunchScreenOption: View {
 
     var body: some View {
         let stroke = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = isSelected ? Palette.lit.opacity(.subtle) : Color.clear
         let mark = isSelected ? "checkmark.circle.fill" : "circle"
 
         Button(action: action) {

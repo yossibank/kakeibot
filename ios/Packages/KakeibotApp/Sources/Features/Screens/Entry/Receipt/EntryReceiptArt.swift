@@ -42,7 +42,7 @@ private extension EntryReceiptArt {
     var flat: some View {
         ZStack(alignment: .bottom) {
             Capsule()
-                .fill(Palette.accent.opacity(.subtle))
+                .fill(Palette.lit.opacity(.subtle))
                 .frame(height: 3)
 
             paper(width: 38, height: 50)

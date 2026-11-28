@@ -14,7 +14,7 @@ struct RecordsSheetPlaceholder: View {
                 .sansFont(.title, weight: .light)
                 .foregroundStyle(Palette.accent)
                 .frame(width: 64, height: 64)
-                .background(Palette.accent.opacity(.subtle), in: Circle())
+                .background(Palette.lit.opacity(.subtle), in: Circle())
 
             VStack(spacing: 8) {
                 Text(title)

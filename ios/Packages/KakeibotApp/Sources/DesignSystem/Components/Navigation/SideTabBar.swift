@@ -104,7 +104,7 @@ private extension SideTabBar {
         let isSelected = item.value == selection
         let iconColor = isSelected ? Palette.accent : Palette.subtext
         let titleColor = isSelected ? Palette.accentStrong : Palette.text
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : .clear
+        let fill = isSelected ? Palette.lit.opacity(.subtle) : .clear
         let rimOpacity: Double = isSelected ? 1 : 0
 
         return Button {

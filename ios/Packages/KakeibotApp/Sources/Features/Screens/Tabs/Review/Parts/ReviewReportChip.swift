@@ -18,7 +18,7 @@ struct ReviewReportChip: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background(
-            Palette.accent.opacity(.subtle),
+            Palette.lit.opacity(.subtle),
             in: .rect(cornerRadius: ReviewReportRadius.block)
         )
     }

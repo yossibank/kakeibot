@@ -34,11 +34,11 @@ enum TabBarStyle {
     static var goldRing: AngularGradient {
         AngularGradient(
             colors: [
-                Palette.accentStrong,
-                Palette.accent,
-                Palette.accentDeep,
-                Palette.accent,
-                Palette.accentStrong
+                Palette.goldLight,
+                Palette.goldFace,
+                Palette.goldShade,
+                Palette.goldFace,
+                Palette.goldLight
             ],
             center: .center
         )

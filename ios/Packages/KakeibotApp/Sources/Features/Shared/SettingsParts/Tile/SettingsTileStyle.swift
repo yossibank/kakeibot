@@ -11,7 +11,7 @@ enum SettingsTileStyle {
     }
 
     static func fill(isSelected: Bool) -> Color {
-        isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        isSelected ? Palette.lit.opacity(.subtle) : Color.clear
     }
 
     static func stroke(isSelected: Bool) -> Color {

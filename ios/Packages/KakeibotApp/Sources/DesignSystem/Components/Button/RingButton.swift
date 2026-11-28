@@ -85,7 +85,7 @@ private extension RingButton {
 
     var fill: Color {
         isEnabled && style == .prominent
-            ? Palette.accent.opacity(.subtle)
+            ? Palette.lit.opacity(.subtle)
             : Color.clear
     }
 }

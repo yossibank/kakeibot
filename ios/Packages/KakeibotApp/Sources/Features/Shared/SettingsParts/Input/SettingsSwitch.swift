@@ -27,7 +27,7 @@ struct SettingsSwitch: View {
                     .foregroundStyle(Palette.subtext)
             }
         }
-        .background(Palette.panel, in: .rect(cornerRadius: corner.radius(16)))
+        .background(Palette.field, in: .rect(cornerRadius: corner.radius(16)))
     }
 }
 

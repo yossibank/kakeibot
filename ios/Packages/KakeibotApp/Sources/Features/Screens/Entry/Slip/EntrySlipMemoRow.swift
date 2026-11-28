@@ -84,7 +84,7 @@ private extension EntrySlipMemoRow {
     }
 
     func receiptBadge(_ left: Int) -> some View {
-        let fill = left > 0 ? Palette.accent : Palette.amber
+        let fill = left > 0 ? Palette.goldFace : Palette.amber
 
         return Text("\(left)")
             .sansFont(.micro, weight: .bold)

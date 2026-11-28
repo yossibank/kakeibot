@@ -108,7 +108,7 @@ private extension EntryTypeSwitch {
 
     static var gold: LinearGradient {
         LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent, Palette.accentDeep],
+            colors: [Palette.goldLight, Palette.goldFace, Palette.goldShade],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )

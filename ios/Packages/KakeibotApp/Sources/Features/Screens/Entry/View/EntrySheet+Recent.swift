@@ -19,7 +19,7 @@ extension EntrySheet {
             let entries = model.output.recentEntries
 
             if !templates.isEmpty || !entries.isEmpty {
-                EntryRecentRow(title: "よく使う") {
+                EntryRecentRow(title: "よく使う・最近の記録") {
                     EntryRecentLines {
                         ForEach(templates) { template in
                             templateCard(template)

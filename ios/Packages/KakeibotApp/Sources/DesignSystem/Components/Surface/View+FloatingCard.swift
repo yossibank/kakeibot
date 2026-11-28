@@ -12,7 +12,7 @@ private struct FloatingCardBackground: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .background(Palette.panel, in: .rect(cornerRadius: corner.radius(20)))
+            .background(Palette.field, in: .rect(cornerRadius: corner.radius(20)))
             .overlay {
                 RoundedRectangle(cornerRadius: corner.radius(20))
                     .stroke(Palette.outline, lineWidth: 1)

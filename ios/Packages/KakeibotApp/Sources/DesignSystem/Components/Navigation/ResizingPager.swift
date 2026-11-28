@@ -44,6 +44,7 @@ public struct ResizingPager<Item, ID: Hashable, Page: View>: View {
                 }
             }
             .scrollTargetLayout()
+            .frame(height: height, alignment: .top)
         }
         .scrollTargetBehavior(.paging)
         .scrollPosition(id: $position)

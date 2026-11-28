@@ -72,7 +72,7 @@ private extension WhatsNewRecurringScene {
             }
         }
         .padding(2)
-        .background(Palette.accent.opacity(.subtle), in: .capsule)
+        .background(Palette.lit.opacity(.subtle), in: .capsule)
         .padding(.horizontal, 8)
     }
 

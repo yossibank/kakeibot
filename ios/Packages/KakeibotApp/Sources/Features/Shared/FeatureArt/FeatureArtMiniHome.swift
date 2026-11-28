@@ -95,7 +95,7 @@ private extension FeatureArtMiniHome {
             ForEach(FeatureArtSample.items, id: \.self) { item in
                 HStack(spacing: 8) {
                     Circle()
-                        .fill(Palette.accent.opacity(.subtle))
+                        .fill(Palette.lit.opacity(.subtle))
                         .frame(width: 26, height: 26)
 
                     Text(item.name)

@@ -21,7 +21,7 @@ struct BillStatus: View {
                     .sansFont(.micro, weight: .heavy)
                     .foregroundStyle(Palette.backgroundBottom)
                     .frame(width: 14, height: 14)
-                    .background(Palette.accent, in: .circle)
+                    .background(Palette.goldFace, in: .circle)
 
                 Text(BillText.settled)
                     .foregroundStyle(Palette.subtext)

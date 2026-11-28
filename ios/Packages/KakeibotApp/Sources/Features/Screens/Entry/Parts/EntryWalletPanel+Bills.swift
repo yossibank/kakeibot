@@ -31,7 +31,7 @@ extension EntryWalletPanel {
                 .transition(.opacity)
             }
         }
-        .background(Palette.panel.opacity(.strong), in: shape)
+        .background(Palette.tile.opacity(.strong), in: shape)
         .overlay {
             shape
                 .stroke(ring, lineWidth: 1)
@@ -65,7 +65,7 @@ private extension EntryWalletPanel {
                         .foregroundStyle(Palette.accentStrong)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
-                        .background(Palette.accent.opacity(.subtle), in: .capsule)
+                        .background(Palette.lit.opacity(.subtle), in: .capsule)
                 }
 
                 Spacer(minLength: 0)
@@ -90,7 +90,7 @@ private extension EntryWalletPanel {
     func billButton(_ choice: EntryModel.BillChoice) -> some View {
         let isSelected = model.output.selectedBillDate == choice.date
         let titleColor = isSelected ? Palette.accentStrong : Palette.subtext
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = isSelected ? Palette.lit.opacity(.subtle) : Color.clear
         let ring = isSelected ? Palette.accent : Palette.line
         let shape = RoundedRectangle(cornerRadius: corner.radius(16))
 

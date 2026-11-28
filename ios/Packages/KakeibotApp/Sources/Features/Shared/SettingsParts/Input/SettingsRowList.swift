@@ -77,7 +77,7 @@ private extension SettingsRowList {
                         .sansFont(.small)
                         .foregroundStyle(Palette.accent)
                         .frame(width: 28, height: 28)
-                        .background(Palette.accent.opacity(.subtle), in: Circle())
+                        .background(Palette.lit.opacity(.subtle), in: Circle())
 
                     Text(item.title)
                         .textFont(.subheadline)

@@ -45,9 +45,9 @@ private extension GoldBackground {
     static var gold: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accent.mix(with: Palette.accentStrong, by: 0.3),
-                Palette.accent,
-                Palette.accent.mix(with: Palette.accentDeep, by: 0.45)
+                Palette.goldFace.mix(with: Palette.goldLight, by: 0.3),
+                Palette.goldFace,
+                Palette.goldFace.mix(with: Palette.goldShade, by: 0.45)
             ],
             startPoint: .top,
             endPoint: .bottom
@@ -68,7 +68,7 @@ private extension GoldBackground {
 
     var rim: LinearGradient {
         let colors = if isEnabled {
-            [Palette.accentStrong.opacity(.strong), Palette.accent.opacity(.soft)]
+            [Palette.goldLight.opacity(.strong), Palette.accent.opacity(.soft)]
         } else {
             [Palette.accent.opacity(.muted), Palette.accent.opacity(.subtle)]
         }

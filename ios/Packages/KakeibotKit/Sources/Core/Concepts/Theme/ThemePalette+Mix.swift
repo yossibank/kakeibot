@@ -46,9 +46,7 @@ public extension ThemePalette {
             hint: hint
         )
     }
-}
 
-private extension ThemePalette {
     static func mix(
         _ color: UInt32,
         _ target: (UInt32, Double)

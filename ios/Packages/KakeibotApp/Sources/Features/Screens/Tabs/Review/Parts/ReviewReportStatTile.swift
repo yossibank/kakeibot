@@ -25,7 +25,7 @@ struct ReviewReportStatTile: View {
                         .foregroundStyle(Palette.accent)
                         .frame(width: 24, height: 24)
                         .background(
-                            Palette.accent.opacity(.subtle),
+                            Palette.lit.opacity(.subtle),
                             in: .rect(cornerRadius: ReviewReportRadius.chip)
                         )
                 }
@@ -53,7 +53,7 @@ struct ReviewReportStatTile: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(Palette.accent.opacity(.faint))
+        .background(Palette.lit.opacity(.faint))
         .background(Palette.cardBottom)
     }
 }
@@ -72,7 +72,7 @@ private extension ReviewReportStatTile {
             let clamped = min(max(progress, 0), 1)
 
             Capsule()
-                .fill(Palette.accent.opacity(.subtle))
+                .fill(Palette.lit.opacity(.subtle))
                 .frame(height: 4)
                 .overlay(alignment: .leading) {
                     GeometryReader { proxy in

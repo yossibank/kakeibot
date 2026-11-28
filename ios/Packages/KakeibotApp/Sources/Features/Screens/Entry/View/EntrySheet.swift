@@ -13,6 +13,7 @@ public struct EntrySheet: View {
     @Environment(\.isPro) var isPro
     @Environment(\.canScanReceipt) var canScanReceipt
     @Environment(\.openURL) var openURL
+    @Environment(\.colorScheme) var colorScheme
 
     @State private var notice: EntryNoticeModel
 

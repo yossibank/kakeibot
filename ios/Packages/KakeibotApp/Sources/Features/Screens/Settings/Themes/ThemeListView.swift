@@ -145,6 +145,8 @@ private extension ThemeListView {
                 }
                 .padding(.vertical, 8)
             }
+            .contentMargins(.horizontal, SettingsSpacing.side, for: .scrollContent)
+            .padding(.horizontal, -SettingsSpacing.side)
             .scrollIndicators(.hidden)
             .scrollDisabled(shownMenu != nil)
             .deletionNotice(model.state.notices.deletion) { deletion in

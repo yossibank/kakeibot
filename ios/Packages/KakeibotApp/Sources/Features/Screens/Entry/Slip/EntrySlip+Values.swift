@@ -29,7 +29,7 @@ extension EntrySlip {
 
     static var gold: LinearGradient {
         LinearGradient(
-            colors: [Palette.accentStrong, Palette.accent, Palette.accentDeep],
+            colors: [Palette.goldLight, Palette.goldFace, Palette.goldShade],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
@@ -38,7 +38,7 @@ extension EntrySlip {
     static var cardFill: LinearGradient {
         LinearGradient(
             colors: [
-                Palette.accent.mix(with: Palette.cardTop, by: 0.84),
+                Palette.cardTint,
                 Palette.cardTop,
                 Palette.cardBottom
             ],
@@ -49,7 +49,7 @@ extension EntrySlip {
 
     static var litFill: LinearGradient {
         LinearGradient(
-            colors: [Palette.accent.opacity(.soft), .clear],
+            colors: [Palette.lit.opacity(.soft), .clear],
             startPoint: .leading,
             endPoint: .trailing
         )

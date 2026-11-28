@@ -132,7 +132,7 @@ private extension ReviewView {
 
     func kindTile(_ kind: ReviewKind) -> some View {
         let isSelected = kind == model.input.kind
-        let fill = isSelected ? Palette.accent.opacity(.subtle) : Color.clear
+        let fill = isSelected ? Palette.lit.opacity(.subtle) : Color.clear
         let rim = isSelected ? Palette.accent : Palette.accent.opacity(.soft)
         let titleColor = isSelected ? Palette.accent : Palette.subtext
         let change = model.output.change(of: kind)

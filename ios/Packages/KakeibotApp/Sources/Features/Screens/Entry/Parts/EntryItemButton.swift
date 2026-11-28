@@ -57,7 +57,7 @@ private extension EntryItemButton {
     )
 
     var fill: Color {
-        adjustment == 0 ? Palette.accent.opacity(.subtle) : Palette.amber.opacity(.subtle)
+        adjustment == 0 ? Palette.lit.opacity(.subtle) : Palette.amber.opacity(.subtle)
     }
 }
 

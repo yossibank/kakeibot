@@ -106,7 +106,7 @@ private extension SyncChoiceCard {
                     .foregroundStyle(Palette.backgroundBottom)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 2)
-                    .background(Palette.accent, in: Capsule())
+                    .background(Palette.goldFace, in: Capsule())
                     .fixedSize()
                     .offset(y: -9)
             }

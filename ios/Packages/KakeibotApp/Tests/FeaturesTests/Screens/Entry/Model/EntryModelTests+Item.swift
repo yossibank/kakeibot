@@ -174,7 +174,7 @@ extension EntryModelTests {
 
         #expect(Set(all) == ["牛乳", "低脂肪乳", "パン"])
         #expect(Set(milk) == ["牛乳", "低脂肪乳"])
-        #expect(exact.isEmpty)
+        #expect(Set(exact) == ["牛乳", "低脂肪乳"])
     }
 
     @Test
@@ -188,6 +188,30 @@ extension EntryModelTests {
         #expect(empty == ["業務スーパー", "ランチ"])
         #expect(typed == ["ｽｰﾊﾟｰ", "スーパー玉出", "スーパー", "業務スーパー"])
         #expect(exact == ["ｽｰﾊﾟｰ", "スーパー玉出", "業務スーパー"])
+    }
+
+    @Test
+    func suggestsKanjiByReading() {
+        let recent = ["コンビニ", "昼食", "大根と人参", "電車", "シャツ", "歯医者"]
+
+        let lunch = EntryModel.suggestions(from: recent, for: "ちゅう", limit: 6)
+        let radish = EntryModel.suggestions(from: recent, for: "にんじん", limit: 6)
+        let tooth = EntryModel.suggestions(from: recent, for: "は", limit: 6)
+
+        #expect(lunch == ["昼食"])
+        #expect(radish == ["大根と人参"])
+        #expect(tooth == ["歯医者"])
+    }
+
+    @Test
+    func showsRecentWhenNothingMatches() {
+        let recent = ["コンビニ", "昼食", "ランチ"]
+
+        let none = EntryModel.suggestions(from: recent, for: "ぴざ", limit: 2)
+        let typed = EntryModel.suggestions(from: recent, for: "ランチ", limit: 6)
+
+        #expect(none == ["コンビニ", "昼食"])
+        #expect(typed == ["コンビニ", "昼食"])
     }
 
     @Test

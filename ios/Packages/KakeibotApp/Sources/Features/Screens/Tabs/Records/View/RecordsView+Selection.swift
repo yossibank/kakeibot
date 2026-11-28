@@ -31,7 +31,7 @@ extension RecordsView {
         }
         .padding(.horizontal, 8)
         .frame(minHeight: 56)
-        .background(Palette.panel, in: .capsule)
+        .background(Palette.field, in: .capsule)
         .overlay {
             Capsule()
                 .stroke(Palette.outline, lineWidth: 1)
@@ -158,15 +158,15 @@ private extension RecordsView {
                 if isStacked {
                     VStack(spacing: 2) {
                         Image(systemName: systemImage)
-                            .sansFont(.small, weight: .semibold)
+                            .sansFont(.body, weight: .semibold)
 
                         Text(title)
-                            .textFont(size: .micro)
+                            .textFont(size: .caption)
                     }
                     .frame(minWidth: 44)
                 } else {
                     Label(title, systemImage: systemImage)
-                        .textFont(.footnote)
+                        .textFont(.subheadline, weight: .medium)
                 }
             }
             .lineLimit(1)

@@ -45,7 +45,7 @@ public struct TemplateCard<Name: View, Amount: View>: View {
             }
 
             Rectangle()
-                .fill(Palette.accent.opacity(.soft))
+                .fill(Palette.lit.opacity(.soft))
                 .frame(height: 0.5)
 
             amount

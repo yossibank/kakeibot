@@ -18,7 +18,7 @@ extension TemplateEditSheet {
         .frame(maxWidth: .infinity)
         .background {
             EllipticalGradient(
-                colors: [Palette.accent.opacity(.soft), .clear],
+                colors: [Palette.lit.opacity(.soft), .clear],
                 center: .center,
                 startRadiusFraction: 0,
                 endRadiusFraction: 0.5
@@ -144,7 +144,7 @@ private extension TemplateEditSheet {
         .glow(Palette.glow.opacity(.subtle), radius: 30)
         .background(alignment: .bottom) {
             Ellipse()
-                .fill(Palette.shadow.opacity(0.55))
+                .fill(Palette.softShadow.opacity(0.55))
                 .frame(width: 260, height: 22)
                 .blur(radius: 14)
                 .offset(y: 26)
