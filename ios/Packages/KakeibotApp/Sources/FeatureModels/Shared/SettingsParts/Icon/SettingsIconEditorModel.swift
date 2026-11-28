@@ -166,7 +166,8 @@ public extension SettingsIconEditorModel {
             glyphs: [
                 .food, .cafe, .drink, .cake, .snack, .grocery, .fish, .cooking,
                 .takeout, .bottle, .social, .dining, .hotdrink, .oven,
-                .microwave, .stove
+                .microwave, .stove,
+                .pizza, .serving, .menu, .cooktop, .table
             ]
         ),
         GlyphSection(
@@ -185,7 +186,11 @@ public extension SettingsIconEditorModel {
             glyphs: [
                 .phone, .wifi, .laptop, .computer, .tv, .audio, .printer,
                 .display, .keyboard, .video, .antenna, .media, .call,
-                .streaming, .app, .storage
+                .streaming, .app, .storage,
+                .earbuds, .headphones, .headset, .smartwatch, .wristwatch, .tablet, .smartspeaker,
+                .speaker, .mouse, .drive, .sdcard, .simcard, .memory, .cpu, .server, .cable,
+                .router, .scanner, .fax, .flipphone, .radio, .projector, .webcam, .vacuum,
+                .powerbank, .disc, .drone, .console
             ]
         ),
         GlyphSection(
@@ -224,7 +229,10 @@ public extension SettingsIconEditorModel {
                 .beauty, .haircut, .comb, .glasses, .clothes, .hanger, .shoe,
                 .handbag, .medical, .pill, .syringe, .bandage, .mask, .health,
                 .hospital, .checkup, .drip, .hearing, .eye, .sunglasses,
-                .lab, .allergy, .dental, .makeup
+                .lab, .allergy, .dental, .makeup,
+                .lungs, .brain, .nose, .eyes, .hand, .handcare, .mustache, .cap, .hat, .jacket,
+                .coat, .sneaker, .capsule, .inhaler, .bloodpressure, .thermometer, .emergency,
+                .heartbeat, .germ, .testtube, .hearingaid, .meditation, .stretch, .sleep
             ]
         ),
         GlyphSection(
@@ -244,7 +252,10 @@ public extension SettingsIconEditorModel {
                 .subscription, .work, .office, .goal, .target, .loss,
                 .walletPass, .barcode, .qrcode, .donation, .security, .document,
                 .clipboard, .tag, .exchange, .refund, .giftcard,
-                .repayment, .installment, .savings
+                .repayment, .installment, .savings,
+                .bankyen, .yen, .points, .receipt, .purchase, .dollar, .euro, .crypto, .trend,
+                .perk, .balance, .total, .celebration, .coverage, .yenback, .statement, .keycard,
+                .idcard
             ]
         ),
         GlyphSection(
