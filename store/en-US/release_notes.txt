@@ -1,5 +1,9 @@
-・Reviews are new. The current period shows your pace and the month-end outlook.
-・When a period closes, a report arrives with the results and your next step. The next step is checked when the following period closes.
-・Tap a bar in the yearly review to open that month's records.
-・Widget tiles are easier to read.
-・The Assets screen runs more smoothly.
+・Four new fonts: textbook, bold Mincho, bold Gothic and kana Mincho. Handwriting and these four download when you choose them.
+・More icons for food, gadgets, health and money.
+・Light theme colors are easier on the eyes.
+・The entry sheet now shows what to enter above the keypad.
+・Memo suggestions narrow as you type and match kanji memos by their reading.
+・Calendar amounts stay on fixed lines, even with many digits.
+・Custom themes have more colors to choose from.
+・The contact form now fills in your device model.
+・Fixed an issue where records could fail to come back after undoing a delete or syncing.
