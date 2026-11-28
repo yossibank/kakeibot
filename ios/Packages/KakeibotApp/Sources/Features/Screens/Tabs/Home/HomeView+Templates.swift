@@ -60,9 +60,9 @@ private extension HomeView {
     var templateShelf: some View {
         ScrollView(.horizontal) {
             VStack(alignment: .leading, spacing: 12) {
-                ForEach(shelfRows.indices, id: \.self) { index in
+                ForEach(Array(shelfRows.enumerated()), id: \.offset) { _, row in
                     HStack(spacing: 12) {
-                        ForEach(shelfRows[index]) { template in
+                        ForEach(row) { template in
                             CappedWidthLayout(maxWidth: shelfCardWidth) {
                                 templateButton(template)
                             }
