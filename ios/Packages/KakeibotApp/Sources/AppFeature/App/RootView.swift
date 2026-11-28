@@ -70,8 +70,7 @@ public struct RootView: View {
         .environment(\.canScanReceipt, VNDocumentCameraViewController.isSupported)
         .palette(shownLook)
         .environment(\.palette, shownPalette)
-        .environment(\.themeStyle, shownStyle)
-        .font(shownStyle.bodyFont)
+        .themeStyle(shownStyle)
         .warmsUpInput()
     }
 }

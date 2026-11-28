@@ -45,12 +45,17 @@ enum class FontTextStyle(
 
 internal val ThemeFont.family: FontFamily
     get() = when (this) {
-        ThemeFont.mincho -> FontFamily.Serif
+        ThemeFont.mincho,
+        ThemeFont.textbook,
+        ThemeFont.boldMincho,
+        ThemeFont.kanaMincho,
+        -> FontFamily.Serif
 
         ThemeFont.gothic,
         ThemeFont.rounded,
         ThemeFont.handwriting,
         ThemeFont.dot,
         ThemeFont.pop,
+        ThemeFont.boldGothic,
         -> FontFamily.Default
     }

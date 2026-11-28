@@ -5,4 +5,8 @@ public enum ThemeFont: String, CaseIterable, Codable, Sendable {
     case handwriting
     case dot
     case pop
+    case textbook
+    case boldMincho
+    case boldGothic
+    case kanaMincho
 }

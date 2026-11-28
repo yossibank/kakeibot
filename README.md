@@ -99,12 +99,10 @@ flowchart LR
 
 | 字体 | フォント | 見本 |
 | --- | --- | --- |
-| 手書き | [Klee One](https://github.com/fontworks-fonts/Klee) | <img src="docs/images/font-KleeOne.png" height="38" alt="Klee One の見本"> |
 | ドット | [DotGothic16](https://github.com/fontworks-fonts/DotGothic16) | <img src="docs/images/font-DotGothic16.png" height="38" alt="DotGothic16 の見本"> |
 | ポップ | [Hachi Maru Pop](https://github.com/noriokanisawa/HachiMaruPop) | <img src="docs/images/font-HachiMaruPop.png" height="38" alt="Hachi Maru Pop の見本"> |
 
 | フォント | 著作権者 | ライセンス |
 | --- | --- | --- |
-| Klee One | The Klee Project Authors | [OFL 1.1](https://openfontlicense.org/) |
 | DotGothic16 | The DotGothic16 Project Authors | [OFL 1.1](https://openfontlicense.org/) |
 | Hachi Maru Pop | The Hachi Maru Pop Project Authors | [OFL 1.1](https://openfontlicense.org/) |

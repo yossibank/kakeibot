@@ -274,9 +274,7 @@ public extension ThemeStyleModel.FontOffer {
     var feature: String {
         "\(font.title)の字体"
     }
-}
 
-extension ThemeStyleModel.FontOffer {
     var font: ThemeFont {
         switch self {
         case let .display(font), let .text(font): font

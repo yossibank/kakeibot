@@ -5,6 +5,3 @@ manual:
   - name: Hachi Maru Pop
     source: https://github.com/noriokanisawa/HachiMaruPop
     file: Kakeibot/Fonts/HachiMaruPop-OFL.txt
-  - name: Klee One
-    source: https://github.com/fontworks-fonts/Klee
-    file: Kakeibot/Fonts/KleeOne-OFL.txt

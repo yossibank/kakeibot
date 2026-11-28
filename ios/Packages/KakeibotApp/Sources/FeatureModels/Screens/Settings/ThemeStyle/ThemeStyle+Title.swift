@@ -86,6 +86,10 @@ public extension ThemeFont {
         case .handwriting: "手書き"
         case .dot: "ドット"
         case .pop: "ポップ"
+        case .textbook: "教科書"
+        case .boldMincho: "太明朝"
+        case .boldGothic: "太ゴシック"
+        case .kanaMincho: "かな明朝"
         }
     }
 }
